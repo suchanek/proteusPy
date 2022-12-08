@@ -1,0 +1,36 @@
+To build the package:
+
+	1) create a subdirectory two levels below your root home directory,
+	   like ~/src/ss_search
+	2) copy the tar file into it and extract with 'tar xf ss_search.tar'.
+	   This will create ~/ss/ss_patterns.dat, the SS database I've been
+	   using.
+	3) do a 'make ss_search'.  You might need to get rid of the -mips2 flag.
+	4) assuming the build worked, do a 'setenv SS_DBNAME 
+	   /yourpath/ss/ss_patterns.dat.  I.e. the complete path to the file.
+	5) try 'ss_search crambin.pdb .5'.  You should see:
+
+ss_search crambin.pdb .5
+name: /home/suchanek/ss/ss_patterns.dat
+Read 99 entries from SS database.
+Min dist: 3.777768, Max dist: 6.784639 
+Totals: Residues: 44, Low: 3 High: 46 Atoms: 313 
+Building distance matrix...
+Proximal: 12 
+Proximal: 22 
+Proximal: 32 
+Proximal: 42 
+Potential Disulfides
+Proximal     Distal          Error     Name
+******************************************************
+   16           26           0.35     1CRN-1-16-1CRN-1-26
+   26           16           0.38     1CRN-1-16-1CRN-1-26
+   32            4           0.47     1CRN-1-4-1CRN-1-32
+   40            3           0.48     1CRN-1-3-1CRN-1-40
+
+
+If you get different results it could suggest a real problem with the build. 
+You'll have to let me know if that's the case.  Works well on my SGI.
+
+Good luck,
+Eric
