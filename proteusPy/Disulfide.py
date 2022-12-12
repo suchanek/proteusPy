@@ -23,9 +23,17 @@ from numpy import cos
 from Bio.PDB import PDBList, Select, Vector
 
 # global variables for ProteusPy
-from proteusPy.ProteusGlobals import *
+from proteusPy import *
 from proteusPy.Turtle3D import Turtle3D
 from proteusPy.DisulfideExceptions import DisulfideIOException
+from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR
+
+# these live in MODEL_DIR
+SS_ID_FILE = 'ss_ids.txt'
+SS_PICKLE_FILE = 'PDB_all_ss.pkl'
+SS_DICT_PICKLE_FILE = 'PDB_all_ss_dict.pkl'
+SS_TORSIONS_FILE = 'PDB_SS_torsions.csv'
+PROBLEM_ID_FILE = 'PDB_SS_problems.csv'
 
 # float init for class 
 _FLOAT_INIT = -999.9
@@ -112,9 +120,11 @@ class DisulfideList(UserList):
 # .ent files to the PDB_DIR global. 
 # Used to download the list of proteins containing at least one SS bond
 # with the ID list generated from: http://www.rcsb.org/
-# 
-def DownloadDisulfides(ssfilename = f'{SS_ID_FILE}', 
-                       pdb_home=PDB_DIR, model_home=MODEL_DIR, 
+#
+
+
+
+def DownloadDisulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR, 
                        verbose=False, reset=False) -> None:
     '''
     Function reads a comma separated list of PDB IDs and downloads them
@@ -127,10 +137,14 @@ def DownloadDisulfides(ssfilename = f'{SS_ID_FILE}',
     start = time.time()
     donelines = []
     SS_done = []
+    ssfile = None
     
     cwd = os.getcwd()
     os.chdir(pdb_home)
+
     pdblist = PDBList(pdb=pdb_home, verbose=verbose)
+    ssfilename = f'{model_home}{SS_ID_FILE}'
+    print(ssfilename)
     
     # list of IDs containing >1 SSBond record
     try:
