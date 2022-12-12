@@ -32,7 +32,45 @@ from proteusPy.turtle3D import *
 from proteusPy.proteusGlobals import PDB_DIR, MODEL_DIR, ORIENT_SIDECHAIN
 from proteusPy.DisulfideGlobals import *
 
+class DisulfideList(UserList):
+    def __init__(self, iterable, id):
+        self.pdb_id = id
+        super().__init__(self.validate_ss(item) for item in iterable)
 
+    def __getitem__(self, item):
+        if isinstance(item, slice):
+            indices = range(*item.indices(len(self.data)))
+            name = self.data[0].pdb_id
+            sublist = [self.data[i] for i in indices]
+            return DisulfideList(sublist, name)    
+        return UserList.__getitem__(self, item)
+    
+    def __setitem__(self, index, item):
+        self.data[index] = self.validate_ss(item)
+
+    def insert(self, index, item):
+        self.data.insert(index, self.validate_ss(item))
+
+    def append(self, item):
+        self.data.append(self.validate_ss(item))
+
+    def extend(self, other):
+        if isinstance(other, type(self)):
+            self.data.extend(other)
+        else:
+            self.data.extend(self._validate_ss(item) for item in other)
+    
+    def validate_ss(self, value):
+        if isinstance(value, (proteusPy.disulfide.Disulfide)):
+            return value
+        raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
+    
+    def set_id(self, value):
+        self.pdb_id = value
+    
+    def get_id(self):
+        return self.pdb_id
+ 
 class DisulfideLoader():
     '''
     This class loads .pkl files created from the DisulfideExtractor() routine 
@@ -60,6 +98,7 @@ class DisulfideLoader():
         self.PickleDictFile = f'{modeldir}{pickle_dict_file}'
         self.TorsionFile = f'{modeldir}{torsion_file}'
         self.SSList = DisulfideList([], 'ALL_PDB_SS')
+        #self.SSList = []
         self.SSDict = {}
         self.TorsionDF = pd.DataFrame()
         self.TotalDisulfides = 0
@@ -68,7 +107,7 @@ class DisulfideLoader():
         # create a dataframe with the following columns for the disulfide conformations extracted from the structure
         df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy']
         SS_df = pd.DataFrame(columns=df_cols, index=['source'])
-        SSList = DisulfideList([], 'ALL_PDB_SS')
+        _SSList = DisulfideList([], 'ALL_PDB_SS')
 
         idlist = []
         if verbose:
@@ -76,7 +115,7 @@ class DisulfideLoader():
         print(f'reading {self.PickleFile}')
         with open(self.PickleFile, 'rb') as f:
             self.SSList = pickle.load(f)
-            
+
         self.TotalDisulfides = len(self.SSList)
         
         if verbose:
@@ -143,45 +182,7 @@ class DisulfideLoader():
             f"Disulfide object expected, got {type(value).__name__}"
         )
  
-class DisulfideList(UserList):
-    def __init__(self, iterable, id):
-        self.pdb_id = id
-        super().__init__(self.validate_ss(item) for item in iterable)
-
-    def __getitem__(self, item):
-        if isinstance(item, slice):
-            indices = range(*item.indices(len(self.data)))
-            name = self.data[0].pdb_id
-            sublist = [self.data[i] for i in indices]
-            return DisulfideList(sublist, name)    
-        return UserList.__getitem__(self, item)
-    
-    def __setitem__(self, index, item):
-        self.data[index] = self.validate_ss(item)
-
-    def insert(self, index, item):
-        self.data.insert(index, self.validate_ss(item))
-
-    def append(self, item):
-        self.data.append(self.validate_ss(item))
-
-    def extend(self, other):
-        if isinstance(other, type(self)):
-            self.data.extend(other)
-        else:
-            self.data.extend(self._validate_ss(item) for item in other)
-    
-    def validate_ss(self, value):
-        if isinstance(value, (proteusPy.disulfide.Disulfide)):
-            return value
-        raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
-    
-    def set_id(self, value):
-        self.pdb_id = value
-    
-    def get_id(self):
-        return self.pdb_id
-   
+  
 # float init for class 
 _FLOAT_INIT = -999.9
 
