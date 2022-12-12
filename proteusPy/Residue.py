@@ -8,7 +8,7 @@
 
 import numpy  # type: ignore
 
-#from Bio.PDB import Vector
+from Bio.PDB import Vector
 
 from proteusPy.turtle3D import Turtle3D
 
