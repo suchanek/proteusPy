@@ -74,8 +74,8 @@ class DisulfideLoader():
         if verbose:
             print(f'Reading disulfides from: {self.PickleFile}')
         print(f'reading {self.PickleFile}')
-        # with open(self.PickleFile, 'rb') as f:
-        #    SSList = pickle.load(f)
+        with open(self.PickleFile, 'rb') as f:
+            self.SSList = pickle.load(f)
             
         self.TotalDisulfides = len(self.SSList)
         
@@ -93,7 +93,6 @@ class DisulfideLoader():
         if verbose:
             print(f'Reading Torsion DF {self.TorsionFile}.')
         
-        #self.TorsionDF = build_torsion_df(self.SSList)
         self.TorsionDF = pd.read_csv(self.TorsionFile)
 
         if verbose:
