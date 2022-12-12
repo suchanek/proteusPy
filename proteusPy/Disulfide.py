@@ -112,7 +112,6 @@ class DisulfideLoader():
         idlist = []
         if verbose:
             print(f'Reading disulfides from: {self.PickleFile}')
-        print(f'reading {self.PickleFile}')
         with open(self.PickleFile, 'rb') as f:
             self.SSList = pickle.load(f)
 
