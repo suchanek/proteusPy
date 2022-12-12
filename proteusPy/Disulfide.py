@@ -20,13 +20,14 @@ from tqdm import tqdm
 from collections import UserList
 from numpy import cos
 
-from Bio.PDB import PDBList, Select, Vector
+from Bio.PDB import PDBList, Select, Vector, PDBParser
+from Bio.PDB.vectors import calc_dihedral
 
 # global variables for ProteusPy
 from proteusPy import *
 from proteusPy.Turtle3D import Turtle3D
-from proteusPy.DisulfideExceptions import DisulfideIOException
-from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR
+from proteusPy.DisulfideExceptions import DisulfideIOException, DisulfideConstructionWarning, DisulfideConstructionException
+from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR, ORIENT_SIDECHAIN
 
 # these live in MODEL_DIR
 SS_ID_FILE = 'ss_ids.txt'
@@ -230,7 +231,7 @@ def DisulfideExtractor(numb=-1, verbose=False, quiet=False, pdbdir=PDB_DIR,
         dictfile:       name of the .pkl file
     
     Example:
-        from Disulfide import DisulfideExtractor, DisulfideLoader, DisulfideList
+        from proteusPy.Disulfide import DisulfideExtractor, DisulfideLoader, DisulfideList
 
         DisulfideExtractor(numb=500, pdbdir=PDB_DIR, verbose=False, quiet=True)
 
@@ -291,7 +292,7 @@ def DisulfideExtractor(numb=-1, verbose=False, quiet=False, pdbdir=PDB_DIR,
 
         # returns an empty list if none are found.
         sslist = DisulfideList([], entry)
-        sslist = load_disulfides_from_id(entry, model_numb=0, verbose=verbose, quiet=quiet, pdb_dir=PDB_DIR)
+        sslist = load_disulfides_from_id(entry, model_numb=0, verbose=verbose, quiet=quiet, pdb_dir=pdbdir)
         if len(sslist) > 0:
             for ss in sslist:
                 All_ss_list.append(ss)
@@ -321,7 +322,7 @@ def DisulfideExtractor(numb=-1, verbose=False, quiet=False, pdbdir=PDB_DIR,
    
     # dump the all_ss array of disulfides to a .pkl file. ~520 MB.
     fname = f'{modeldir}{picklefile}'
-    if verbose:
+    if True:
         print(f'Saving {len(All_ss_list)} Disulfides to file: {fname}')
     
     with open(fname, 'wb+') as f:
@@ -331,14 +332,14 @@ def DisulfideExtractor(numb=-1, verbose=False, quiet=False, pdbdir=PDB_DIR,
     dict_len = len(All_ss_dict)
     fname = f'{modeldir}{dictfile}'
 
-    if verbose:
+    if True:
         print(f'Saving {len(All_ss_dict)} Disulfide-containing PDB IDs to file: {fname}')
 
     with open(fname, 'wb+') as f:
         pickle.dump(All_ss_dict, f)
 
     fname = f'{modeldir}{torsionfile}'
-    if verbose:
+    if True:
         print(f'Saving torsions to file: {fname}')
 
     SS_df.to_csv(fname)
@@ -346,7 +347,7 @@ def DisulfideExtractor(numb=-1, verbose=False, quiet=False, pdbdir=PDB_DIR,
     end = time.time()
     elapsed = end - start
 
-    print(f'Complete. Elapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)')
+    print(f'Disulfide Extraction complete! Elapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)')
 
     # return to original directory
     os.chdir(cwd)
