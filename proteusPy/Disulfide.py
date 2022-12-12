@@ -224,7 +224,6 @@ def parse_ssbond_header_rec(ssbond_dict: dict) -> list:
 
     return disulfide_list
 
-
 #
 # function reads a comma separated list of PDB IDs and download the corresponding
 # .ent files to the PDB_DIR global. 
