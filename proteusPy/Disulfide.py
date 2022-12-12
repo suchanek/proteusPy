@@ -3,7 +3,7 @@
 # Part of the program Proteus, a program for the analysis and modeling of 
 # protein structures with an emphasis on disulfide bonds
 # Author: Eric G. Suchanek, PhD
-
+# 
 import sys
 import os
 import glob
@@ -23,9 +23,9 @@ from numpy import cos
 from Bio.PDB import PDBList, Select, Vector
 
 # global variables for ProteusPy
-from proteusPy import Residue, DisulfideExceptions
 from proteusPy.ProteusGlobals import *
 from proteusPy.Turtle3D import Turtle3D
+from proteusPy.DisulfideExceptions import DisulfideIOException
 
 # float init for class 
 _FLOAT_INIT = -999.9
@@ -114,7 +114,8 @@ class DisulfideList(UserList):
 # with the ID list generated from: http://www.rcsb.org/
 # 
 def DownloadDisulfides(ssfilename = f'{SS_ID_FILE}', 
-                       pdb_home = PDB_DIR, verbose=False) -> None:
+                       pdb_home=PDB_DIR, model_home=MODEL_DIR, 
+                       verbose=False, reset=False) -> None:
     '''
     Function reads a comma separated list of PDB IDs and downloads them
     to the pdb_home path. 
@@ -124,11 +125,19 @@ def DownloadDisulfides(ssfilename = f'{SS_ID_FILE}',
     '''
 
     start = time.time()
+    donelines = []
+    SS_done = []
+    
+    cwd = os.getcwd()
+    os.chdir(pdb_home)
     pdblist = PDBList(pdb=pdb_home, verbose=verbose)
     
     # list of IDs containing >1 SSBond record
-    ssfile = open(ssfilename)
-    Line = ssfile.readlines()
+    try:
+        ssfile = open(ssfilename)
+        Line = ssfile.readlines()
+    except Exception:
+        raise DisulfideIOException(f'Cannot open file: {ssfile}')
 
     for line in Line:
         entries = line.split(',')
@@ -137,12 +146,16 @@ def DownloadDisulfides(ssfilename = f'{SS_ID_FILE}',
     completed = {'xxx'} # set to keep track of downloaded
 
     # file to track already downloaded entries.
-    completed_file = open('ss_completed.txt', 'r+')
-    donelines = completed_file.readlines()
+    if reset==True:
+        completed_file = open(f'{model_home}ss_completed.txt', 'w')
+    else:
+        completed_file = open(f'{model_home}ss_completed.txt', 'w+')
+        donelines = completed_file.readlines()
 
-    for dl in donelines[0]:
-        # create a list of pdb id already downloaded
-        SS_done = dl.split(',')
+    if len(donelines) > 0:
+        for dl in donelines[0]:
+            # create a list of pdb id already downloaded
+            SS_done = dl.split(',')
 
     count = len(SS_done) - 1
     completed.update(SS_done) # update the completed set with what's downloaded
@@ -152,7 +165,7 @@ def DownloadDisulfides(ssfilename = f'{SS_ID_FILE}',
     for entry in pbar:
         pbar.set_postfix({'Entry': entry})
         if entry not in completed:
-            if pdblist.retrieve_pdb_file(entry, file_format='pdb', pdir=PDB_DIR):
+            if pdblist.retrieve_pdb_file(entry, file_format='pdb', pdir=pdb_home):
                 completed.update(entry)
                 completed_file.write(f'{entry},')
                 count += 1
@@ -164,6 +177,7 @@ def DownloadDisulfides(ssfilename = f'{SS_ID_FILE}',
 
     print(f'Overall files processed: {count}')
     print(f'Complete. Elapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)')
+    os.chdir(cwd)
     return
 
 def build_torsion_df(SSList: DisulfideList):
