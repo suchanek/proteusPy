@@ -8,5 +8,5 @@ setup(name='proteusPy',
       author='Eric G. Suchanek, PhD',
       author_email='suchanek@mac.com',
       license='BSD',
-      packages=['proteusPy'],
+      packages=['proteusPy',],
       zip_safe=False)

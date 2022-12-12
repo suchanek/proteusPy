@@ -8,8 +8,9 @@
 
 import numpy  # type: ignore
 
-from Bio.PDB import Vector
-from proteusPy.Turtle3D import Turtle3D
+#from Bio.PDB import Vector
+
+from proteusPy.turtle3D import Turtle3D
 
 def build_residue(turtle: Turtle3D):
     '''

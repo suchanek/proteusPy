@@ -8,7 +8,7 @@
 import os
 import warnings
 
-from proteusPy.ProteusPyWarning import ProteusPyWarning
+from proteusPy.proteusPyWarning import ProteusPyWarning
 
 """Some Disulfide-specific exceptions."""
 

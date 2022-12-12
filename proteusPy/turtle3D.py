@@ -10,8 +10,11 @@
 
 import numpy
 import math
+
 from Bio.PDB.vectors import Vector
-from  proteusPy.ProteusGlobals import *
+from Bio.PDB.vectors import calc_angle, calc_dihedral
+
+from  proteusPy.proteusGlobals import *
 
 _DOWN_ = -1
 _UP_ = 1

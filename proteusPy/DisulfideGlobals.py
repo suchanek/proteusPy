@@ -7,10 +7,5 @@ SS_DICT_PICKLE_FILE = 'PDB_all_ss_dict.pkl'
 SS_TORSIONS_FILE = 'PDB_SS_torsions.csv'
 PROBLEM_ID_FILE = 'PDB_SS_problems.csv'
 
-# global for initialization of dihedrals and energies
-
-ORIENT_BACKBONE = 2
-ORIENT_SIDECHAIN = 1
-
 # Cα Cβ Sγ Χ1 - Χ5 Χ
 
