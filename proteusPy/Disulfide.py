@@ -26,7 +26,7 @@ from Bio.PDB import *
 from Bio.PDB import PDBList
 
 # global variables for ProteusPy
-from globals import *
+from ProteusGlobals import *
 
 from turtle3D import *
 from Residue import *

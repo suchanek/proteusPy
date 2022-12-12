@@ -17,7 +17,7 @@ _UP_ = 1
 _ORIENTATION_INIT = -1
 
 # global variables are in globals.py
-from globals import *
+from ProteusGlobals import *
 
 """
     Return a (left multiplying) matrix that rotates p onto q.
