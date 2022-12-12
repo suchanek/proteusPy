@@ -22,7 +22,7 @@ import pickle
 from Bio.PDB import PDBParser
 
 # Eric's modules
-from globals import *
+from ProteusGlobals import *
 
 from Disulfide import DisulfideList, load_disulfides_from_id, name_to_id
 

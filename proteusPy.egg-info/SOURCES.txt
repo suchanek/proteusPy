@@ -1,0 +1,14 @@
+setup.py
+proteusPy/Disulfide.py
+proteusPy/DisulfideExceptions.py
+proteusPy/DisulfideGlobals.py
+proteusPy/ProteusPyWarning.py
+proteusPy/Residue.py
+proteusPy/__init__.py
+proteusPy/globals.py
+proteusPy/turtle3D.py
+proteusPy.egg-info/PKG-INFO
+proteusPy.egg-info/SOURCES.txt
+proteusPy.egg-info/dependency_links.txt
+proteusPy.egg-info/not-zip-safe
+proteusPy.egg-info/top_level.txt
