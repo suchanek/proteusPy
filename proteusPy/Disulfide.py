@@ -3,6 +3,7 @@
 # Part of the program Proteus, a program for the analysis and modeling of 
 # protein structures with an emphasis on disulfide bonds
 # Author: Eric G. Suchanek, PhD
+
 import sys
 import os
 import glob
@@ -15,22 +16,16 @@ import time
 import datetime
 
 import pandas as pd
-
 from tqdm import tqdm
-
 from collections import UserList
-
 from numpy import cos
 
-from Bio.PDB import *
-from Bio.PDB import PDBList
+from Bio.PDB import PDBList, Select, Vector
 
 # global variables for ProteusPy
-from ProteusGlobals import *
-
-from turtle3D import *
-from Residue import *
-from DisulfideExceptions import *
+from proteusPy import Residue, DisulfideExceptions
+from proteusPy.ProteusGlobals import *
+from proteusPy.Turtle3D import Turtle3D
 
 # float init for class 
 _FLOAT_INIT = -999.9
@@ -118,7 +113,7 @@ class DisulfideList(UserList):
 # Used to download the list of proteins containing at least one SS bond
 # with the ID list generated from: http://www.rcsb.org/
 # 
-def DownloadDisulfides(ssfilename = f'{PDB_DIR}ss_ids.txt', 
+def DownloadDisulfides(ssfilename = f'{SS_ID_FILE}', 
                        pdb_home = PDB_DIR, verbose=False) -> None:
     '''
     Function reads a comma separated list of PDB IDs and downloads them

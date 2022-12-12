@@ -9,10 +9,7 @@
 import numpy  # type: ignore
 
 from Bio.PDB import Vector
-
-from turtle3D import Turtle3D
-# globals for turtle orientations
-
+from proteusPy.Turtle3D import Turtle3D
 
 def build_residue(turtle: Turtle3D):
     '''

@@ -11,13 +11,11 @@
 import numpy
 import math
 from Bio.PDB.vectors import Vector
+from  proteusPy import ProteusGlobals
 
 _DOWN_ = -1
 _UP_ = 1
 _ORIENTATION_INIT = -1
-
-# global variables are in globals.py
-from ProteusGlobals import *
 
 """
     Return a (left multiplying) matrix that rotates p onto q.
