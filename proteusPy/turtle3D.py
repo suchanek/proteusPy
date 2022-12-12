@@ -11,7 +11,7 @@
 import numpy
 import math
 from Bio.PDB.vectors import Vector
-from  proteusPy import ProteusGlobals
+from  proteusPy.ProteusGlobals import *
 
 _DOWN_ = -1
 _UP_ = 1
