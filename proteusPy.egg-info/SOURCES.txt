@@ -7,6 +7,7 @@ proteusPy/ProteusPyWarning.py
 proteusPy/Residue.py
 proteusPy/Turtle3D.py
 proteusPy/__init__.py
+proteusPy/disulfide.py
 proteusPy/turtle3D.py
 proteusPy.egg-info/PKG-INFO
 proteusPy.egg-info/SOURCES.txt

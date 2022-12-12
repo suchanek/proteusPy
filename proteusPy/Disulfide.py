@@ -23,11 +23,11 @@ from numpy import cos
 from Bio.PDB import PDBList, Select, Vector, PDBParser
 from Bio.PDB.vectors import calc_dihedral
 
-# global variables for ProteusPy
 from proteusPy import *
-from proteusPy.Turtle3D import Turtle3D
-from proteusPy.DisulfideExceptions import DisulfideIOException, DisulfideConstructionWarning, DisulfideConstructionException
-from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR, ORIENT_SIDECHAIN
+from proteusPy.DisulfideExceptions import *
+
+from proteusPy.turtle3D import Turtle3D
+from proteusPy.proteusGlobals import PDB_DIR, MODEL_DIR, ORIENT_SIDECHAIN
 
 # these live in MODEL_DIR
 SS_ID_FILE = 'ss_ids.txt'
@@ -122,8 +122,6 @@ class DisulfideList(UserList):
 # Used to download the list of proteins containing at least one SS bond
 # with the ID list generated from: http://www.rcsb.org/
 #
-
-
 
 def DownloadDisulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR, 
                        verbose=False, reset=False) -> None:
