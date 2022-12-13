@@ -4,35 +4,14 @@
 # protein structures with an emphasis on disulfide bonds
 # Author: Eric G. Suchanek, PhD
 # 
-'''
-import sys
-import os
-import glob
-import warnings
-import copy
 
-import numpy‚
-import pickle
-import time
-import datetime
-
-from collections import UserList
-
-import pandas as pd
-from tqdm import tqdm
-from numpy import cos
-
-from Bio.PDB import PDBList, Select, Vector, PDBParser
-from Bio.PDB.vectors import calc_dihedral
-'''
-
+import proteusPy
 from proteusPy import *
 
-from proteusPy.DisulfideExceptions import *
+from .DisulfideExceptions import *
+from .DisulfideGlobals import *
+from .proteusGlobals import *
 
-from proteusPy.turtle3D import *
-from proteusPy.proteusGlobals import PDB_DIR, MODEL_DIR, ORIENT_SIDECHAIN
-from proteusPy.DisulfideGlobals import *
 from Bio.PDB import Select, Vector
 
 class DisulfideList(UserList):
@@ -82,10 +61,10 @@ class DisulfideLoader():
     array index or PDB structure ID.\n
 
     Example:
-        from Disulfide import DisulfideList, Disulfide, DisulfideLoader
+        from proteusPy.disulfide import DisulfideList, Disulfide, DisulfideLoader
 
-        SS1 = DisulfideList([],'All_SS')
-        SS2 = DisulfideList([], '4yys')
+        SS1 = DisulfideList([],'tmp1')
+        SS2 = DisulfideList([],'tmp2')
 
         PDB_SS = DisulfideLoader()
         SS1 = PDB_SS[0]         <-- returns a Disulfide object at index 0
@@ -305,7 +284,7 @@ def DownloadDisulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR,
     os.chdir(cwd)
     return
 
-def build_torsion_df(SSList: DisulfideList):
+def build_torsion_df(SSList: DisulfideList) -> pd.DataFrame:
     # create a dataframe with the following columns for the disulfide conformations extracted from the structure
     df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy']
     SS_df = pd.DataFrame(columns=df_cols)

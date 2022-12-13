@@ -2,7 +2,7 @@
 from distutils.core import setup
 
 setup(name='proteusPy',
-      version='0.1dev',
+      version='0.2dev',
       description='proteus structure analysis tools',
       url='https://github.com/suchanek/proteusPy/',
       author='Eric G. Suchanek, PhD',
