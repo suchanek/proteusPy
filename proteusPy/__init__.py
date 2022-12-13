@@ -18,7 +18,10 @@ import datetime
 import pandas as pd
 from tqdm import tqdm
 from numpy import cos
+from collections import UserList
 
+
+'''
 import proteusPy.turtle3D
 import proteusPy.residue
 import proteusPy.disulfide
@@ -28,6 +31,9 @@ import proteusPy.proteusPyWarning
 import proteusPy.DisulfideExceptions
 import proteusPy.DisulfideGlobals
 import proteusPy.turtle3D
+'''
+
+__Version__ = "0.1dev"
 
 from proteusPy.proteusGlobals import *
 from proteusPy.turtle3D import Turtle3D
@@ -39,7 +45,7 @@ from proteusPy.disulfide import parse_ssbond_header_rec, DownloadDisulfides, Dis
 from proteusPy.DisulfideExceptions import DisulfideIOException, DisulfideConstructionWarning, DisulfideConstructionException
 from proteusPy.residue import build_residue, get_backbone_from_chain, to_alpha, to_carbonyl, to_nitrogen, to_oxygen
 
-from Bio.PDB import calc_dihedral, calc_angle
-from Bio.PDB import Vector
+from Bio.PDB import *
+from Bio.PDB.vectors import calc_dihedral, calc_angle
 
 # end of file

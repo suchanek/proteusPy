@@ -4,13 +4,14 @@
 # protein structures with an emphasis on disulfide bonds
 # Author: Eric G. Suchanek, PhD
 # 
+'''
 import sys
 import os
 import glob
 import warnings
 import copy
 
-import numpy
+import numpy‚
 import pickle
 import time
 import datetime
@@ -23,6 +24,7 @@ from numpy import cos
 
 from Bio.PDB import PDBList, Select, Vector, PDBParser
 from Bio.PDB.vectors import calc_dihedral
+'''
 
 from proteusPy import *
 
@@ -31,6 +33,7 @@ from proteusPy.DisulfideExceptions import *
 from proteusPy.turtle3D import *
 from proteusPy.proteusGlobals import PDB_DIR, MODEL_DIR, ORIENT_SIDECHAIN
 from proteusPy.DisulfideGlobals import *
+from Bio.PDB import Select, Vector
 
 class DisulfideList(UserList):
     def __init__(self, iterable, id):
