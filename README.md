@@ -6,7 +6,8 @@ class, which implements a three-dimensional 'Turtle'. The turtle
 implements ``Move``, ``Roll``, ``Yaw``, ``Pitch`` and ``Turn`` for movement 
 in a three-dimensional space. The DisulfideBond class implements the protein
 structure stabilizing element known as a Disulfide Bond. This is used to perform 
-an analysis of proteins contained in the RCSB protein data bank.
+an analysis of over 292,000 disulfide bonds contained in 32,xxx proteins contained 
+in the RCSB protein data bank.
 
 Eric G. Suchanek, PhD.
 suchanek@mac.com
