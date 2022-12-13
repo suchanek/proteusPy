@@ -33,13 +33,14 @@ import proteusPy.DisulfideGlobals
 import proteusPy.turtle3D
 '''
 
-__Version__ = "0.1dev"
+__Version__ = "0.2dev"
 
 from proteusPy.proteusGlobals import *
+from proteusPy.DisulfideGlobals import *
 from proteusPy.turtle3D import Turtle3D
 from proteusPy.turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN
 
-from proteusPy.disulfide import DisulfideList, DisulfideLoader
+from proteusPy.disulfide import DisulfideList, DisulfideLoader, CysSelect
 from proteusPy.disulfide import name_to_id, todeg, torad, build_torsion_df
 from proteusPy.disulfide import parse_ssbond_header_rec, DownloadDisulfides, DisulfideExtractor
 from proteusPy.DisulfideExceptions import DisulfideIOException, DisulfideConstructionWarning, DisulfideConstructionException
