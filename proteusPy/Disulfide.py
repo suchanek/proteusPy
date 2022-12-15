@@ -16,7 +16,6 @@ from Bio.PDB import Select, Vector, PDBParser
 
 def check_chains(pdbid, pdbdir, verbose=True):
     '''Returns True if structure has multiple chains of identical length, False otherwise'''
-    same = False
 
     parser = PDBParser(PERMISSIVE=True)
     structure = parser.get_structure(pdbid, file=f'{pdbdir}pdb{pdbid}.ent')
@@ -25,12 +24,14 @@ def check_chains(pdbid, pdbdir, verbose=True):
     if verbose:
         print(f'ssbond dict: {ssbond_dict}')
 
+    same = False
     model = structure[0]
     chainlist = model.get_list()
+
     if len(chainlist) > 1:
         chain_lens = []
-
-        print(f'multiple chains. {chainlist}')
+        if verbose:
+            print(f'multiple chains. {chainlist}')
         for chain in chainlist:
             chain_length = len(chain.get_list())
             chain_id = chain.get_id()
