@@ -394,7 +394,6 @@ class Turtle3D:
         '''
 
         assert orientation == 1 or orientation == 2, f'orient_at_residue() requires Turtle3D to be #1 or #2'
-
         
         _n = n.copy()
         _ca = ca.copy()

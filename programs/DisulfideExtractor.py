@@ -26,7 +26,7 @@ from ProteusGlobals import *
 
 from Disulfide import DisulfideList, load_disulfides_from_id, name_to_id
 
-def DisulfideExtractor(pdbdir=PDB_DIR, modeldir=MODEL_DIR,
+def ExtractDisulfides(pdbdir=PDB_DIR, modeldir=MODEL_DIR,
                         picklefile=SS_PICKLE_FILE, torsionsfile=SS_TORSIONS_FILE,
                         problemfile=PROBLEM_ID_FILE, dictfile=SS_DICT_PICKLE_FILE):
     parser = PDBParser(PERMISSIVE=True, QUIET=True)
