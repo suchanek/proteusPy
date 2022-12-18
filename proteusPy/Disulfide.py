@@ -447,8 +447,7 @@ def DisulfideExtractor(numb=-1, verbose=False, quiet=False, pdbdir=PDB_DIR,
    
     # dump the all_ss array of disulfides to a .pkl file. ~520 MB.
     fname = f'{modeldir}{picklefile}'
-    if True:
-        print(f'Saving {len(All_ss_list)} Disulfides to file: {fname}')
+    print(f'Saving {len(All_ss_list)} Disulfides to file: {fname}')
     
     with open(fname, 'wb+') as f:
         pickle.dump(All_ss_list, f)
@@ -457,8 +456,7 @@ def DisulfideExtractor(numb=-1, verbose=False, quiet=False, pdbdir=PDB_DIR,
     dict_len = len(All_ss_dict)
     fname = f'{modeldir}{dictfile}'
 
-    if True:
-        print(f'Saving {len(All_ss_dict)} Disulfide-containing PDB IDs to file: {fname}')
+    print(f'Saving {len(All_ss_dict)} Disulfide-containing PDB IDs to file: {fname}')
 
     with open(fname, 'wb+') as f:
         pickle.dump(All_ss_dict, f)
