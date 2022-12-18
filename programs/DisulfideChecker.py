@@ -32,7 +32,7 @@ badcount = 0
 count = 0
 
 # Loop over all entries, 
-pbar = tqdm(all_pdb_files[5:], ncols=100)
+pbar = tqdm(all_pdb_files, ncols=100)
 for entry in pbar:
     pbar.set_postfix({'Entry': entry, 'Bad': badcount})
     if not check_header_from_file(entry):
