@@ -1,9 +1,10 @@
 # Implementation for a Disulfide Bond Class object.
 # Based on the original C/C++ implementation by Eric G. Suchanek
 # Part of the program Proteus, a program for the analysis and modeling of 
-# protein structures with an emphasis on disulfide bonds
+# protein structures, with an emphasis on disulfide bonds.
 # Author: Eric G. Suchanek, PhD
-# 
+# Last revision: 12/18/22
+# Cα Cβ Sγ
 
 import proteusPy
 from proteusPy import *
@@ -13,6 +14,22 @@ from .DisulfideGlobals import *
 from .proteusGlobals import *
 
 from Bio.PDB import Select, Vector, PDBParser
+from Bio.PDB.vectors import calc_dihedral
+import math
+
+def distance3d(p1: Vector, p2: Vector):
+    '''
+    Calculate the 3D Euclidean distance for 2 Vector objects
+    
+    Arguments: p1, p2 Vector objects of dimensionality 3 (3D)
+    Returns: Distance
+    '''
+    _p1 = p1.get_array()
+    _p2 = p2.get_array()
+    if (len(_p1) != 3 or len(_p2) != 3):
+        raise ProteusPyWarning("--> distance3d() requires vectors of length 3!")
+    d = math.dist(_p1, _p2)
+    return d
 
 def check_chains(pdbid, pdbdir, verbose=True):
     '''Returns True if structure has multiple chains of identical length, False otherwise'''
@@ -91,7 +108,7 @@ class DisulfideList(UserList):
  
 class DisulfideLoader():
     '''
-    This class loads .pkl files created from the DisulfideExtractor() routine 
+    This class loads .pkl files created from the ExtractDisulfides() routine 
     and initializes itself with their contents. The Disulfide objects are contained
     in a DisulfideList object and Dict. This makes it possible to access the disulfides by
     array index or PDB structure ID.\n
@@ -116,7 +133,6 @@ class DisulfideLoader():
         self.PickleDictFile = f'{modeldir}{pickle_dict_file}'
         self.TorsionFile = f'{modeldir}{torsion_file}'
         self.SSList = DisulfideList([], 'ALL_PDB_SS')
-        #self.SSList = []
         self.SSDict = {}
         self.TorsionDF = pd.DataFrame()
         self.TotalDisulfides = 0
@@ -328,13 +344,15 @@ def build_torsion_df(SSList: DisulfideList) -> pd.DataFrame:
     pbar = tqdm(SSList, ncols=_PBAR_COLS, miniters=400000)
     for ss in pbar:
         #pbar.set_postfix({'ID': ss.name}) # update the progress bar
-        new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, ss.chi3, ss.chi4, ss.chi5, ss.energy]
+
+        new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, 
+        		ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_dist]
         # add the row to the end of the dataframe
         SS_df.loc[len(SS_df.index)] = new_row.copy() # deep copy
     
     return SS_df.copy()
 
-def DisulfideExtractor(numb=-1, verbose=False, quiet=False, pdbdir=PDB_DIR, 
+def ExtractDisulfides(numb=-1, verbose=False, quiet=False, pdbdir=PDB_DIR, 
                         modeldir=MODEL_DIR, picklefile=SS_PICKLE_FILE, 
                         torsionfile=SS_TORSIONS_FILE, problemfile=PROBLEM_ID_FILE,
                         dictfile=SS_DICT_PICKLE_FILE) -> None:
@@ -356,9 +374,9 @@ def DisulfideExtractor(numb=-1, verbose=False, quiet=False, pdbdir=PDB_DIR,
         dictfile:       name of the .pkl file
     
     Example:
-        from proteusPy.Disulfide import DisulfideExtractor, DisulfideLoader, DisulfideList
+        from proteusPy.Disulfide import ExtractDisulfides, DisulfideLoader, DisulfideList
 
-        DisulfideExtractor(numb=500, pdbdir=PDB_DIR, verbose=False, quiet=True)
+        ExtractDisulfides(numb=500, pdbdir=PDB_DIR, verbose=False, quiet=True)
 
         SS1 = DisulfideList([],'All_SS')
         SS2 = DisulfideList([], '4yys')
@@ -799,6 +817,9 @@ class Disulfide:
         self.distal_residue_fullid = str('')
         self.PERMISSIVE = bool(True)
         self.QUIET = bool(True)
+        #
+        self.ca_distance = _FLOAT_INIT
+        self.torsion_vector = numpy.array((_FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT))
 
         # global coordinates for the Disulfide, typically as returned from the PDB file
         self.n_prox = Vector(0,0,0)
@@ -1063,6 +1084,9 @@ class Disulfide:
         self.chi4 = numpy.degrees(calc_dihedral(sg1, sg2, cb2, ca2))
         self.chi5 = numpy.degrees(calc_dihedral(sg2, cb2, ca2, n2))
 
+        self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
+        self.torsion_array = numpy.array((self.chi1, self.chi2, self.chi3, self.chi4, self.chi5))
+
         # calculate and set the SS bond torsional energy
         self.compute_disulfide_torsional_energy()
 
@@ -1144,6 +1168,22 @@ class Disulfide:
 
         self.proximal = proximal
         self.distal = distal
+
+    def TorsionDistance(p1: Vector, p2: Vector):
+        '''
+        Calculate the 5D Euclidean distance for 2 Disulfide torsion_vector objects. This is used
+        to compare Disulfide Bond torsion angles to determine their torsional 
+        'distance'.
+        
+        Arguments: p1, p2 Vector objects of dimensionality 5 (5D)
+        Returns: Distance
+        '''
+        _p1 = p1.get_array()
+        _p2 = p2.get_array()
+        if (len(_p1) != 5 or len(_p2) != 5):
+            raise ProteusPyWarning("--> distance5d() requires vectors of length 5!")
+        d = math.dist(_p1, _p2)
+        return d
 
     def compute_disulfide_torsional_energy(self):
         '''
