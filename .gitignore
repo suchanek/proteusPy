@@ -1,5 +1,9 @@
 .ipynb_checkpoints
 __pycache__
-*.pkl
 
 .DS_Store
+proteusPy/.DS_Store
+proteusPy/pdb/.DS_Store
+proteusPy/pdb/models/ss_completed.txt
+
+*.pkl
