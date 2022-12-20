@@ -561,13 +561,18 @@ def load_disulfides_from_id(struct_name: str,
             chain2_id = pair[3]
 
             if not proximal.isnumeric() or not distal.isnumeric():
-                mess = f'Cannot parse SSBond record (non-numeric IDs): {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring.'
+                mess = f' -> Cannot parse SSBond record (non-numeric IDs): {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring.'
                 warnings.warn(mess, DisulfideConstructionWarning)
                 continue
             else:
                 proximal = int(proximal)
                 distal = int(distal)
             
+            if proximal == distal:
+                mess = f' -> Cannot parse SSBond record (proximal == distal): {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring.'
+                warnings.warn(mess, DisulfideConstructionWarning)
+                continue
+
             _chaina = model[chain1_id]
             _chainb = model[chain2_id]
 
