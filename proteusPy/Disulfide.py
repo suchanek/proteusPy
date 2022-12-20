@@ -338,7 +338,7 @@ def DownloadDisulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR,
 
 def build_torsion_df(SSList: DisulfideList) -> pd.DataFrame:
     # create a dataframe with the following columns for the disulfide conformations extracted from the structure
-    df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy']
+    df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy', 'ca_distance']
     SS_df = pd.DataFrame(columns=df_cols)
 
     pbar = tqdm(SSList, ncols=_PBAR_COLS, miniters=400000)
@@ -346,7 +346,7 @@ def build_torsion_df(SSList: DisulfideList) -> pd.DataFrame:
         #pbar.set_postfix({'ID': ss.name}) # update the progress bar
 
         new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, 
-        		ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_dist]
+        		ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance]
         # add the row to the end of the dataframe
         SS_df.loc[len(SS_df.index)] = new_row.copy() # deep copy
     
@@ -417,9 +417,8 @@ def ExtractDisulfides(numb=-1, verbose=False, quiet=False, pdbdir=PDB_DIR,
         entrylist.append(name_to_id(entry))
 
     # create a dataframe with the following columns for the disulfide conformations extracted from the structure
-    #df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy']
-    #SS_df = pd.DataFrame(columns=df_cols)
-    df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy']
+    
+    df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy', 'ca_distance']
     SS_df = pd.DataFrame(columns=df_cols)
 
     # define a tqdm progressbar using the fully loaded entrylist list. If numb is passed then
@@ -439,7 +438,7 @@ def ExtractDisulfides(numb=-1, verbose=False, quiet=False, pdbdir=PDB_DIR,
         if len(sslist) > 0:
             for ss in sslist:
                 All_ss_list.append(ss)
-                new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, ss.chi3, ss.chi4, ss.chi5, ss.energy]
+                new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance]
                 # add the row to the end of the dataframe
                 SS_df.loc[len(SS_df.index)] = new_row.copy() # deep copy
     
