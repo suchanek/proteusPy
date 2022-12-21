@@ -9,9 +9,9 @@
 import proteusPy
 from proteusPy import *
 
-from .DisulfideExceptions import *
-from .DisulfideGlobals import *
-from .proteusGlobals import *
+from proteusPy.DisulfideExceptions import *
+from proteusPy.DisulfideGlobals import *
+from proteusPy.proteusGlobals import *
 
 from Bio.PDB import Select, Vector, PDBParser
 from Bio.PDB.vectors import calc_dihedral
@@ -862,6 +862,53 @@ class Disulfide:
 
         # I initialize an array for the torsions which will be used for comparisons
         self.dihedrals = numpy.array((_FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT), "d")
+
+    def internal_coords(self) -> numpy.array:
+        res_array = numpy.zeros(shape=(6,3))
+
+        res_array = numpy.array((
+            self._n_prox.get_array(),
+            self._ca_prox.get_array(),
+            self._c_prox.get_array(), 
+            self._o_prox.get_array(), 
+            self._cb_prox.get_array(),
+            self._sg_prox.get_array(),
+            self._n_dist.get_array(),
+            self._ca_dist.get_array(),
+            self._c_dist.get_array(), 
+            self._o_dist.get_array(), 
+            self._cb_dist.get_array(),
+            self._sg_dist.get_array(),
+        ))
+        return res_array
+    
+    def internal_coords_res(self, resnumb) -> numpy.array:
+        res_array = numpy.zeros(shape=(6,3))
+
+        if resnumb == self.proximal:
+            res_array = numpy.array((
+                self._n_prox.get_array(),
+                self._ca_prox.get_array(),
+                self._c_prox.get_array(), 
+                self._o_prox.get_array(), 
+                self._cb_prox.get_array(),
+                self._sg_prox.get_array(),
+            ))
+            return res_array
+        elif resnumb == self.distal:
+            res_array = numpy.array((
+                self._n_dist.get_array(),
+                self._ca_dist.get_array(),
+                self._c_dist.get_array(), 
+                self._o_dist.get_array(), 
+                self._cb_dist.get_array(),
+                self._sg_dist.get_array(),
+            ))
+            return res_array
+        else:
+            mess = f'-> Disulfide.internal_coords(): Invalid argument. Unable to find residue: {resnumb} '
+            raise DisulfideConstructionWarning(mess)
+    
 
     def reset(self):
         self.__init__(self)
