@@ -12,62 +12,52 @@ from proteusPy import *
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideGlobals import *
 from proteusPy.proteusGlobals import *
+#from proteusPy.disulfide import Disulfide
 
 from Bio.PDB import Select, Vector, PDBParser
 from Bio.PDB.vectors import calc_dihedral
 import math
 
-def distance3d(p1: Vector, p2: Vector):
-    '''
-    Calculate the 3D Euclidean distance for 2 Vector objects
-    
-    Arguments: p1, p2 Vector objects of dimensionality 3 (3D)
-    Returns: Distance
-    '''
-    _p1 = p1.get_array()
-    _p2 = p2.get_array()
-    if (len(_p1) != 3 or len(_p2) != 3):
-        raise ProteusPyWarning("--> distance3d() requires vectors of length 3!")
-    d = math.dist(_p1, _p2)
-    return d
+import pyvista as pv
 
-def check_chains(pdbid, pdbdir, verbose=True):
-    '''Returns True if structure has multiple chains of identical length, False otherwise'''
+# float init for class 
+_FLOAT_INIT = -999.9
 
-    parser = PDBParser(PERMISSIVE=True)
-    structure = parser.get_structure(pdbid, file=f'{pdbdir}pdb{pdbid}.ent')
-    ssbond_dict = structure.header['ssbond'] # dictionary of tuples with SSBond prox and distal
-    
-    if verbose:
-        print(f'ssbond dict: {ssbond_dict}')
+# tqdm progress bar width
+_PBAR_COLS = 100
 
-    same = False
-    model = structure[0]
-    chainlist = model.get_list()
-
-    if len(chainlist) > 1:
-        chain_lens = []
-        if verbose:
-            print(f'multiple chains. {chainlist}')
-        for chain in chainlist:
-            chain_length = len(chain.get_list())
-            chain_id = chain.get_id()
-            if verbose:
-                print(f'Chain: {chain_id}, length: {chain_length}')
-            chain_lens.append(chain_length)
-
-        if numpy.min(chain_lens) != numpy.max(chain_lens):
-            same = False
-            if verbose:
-                print(f'chain lengths are unequal: {chain_lens}')
-        else:
-            same = True
-            if verbose:
-                print(f'Chains are equal length, assuming the same. {chain_lens}')
-    return(same)
-
-
+#
+#
 class DisulfideList(UserList):
+    '''
+    Class provides a sortable list for Disulfide objects.
+    Indexing and slicing are supported, and normal list operations like .insert, .append and .extend.
+    The DisulfideList object must be initialized with an iterable (tuple, list) and a name.
+    
+    Example:
+        from proteusPy.disulfide import DisulfideList, Disulfide, DisulfideLoader
+
+        # make some empty disulfides
+        ss1 = Disulfide('ss1')
+        ss2 = Disulfide('ss2')
+
+        # make a DisulfideList containing ss1, named 'tmp'
+        sslist = DisulfideList([ss1], 'tmp')
+        sslist.append(ss2)
+
+        # load the PDB Disulfide database
+        PDB_SS = None
+        PDB_SS = DisulfideLoader(verbose=True, modeldir=MODELS)
+
+        # extract a disulfide with typical index
+        ss1 = PDB_SS[0]
+        print(f'{ss1.pprint_all()}')
+
+        # grab a subset via slicing
+        subset = DisulfideList(PDB_SS[0:10],'subset')
+
+
+    '''
     def __init__(self, iterable, id):
         self.pdb_id = id
         super().__init__(self.validate_ss(item) for item in iterable)
@@ -105,7 +95,628 @@ class DisulfideList(UserList):
     
     def get_id(self):
         return self.pdb_id
- 
+
+# Class definition for a Disulfide bond. 
+class Disulfide:
+    """
+    This class provides an object representing a physical disulfide bond that is either
+    extracted from the RCSB protein databank or built using the proteusPy.Turtle3D
+    The Disulfide Bond is characterized by the atomic coordinates N, Cα, Cβ, C', Sγ 
+    for both residues, the dihedral angles Χ1 - Χ5 for the disulfide bond conformation,
+    a name, proximal resiude number and distal residue number, and conformational energy.
+    All atomic coordinates are represented by the BIO.PDB.Vector class. The class uses the
+    internal methods to initialize dihedral angles and approximate energy upon initialization.
+
+    """
+    def __init__(self, name="SSBOND"):
+        """
+        Initialize the class. All positions are set to the origin. The optional string name may be passed.
+        """
+        self.name = name
+        self.proximal = -1
+        self.distal = -1
+        self.energy = _FLOAT_INIT
+        self.proximal_chain = str('')
+        self.distal_chain = str('')
+        self.pdb_id = str('')
+        self.proximal_residue_fullid = str('')
+        self.distal_residue_fullid = str('')
+        self.PERMISSIVE = bool(True)
+        self.QUIET = bool(True)
+        #
+        self.ca_distance = _FLOAT_INIT
+        self.torsion_array = numpy.array((_FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT))
+
+        # global coordinates for the Disulfide, typically as returned from the PDB file
+        self.n_prox = Vector(0,0,0)
+        self.ca_prox = Vector(0,0,0)
+        self.c_prox = Vector(0,0,0)
+        self.o_prox = Vector(0,0,0)
+        self.cb_prox = Vector(0,0,0)
+        self.sg_prox = Vector(0,0,0)
+        self.sg_dist = Vector(0,0,0)
+        self.cb_dist = Vector(0,0,0)
+        self.ca_dist = Vector(0,0,0)
+        self.n_dist = Vector(0,0,0)
+        self.c_dist = Vector(0,0,0)
+        self.o_dist = Vector(0,0,0)
+
+        # local coordinates for the Disulfide, computed using the Turtle3D in 
+        # Orientation #1 these are generally private.
+
+        self._n_prox = Vector(0,0,0)
+        self._ca_prox = Vector(0,0,0)
+        self._c_prox = Vector(0,0,0)
+        self._o_prox = Vector(0,0,0)
+        self._cb_prox = Vector(0,0,0)
+        self._sg_prox = Vector(0,0,0)
+        self._sg_dist = Vector(0,0,0)
+        self._cb_dist = Vector(0,0,0)
+        self._ca_dist = Vector(0,0,0)
+        self._n_dist = Vector(0,0,0)
+        self._c_dist = Vector(0,0,0)
+        self._o_dist = Vector(0,0,0)
+
+        # Dihedral angles for the disulfide bond itself, set to _FLOAT_INIT
+        self.chi1 = _FLOAT_INIT
+        self.chi2 = _FLOAT_INIT
+        self.chi3 = _FLOAT_INIT
+        self.chi4 = _FLOAT_INIT
+        self.chi5 = _FLOAT_INIT
+
+        # I initialize an array for the torsions which will be used for comparisons
+        self.dihedrals = numpy.array((_FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT), "d")
+
+    def internal_coords(self) -> numpy.array:
+        res_array = numpy.zeros(shape=(6,3))
+
+        res_array = numpy.array((
+            self._n_prox.get_array(),
+            self._ca_prox.get_array(),
+            self._c_prox.get_array(), 
+            self._o_prox.get_array(), 
+            self._cb_prox.get_array(),
+            self._sg_prox.get_array(),
+            self._n_dist.get_array(),
+            self._ca_dist.get_array(),
+            self._c_dist.get_array(), 
+            self._o_dist.get_array(), 
+            self._cb_dist.get_array(),
+            self._sg_dist.get_array(),
+        ))
+        return res_array
+    
+    def internal_coords_res(self, resnumb) -> numpy.array:
+        res_array = numpy.zeros(shape=(6,3))
+
+        if resnumb == self.proximal:
+            res_array = numpy.array((
+                self._n_prox.get_array(),
+                self._ca_prox.get_array(),
+                self._c_prox.get_array(), 
+                self._o_prox.get_array(), 
+                self._cb_prox.get_array(),
+                self._sg_prox.get_array(),
+            ))
+            return res_array
+        elif resnumb == self.distal:
+            res_array = numpy.array((
+                self._n_dist.get_array(),
+                self._ca_dist.get_array(),
+                self._c_dist.get_array(), 
+                self._o_dist.get_array(), 
+                self._cb_dist.get_array(),
+                self._sg_dist.get_array(),
+            ))
+            return res_array
+        else:
+            mess = f'-> Disulfide.internal_coords(): Invalid argument. Unable to find residue: {resnumb} '
+            raise DisulfideConstructionWarning(mess)
+    
+    def reset(self):
+        self.__init__(self)
+    
+    def render(self, pvp=pv.Plotter(), cpk=False, bs_scale=.2, spec=.8, specpow=6):
+        ''' Update the passed pyVista plotter() object with the mesh data for the input Disulfide Bond
+            Arguments:
+                pvp: pyvista.Plotter() object
+                cpk: Whether to render as CPK object or ball-and-stick (bool)
+        '''
+        
+        cyl_radius = .6 * bs_scale
+        coords = self.internal_coords()
+        atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C', 'SG')
+
+        newplt = pvp
+        
+        # bond connection table with atoms in the specific order shown above: 
+        bond_conn = numpy.array(
+            [
+                [0, 1], # n-ca
+                [1, 2], # ca-c
+                [2, 3], # c-o
+                [1, 4], # ca-cb
+                [4, 5], # cb-sg
+                [6, 7], # n-ca
+                [7, 8], # ca-c
+                [8, 9], # c-o
+                [7, 10], # ca-cb
+                [10, 11], #cb-sg
+                [5, 11]   #sg -sg
+            ])
+        
+        if cpk:
+            i = 0
+            for atom in atoms:
+                rad = ATOM_RADII_CPK[atom]
+                newplt.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
+                i += 1
+        else: # ball and stick
+            i = 0
+            for atom in atoms:
+                rad = ATOM_RADII_CPK[atom] * bs_scale
+                sphr = pv.Sphere(center=coords[i], radius=rad)
+                newplt.add_mesh(sphr, color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
+                i += 1
+            # now do the bonds.
+            for i in range(len(bond_conn)):
+                bond = bond_conn[i]
+                orig = bond[0]
+                dest = bond[1]
+                prox_pos = coords[orig]
+                distal_pos = coords[dest]
+                direction = distal_pos - prox_pos
+                height = math.dist(prox_pos, distal_pos)
+                origin = prox_pos + 0.5 * direction # the cylinder origin is actually in the middle so we translate
+                cyl = pv.Cylinder(origin, direction, radius=cyl_radius, height=height)
+                newplt.add_mesh(cyl)
+        return newplt
+
+    # comparison operators, used for sorting. keyed to SS bond energy
+    def __lt__(self, other):
+        if isinstance(other, Disulfide):
+            return self.energy < other.energy
+
+    def __le__(self, other):
+        if isinstance(other, Disulfide):
+            return self.energy <= other.energy
+    
+    def __gt__(self, other):
+        if isinstance(other, Disulfide):
+            return self.energy > other.energy
+
+    def __ge__(self, other):
+        if isinstance(other, Disulfide):
+            return self.energy >= other.energy
+
+    def __eq__(self, other):
+        if isinstance(other, Disulfide):
+            return self.energy == other.energy
+
+    def __ne__(self, other):
+        if isinstance(other, Disulfide):
+            return self.energy != other.energy
+    
+    # repr functions. The class is large, so I split it up into sections
+    def repr_ss_info(self):
+        """
+        Representation for the Disulfide class
+        """
+        s1 = f'<Disulfide {self.name} SourceID: {self.pdb_id} Proximal: {self.proximal} {self.proximal_chain} Distal: {self.distal} {self.distal_chain}'
+        return s1
+    
+    def repr_ss_coords(self):
+        s2 = f'\nProximal Coordinates:\n   N: {self.n_prox}\n   Cα: {self.ca_prox}\n   C: {self.c_prox}\n   O: {self.o_prox}\n   Cβ: {self.cb_prox}\n   Sγ: {self.sg_prox}\n\n'
+        s3 = f'Distal Coordinates:\n   N: {self.n_dist}\n   Cα: {self.ca_dist}\n   C: {self.c_dist}\n   O: {self.o_dist}\n   Cβ: {self.cb_dist}\n   Sγ: {self.sg_dist}\n\n'
+        stot = f'{s2} {s3}'
+        return stot
+
+    def repr_ss_conformation(self):
+        s4 = f'Conformation: (Χ1-Χ5):  {self.chi1:.3f}°, {self.chi2:.3f}°, {self.chi3:.3f}°, {self.chi4:.3f}° {self.chi5:.3f}° '
+        s5 = f'Energy: {self.energy:.3f} kcal/mol'
+        stot = f'{s4} {s5}'
+        return stot
+
+    def repr_ss_local_coords(self):
+        """
+        Representation for the Disulfide class, internal coordinates.
+        """
+        s2i = f'Proximal Internal Coordinates:\n   N: {self._n_prox}\n   Cα: {self._ca_prox}\n   C: {self._c_prox}\n   O: {self._o_prox}\n   Cβ: {self._cb_prox}\n   Sγ: {self._sg_prox}\n\n'
+        s3i = f'Distal Internal Coordinates:\n   N: {self._n_dist}\n   Cα: {self._ca_dist}\n   C: {self._c_dist}\n   O: {self._o_dist}\n   Cβ: {self._cb_dist}\n   Sγ: {self._sg_dist}\n'
+        stot = f'{s2i} {s3i}'
+        return stot
+    
+    def repr_ss_chain_ids(self):
+        return(f'Proximal Chain fullID: <{self.proximal_residue_fullid}> Distal Chain fullID: <{self.distal_residue_fullid}>')
+
+    def __repr__(self):
+        """
+        Representation for the Disulfide class
+        """
+        
+        s1 = self.repr_ss_info()
+        res = f'{s1}>'
+        return res
+
+    def pprint(self):
+        """
+        pretty print general info for the Disulfide
+        """
+        
+        s1 = self.repr_ss_info()
+        s4 = self.repr_ss_conformation()
+        res = f'{s1} {s4}>'
+        return res
+
+    def pprint_all(self):
+        """
+        pretty print all info for a Disulfide
+        """
+        
+        s1 = self.repr_ss_info() + '\n'
+        s2 = self.repr_ss_coords()
+        s3 = self.repr_ss_local_coords()
+        s4 = self.repr_ss_conformation()
+        s5 = self.repr_chain_ids()
+        res = f'{s1} {s5} {s2} {s3} {s4} >'
+        return res
+
+    def _handle_SS_exception(self, message):
+        """Handle exception (PRIVATE).
+
+        This method catches an exception that occurs in the Disulfide
+        object (if PERMISSIVE), or raises it again, this time adding the
+        PDB line number to the error message.
+        """
+        # message = "%s at line %i." % (message)
+        message = f'{message}'
+
+        if self.PERMISSIVE:
+            # just print a warning - some residues/atoms may be missing
+            warnings.warn(
+                "DisulfideConstructionException: %s\n"
+                "Exception ignored.\n"
+                "Some atoms may be missing in the data structure."
+                % message,
+                DisulfideConstructionWarning,
+            )
+        else:
+            # exceptions are fatal - raise again with new message (including line nr)
+            raise DisulfideConstructionException(message) from None
+
+    def print_compact(self):
+        return(f'{self.repr_ss_info()} {self.repr_ss_conformation()}')
+
+    def repr_conformation(self):
+        return(f'{self.repr_ss_conformation()}')
+    
+    def repr_coords(self):
+        return(f'{self.repr_ss_coords()}')
+
+    def repr_internal_coords(self):
+        return(f'{self.repr_ss_local_coords()}')
+
+    def repr_chain_ids(self):
+        return(f'{self.repr_ss_chain_ids()}')
+
+    def set_permissive(self, perm: bool) -> None:
+        self.PERMISSIVE = perm
+    
+    def get_permissive(self) -> bool:
+        return self.PERMISIVE
+
+    def set_quiet(self, perm: bool) -> None:
+        self.QUIET = perm
+    
+    def get_quiet(self) -> bool:
+        return self.QUIET
+
+    def get_full_id(self):
+        return((self.proximal_residue_fullid, self.distal_residue_fullid))
+    
+    def initialize_disulfide_from_chain(self, chain1, chain2, proximal, distal):
+        '''
+        Initialize a new Disulfide object with atomic coordinates from the proximal and 
+        distal coordinates, typically taken from a PDB file.
+
+        Arguments: 
+            chain1: list of Residues in the model, eg: chain = model['A']
+            chain2: list of Residues in the model, eg: chain = model['A']
+            proximal: proximal residue sequence ID
+            distal: distal residue sequence ID
+        
+        Returns: none. The internal state is modified.
+        '''
+
+        id = chain1.get_full_id()[0]
+
+        self.pdb_id = id
+        
+        # create a new Disulfide object
+        chi1 = chi2 = chi3 = chi4 = chi5 = _FLOAT_INIT
+
+        prox = int(proximal)
+        dist = int(distal)
+
+        prox_residue = chain1[prox]
+        dist_residue = chain2[dist]
+
+        if (prox_residue.get_resname() != 'CYS' or dist_residue.get_resname() != 'CYS'):
+            print(f'build_disulfide() requires CYS at both residues: {prox} {prox_residue.get_resname()} {dist} {dist_residue.get_resname()} Chain: {prox_residue.get_segid()}')
+
+        # set the objects proximal and distal values
+        self.set_resnum(proximal, distal)
+
+        self.proximal_chain = chain1.get_id()
+        self.distal_chain = chain2.get_id()
+
+        self.proximal_residue_fullid = prox_residue.get_full_id()
+        self.distal_residue_fullid = dist_residue.get_full_id()
+
+
+        # grab the coordinates for the proximal and distal residues as vectors so we can do math on them later
+
+        # proximal residue
+        if self.QUIET:
+            warnings.filterwarnings("ignore", category=DisulfideConstructionWarning)
+        try:
+            n1 = prox_residue['N'].get_vector()
+            ca1 = prox_residue['CA'].get_vector()
+            c1 = prox_residue['C'].get_vector()
+            o1 = prox_residue['O'].get_vector()
+            cb1 = prox_residue['CB'].get_vector()
+            sg1 = prox_residue['SG'].get_vector()
+            
+        except Exception:
+            raise DisulfideConstructionWarning(f"Invalid or missing coordinates for proximal residue {proximal}") from None
+        
+        # distal residue
+        try:
+            n2 = dist_residue['N'].get_vector()
+            ca2 = dist_residue['CA'].get_vector()
+            c2 = dist_residue['C'].get_vector()
+            o2 = dist_residue['O'].get_vector()
+            cb2 = dist_residue['CB'].get_vector()
+            sg2 = dist_residue['SG'].get_vector()
+
+        except Exception:
+            raise DisulfideConstructionWarning(f"Invalid or missing coordinates for proximal residue {distal}") from None
+        
+        # update the positions and conformation
+        self.set_positions(n1, ca1, c1, o1, cb1, sg1, n2, ca2, c2, o2, cb2, sg2)
+        
+        # calculate and set the disulfide dihedral angles
+        self.chi1 = numpy.degrees(calc_dihedral(n1, ca1, cb1, sg1))
+        self.chi2 = numpy.degrees(calc_dihedral(ca1, cb1, sg1, sg2))
+        self.chi3 = numpy.degrees(calc_dihedral(cb1, sg1, sg2, cb2))
+        self.chi4 = numpy.degrees(calc_dihedral(sg1, sg2, cb2, ca2))
+        self.chi5 = numpy.degrees(calc_dihedral(sg2, cb2, ca2, n2))
+
+        self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
+        self.torsion_array = numpy.array((self.chi1, self.chi2, self.chi3, self.chi4, self.chi5))
+
+        # calculate and set the SS bond torsional energy
+        self.compute_torsional_energy()
+
+        # compute and set the local coordinates
+        self.compute_local_coords()
+
+    def set_chain_id(self, chain_id):
+        self.chain_id = chain_id
+
+    def set_positions(self, n_prox: Vector, ca_prox: Vector, c_prox: Vector,
+                      o_prox: Vector, cb_prox: Vector, sg_prox: Vector, 
+                      n_dist: Vector, ca_dist: Vector, c_dist: Vector,
+                      o_dist: Vector, cb_dist: Vector, sg_dist: Vector):
+        '''
+        Sets the atomic positions for all atoms in the disulfide bond.
+        Arguments:
+            n_prox
+            ca_prox
+            c_prox
+            o_prox
+            cb_prox
+            sg_prox
+            n_distal
+            ca_distal
+            c_distal
+            o_distal
+            cb_distal
+            sg_distal
+        Returns: None
+        '''
+
+        # deep copy
+        self.n_prox = n_prox.copy()
+        self.ca_prox = ca_prox.copy()
+        self.c_prox = c_prox.copy()
+        self.o_prox = o_prox.copy()
+        self.cb_prox = cb_prox.copy()
+        self.sg_prox = sg_prox.copy()
+        self.sg_dist = sg_dist.copy()
+        self.cb_dist = cb_dist.copy()
+        self.ca_dist = ca_dist.copy()
+        self.n_dist = n_dist.copy()
+        self.c_dist = c_dist.copy()
+        self.o_dist = o_dist.copy()
+
+    def set_conformation(self, chi1, chi2, chi3, chi4, chi5):
+        '''
+        Sets the 5 dihedral angles chi1 - chi5 for the Disulfide object and computes the torsional energy.
+        
+        Arguments: chi, chi2, chi3, chi4, chi5 - Dihedral angles in degrees (-180 - 180) for the Disulfide conformation.
+        Returns: None
+        '''
+
+        self.chi1 = chi1
+        self.chi2 = chi2
+        self.chi3 = chi3
+        self.chi4 = chi4
+        self.chi5 = chi5
+        self.dihedrals = list([chi1, chi2, chi3, chi4, chi5])
+        self.compute_torsional_energy()
+
+    def set_name(self, namestr="Disulfide"):
+        '''
+        Sets the Disulfide's name
+        Arguments: (str)namestr
+        Returns: none
+        '''
+
+        self.name = namestr
+
+    def set_resnum(self, proximal, distal):
+        '''
+        Sets the Proximal and Distal Residue numbers for the Disulfide
+        Arguments: 
+            Proximal: Proximal residue number
+            Distal: Distal residue number
+        Returns: None
+        '''
+
+        self.proximal = proximal
+        self.distal = distal
+
+    def TorsionDistance(p1: Vector, p2: Vector):
+        '''
+        Calculate the 5D Euclidean distance for 2 Disulfide torsion_vector objects. This is used
+        to compare Disulfide Bond torsion angles to determine their torsional 
+        'distance'.
+        
+        Arguments: p1, p2 Vector objects of dimensionality 5 (5D)
+        Returns: Distance
+        '''
+        _p1 = p1.get_array()
+        _p2 = p2.get_array()
+        if (len(_p1) != 5 or len(_p2) != 5):
+            raise ProteusPyWarning("--> distance5d() requires vectors of length 5!")
+        d = math.dist(_p1, _p2)
+        return d
+
+    def compute_torsional_energy(self):
+        '''
+        Compute the approximate torsional energy for the Disulfide's conformation.
+        Arguments: chi1, chi2, chi3, chi4, chi5 - the dihedral angles for the Disulfide
+        Returns: Energy (kcal/mol)
+        '''
+        # @TODO find citation for the ss bond energy calculation
+        chi1 = self.chi1
+        chi2 = self.chi2
+        chi3 = self.chi3
+        chi4 = self.chi4
+        chi5 = self.chi5
+
+        energy = 2.0 * (cos(torad(3.0 * chi1)) + cos(torad(3.0 * chi5)))
+        energy += cos(torad(3.0 * chi2)) + cos(torad(3.0 * chi4))
+        energy += 3.5 * cos(torad(2.0 * chi3)) + 0.6 * cos(torad(3.0 * chi3)) + 10.1
+
+        self.energy = energy
+
+    def compute_local_coords(self):
+        """
+        Compute the internal coordinates for a properly initialized Disulfide Object.
+        Arguments: SS initialized Disulfide object
+        Returns: None, modifies internal state of the input
+        """
+
+        turt = Turtle3D('tmp')
+        # get the coordinates as numpy.array for Turtle3D use.
+        n = self.n_prox.get_array()
+        ca = self.ca_prox.get_array()
+        c = self.c_prox.get_array()
+        cb = self.cb_prox.get_array()
+        o = self.o_prox.get_array()
+        sg = self.sg_prox.get_array()
+
+        sg2 = self.sg_dist.get_array()
+        cb2 = self.cb_dist.get_array()
+        ca2 = self.ca_dist.get_array()
+        c2 = self.c_dist.get_array()
+        n2 = self.n_dist.get_array()
+        o2 = self.o_dist.get_array()
+
+        turt.orient_from_backbone(n, ca, c, cb, ORIENT_SIDECHAIN)
+        
+        # internal (local) coordinates, stored as Vector objects
+        # to_local returns numpy.array objects
+
+        self._n_prox = Vector(turt.to_local(n))
+        self._ca_prox = Vector(turt.to_local(ca))
+        self._c_prox = Vector(turt.to_local(c))
+        self._o_prox = Vector(turt.to_local(o))
+        self._cb_prox = Vector(turt.to_local(cb))
+        self._sg_prox = Vector(turt.to_local(sg))
+
+        self._n_dist = Vector(turt.to_local(n2))
+        self._ca_dist = Vector(turt.to_local(ca2))
+        self._c_dist = Vector(turt.to_local(c2))
+        self._o_dist = Vector(turt.to_local(o2))
+        self._cb_dist = Vector(turt.to_local(cb2))
+        self._sg_dist = Vector(turt.to_local(sg2))
+
+    def build_model(self, turtle: Turtle3D):
+        """
+        Build a model Disulfide based on the internal dihedral angles.
+        Routine assumes turtle is in orientation #1 (at Ca, headed toward
+        Cb, with N on left), builds disulfide, and updates the object's internal
+        coordinate state. It also adds the distal protein backbone,
+        and computes the disulfide conformational energy.
+
+        Arguments: turtle: Turtle3D object properly oriented for the build.
+        Returns: None. The Disulfide object's internal state is updated.
+        """
+
+        tmp = Turtle3D('tmp')
+        tmp.copy_coords(turtle)
+
+        n = Vector(0, 0, 0)
+        ca = Vector(0, 0, 0)
+        cb = Vector(0, 0, 0)
+        c = Vector(0, 0, 0)
+
+        self.ca_prox = tmp._position
+        tmp.schain_to_bbone()
+        n, ca, cb, c = build_residue(tmp)
+
+        self.n_prox = n
+        self.ca_prox = ca
+        self.c_prox = c
+
+        tmp.bbone_to_schain()
+        tmp.move(1.53)
+        tmp.roll(self.chi1)
+        tmp.yaw(112.8)
+        self.cb_prox = tmp._position
+
+        tmp.move(1.86)
+        tmp.roll(self.chi2)
+        tmp.yaw(103.8)
+        self.sg_prox = tmp._position
+
+        tmp.move(2.044)
+        tmp.roll(self.chi3)
+        tmp.yaw(103.8)
+        self.sg_dist = tmp._position
+
+        tmp.move(1.86)
+        tmp.roll(self.chi4)
+        tmp.yaw(112.8)
+        self.cb_dist = tmp._position
+
+        tmp.move(1.53)
+        tmp.roll(self.chi5)
+        tmp.pitch(180.0)
+        tmp.schain_to_bbone()
+        n, ca, cb, c = build_residue(tmp)
+
+        self.n_dist = n
+        self.ca_dist = ca
+        self.c_dist = c
+
+        self.compute_torsional_energy()
+
+# Class defination ends
+
 class DisulfideLoader():
     '''
     This class loads .pkl files created from the ExtractDisulfides() routine 
@@ -214,13 +825,7 @@ class DisulfideLoader():
         raise TypeError(
             f"Disulfide object expected, got {type(value).__name__}"
         )
- 
-  
-# float init for class 
-_FLOAT_INIT = -999.9
-
-# tqdm progress bar width
-_PBAR_COLS = 100
+# class ends
 
 class CysSelect(Select):
     def accept_residue(self, residue):
@@ -228,6 +833,21 @@ class CysSelect(Select):
             return True
         else:
             return False
+
+def distance3d(p1: Vector, p2: Vector):
+    '''
+    Calculate the 3D Euclidean distance for 2 Vector objects
+    
+    Arguments: p1, p2 Vector objects of dimensionality 3 (3D)
+    Returns: Distance
+    '''
+    _p1 = p1.get_array()
+    _p2 = p2.get_array()
+    if (len(_p1) != 3 or len(_p2) != 3):
+        raise ProteusPyWarning("--> distance3d() requires vectors of length 3!")
+    d = math.dist(_p1, _p2)
+    return d
+
 
 def name_to_id(fname: str):
     '''return an entry id for filename pdb1crn.ent -> 1crn'''
@@ -493,6 +1113,40 @@ def ExtractDisulfides(numb=-1, verbose=False, quiet=False, pdbdir=PDB_DIR,
     os.chdir(cwd)
     return
    
+def check_chains(pdbid, pdbdir, verbose=True):
+    '''Returns True if structure has multiple chains of identical length, False otherwise'''
+
+    parser = PDBParser(PERMISSIVE=True)
+    structure = parser.get_structure(pdbid, file=f'{pdbdir}pdb{pdbid}.ent')
+    ssbond_dict = structure.header['ssbond'] # dictionary of tuples with SSBond prox and distal
+    
+    if verbose:
+        print(f'ssbond dict: {ssbond_dict}')
+
+    same = False
+    model = structure[0]
+    chainlist = model.get_list()
+
+    if len(chainlist) > 1:
+        chain_lens = []
+        if verbose:
+            print(f'multiple chains. {chainlist}')
+        for chain in chainlist:
+            chain_length = len(chain.get_list())
+            chain_id = chain.get_id()
+            if verbose:
+                print(f'Chain: {chain_id}, length: {chain_length}')
+            chain_lens.append(chain_length)
+
+        if numpy.min(chain_lens) != numpy.max(chain_lens):
+            same = False
+            if verbose:
+                print(f'chain lengths are unequal: {chain_lens}')
+        else:
+            same = True
+            if verbose:
+                print(f'Chains are equal length, assuming the same. {chain_lens}')
+    return(same)
 
 # NB - this only works with the EGS modified version of  BIO.parse_pdb_header.py
 def load_disulfides_from_id(struct_name: str, 
@@ -797,565 +1451,58 @@ def check_header_from_id(struct_name: str,
 
 # Class defination for a structure-based Disulfide Bond.
 
-class Disulfide:
-    """
-    The Disulfide Bond is characterized by the atomic coordinates N, Cα, Cβ, C', Sγ 
-    for both residues, the dihedral angles Χ1 - Χ5 for the disulfide bond conformation,
-    a name, proximal resiude number and distal residue number, and conformational energy.
-    All atomic coordinates are represented by the BIO.PDB.Vector class.
-    """
-    def __init__(self, name="SSBOND"):
-        """
-        Initialize the class. All positions are set to the origin. The optional string name may be passed.
-        """
-        self.name = name
-        self.proximal = -1
-        self.distal = -1
-        self.energy = _FLOAT_INIT
-        self.proximal_chain = str('')
-        self.distal_chain = str('')
-        self.pdb_id = str('')
-        self.proximal_residue_fullid = str('')
-        self.distal_residue_fullid = str('')
-        self.PERMISSIVE = bool(True)
-        self.QUIET = bool(True)
-        #
-        self.ca_distance = _FLOAT_INIT
-        self.torsion_vector = numpy.array((_FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT))
 
-        # global coordinates for the Disulfide, typically as returned from the PDB file
-        self.n_prox = Vector(0,0,0)
-        self.ca_prox = Vector(0,0,0)
-        self.c_prox = Vector(0,0,0)
-        self.o_prox = Vector(0,0,0)
-        self.cb_prox = Vector(0,0,0)
-        self.sg_prox = Vector(0,0,0)
-        self.sg_dist = Vector(0,0,0)
-        self.cb_dist = Vector(0,0,0)
-        self.ca_dist = Vector(0,0,0)
-        self.n_dist = Vector(0,0,0)
-        self.c_dist = Vector(0,0,0)
-        self.o_dist = Vector(0,0,0)
-
-        # local coordinates for the Disulfide, computed using the Turtle3D in 
-        # Orientation #1 these are generally private.
-
-        self._n_prox = Vector(0,0,0)
-        self._ca_prox = Vector(0,0,0)
-        self._c_prox = Vector(0,0,0)
-        self._o_prox = Vector(0,0,0)
-        self._cb_prox = Vector(0,0,0)
-        self._sg_prox = Vector(0,0,0)
-        self._sg_dist = Vector(0,0,0)
-        self._cb_dist = Vector(0,0,0)
-        self._ca_dist = Vector(0,0,0)
-        self._n_dist = Vector(0,0,0)
-        self._c_dist = Vector(0,0,0)
-        self._o_dist = Vector(0,0,0)
-
-        # Dihedral angles for the disulfide bond itself, set to _FLOAT_INIT
-        self.chi1 = _FLOAT_INIT
-        self.chi2 = _FLOAT_INIT
-        self.chi3 = _FLOAT_INIT
-        self.chi4 = _FLOAT_INIT
-        self.chi5 = _FLOAT_INIT
-
-        # I initialize an array for the torsions which will be used for comparisons
-        self.dihedrals = numpy.array((_FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT), "d")
-
-    def internal_coords(self) -> numpy.array:
-        res_array = numpy.zeros(shape=(6,3))
-
-        res_array = numpy.array((
-            self._n_prox.get_array(),
-            self._ca_prox.get_array(),
-            self._c_prox.get_array(), 
-            self._o_prox.get_array(), 
-            self._cb_prox.get_array(),
-            self._sg_prox.get_array(),
-            self._n_dist.get_array(),
-            self._ca_dist.get_array(),
-            self._c_dist.get_array(), 
-            self._o_dist.get_array(), 
-            self._cb_dist.get_array(),
-            self._sg_dist.get_array(),
-        ))
-        return res_array
-    
-    def internal_coords_res(self, resnumb) -> numpy.array:
-        res_array = numpy.zeros(shape=(6,3))
-
-        if resnumb == self.proximal:
-            res_array = numpy.array((
-                self._n_prox.get_array(),
-                self._ca_prox.get_array(),
-                self._c_prox.get_array(), 
-                self._o_prox.get_array(), 
-                self._cb_prox.get_array(),
-                self._sg_prox.get_array(),
-            ))
-            return res_array
-        elif resnumb == self.distal:
-            res_array = numpy.array((
-                self._n_dist.get_array(),
-                self._ca_dist.get_array(),
-                self._c_dist.get_array(), 
-                self._o_dist.get_array(), 
-                self._cb_dist.get_array(),
-                self._sg_dist.get_array(),
-            ))
-            return res_array
-        else:
-            mess = f'-> Disulfide.internal_coords(): Invalid argument. Unable to find residue: {resnumb} '
-            raise DisulfideConstructionWarning(mess)
-    
-
-    def reset(self):
-        self.__init__(self)
-    
-    # comparison operators, used for sorting. keyed to SS bond energy
-    def __lt__(self, other):
-        if isinstance(other, Disulfide):
-            return self.energy < other.energy
-
-    def __le__(self, other):
-        if isinstance(other, Disulfide):
-            return self.energy <= other.energy
-    
-    def __gt__(self, other):
-        if isinstance(other, Disulfide):
-            return self.energy > other.energy
-
-    def __ge__(self, other):
-        if isinstance(other, Disulfide):
-            return self.energy >= other.energy
-
-    def __eq__(self, other):
-        if isinstance(other, Disulfide):
-            return self.energy == other.energy
-
-    def __ne__(self, other):
-        if isinstance(other, Disulfide):
-            return self.energy != other.energy
-    
-    # repr functions. The class is large, so I split it up into sections
-    def repr_ss_info(self):
-        """
-        Representation for the Disulfide class
-        """
-        s1 = f'<Disulfide {self.name} SourceID: {self.pdb_id} Proximal: {self.proximal} {self.proximal_chain} Distal: {self.distal} {self.distal_chain}'
-        return s1
-    
-    def repr_ss_coords(self):
-        s2 = f'\nProximal Coordinates:\n   N: {self.n_prox}\n   Cα: {self.ca_prox}\n   C: {self.c_prox}\n   O: {self.o_prox}\n   Cβ: {self.cb_prox}\n   Sγ: {self.sg_prox}\n\n'
-        s3 = f'Distal Coordinates:\n   N: {self.n_dist}\n   Cα: {self.ca_dist}\n   C: {self.c_dist}\n   O: {self.o_dist}\n   Cβ: {self.cb_dist}\n   Sγ: {self.sg_dist}\n\n'
-        stot = f'{s2} {s3}'
-        return stot
-
-    def repr_ss_conformation(self):
-        s4 = f'Conformation: (Χ1-Χ5):  {self.chi1:.3f}°, {self.chi2:.3f}°, {self.chi3:.3f}°, {self.chi4:.3f}° {self.chi5:.3f}° '
-        s5 = f'Energy: {self.energy:.3f} kcal/mol'
-        stot = f'{s4} {s5}'
-        return stot
-
-    def repr_ss_local_coords(self):
-        """
-        Representation for the Disulfide class, internal coordinates.
-        """
-        s2i = f'Proximal Internal Coordinates:\n   N: {self._n_prox}\n   Cα: {self._ca_prox}\n   C: {self._c_prox}\n   O: {self._o_prox}\n   Cβ: {self._cb_prox}\n   Sγ: {self._sg_prox}\n\n'
-        s3i = f'Distal Internal Coordinates:\n   N: {self._n_dist}\n   Cα: {self._ca_dist}\n   C: {self._c_dist}\n   O: {self._o_dist}\n   Cβ: {self._cb_dist}\n   Sγ: {self._sg_dist}\n'
-        stot = f'{s2i} {s3i}'
-        return stot
-    
-    def repr_ss_chain_ids(self):
-        return(f'Proximal Chain fullID: <{self.proximal_residue_fullid}> Distal Chain fullID: <{self.distal_residue_fullid}>')
-
-    def __repr__(self):
-        """
-        Representation for the Disulfide class
-        """
-        
-        s1 = self.repr_ss_info()
-        res = f'{s1}>'
-        return res
-
-    def pprint(self):
-        """
-        pretty print general info for the Disulfide
-        """
-        
-        s1 = self.repr_ss_info()
-        s4 = self.repr_ss_conformation()
-        res = f'{s1} {s4}>'
-        return res
-
-    def pprint_all(self):
-        """
-        pretty print all info for a Disulfide
-        """
-        
-        s1 = self.repr_ss_info() + '\n'
-        s2 = self.repr_ss_coords()
-        s3 = self.repr_ss_local_coords()
-        s4 = self.repr_ss_conformation()
-        s5 = self.repr_chain_ids()
-        res = f'{s1} {s5} {s2} {s3} {s4} >'
-        return res
-
-    def _handle_SS_exception(self, message):
-        """Handle exception (PRIVATE).
-
-        This method catches an exception that occurs in the Disulfide
-        object (if PERMISSIVE), or raises it again, this time adding the
-        PDB line number to the error message.
-        """
-        # message = "%s at line %i." % (message)
-        message = f'{message}'
-
-        if self.PERMISSIVE:
-            # just print a warning - some residues/atoms may be missing
-            warnings.warn(
-                "DisulfideConstructionException: %s\n"
-                "Exception ignored.\n"
-                "Some atoms may be missing in the data structure."
-                % message,
-                DisulfideConstructionWarning,
-            )
-        else:
-            # exceptions are fatal - raise again with new message (including line nr)
-            raise DisulfideConstructionException(message) from None
-
-    def print_compact(self):
-        return(f'{self.repr_ss_info()} {self.repr_ss_conformation()}')
-
-    def repr_conformation(self):
-        return(f'{self.repr_ss_conformation()}')
-    
-    def repr_coords(self):
-        return(f'{self.repr_ss_coords()}')
-
-    def repr_internal_coords(self):
-        return(f'{self.repr_ss_local_coords()}')
-
-    def repr_chain_ids(self):
-        return(f'{self.repr_ss_chain_ids()}')
-
-    def set_permissive(self, perm: bool) -> None:
-        self.PERMISSIVE = perm
-    
-    def get_permissive(self) -> bool:
-        return self.PERMISIVE
-
-    def set_quiet(self, perm: bool) -> None:
-        self.QUIET = perm
-    
-    def get_quiet(self) -> bool:
-        return self.QUIET
-
-    def get_full_id(self):
-        return((self.proximal_residue_fullid, self.distal_residue_fullid))
-    
-    def initialize_disulfide_from_chain(self, chain1, chain2, proximal, distal):
-        '''
-        Initialize a new Disulfide object with atomic coordinates from the proximal and 
-        distal coordinates, typically taken from a PDB file.
-
-        Arguments: 
-            chain1: list of Residues in the model, eg: chain = model['A']
-            chain2: list of Residues in the model, eg: chain = model['A']
-            proximal: proximal residue sequence ID
-            distal: distal residue sequence ID
-        
-        Returns: none. The internal state is modified.
-        '''
-
-        id = chain1.get_full_id()[0]
-
-        self.pdb_id = id
-        
-        # create a new Disulfide object
-        chi1 = chi2 = chi3 = chi4 = chi5 = _FLOAT_INIT
-
-        prox = int(proximal)
-        dist = int(distal)
-
-        prox_residue = chain1[prox]
-        dist_residue = chain2[dist]
-
-        if (prox_residue.get_resname() != 'CYS' or dist_residue.get_resname() != 'CYS'):
-            print(f'build_disulfide() requires CYS at both residues: {prox} {prox_residue.get_resname()} {dist} {dist_residue.get_resname()} Chain: {prox_residue.get_segid()}')
-
-        # set the objects proximal and distal values
-        self.set_resnum(proximal, distal)
-
-        self.proximal_chain = chain1.get_id()
-        self.distal_chain = chain2.get_id()
-
-        self.proximal_residue_fullid = prox_residue.get_full_id()
-        self.distal_residue_fullid = dist_residue.get_full_id()
-
-
-        # grab the coordinates for the proximal and distal residues as vectors so we can do math on them later
-
-        # proximal residue
-        if self.QUIET:
-            warnings.filterwarnings("ignore", category=DisulfideConstructionWarning)
-        try:
-            n1 = prox_residue['N'].get_vector()
-            ca1 = prox_residue['CA'].get_vector()
-            c1 = prox_residue['C'].get_vector()
-            o1 = prox_residue['O'].get_vector()
-            cb1 = prox_residue['CB'].get_vector()
-            sg1 = prox_residue['SG'].get_vector()
-            
-        except Exception:
-            raise DisulfideConstructionWarning(f"Invalid or missing coordinates for proximal residue {proximal}") from None
-        
-        # distal residue
-        try:
-            n2 = dist_residue['N'].get_vector()
-            ca2 = dist_residue['CA'].get_vector()
-            c2 = dist_residue['C'].get_vector()
-            o2 = dist_residue['O'].get_vector()
-            cb2 = dist_residue['CB'].get_vector()
-            sg2 = dist_residue['SG'].get_vector()
-
-        except Exception:
-            raise DisulfideConstructionWarning(f"Invalid or missing coordinates for proximal residue {distal}") from None
-        
-        # update the positions and conformation
-        self.set_positions(n1, ca1, c1, o1, cb1, sg1, n2, ca2, c2, o2, cb2, sg2)
-        
-        # calculate and set the disulfide dihedral angles
-        self.chi1 = numpy.degrees(calc_dihedral(n1, ca1, cb1, sg1))
-        self.chi2 = numpy.degrees(calc_dihedral(ca1, cb1, sg1, sg2))
-        self.chi3 = numpy.degrees(calc_dihedral(cb1, sg1, sg2, cb2))
-        self.chi4 = numpy.degrees(calc_dihedral(sg1, sg2, cb2, ca2))
-        self.chi5 = numpy.degrees(calc_dihedral(sg2, cb2, ca2, n2))
-
-        self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
-        self.torsion_array = numpy.array((self.chi1, self.chi2, self.chi3, self.chi4, self.chi5))
-
-        # calculate and set the SS bond torsional energy
-        self.compute_disulfide_torsional_energy()
-
-        # compute and set the local coordinates
-        self.compute_local_disulfide_coords()
-
-    def set_chain_id(self, chain_id):
-        self.chain_id = chain_id
-
-    def set_positions(self, n_prox: Vector, ca_prox: Vector, c_prox: Vector,
-                      o_prox: Vector, cb_prox: Vector, sg_prox: Vector, 
-                      n_dist: Vector, ca_dist: Vector, c_dist: Vector,
-                      o_dist: Vector, cb_dist: Vector, sg_dist: Vector):
-        '''
-        Sets the atomic positions for all atoms in the disulfide bond.
+def render_ss(ss: Disulfide, pvp: pv.Plotter(), cpk=False, bs_scale=.2, spec=.8, specpow=6):
+    ''' Update the passed pyVista plotter() object with the mesh data for the input Disulfide Bond
         Arguments:
-            n_prox
-            ca_prox
-            c_prox
-            o_prox
-            cb_prox
-            sg_prox
-            n_distal
-            ca_distal
-            c_distal
-            o_distal
-            cb_distal
-            sg_distal
-        Returns: None
-        '''
-
-        # deep copy
-        self.n_prox = n_prox.copy()
-        self.ca_prox = ca_prox.copy()
-        self.c_prox = c_prox.copy()
-        self.o_prox = o_prox.copy()
-        self.cb_prox = cb_prox.copy()
-        self.sg_prox = sg_prox.copy()
-        self.sg_dist = sg_dist.copy()
-        self.cb_dist = cb_dist.copy()
-        self.ca_dist = ca_dist.copy()
-        self.n_dist = n_dist.copy()
-        self.c_dist = c_dist.copy()
-        self.o_dist = o_dist.copy()
-
-    def set_conformation(self, chi1, chi2, chi3, chi4, chi5):
-        '''
-        Sets the 5 dihedral angles chi1 - chi5 for the Disulfide object and computes the torsional energy.
+            pvp: pyvista.Plotter() object
+            cpk: Whether to render as CPK object or ball-and-stick (bool)
+    '''
+    
+    cyl_radius = .6 * bs_scale
+    coords = ss.internal_coords()
+    atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C', 'SG')
+    
+    # bond connection table with atoms in the specific order shown above: 
+    bond_conn = numpy.array(
+        [
+            [0, 1], # n-ca
+            [1, 2], # ca-c
+            [2, 3], # c-o
+            [1, 4], # ca-cb
+            [4, 5], # cb-sg
+            [6, 7], # n-ca
+            [7, 8], # ca-c
+            [8, 9], # c-o
+            [7, 10], # ca-cb
+            [10, 11], #cb-sg
+            [5, 11]   #sg -sg
+        ])
+    
+    if cpk:
+        i = 0
+        for atom in atoms:
+            rad = ATOM_RADII_CPK[atom]
+            pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
+            i += 1
+    else: # ball and stick
+        i = 0
+        for atom in atoms:
+            rad = ATOM_RADII_CPK[atom] * bs_scale
+            pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
+            i += 1
         
-        Arguments: chi, chi2, chi3, chi4, chi5 - Dihedral angles in degrees (-180 - 180) for the Disulfide conformation.
-        Returns: None
-        '''
+        for i in range(len(bond_conn)):
+            bond = bond_conn[i]
+            orig = bond[0]
+            dest = bond[1]
+            prox_pos = coords[orig]
+            distal_pos = coords[dest]
+            direction = distal_pos - prox_pos
+            height = math.dist(prox_pos, distal_pos)
+            origin = prox_pos + 0.5 * direction # the cylinder origin is actually in the middle so we translate
+            cyl = pv.Cylinder(origin, direction, radius=cyl_radius, height=height)
+            pvp.add_mesh(cyl)
+    return
 
-        self.chi1 = chi1
-        self.chi2 = chi2
-        self.chi3 = chi3
-        self.chi4 = chi4
-        self.chi5 = chi5
-        self.dihedrals = list([chi1, chi2, chi3, chi4, chi5])
-        self.compute_disulfide_torsional_energy()
-
-    def set_name(self, namestr="Disulfide"):
-        '''
-        Sets the Disulfide's name
-        Arguments: (str)namestr
-        Returns: none
-        '''
-
-        self.name = namestr
-
-    def set_resnum(self, proximal, distal):
-        '''
-        Sets the Proximal and Distal Residue numbers for the Disulfide
-        Arguments: 
-            Proximal: Proximal residue number
-            Distal: Distal residue number
-        Returns: None
-        '''
-
-        self.proximal = proximal
-        self.distal = distal
-
-    def TorsionDistance(p1: Vector, p2: Vector):
-        '''
-        Calculate the 5D Euclidean distance for 2 Disulfide torsion_vector objects. This is used
-        to compare Disulfide Bond torsion angles to determine their torsional 
-        'distance'.
-        
-        Arguments: p1, p2 Vector objects of dimensionality 5 (5D)
-        Returns: Distance
-        '''
-        _p1 = p1.get_array()
-        _p2 = p2.get_array()
-        if (len(_p1) != 5 or len(_p2) != 5):
-            raise ProteusPyWarning("--> distance5d() requires vectors of length 5!")
-        d = math.dist(_p1, _p2)
-        return d
-
-    def compute_disulfide_torsional_energy(self):
-        '''
-        Compute the approximate torsional energy for the Disulfide's conformation.
-        Arguments: chi1, chi2, chi3, chi4, chi5 - the dihedral angles for the Disulfide
-        Returns: Energy (kcal/mol)
-        '''
-        # @TODO find citation for the ss bond energy calculation
-        chi1 = self.chi1
-        chi2 = self.chi2
-        chi3 = self.chi3
-        chi4 = self.chi4
-        chi5 = self.chi5
-
-        energy = 2.0 * (cos(torad(3.0 * chi1)) + cos(torad(3.0 * chi5)))
-        energy += cos(torad(3.0 * chi2)) + cos(torad(3.0 * chi4))
-        energy += 3.5 * cos(torad(2.0 * chi3)) + 0.6 * cos(torad(3.0 * chi3)) + 10.1
-
-        self.energy = energy
-
-    def compute_local_disulfide_coords(self):
-        """
-        Compute the internal coordinates for a properly initialized Disulfide Object.
-        Arguments: SS initialized Disulfide object
-        Returns: None, modifies internal state of the input
-        """
-
-        turt = Turtle3D('tmp')
-        # get the coordinates as numpy.array for Turtle3D use.
-        n = self.n_prox.get_array()
-        ca = self.ca_prox.get_array()
-        c = self.c_prox.get_array()
-        cb = self.cb_prox.get_array()
-        o = self.o_prox.get_array()
-        sg = self.sg_prox.get_array()
-
-        sg2 = self.sg_dist.get_array()
-        cb2 = self.cb_dist.get_array()
-        ca2 = self.ca_dist.get_array()
-        c2 = self.c_dist.get_array()
-        n2 = self.n_dist.get_array()
-        o2 = self.o_dist.get_array()
-
-        turt.orient_from_backbone(n, ca, c, cb, ORIENT_SIDECHAIN)
-        
-        # internal (local) coordinates, stored as Vector objects
-        # to_local returns numpy.array objects
-
-        self._n_prox = Vector(turt.to_local(n))
-        self._ca_prox = Vector(turt.to_local(ca))
-        self._c_prox = Vector(turt.to_local(c))
-        self._o_prox = Vector(turt.to_local(o))
-        self._cb_prox = Vector(turt.to_local(cb))
-        self._sg_prox = Vector(turt.to_local(sg))
-
-        self._n_dist = Vector(turt.to_local(n2))
-        self._ca_dist = Vector(turt.to_local(ca2))
-        self._c_dist = Vector(turt.to_local(c2))
-        self._o_dist = Vector(turt.to_local(o2))
-        self._cb_dist = Vector(turt.to_local(cb2))
-        self._sg_dist = Vector(turt.to_local(sg2))
-
-    def build_disulfide_model(self, turtle: Turtle3D):
-        """
-        Build a model Disulfide based on the internal dihedral angles.
-        Routine assumes turtle is in orientation #1 (at Ca, headed toward
-        Cb, with N on left), builds disulfide, and updates the object's internal
-        coordinate state. It also adds the distal protein backbone,
-        and computes the disulfide conformational energy.
-
-        Arguments: turtle: Turtle3D object properly oriented for the build.
-        Returns: None. The Disulfide object's internal state is updated.
-        """
-
-        tmp = Turtle3D('tmp')
-        tmp.copy_coords(turtle)
-
-        n = Vector(0, 0, 0)
-        ca = Vector(0, 0, 0)
-        cb = Vector(0, 0, 0)
-        c = Vector(0, 0, 0)
-
-        self.ca_prox = tmp._position
-        tmp.schain_to_bbone()
-        n, ca, cb, c = build_residue(tmp)
-
-        self.n_prox = n
-        self.ca_prox = ca
-        self.c_prox = c
-
-        tmp.bbone_to_schain()
-        tmp.move(1.53)
-        tmp.roll(self.chi1)
-        tmp.yaw(112.8)
-        self.cb_prox = tmp._position
-
-        tmp.move(1.86)
-        tmp.roll(self.chi2)
-        tmp.yaw(103.8)
-        self.sg_prox = tmp._position
-
-        tmp.move(2.044)
-        tmp.roll(self.chi3)
-        tmp.yaw(103.8)
-        self.sg_dist = tmp._position
-
-        tmp.move(1.86)
-        tmp.roll(self.chi4)
-        tmp.yaw(112.8)
-        self.cb_dist = tmp._position
-
-        tmp.move(1.53)
-        tmp.roll(self.chi5)
-        tmp.pitch(180.0)
-        tmp.schain_to_bbone()
-        n, ca, cb, c = build_residue(tmp)
-
-        self.n_dist = n
-        self.ca_dist = ca
-        self.c_dist = c
-
-        self.compute_torsional_energy()
-
-# Class defination ends
- 
 # End of file
