@@ -1,10 +1,8 @@
-Metadata-Version: 1.0
+Metadata-Version: 2.1
 Name: proteusPy
-Version: 0.1.dev0
+Version: 0.2.dev0
 Summary: proteus structure analysis tools
 Home-page: https://github.com/suchanek/proteusPy/
 Author: Eric G. Suchanek, PhD
 Author-email: suchanek@mac.com
-License: BSD
-Description: UNKNOWN
-Platform: UNKNOWN
+License: MIT
