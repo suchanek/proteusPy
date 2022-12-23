@@ -20,27 +20,15 @@ from tqdm import tqdm
 from numpy import cos
 from collections import UserList
 
-
-'''
-import proteusPy.turtle3D
-import proteusPy.residue
-import proteusPy.disulfide
-import proteusPy.disulfideLoader
-import proteusPy.proteusGlobals
-import proteusPy.proteusPyWarning
-import proteusPy.DisulfideExceptions
-import proteusPy.DisulfideGlobals
-import proteusPy.turtle3D
-'''
-
-__Version__ = "0.3dev"
+__Version__ = "0.5dev"
 
 from proteusPy.proteusGlobals import *
 from proteusPy.DisulfideGlobals import *
 from proteusPy.turtle3D import Turtle3D
 from proteusPy.turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN
 
-from proteusPy.disulfide import DisulfideList, DisulfideLoader, CysSelect
+from proteusPy.disulfide import DisulfideList, DisulfideLoader, CysSelect, Disulfide
+
 from proteusPy.disulfide import name_to_id, todeg, torad, build_torsion_df, distance3d, render_ss
 from proteusPy.disulfide import parse_ssbond_header_rec, DownloadDisulfides, ExtractDisulfides, check_chains
 from proteusPy.DisulfideExceptions import DisulfideIOException, DisulfideConstructionWarning, DisulfideConstructionException

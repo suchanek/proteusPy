@@ -12,7 +12,6 @@ from proteusPy import *
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideGlobals import *
 from proteusPy.proteusGlobals import *
-#from proteusPy.disulfide import Disulfide
 
 from Bio.PDB import Select, Vector, PDBParser
 from Bio.PDB.vectors import calc_dihedral
@@ -55,9 +54,8 @@ class DisulfideList(UserList):
 
         # grab a subset via slicing
         subset = DisulfideList(PDB_SS[0:10],'subset')
-
-
     '''
+    
     def __init__(self, iterable, id):
         self.pdb_id = id
         super().__init__(self.validate_ss(item) for item in iterable)

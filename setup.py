@@ -7,6 +7,6 @@ setup(name='proteusPy',
       url='https://github.com/suchanek/proteusPy/',
       author='Eric G. Suchanek, PhD',
       author_email='suchanek@mac.com',
-      license='BSD',
+      license='MIT',
       packages=['proteusPy'],
       zip_safe=False)
