@@ -25,8 +25,14 @@ _FLOAT_INIT = -999.9
 # tqdm progress bar width
 _PBAR_COLS = 100
 
-#
-#
+# rendering variables
+_render_styles = ['cpk', 'bs', 'st']
+_colors = ['byatom', 'bychain']
+
+# DisulfideList class definition.
+# I extend UserList to handle lists of Disulfide objects.
+# Indexing and slicing are supported, sorting is based on energy
+
 class DisulfideList(UserList):
     '''
     Class provides a sortable list for Disulfide objects.
@@ -214,7 +220,7 @@ class Disulfide:
     def reset(self):
         self.__init__(self)
     
-    def render(self, pvp=pv.Plotter(), cpk=False, bs_scale=.2, spec=.8, specpow=6):
+    def render(self, pvp=pv.Plotter(), cpk=False, bs_scale=.2, spec=.8, specpow=6) -> pv.Plotter:
         ''' Update the passed pyVista plotter() object with the mesh data for the input Disulfide Bond
             Arguments:
                 pvp: pyvista.Plotter() object
@@ -1447,10 +1453,8 @@ def check_header_from_id(struct_name: str,
         i += 1
     return True
 
-# Class defination for a structure-based Disulfide Bond.
-
-
-def render_ss(ss: Disulfide, pvp: pv.Plotter(), cpk=False, bs_scale=.2, spec=.8, specpow=6):
+# Using pyVista to render a Disulfide Bond.
+def render_Disulfide(ss: Disulfide, pvplotter: pv.Plotter(), style='cpk', bs_scale=.2, spec=.8, specpow=4) -> pv.Plotter:
     ''' Update the passed pyVista plotter() object with the mesh data for the input Disulfide Bond
         Arguments:
             pvp: pyvista.Plotter() object
@@ -1461,6 +1465,8 @@ def render_ss(ss: Disulfide, pvp: pv.Plotter(), cpk=False, bs_scale=.2, spec=.8,
     coords = ss.internal_coords()
     atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C', 'SG')
     
+    pvp = pvplotter
+
     # bond connection table with atoms in the specific order shown above: 
     bond_conn = numpy.array(
         [
@@ -1477,19 +1483,18 @@ def render_ss(ss: Disulfide, pvp: pv.Plotter(), cpk=False, bs_scale=.2, spec=.8,
             [5, 11]   #sg -sg
         ])
     
-    if cpk:
+    if style=='cpk':
         i = 0
         for atom in atoms:
             rad = ATOM_RADII_CPK[atom]
             pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
             i += 1
-    else: # ball and stick
+    elif style == 'bs': # ball and stick
         i = 0
         for atom in atoms:
             rad = ATOM_RADII_CPK[atom] * bs_scale
             pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
             i += 1
-        
         for i in range(len(bond_conn)):
             bond = bond_conn[i]
             orig = bond[0]
@@ -1501,6 +1506,62 @@ def render_ss(ss: Disulfide, pvp: pv.Plotter(), cpk=False, bs_scale=.2, spec=.8,
             origin = prox_pos + 0.5 * direction # the cylinder origin is actually in the middle so we translate
             cyl = pv.Cylinder(origin, direction, radius=cyl_radius, height=height)
             pvp.add_mesh(cyl)
-    return
+    else: # sticks
+        for i in range(len(bond_conn)):
+            bond = bond_conn[i]
+            orig = bond[0]
+            dest = bond[1]
+            prox_pos = coords[orig]
+            distal_pos = coords[dest]
+            direction = distal_pos - prox_pos
+            height = math.dist(prox_pos, distal_pos)
+            origin = prox_pos + 0.5 * direction # the cylinder origin is actually in the middle so we translate
+            cap1 = pv.Sphere(center=prox_pos, radius=cyl_radius)
+            cap2 = pv.Sphere(center=distal_pos, radius=cyl_radius)
+            cyl = pv.Cylinder(origin, direction, radius=cyl_radius, height=height)
+            pvp.add_mesh(cap1)
+            pvp.add_mesh(cap2)
+            pvp.add_mesh(cyl)
+    return pvp
+
+# create a pyvista plotter() object containing a 4 subplot view the disulfide passed
+# returns the plotter object
+
+import pyvista as pv
+def render_disulfide_panel(ss: Disulfide) -> pv.Plotter:
+    # fontsize
+    _fs = 12
+    name = ss.name
+    title = f'Disulfide {name}'
+
+    pl = pv.Plotter(window_size=(1200, 1200), shape=(2,2))
+    pl.enable_anti_aliasing('msaa')
+    pl.view_isometric()
+    pl.add_camera_orientation_widget()
+
+    pl.subplot(0,0)
+    pl.add_axes()
+    pl.add_title(title=title, font_size=_fs)
+    render_Disulfide(PDB_SS[0], pl, style='cpk')
+    
+    pl.subplot(0,1)
+    pl.add_axes()
+    pl.add_title(title=title, font_size=_fs)
+    render_Disulfide(PDB_SS[0], pl, style='bs')
+
+    pl.subplot(1,0)
+    pl.add_axes()
+    pl.add_title(title=title, font_size=_fs)
+    render_Disulfide(PDB_SS[0], pl, style='st')
+
+    pl.subplot(1,1)
+    pl.add_axes()
+    pl.add_title(title=title, font_size=_fs)
+    render_Disulfide(PDB_SS[0], pl, style='st')
+
+    pl.link_views()
+    pl.camera_position = [(0, 0, -20), (0, -2, 0), (0, 1, 0)]
+    pl.camera.zoom(.75)
+    return pl
 
 # End of file
