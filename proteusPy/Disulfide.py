@@ -10,6 +10,7 @@ import math
 
 import proteusPy
 from proteusPy import *
+from proteusPy.atoms import *
 
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideGlobals import *
@@ -25,84 +26,6 @@ _FLOAT_INIT = -999.9
 
 # tqdm progress bar width
 _PBAR_COLS = 100
-
-# rendering variables
-_render_styles = ['cpk', 'bs', 'st']
-_colors = ['byatom', 'bychain']
-
-
-# Using pyVista to render a Disulfide Bond.
-def render_Disulfide(ss, pvp: pv.Plotter(), style='cpk', bs_scale=.2, spec=.8, specpow=4) -> pv.Plotter:
-    ''' Update the passed pyVista plotter() object with the mesh data for the input Disulfide Bond
-        Arguments:
-            pvp: pyvista.Plotter() object
-            cpk: Whether to render as CPK object or ball-and-stick (bool)
-    '''
-    
-    cyl_radius = .12
-    coords = ss.internal_coords()
-    atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C', 'SG')
-    
-    #pvp = pv.Plotter()
-
-    # bond connection table with atoms in the specific order shown above: 
-    bond_conn = numpy.array(
-        [
-            [0, 1], # n-ca
-            [1, 2], # ca-c
-            [2, 3], # c-o
-            [1, 4], # ca-cb
-            [4, 5], # cb-sg
-            [6, 7], # n-ca
-            [7, 8], # ca-c
-            [8, 9], # c-o
-            [7, 10], # ca-cb
-            [10, 11], #cb-sg
-            [5, 11]   #sg -sg
-        ])
-    
-    if style=='cpk':
-        i = 0
-        for atom in atoms:
-            rad = ATOM_RADII_CPK[atom]
-            pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
-            i += 1
-    elif style == 'bs': # ball and stick
-        i = 0
-        for atom in atoms:
-            rad = ATOM_RADII_CPK[atom] * bs_scale
-            pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
-            i += 1
-        
-        for i in range(len(bond_conn)):
-            bond = bond_conn[i]
-            orig = bond[0]
-            dest = bond[1]
-            prox_pos = coords[orig]
-            distal_pos = coords[dest]
-            direction = distal_pos - prox_pos
-            height = math.dist(prox_pos, distal_pos)
-            origin = prox_pos + 0.5 * direction # the cylinder origin is actually in the middle so we translate
-            cyl = pv.Cylinder(origin, direction, radius=cyl_radius, height=height)
-            pvp.add_mesh(cyl)
-    
-    else: # sticks with sphere caps to make them pretty
-        for i in range(len(bond_conn)):
-            bond = bond_conn[i]
-            orig = bond[0]
-            dest = bond[1]
-            prox_pos = coords[orig]
-            distal_pos = coords[dest]
-            direction = distal_pos - prox_pos
-            height = math.dist(prox_pos, distal_pos)
-            origin = prox_pos + 0.5 * direction # the cylinder origin is actually in the middle so we translate
-            cap1 = pv.Sphere(center=prox_pos, radius=cyl_radius, end_phi=90)
-            cap2 = pv.Sphere(center=distal_pos, radius=cyl_radius, end_phi=90)
-            cyl = pv.Cylinder(origin, direction, radius=cyl_radius, height=height)
-            pvp.add_mesh(cap1)
-            pvp.add_mesh(cap2)
-            pvp.add_mesh(cyl)
-    return pvp
 
 # DisulfideList class definition.
 # I extend UserList to handle lists of Disulfide objects.
@@ -202,7 +125,6 @@ class Disulfide:
         self.distal_residue_fullid = str('')
         self.PERMISSIVE = bool(True)
         self.QUIET = bool(True)
-        #
         self.ca_distance = _FLOAT_INIT
         self.torsion_array = numpy.array((_FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT))
         self.pvplotter = None
@@ -296,35 +218,13 @@ class Disulfide:
     def reset(self):
         self.__init__(self)
     
-    def render(self, style='bs'):
-        ''' 
-        Create the pyvista meshes needed to render the Disulfide in the given style.
-        Argument:
-            style: One of 'cpk', 'bs', or 'st' to render as CPK, ball-and-stick or stick only
-        Returns:
-            None. Updates internal object.
-        '''
+    def display(self, single=False, style='bs'):
         pvp = pv.Plotter()
-        pvp = render_Disulfide(self, pvp, style)
-        self.pvplotter = pvp
 
-    def render4up(self):
-        ''' 
-        Create the pyvista meshes needed to render the Disulfide in the given style.
-        Argument:
-            style: One of 'cpk', 'bs', or 'st' to render as CPK, ball-and-stick or stick only
-        Returns:
-            None. Updates internal object.
-        '''
-        pvp = pv.Plotter()
-        pvp = render_disulfide_panel(self)
-        self.pvplotter = pvp
-
-    def display(self, single=True, style='bs'):
         if single:
-            self.render(self, style)
+            self.pvplotter = render_disulfide(self, pvp, style)
         else:
-            self.render4up()
+            self.pvplotter = render_disulfide_panel(self)
 
         self.pvplotter.show()
 
@@ -772,6 +672,7 @@ class Disulfide:
         self.compute_torsional_energy()
 
 # Class defination ends
+import copy
 
 class DisulfideLoader():
     '''
@@ -878,9 +779,11 @@ class DisulfideLoader():
     def validate_ss(self, value):
         if isinstance(value, (Disulfide)):
             return value
-        raise TypeError(
-            f"Disulfide object expected, got {type(value).__name__}"
-        )
+        raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
+
+    def copy(self):
+        return copy.deepcopy(self)
+    
 # class ends
 
 class CysSelect(Select):
@@ -1505,11 +1408,102 @@ def check_header_from_id(struct_name: str,
         i += 1
     return True
 
-# !!!
+# Rendering with pyvista
 # create a pyvista plotter() object containing a 4 subplot view the disulfide passed
 # returns the plotter object
+# rendering variables
+
+_render_styles = ['cpk', 'bs', 'st', 'surf']
+_colorstyle = ['byatom', 'bychain']
+
 import pyvista as pv
+from proteusPy.atoms import *
+
+# Using pyVista to render a Disulfide Bond.
+
+def render_disulfide(ss: Disulfide, pvplotter: pv.Plotter(), style='cpk', 
+                    bondcolor=[.2, .2, .2], bs_scale=.2, spec=.6, specpow=4) -> pv.Plotter:
+    ''' 
+    Update the passed pyVista plotter() object with the mesh data for the input Disulfide Bond
+    Arguments:
+        pvp: pyvista.Plotter() object
+        style: 'bs', 'st', 'cpk': Whether to render as CPK, ball-and-stick or stick
+    '''
+    
+    cyl_radius = .12
+    coords = ss.internal_coords()
+    atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C', 'SG')
+    pvp = pvplotter
+    
+    # bond connection table with atoms in the specific order shown above: 
+    bond_conn = numpy.array(
+        [
+            [0, 1], # n-ca
+            [1, 2], # ca-c
+            [2, 3], # c-o
+            [1, 4], # ca-cb
+            [4, 5], # cb-sg
+            [6, 7], # n-ca
+            [7, 8], # ca-c
+            [8, 9], # c-o
+            [7, 10], # ca-cb
+            [10, 11], #cb-sg
+            [5, 11]   #sg -sg
+        ])
+    
+    if style=='cpk':
+        i = 0
+        for atom in atoms:
+            rad = ATOM_RADII_CPK[atom]
+            pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
+            i += 1
+    elif style == 'bs': # ball and stick
+        i = 0
+        for atom in atoms:
+            rad = ATOM_RADII_CPK[atom] * bs_scale
+            pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
+            i += 1
+        
+        for i in range(len(bond_conn)):
+            bond = bond_conn[i]
+            orig = bond[0]
+            dest = bond[1]
+            prox_pos = coords[orig]
+            distal_pos = coords[dest]
+            direction = distal_pos - prox_pos
+            height = math.dist(prox_pos, distal_pos)
+            origin = prox_pos + 0.5 * direction # the cylinder origin is actually in the middle so we translate
+            cyl = pv.Cylinder(origin, direction, radius=cyl_radius, height=height)
+            pvp.add_mesh(cyl)
+    
+    else: # sticks with sphere caps to make them pretty
+        for i in range(len(bond_conn)):
+            bond = bond_conn[i]
+            orig = bond[0]
+            dest = bond[1]
+            prox_pos = coords[orig]
+            distal_pos = coords[dest]
+            direction = distal_pos - prox_pos
+            height = math.dist(prox_pos, distal_pos)
+            origin = prox_pos + 0.5 * direction # the cylinder origin is actually in the middle so we translate
+            cap1 = pv.Sphere(center=prox_pos, radius=cyl_radius)
+            cap2 = pv.Sphere(center=distal_pos, radius=cyl_radius)
+            cyl = pv.Cylinder(origin, direction, radius=cyl_radius, height=height)
+            pvp.add_mesh(cap1, color=bondcolor)
+            pvp.add_mesh(cap2, color=bondcolor)
+            pvp.add_mesh(cyl, color=bondcolor)
+    return pvp
+
 def render_disulfide_panel(ss: Disulfide) -> pv.Plotter:
+    ''' 
+        Create a pyvista Plotter object with linked four windows for CPK, ball and stick,
+        wireframe and surface displays for the Disulfide.
+        Argument:
+            self
+        Returns:
+            None. Updates internal object.
+        '''
+    
     # fontsize
     _fs = 12
     name = ss.name
@@ -1524,22 +1518,22 @@ def render_disulfide_panel(ss: Disulfide) -> pv.Plotter:
     pl.subplot(0,0)
     pl.add_axes()
     pl.add_title(title=title, font_size=_fs)
-    pl = render_Disulfide(ss, pl, style='cpk')
+    pl = render_disulfide(ss, pl, style='cpk')
     
     pl.subplot(0,1)
     pl.add_axes()
     pl.add_title(title=title, font_size=_fs)
-    pl = render_Disulfide(ss, pl, style='bs')
+    pl = render_disulfide(ss, pl, style='bs')
 
     pl.subplot(1,0)
     pl.add_axes()
     pl.add_title(title=title, font_size=_fs)
-    pl = render_Disulfide(ss, pl, style='st')
+    pl = render_disulfide(ss, pl, style='st')
 
     pl.subplot(1,1)
     pl.add_axes()
     pl.add_title(title=title, font_size=_fs)
-    pl = render_Disulfide(ss, pl, style='st')
+    pl = render_disulfide(ss, pl, style='st')
 
     pl.link_views()
     pl.camera_position = [(0, 0, -20), (0, -2, 0), (0, 1, 0)]
