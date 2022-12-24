@@ -20,7 +20,7 @@ from tqdm import tqdm
 from numpy import cos
 from collections import UserList
 
-__Version__ = "0.5dev"
+__Version__ = "0.6dev"
 
 from proteusPy.proteusGlobals import *
 from proteusPy.DisulfideGlobals import *
