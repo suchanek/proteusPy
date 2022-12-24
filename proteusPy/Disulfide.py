@@ -1540,4 +1540,58 @@ def render_disulfide_panel(ss: Disulfide) -> pv.Plotter:
     pl.camera.zoom(.75)
     return pl
 
+def cmap_vector(strtc, endc, steps):
+    # make a colormap in vector space
+    # starting and ending colors
+
+    newcol = numpy.zeros(shape=3)
+    cdir = numpy.zeros(shape=3)
+    res = numpy.zeros(shape=(steps,3))
+
+    # color direction vector and length
+    cdir = endc - strtc
+    clen = math.dist(strtc, endc)
+    cdir /= clen # normalize direction
+
+    # delta along color vector
+    dlta = clen / steps
+    for i in range(steps):
+        newcol = strtc + cdir * i * dlta
+        res[i] = newcol
+    return res
+   
+def render_ssbonds_by_id(PDB_SS, pdbid: str) -> pv.Plotter():
+    ''' 
+    Given a pv.Plotter() object (usually bunch of Disulfides), put a window and axes
+    around it and return the plotter object    
+    '''
+    
+    _fs = 12 # fontsize
+
+    ss = PDB_SS[pdbid]
+    tot_ss = len(ss) # number off ssbonds
+    title = f'Disulfides for {pdbid} ({tot_ss} total)'
+
+    pl = pv.Plotter(window_size=(1200, 1200))
+    pl.add_title(title=title, font_size=_fs)
+    pl.enable_anti_aliasing('msaa')
+    # pl.view_isometric()
+    pl.add_camera_orientation_widget()
+    pl.add_axes()
+    pl.camera_position = [(0, 0, -20), (0, -2, 0), (0, 1, 0)]
+    pl.camera.zoom(.75)
+    
+    # make a colormap in vector space
+    # starting and ending colors
+    strtc = numpy.array([0, .2, .8])
+    endc = numpy.array([1, 0, 0])
+    mycol = cmap_vector(strtc, endc, tot_ss)
+
+    i = 0
+    for ssbond in ss:
+        print(f'SS: {ssbond}')
+        pl = render_disulfide(ssbond, pl, style='st', bondcolor=mycol[i])
+        i += 1
+    return pl
+
 # End of file
