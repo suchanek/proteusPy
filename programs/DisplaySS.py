@@ -35,24 +35,22 @@ MODELS = f'{PDB_BASE}models/'
 # location of the compressed Disulfide .pkl files
 # MODELS = f'{PDB_BASE}models/'
 
-# Set the figure sizes and axis limits.
-DPI = 220
-WIDTH = 6.0
-HEIGHT = 3.0
-TORMIN = -179.0
-TORMAX = 180.0
-GRIDSIZE = 20
-
 import pyvista as pv
 from pyvista import Plotter
 
-PDB_SS = None
-PDB_SS = DisulfideLoader(verbose=True, modeldir=MODELS)
+from proteusPy.disulfide import render_Disulfide, render_disulfide_panel, DisulfideLoader
 
 if __name__ == '__main__':
-    pl = pv.Plotter()
-    pl = render_disulfide_panel(PDB_SS[0])
-    pl.show()
+    PDB_SS = None
+    PDB_SS = DisulfideLoader(verbose=True, modeldir=MODELS)
+    
+    ss = PDB_SS[0]
+
+    pvp = render_disulfide_panel(ss)
+    pvp.show()
+    
+    # ss.display(single=True)
+    
     exit()
 
 
