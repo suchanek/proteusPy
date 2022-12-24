@@ -50,7 +50,6 @@ if __name__ == '__main__':
     pvp = render_ssbonds_by_id(PDB_SS, '4yys')
     pvp.show()
 
-
     exit()
 
 

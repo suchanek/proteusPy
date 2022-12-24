@@ -1271,7 +1271,6 @@ def check_header_from_file(filename: str,
     structure = parser.get_structure('tmp', file=filename)
     struct_name = structure.get_id()
     
-#    structure = parser.get_structure(struct_name, file=f'{pdb_dir}pdb{struct_name}.ent')
     model = structure[model_numb]
 
     if verbose:
@@ -1284,7 +1283,6 @@ def check_header_from_file(filename: str,
 
     for pair in ssbonds:
         # in the form (proximal, distal, chain)
-
         proximal = pair[0] 
         distal = pair[1]
 
@@ -1589,7 +1587,7 @@ def render_ssbonds_by_id(PDB_SS, pdbid: str) -> pv.Plotter():
 
     i = 0
     for ssbond in ss:
-        print(f'SS: {ssbond}')
+        # print(f'SS: {ssbond}')
         pl = render_disulfide(ssbond, pl, style='st', bondcolor=mycol[i])
         i += 1
     return pl
