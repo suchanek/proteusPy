@@ -1420,7 +1420,7 @@ from proteusPy.atoms import *
 # Using pyVista to render a Disulfide Bond.
 
 def render_disulfide(ss: Disulfide, pvplotter: pv.Plotter(), style='cpk', 
-                    bondcolor=[.2, .2, .2], bs_scale=.2, spec=.6, specpow=4) -> pv.Plotter:
+                    bondcolor=[.6,.6,.6], bs_scale=.2, spec=.6, specpow=4) -> pv.Plotter:
     ''' 
     Update the passed pyVista plotter() object with the mesh data for the input Disulfide Bond
     Arguments:
@@ -1472,7 +1472,7 @@ def render_disulfide(ss: Disulfide, pvplotter: pv.Plotter(), style='cpk',
             height = math.dist(prox_pos, distal_pos)
             origin = prox_pos + 0.5 * direction # the cylinder origin is actually in the middle so we translate
             cyl = pv.Cylinder(origin, direction, radius=cyl_radius, height=height)
-            pvp.add_mesh(cyl)
+            pvp.add_mesh(cyl, color=bondcolor)
     
     else: # sticks with sphere caps to make them pretty
         for i in range(len(bond_conn)):
@@ -1562,8 +1562,7 @@ def render_ssbonds_by_id(PDB_SS, pdbid: str) -> pv.Plotter():
     ''' 
     Given a pv.Plotter() object (usually bunch of Disulfides), put a window and axes
     around it and return the plotter object    
-    '''
-    
+    ''' 
     _fs = 12 # fontsize
 
     ss = PDB_SS[pdbid]
@@ -1581,7 +1580,7 @@ def render_ssbonds_by_id(PDB_SS, pdbid: str) -> pv.Plotter():
     
     # make a colormap in vector space
     # starting and ending colors
-    strtc = numpy.array([0, .2, .8])
+    strtc = numpy.array([0, 0, 1])
     endc = numpy.array([1, 0, 0])
     mycol = cmap_vector(strtc, endc, tot_ss)
 
