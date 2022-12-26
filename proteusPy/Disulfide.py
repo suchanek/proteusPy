@@ -188,6 +188,20 @@ class Disulfide:
         ))
         return res_array
     
+    def cofmass(self) -> numpy.array:
+        res = res_array = numpy.zeros(shape=(6,3))
+        res_array = numpy.zeros(shape=(3))
+
+        res = self.internal_coords()
+        xavg = res[:0].sum() / 12
+        yavg = res[:1].sum() / 12
+        zavg = res[:2].sum() / 12
+        res_array[0] = xavg
+        res_array[1] = yavg
+        res_array[2] = zavg
+
+        return res_array
+
     def internal_coords_res(self, resnumb) -> numpy.array:
         res_array = numpy.zeros(shape=(6,3))
 
@@ -1406,7 +1420,8 @@ def check_header_from_id(struct_name: str,
     return True
 
 # Using pyVista to render Disulfide Bonds.
-# fontsize
+
+from proteusPy.atoms import BOND_RADIUS, FONTSIZE
 
 def render_disulfide(ss: Disulfide, pvplot: pv.Plotter(), style='cpk', 
                     bondcolor=[.4, .4, .4], bs_scale=.2, spec=.6, specpow=4) -> pv.Plotter:
@@ -1458,7 +1473,7 @@ def render_disulfide(ss: Disulfide, pvplot: pv.Plotter(), style='cpk',
             ('SG', 'SG')
         ]
     )
-    
+            
     if style=='cpk':
         i = 0
         for atom in atoms:
@@ -1500,6 +1515,7 @@ def render_disulfide(ss: Disulfide, pvplot: pv.Plotter(), style='cpk',
             
             cyl1 = pv.Cylinder(origin1, direction, radius=cyl_radius, height=height)
             cyl2 = pv.Cylinder(origin2, direction, radius=cyl_radius, height=height)
+            
             pvp.add_mesh(cyl1, color=orig_col)
             pvp.add_mesh(cyl2, color=dest_col)
             
@@ -1534,7 +1550,6 @@ def render_disulfide(ss: Disulfide, pvplot: pv.Plotter(), style='cpk',
             pvp.add_mesh(cap1, color=orig_col)
             pvp.add_mesh(cap2, color=dest_col)
 
-
     else: # plain
         for i in range(len(bond_conn)):
             bond = bond_conn[i]
@@ -1557,7 +1572,6 @@ def render_disulfide(ss: Disulfide, pvplot: pv.Plotter(), style='cpk',
     return pvp
 
 #
-
 def render_disulfide_panel(ss: Disulfide) -> pv.Plotter:
     ''' 
         Create a pyvista Plotter object with linked four windows for CPK, ball and stick,
@@ -1569,38 +1583,40 @@ def render_disulfide_panel(ss: Disulfide) -> pv.Plotter:
         '''
     name = ss.pdb_id
     
-    s1 = ss._sg_prox
-    s2 = ss._sg_dist
     enrg = ss.energy
     title = f'SS {name}: Energy: {enrg:.2f} kcal/mol'
 
-    savg = (s1 + s2) / 2.0
+    avg_pos = ss.cofmass()
 
-    pl = pv.Plotter(window_size=(1200, 1200))
-    
     pl = pv.Plotter(window_size=(1200, 1200), shape=(2,2))
     pl.add_title(title=title, font_size=FONTSIZE)
     pl.enable_anti_aliasing('msaa')
     pl.add_axes()
     # pl.view_isometric()
     pl.add_camera_orientation_widget()
+    pl.camera_position = [(0, 0, -20), avg_pos, (0, 1, 0)]
+
 
     pl.subplot(0,0)
     pl.add_axes()
     pl.add_title(title=title, font_size=FONTSIZE)
     pl = render_disulfide(ss, pl, style='cpk')
+    pl.camera_position = [(0, 0, -20), avg_pos, (0, 1, 0)]
+
     
     pl.subplot(0,1)
     pl.add_axes()
     pl.add_title(title=title, font_size=FONTSIZE)
     pl = render_disulfide(ss, pl, style='bs')
+    pl.camera_position = [(0, 0, -20), avg_pos, (0, 1, 0)]
 
     pl.subplot(1,0)
     pl.add_axes()
     pl.add_title(title=title, font_size=FONTSIZE)
     pl = render_disulfide(ss, pl, style='st')
+    pl.camera_position = [(0, 0, -20), avg_pos, (0, 1, 0)]
 
-    pl.camera_position = [(0, 0, -20), savg.get_array(), (0, 1, 0)]
+    pl.camera_position = [(0, 0, -20), avg_pos, (0, 1, 0)]
     pl.link_views()
     #pl.camera.zoom(.5)
     

@@ -45,6 +45,7 @@ if __name__ == '__main__':
     ss = Disulfide()
     ss = PDB_SS[0]
     print(f'SS: {ss}')
+    print(f'SS cofmass: {ss.cofmass()}')
 
     # get all disulfides for one structure. Make a 
     # DisulfideList object to hold it
@@ -58,8 +59,11 @@ if __name__ == '__main__':
     print(f'tot {tot_ss}')
 
     pvp = pv.Plotter()
+
     pvp = render_all_disulfides(ss4yss)
     #pvp = render_disulfide(ss4yss[0], pvp, style='sb')
+    #pvp = render_disulfide_panel(ss)
+    
     # showit(ss)
     #pvp = render_disulfides_by_id(PDB_SS, '4yys')
     
