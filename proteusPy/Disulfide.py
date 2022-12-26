@@ -7,17 +7,17 @@
 # Cα Cβ Sγ
 
 import math
+import numpy
 
-import proteusPy
 from proteusPy import *
-from proteusPy.atoms import *
 
+from proteusPy.atoms import *
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideGlobals import *
 from proteusPy.proteusGlobals import *
 
 from Bio.PDB import Select, Vector, PDBParser
-from Bio.PDB.vectors import calc_dihedral
+from Bio.PDB.vectors import calc_dihedral, calc_angle
 
 import pyvista as pv
 
@@ -807,7 +807,6 @@ def distance3d(p1: Vector, p2: Vector):
     d = math.dist(_p1, _p2)
     return d
 
-
 def name_to_id(fname: str):
     '''return an entry id for filename pdb1crn.ent -> 1crn'''
     ent = fname[3:-4]
@@ -1406,23 +1405,28 @@ def check_header_from_id(struct_name: str,
         i += 1
     return True
 
-# Using pyVista to render a Disulfide Bond.
+# Using pyVista to render Disulfide Bonds.
+# fontsize
 
-def render_disulfide(ss: Disulfide, pvplotter: pv.Plotter(), style='cpk', 
-                    bondcolor=[.6,.6,.6], bs_scale=.2, spec=.6, specpow=4) -> pv.Plotter:
+def render_disulfide(ss: Disulfide, pvplot: pv.Plotter(), style='cpk', 
+                    bondcolor=[.4, .4, .4], bs_scale=.2, spec=.6, specpow=4) -> pv.Plotter:
     ''' 
     Update the passed pyVista plotter() object with the mesh data for the input Disulfide Bond
     Arguments:
         pvp: pyvista.Plotter() object
-        style: 'bs', 'st', 'cpk': Whether to render as CPK, ball-and-stick or stick
+        style: 'bs', 'st', 'cpk', 'plain': Whether to render as CPK, ball-and-stick or stick.
+        Bonds are colored by atom color, unless 'plain' is specified.
+    Returns:
+        Updated pv.Plotter() object.
     '''
     
-    cyl_radius = .12
+    cyl_radius = BOND_RADIUS
     coords = ss.internal_coords()
     atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C', 'SG')
-    pvp = pvplotter
+    pvp = pvplot
     
     # bond connection table with atoms in the specific order shown above: 
+    # returned by ss.get_internal_coords()
     bond_conn = numpy.array(
         [
             [0, 1], # n-ca
@@ -1438,12 +1442,30 @@ def render_disulfide(ss: Disulfide, pvplotter: pv.Plotter(), style='cpk',
             [5, 11]   #sg -sg
         ])
     
+    # colors for the bonds. Index into ATOM_COLORS array
+    bond_split_colors = numpy.array(
+        [
+            ('N', 'C'),
+            ('C', 'C'),
+            ('C', 'O'),
+            ('C', 'C'),
+            ('C', 'SG'),
+            ('N', 'C'),
+            ('C', 'C'),
+            ('C', 'O'),
+            ('C', 'C'),
+            ('C', 'SG'),
+            ('SG', 'SG')
+        ]
+    )
+    
     if style=='cpk':
         i = 0
         for atom in atoms:
             rad = ATOM_RADII_CPK[atom]
             pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
             i += 1
+        
     elif style == 'bs': # ball and stick
         i = 0
         for atom in atoms:
@@ -1451,35 +1473,90 @@ def render_disulfide(ss: Disulfide, pvplotter: pv.Plotter(), style='cpk',
             pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
             i += 1
         
+        # work through connectivity and colors
+        for i in range(len(bond_conn)):
+            bond = bond_conn[i]
+
+            # get the indices for the origin and destination atoms
+            orig = bond[0]
+            dest = bond[1]
+
+            col = bond_split_colors[i]
+            orig_col = ATOM_COLORS[col[0]]
+            dest_col = ATOM_COLORS[col[1]]
+            
+            # get the coords
+            prox_pos = coords[orig]
+            distal_pos = coords[dest]
+            
+            # compute a direction vector
+            direction = distal_pos - prox_pos
+
+            # and vector length. divide by 2 since split bond
+            height = math.dist(prox_pos, distal_pos) / 2.0
+
+            origin1 = prox_pos + 0.25 * direction # the cylinder origin is actually in the middle so we translate
+            origin2 = prox_pos + 0.75 * direction # the cylinder origin is actually in the middle so we translate
+            
+            cyl1 = pv.Cylinder(origin1, direction, radius=cyl_radius, height=height)
+            cyl2 = pv.Cylinder(origin2, direction, radius=cyl_radius, height=height)
+            pvp.add_mesh(cyl1, color=orig_col)
+            pvp.add_mesh(cyl2, color=dest_col)
+            
+    elif style == 'sb': # splitbonds
+        i = 0
+        
         for i in range(len(bond_conn)):
             bond = bond_conn[i]
             orig = bond[0]
             dest = bond[1]
+
+            col = bond_split_colors[i]
+            orig_col = ATOM_COLORS[col[0]]
+            dest_col = ATOM_COLORS[col[1]]
+
             prox_pos = coords[orig]
             distal_pos = coords[dest]
             direction = distal_pos - prox_pos
-            height = math.dist(prox_pos, distal_pos)
-            origin = prox_pos + 0.5 * direction # the cylinder origin is actually in the middle so we translate
-            cyl = pv.Cylinder(origin, direction, radius=cyl_radius, height=height)
-            pvp.add_mesh(cyl, color=bondcolor)
-    
-    else: # sticks with sphere caps to make them pretty
-        for i in range(len(bond_conn)):
-            bond = bond_conn[i]
-            orig = bond[0]
-            dest = bond[1]
-            prox_pos = coords[orig]
-            distal_pos = coords[dest]
-            direction = distal_pos - prox_pos
-            height = math.dist(prox_pos, distal_pos)
-            origin = prox_pos + 0.5 * direction # the cylinder origin is actually in the middle so we translate
+            height = math.dist(prox_pos, distal_pos) / 2.0
+
+            origin = prox_pos + 0.25 * direction # the cylinder origin is actually in the middle so we translate
+            origin2 = prox_pos + 0.75 * direction # the cylinder origin is actually in the middle so we translate
+            
             cap1 = pv.Sphere(center=prox_pos, radius=cyl_radius)
             cap2 = pv.Sphere(center=distal_pos, radius=cyl_radius)
+            
+            cyl1 = pv.Cylinder(origin, direction, radius=cyl_radius, height=height)
+            cyl2 = pv.Cylinder(origin2, direction, radius=cyl_radius, height=height)
+            
+            pvp.add_mesh(cyl1, color=orig_col)
+            pvp.add_mesh(cyl2, color=dest_col)
+            pvp.add_mesh(cap1, color=orig_col)
+            pvp.add_mesh(cap2, color=dest_col)
+
+
+    else: # plain
+        for i in range(len(bond_conn)):
+            bond = bond_conn[i]
+            orig = bond[0]
+            dest = bond[1]
+            prox_pos = coords[orig]
+            distal_pos = coords[dest]
+            direction = distal_pos - prox_pos
+            height = math.dist(prox_pos, distal_pos)
+            origin = prox_pos + 0.5 * direction # the cylinder origin is actually in the middle so we translate
+            
+            cap1 = pv.Sphere(center=prox_pos, radius=cyl_radius)
+            cap2 = pv.Sphere(center=distal_pos, radius=cyl_radius)
+            
             cyl = pv.Cylinder(origin, direction, radius=cyl_radius, height=height)
+            
             pvp.add_mesh(cap1, color=bondcolor)
             pvp.add_mesh(cap2, color=bondcolor)
             pvp.add_mesh(cyl, color=bondcolor)
     return pvp
+
+#
 
 def render_disulfide_panel(ss: Disulfide) -> pv.Plotter:
     ''' 
@@ -1490,9 +1567,6 @@ def render_disulfide_panel(ss: Disulfide) -> pv.Plotter:
         Returns:
             None. Updates internal object.
         '''
-    
-    # fontsize
-    _fs = 12
     name = ss.pdb_id
     
     s1 = ss._sg_prox
@@ -1504,9 +1578,8 @@ def render_disulfide_panel(ss: Disulfide) -> pv.Plotter:
 
     pl = pv.Plotter(window_size=(1200, 1200))
     
-
     pl = pv.Plotter(window_size=(1200, 1200), shape=(2,2))
-    pl.add_title(title=title, font_size=_fs)
+    pl.add_title(title=title, font_size=FONTSIZE)
     pl.enable_anti_aliasing('msaa')
     pl.add_axes()
     # pl.view_isometric()
@@ -1514,25 +1587,20 @@ def render_disulfide_panel(ss: Disulfide) -> pv.Plotter:
 
     pl.subplot(0,0)
     pl.add_axes()
-    pl.add_title(title=title, font_size=_fs)
+    pl.add_title(title=title, font_size=FONTSIZE)
     pl = render_disulfide(ss, pl, style='cpk')
     
     pl.subplot(0,1)
     pl.add_axes()
-    pl.add_title(title=title, font_size=_fs)
+    pl.add_title(title=title, font_size=FONTSIZE)
     pl = render_disulfide(ss, pl, style='bs')
 
     pl.subplot(1,0)
     pl.add_axes()
-    pl.add_title(title=title, font_size=_fs)
+    pl.add_title(title=title, font_size=FONTSIZE)
     pl = render_disulfide(ss, pl, style='st')
 
-    #pl.subplot(1,1)
-    #pl.add_axes()
-    #pl.add_title(title=title, font_size=_fs)
-    #pl = render_disulfide(ss, pl, style='st')
-
-    #pl.camera_position = [(0, 0, -20), savg.get_array(), (0, 1, 0)]
+    pl.camera_position = [(0, 0, -20), savg.get_array(), (0, 1, 0)]
     pl.link_views()
     #pl.camera.zoom(.5)
     
@@ -1558,7 +1626,7 @@ def cmap_vector(strtc, endc, steps):
         res[i] = newcol
     return res
    
-def render_disulfides_by_id(PDB_SS, pdbid: str) -> pv.Plotter():
+def render_disulfides_by_id(PDB_SS: DisulfideLoader, pdbid: str) -> pv.Plotter():
     ''' 
     Render all disulfides for a given PDB ID overlaid in stick mode against
     a common coordinate frames. This allows us to see all of the disulfides
@@ -1570,14 +1638,13 @@ def render_disulfides_by_id(PDB_SS, pdbid: str) -> pv.Plotter():
 
     Returns: PV.Plotter object.    
     ''' 
-    _fs = 12 # fontsize
 
     ss = PDB_SS[pdbid]
     tot_ss = len(ss) # number off ssbonds
     title = f'Disulfides for {pdbid} ({tot_ss} total)'
 
     pl = pv.Plotter(window_size=(1200, 1200))
-    pl.add_title(title=title, font_size=_fs)
+    pl.add_title(title=title, font_size=FONTSIZE)
     pl.enable_anti_aliasing('msaa')
     # pl.view_isometric()
     pl.add_camera_orientation_widget()
@@ -1618,7 +1685,7 @@ def render_all_disulfides(ssList: DisulfideList, style='bs') -> pv.Plotter:
             None. Updates internal object.
     '''
     
-    _fs = 10 # fontsize
+    FONTSIZE = 10 # fontsize
     name = ssList.pdb_id
     tot_ss = len(ssList) # number off ssbonds
     
@@ -1640,7 +1707,7 @@ def render_all_disulfides(ssList: DisulfideList, style='bs') -> pv.Plotter:
                 ss = ssList[i]
                 enrg = ss.energy
                 title = f'SS from {name}: {i+1}/{tot_ss}: {enrg:.2f} kcal/mol'
-                pl.add_title(title=title, font_size=_fs)
+                pl.add_title(title=title, font_size=FONTSIZE)
                 pl = render_disulfide(ss, pl, style=style)
             
             i += 1
