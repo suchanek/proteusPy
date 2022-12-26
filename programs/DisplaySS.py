@@ -7,9 +7,8 @@ import pandas as pd
 import numpy
 import math
 
-from proteusPy.disulfide import render_disulfide, display_all_disulfides, display_disulfide_panel
+from proteusPy.disulfide import display_disulfide, display_all_disulfides, display_disulfide_panel
 from proteusPy.disulfide import DisulfideLoader, Disulfide, DisulfideList
-from proteusPy.atoms import ATOM_COLORS, BOND_RADIUS, ATOM_RADII_CPK, ATOM_RADII_COVALENT
 
 import pyvista as pv
 from pyvista import set_plot_theme
@@ -36,7 +35,6 @@ from pyvista import Plotter
 def showit(ss: Disulfide):
     ss.display(single=True, style='cpk')
 
-
 if __name__ == '__main__':
     PDB_SS = None
     PDB_SS = DisulfideLoader(verbose=True, modeldir=MODELS)
@@ -59,13 +57,13 @@ if __name__ == '__main__':
     pvp = pv.Plotter()
 
     #pvp = display_all_disulfides(ss4yss)
-    #pvp = display_disulfide(ss4yss[0], pvp, style='sb')
-    #pvp = display_disulfide_panel(ss)
+    #pvp = display_disulfide(ss4yss[0], style='sb')
+    pvp = display_disulfide_panel(ss)
     
-    ss.display(single=True, style='sb')
+    #ss.display(single=True, style='sb')
 
     #pvp = render_disulfides_by_id(PDB_SS, '4yys')
     
-    #pvp.show()
+    pvp.show()
 
     exit()

@@ -17,7 +17,7 @@ from proteusPy.DisulfideGlobals import *
 from proteusPy.proteusGlobals import *
 
 from Bio.PDB import Select, Vector, PDBParser
-from Bio.PDB.vectors import calc_dihedral, calc_angle
+from Bio.PDB.vectors import calc_dihedral
 
 import pyvista as pv
 
@@ -189,18 +189,9 @@ class Disulfide:
         return res_array
     
     def cofmass(self) -> numpy.array:
-        res = res_array = numpy.zeros(shape=(6,3))
-        res_array = numpy.zeros(shape=(3))
-
+        res = numpy.zeros(shape=(6,3))
         res = self.internal_coords()
-        xavg = res[:0].sum() / 12
-        yavg = res[:1].sum() / 12
-        zavg = res[:2].sum() / 12
-        res_array[0] = xavg
-        res_array[1] = yavg
-        res_array[2] = zavg
-
-        return res_array
+        return res.mean(axis=0)
 
     def internal_coords_res(self, resnumb) -> numpy.array:
         res_array = numpy.zeros(shape=(6,3))
@@ -1603,8 +1594,7 @@ def display_disulfide(ss: Disulfide, style='sb') -> pv.Plotter:
     pl.add_axes()
     pl.add_camera_orientation_widget()
     pl = render_disulfide(ss, pl, style=style)
-    pl.camera.zoom(.5)
-
+    pl.camera_position = CAMERA_POS
     return pl
 
 def display_disulfide_panel(ss: Disulfide) -> pv.Plotter:
@@ -1648,6 +1638,8 @@ def display_disulfide_panel(ss: Disulfide) -> pv.Plotter:
     pl = render_disulfide(ss, pl, style='st')
 
     pl.link_views()
+    pl.camera_position = ((0, -20, 0), (0,0,0), (0,0,1))
+
     pl.camera.zoom(.5)
     
     return pl
@@ -1707,7 +1699,7 @@ def display_disulfides_by_id(PDB_SS: DisulfideLoader, pdbid: str) -> pv.Plotter(
         pl = render_disulfide(ssbond, pl, style='st', bondcolor=mycol[i])
         pl.camera_position = [CAMERA_POS, (0,0,0), (0, 1, 0)]    
         i += 1
-    
+
     return pl
 
 def display_all_disulfides(ssList: DisulfideList, style='bs') -> pv.Plotter:
