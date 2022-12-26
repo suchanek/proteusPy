@@ -44,8 +44,6 @@ if __name__ == '__main__':
     # one disulfide from the database
     ss = Disulfide()
     ss = PDB_SS[0]
-    print(f'SS: {ss}')
-    print(f'SS cofmass: {ss.cofmass()}')
 
     # get all disulfides for one structure. Make a 
     # DisulfideList object to hold it
