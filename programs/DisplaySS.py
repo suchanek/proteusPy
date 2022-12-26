@@ -4,11 +4,12 @@
 # Cα Cβ Sγ
 
 import pandas as pd
+import numpy
+import math
 
-import proteusPy
-from proteusPy import *
-from proteusPy.disulfide import *
-from proteusPy.proteusGlobals import *
+from proteusPy.disulfide import render_disulfide, render_all_disulfides, render_disulfide_panel
+from proteusPy.disulfide import DisulfideLoader, Disulfide, DisulfideList
+from proteusPy.atoms import ATOM_COLORS, BOND_RADIUS, ATOM_RADII_CPK, ATOM_RADII_COVALENT
 
 import pyvista as pv
 from pyvista import set_plot_theme
@@ -32,11 +33,9 @@ MODELS = f'{PDB_BASE}models/'
 import pyvista as pv
 from pyvista import Plotter
 
-from proteusPy.disulfide import render_disulfide
-from proteusPy.disulfide import DisulfideLoader
-
 def showit(ss: Disulfide):
     ss.display(single=False, style='cpk')
+
 
 if __name__ == '__main__':
     PDB_SS = None
@@ -59,8 +58,8 @@ if __name__ == '__main__':
     print(f'tot {tot_ss}')
 
     pvp = pv.Plotter()
-    #pvp = render_all_disulfides(ss4yss)
-    pvp = render_disulfide_panel(ss4yss[0])
+    pvp = render_all_disulfides(ss4yss)
+    #pvp = render_disulfide(ss4yss[0], pvp, style='sb')
     # showit(ss)
     #pvp = render_disulfides_by_id(PDB_SS, '4yys')
     
