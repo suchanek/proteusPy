@@ -1029,13 +1029,13 @@ def ExtractDisulfides(numb=-1, verbose=False, quiet=False, pdbdir=PDB_DIR,
             os.remove(f'pdb{entry}.ent')
     
     if bad > 0:
-        if verbose:
-            print(f'Found and removed: {len(problem_ids)} problem structures.')
         prob_cols = ['id']
         problem_df = pd.DataFrame(columns=prob_cols)
         problem_df['id'] = problem_ids
 
+        print(f'Found and removed: {len(problem_ids)} problem structures.')
         print(f'Saving problem IDs to file: {modeldir}{problemfile}')
+
         problem_df.to_csv(f'{modeldir}{problemfile}')
     else:
         if verbose:
@@ -1057,9 +1057,9 @@ def ExtractDisulfides(numb=-1, verbose=False, quiet=False, pdbdir=PDB_DIR,
     with open(fname, 'wb+') as f:
         pickle.dump(All_ss_dict, f)
 
+    # save the torsions
     fname = f'{modeldir}{torsionfile}'
-    if True:
-        print(f'Saving torsions to file: {fname}')
+    print(f'Saving torsions to file: {fname}')
 
     SS_df.to_csv(fname)
 
@@ -1406,17 +1406,6 @@ def check_header_from_id(struct_name: str,
         i += 1
     return True
 
-# Rendering with pyvista
-# create a pyvista plotter() object containing a 4 subplot view the disulfide passed
-# returns the plotter object
-# rendering variables
-
-_render_styles = ['cpk', 'bs', 'st', 'surf']
-_colorstyle = ['byatom', 'bychain']
-
-import pyvista as pv
-from proteusPy.atoms import *
-
 # Using pyVista to render a Disulfide Bond.
 
 def render_disulfide(ss: Disulfide, pvplotter: pv.Plotter(), style='cpk', 
@@ -1504,13 +1493,23 @@ def render_disulfide_panel(ss: Disulfide) -> pv.Plotter:
     
     # fontsize
     _fs = 12
-    name = ss.name
-    title = f'Disulfide {name}'
+    name = ss.pdb_id
+    
+    s1 = ss._sg_prox
+    s2 = ss._sg_dist
+    enrg = ss.energy
+    title = f'SS {name}: Energy: {enrg:.2f} kcal/mol'
+
+    savg = (s1 + s2) / 2.0
+
+    pl = pv.Plotter(window_size=(1200, 1200))
+    
 
     pl = pv.Plotter(window_size=(1200, 1200), shape=(2,2))
-    
+    pl.add_title(title=title, font_size=_fs)
     pl.enable_anti_aliasing('msaa')
-    pl.view_isometric()
+    pl.add_axes()
+    # pl.view_isometric()
     pl.add_camera_orientation_widget()
 
     pl.subplot(0,0)
@@ -1528,14 +1527,15 @@ def render_disulfide_panel(ss: Disulfide) -> pv.Plotter:
     pl.add_title(title=title, font_size=_fs)
     pl = render_disulfide(ss, pl, style='st')
 
-    pl.subplot(1,1)
-    pl.add_axes()
-    pl.add_title(title=title, font_size=_fs)
-    pl = render_disulfide(ss, pl, style='st')
+    #pl.subplot(1,1)
+    #pl.add_axes()
+    #pl.add_title(title=title, font_size=_fs)
+    #pl = render_disulfide(ss, pl, style='st')
 
+    #pl.camera_position = [(0, 0, -20), savg.get_array(), (0, 1, 0)]
     pl.link_views()
-    pl.camera_position = [(0, 0, -20), (0, -2, 0), (0, 1, 0)]
-    pl.camera.zoom(.75)
+    #pl.camera.zoom(.5)
+    
     return pl
 
 def cmap_vector(strtc, endc, steps):
@@ -1558,10 +1558,17 @@ def cmap_vector(strtc, endc, steps):
         res[i] = newcol
     return res
    
-def render_ssbonds_by_id(PDB_SS, pdbid: str) -> pv.Plotter():
+def render_disulfides_by_id(PDB_SS, pdbid: str) -> pv.Plotter():
     ''' 
-    Given a pv.Plotter() object (usually bunch of Disulfides), put a window and axes
-    around it and return the plotter object    
+    Render all disulfides for a given PDB ID overlaid in stick mode against
+    a common coordinate frames. This allows us to see all of the disulfides
+    at one time in a single view. Colors vary smoothy between bonds.
+    
+    Arguments:
+        PDB_SS: DisulfideLoader object initialized with the database.
+        pdbid: the actual PDB id string
+
+    Returns: PV.Plotter object.    
     ''' 
     _fs = 12 # fontsize
 
@@ -1575,20 +1582,71 @@ def render_ssbonds_by_id(PDB_SS, pdbid: str) -> pv.Plotter():
     # pl.view_isometric()
     pl.add_camera_orientation_widget()
     pl.add_axes()
-    pl.camera_position = [(0, 0, -20), (0, -2, 0), (0, 1, 0)]
-    pl.camera.zoom(.75)
+    
     
     # make a colormap in vector space
     # starting and ending colors
-    strtc = numpy.array([0, 0, 1])
-    endc = numpy.array([1, 0, 0])
+    strtc = numpy.array([.1, .1, 1])
+    endc = numpy.array([.95, .1, .15])
     mycol = cmap_vector(strtc, endc, tot_ss)
 
     i = 0
+    s1 = Vector(0,0,0)
+    s2 = Vector(0,0,0)
+    savg = Vector(0,0,0)
+
     for ssbond in ss:
         # print(f'SS: {ssbond}')
         pl = render_disulfide(ssbond, pl, style='st', bondcolor=mycol[i])
+        s1 = ssbond._sg_prox
+        s2 = ssbond._sg_dist
         i += 1
+    savg = (s1 + s2) / 2
+
+    pl.camera_position = [(0, 0, -40), savg.get_array(), (0, 1, 0)]
+    pl.camera.zoom(.5)
+
+    return pl
+
+def render_all_disulfides(ssList: DisulfideList, style='bs') -> pv.Plotter:
+    ''' 
+        Create a pyvista Plotter object with linked four windows for CPK, ball and stick,
+        wireframe and surface displays for the Disulfide.
+        Argument:
+            self
+        Returns:
+            None. Updates internal object.
+    '''
+    
+    _fs = 10 # fontsize
+    name = ssList.pdb_id
+    tot_ss = len(ssList) # number off ssbonds
+    
+    cols = 2
+    rows = (tot_ss + 1) // cols
+    i = 0
+
+    pl = pv.Plotter(window_size=(1200, 1200), shape=(rows, cols))
+    pl.add_camera_orientation_widget()
+
+    for r in range(rows):
+        for c in range(cols):
+            pl.subplot(r,c)
+            if i < tot_ss:
+                pl.enable_anti_aliasing('msaa')
+                #pl.view_isometric()
+                pl.add_axes()
+                
+                ss = ssList[i]
+                enrg = ss.energy
+                title = f'SS from {name}: {i+1}/{tot_ss}: {enrg:.2f} kcal/mol'
+                pl.add_title(title=title, font_size=_fs)
+                pl = render_disulfide(ss, pl, style=style)
+            
+            i += 1
+    pl.link_views()
+    pl.camera_position = [(0, 0, -20), (0, 0, 0), (0, 1, 0)]
+    #pl.camera.zoom(.65)
     return pl
 
 # End of file

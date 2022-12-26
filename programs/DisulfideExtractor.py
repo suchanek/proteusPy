@@ -12,6 +12,7 @@
 #
 
 import shutil
+from proteusPy.disulfide import ExtractDisulfides
 
 # the locations below represent the actual location on the dev drive.
 # location for PDB repository
@@ -24,9 +25,7 @@ REPO_MODELS = '/Users/egs/repos/proteusPy/proteusPy/pdb/models/'
 # location of the compressed Disulfide .pkl files
 MODELS = f'{PDB_BASE}models/'
 
-from proteusPy.disulfide import ExtractDisulfides
-
-ExtractDisulfides(numb=-1, pdbdir=PDB, modeldir=MODELS, verbose=False, quiet=True)
+ExtractDisulfides(numb=5000, pdbdir=PDB, modeldir=MODELS, verbose=False, quiet=True)
 
 update = True
 
