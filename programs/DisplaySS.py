@@ -38,44 +38,6 @@ from proteusPy.disulfide import DisulfideLoader
 def showit(ss: Disulfide):
     ss.display(single=False, style='cpk')
 
-def render_all_disulfides(ssList: DisulfideList) -> pv.Plotter:
-    ''' 
-        Create a pyvista Plotter object with linked four windows for CPK, ball and stick,
-        wireframe and surface displays for the Disulfide.
-        Argument:
-            self
-        Returns:
-            None. Updates internal object.
-        '''
-    
-    # fontsize
-    _fs = 12
-    name = ssList.pdb_id
-    tot_ss = len(ssList) # number off ssbonds
-    title = f'Disulfides from {name}: ({tot_ss} total)'
-    cols = 2
-    rows = tot_ss // cols
-
-    pl = pv.Plotter(window_size=(1200, 1200), shape=(rows, cols))
-    
-    i = 0
-
-    for r in range(rows):
-        for c in range(cols):
-            ss = ssList[i]
-            pl.enable_anti_aliasing('msaa')
-            pl.view_isometric()
-            pl.add_camera_orientation_widget()
-            pl.subplot(r,c)
-            pl.add_axes()
-            pl.add_title(title=title, font_size=_fs)
-            pl = render_disulfide(ss, pl, style='bs')
-            i += 1
-    pl.link_views()
-    pl.camera_position = [(0, 0, -20), (0, -2, 0), (0, 1, 0)]
-    pl.camera.zoom(.75)
-    return pl
-
 if __name__ == '__main__':
     PDB_SS = None
     PDB_SS = DisulfideLoader(verbose=True, modeldir=MODELS)
@@ -90,14 +52,17 @@ if __name__ == '__main__':
     ss4yss = DisulfideList([], '4yys')
     ss4yss = PDB_SS['4yys']
 
+    ss4crn = DisulfideList([], '1crn')
+    ss4crn = PDB_SS['1crn']
+
     tot_ss = len(ss4yss) # number off ssbonds
     print(f'tot {tot_ss}')
 
     pvp = pv.Plotter()
-    pvp = render_all_disulfides(ss4yss)
-
+    #pvp = render_all_disulfides(ss4yss)
+    pvp = render_disulfide_panel(ss4yss[0])
     # showit(ss)
-    #pvp = render_ssbonds_by_id(PDB_SS, '4yys')
+    #pvp = render_disulfides_by_id(PDB_SS, '4yys')
     
     pvp.show()
 
