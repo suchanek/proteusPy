@@ -7,7 +7,7 @@ import pandas as pd
 import numpy
 import math
 
-from proteusPy.disulfide import render_disulfide, render_all_disulfides, render_disulfide_panel
+from proteusPy.disulfide import render_disulfide, display_all_disulfides, display_disulfide_panel
 from proteusPy.disulfide import DisulfideLoader, Disulfide, DisulfideList
 from proteusPy.atoms import ATOM_COLORS, BOND_RADIUS, ATOM_RADII_CPK, ATOM_RADII_COVALENT
 
@@ -34,7 +34,7 @@ import pyvista as pv
 from pyvista import Plotter
 
 def showit(ss: Disulfide):
-    ss.display(single=False, style='cpk')
+    ss.display(single=True, style='cpk')
 
 
 if __name__ == '__main__':
@@ -50,23 +50,22 @@ if __name__ == '__main__':
     ss4yss = DisulfideList([], '4yys')
     ss4yss = PDB_SS['4yys']
 
-    ss4crn = DisulfideList([], '1crn')
-    ss4crn = PDB_SS['1crn']
+    #ss4crn = DisulfideList([], '1crn')
+    #ss4crn = PDB_SS['1crn']
 
     tot_ss = len(ss4yss) # number off ssbonds
     print(f'tot {tot_ss}')
 
     pvp = pv.Plotter()
 
-    pvp = render_all_disulfides(ss4yss)
-    #pvp = render_disulfide(ss4yss[0], pvp, style='sb')
-    #pvp = render_disulfide_panel(ss)
+    #pvp = display_all_disulfides(ss4yss)
+    #pvp = display_disulfide(ss4yss[0], pvp, style='sb')
+    #pvp = display_disulfide_panel(ss)
     
-    # showit(ss)
+    ss.display(single=True, style='sb')
+
     #pvp = render_disulfides_by_id(PDB_SS, '4yys')
     
-    pvp.show()
+    #pvp.show()
 
     exit()
-
-
