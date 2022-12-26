@@ -88,7 +88,7 @@ class DisulfideList(UserList):
             self.data.extend(self._validate_ss(item) for item in other)
     
     def validate_ss(self, value):
-        if isinstance(value, (proteusPy.disulfide.Disulfide)):
+        if isinstance(value, (Disulfide)):
             return value
         raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
     
@@ -1424,7 +1424,7 @@ def check_header_from_id(struct_name: str,
 from proteusPy.atoms import BOND_RADIUS, FONTSIZE
 
 def render_disulfide(ss: Disulfide, pvplot: pv.Plotter(), style='cpk', 
-                    bondcolor=[.4, .4, .4], bs_scale=.2, spec=.6, specpow=4) -> pv.Plotter:
+                    bondcolor='brown', bs_scale=.2, spec=.6, specpow=4) -> pv.Plotter:
     ''' 
     Update the passed pyVista plotter() object with the mesh data for the input Disulfide Bond
     Arguments:
@@ -1437,6 +1437,12 @@ def render_disulfide(ss: Disulfide, pvplot: pv.Plotter(), style='cpk',
     
     cyl_radius = BOND_RADIUS
     coords = ss.internal_coords()
+    cofmass = ss.cofmass()
+    
+    # translate to cofmass frame
+    for i in range(12):
+        coords[i] = coords[i] - cofmass
+    
     atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C', 'SG')
     pvp = pvplot
     
@@ -1563,7 +1569,6 @@ def render_disulfide(ss: Disulfide, pvplot: pv.Plotter(), style='cpk',
             
             cap1 = pv.Sphere(center=prox_pos, radius=cyl_radius)
             cap2 = pv.Sphere(center=distal_pos, radius=cyl_radius)
-            
             cyl = pv.Cylinder(origin, direction, radius=cyl_radius, height=height)
             
             pvp.add_mesh(cap1, color=bondcolor)
@@ -1582,11 +1587,8 @@ def render_disulfide_panel(ss: Disulfide) -> pv.Plotter:
             None. Updates internal object.
         '''
     name = ss.pdb_id
-    
     enrg = ss.energy
     title = f'SS {name}: Energy: {enrg:.2f} kcal/mol'
-
-    avg_pos = ss.cofmass()
 
     pl = pv.Plotter(window_size=(1200, 1200), shape=(2,2))
     pl.add_title(title=title, font_size=FONTSIZE)
@@ -1594,29 +1596,24 @@ def render_disulfide_panel(ss: Disulfide) -> pv.Plotter:
     pl.add_axes()
     # pl.view_isometric()
     pl.add_camera_orientation_widget()
-    pl.camera_position = [(0, 0, -20), avg_pos, (0, 1, 0)]
-
 
     pl.subplot(0,0)
     pl.add_axes()
     pl.add_title(title=title, font_size=FONTSIZE)
     pl = render_disulfide(ss, pl, style='cpk')
-    pl.camera_position = [(0, 0, -20), avg_pos, (0, 1, 0)]
 
-    
     pl.subplot(0,1)
     pl.add_axes()
     pl.add_title(title=title, font_size=FONTSIZE)
     pl = render_disulfide(ss, pl, style='bs')
-    pl.camera_position = [(0, 0, -20), avg_pos, (0, 1, 0)]
 
     pl.subplot(1,0)
     pl.add_axes()
     pl.add_title(title=title, font_size=FONTSIZE)
     pl = render_disulfide(ss, pl, style='st')
-    pl.camera_position = [(0, 0, -20), avg_pos, (0, 1, 0)]
 
-    pl.camera_position = [(0, 0, -20), avg_pos, (0, 1, 0)]
+    #pl.camera_position = [(0, 0, -20), (0,0,0), (0, 1, 0)]
+
     pl.link_views()
     #pl.camera.zoom(.5)
     
@@ -1674,19 +1671,13 @@ def render_disulfides_by_id(PDB_SS: DisulfideLoader, pdbid: str) -> pv.Plotter()
     mycol = cmap_vector(strtc, endc, tot_ss)
 
     i = 0
-    s1 = Vector(0,0,0)
-    s2 = Vector(0,0,0)
-    savg = Vector(0,0,0)
-
+    
     for ssbond in ss:
         # print(f'SS: {ssbond}')
         pl = render_disulfide(ssbond, pl, style='st', bondcolor=mycol[i])
-        s1 = ssbond._sg_prox
-        s2 = ssbond._sg_dist
         i += 1
-    savg = (s1 + s2) / 2
-
-    pl.camera_position = [(0, 0, -40), savg.get_array(), (0, 1, 0)]
+    
+    pl.camera_position = [(0, 0, -40), avg_pos, (0, 1, 0)]
     pl.camera.zoom(.5)
 
     return pl
@@ -1719,17 +1710,15 @@ def render_all_disulfides(ssList: DisulfideList, style='bs') -> pv.Plotter:
                 pl.enable_anti_aliasing('msaa')
                 #pl.view_isometric()
                 pl.add_axes()
-                
                 ss = ssList[i]
                 enrg = ss.energy
-                title = f'SS from {name}: {i+1}/{tot_ss}: {enrg:.2f} kcal/mol'
+                title = f'{name}: {i+1}/{tot_ss}: {enrg:.2f} kcal/mol'
                 pl.add_title(title=title, font_size=FONTSIZE)
                 pl = render_disulfide(ss, pl, style=style)
-            
+                #pl.camera_position = [(0, 0, -20), (0,0,0), (0, 1, 0)]
             i += 1
     pl.link_views()
-    pl.camera_position = [(0, 0, -20), (0, 0, 0), (0, 1, 0)]
-    #pl.camera.zoom(.65)
+    pl.camera.zoom(.65)
     return pl
 
 # End of file

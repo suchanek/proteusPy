@@ -28,13 +28,13 @@ MODELS = f'{PDB_BASE}models/'
 # setting up specific pkl files for a small extraction. 
 # don't set these at all for the default extraction
 
-_SS_PICKLE_FILE = 'PDB_5000_ss.pkl'
-_SS_DICT_PICKLE_FILE = 'PDB_5000_ss_dict.pkl'
-_SS_TORSIONS_FILE = 'PDB_5000_SS_torsions.csv'
-_PROBLEM_ID_FILE = 'PDB_5000_SS_problems.csv'
+_SS_PICKLE_FILE = 'PDB_1000_ss.pkl'
+_SS_DICT_PICKLE_FILE = 'PDB_1000_ss_dict.pkl'
+_SS_TORSIONS_FILE = 'PDB_1000_SS_torsions.csv'
+_PROBLEM_ID_FILE = 'PDB_1000_SS_problems.csv'
 
 '''
-ExtractDisulfides(numb=5000, pdbdir=PDB, modeldir=MODELS,
+ExtractDisulfides(numb=1000, pdbdir=PDB, modeldir=MODELS,
                 dictfile=_SS_DICT_PICKLE_FILE,
                 picklefile=_SS_PICKLE_FILE,
                 torsionfile=_SS_TORSIONS_FILE,
@@ -42,7 +42,7 @@ ExtractDisulfides(numb=5000, pdbdir=PDB, modeldir=MODELS,
                 verbose=False, quiet=True)
 '''
 
-ExtractDisulfides(numb=5000, pdbdir=PDB, 
+ExtractDisulfides(numb=1000, pdbdir=PDB, 
                 modeldir=MODELS,
                 verbose=False, quiet=True)
 
