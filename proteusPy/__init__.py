@@ -38,8 +38,8 @@ from proteusPy.residue import build_residue, get_backbone_from_chain, to_alpha, 
 
 from proteusPy.disulfide import DisulfideList, DisulfideLoader, CysSelect, Disulfide
 from proteusPy.disulfide import name_to_id, todeg, torad, build_torsion_df, distance3d
-from proteusPy.disulfide import parse_ssbond_header_rec, DownloadDisulfides, ExtractDisulfides, check_chains, render_all_disulfides
-from proteusPy.disulfide import render_disulfide, render_disulfide_panel, render_disulfides_by_id
+from proteusPy.disulfide import parse_ssbond_header_rec, DownloadDisulfides, ExtractDisulfides, check_chains
+from proteusPy.disulfide import render_disulfide, display_disulfide_panel, display_all_disulfides, display_disulfides_by_id
 from proteusPy.disulfide import  cmap_vector
 
 # end of file
