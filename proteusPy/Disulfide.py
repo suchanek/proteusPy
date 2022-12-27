@@ -27,6 +27,29 @@ _FLOAT_INIT = -999.9
 # tqdm progress bar width
 _PBAR_COLS = 100
 
+# make a colormap in vector space from starting color to
+# ending color
+
+def cmap_vector(strtc, endc, steps):
+    # make a colormap in vector space
+    # starting and ending colors
+
+    newcol = numpy.zeros(shape=3)
+    cdir = numpy.zeros(shape=3)
+    res = numpy.zeros(shape=(steps,3))
+
+    # color direction vector and length
+    cdir = endc - strtc
+    clen = math.dist(strtc, endc)
+    cdir /= clen # normalize direction
+
+    # delta along color vector
+    dlta = clen / steps
+    for i in range(steps):
+        newcol = strtc + cdir * i * dlta
+        res[i] = newcol
+    return res
+ 
 # DisulfideList class definition.
 # I extend UserList to handle lists of Disulfide objects.
 # Indexing and slicing are supported, sorting is based on energy
@@ -272,15 +295,54 @@ class Disulfide:
     def reset(self):
         self.__init__(self)
     
-    def display(self, single=False, style='bs'):
-        pvp = pv.Plotter()
+    def display(self, single=True, style='bs'):
+        src = self.pdb_id
+        enrg = self.energy
+        title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain} Energy: {enrg:.2f} kcal/mol'
+        
+        near_range = -10.0
+        far_range = 10.0
+        src = self.pdb_id
+        fullname = self.name
+        enrg = self.energy
+        title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain} Energy: {enrg:.2f} kcal/mol'
+        
+        near_range = -10.0
+        far_range = 10.0
+        
+        pl = pv.Plotter(window_size=WINSIZE)
+        pl.camera.clipping_range = (near_range, far_range)
+        pl.add_title(title=title, font_size=FONTSIZE)
+        pl.enable_anti_aliasing('msaa')
+        pl.add_axes()
+        pl.add_camera_orientation_widget()
 
         if single:
-            self.pvplotter = render_disulfide(self, pvp, style)
+            pl = pv.Plotter(window_size=WINSIZE)
+            pl = render_disulfide(self, pl, style=style)
+            pl.camera_position = CAMERA_POS
+            pl.camera.zoom(.4)
+            pl.link_views()
+        
         else:
-            self.pvplotter = display_disulfide_panel(self)
+            pl = pv.Plotter(window_size=WINSIZE, shape=(2,2))
+            pl.subplot(0,0)
+            pl.add_axes()
+            pl.add_title(title=title, font_size=FONTSIZE)
+            pl = render_disulfide(self, pl, style='cpk')
 
-        self.pvplotter.show()
+            pl.subplot(0,1)
+            pl.add_axes()
+            pl.add_title(title=title, font_size=FONTSIZE)
+            pl = render_disulfide(self, pl, style='sb')
+
+            pl.subplot(1,0)
+            pl.add_axes()
+            pl.add_title(title=title, font_size=FONTSIZE)
+            pl = render_disulfide(self, pl, style='plain')
+
+        pl.show()
+        pl.close()
 
     # comparison operators, used for sorting. keyed to SS bond energy
     def __lt__(self, other):
@@ -859,6 +921,7 @@ class DisulfideLoader():
         pl = pv.Plotter(window_size=WINSIZE)
         pl.add_title(title=title, font_size=FONTSIZE)
         pl.enable_anti_aliasing('msaa')
+        
         # pl.view_isometric()
         pl.add_camera_orientation_widget()
         pl.camera_position = CAMERA_POS
@@ -879,6 +942,55 @@ class DisulfideLoader():
         pl.show()
         pl.close()
         return
+    
+    def display(self, style='bs'):
+        ''' 
+        Display the Disulfides
+        Argument:
+            self
+        Returns:
+            None. Updates internal object.
+        '''
+    
+        FONTSIZE = 10 # fontsize
+        
+        ssList = self.SSList
+        tot_ss = len(ssList) # number off ssbonds
+
+        cols = 2
+        rows = (tot_ss + 1) // cols
+        near_range = -10.0
+        far_range = 10.0
+        i = 0
+
+        pl = pv.Plotter(window_size=WINSIZE, shape=(rows, cols))
+        pl.camera.clipping_range = (near_range, far_range)
+        pl.add_camera_orientation_widget()
+
+        for r in range(rows):
+            for c in range(cols):
+                pl.subplot(r,c)
+                if i < tot_ss:
+                    pl.enable_anti_aliasing('msaa')
+                    #pl.view_isometric()
+                    pl.add_axes()
+                    ss = ssList[i]
+                    src = ss.pdb_id
+                    enrg = ss.energy
+                    title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain} Energy: {enrg:.2f} kcal/mol'
+
+                    pl.add_title(title=title, font_size=FONTSIZE)
+                    pl = render_disulfide(ss, pl, style=style)
+                    pl.camera_position = CAMERA_POS
+                i += 1
+        
+        pl.link_views()
+        pl.camera.zoom(.65)
+
+        pl.show()
+        pl.close()
+        return
+
 # class ends
 
 class CysSelect(Select):
@@ -1658,198 +1770,5 @@ def render_disulfide(ss: Disulfide, pvplot: pv.Plotter(), style='cpk',
             pvp.add_mesh(cap2, color=bondcolor)
             pvp.add_mesh(cyl, color=bondcolor)
     return pvp
-
-# !!!
-def display_disulfide(ss: Disulfide, style='sb'):
-    ''' 
-        Display the individual Disulfide Bond in the given style.
-        
-        Argument:
-            ss: Disulfide
-
-        Returns:
-            Window displaying the Disulfide. Must be closed to exit.
-        
-    '''
-
-    src = ss.pdb_id
-    fullname = ss.name
-    enrg = ss.energy
-    title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain} Energy: {enrg:.2f} kcal/mol'
-    
-    near_range = -10.0
-    far_range = 10.0
-    
-    pl = pv.Plotter(window_size=WINSIZE)
-    pl.camera.clipping_range = (near_range, far_range)
-
-    pl.add_title(title=title, font_size=FONTSIZE)
-    pl.enable_anti_aliasing('msaa')
-    pl.add_axes()
-    pl.add_camera_orientation_widget()
-    pl = render_disulfide(ss, pl, style=style)
-    pl.camera_position = CAMERA_POS
-
-    pl.camera.zoom(.4)
-    pl.show()
-    pl.close()
-    return
-
-def display_disulfide_panel(ss: Disulfide):
-    ''' 
-        Create a pyvista Plotter object with linked four windows for CPK, ball and stick,
-        wireframe and surface displays for the Disulfide.
-        Argument:
-            self
-        Returns:
-            None. Updates internal object.
-    '''
-
-    src = ss.pdb_id
-    enrg = ss.energy
-    title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain} Energy: {enrg:.2f} kcal/mol'
-    
-    near_range = -10.0
-    far_range = 10.0
-    
-    pl = pv.Plotter(window_size=WINSIZE, shape=(2,2))
-    pl.camera.clipping_range = (near_range, far_range)
-
-    pl.add_title(title=title, font_size=FONTSIZE)
-    pl.enable_anti_aliasing('msaa')
-    pl.add_axes()
-    pl.add_camera_orientation_widget()
-
-    # pl.view_isometric()
-
-    pl.subplot(0,0)
-    pl.add_axes()
-    pl.add_title(title=title, font_size=FONTSIZE)
-    pl = render_disulfide(ss, pl, style='cpk')
-
-    pl.subplot(0,1)
-    pl.add_axes()
-    pl.add_title(title=title, font_size=FONTSIZE)
-    pl = render_disulfide(ss, pl, style='sb')
-
-    pl.subplot(1,0)
-    pl.add_axes()
-    pl.add_title(title=title, font_size=FONTSIZE)
-    pl = render_disulfide(ss, pl, style='plain')
-
-    pl.link_views()
-    pl.camera_position = CAMERA_POS
-
-    pl.camera.zoom(.4)
-    pl.show()
-    pl.close()
-   
-    return
-
-def cmap_vector(strtc, endc, steps):
-    # make a colormap in vector space
-    # starting and ending colors
-
-    newcol = numpy.zeros(shape=3)
-    cdir = numpy.zeros(shape=3)
-    res = numpy.zeros(shape=(steps,3))
-
-    # color direction vector and length
-    cdir = endc - strtc
-    clen = math.dist(strtc, endc)
-    cdir /= clen # normalize direction
-
-    # delta along color vector
-    dlta = clen / steps
-    for i in range(steps):
-        newcol = strtc + cdir * i * dlta
-        res[i] = newcol
-    return res
-   
-def display_disulfides_by_id(PDB_SS: DisulfideLoader, pdbid: str):
-    ''' 
-    Render all disulfides for a given PDB ID overlaid in stick mode against
-    a common coordinate frames. This allows us to see all of the disulfides
-    at one time in a single view. Colors vary smoothy between bonds.
-    
-    Arguments:
-        PDB_SS: DisulfideLoader object initialized with the database.
-        pdbid: the actual PDB id string
-
-    Returns: None.    
-    ''' 
-
-    ssbonds = PDB_SS[pdbid]
-    tot_ss = len(ssbonds) # number off ssbonds
-    title = f'Disulfides for {pdbid} ({tot_ss} total)'
-
-    pl = pv.Plotter(window_size=WINSIZE)
-    pl.add_title(title=title, font_size=FONTSIZE)
-    pl.enable_anti_aliasing('msaa')
-    # pl.view_isometric()
-    pl.add_camera_orientation_widget()
-    pl.add_axes()
-    
-    # make a colormap in vector space
-    # starting and ending colors
-    strtc = numpy.array([.1, .1, 1])
-    endc = numpy.array([.95, .1, .15])
-    mycol = cmap_vector(strtc, endc, tot_ss)
-    
-    i = 0
-    for ss in ssbonds:
-        pl = render_disulfide(ss, pl, style='st', bondcolor=mycol[i])
-        pl.camera_position = CAMERA_POS    
-        i += 1
-    pl.show()
-    pl.close()
-    return
-
-def display_all_disulfides(ssList: DisulfideList, style='bs'):
-    ''' 
-        Create a pyvista Plotter object with linked four windows for CPK, ball and stick,
-        wireframe and surface displays for the Disulfide.
-        Argument:
-            self
-        Returns:
-            None. Updates internal object.
-    '''
-    
-    FONTSIZE = 10 # fontsize
-    tot_ss = len(ssList) # number off ssbonds
-    
-    cols = 2
-    rows = (tot_ss + 1) // cols
-    near_range = -10.0
-    far_range = 10.0
-    i = 0
-
-    pl = pv.Plotter(window_size=WINSIZE, shape=(rows, cols))
-    pl.camera.clipping_range = (near_range, far_range)
-    pl.add_camera_orientation_widget()
-
-    for r in range(rows):
-        for c in range(cols):
-            pl.subplot(r,c)
-            if i < tot_ss:
-                pl.enable_anti_aliasing('msaa')
-                #pl.view_isometric()
-                pl.add_axes()
-                ss = ssList[i]
-                src = ss.pdb_id
-                enrg = ss.energy
-                title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain} Energy: {enrg:.2f} kcal/mol'
-
-                pl.add_title(title=title, font_size=FONTSIZE)
-                pl = render_disulfide(ss, pl, style=style)
-                pl.camera_position = CAMERA_POS
-            i += 1
-    
-    pl.link_views()
-    pl.camera.zoom(.65)
-
-    pl.show()
-    pl.exit()
-    return pl
 
 # End of file
