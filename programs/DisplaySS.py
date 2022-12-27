@@ -1,14 +1,12 @@
 # Disulfide Bond Analysis
 # Author: Eric G. Suchanek, PhD.
-# Last revision: 12/16/22 -egs-
+# Last revision: 12/26/22 -egs-
 # Cα Cβ Sγ
 
 import pandas as pd
 import numpy
 import math
 
-from proteusPy.disulfide import display_disulfide, display_all_disulfides, display_disulfide_panel
-from proteusPy.disulfide import display_disulfides_by_id
 from proteusPy.disulfide import DisulfideLoader, Disulfide, DisulfideList
 
 import pyvista as pv
@@ -32,9 +30,10 @@ MODELS = f'{PDB_BASE}models/'
 
 import pyvista as pv
 from pyvista import Plotter
+from proteusPy.disulfide import *
 
 def showit(ss: Disulfide):
-    ss.display(single=True, style='cpk')
+    ss.display(single=True, style='bs')
 
 if __name__ == '__main__':
     PDB_SS = None
@@ -43,29 +42,20 @@ if __name__ == '__main__':
     # one disulfide from the database
     ss = Disulfide()
     ss = PDB_SS[0]
+    ss.display(style='sb', single=True)
+    ss.display(style='bs', single=False)
 
     # get all disulfides for one structure. Make a 
     # DisulfideList object to hold it
-    ss4yss = DisulfideList([], '4yys')
     ss4yss = PDB_SS['4yys']
 
     #ss4yss.display('cpk')
+    #ss4yss.display('bs')
+    #ss4yss.display('sb')
+    #ss4yss.display('plain')
 
     sslist = PDB_SS[:8]
-    sslist.display('sb')
-
-    #ss4crn = DisulfideList([], '1crn')
-    #ss4crn = PDB_SS['1crn']
-
-    tot_ss = len(ss4yss) # number off ssbonds
-    print(f'tot {tot_ss}')
-
-    #pvp = pv.Plotter()
-
-    #pvp = display_all_disulfides(ss4yss)
-    
-    #display_disulfide(ss4yss[0], style='sb')
-    #display_disulfide_panel(ss)
+    #sslist.display('sb')
 
     #PDB_SS.display_overlay('4yys')
     
