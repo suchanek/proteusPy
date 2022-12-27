@@ -8,6 +8,7 @@ import numpy
 import math
 
 from proteusPy.disulfide import display_disulfide, display_all_disulfides, display_disulfide_panel
+from proteusPy.disulfide import display_disulfides_by_id
 from proteusPy.disulfide import DisulfideLoader, Disulfide, DisulfideList
 
 import pyvista as pv
@@ -48,22 +49,31 @@ if __name__ == '__main__':
     ss4yss = DisulfideList([], '4yys')
     ss4yss = PDB_SS['4yys']
 
+    #ss4yss.display('cpk')
+
+    sslist = PDB_SS[:8]
+    sslist.display('sb')
+
     #ss4crn = DisulfideList([], '1crn')
     #ss4crn = PDB_SS['1crn']
 
     tot_ss = len(ss4yss) # number off ssbonds
     print(f'tot {tot_ss}')
 
-    pvp = pv.Plotter()
+    #pvp = pv.Plotter()
 
     #pvp = display_all_disulfides(ss4yss)
-    #pvp = display_disulfide(ss4yss[0], style='sb')
-    pvp = display_disulfide_panel(ss)
+    
+    #display_disulfide(ss4yss[0], style='sb')
+    #display_disulfide_panel(ss)
+
+    #PDB_SS.display_overlay('4yys')
     
     #ss.display(single=True, style='sb')
 
     #pvp = render_disulfides_by_id(PDB_SS, '4yys')
     
-    pvp.show()
+    #pvp.show()
+    #pvp.close()
 
     exit()
