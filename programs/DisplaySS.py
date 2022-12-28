@@ -53,7 +53,7 @@ if __name__ == '__main__':
     #ss4yss.display('plain')
 
     sslist = PDB_SS[:8]
-    #sslist.display('sb')
+    sslist.display('sb')
 
     #PDB_SS.display_overlay('4yys')
     
