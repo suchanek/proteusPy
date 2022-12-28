@@ -1,4 +1,6 @@
-
+# atoms.py
+# various radii used within the proteusPy program
+# ancient vestiges of code shown below
 #/* atoms.py - covalent radii used by atoms.inc */
 #/* from Pauling and CAChe S/W */
 # /* 5/4/94 -egs- */
@@ -33,5 +35,10 @@ ATOM_COLORS = {'O': 'red', 'C': 'grey', 'N': [0.0, 0.0, 1.0], 'S': 'yellow', 'H'
             'SG': 'yellow', 'CB': 'grey', 'FE': 'green'}
 
 BOND_RADIUS = .12
-FONTSIZE = 12
+BOND_COLOR = 'tan'
+FONTSIZE = 10
+BS_SCALE = .25
+SPECULARITY = .6
+SPEC_POWER = 15
+
 
