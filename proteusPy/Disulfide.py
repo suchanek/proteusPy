@@ -121,6 +121,7 @@ class DisulfideList(UserList):
     def get_id(self):
         return self.pdb_id
 
+    
     def display(self, style='bs'):
         ''' 
             Create a pyvista Plotter object with linked four windows for CPK, ball and stick,
@@ -157,6 +158,7 @@ class DisulfideList(UserList):
                     title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain} Energy: {enrg:.2f} kcal/mol'
 
                     pl.add_title(title=title, font_size=FONTSIZE)
+                    pl = ss.render()
                     pl = render_disulfide(ss, pl, style=style)
                     pl.camera_position = CAMERA_POS
                 i += 1
@@ -167,6 +169,9 @@ class DisulfideList(UserList):
         pl.show()
         pl.close()
         return
+
+WINSIZE = (1200, 1200)
+CAMERA_POS = ((0, 0, -10), (0,0,0), (0,1,0))
 
 # Class definition for a Disulfide bond. 
 class Disulfide:
@@ -259,7 +264,7 @@ class Disulfide:
         return res_array
     
     def cofmass(self) -> numpy.array:
-        res = numpy.zeros(shape=(6,3))
+        res = numpy.zeros(shape=(12,3))
         res = self.internal_coords()
         return res.mean(axis=0)
 
@@ -293,16 +298,176 @@ class Disulfide:
     def reset(self):
         self.__init__(self)
     
-    def compute_extents(self):
-        ic = numpy.zeros(shape=(6,3))
+    def compute_extents(self, dim='z'):
         ic = self.internal_coords()
+        # set default index to 'z'
+        idx = 2
 
+        if dim == 'x':
+            idx = 0
+        elif dim == 'y':
+            idx = 1
+        elif dim == 'z':
+            idx = 2
 
-        zmin = ic[:, 2].min()
-        zmax = ic[:, 2].max()
-        # print(f'{ic[:,2]}  {zmin} {zmax}')
+        _min = ic[:, idx].min()
+        _max = ic[:, idx].max()
 
-        return zmin, zmax
+        return _min, _max
+
+    def render(self, pvplot: pv.Plotter(), style='cpk', 
+               bondcolor=BOND_COLOR, bs_scale=BS_SCALE, spec=SPECULARITY, 
+               specpow=SPEC_POWER) -> pv.Plotter:
+        ''' 
+        Update the passed pyVista plotter() object with the mesh data for the input Disulfide Bond
+        Arguments:
+            pvp: pyvista.Plotter() object
+            style: 'bs', 'st', 'cpk', 'plain': Whether to render as CPK, ball-and-stick or stick.
+            Bonds are colored by atom color, unless 'plain' is specified.
+        Returns:
+            Updated pv.Plotter() object.
+        '''
+        
+        cyl_radius = BOND_RADIUS
+        coords = self.internal_coords()
+        cofmass = self.cofmass()
+        
+        # translate to cofmass frame
+        for i in range(12):
+            coords[i] = coords[i] - cofmass
+        
+        atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C', 'SG')
+        pvp = pvplot
+        
+        # bond connection table with atoms in the specific order shown above: 
+        # returned by ss.get_internal_coords()
+        bond_conn = numpy.array(
+            [
+                [0, 1], # n-ca
+                [1, 2], # ca-c
+                [2, 3], # c-o
+                [1, 4], # ca-cb
+                [4, 5], # cb-sg
+                [6, 7], # n-ca
+                [7, 8], # ca-c
+                [8, 9], # c-o
+                [7, 10], # ca-cb
+                [10, 11], #cb-sg
+                [5, 11]   #sg -sg
+            ])
+        
+        # colors for the bonds. Index into ATOM_COLORS array
+        bond_split_colors = numpy.array(
+            [
+                ('N', 'C'),
+                ('C', 'C'),
+                ('C', 'O'),
+                ('C', 'C'),
+                ('C', 'SG'),
+                ('N', 'C'),
+                ('C', 'C'),
+                ('C', 'O'),
+                ('C', 'C'),
+                ('C', 'SG'),
+                ('SG', 'SG')
+            ]
+        )
+                
+        if style=='cpk':
+            i = 0
+            for atom in atoms:
+                rad = ATOM_RADII_CPK[atom]
+                pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
+                i += 1
+            
+        elif style == 'bs': # ball and stick
+            i = 0
+            for atom in atoms:
+                rad = ATOM_RADII_CPK[atom] * bs_scale
+                pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
+                i += 1
+            
+            # work through connectivity and colors
+            for i in range(len(bond_conn)):
+                bond = bond_conn[i]
+
+                # get the indices for the origin and destination atoms
+                orig = bond[0]
+                dest = bond[1]
+
+                col = bond_split_colors[i]
+                orig_col = ATOM_COLORS[col[0]]
+                dest_col = ATOM_COLORS[col[1]]
+                
+                # get the coords
+                prox_pos = coords[orig]
+                distal_pos = coords[dest]
+                
+                # compute a direction vector
+                direction = distal_pos - prox_pos
+
+                # and vector length. divide by 2 since split bond
+                height = math.dist(prox_pos, distal_pos) / 2.0
+
+                origin1 = prox_pos + 0.25 * direction # the cylinder origin is actually in the middle so we translate
+                origin2 = prox_pos + 0.75 * direction # the cylinder origin is actually in the middle so we translate
+                
+                cyl1 = pv.Cylinder(origin1, direction, radius=cyl_radius, height=height)
+                cyl2 = pv.Cylinder(origin2, direction, radius=cyl_radius, height=height)
+                
+                pvp.add_mesh(cyl1, color=orig_col)
+                pvp.add_mesh(cyl2, color=dest_col)
+                
+        elif style == 'sb': # splitbonds
+            i = 0
+            
+            for i in range(len(bond_conn)):
+                bond = bond_conn[i]
+                orig = bond[0]
+                dest = bond[1]
+
+                col = bond_split_colors[i]
+                orig_col = ATOM_COLORS[col[0]]
+                dest_col = ATOM_COLORS[col[1]]
+
+                prox_pos = coords[orig]
+                distal_pos = coords[dest]
+                direction = distal_pos - prox_pos
+                height = math.dist(prox_pos, distal_pos) / 2.0
+
+                origin = prox_pos + 0.25 * direction # the cylinder origin is actually in the middle so we translate
+                origin2 = prox_pos + 0.75 * direction # the cylinder origin is actually in the middle so we translate
+                
+                cap1 = pv.Sphere(center=prox_pos, radius=cyl_radius)
+                cap2 = pv.Sphere(center=distal_pos, radius=cyl_radius)
+                
+                cyl1 = pv.Cylinder(origin, direction, radius=cyl_radius, height=height)
+                cyl2 = pv.Cylinder(origin2, direction, radius=cyl_radius, height=height)
+                
+                pvp.add_mesh(cyl1, color=orig_col)
+                pvp.add_mesh(cyl2, color=dest_col)
+                pvp.add_mesh(cap1, color=orig_col)
+                pvp.add_mesh(cap2, color=dest_col)
+
+        else: # plain
+            for i in range(len(bond_conn)):
+                bond = bond_conn[i]
+                orig = bond[0]
+                dest = bond[1]
+                prox_pos = coords[orig]
+                distal_pos = coords[dest]
+                direction = distal_pos - prox_pos
+                height = math.dist(prox_pos, distal_pos)
+                origin = prox_pos + 0.5 * direction # the cylinder origin is actually in the middle so we translate
+                
+                cap1 = pv.Sphere(center=prox_pos, radius=cyl_radius)
+                cap2 = pv.Sphere(center=distal_pos, radius=cyl_radius)
+                cyl = pv.Cylinder(origin, direction, radius=cyl_radius, height=height)
+                
+                pvp.add_mesh(cap1, color=bondcolor)
+                pvp.add_mesh(cap2, color=bondcolor)
+                pvp.add_mesh(cyl, color=bondcolor)
+        return pvp
 
     def display(self, single=True, style='bs'):
         src = self.pdb_id
@@ -317,47 +482,58 @@ class Disulfide:
         # print(f'Near, far: {near_range}, {far_range}')
         
         if single:
-            pl = pv.Plotter(window_size=WINSIZE)
-            pl.add_title(title=title, font_size=FONTSIZE)
-            pl.enable_anti_aliasing('msaa')
-            pl.add_axes()
-            pl.add_camera_orientation_widget()
+            _pl = pv.Plotter(window_size=WINSIZE)
+            #_pl.add_title(title=title, font_size=FONTSIZE)
+            _pl.enable_anti_aliasing('msaa')
+            _pl.add_axes()
+            _pl.add_camera_orientation_widget()
+            _pl.camera_position = CAMERA_POS
 
-            pl = render_disulfide(self, pl, style=style)
-            pl.camera.clipping_range = (near_range, far_range)
-            #pl.camera.zoom(.4)
-        
+            _pl = self.render(_pl, style=style, bondcolor=BOND_COLOR, 
+                        bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+ 
+            _pl.camera.clipping_range = (near_range, far_range)
+            _pl.enable_shadows()
+            _pl.camera.zoom(.4)
+            _pl.show(title=title)
         else:
             pl = pv.Plotter(window_size=WINSIZE, shape=(2,2))
             pl.subplot(0,0)
+            
             pl.add_axes()
             pl.add_title(title=title, font_size=FONTSIZE)
             pl.enable_anti_aliasing('msaa')
+
             pl.add_camera_orientation_widget()
-            pl.camera_position = CAMERA_POS
-            pl.camera.clipping_range = (near_range, far_range)
-            pl = render_disulfide(self, pl, style='cpk')
-
-
-            pl.add_title(title=title, font_size=FONTSIZE)
-            pl = render_disulfide(self, pl, style='bs')
-            pl.show_bounds(all_edges=True)
+            pl = self.render(pl, style='cpk', bondcolor=BOND_COLOR, 
+                        bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
 
             pl.subplot(0,1)
             pl.add_axes()
             pl.add_title(title=title, font_size=FONTSIZE)
-            pl = render_disulfide(self, pl, style='sb')
+            pl = self.render(pl, style='bs', bondcolor=BOND_COLOR, 
+                        bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
 
             pl.subplot(1,0)
             pl.add_axes()
             pl.add_title(title=title, font_size=FONTSIZE)
-            pl = render_disulfide(self, pl, style='plain')
-            pl.show_bounds(all_edges=True)
+            pl = self.render(pl, style='sb', bondcolor=BOND_COLOR, 
+                        bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+            
+            pl.subplot(1,1)
+            pl.add_axes()
+            pl.add_title(title=title, font_size=FONTSIZE)
+            pl = self.render(pl, style='plain', bondcolor=BOND_COLOR, 
+                        bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+            
             pl.link_views()
+            pl.camera_position = CAMERA_POS
+            pl.camera.clipping_range = (near_range, far_range)
             pl.camera.zoom(.4)
+            pl.show()
+            pl.close()
         # 
-        pl.show()
-        pl.close()
+        
 
     # comparison operators, used for sorting. keyed to SS bond energy
     def __lt__(self, other):
@@ -1627,14 +1803,8 @@ def check_header_from_id(struct_name: str,
         i += 1
     return True
 
-# Using pyVista to render Disulfide Bonds.
-
-from proteusPy.atoms import BOND_RADIUS, FONTSIZE
-WINSIZE = (1200, 1200)
-CAMERA_POS = ((0, 0, -10), (0,0,0), (0,1,0))
-
-def render_disulfide(ss: Disulfide, pvplot: pv.Plotter(), style='cpk', 
-                    bondcolor='brown', bs_scale=.2, spec=.6, specpow=4) -> pv.Plotter:
+def Xrender_disulfide(ss: Disulfide, pvplot: pv.Plotter(), style='cpk', 
+                    bondcolor=BOND_COLOR, bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER) -> pv.Plotter:
     ''' 
     Update the passed pyVista plotter() object with the mesh data for the input Disulfide Bond
     Arguments:
