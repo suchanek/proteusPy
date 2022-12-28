@@ -121,7 +121,6 @@ class DisulfideList(UserList):
     def get_id(self):
         return self.pdb_id
 
-    
     def display(self, style='bs'):
         ''' 
             Create a pyvista Plotter object with linked four windows for CPK, ball and stick,
@@ -158,11 +157,10 @@ class DisulfideList(UserList):
                     title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain} Energy: {enrg:.2f} kcal/mol'
 
                     pl.add_title(title=title, font_size=FONTSIZE)
-                    pl = ss.render()
-                    pl = render_disulfide(ss, pl, style=style)
+                    pl = ss.render(pl, style=style, bondcolor=BOND_COLOR, 
+                                   bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
                     pl.camera_position = CAMERA_POS
                 i += 1
-        
         pl.link_views()
         pl.camera.zoom(.65)
 
@@ -496,6 +494,8 @@ class Disulfide:
             _pl.enable_shadows()
             _pl.camera.zoom(.4)
             _pl.show(title=title)
+            _pl.close()
+
         else:
             pl = pv.Plotter(window_size=WINSIZE, shape=(2,2))
             pl.subplot(0,0)
