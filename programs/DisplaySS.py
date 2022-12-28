@@ -6,9 +6,7 @@
 import pandas as pd
 import numpy
 import math
-
 from proteusPy.disulfide import DisulfideLoader, Disulfide, DisulfideList
-
 import pyvista as pv
 from pyvista import set_plot_theme
 
@@ -42,7 +40,7 @@ if __name__ == '__main__':
     # one disulfide from the database
     ss = Disulfide()
     ss = PDB_SS[0]
-    ss.display(style='sb', single=True)
+    ss.display(style='bs', single=True)
     ss.display(style='bs', single=False)
 
     # get all disulfides for one structure. Make a 
