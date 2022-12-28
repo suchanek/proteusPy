@@ -40,7 +40,8 @@ if __name__ == '__main__':
     # one disulfide from the database
     ss = Disulfide()
     ss = PDB_SS[0]
-    ss.display(style='bs', single=True)
+    ss.display(style='cpk', single=True)
+    ss.display(style='cov', single=True)
     ss.display(style='bs', single=False)
 
     # get all disulfides for one structure. Make a 
