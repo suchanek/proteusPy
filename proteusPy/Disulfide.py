@@ -27,6 +27,9 @@ _FLOAT_INIT = -999.9
 # tqdm progress bar width
 _PBAR_COLS = 100
 
+WINSIZE = (1200, 1200)
+CAMERA_POS = ((0, 0, -10), (0,0,0), (0,1,0))
+
 # make a colormap in vector space from starting color to
 # ending color
 
@@ -123,12 +126,12 @@ class DisulfideList(UserList):
 
     def display(self, style='bs'):
         ''' 
-            Create a pyvista Plotter object with linked four windows for CPK, ball and stick,
-            wireframe and surface displays for the Disulfide.
+            Display a window showing the list of disulfides in the given style.
             Argument:
                 self
+                style: one of 'cpk', 'bs', 'sb', 'plain', 'cov'
             Returns:
-                None. Updates internal object.
+                Window displaying the Disulfides.
         '''
                 
         ssList = self.data
@@ -136,12 +139,9 @@ class DisulfideList(UserList):
 
         cols = 2
         rows = (tot_ss + 1) // cols
-        near_range = -10.0
-        far_range = 10.0
         i = 0
 
         pl = pv.Plotter(window_size=WINSIZE, shape=(rows, cols))
-        pl.camera.clipping_range = (near_range, far_range)
         pl.add_camera_orientation_widget()
 
         for r in range(rows):
@@ -149,18 +149,20 @@ class DisulfideList(UserList):
                 pl.subplot(r,c)
                 if i < tot_ss:
                     pl.enable_anti_aliasing('msaa')
-                    #pl.view_isometric()
                     pl.add_axes()
                     ss = ssList[i]
                     src = ss.pdb_id
                     enrg = ss.energy
+                    near_range, far_range = ss.compute_extents()
                     title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain} Energy: {enrg:.2f} kcal/mol'
-
                     pl.add_title(title=title, font_size=FONTSIZE)
+
                     pl = ss.render(pl, style=style, bondcolor=BOND_COLOR, 
                                    bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
                     pl.camera_position = CAMERA_POS
                 i += 1
+        
+        pl.camera.clipping_range = (near_range, far_range)
         pl.link_views()
         pl.camera.zoom(.65)
 
@@ -168,8 +170,6 @@ class DisulfideList(UserList):
         pl.close()
         return
 
-WINSIZE = (1200, 1200)
-CAMERA_POS = ((0, 0, -10), (0,0,0), (0,1,0))
 
 # Class definition for a Disulfide bond. 
 class Disulfide:
@@ -313,20 +313,20 @@ class Disulfide:
 
         return _min, _max
 
-    def render(self, pvplot: pv.Plotter(), style='cpk', 
+    def render(self, pvplot: pv.Plotter(), style='bs', 
                bondcolor=BOND_COLOR, bs_scale=BS_SCALE, spec=SPECULARITY, 
                specpow=SPEC_POWER) -> pv.Plotter:
         ''' 
         Update the passed pyVista plotter() object with the mesh data for the input Disulfide Bond
         Arguments:
-            pvp: pyvista.Plotter() object
+            pvpplot: pyvista.Plotter() object
             style: 'bs', 'st', 'cpk', 'plain': Whether to render as CPK, ball-and-stick or stick.
             Bonds are colored by atom color, unless 'plain' is specified.
         Returns:
             Updated pv.Plotter() object.
         '''
         
-        cyl_radius = BOND_RADIUS
+        radius = BOND_RADIUS
         coords = self.internal_coords()
         cofmass = self.cofmass()
         
@@ -378,6 +378,13 @@ class Disulfide:
                 pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
                 i += 1
             
+        elif style=='cov':
+            i = 0
+            for atom in atoms:
+                rad = ATOM_RADII_COVALENT[atom]
+                pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
+                i += 1
+
         elif style == 'bs': # ball and stick
             i = 0
             for atom in atoms:
@@ -410,8 +417,8 @@ class Disulfide:
                 origin1 = prox_pos + 0.25 * direction # the cylinder origin is actually in the middle so we translate
                 origin2 = prox_pos + 0.75 * direction # the cylinder origin is actually in the middle so we translate
                 
-                cyl1 = pv.Cylinder(origin1, direction, radius=cyl_radius, height=height)
-                cyl2 = pv.Cylinder(origin2, direction, radius=cyl_radius, height=height)
+                cyl1 = pv.Cylinder(origin1, direction, radius=radius, height=height)
+                cyl2 = pv.Cylinder(origin2, direction, radius=radius, height=height)
                 
                 pvp.add_mesh(cyl1, color=orig_col)
                 pvp.add_mesh(cyl2, color=dest_col)
@@ -436,11 +443,11 @@ class Disulfide:
                 origin = prox_pos + 0.25 * direction # the cylinder origin is actually in the middle so we translate
                 origin2 = prox_pos + 0.75 * direction # the cylinder origin is actually in the middle so we translate
                 
-                cap1 = pv.Sphere(center=prox_pos, radius=cyl_radius)
-                cap2 = pv.Sphere(center=distal_pos, radius=cyl_radius)
+                cap1 = pv.Sphere(center=prox_pos, radius=radius)
+                cap2 = pv.Sphere(center=distal_pos, radius=radius)
                 
-                cyl1 = pv.Cylinder(origin, direction, radius=cyl_radius, height=height)
-                cyl2 = pv.Cylinder(origin2, direction, radius=cyl_radius, height=height)
+                cyl1 = pv.Cylinder(origin, direction, radius=radius, height=height)
+                cyl2 = pv.Cylinder(origin2, direction, radius=radius, height=height)
                 
                 pvp.add_mesh(cyl1, color=orig_col)
                 pvp.add_mesh(cyl2, color=dest_col)
@@ -458,9 +465,9 @@ class Disulfide:
                 height = math.dist(prox_pos, distal_pos)
                 origin = prox_pos + 0.5 * direction # the cylinder origin is actually in the middle so we translate
                 
-                cap1 = pv.Sphere(center=prox_pos, radius=cyl_radius)
-                cap2 = pv.Sphere(center=distal_pos, radius=cyl_radius)
-                cyl = pv.Cylinder(origin, direction, radius=cyl_radius, height=height)
+                cap1 = pv.Sphere(center=prox_pos, radius=radius)
+                cap2 = pv.Sphere(center=distal_pos, radius=radius)
+                cyl = pv.Cylinder(origin, direction, radius=radius, height=height)
                 
                 pvp.add_mesh(cap1, color=bondcolor)
                 pvp.add_mesh(cap2, color=bondcolor)
@@ -477,7 +484,6 @@ class Disulfide:
         title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain} Energy: {enrg:.2f} kcal/mol'
         
         near_range, far_range = self.compute_extents()
-        # print(f'Near, far: {near_range}, {far_range}')
         
         if single:
             _pl = pv.Plotter(window_size=WINSIZE)
@@ -1815,7 +1821,7 @@ def Xrender_disulfide(ss: Disulfide, pvplot: pv.Plotter(), style='cpk',
         Updated pv.Plotter() object.
     '''
     
-    cyl_radius = BOND_RADIUS
+    radius = BOND_RADIUS
     coords = ss.internal_coords()
     cofmass = ss.cofmass()
     
@@ -1899,8 +1905,8 @@ def Xrender_disulfide(ss: Disulfide, pvplot: pv.Plotter(), style='cpk',
             origin1 = prox_pos + 0.25 * direction # the cylinder origin is actually in the middle so we translate
             origin2 = prox_pos + 0.75 * direction # the cylinder origin is actually in the middle so we translate
             
-            cyl1 = pv.Cylinder(origin1, direction, radius=cyl_radius, height=height)
-            cyl2 = pv.Cylinder(origin2, direction, radius=cyl_radius, height=height)
+            cyl1 = pv.Cylinder(origin1, direction, radius=radius, height=height)
+            cyl2 = pv.Cylinder(origin2, direction, radius=radius, height=height)
             
             pvp.add_mesh(cyl1, color=orig_col)
             pvp.add_mesh(cyl2, color=dest_col)
@@ -1925,11 +1931,11 @@ def Xrender_disulfide(ss: Disulfide, pvplot: pv.Plotter(), style='cpk',
             origin = prox_pos + 0.25 * direction # the cylinder origin is actually in the middle so we translate
             origin2 = prox_pos + 0.75 * direction # the cylinder origin is actually in the middle so we translate
             
-            cap1 = pv.Sphere(center=prox_pos, radius=cyl_radius)
-            cap2 = pv.Sphere(center=distal_pos, radius=cyl_radius)
+            cap1 = pv.Sphere(center=prox_pos, radius=radius)
+            cap2 = pv.Sphere(center=distal_pos, radius=radius)
             
-            cyl1 = pv.Cylinder(origin, direction, radius=cyl_radius, height=height)
-            cyl2 = pv.Cylinder(origin2, direction, radius=cyl_radius, height=height)
+            cyl1 = pv.Cylinder(origin, direction, radius=radius, height=height)
+            cyl2 = pv.Cylinder(origin2, direction, radius=radius, height=height)
             
             pvp.add_mesh(cyl1, color=orig_col)
             pvp.add_mesh(cyl2, color=dest_col)
@@ -1947,9 +1953,9 @@ def Xrender_disulfide(ss: Disulfide, pvplot: pv.Plotter(), style='cpk',
             height = math.dist(prox_pos, distal_pos)
             origin = prox_pos + 0.5 * direction # the cylinder origin is actually in the middle so we translate
             
-            cap1 = pv.Sphere(center=prox_pos, radius=cyl_radius)
-            cap2 = pv.Sphere(center=distal_pos, radius=cyl_radius)
-            cyl = pv.Cylinder(origin, direction, radius=cyl_radius, height=height)
+            cap1 = pv.Sphere(center=prox_pos, radius=radius)
+            cap2 = pv.Sphere(center=distal_pos, radius=radius)
+            cyl = pv.Cylinder(origin, direction, radius=radius, height=height)
             
             pvp.add_mesh(cap1, color=bondcolor)
             pvp.add_mesh(cap2, color=bondcolor)
