@@ -130,9 +130,7 @@ class DisulfideList(UserList):
             Returns:
                 None. Updates internal object.
         '''
-        
-        FONTSIZE = 10 # fontsize
-        
+                
         ssList = self.data
         tot_ss = len(ssList) # number off ssbonds
 
@@ -295,41 +293,55 @@ class Disulfide:
     def reset(self):
         self.__init__(self)
     
+    def compute_extents(self):
+        ic = numpy.zeros(shape=(6,3))
+        ic = self.internal_coords()
+
+
+        zmin = ic[:, 2].min()
+        zmax = ic[:, 2].max()
+        # print(f'{ic[:,2]}  {zmin} {zmax}')
+
+        return zmin, zmax
+
     def display(self, single=True, style='bs'):
         src = self.pdb_id
         enrg = self.energy
         title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain} Energy: {enrg:.2f} kcal/mol'
         
-        near_range = -10.0
-        far_range = 10.0
         src = self.pdb_id
-        fullname = self.name
         enrg = self.energy
         title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain} Energy: {enrg:.2f} kcal/mol'
         
-        near_range = -10.0
-        far_range = 10.0
+        near_range, far_range = self.compute_extents()
+        # print(f'Near, far: {near_range}, {far_range}')
         
-        pl = pv.Plotter(window_size=WINSIZE)
-        pl.camera.clipping_range = (near_range, far_range)
-        pl.add_title(title=title, font_size=FONTSIZE)
-        pl.enable_anti_aliasing('msaa')
-        pl.add_axes()
-        pl.add_camera_orientation_widget()
-
         if single:
             pl = pv.Plotter(window_size=WINSIZE)
+            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.enable_anti_aliasing('msaa')
+            pl.add_axes()
+            pl.add_camera_orientation_widget()
+
             pl = render_disulfide(self, pl, style=style)
-            pl.camera_position = CAMERA_POS
-            pl.camera.zoom(.4)
-            pl.link_views()
+            pl.camera.clipping_range = (near_range, far_range)
+            #pl.camera.zoom(.4)
         
         else:
             pl = pv.Plotter(window_size=WINSIZE, shape=(2,2))
             pl.subplot(0,0)
             pl.add_axes()
             pl.add_title(title=title, font_size=FONTSIZE)
+            pl.enable_anti_aliasing('msaa')
+            pl.add_camera_orientation_widget()
+            pl.camera_position = CAMERA_POS
+            pl.camera.clipping_range = (near_range, far_range)
             pl = render_disulfide(self, pl, style='cpk')
+
+
+            pl.add_title(title=title, font_size=FONTSIZE)
+            pl = render_disulfide(self, pl, style='bs')
+            pl.show_bounds(all_edges=True)
 
             pl.subplot(0,1)
             pl.add_axes()
@@ -340,7 +352,10 @@ class Disulfide:
             pl.add_axes()
             pl.add_title(title=title, font_size=FONTSIZE)
             pl = render_disulfide(self, pl, style='plain')
-
+            pl.show_bounds(all_edges=True)
+            pl.link_views()
+            pl.camera.zoom(.4)
+        # 
         pl.show()
         pl.close()
 
