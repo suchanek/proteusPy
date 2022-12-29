@@ -63,8 +63,24 @@ class DisulfideList(UserList):
     Indexing and slicing are supported, and normal list operations like .insert, .append and .extend.
     The DisulfideList object must be initialized with an iterable (tuple, list) and a name.
     
-    Example:
+    The class can also render Disulfides to a pyVista window using the DisulfideList.display() 
+    method. See below for examples.\n
+
+    Examples:
         from proteusPy.disulfide import DisulfideList, Disulfide, DisulfideLoader
+        
+        # instantiate some variables
+        SS = Disulfide()
+        # Note: the list is initialized with an iterable and a name (optional)
+        SSlist = DisulfideList([],'ss')
+
+        PDB_SS = DisulfideLoader()  # load the Disulfide database\n
+        SS = PDB_SS[0]              # returns a Disulfide object at index 0
+        SSlist = PDB_SS['4yys']     # returns a DisulfideList containing all
+                                    #  disulfides for 4yys\n
+
+        SSlist = PDB_SS[:8]         # get SS bonds for the last 8 structures\n
+        SSlist.display('sb')        # render the disulfides in 'split bonds' style\n
 
         # make some empty disulfides
         ss1 = Disulfide('ss1')
@@ -74,16 +90,13 @@ class DisulfideList(UserList):
         sslist = DisulfideList([ss1], 'tmp')
         sslist.append(ss2)
 
-        # load the PDB Disulfide database
-        PDB_SS = None
-        PDB_SS = DisulfideLoader(verbose=True, modeldir=MODELS)
-
         # extract a disulfide with typical index
         ss1 = PDB_SS[0]
         print(f'{ss1.pprint_all()}')
 
         # grab a subset via slicing
         subset = DisulfideList(PDB_SS[0:10],'subset')
+        subset.display(style='sb')      # display the disulfides in 'split bond' style
     '''
     
     def __init__(self, iterable, id):
@@ -164,7 +177,7 @@ class DisulfideList(UserList):
         
         pl.camera.clipping_range = (near_range, far_range)
         pl.link_views()
-        pl.camera.zoom(.40)
+        pl.camera.zoom(CAMERA_SCALE)
 
         pl.show()
         pl.close()
@@ -445,7 +458,7 @@ class Disulfide:
                 
                 pvp.add_mesh(cyl1, color=orig_col)
                 pvp.add_mesh(cyl2, color=dest_col)
-                
+
         elif style == 'sb': # splitbonds
             i = 0
             
@@ -495,6 +508,7 @@ class Disulfide:
                 pvp.add_mesh(cap1, color=bondcolor)
                 pvp.add_mesh(cap2, color=bondcolor)
                 pvp.add_mesh(cyl, color=bondcolor)
+        #pvp.enable_shadows()
         return pvp
 
     def display(self, single=True, style='bs'):
@@ -510,19 +524,18 @@ class Disulfide:
         
         if single:
             _pl = pv.Plotter(window_size=WINSIZE)
-            #_pl.add_title(title=title, font_size=FONTSIZE)
+            _pl.add_title(title=title, font_size=FONTSIZE)
             _pl.enable_anti_aliasing('msaa')
             #_pl.add_axes()
             _pl.add_camera_orientation_widget()
-            _pl.camera_position = CAMERA_POS
 
             _pl = self.render(_pl, style=style, bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
  
             _pl.camera.clipping_range = (near_range, far_range)
-            _pl.enable_shadows()
-            _pl.camera.zoom(.4)
-            _pl.show(title=title)
+            _pl.camera_position = CAMERA_POS
+            _pl.camera.zoom(CAMERA_SCALE)
+            _pl.show()
             _pl.close()
 
         else:
@@ -556,9 +569,9 @@ class Disulfide:
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
             
             pl.link_views()
-            pl.camera_position = CAMERA_POS
             pl.camera.clipping_range = (near_range, far_range)
-            pl.camera.zoom(.4)
+            pl.camera_position = CAMERA_POS
+            pl.camera.zoom(CAMERA_SCALE)
             pl.show()
             pl.close()
         # 
@@ -1015,7 +1028,8 @@ class DisulfideLoader():
     This class loads .pkl files created from the ExtractDisulfides() routine 
     and initializes itself with their contents. The Disulfide objects are contained
     in a DisulfideList object and Dict. This makes it possible to access the disulfides by
-    array index or PDB structure ID.\n
+    array index or PDB structure ID. The class can also render Disulfides to a pyVista
+    window using the DisulfideLoader.display() method. See below for examples.\n
 
     Example:
         from proteusPy.disulfide import DisulfideList, Disulfide, DisulfideLoader
@@ -1024,9 +1038,13 @@ class DisulfideLoader():
         SS2 = DisulfideList([],'tmp2')
 
         PDB_SS = DisulfideLoader()
-        SS1 = PDB_SS[0]         <-- returns a Disulfide object at index 0
-        SS2 = PDB_SS['4yys']    <-- returns a DisulfideList containing all disulfides for 4yys
-        SS3 = PDB_SS[:10]       <-- returns a DisulfideList containing the slice
+        SS1 = PDB_SS[0]         # returns a Disulfide object at index 0
+        SS2 = PDB_SS['4yys']    # returns a DisulfideList containing all disulfides for 4yys
+        SS3 = PDB_SS[:10]       # returns a DisulfideList containing the slice
+
+        SSlist = PDB_SS[:8]     # get SS bonds for the last 8 structures
+        SSlist.display('sb')    # render the disulfides in 'split bonds' style
+
     '''
 
     def __init__(self, verbose=True, modeldir=MODEL_DIR, picklefile=SS_PICKLE_FILE, 
@@ -1159,10 +1177,9 @@ class DisulfideLoader():
             #pl = render_disulfide(ss, pl, style='st', bondcolor=mycol[i])
             i += 1
 
-        pl.camera.zoom(.4)
+        pl.camera.zoom(CAMERA_SCALE)
         pl.show()
         pl.close()
-        return
     
     def display(self, style='bs'):
         ''' 
@@ -1172,8 +1189,6 @@ class DisulfideLoader():
         Returns:
             None. Updates internal object.
         '''
-    
-        FONTSIZE = 10 # fontsize
         
         ssList = self.SSList
         tot_ss = len(ssList) # number off ssbonds
@@ -1185,7 +1200,6 @@ class DisulfideLoader():
         i = 0
 
         pl = pv.Plotter(window_size=WINSIZE, shape=(rows, cols))
-        pl.camera.clipping_range = (near_range, far_range)
         pl.add_camera_orientation_widget()
 
         for r in range(rows):
@@ -1201,14 +1215,16 @@ class DisulfideLoader():
                     title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol'
                     pl.add_title(title=title, font_size=FONTSIZE)
                     pl = ss.render(pl, style=style)
+                    near_range, far_range = ss.compute_extents()
+                    pl.camera.clipping_range = (near_range, far_range)
+
                     pl.camera_position = CAMERA_POS
                 i += 1        
         pl.link_views()
-        pl.camera.zoom(.4)
+        pl.camera.zoom(CAMERA_SCALE)
 
         pl.show()
         pl.close()
-        return
 
 # class ends
 
