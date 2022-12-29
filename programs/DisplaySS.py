@@ -40,18 +40,19 @@ if __name__ == '__main__':
     # one disulfide from the database
     ss = Disulfide()
     ss = PDB_SS[0]
-    ss.display(style='cpk', single=True)
-    ss.display(style='cov', single=True)
-    ss.display(style='bs', single=False)
+
+    #ss.display(style='cpk', single=True)
+    #ss.display(style='cov', single=True)
+    #ss.display(style='bs', single=False)
 
     # get all disulfides for one structure. Make a 
     # DisulfideList object to hold it
     ss4yss = PDB_SS['4yys']
 
-    #ss4yss.display('cpk')
-    #ss4yss.display('bs')
-    #ss4yss.display('sb')
-    #ss4yss.display('plain')
+    ss4yss.display('cpk')
+    ss4yss.display('bs')
+    ss4yss.display('sb')
+    ss4yss.display('plain')
 
     sslist = PDB_SS[:8]
     sslist.display('sb')
