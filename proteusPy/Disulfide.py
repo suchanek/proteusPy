@@ -170,7 +170,7 @@ class DisulfideList(UserList):
                     title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol'
                     pl.add_title(title=title, font_size=FONTSIZE)
 
-                    pl = ss.render(pl, style=style, bondcolor=BOND_COLOR, 
+                    pl = ss._render(pl, style=style, bondcolor=BOND_COLOR, 
                                    bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
                     pl.camera_position = CAMERA_POS
                 i += 1
@@ -180,7 +180,6 @@ class DisulfideList(UserList):
         pl.camera.zoom(CAMERA_SCALE)
 
         pl.show()
-        pl.close()
         return
 
 # Class definition for a Disulfide bond. 
@@ -337,14 +336,14 @@ class Disulfide:
 
         return res
 
-    def render(self, pvplot: pv.Plotter(), style='bs', 
+    def _render(self, pvplot: pv.Plotter(), style='bs', 
                bondcolor=BOND_COLOR, bs_scale=BS_SCALE, spec=SPECULARITY, 
                specpow=SPEC_POWER) -> pv.Plotter:
         ''' 
         Update the passed pyVista plotter() object with the mesh data for the input Disulfide Bond
         Arguments:
             pvpplot: pyvista.Plotter() object
-            style: 'bs', 'st', 'cpk', 'plain': Whether to render as CPK, ball-and-stick or stick.
+            style: 'bs', 'st', 'cpk', 'plain', 'cov': Whether to render as CPK, ball-and-stick or stick.
             Bonds are colored by atom color, unless 'plain' is specified.
         Returns:
             Updated pv.Plotter() object.
@@ -401,7 +400,6 @@ class Disulfide:
                 rad = ATOM_RADII_CPK[atom]
                 pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
                 i += 1
-            
         elif style=='cov':
             i = 0
             for atom in atoms:
@@ -511,11 +509,7 @@ class Disulfide:
         #pvp.enable_shadows()
         return pvp
 
-    def display(self, single=True, style='bs'):
-        src = self.pdb_id
-        enrg = self.energy
-        title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol'
-        
+    def display(self, single=True, style='sb'):
         src = self.pdb_id
         enrg = self.energy
         title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol'
@@ -529,14 +523,13 @@ class Disulfide:
             #_pl.add_axes()
             _pl.add_camera_orientation_widget()
 
-            _pl = self.render(_pl, style=style, bondcolor=BOND_COLOR, 
+            _pl = self._render(_pl, style=style, bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
  
             _pl.camera.clipping_range = (near_range, far_range)
             _pl.camera_position = CAMERA_POS
             _pl.camera.zoom(CAMERA_SCALE)
             _pl.show()
-            _pl.close()
 
         else:
             pl = pv.Plotter(window_size=WINSIZE, shape=(2,2))
@@ -547,36 +540,30 @@ class Disulfide:
             pl.enable_anti_aliasing('msaa')
 
             pl.add_camera_orientation_widget()
-            pl = self.render(pl, style='cpk', bondcolor=BOND_COLOR, 
+            pl = self._render(pl, style='cpk', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
 
             pl.subplot(0,1)
-            #pl.add_axes()
             pl.add_title(title=title, font_size=FONTSIZE)
-            pl = self.render(pl, style='cov', bondcolor=BOND_COLOR, 
+            pl = self._render(pl, style='cov', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
 
             pl.subplot(1,0)
-            #pl.add_axes()
             pl.add_title(title=title, font_size=FONTSIZE)
-            pl = self.render(pl, style='bs', bondcolor=BOND_COLOR, 
+            pl = self._render(pl, style='bs', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
             
             pl.subplot(1,1)
-            #pl.add_axes()
             pl.add_title(title=title, font_size=FONTSIZE)
-            pl = self.render(pl, style='sb', bondcolor=BOND_COLOR, 
+            pl = self._render(pl, style='sb', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
             
             pl.link_views()
             pl.camera.clipping_range = (near_range, far_range)
             pl.camera_position = CAMERA_POS
             pl.camera.zoom(CAMERA_SCALE)
-            pl.show()
-            pl.close()
-        # 
-        
-
+            pl.show()        # 
+    
     # comparison operators, used for sorting. keyed to SS bond energy
     def __lt__(self, other):
         if isinstance(other, Disulfide):
@@ -734,10 +721,8 @@ class Disulfide:
         '''
 
         id = chain1.get_full_id()[0]
-
         self.pdb_id = id
         
-        # create a new Disulfide object
         chi1 = chi2 = chi3 = chi4 = chi5 = _FLOAT_INIT
 
         prox = int(proximal)
@@ -758,8 +743,8 @@ class Disulfide:
         self.proximal_residue_fullid = prox_residue.get_full_id()
         self.distal_residue_fullid = dist_residue.get_full_id()
 
-
-        # grab the coordinates for the proximal and distal residues as vectors so we can do math on them later
+        # grab the coordinates for the proximal and distal residues as vectors 
+        # so we can do math on them later
 
         # proximal residue
         if self.QUIET:
@@ -1173,13 +1158,12 @@ class DisulfideLoader():
         
         i = 0
         for ss in ssbonds:
-            pl = ss.render(pl, style='st', bondcolor=mycol[i])
+            pl = ss._render(pl, style='st', bondcolor=mycol[i])
             #pl = render_disulfide(ss, pl, style='st', bondcolor=mycol[i])
             i += 1
 
         pl.camera.zoom(CAMERA_SCALE)
         pl.show()
-        pl.close()
     
     def display(self, style='bs'):
         ''' 
@@ -1214,7 +1198,7 @@ class DisulfideLoader():
                     enrg = ss.energy
                     title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol'
                     pl.add_title(title=title, font_size=FONTSIZE)
-                    pl = ss.render(pl, style=style)
+                    pl = ss._render(pl, style=style)
                     near_range, far_range = ss.compute_extents()
                     pl.camera.clipping_range = (near_range, far_range)
 
@@ -1224,7 +1208,6 @@ class DisulfideLoader():
         pl.camera.zoom(CAMERA_SCALE)
 
         pl.show()
-        pl.close()
 
 # class ends
 

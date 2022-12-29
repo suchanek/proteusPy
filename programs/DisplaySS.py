@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
     # get all disulfides for one structure. Make a 
     # DisulfideList object to hold it
-    '''
+    
     ss4yss = DisulfideList([], 'tmp')
     ss4yss = PDB_SS['4yys']
 
@@ -53,9 +53,7 @@ if __name__ == '__main__':
     ss4yss.display('bs')
     ss4yss.display('sb')
     ss4yss.display('plain')
-    '''
-
-
+    
     sslist = DisulfideList([], 'slice')
     sslist = PDB_SS[:8]
     sslist.display('sb')
@@ -64,13 +62,7 @@ if __name__ == '__main__':
     ss1j5h = PDB_SS['1j5h']
     ss1j5h.display('sb')
 
-    #PDB_SS.display_overlay('4yys')
+    PDB_SS.display_overlay('4yys')
     
-    #ss.display(single=True, style='sb')
-
-    #pvp = render_disulfides_by_id(PDB_SS, '4yys')
-    
-    #pvp.show()
-    #pvp.close()
 
     exit()
