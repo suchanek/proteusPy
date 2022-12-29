@@ -175,7 +175,7 @@ class DisulfideList(UserList):
                     pl.camera_position = CAMERA_POS
                 i += 1
         
-        pl.camera.clipping_range = (near_range, far_range)
+        #pl.camera.clipping_range = (near_range, far_range)
         pl.link_views()
         pl.camera.zoom(CAMERA_SCALE)
 
@@ -526,7 +526,7 @@ class Disulfide:
             _pl = self._render(_pl, style=style, bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
  
-            _pl.camera.clipping_range = (near_range, far_range)
+            #_pl.camera.clipping_range = (near_range, far_range)
             _pl.camera_position = CAMERA_POS
             _pl.camera.zoom(CAMERA_SCALE)
             _pl.show()
@@ -559,7 +559,7 @@ class Disulfide:
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
             
             pl.link_views()
-            pl.camera.clipping_range = (near_range, far_range)
+            #pl.camera.clipping_range = (near_range, far_range)
             pl.camera_position = CAMERA_POS
             pl.camera.zoom(CAMERA_SCALE)
             pl.show()        # 
@@ -1200,7 +1200,7 @@ class DisulfideLoader():
                     pl.add_title(title=title, font_size=FONTSIZE)
                     pl = ss._render(pl, style=style)
                     near_range, far_range = ss.compute_extents()
-                    pl.camera.clipping_range = (near_range, far_range)
+                    #pl.camera.clipping_range = (near_range, far_range)
 
                     pl.camera_position = CAMERA_POS
                 i += 1        
