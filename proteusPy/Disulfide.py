@@ -27,11 +27,19 @@ _FLOAT_INIT = -999.9
 # tqdm progress bar width
 _PBAR_COLS = 100
 
-WINSIZE = (1200, 1200)
-CAMERA_POS = ((0, 0, -10), (0,0,0), (0,1,0))
+#WINSIZE = (1200, 1200)
+#CAMERA_POS = ((0, 0, -10), (0,0,0), (0,1,0))
 
 # make a colormap in vector space from starting color to
 # ending color
+
+from matplotlib.colors import LinearSegmentedColormap
+
+def Ncmap_vector(strtr, strtg, strtb, steps):
+    cols = [strtr, strtg, strtb]
+    cmap_name = 'cmap'
+    cmap = LinearSegmentedColormap.from_list(cmap_name, cols, N=steps)
+    return cmap
 
 def cmap_vector(strtc, endc, steps):
     # make a colormap in vector space
@@ -67,7 +75,7 @@ class DisulfideList(UserList):
     method. See below for examples.\n
 
     Examples:
-        from proteusPy.disulfide import DisulfideList, Disulfide, DisulfideLoader
+        from proteusPy.Disulfide import DisulfideList, Disulfide, DisulfideLoader
         
         # instantiate some variables
         SS = Disulfide()
@@ -487,6 +495,34 @@ class Disulfide:
                 pvp.add_mesh(cyl2, color=dest_col)
                 pvp.add_mesh(cap1, color=orig_col)
                 pvp.add_mesh(cap2, color=dest_col)
+        
+        elif style == 'pd': # splitbonds
+            i = 0
+                
+            for i in range(len(bond_conn)):
+                bond = bond_conn[i]
+                orig = bond[0]
+                dest = bond[1]
+                prox_pos = coords[orig]
+                distal_pos = coords[dest]
+                direction = distal_pos - prox_pos
+                height = math.dist(prox_pos, distal_pos)
+                origin = prox_pos + 0.5 * direction # the cylinder origin is actually in the middle so we translate
+                
+                cap1 = pv.Sphere(center=prox_pos, radius=radius*1.2)
+                cap2 = pv.Sphere(center=distal_pos, radius=radius*1.2)
+                cyl = pv.Cylinder(origin, direction, radius=radius, height=height)
+                
+                if i < 5:
+                    color = 'red'
+                else:
+                    color = 'green'
+                if i == 10:
+                    color = 'yellow'
+                
+                pvp.add_mesh(cap1, color=color)
+                pvp.add_mesh(cap2, color=color)
+                pvp.add_mesh(cyl, color=color)
 
         else: # plain
             for i in range(len(bond_conn)):
@@ -528,7 +564,10 @@ class Disulfide:
  
             #_pl.camera.clipping_range = (near_range, far_range)
             _pl.camera_position = CAMERA_POS
-            _pl.camera.zoom(CAMERA_SCALE)
+            zoom = CAMERA_SCALE
+            if style == 'cpk':
+                zoom = zoom * .75
+            _pl.camera.zoom(zoom)
             _pl.show()
 
         else:
@@ -545,7 +584,7 @@ class Disulfide:
 
             pl.subplot(0,1)
             pl.add_title(title=title, font_size=FONTSIZE)
-            pl = self._render(pl, style='cov', bondcolor=BOND_COLOR, 
+            pl = self._render(pl, style='pd', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
 
             pl.subplot(1,0)
@@ -1017,7 +1056,7 @@ class DisulfideLoader():
     window using the DisulfideLoader.display() method. See below for examples.\n
 
     Example:
-        from proteusPy.disulfide import DisulfideList, Disulfide, DisulfideLoader
+        from proteusPy.Disulfide import DisulfideList, Disulfide, DisulfideLoader
 
         SS1 = DisulfideList([],'tmp1')
         SS2 = DisulfideList([],'tmp2')
@@ -1152,10 +1191,11 @@ class DisulfideLoader():
         
         # make a colormap in vector space
         # starting and ending colors
-        strtc = numpy.array([.1, .1, 1])
-        endc = numpy.array([.95, .1, .15])
-        mycol = cmap_vector(strtc, endc, tot_ss)
-        
+        strtr = numpy.array([1, 0, 0])
+        strtg = numpy.array([0, 1, 0])
+        strtb = numpy.array([0, 0, 1])
+        mycol = cmap_vector(strtr, strtg, tot_ss)
+        print(f'colors: {mycol}')
         i = 0
         for ss in ssbonds:
             pl = ss._render(pl, style='st', bondcolor=mycol[i])

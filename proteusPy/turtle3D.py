@@ -479,7 +479,6 @@ class Turtle3D:
         self.roll(240.0)
         self.set_orientation(1) # sets the orientation flag
 
-
     def schain_to_bbone(self):
         '''
         Function requires turtle to be in orientation #1 (at alpha c, headed to beta carbon, with nitrogen on left)

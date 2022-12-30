@@ -4,7 +4,7 @@
 # Cα Cβ Sγ
 
 import pandas as pd
-from proteusPy.disulfide import DisulfideLoader, Disulfide, DisulfideList
+from proteusPy.Disulfide import DisulfideLoader, Disulfide, DisulfideList
 import pyvista as pv
 from pyvista import set_plot_theme
 
@@ -26,7 +26,7 @@ MODELS = f'{PDB_BASE}models/'
 
 import pyvista as pv
 from pyvista import Plotter
-from proteusPy.disulfide import *
+from proteusPy.Disulfide import *
 
 def showit(ss: Disulfide):
     ss.display(single=True, style='bs')
@@ -39,9 +39,9 @@ if __name__ == '__main__':
     ss = Disulfide()
     ss = PDB_SS[0]
 
-    ss.display(style='cpk', single=True)
-    ss.display(style='cov', single=True)
-    ss.display(style='bs', single=False)
+    ss.display(style='pd', single=True)
+    ss.display(style='sb', single=True)
+    ss.display(style='pd', single=False)
 
     # get all disulfides for one structure. Make a 
     # DisulfideList object to hold it
@@ -49,18 +49,19 @@ if __name__ == '__main__':
     ss4yss = DisulfideList([], 'tmp')
     ss4yss = PDB_SS['4yys']
 
-    ss4yss.display('cpk')
-    ss4yss.display('bs')
-    ss4yss.display('sb')
-    ss4yss.display('plain')
+    #ss4yss.display('cpk')
+    #ss4yss.display('bs')
+    #ss4yss.display('sb')
+    #ss4yss.display('pd')
     
     sslist = DisulfideList([], 'slice')
     sslist = PDB_SS[:8]
-    sslist.display('sb')
+    sslist.display('pd')
 
     ss1j5h = DisulfideList([], 'ss1j5h')
     ss1j5h = PDB_SS['1j5h']
     ss1j5h.display('sb')
+    ss1j5h.display('pd')
 
     PDB_SS.display_overlay('4yys')
     
