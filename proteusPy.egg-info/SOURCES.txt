@@ -8,6 +8,7 @@ proteusPy/ProteusPyWarning.py
 proteusPy/Residue.py
 proteusPy/Turtle3D.py
 proteusPy/__init__.py
+proteusPy/atoms.py
 proteusPy/disulfide.py
 proteusPy/proteusGlobals.py
 proteusPy/proteusPyWarning.py

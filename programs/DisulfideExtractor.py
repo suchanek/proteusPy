@@ -12,7 +12,7 @@
 #
 
 import shutil
-from proteusPy.disulfide import ExtractDisulfides
+from proteusPy.Disulfide import ExtractDisulfides
 
 # the locations below represent the actual location on the dev drive.
 # location for PDB repository
