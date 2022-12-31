@@ -3,7 +3,7 @@
 # Part of the program Proteus, a program for the analysis and modeling of 
 # protein structures, with an emphasis on disulfide bonds.
 # Author: Eric G. Suchanek, PhD
-# Last revision: 12/18/22
+# Last revision: 12/31/22
 # Cα Cβ Sγ
 
 import math
@@ -71,17 +71,17 @@ def Ocmap_vector(strth, endh, steps):
     Returns: 
         steps X 3 array of RGB values.
     '''
-
-    dhue = endh - strth
     rgbcol = numpy.zeros(shape=(steps, 3))
 
     hues = linspace(strth, endh, steps)
     print(f'Hues: {hues}')
     i = 0
+    
     for hue in hues:
         print(f'--> {hue}')
         rgb = hsv2rgb(hue, .7, .7)
         print(f'Hue: {hue} RGB: {rgb[0]} {rgb[1]} {rgb[2]}')
+
         rgbcol[i][0] = int(rgb[0])
         rgbcol[i][1] = int(rgb[1])
         rgbcol[i][2] = int(rgb[2])
@@ -214,7 +214,54 @@ class DisulfideList(UserList):
         pl.camera.zoom(CAMERA_SCALE)
 
         pl.show()
-        return
+    
+    def display_overlay(self):
+        ''' 
+        Display all disulfides in the list overlaid in stick mode against
+        a common coordinate frames. This allows us to see all of the disulfides
+        at one time in a single view. Colors vary smoothy between bonds.
+        
+        Arguments:
+            PDB_SS: DisulfideLoader object initialized with the database.
+            pdbid: the actual PDB id string
+
+        Returns: None.    
+        ''' 
+        id = self.pdb_id
+        ssbonds = self.data
+        tot_ss = len(ssbonds) # number off ssbonds
+
+        tot_ss = len(ssbonds) # number off ssbonds
+        title = f'Disulfides for SS list {id}: ({tot_ss} total)'
+
+        pl = pv.Plotter(window_size=WINSIZE)
+        pl.add_title(title=title, font_size=FONTSIZE)
+        pl.enable_anti_aliasing('msaa')
+        
+        # pl.view_isometric()
+        pl.add_camera_orientation_widget()
+        pl.camera_position = CAMERA_POS
+        # pl.add_axes()
+        
+        # make a colormap in vector space
+        # starting and ending colors
+        strthue = 30
+        endhue = 340
+        
+        mycol = numpy.zeros(shape=(tot_ss, 3))
+        mycol = cmap_vector(strthue, endhue, tot_ss)
+
+        i = 0
+        for ss in ssbonds:
+            color = [int(mycol[i][0]), int(mycol[i][1]),
+                    int(mycol[i][2])]
+
+            pl = ss._render(pl, style='st', bondcolor=color)
+            i += 1
+
+        pl.camera.zoom(CAMERA_SCALE)
+        pl.show()
+    
 
 # Class definition for a Disulfide bond. 
 class Disulfide:
@@ -1198,38 +1245,8 @@ class DisulfideLoader():
         ''' 
 
         ssbonds = self[pdbid]
-        
-        tot_ss = len(ssbonds) # number off ssbonds
-        title = f'Disulfides for {pdbid}: ({tot_ss} total)'
+        ssbonds.display_overlay()
 
-        pl = pv.Plotter(window_size=WINSIZE)
-        pl.add_title(title=title, font_size=FONTSIZE)
-        pl.enable_anti_aliasing('msaa')
-        
-        # pl.view_isometric()
-        pl.add_camera_orientation_widget()
-        pl.camera_position = CAMERA_POS
-        # pl.add_axes()
-        
-        # make a colormap in vector space
-        # starting and ending colors
-        strthue = 30
-        endhue = 340
-        
-        mycol = numpy.zeros(shape=(tot_ss, 3))
-        mycol = cmap_vector(strthue, endhue, tot_ss)
-        #print(f'colors: {mycol}')
-        i = 0
-        for ss in ssbonds:
-            color = [int(mycol[i][0]), int(mycol[i][1]),
-                    int(mycol[i][2])]
-
-            pl = ss._render(pl, style='st', bondcolor=color)
-            i += 1
-
-        pl.camera.zoom(CAMERA_SCALE)
-        pl.show()
-    
     def display(self, style='bs'):
         ''' 
         Display the Disulfides

@@ -54,14 +54,14 @@ if __name__ == '__main__':
     #ss4yss.display('sb')
     #ss4yss.display('pd')
     
-    sslist = DisulfideList([], 'slice')
-    sslist = PDB_SS[:8]
-    #sslist.display('pd')
+    sslist = DisulfideList([], 'last 12')
+    sslist = PDB_SS[:12]
+    sslist.display_overlay()
 
-    ss1j5h = DisulfideList([], 'ss1j5h')
-    ss1j5h = PDB_SS['1j5h']
-    ss1j5h.display('sb')
-    ss1j5h.display('pd')
+    #ss1j5h = DisulfideList([], 'ss1j5h')
+    #ss1j5h = PDB_SS['1j5h']
+    #ss1j5h.display('sb')
+    #ss1j5h.display('pd')
 
     PDB_SS.display_overlay('1j5h')
     PDB_SS.display_overlay('4yys')
