@@ -10,7 +10,6 @@ import math
 import numpy
 
 from proteusPy import *
-
 from proteusPy.atoms import *
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideGlobals import *
@@ -27,39 +26,24 @@ _FLOAT_INIT = -999.9
 # tqdm progress bar width
 _PBAR_COLS = 100
 
-#WINSIZE = (1200, 1200)
-#CAMERA_POS = ((0, 0, -10), (0,0,0), (0,1,0))
-
 # make a colormap in vector space from starting color to
 # ending color
 
-from matplotlib.colors import LinearSegmentedColormap
+import colorsys
 
-def Ncmap_vector(strtr, strtg, strtb, steps):
-    cols = [strtr, strtg, strtb]
-    cmap_name = 'cmap'
-    cmap = LinearSegmentedColormap.from_list(cmap_name, cols, N=steps)
-    return cmap
+# map starting and ending hues into rgb colorspace over steps steps
 
-def cmap_vector(strtc, endc, steps):
-    # make a colormap in vector space
-    # starting and ending colors
+def cmap_vector(strth, endh, steps):
+    dhue = endh - strth
+    deltahue = dhue / steps
+    rgbcol = numpy.zeros(shape=(steps, 3))
 
-    newcol = numpy.zeros(shape=3)
-    cdir = numpy.zeros(shape=3)
-    res = numpy.zeros(shape=(steps,3))
-
-    # color direction vector and length
-    cdir = endc - strtc
-    clen = math.dist(strtc, endc)
-    cdir /= clen # normalize direction
-
-    # delta along color vector
-    dlta = clen / steps
     for i in range(steps):
-        newcol = strtc + cdir * i * dlta
-        res[i] = newcol
-    return res
+        newhue = strth + deltahue * i
+        (h, s, v) = (newhue, .6, .6)
+        (r, g, b) = colorsys.hsv_to_rgb(h, s, v)
+        rgbcol[i] = [r, g, b]
+    return rgbcol
  
 # DisulfideList class definition.
 # I extend UserList to handle lists of Disulfide objects.
@@ -150,7 +134,7 @@ class DisulfideList(UserList):
             Display a window showing the list of disulfides in the given style.
             Argument:
                 self
-                style: one of 'cpk', 'bs', 'sb', 'plain', 'cov'
+                style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd'
             Returns:
                 Window displaying the Disulfides.
         '''
@@ -170,7 +154,6 @@ class DisulfideList(UserList):
                 pl.subplot(r,c)
                 if i < tot_ss:
                     pl.enable_anti_aliasing('msaa')
-                    #pl.add_axes()
                     ss = ssList[i]
                     src = ss.pdb_id
                     enrg = ss.energy
@@ -1191,11 +1174,11 @@ class DisulfideLoader():
         
         # make a colormap in vector space
         # starting and ending colors
-        strtr = numpy.array([1, 0, 0])
-        strtg = numpy.array([0, 1, 0])
-        strtb = numpy.array([0, 0, 1])
-        mycol = cmap_vector(strtr, strtg, tot_ss)
-        print(f'colors: {mycol}')
+        strthue = 30
+        endhue = 320
+        
+        mycol = cmap_vector(strthue, endhue, tot_ss)
+        # print(f'colors: {mycol}')
         i = 0
         for ss in ssbonds:
             pl = ss._render(pl, style='st', bondcolor=mycol[i])
