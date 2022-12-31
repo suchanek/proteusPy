@@ -30,22 +30,65 @@ _PBAR_COLS = 100
 # ending color
 
 import colorsys
+from numpy import linspace
 
 # map starting and ending hues into rgb colorspace over steps steps
+def hsv2rgb(h,s,v):
+    return tuple(int(i * 255) for i in colorsys.hsv_to_rgb(h,s,v))
 
 def cmap_vector(strth, endh, steps):
-    dhue = endh - strth
-    deltahue = dhue / steps
+    '''
+    Given a starting hue, ending hue and steps return a steps X 3 array of
+    RGB values.
+    Inputs:
+        strth: starting hue, 0-360 degrees
+        endh:  ending hue, 0-360 degress
+
+    Returns: 
+        steps X 3 array of RGB values.
+    '''
+
     rgbcol = numpy.zeros(shape=(steps, 3))
 
-    for i in range(steps):
-        newhue = strth + deltahue * i
-        (h, s, v) = (newhue, .6, .6)
-        (r, g, b) = colorsys.hsv_to_rgb(h, s, v)
-        rgbcol[i] = [r, g, b]
+    reds = linspace(200, 30, steps)
+    greens = linspace(10, 100, steps)
+    blues = linspace(10, 240, steps)
+    
+    rgbcol[:, 0] = reds
+    rgbcol[:, 1] = greens
+    rgbcol[:, 2] = blues
+    
     return rgbcol
  
-# DisulfideList class definition.
+def Ocmap_vector(strth, endh, steps):
+    '''
+    Given a starting hue, ending hue and steps return a steps X 3 array of
+    RGB values.
+    Inputs:
+        strth: starting hue, 0-360 degrees
+        endh:  ending hue, 0-360 degress
+
+    Returns: 
+        steps X 3 array of RGB values.
+    '''
+
+    dhue = endh - strth
+    rgbcol = numpy.zeros(shape=(steps, 3))
+
+    hues = linspace(strth, endh, steps)
+    print(f'Hues: {hues}')
+    i = 0
+    for hue in hues:
+        print(f'--> {hue}')
+        rgb = hsv2rgb(hue, .7, .7)
+        print(f'Hue: {hue} RGB: {rgb[0]} {rgb[1]} {rgb[2]}')
+        rgbcol[i][0] = int(rgb[0])
+        rgbcol[i][1] = int(rgb[1])
+        rgbcol[i][2] = int(rgb[2])
+        i += 1
+    return rgbcol
+ 
+# DisulfideList Class definition.
 # I extend UserList to handle lists of Disulfide objects.
 # Indexing and slicing are supported, sorting is based on energy
 
@@ -245,7 +288,7 @@ class Disulfide:
         self.dihedrals = numpy.array((_FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT), "d")
 
     def internal_coords(self) -> numpy.array:
-        res_array = numpy.zeros(shape=(6,3))
+        res_array = numpy.zeros(shape=(12,3))
 
         res_array = numpy.array((
             self._n_prox.get_array(),
@@ -263,11 +306,13 @@ class Disulfide:
         ))
         return res_array
     
+    @property
     def cofmass(self) -> numpy.array:
         res = numpy.zeros(shape=(12,3))
         res = self.internal_coords()
         return res.mean(axis=0)
 
+    @property
     def internal_coords_res(self, resnumb) -> numpy.array:
         res_array = numpy.zeros(shape=(6,3))
 
@@ -342,11 +387,6 @@ class Disulfide:
         
         radius = BOND_RADIUS
         coords = self.internal_coords()
-        cofmass = self.cofmass()
-        
-        # translate to cofmass frame
-        for i in range(12):
-            coords[i] = coords[i] - cofmass
         
         atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C', 'SG')
         pvp = pvplot
@@ -539,7 +579,6 @@ class Disulfide:
             _pl = pv.Plotter(window_size=WINSIZE)
             _pl.add_title(title=title, font_size=FONTSIZE)
             _pl.enable_anti_aliasing('msaa')
-            #_pl.add_axes()
             _pl.add_camera_orientation_widget()
 
             _pl = self._render(_pl, style=style, bondcolor=BOND_COLOR, 
@@ -1175,14 +1214,17 @@ class DisulfideLoader():
         # make a colormap in vector space
         # starting and ending colors
         strthue = 30
-        endhue = 320
+        endhue = 340
         
+        mycol = numpy.zeros(shape=(tot_ss, 3))
         mycol = cmap_vector(strthue, endhue, tot_ss)
-        # print(f'colors: {mycol}')
+        #print(f'colors: {mycol}')
         i = 0
         for ss in ssbonds:
-            pl = ss._render(pl, style='st', bondcolor=mycol[i])
-            #pl = render_disulfide(ss, pl, style='st', bondcolor=mycol[i])
+            color = [int(mycol[i][0]), int(mycol[i][1]),
+                    int(mycol[i][2])]
+
+            pl = ss._render(pl, style='st', bondcolor=color)
             i += 1
 
         pl.camera.zoom(CAMERA_SCALE)
