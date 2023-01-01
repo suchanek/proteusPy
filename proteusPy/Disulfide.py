@@ -15,7 +15,7 @@ from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideGlobals import *
 from proteusPy.proteusGlobals import *
 
-from Bio.PDB import Select, Vector, PDBParser
+from Bio.PDB import Select, Vector, PDBParser, PDBList
 from Bio.PDB.vectors import calc_dihedral
 
 import pyvista as pv
@@ -36,13 +36,12 @@ from numpy import linspace
 def hsv2rgb(h,s,v):
     return tuple(int(i * 255) for i in colorsys.hsv_to_rgb(h,s,v))
 
-def cmap_vector(strth, endh, steps):
+def cmap_vector(steps):
     '''
-    Given a starting hue, ending hue and steps return a steps X 3 array of
-    RGB values.
-    Inputs:
-        strth: starting hue, 0-360 degrees
-        endh:  ending hue, 0-360 degress
+    Return an RGB array of steps rows
+    
+    Argument:
+        steps: number of RGB elements to return
 
     Returns: 
         steps X 3 array of RGB values.
@@ -50,42 +49,14 @@ def cmap_vector(strth, endh, steps):
 
     rgbcol = numpy.zeros(shape=(steps, 3))
 
-    reds = linspace(200, 30, steps)
-    greens = linspace(10, 100, steps)
-    blues = linspace(10, 240, steps)
+    reds = linspace(10, 255, steps)
+    greens = linspace(10, 255, steps)
+    blues = linspace(255, 10, steps)
     
     rgbcol[:, 0] = reds
     rgbcol[:, 1] = greens
     rgbcol[:, 2] = blues
     
-    return rgbcol
- 
-def Ocmap_vector(strth, endh, steps):
-    '''
-    Given a starting hue, ending hue and steps return a steps X 3 array of
-    RGB values.
-    Inputs:
-        strth: starting hue, 0-360 degrees
-        endh:  ending hue, 0-360 degress
-
-    Returns: 
-        steps X 3 array of RGB values.
-    '''
-    rgbcol = numpy.zeros(shape=(steps, 3))
-
-    hues = linspace(strth, endh, steps)
-    print(f'Hues: {hues}')
-    i = 0
-    
-    for hue in hues:
-        print(f'--> {hue}')
-        rgb = hsv2rgb(hue, .7, .7)
-        print(f'Hue: {hue} RGB: {rgb[0]} {rgb[1]} {rgb[2]}')
-
-        rgbcol[i][0] = int(rgb[0])
-        rgbcol[i][1] = int(rgb[1])
-        rgbcol[i][2] = int(rgb[2])
-        i += 1
     return rgbcol
  
 # DisulfideList Class definition.
@@ -129,9 +100,10 @@ class DisulfideList(UserList):
         ss1 = PDB_SS[0]
         print(f'{ss1.pprint_all()}')
 
-        # grab a subset via slicing
+        # grab a list of disulfides via slicing
         subset = DisulfideList(PDB_SS[0:10],'subset')
         subset.display(style='sb')      # display the disulfides in 'split bond' style
+        subset.display_overlay()        # display all disulfides overlaid in stick style
     '''
     
     def __init__(self, iterable, id):
@@ -172,6 +144,48 @@ class DisulfideList(UserList):
     def get_id(self):
         return self.pdb_id
 
+    def get_chains(self):
+        res_dict = {'xxx'}
+        sslist = self.data
+
+        for ss in sslist:
+            pchain = ss.proximal_chain
+            dchain = ss.distal_chain
+            res_dict.update(pchain)
+            res_dict.update(dchain)
+        return res_dict
+
+    def has_chain(self, chain) -> bool:
+        chns = {'xxx'}
+        chns = self.get_chains()
+        if chain in chns:
+            return True
+        else:
+            return False
+    
+    def by_chain(self, chain: str):
+        '''
+        Return a DisulfideList from the input chain identifier.
+
+        Arguments:
+            chain: str - chain identifier, 'A', 'B, etc
+        Returns:
+            DisulfideList containing disulfides within that chain.
+        '''
+        
+        reslist = DisulfideList([], chain)
+        sslist = self.data
+
+        for ss in sslist:
+            pchain = ss.proximal_chain
+            dchain = ss.distal_chain
+            if pchain == dchain:
+                if pchain == chain:
+                    reslist.append(ss)
+            else:
+                print(f'Cross chain SS: {ss.print_compact}:')
+        return reslist
+    
     def display(self, style='bs'):
         ''' 
             Display a window showing the list of disulfides in the given style.
@@ -211,7 +225,7 @@ class DisulfideList(UserList):
         
         #pl.camera.clipping_range = (near_range, far_range)
         pl.link_views()
-        pl.camera.zoom(CAMERA_SCALE)
+        pl.reset_camera()
 
         pl.show()
     
@@ -243,25 +257,17 @@ class DisulfideList(UserList):
         pl.camera_position = CAMERA_POS
         # pl.add_axes()
         
-        # make a colormap in vector space
-        # starting and ending colors
-        strthue = 30
-        endhue = 340
-        
         mycol = numpy.zeros(shape=(tot_ss, 3))
-        mycol = cmap_vector(strthue, endhue, tot_ss)
+        mycol = cmap_vector(tot_ss)
 
         i = 0
         for ss in ssbonds:
-            color = [int(mycol[i][0]), int(mycol[i][1]),
-                    int(mycol[i][2])]
-
+            color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
             pl = ss._render(pl, style='st', bondcolor=color)
             i += 1
 
-        pl.camera.zoom(CAMERA_SCALE)
+        pl.reset_camera()
         pl.show()
-    
 
 # Class definition for a Disulfide bond. 
 class Disulfide:
@@ -359,7 +365,6 @@ class Disulfide:
         res = self.internal_coords()
         return res.mean(axis=0)
 
-    @property
     def internal_coords_res(self, resnumb) -> numpy.array:
         res_array = numpy.zeros(shape=(6,3))
 
@@ -386,6 +391,18 @@ class Disulfide:
         else:
             mess = f'-> Disulfide.internal_coords(): Invalid argument. Unable to find residue: {resnumb} '
             raise DisulfideConstructionWarning(mess)
+    
+    def get_chains(self):
+        prox = self.proximal_chain
+        dist = self.distal_chain
+        return tuple(prox, dist)
+    
+    def same_chains(self):
+        (prox, dist) = self.get_chains()
+        if prox == dist:
+            return True
+        else:
+            return False
     
     def reset(self):
         self.__init__(self)
@@ -630,13 +647,7 @@ class Disulfide:
 
             _pl = self._render(_pl, style=style, bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
- 
-            #_pl.camera.clipping_range = (near_range, far_range)
-            _pl.camera_position = CAMERA_POS
-            zoom = CAMERA_SCALE
-            if style == 'cpk':
-                zoom = zoom * .75
-            _pl.camera.zoom(zoom)
+            _pl.reset_camera()
             _pl.show()
 
         else:
@@ -667,10 +678,8 @@ class Disulfide:
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
             
             pl.link_views()
-            #pl.camera.clipping_range = (near_range, far_range)
-            pl.camera_position = CAMERA_POS
-            pl.camera.zoom(CAMERA_SCALE)
-            pl.show()        # 
+            pl.reset_camera()
+            pl.show()
     
     # comparison operators, used for sorting. keyed to SS bond energy
     def __lt__(self, other):
@@ -945,7 +954,6 @@ class Disulfide:
         Arguments: chi, chi2, chi3, chi4, chi5 - Dihedral angles in degrees (-180 - 180) for the Disulfide conformation.
         Returns: None
         '''
-
         self.chi1 = chi1
         self.chi2 = chi2
         self.chi3 = chi3
@@ -1114,184 +1122,6 @@ class Disulfide:
         self.compute_torsional_energy()
 
 # Class defination ends
-import copy
-
-class DisulfideLoader():
-    '''
-    This class loads .pkl files created from the ExtractDisulfides() routine 
-    and initializes itself with their contents. The Disulfide objects are contained
-    in a DisulfideList object and Dict. This makes it possible to access the disulfides by
-    array index or PDB structure ID. The class can also render Disulfides to a pyVista
-    window using the DisulfideLoader.display() method. See below for examples.\n
-
-    Example:
-        from proteusPy.Disulfide import DisulfideList, Disulfide, DisulfideLoader
-
-        SS1 = DisulfideList([],'tmp1')
-        SS2 = DisulfideList([],'tmp2')
-
-        PDB_SS = DisulfideLoader()
-        SS1 = PDB_SS[0]         # returns a Disulfide object at index 0
-        SS2 = PDB_SS['4yys']    # returns a DisulfideList containing all disulfides for 4yys
-        SS3 = PDB_SS[:10]       # returns a DisulfideList containing the slice
-
-        SSlist = PDB_SS[:8]     # get SS bonds for the last 8 structures
-        SSlist.display('sb')    # render the disulfides in 'split bonds' style
-
-    '''
-
-    def __init__(self, verbose=True, modeldir=MODEL_DIR, picklefile=SS_PICKLE_FILE, 
-                pickle_dict_file=SS_DICT_PICKLE_FILE,
-                torsion_file=SS_TORSIONS_FILE):
-        self.ModelDir = modeldir
-        self.PickleFile = f'{modeldir}{picklefile}'
-        self.PickleDictFile = f'{modeldir}{pickle_dict_file}'
-        self.TorsionFile = f'{modeldir}{torsion_file}'
-        self.SSList = DisulfideList([], 'ALL_PDB_SS')
-        self.SSDict = {}
-        self.TorsionDF = pd.DataFrame()
-        self.TotalDisulfides = 0
-        self.IDList = []
-
-        # create a dataframe with the following columns for the disulfide conformations extracted from the structure
-        df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy']
-        SS_df = pd.DataFrame(columns=df_cols, index=['source'])
-        _SSList = DisulfideList([], 'ALL_PDB_SS')
-
-        idlist = []
-        if verbose:
-            print(f'Reading disulfides from: {self.PickleFile}')
-        with open(self.PickleFile, 'rb') as f:
-            self.SSList = pickle.load(f)
-
-        self.TotalDisulfides = len(self.SSList)
-        
-        if verbose:
-            print(f'Disulfides Read: {self.TotalDisulfides}')
-            print(f'Reading disulfide dict from: {self.PickleDictFile}')
-        
-        with open(self.PickleDictFile, 'rb') as f:
-            self.SSDict = pickle.load(f)
-            for key in self.SSDict:
-                idlist.append(key)
-            self.IDList = idlist.copy()
-            totalSS_dict = len(self.IDList)
-        
-        if verbose:
-            print(f'Reading Torsion DF {self.TorsionFile}.')
-        
-        self.TorsionDF = pd.read_csv(self.TorsionFile)
-
-        if verbose:
-            print(f'Read torsions DF.')
-            print(f'PDB IDs parsed: {totalSS_dict}')
-            print(f'Total Space Used: {sys.getsizeof(self.SSList) + sys.getsizeof(self.SSDict) + sys.getsizeof(self.TorsionDF)} bytes.')
-        return
-
-    # overload __getitem__ to handle slicing and indexing
-    def __getitem__(self, item):
-        if isinstance(item, slice):
-            indices = range(*item.indices(len(self.SSList)))
-            # return [self.SSList[i] for i in indices]
-            name = self.SSList[0].pdb_id
-            sublist = [self.SSList[i] for i in indices]
-            return DisulfideList(sublist, name)
-        
-        if isinstance(item, int):
-            if (item < 0 or item >= self.TotalDisulfides):
-                mess = f'DisulfideDataLoader error. Index {item} out of range 0-{self.TotalDisulfides - 1}'
-                raise DisulfideException(mess)
-            else:
-                return self.SSList[item]
-
-        try:
-            res = self.SSDict[item]
-        except KeyError:
-            mess = f'! Cannot find key {item} in SSBond dict!'
-            raise DisulfideException(mess)
-        return res
-    
-    def __setitem__(self, index, item):
-        self.SSList[index] = self.validate_ss(item)
-
-    def getlist(self):
-        return self.SSList.copy()
-    
-    def getdict(self) -> dict:
-        return copy.deepcopy(self.SSDict)
-
-    def getTorsions(self):
-        return copy.deepcopy(self.TorsionDF)
-
-    def validate_ss(self, value):
-        if isinstance(value, (Disulfide)):
-            return value
-        raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
-
-    def copy(self):
-        return copy.deepcopy(self)
-    
-    def display_overlay(self, pdbid: str):
-        ''' 
-        Render all disulfides for a given PDB ID overlaid in stick mode against
-        a common coordinate frames. This allows us to see all of the disulfides
-        at one time in a single view. Colors vary smoothy between bonds.
-        
-        Arguments:
-            PDB_SS: DisulfideLoader object initialized with the database.
-            pdbid: the actual PDB id string
-
-        Returns: None.    
-        ''' 
-
-        ssbonds = self[pdbid]
-        ssbonds.display_overlay()
-
-    def display(self, style='bs'):
-        ''' 
-        Display the Disulfides
-        Argument:
-            self
-        Returns:
-            None. Updates internal object.
-        '''
-        
-        ssList = self.SSList
-        tot_ss = len(ssList) # number off ssbonds
-
-        cols = 2
-        rows = (tot_ss + 1) // cols
-        near_range = -10.0
-        far_range = 10.0
-        i = 0
-
-        pl = pv.Plotter(window_size=WINSIZE, shape=(rows, cols))
-        pl.add_camera_orientation_widget()
-
-        for r in range(rows):
-            for c in range(cols):
-                pl.subplot(r,c)
-                if i < tot_ss:
-                    pl.enable_anti_aliasing('msaa')
-                    #pl.view_isometric()
-                    #pl.add_axes()
-                    ss = ssList[i]
-                    src = ss.pdb_id
-                    enrg = ss.energy
-                    title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol'
-                    pl.add_title(title=title, font_size=FONTSIZE)
-                    pl = ss._render(pl, style=style)
-                    near_range, far_range = ss.compute_extents()
-                    #pl.camera.clipping_range = (near_range, far_range)
-
-                    pl.camera_position = CAMERA_POS
-                i += 1        
-        pl.link_views()
-        pl.camera.zoom(CAMERA_SCALE)
-
-        pl.show()
-
-# class ends
 
 class CysSelect(Select):
     def accept_residue(self, residue):
@@ -1526,7 +1356,6 @@ def ExtractDisulfides(numb=-1, verbose=False, quiet=False, pdbdir=PDB_DIR,
                 new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance]
                 # add the row to the end of the dataframe
                 SS_df.loc[len(SS_df.index)] = new_row.copy() # deep copy
-    
             All_ss_dict[entry] = sslist
         else:
             # at this point I really shouldn't have any bad non-parsible file
@@ -1577,41 +1406,6 @@ def ExtractDisulfides(numb=-1, verbose=False, quiet=False, pdbdir=PDB_DIR,
     # return to original directory
     os.chdir(cwd)
     return
-   
-def check_chains(pdbid, pdbdir, verbose=True):
-    '''Returns True if structure has multiple chains of identical length, False otherwise'''
-
-    parser = PDBParser(PERMISSIVE=True)
-    structure = parser.get_structure(pdbid, file=f'{pdbdir}pdb{pdbid}.ent')
-    ssbond_dict = structure.header['ssbond'] # dictionary of tuples with SSBond prox and distal
-    
-    if verbose:
-        print(f'ssbond dict: {ssbond_dict}')
-
-    same = False
-    model = structure[0]
-    chainlist = model.get_list()
-
-    if len(chainlist) > 1:
-        chain_lens = []
-        if verbose:
-            print(f'multiple chains. {chainlist}')
-        for chain in chainlist:
-            chain_length = len(chain.get_list())
-            chain_id = chain.get_id()
-            if verbose:
-                print(f'Chain: {chain_id}, length: {chain_length}')
-            chain_lens.append(chain_length)
-
-        if numpy.min(chain_lens) != numpy.max(chain_lens):
-            same = False
-            if verbose:
-                print(f'chain lengths are unequal: {chain_lens}')
-        else:
-            same = True
-            if verbose:
-                print(f'Chains are equal length, assuming the same. {chain_lens}')
-    return(same)
 
 # NB - this only works with the EGS modified version of  BIO.parse_pdb_header.py
 def load_disulfides_from_id(struct_name: str, 
@@ -1911,5 +1705,40 @@ def check_header_from_id(struct_name: str,
 
         i += 1
     return True
+
+def check_chains(pdbid, pdbdir, verbose=True):
+    '''Returns True if structure has multiple chains of identical length, False otherwise'''
+
+    parser = PDBParser(PERMISSIVE=True)
+    structure = parser.get_structure(pdbid, file=f'{pdbdir}pdb{pdbid}.ent')
+    ssbond_dict = structure.header['ssbond'] # dictionary of tuples with SSBond prox and distal
+    
+    if verbose:
+        print(f'ssbond dict: {ssbond_dict}')
+
+    same = False
+    model = structure[0]
+    chainlist = model.get_list()
+
+    if len(chainlist) > 1:
+        chain_lens = []
+        if verbose:
+            print(f'multiple chains. {chainlist}')
+        for chain in chainlist:
+            chain_length = len(chain.get_list())
+            chain_id = chain.get_id()
+            if verbose:
+                print(f'Chain: {chain_id}, length: {chain_length}')
+            chain_lens.append(chain_length)
+
+        if numpy.min(chain_lens) != numpy.max(chain_lens):
+            same = False
+            if verbose:
+                print(f'chain lengths are unequal: {chain_lens}')
+        else:
+            same = True
+            if verbose:
+                print(f'Chains are equal length, assuming the same. {chain_lens}')
+    return(same)
 
 # End of file
