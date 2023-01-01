@@ -4,7 +4,9 @@
 # Cα Cβ Sγ
 
 import pandas as pd
-from proteusPy.Disulfide import DisulfideLoader, Disulfide, DisulfideList
+from proteusPy.Disulfide import Disulfide
+from proteusPy.DisulfideLoader import DisulfideLoader
+
 import pyvista as pv
 from pyvista import set_plot_theme
 

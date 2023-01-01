@@ -8,6 +8,8 @@
 
 import math
 import numpy
+import matplotlib
+
 
 from proteusPy import *
 from proteusPy.atoms import *
@@ -29,7 +31,7 @@ _PBAR_COLS = 100
 # make a colormap in vector space from starting color to
 # ending color
 
-import colorsys
+from matplotlib import cm
 from numpy import linspace
 
 # map starting and ending hues into rgb colorspace over steps steps
@@ -48,17 +50,20 @@ def cmap_vector(steps):
     '''
 
     rgbcol = numpy.zeros(shape=(steps, 3))
+    norm = linspace(0.0, 1.0, steps)
 
-    reds = linspace(10, 255, steps)
-    greens = linspace(10, 255, steps)
-    blues = linspace(255, 10, steps)
+    #colormap possible values = viridis, jet, spectral
+    rgb_all = cm.jet(norm, bytes=True) 
+    i = 0
     
-    rgbcol[:, 0] = reds
-    rgbcol[:, 1] = greens
-    rgbcol[:, 2] = blues
-    
+    for rgb in rgb_all:
+        rgbcol[i][0] = rgb[0]
+        rgbcol[i][1] = rgb[1]
+        rgbcol[i][2] = rgb[2]
+        i += 1
+
     return rgbcol
- 
+
 # DisulfideList Class definition.
 # I extend UserList to handle lists of Disulfide objects.
 # Indexing and slicing are supported, sorting is based on energy
@@ -162,7 +167,7 @@ class DisulfideList(UserList):
             return True
         else:
             return False
-    
+
     def by_chain(self, chain: str):
         '''
         Return a DisulfideList from the input chain identifier.
