@@ -39,7 +39,7 @@ if __name__ == '__main__':
     ss = Disulfide()
     ss = PDB_SS[0]
 
-    #ss.display(style='pd', single=True)
+    ss.display(style='cpk', single=True)
     #ss.display(style='sb', single=True)
     #ss.display(style='pd', single=False)
 
