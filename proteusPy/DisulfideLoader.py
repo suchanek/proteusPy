@@ -1,6 +1,7 @@
 from proteusPy import *
 from proteusPy.atoms import *
 from proteusPy.Disulfide import check_chains
+from proteusPy.Disulfide import DisulfideList
 
 import pyvista as pv
 

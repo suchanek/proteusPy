@@ -3,13 +3,13 @@
 # Part of the program Proteus, a program for the analysis and modeling of 
 # protein structures, with an emphasis on disulfide bonds.
 # Author: Eric G. Suchanek, PhD
-# Last revision: 12/31/22
+# Last revision: 1/1/2023
 # Cα Cβ Sγ
 
 import math
-import numpy
-import matplotlib
 
+from matplotlib import cm
+from numpy import linspace
 
 from proteusPy import *
 from proteusPy.atoms import *
@@ -24,19 +24,13 @@ import pyvista as pv
 
 # float init for class 
 _FLOAT_INIT = -999.9
+_ANG_INIT = -180.0
 
 # tqdm progress bar width
 _PBAR_COLS = 100
 
 # make a colormap in vector space from starting color to
 # ending color
-
-from matplotlib import cm
-from numpy import linspace
-
-# map starting and ending hues into rgb colorspace over steps steps
-def hsv2rgb(h,s,v):
-    return tuple(int(i * 255) for i in colorsys.hsv_to_rgb(h,s,v))
 
 def cmap_vector(steps):
     '''
@@ -64,10 +58,16 @@ def cmap_vector(steps):
 
     return rgbcol
 
+class CysSelect(Select):
+    def accept_residue(self, residue):
+        if residue.get_name() == 'CYS':
+            return True
+        else:
+            return False
+
 # DisulfideList Class definition.
 # I extend UserList to handle lists of Disulfide objects.
 # Indexing and slicing are supported, sorting is based on energy
-
 class DisulfideList(UserList):
     '''
     Class provides a sortable list for Disulfide objects.
@@ -93,7 +93,7 @@ class DisulfideList(UserList):
         SSlist = PDB_SS[:8]         # get SS bonds for the last 8 structures\n
         SSlist.display('sb')        # render the disulfides in 'split bonds' style\n
 
-        # make some empty disulfides
+        # make some empty disulfidesx
         ss1 = Disulfide('ss1')
         ss2 = Disulfide('ss2')
 
@@ -150,6 +150,9 @@ class DisulfideList(UserList):
         return self.pdb_id
 
     def get_chains(self):
+        '''
+        Return the chain IDs for chains within the given Disulfide.
+        '''
         res_dict = {'xxx'}
         sslist = self.data
 
@@ -158,9 +161,16 @@ class DisulfideList(UserList):
             dchain = ss.distal_chain
             res_dict.update(pchain)
             res_dict.update(dchain)
+        
+        res_dict.remove('xxx')
+
         return res_dict
 
     def has_chain(self, chain) -> bool:
+        '''
+        Returns True if given chain contained in Disulfide, False otherwise.
+        '''
+        
         chns = {'xxx'}
         chns = self.get_chains()
         if chain in chns:
@@ -203,11 +213,17 @@ class DisulfideList(UserList):
                 
         ssList = self.data
         tot_ss = len(ssList) # number off ssbonds
-
-        cols = 2
+        if tot_ss < 4:
+            cols = 2
+        elif tot_ss == 3:
+            cols = 3
+        else:
+            cols = 4
+        
         rows = (tot_ss + 1) // cols
         i = 0
 
+        WINSIZE = (512 * cols, 512 * rows)
         pl = pv.Plotter(window_size=WINSIZE, shape=(rows, cols))
         pl.add_camera_orientation_widget()
 
@@ -225,10 +241,9 @@ class DisulfideList(UserList):
 
                     pl = ss._render(pl, style=style, bondcolor=BOND_COLOR, 
                                    bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
-                    pl.camera_position = CAMERA_POS
+                    #pl.camera_position = CAMERA_POS
                 i += 1
         
-        #pl.camera.clipping_range = (near_range, far_range)
         pl.link_views()
         pl.reset_camera()
 
@@ -303,8 +318,9 @@ class Disulfide:
         self.QUIET = bool(True)
         self.ca_distance = _FLOAT_INIT
         self.torsion_array = numpy.array((_FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT))
-        self.pvplotter = None
-
+        self.phipsi_prox = numpy.array((_ANG_INIT, _ANG_INIT))
+        self.phipsi_dist = numpy.array((_ANG_INIT, _ANG_INIT))
+        
         # global coordinates for the Disulfide, typically as returned from the PDB file
         self.n_prox = Vector(0,0,0)
         self.ca_prox = Vector(0,0,0)
@@ -318,6 +334,12 @@ class Disulfide:
         self.n_dist = Vector(0,0,0)
         self.c_dist = Vector(0,0,0)
         self.o_dist = Vector(0,0,0)
+
+        # need these to calculate backbone dihedral angles
+        self.c_prev_prox = Vector(-1,-1,-1)
+        self.n_next_prox = Vector(-1,1,-1)
+        self.c_prev_dist = Vector(-1,-1,-1)
+        self.n_next_dist = Vector(-1,-1,-1)
 
         # local coordinates for the Disulfide, computed using the Turtle3D in 
         # Orientation #1 these are generally private.
@@ -334,6 +356,12 @@ class Disulfide:
         self._n_dist = Vector(0,0,0)
         self._c_dist = Vector(0,0,0)
         self._o_dist = Vector(0,0,0)
+
+        # need these to calculate backbone dihedral angles
+        self._c_prev_prox = Vector(-1,-1,-1)
+        self._n_next_prox = Vector(-1,-1,-1)
+        self._c_prev_dist = Vector(-1,-1,-1)
+        self._n_next_dist = Vector(-1,-1,-1)
 
         # Dihedral angles for the disulfide bond itself, set to _FLOAT_INIT
         self.chi1 = _FLOAT_INIT
@@ -387,7 +415,7 @@ class Disulfide:
             res_array = numpy.array((
                 self._n_dist.get_array(),
                 self._ca_dist.get_array(),
-                self._c_dist.get_array(), 
+                self._c_dist.get_array(),
                 self._o_dist.get_array(), 
                 self._cb_dist.get_array(),
                 self._sg_dist.get_array(),
@@ -423,10 +451,9 @@ class Disulfide:
             idx = 1
         elif dim == 'z':
             idx = 2
-
+        
         _min = ic[:, idx].min()
         _max = ic[:, idx].max()
-
         return _min, _max
 
     def bounding_box(self):
@@ -649,14 +676,14 @@ class Disulfide:
             _pl.add_title(title=title, font_size=FONTSIZE)
             _pl.enable_anti_aliasing('msaa')
             _pl.add_camera_orientation_widget()
-
             _pl = self._render(_pl, style=style, bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
             _pl.reset_camera()
             _pl.show()
 
         else:
-            pl = pv.Plotter(window_size=WINSIZE, shape=(2,2))
+            _WINSIZE = (1024, 1024)
+            pl = pv.Plotter(window_size=_WINSIZE, shape=(2,2))
             pl.subplot(0,0)
             
             #pl.add_axes()
@@ -720,8 +747,8 @@ class Disulfide:
         return s1
     
     def repr_ss_coords(self):
-        s2 = f'\nProximal Coordinates:\n   N: {self.n_prox}\n   Cα: {self.ca_prox}\n   C: {self.c_prox}\n   O: {self.o_prox}\n   Cβ: {self.cb_prox}\n   Sγ: {self.sg_prox}\n\n'
-        s3 = f'Distal Coordinates:\n   N: {self.n_dist}\n   Cα: {self.ca_dist}\n   C: {self.c_dist}\n   O: {self.o_dist}\n   Cβ: {self.cb_dist}\n   Sγ: {self.sg_dist}\n\n'
+        s2 = f'\nProximal Coordinates:\n   N: {self.n_prox}\n   Cα: {self.ca_prox}\n   C: {self.c_prox}\n   O: {self.o_prox}\n   Cβ: {self.cb_prox}\n   Sγ: {self.sg_prox}\n   Cprev {self.c_prev_prox}\n   Nnext: {self.n_next_prox}\n'
+        s3 = f'Distal Coordinates:\n   N: {self.n_dist}\n   Cα: {self.ca_dist}\n   C: {self.c_dist}\n   O: {self.o_dist}\n   Cβ: {self.cb_dist}\n   Sγ: {self.sg_dist}\n   Cprev {self.c_prev_dist}\n   Nnext: {self.n_next_dist}\n\n'
         stot = f'{s2} {s3}'
         return stot
 
@@ -735,8 +762,8 @@ class Disulfide:
         """
         Representation for the Disulfide class, internal coordinates.
         """
-        s2i = f'Proximal Internal Coordinates:\n   N: {self._n_prox}\n   Cα: {self._ca_prox}\n   C: {self._c_prox}\n   O: {self._o_prox}\n   Cβ: {self._cb_prox}\n   Sγ: {self._sg_prox}\n\n'
-        s3i = f'Distal Internal Coordinates:\n   N: {self._n_dist}\n   Cα: {self._ca_dist}\n   C: {self._c_dist}\n   O: {self._o_dist}\n   Cβ: {self._cb_dist}\n   Sγ: {self._sg_dist}\n'
+        s2i = f'Proximal Internal Coordinates:\n   N: {self._n_prox}\n   Cα: {self._ca_prox}\n   C: {self._c_prox}\n   O: {self._o_prox}\n   Cβ: {self._cb_prox}\n   Sγ: {self._sg_prox}\n   Cprev {self.c_prev_prox}\n   Nnext: {self.n_next_prox}\n'
+        s3i = f'Distal Internal Coordinates:\n   N: {self._n_dist}\n   Cα: {self._ca_dist}\n   C: {self._c_dist}\n   O: {self._o_dist}\n   Cβ: {self._cb_dist}\n   Sγ: {self._sg_dist}\n   Cprev {self.c_prev_dist}\n   Nnext: {self.n_next_dist}\n\n'
         stot = f'{s2i} {s3i}'
         return stot
     
@@ -773,7 +800,7 @@ class Disulfide:
         s4 = self.repr_ss_conformation()
         s5 = self.repr_chain_ids()
         res = f'{s1} {s5} {s2} {s3} {s4} >'
-        return res
+        print(res)
 
     def _handle_SS_exception(self, message):
         """Handle exception (PRIVATE).
@@ -828,7 +855,7 @@ class Disulfide:
     def get_full_id(self):
         return((self.proximal_residue_fullid, self.distal_residue_fullid))
     
-    def initialize_disulfide_from_chain(self, chain1, chain2, proximal, distal):
+    def initialize_disulfide_from_chain(self, chain1, chain2, proximal, distal, quiet=False):
         '''
         Initialize a new Disulfide object with atomic coordinates from the proximal and 
         distal coordinates, typically taken from a PDB file.
@@ -865,12 +892,15 @@ class Disulfide:
         self.proximal_residue_fullid = prox_residue.get_full_id()
         self.distal_residue_fullid = dist_residue.get_full_id()
 
+        if quiet:
+            warnings.filterwarnings("ignore", category=DisulfideConstructionWarning)
+        else:
+            warnings.simplefilter("always")
+
         # grab the coordinates for the proximal and distal residues as vectors 
         # so we can do math on them later
-
         # proximal residue
-        if self.QUIET:
-            warnings.filterwarnings("ignore", category=DisulfideConstructionWarning)
+        
         try:
             n1 = prox_residue['N'].get_vector()
             ca1 = prox_residue['CA'].get_vector()
@@ -892,10 +922,30 @@ class Disulfide:
             sg2 = dist_residue['SG'].get_vector()
 
         except Exception:
-            raise DisulfideConstructionWarning(f"Invalid or missing coordinates for proximal residue {distal}") from None
+            raise DisulfideConstructionWarning(f"Invalid or missing coordinates for distal residue {distal}") from None
         
+        # previous residue and next residue - optional, used for phi, psi calculations
+        try:
+            prevprox = chain1[prox-1]
+            nextprox = chain1[prox+1]
+
+            prevdist = chain2[dist-1]
+            nextdist = chain2[dist+1]
+
+            cprev_prox = prevprox['C'].get_vector()
+            nnext_prox = nextprox['N'].get_vector()
+
+            cprev_dist = prevdist['C'].get_vector()
+            nnext_dist = nextdist['N'].get_vector()
+
+        except Exception:
+            mess = f'Cannot {prox-1} or {dist+1} for SS {proximal}-{distal}'
+            cprev_prox = nnext_prox = cprev_dist = nnext_dist = Vector(-1.0, -1.0, -1.0)
+            warnings.warn(mess, DisulfideConstructionWarning)
+
         # update the positions and conformation
-        self.set_positions(n1, ca1, c1, o1, cb1, sg1, n2, ca2, c2, o2, cb2, sg2)
+        self.set_positions(n1, ca1, c1, o1, cb1, sg1, n2, ca2, c2, o2, cb2, 
+                           sg2, cprev_prox, nnext_prox, cprev_dist, nnext_dist)
         
         # calculate and set the disulfide dihedral angles
         self.chi1 = numpy.degrees(calc_dihedral(n1, ca1, cb1, sg1))
@@ -919,7 +969,10 @@ class Disulfide:
     def set_positions(self, n_prox: Vector, ca_prox: Vector, c_prox: Vector,
                       o_prox: Vector, cb_prox: Vector, sg_prox: Vector, 
                       n_dist: Vector, ca_dist: Vector, c_dist: Vector,
-                      o_dist: Vector, cb_dist: Vector, sg_dist: Vector):
+                      o_dist: Vector, cb_dist: Vector, sg_dist: Vector,
+                      c_prev_prox: Vector, n_next_prox: Vector,
+                      c_prev_dist: Vector, n_next_dist: Vector
+                      ):
         '''
         Sets the atomic positions for all atoms in the disulfide bond.
         Arguments:
@@ -951,6 +1004,11 @@ class Disulfide:
         self.n_dist = n_dist.copy()
         self.c_dist = c_dist.copy()
         self.o_dist = o_dist.copy()
+
+        self.c_prev_prox = c_prev_prox.copy()
+        self.n_next_prox = n_next_prox.copy()
+        self.c_prev_dist = c_prev_dist.copy()
+        self.n_next_dist = n_next_dist.copy()
 
     def set_conformation(self, chi1, chi2, chi3, chi4, chi5):
         '''
@@ -988,22 +1046,24 @@ class Disulfide:
         self.proximal = proximal
         self.distal = distal
 
-    def TorsionDistance(p1: Vector, p2: Vector):
+    def RMS_Difference(self, other):
         '''
-        Calculate the 5D Euclidean distance for 2 Disulfide torsion_vector objects. This is used
-        to compare Disulfide Bond torsion angles to determine their torsional 
-        'distance'.
-        
-        Arguments: p1, p2 Vector objects of dimensionality 5 (5D)
-        Returns: Distance
+        Calculate the RMS distance between the internal coordinates
+        of self and another Disulfide
         '''
-        _p1 = p1.get_array()
-        _p2 = p2.get_array()
-        if (len(_p1) != 5 or len(_p2) != 5):
-            raise ProteusPyWarning("--> distance5d() requires vectors of length 5!")
-        d = math.dist(_p1, _p2)
-        return d
+        ic1 = self.internal_coords()
+        ic2 = other.internal_coords()
 
+        totsq = 0.0
+        for i in range(12):
+            p1 = ic1[i]
+            p2 = ic2[i]
+            totsq += math.dist(p1, p2)**2
+        
+        totsq /= 12
+
+        return(math.sqrt(totsq))
+    
     def compute_torsional_energy(self):
         '''
         Compute the approximate torsional energy for the Disulfide's conformation.
@@ -1127,13 +1187,39 @@ class Disulfide:
         self.compute_torsional_energy()
 
 # Class defination ends
+def TorsionDistance(ss1, ss2):
+    '''
+    Calculate the 5D Euclidean distance for 2 Disulfide torsion_vector objects. This is used
+    to compare Disulfide Bond torsion angles to determine their torsional 
+    'distance'.
+    
+    Arguments: p1, p2 Vector objects of dimensionality 5 (5D)
+    Returns: Distance
+    '''
 
-class CysSelect(Select):
-    def accept_residue(self, residue):
-        if residue.get_name() == 'CYS':
-            return True
-        else:
-            return False
+    _p1 = ss1.torsion_array
+    _p2 = ss2.torsion_array
+    if (len(_p1) != 5 or len(_p2) != 5):
+        raise ProteusPyWarning("--> distance5d() requires vectors of length 5!")
+    d = math.dist(_p1, _p2)
+    return d
+
+def RMS_Difference(ss1, ss2):
+    '''
+    Calculate the RMS distance between the internal coordinates between two Disulfides
+    '''
+    ic1 = ss1.internal_coords()
+    ic2 = ss2.internal_coords()
+
+    totsq = 0.0
+    for i in range(12):
+        p1 = ic1[i]
+        p2 = ic2[i]
+        totsq += math.dist(p1, p2)**2
+    
+    totsq /= 12
+
+    return(math.sqrt(totsq))
 
 def distance3d(p1: Vector, p2: Vector):
     '''
@@ -1526,7 +1612,7 @@ def load_disulfides_from_id(struct_name: str,
                     print(f' -> SSBond: {i}: {struct_name}: {proximal} {chain1_id} - {distal} {chain2_id}')
                 ssbond_name = f'{struct_name}_{proximal}{chain1_id}_{distal}{chain2_id}'       
                 new_ss = Disulfide(ssbond_name)
-                new_ss.initialize_disulfide_from_chain(_chaina, _chainb, proximal, distal)
+                new_ss.initialize_disulfide_from_chain(_chaina, _chainb, proximal, distal, quiet=quiet)
                 SSList.append(new_ss)
         i += 1
     return SSList
