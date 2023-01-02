@@ -317,10 +317,12 @@ class Disulfide:
         self.PERMISSIVE = bool(True)
         self.QUIET = bool(True)
         self.ca_distance = _FLOAT_INIT
-        self.torsion_array = numpy.array((_FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT))
-        self.phipsi_prox = numpy.array((_ANG_INIT, _ANG_INIT))
-        self.phipsi_dist = numpy.array((_ANG_INIT, _ANG_INIT))
-        
+        self.torsion_array = numpy.array((_ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT))
+        self.phiprox = _ANG_INIT
+        self.psiprox = _ANG_INIT
+        self.phidist = _ANG_INIT
+        self.psidist = _ANG_INIT
+
         # global coordinates for the Disulfide, typically as returned from the PDB file
         self.n_prox = Vector(0,0,0)
         self.ca_prox = Vector(0,0,0)
@@ -363,15 +365,15 @@ class Disulfide:
         self._c_prev_dist = Vector(-1,-1,-1)
         self._n_next_dist = Vector(-1,-1,-1)
 
-        # Dihedral angles for the disulfide bond itself, set to _FLOAT_INIT
-        self.chi1 = _FLOAT_INIT
-        self.chi2 = _FLOAT_INIT
-        self.chi3 = _FLOAT_INIT
-        self.chi4 = _FLOAT_INIT
-        self.chi5 = _FLOAT_INIT
+        # Dihedral angles for the disulfide bond itself, set to _ANG_INIT
+        self.chi1 = _ANG_INIT
+        self.chi2 = _ANG_INIT
+        self.chi3 = _ANG_INIT
+        self.chi4 = _ANG_INIT
+        self.chi5 = _ANG_INIT
 
         # I initialize an array for the torsions which will be used for comparisons
-        self.dihedrals = numpy.array((_FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT, _FLOAT_INIT), "d")
+        self.dihedrals = numpy.array((_ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT), "d")
 
     def internal_coords(self) -> numpy.array:
         res_array = numpy.zeros(shape=(12,3))
@@ -846,12 +848,6 @@ class Disulfide:
     def get_permissive(self) -> bool:
         return self.PERMISIVE
 
-    def set_quiet(self, perm: bool) -> None:
-        self.QUIET = perm
-    
-    def get_quiet(self) -> bool:
-        return self.QUIET
-
     def get_full_id(self):
         return((self.proximal_residue_fullid, self.distal_residue_fullid))
     
@@ -872,7 +868,7 @@ class Disulfide:
         id = chain1.get_full_id()[0]
         self.pdb_id = id
         
-        chi1 = chi2 = chi3 = chi4 = chi5 = _FLOAT_INIT
+        chi1 = chi2 = chi3 = chi4 = chi5 = _ANG_INIT
 
         prox = int(proximal)
         dist = int(distal)
@@ -939,7 +935,7 @@ class Disulfide:
             nnext_dist = nextdist['N'].get_vector()
 
         except Exception:
-            mess = f'Cannot {prox-1} or {dist+1} for SS {proximal}-{distal}'
+            mess = f'Missing coords for: {id} {prox-1} or {dist+1} for SS {proximal}-{distal}'
             cprev_prox = nnext_prox = cprev_dist = nnext_dist = Vector(-1.0, -1.0, -1.0)
             warnings.warn(mess, DisulfideConstructionWarning)
 
@@ -954,6 +950,12 @@ class Disulfide:
         self.chi4 = numpy.degrees(calc_dihedral(sg1, sg2, cb2, ca2))
         self.chi5 = numpy.degrees(calc_dihedral(sg2, cb2, ca2, n2))
 
+        # compute phi, psi for prox and distal
+        self.phiprox = numpy.degrees(calc_dihedral(cprev_prox, n1, ca1, c1))
+        self.psiprox = numpy.degrees(calc_dihedral(n1, ca1, c1, nnext_prox))
+        self.phidist = numpy.degrees(calc_dihedral(cprev_dist, n2, ca2, c2))
+        self.psidist = numpy.degrees(calc_dihedral(n2, ca2, c2, nnext_dist))
+        
         self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
         self.torsion_array = numpy.array((self.chi1, self.chi2, self.chi3, self.chi4, self.chi5))
 
@@ -1092,6 +1094,9 @@ class Disulfide:
 
         turt = Turtle3D('tmp')
         # get the coordinates as numpy.array for Turtle3D use.
+        cpp = self.c_prev_prox.get_array()
+        nnp = self.n_next_prox.get_array()
+
         n = self.n_prox.get_array()
         ca = self.ca_prox.get_array()
         c = self.c_prox.get_array()
@@ -1106,17 +1111,25 @@ class Disulfide:
         n2 = self.n_dist.get_array()
         o2 = self.o_dist.get_array()
 
+        cpd = self.c_prev_dist.get_array()
+        nnd = self.n_next_dist.get_array()
+        
         turt.orient_from_backbone(n, ca, c, cb, ORIENT_SIDECHAIN)
         
         # internal (local) coordinates, stored as Vector objects
         # to_local returns numpy.array objects
-
+        
         self._n_prox = Vector(turt.to_local(n))
         self._ca_prox = Vector(turt.to_local(ca))
         self._c_prox = Vector(turt.to_local(c))
         self._o_prox = Vector(turt.to_local(o))
         self._cb_prox = Vector(turt.to_local(cb))
         self._sg_prox = Vector(turt.to_local(sg))
+
+        self._c_prev_prox = Vector(turt.to_local(cpp))
+        self._n_next_prox = Vector(turt.to_local(nnp))
+        self._c_prev_dist = Vector(turt.to_local(cpd))
+        self._n_next_dist = Vector(turt.to_local(nnd))
 
         self._n_dist = Vector(turt.to_local(n2))
         self._ca_dist = Vector(turt.to_local(ca2))
@@ -1358,7 +1371,7 @@ def build_torsion_df(SSList: DisulfideList) -> pd.DataFrame:
     
     return SS_df.copy()
 
-def ExtractDisulfides(numb=-1, verbose=False, quiet=False, pdbdir=PDB_DIR, 
+def ExtractDisulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR, 
                         modeldir=MODEL_DIR, picklefile=SS_PICKLE_FILE, 
                         torsionfile=SS_TORSIONS_FILE, problemfile=PROBLEM_ID_FILE,
                         dictfile=SS_DICT_PICKLE_FILE) -> None:
