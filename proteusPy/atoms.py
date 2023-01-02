@@ -44,5 +44,3 @@ CAMERA_SCALE = .5
 
 WINSIZE = (1024, 1024)
 CAMERA_POS = ((0, 0, -10), (0,0,0), (0,1,0))
-
-
