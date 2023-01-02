@@ -31,7 +31,7 @@ class DisulfideLoader:
 
     def __init__(self, verbose=True, modeldir=MODEL_DIR, picklefile=SS_PICKLE_FILE, 
                 pickle_dict_file=SS_DICT_PICKLE_FILE,
-                torsion_file=SS_TORSIONS_FILE):
+                torsion_file=SS_TORSIONS_FILE, quiet=True):
         self.ModelDir = modeldir
         self.PickleFile = f'{modeldir}{picklefile}'
         self.PickleDictFile = f'{modeldir}{pickle_dict_file}'
@@ -41,6 +41,7 @@ class DisulfideLoader:
         self.TorsionDF = pd.DataFrame()
         self.TotalDisulfides = 0
         self.IDList = []
+        self.QUIET = quiet
 
         # create a dataframe with the following columns for the disulfide conformations extracted from the structure
         df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy']
@@ -117,6 +118,12 @@ class DisulfideLoader:
             return value
         raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
 
+    def set_quiet(self, perm: bool) -> None:
+        self.QUIET = perm
+    
+    def get_quiet(self) -> bool:
+        return self.QUIET
+    
     def copy(self):
         return copy.deepcopy(self)
     
