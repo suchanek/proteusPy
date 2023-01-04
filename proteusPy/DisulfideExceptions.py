@@ -29,6 +29,10 @@ class DisulfideConstructionWarning(ProteusPyWarning):
 
     pass
 
+class DisulfideParseWarning(ProteusPyWarning):
+    """Define class DisulfideConstructionWarning."""
+
+    pass
 
 # The SMCRA structure could not be written to file
 class DisulfideIOException(Exception):

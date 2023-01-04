@@ -1,6 +1,6 @@
 # Disulfide Bond Analysis
 # Author: Eric G. Suchanek, PhD.
-# Last revision: 12/26/22 -egs-
+# Last revision: 1/2/23 -egs-
 # Cα Cβ Sγ
 
 import pandas as pd

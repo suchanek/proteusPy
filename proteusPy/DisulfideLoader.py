@@ -2,6 +2,7 @@ from proteusPy import *
 from proteusPy.atoms import *
 from proteusPy.Disulfide import check_chains
 from proteusPy.Disulfide import DisulfideList
+from proteusPy.DisulfideExceptions import *
 
 import pyvista as pv
 
@@ -44,7 +45,7 @@ class DisulfideLoader:
         self.QUIET = quiet
 
         # create a dataframe with the following columns for the disulfide conformations extracted from the structure
-        df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy']
+        df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist', 'psi_dist']
         SS_df = pd.DataFrame(columns=df_cols, index=['source'])
         _SSList = DisulfideList([], 'ALL_PDB_SS')
 
@@ -157,8 +158,6 @@ class DisulfideLoader:
 
         cols = 2
         rows = (tot_ss + 1) // cols
-        near_range = -10.0
-        far_range = 10.0
         i = 0
 
         pl = pv.Plotter(window_size=WINSIZE, shape=(rows, cols))
@@ -183,7 +182,6 @@ class DisulfideLoader:
                     pl.camera_position = CAMERA_POS
                 i += 1        
         pl.link_views()
-        # pl.camera.zoom(CAMERA_SCALE)
         pl.reset_camera()
         pl.show()
 

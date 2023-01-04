@@ -338,10 +338,10 @@ class Disulfide:
         self.o_dist = Vector(0,0,0)
 
         # need these to calculate backbone dihedral angles
-        self.c_prev_prox = Vector(-1,-1,-1)
-        self.n_next_prox = Vector(-1,1,-1)
-        self.c_prev_dist = Vector(-1,-1,-1)
-        self.n_next_dist = Vector(-1,-1,-1)
+        self.c_prev_prox = Vector(0,0,0)
+        self.n_next_prox = Vector(0,0,0)
+        self.c_prev_dist = Vector(0,0,0)
+        self.n_next_dist = Vector(0,0,0)
 
         # local coordinates for the Disulfide, computed using the Turtle3D in 
         # Orientation #1 these are generally private.
@@ -360,10 +360,10 @@ class Disulfide:
         self._o_dist = Vector(0,0,0)
 
         # need these to calculate backbone dihedral angles
-        self._c_prev_prox = Vector(-1,-1,-1)
-        self._n_next_prox = Vector(-1,-1,-1)
-        self._c_prev_dist = Vector(-1,-1,-1)
-        self._n_next_dist = Vector(-1,-1,-1)
+        self._c_prev_prox = Vector(0,0,0)
+        self._n_next_prox = Vector(0,0,0)
+        self._c_prev_dist = Vector(0,0,0)
+        self._n_next_dist = Vector(0,0,0)
 
         # Dihedral angles for the disulfide bond itself, set to _ANG_INIT
         self.chi1 = _ANG_INIT
@@ -376,7 +376,7 @@ class Disulfide:
         self.dihedrals = numpy.array((_ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT), "d")
 
     def internal_coords(self) -> numpy.array:
-        res_array = numpy.zeros(shape=(12,3))
+        res_array = numpy.zeros(shape=(16,3))
 
         res_array = numpy.array((
             self._n_prox.get_array(),
@@ -391,12 +391,16 @@ class Disulfide:
             self._o_dist.get_array(), 
             self._cb_dist.get_array(),
             self._sg_dist.get_array(),
+            self._c_prev_prox.get_array(),
+            self._n_next_prox.get_array(),
+            self._c_prev_dist.get_array(),
+            self._n_next_dist.get_array()
         ))
         return res_array
     
     @property
     def cofmass(self) -> numpy.array:
-        res = numpy.zeros(shape=(12,3))
+        res = numpy.zeros(shape=(16,3))
         res = self.internal_coords()
         return res.mean(axis=0)
 
@@ -432,14 +436,14 @@ class Disulfide:
         dist = self.distal_chain
         return tuple(prox, dist)
     
-    def same_chains(self):
+    def same_chains(self) -> bool:
         (prox, dist) = self.get_chains()
         if prox == dist:
             return True
         else:
             return False
     
-    def reset(self):
+    def reset(self) -> None:
         self.__init__(self)
     
     def compute_extents(self, dim='z'):
@@ -486,11 +490,12 @@ class Disulfide:
         radius = BOND_RADIUS
         coords = self.internal_coords()
         
-        atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C', 'SG')
+        atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C', 'SG', 'Z', 'Z', 'Z', 'Z')
         pvp = pvplot
         
         # bond connection table with atoms in the specific order shown above: 
         # returned by ss.get_internal_coords()
+        
         bond_conn = numpy.array(
             [
                 [0, 1], # n-ca
@@ -503,7 +508,11 @@ class Disulfide:
                 [8, 9], # c-o
                 [7, 10], # ca-cb
                 [10, 11], #cb-sg
-                [5, 11]   #sg -sg
+                [5, 11],   #sg -sg
+                [12, 0],  # cprev_prox-n
+                [2, 13],  # c-nnext_prox
+                [14,6],   # cprev_dist-n_dist
+                [8,15]    # c-nnext_dist
             ])
         
         # colors for the bonds. Index into ATOM_COLORS array
@@ -519,7 +528,12 @@ class Disulfide:
                 ('C', 'O'),
                 ('C', 'C'),
                 ('C', 'SG'),
-                ('SG', 'SG')
+                ('SG', 'SG'),
+                # prev and next C-N bonds - color by atom Z
+                ('Z', 'Z'),
+                ('Z', 'Z'),
+                ('Z', 'Z'),
+                ('Z', 'Z')
             ]
         )
                 
@@ -543,7 +557,9 @@ class Disulfide:
                 distal_pos = coords[dest]
                 direction = distal_pos - prox_pos
                 height = math.dist(prox_pos, distal_pos)
-                origin = prox_pos + 0.5 * direction # the cylinder origin is actually in the middle so we translate
+                
+                # the cylinder origin is actually in the middle so we translate
+                origin = prox_pos + 0.5 * direction 
                 
                 cyl = pv.Cylinder(origin, direction, radius=radius*2, height=height)
                 pvp.add_mesh(cyl, color=bondcolor)
@@ -552,7 +568,8 @@ class Disulfide:
             i = 0
             for atom in atoms:
                 rad = ATOM_RADII_CPK[atom] * bs_scale
-                pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
+                pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], 
+                             smooth_shading=True, specular=spec, specular_power=specpow)
                 i += 1
             
             # work through connectivity and colors
@@ -663,7 +680,7 @@ class Disulfide:
                 pvp.add_mesh(cap1, color=bondcolor)
                 pvp.add_mesh(cap2, color=bondcolor)
                 pvp.add_mesh(cyl, color=bondcolor)
-        #pvp.enable_shadows()
+
         return pvp
 
     def display(self, single=True, style='sb'):
@@ -851,7 +868,7 @@ class Disulfide:
     def get_full_id(self):
         return((self.proximal_residue_fullid, self.distal_residue_fullid))
     
-    def initialize_disulfide_from_chain(self, chain1, chain2, proximal, distal, quiet=False):
+    def initialize_disulfide_from_chain(self, chain1, chain2, proximal, distal, quiet=True):
         '''
         Initialize a new Disulfide object with atomic coordinates from the proximal and 
         distal coordinates, typically taken from a PDB file.
@@ -1225,6 +1242,7 @@ def RMS_Difference(ss1, ss2):
     ic2 = ss2.internal_coords()
 
     totsq = 0.0
+    # only take coords for the proximal and distal disfulfides, not the prev/next residues.
     for i in range(12):
         p1 = ic1[i]
         p2 = ic2[i]
@@ -1357,7 +1375,7 @@ def DownloadDisulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR,
 
 def build_torsion_df(SSList: DisulfideList) -> pd.DataFrame:
     # create a dataframe with the following columns for the disulfide conformations extracted from the structure
-    df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy', 'ca_distance']
+    df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist', 'psi_dist']
     SS_df = pd.DataFrame(columns=df_cols)
 
     pbar = tqdm(SSList, ncols=_PBAR_COLS, miniters=400000)
@@ -1365,7 +1383,8 @@ def build_torsion_df(SSList: DisulfideList) -> pd.DataFrame:
         #pbar.set_postfix({'ID': ss.name}) # update the progress bar
 
         new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, 
-        		ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance]
+        		ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance,
+                ss.psiprox, ss.psiprox, ss.phidist, ss.psidist]
         # add the row to the end of the dataframe
         SS_df.loc[len(SS_df.index)] = new_row.copy() # deep copy
     
@@ -1437,7 +1456,7 @@ def ExtractDisulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
 
     # create a dataframe with the following columns for the disulfide conformations extracted from the structure
     
-    df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy', 'ca_distance']
+    df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist', 'psi_dist']
     SS_df = pd.DataFrame(columns=df_cols)
 
     # define a tqdm progressbar using the fully loaded entrylist list. If numb is passed then
@@ -1457,7 +1476,9 @@ def ExtractDisulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
         if len(sslist) > 0:
             for ss in sslist:
                 All_ss_list.append(ss)
-                new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance]
+                new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, 
+                          ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance, ss.phiprox, 
+                          ss.psiprox, ss.phidist, ss.psidist]
                 # add the row to the end of the dataframe
                 SS_df.loc[len(SS_df.index)] = new_row.copy() # deep copy
             All_ss_dict[entry] = sslist
