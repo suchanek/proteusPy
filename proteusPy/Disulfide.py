@@ -651,6 +651,7 @@ class Disulfide:
                 cap2 = pv.Sphere(center=distal_pos, radius=radius*1.2)
                 cyl = pv.Cylinder(origin, direction, radius=radius, height=height)
                 
+                # proximal res
                 if i <= 4 or i == 11 or i == 12:
                     color = 'red'
                 else:
@@ -732,6 +733,62 @@ class Disulfide:
             pl.reset_camera()
             pl.show()
     
+    def screenshot(self, single=True, style='sb', fname='ssbond.png',
+                   verbose=False):
+        src = self.pdb_id
+        enrg = self.energy
+        title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol'
+        
+        near_range, far_range = self.compute_extents()
+        
+        if single:
+            print('entered')
+            pl = pv.Plotter(window_size=WINSIZE)
+            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.enable_anti_aliasing('msaa')
+            pl.add_camera_orientation_widget()
+            pl = self._render(pl, style=style, bondcolor=BOND_COLOR, 
+                        bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+            pl.reset_camera()
+            pl.show(auto_close=False)
+            pl.screenshot(fname)
+            pl.clear()
+
+        else:
+            _WINSIZE = (1024, 1024)
+            pl = pv.Plotter(window_size=_WINSIZE, shape=(2,2))
+            pl.subplot(0,0)
+            
+            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.enable_anti_aliasing('msaa')
+
+            pl.add_camera_orientation_widget()
+            pl = self._render(pl, style='cpk', bondcolor=BOND_COLOR, 
+                        bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+
+            pl.subplot(0,1)
+            pl.add_title(title=title, font_size=FONTSIZE)
+            pl = self._render(pl, style='pd', bondcolor=BOND_COLOR, 
+                        bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+
+            pl.subplot(1,0)
+            pl.add_title(title=title, font_size=FONTSIZE)
+            pl = self._render(pl, style='bs', bondcolor=BOND_COLOR, 
+                        bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+            
+            pl.subplot(1,1)
+            pl.add_title(title=title, font_size=FONTSIZE)
+            pl = self._render(pl, style='sb', bondcolor=BOND_COLOR, 
+                        bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+            
+            pl.link_views()
+            pl.reset_camera()
+            pl.show(auto_close=False)
+            pl.screenshot(fname)
+        
+        if verbose:
+            print(f'Saved: {fname}')
+        
     # comparison operators, used for sorting. keyed to SS bond energy
     def __lt__(self, other):
         if isinstance(other, Disulfide):
