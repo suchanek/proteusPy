@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     ss.display(style='cpk', single=True)
     ss.display(style='sb', single=True)
-    ss.display(style='pd', single=False)
+    ss.display(style='pd', single=True)
 
     # get all disulfides for one structure. Make a 
     # DisulfideList object to hold it
@@ -56,10 +56,10 @@ if __name__ == '__main__':
     #ss4yss.display('sb')
     #ss4yss.display('pd')
     
-    sslist = DisulfideList([], 'last 12')
-    sslist = PDB_SS[:12]
-    sslist.display('pd')
-    sslist.display_overlay()
+    #sslist = DisulfideList([], 'last 12')
+    #sslist = PDB_SS[:12]
+    #sslist.display('pd')
+   # sslist.display_overlay()
 
     #ss1j5h = DisulfideList([], 'ss1j5h')
     #ss1j5h = PDB_SS['1j5h']
