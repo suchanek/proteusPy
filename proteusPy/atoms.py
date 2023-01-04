@@ -27,15 +27,16 @@ P_RAD_CPK = 1.9
 S_RAD_CPK = 1.8
 CA_RAD_CPK = 1.274
 H_RAD_CPK = 1.2
+Z_RAD_CPK = 1.0
 
 ATOM_RADII_CPK = {"N": N_RAD_CPK, "C": C_RAD_CPK, "CA": CA_RAD_CPK, 
                 "O": O_RAD_CPK, "SG": S_RAD_CPK, "S": S_RAD_CPK, 
-                "H": H_RAD_CPK, "CB": C_RAD_CPK}
+                "H": H_RAD_CPK, "CB": C_RAD_CPK, "Z": Z_RAD_CPK}
 ATOM_COLORS = {'O': 'red', 'C': 'grey', 'N': [0.0, 0.0, 1.0], 'S': 'yellow', 'H': 'white', 
-            'SG': 'yellow', 'CB': 'grey', 'FE': 'green'}
+            'SG': 'yellow', 'CB': 'grey', 'FE': 'green', 'Z': 'orange'}
 
 BOND_RADIUS = .12
-BOND_COLOR = 'tan'
+BOND_COLOR = 'grey'
 FONTSIZE = 10
 BS_SCALE = .25
 SPECULARITY = .9
