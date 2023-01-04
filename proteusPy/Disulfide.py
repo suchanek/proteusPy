@@ -651,7 +651,7 @@ class Disulfide:
                 cap2 = pv.Sphere(center=distal_pos, radius=radius*1.2)
                 cyl = pv.Cylinder(origin, direction, radius=radius, height=height)
                 
-                if i < 5:
+                if i <= 4 or i == 11 or i == 12:
                     color = 'red'
                 else:
                     color = 'green'
