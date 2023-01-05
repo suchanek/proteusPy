@@ -3,7 +3,7 @@
 # Part of the program Proteus, a program for the analysis and modeling of 
 # protein structures, with an emphasis on disulfide bonds.
 # Author: Eric G. Suchanek, PhD
-# Last revision: 1/1/2023
+# Last revision: 1/4/2023
 # Cα Cβ Sγ
 
 import math
@@ -47,7 +47,7 @@ def cmap_vector(steps):
     norm = linspace(0.0, 1.0, steps)
 
     #colormap possible values = viridis, jet, spectral
-    rgb_all = cm.jet(norm, bytes=True) 
+    rgb_all = cm.spectral(norm, bytes=True) 
     i = 0
     
     for rgb in rgb_all:
@@ -101,7 +101,7 @@ class DisulfideList(UserList):
         sslist = DisulfideList([ss1], 'tmp')
         sslist.append(ss2)
 
-        # extract a disulfide with typical index
+        # extract the first disulfide
         ss1 = PDB_SS[0]
         print(f'{ss1.pprint_all()}')
 
@@ -109,6 +109,7 @@ class DisulfideList(UserList):
         subset = DisulfideList(PDB_SS[0:10],'subset')
         subset.display(style='sb')      # display the disulfides in 'split bond' style
         subset.display_overlay()        # display all disulfides overlaid in stick style
+        subset.screenshot(style='sb', fname='subset.png')  # save a screenshot.
     '''
     
     def __init__(self, iterable, id):
@@ -248,6 +249,57 @@ class DisulfideList(UserList):
         pl.reset_camera()
 
         pl.show()
+    
+    def screenshot(self, style='bs', fname='sslist.png'):
+        ''' 
+            Save the interactive window displaying the list of disulfides in the given style.
+            Argument:
+                self
+                style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd'
+                fname: filename for the resulting image file.
+            Returns:
+                Image file saved to disk.
+        '''
+                
+        ssList = self.data
+        tot_ss = len(ssList) # number off ssbonds
+        if tot_ss < 4:
+            cols = 2
+        elif tot_ss == 3:
+            cols = 3
+        else:
+            cols = 4
+        
+        rows = (tot_ss + 1) // cols
+        i = 0
+
+        WINSIZE = (512 * cols, 512 * rows)
+        pl = pv.Plotter(window_size=WINSIZE, shape=(rows, cols))
+        pl.add_camera_orientation_widget()
+
+        for r in range(rows):
+            for c in range(cols):
+                pl.subplot(r,c)
+                if i < tot_ss:
+                    #pl.enable_anti_aliasing('msaa')
+                    ss = ssList[i]
+                    src = ss.pdb_id
+                    enrg = ss.energy
+                    near_range, far_range = ss.compute_extents()
+                    title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol'
+                    pl.add_title(title=title, font_size=FONTSIZE)
+
+                    pl = ss._render(pl, style=style, bondcolor=BOND_COLOR, 
+                                   bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+                    #pl.camera_position = CAMERA_POS
+                i += 1
+
+        pl.enable_anti_aliasing('fxaa')
+        pl.link_views()
+        pl.reset_camera()
+
+        pl.show(auto_close=False)
+        pl.screenshot(fname)
     
     def display_overlay(self):
         ''' 
@@ -1086,7 +1138,7 @@ class Disulfide:
         self.c_prev_dist = c_prev_dist.copy()
         self.n_next_dist = n_next_dist.copy()
 
-    def set_conformation(self, chi1, chi2, chi3, chi4, chi5):
+    def set_dihedrals(self, chi1, chi2, chi3, chi4, chi5):
         '''
         Sets the 5 dihedral angles chi1 - chi5 for the Disulfide object and computes the torsional energy.
         
@@ -1122,7 +1174,7 @@ class Disulfide:
         self.proximal = proximal
         self.distal = distal
 
-    def RMS_Difference(self, other):
+    def Distance_RMS(self, other):
         '''
         Calculate the RMS distance between the internal coordinates
         of self and another Disulfide
@@ -1274,7 +1326,7 @@ class Disulfide:
         self.compute_torsional_energy()
 
 # Class defination ends
-def TorsionDistance(ss1, ss2):
+def Torsion_RMS(ss1, ss2):
     '''
     Calculate the 5D Euclidean distance for 2 Disulfide torsion_vector objects. This is used
     to compare Disulfide Bond torsion angles to determine their torsional 
@@ -1291,7 +1343,7 @@ def TorsionDistance(ss1, ss2):
     d = math.dist(_p1, _p2)
     return d
 
-def RMS_Difference(ss1, ss2):
+def Distance_RMS(ss1, ss2):
     '''
     Calculate the RMS distance between the internal coordinates between two Disulfides
     '''

@@ -40,7 +40,7 @@ from proteusPy.residue import build_residue, get_backbone_from_chain, to_alpha, 
 #from proteusPy.Disulfide import CysSelect, Disulfide
 from proteusPy.Disulfide import name_to_id, todeg, torad, build_torsion_df, distance3d
 from proteusPy.Disulfide import parse_ssbond_header_rec, DownloadDisulfides, ExtractDisulfides
-from proteusPy.Disulfide import  cmap_vector, check_chains, TorsionDistance, RMS_Difference
+from proteusPy.Disulfide import  cmap_vector, check_chains, Distance_RMS, Torsion_RMS
 
 #from proteusPy.Disulfide import DisulfideList
 from proteusPy.DisulfideLoader import DisulfideLoader

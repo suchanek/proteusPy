@@ -42,7 +42,7 @@ ExtractDisulfides(numb=1000, pdbdir=PDB, modeldir=MODELS,
                 verbose=False, quiet=True)
 '''
 
-ExtractDisulfides(numb=1000, pdbdir=PDB, 
+ExtractDisulfides(numb=2000, pdbdir=PDB, 
                 modeldir=MODELS,
                 verbose=False, quiet=True)
 

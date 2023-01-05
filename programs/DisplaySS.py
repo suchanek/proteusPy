@@ -41,27 +41,28 @@ if __name__ == '__main__':
     ss = Disulfide()
     ss = PDB_SS[0]
 
-    #ss.display(style='cpk', single=True)
-    #ss.display(style='sb', single=True)
-    #ss.display(style='pd', single=True)
+    ss.display(style='cpk', single=True)
+    ss.display(style='sb', single=True)
+    ss.display(style='pd', single=True)
 
-    ss.screenshot(style='cpk', single=True, fname='cpk3.png', verbose=True)
-    ss.screenshot(style='sb', single=False, fname='sb3.png', verbose=True)
-
+    #ss.screenshot(style='cpk', single=True, fname='cpk3.png', verbose=True)
+    #ss.screenshot(style='sb', single=False, fname='sb3.png', verbose=True)
 
     # get all disulfides for one structure. Make a 
     # DisulfideList object to hold it
     
     ss4yss = DisulfideList([], 'tmp')
     ss4yss = PDB_SS['4yys']
+    ss4yss.screenshot(style='sb', fname='ss4yss.png')
 
     #ss4yss.display('cpk')
     #ss4yss.display('bs')
     #ss4yss.display('sb')
     #ss4yss.display('pd')
     
-    #sslist = DisulfideList([], 'last 12')
-    #sslist = PDB_SS[:12]
+    sslist = DisulfideList([], 'last16')
+    sslist = PDB_SS[:16]
+    sslist.screenshot(style='sb', fname='last16.png')
     #sslist.display('pd')
    # sslist.display_overlay()
 
