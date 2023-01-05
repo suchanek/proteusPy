@@ -71,7 +71,11 @@ class DisulfideLoader:
         if verbose:
             print(f'Reading Torsion DF {self.TorsionFile}.')
         
-        self.TorsionDF = pd.read_csv(self.TorsionFile)
+        #tmpDF  = pd.read_csv(self.TorsionFile, index_col='source')
+        tmpDF  = pd.read_csv(self.TorsionFile)
+        tmpDF.drop(tmpDF.columns[[0]], axis=1, inplace=True)
+
+        self.TorsionDF = tmpDF.copy()
 
         if verbose:
             print(f'Read torsions DF.')
@@ -111,9 +115,21 @@ class DisulfideLoader:
     def getdict(self) -> dict:
         return copy.deepcopy(self.SSDict)
 
-    def getTorsions(self):
-        return copy.deepcopy(self.TorsionDF)
+    def getTorsions(self, pdbID=None) -> pd.DataFrame:
+        res_df = pd.DataFrame()
 
+        if pdbID:
+            try:
+                res = self.SSDict[pdbID]
+                sel = self.TorsionDF['source'] == pdbID
+                res_df = self.TorsionDF[sel]
+                return res_df.copy()
+            except KeyError:
+                mess = f'! Cannot find key {pdbID} in SSBond DB'
+                raise DisulfideParseWarning(mess)
+        else:
+            return copy.deepcopy(self.TorsionDF)
+    
     def validate_ss(self, value):
         if isinstance(value, (Disulfide)):
             return value
