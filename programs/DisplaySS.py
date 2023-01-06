@@ -55,14 +55,14 @@ if __name__ == '__main__':
     ss4yss = PDB_SS['4yys']
     ss4yss.screenshot(style='sb', fname='ss4yss.png')
 
-    #ss4yss.display('cpk')
-    #ss4yss.display('bs')
-    #ss4yss.display('sb')
-    #ss4yss.display('pd')
+    ss4yss.display('cpk')
+    ss4yss.display('bs')
+    ss4yss.display('sb')
+    ss4yss.display('pd')
     
     sslist = DisulfideList([], 'last16')
-    sslist = PDB_SS[:16]
-    sslist.screenshot(style='sb', fname='last16.png')
+    sslist = PDB_SS[:12]
+    sslist.screenshot(style='sb', fname='last12.png')
 
     #sslist.display('pd')
    # sslist.display_overlay()
