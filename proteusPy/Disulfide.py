@@ -240,9 +240,8 @@ class DisulfideList(UserList):
                     title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol'
                     pl.add_title(title=title, font_size=FONTSIZE)
 
-                    pl = ss._render(pl, style=style, bondcolor=BOND_COLOR, 
+                    ss._render(pl, style=style, bondcolor=BOND_COLOR, 
                                    bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
-                    #pl.camera_position = CAMERA_POS
                 i += 1
         
         pl.link_views()
@@ -281,11 +280,9 @@ class DisulfideList(UserList):
             for c in range(cols):
                 pl.subplot(r,c)
                 if i < tot_ss:
-                    #pl.enable_anti_aliasing('msaa')
                     ss = ssList[i]
                     src = ss.pdb_id
                     enrg = ss.energy
-                    near_range, far_range = ss.compute_extents()
                     title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol'
                     pl.add_title(title=title, font_size=FONTSIZE)
 
@@ -334,7 +331,7 @@ class DisulfideList(UserList):
         i = 0
         for ss in ssbonds:
             color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
-            pl = ss._render(pl, style='st', bondcolor=color)
+            ss._render(pl, style='st', bondcolor=color)
             i += 1
 
         pl.reset_camera()
