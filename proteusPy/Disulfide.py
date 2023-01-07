@@ -240,14 +240,12 @@ class DisulfideList(UserList):
                     near_range, far_range = ss.compute_extents()
                     title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol'
                     pl.add_title(title=title, font_size=FONTSIZE)
-
                     ss._render(pl, style=style, bondcolor=BOND_COLOR, 
                                    bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
                 i += 1
         
         pl.link_views()
         pl.reset_camera()
-
         pl.show()
     
     def screenshot(self, style='bs', fname='sslist.png'):
@@ -321,11 +319,8 @@ class DisulfideList(UserList):
         pl.add_title(title=title, font_size=FONTSIZE)
         pl.enable_anti_aliasing('msaa')
         
-        # pl.view_isometric()
         pl.add_camera_orientation_widget()
-        # pl.camera_position = CAMERA_POS
-        # pl.add_axes()
-        
+
         mycol = numpy.zeros(shape=(tot_ss, 3))
         mycol = cmap_vector(tot_ss)
 
@@ -333,6 +328,7 @@ class DisulfideList(UserList):
         for ss in ssbonds:
             color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
             ss._render(pl, style='plain', bondcolor=color)
+            pl.view_isometric()
             i += 1
 
         pl.reset_camera()
@@ -638,18 +634,21 @@ class Disulfide:
                 pvp.add_mesh(cap2, color=dest_col)
 
             return pvp
-            
+        
         if style=='cpk':
             i = 0
             for atom in atoms:
                 rad = ATOM_RADII_CPK[atom]
-                pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
+                pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], 
+                             smooth_shading=True, specular=spec, specular_power=specpow)
                 i += 1
+        
         elif style=='cov':
             i = 0
             for atom in atoms:
                 rad = ATOM_RADII_COVALENT[atom]
-                pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], smooth_shading=True, specular=spec, specular_power=specpow)
+                pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], 
+                            smooth_shading=True, specular=spec, specular_power=specpow)
                 i += 1
 
         elif style == 'bs': # ball and stick
@@ -657,7 +656,7 @@ class Disulfide:
             for atom in atoms:
                 rad = ATOM_RADII_CPK[atom] * bs_scale
                 pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], 
-                                smooth_shading=True, specular=spec, specular_power=specpow)
+                            smooth_shading=True, specular=spec, specular_power=specpow)
                 i += 1
             pvp = draw_bonds(pvp, style='bs')
 
