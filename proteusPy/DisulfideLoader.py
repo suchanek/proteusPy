@@ -160,7 +160,7 @@ class DisulfideLoader:
         ssbonds = self[pdbid]
         ssbonds.display_overlay()
 
-    def display(self, style='bs'):
+    def display(self, style='bs', viewstyle=''):
         ''' 
         Display the Disulfides
         Argument:
@@ -184,7 +184,7 @@ class DisulfideLoader:
                 pl.subplot(r,c)
                 if i < tot_ss:
                     pl.enable_anti_aliasing('msaa')
-                    #pl.view_isometric()
+                    pl.view_isometric()
                     #pl.add_axes()
                     ss = ssList[i]
                     src = ss.pdb_id
@@ -193,9 +193,6 @@ class DisulfideLoader:
                     pl.add_title(title=title, font_size=FONTSIZE)
                     pl = ss._render(pl, style=style)
                     near_range, far_range = ss.compute_extents()
-                    #pl.camera.clipping_range = (near_range, far_range)
-
-                    pl.camera_position = CAMERA_POS
                 i += 1        
         pl.link_views()
         pl.reset_camera()

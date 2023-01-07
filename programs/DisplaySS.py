@@ -42,8 +42,8 @@ if __name__ == '__main__':
     ss = PDB_SS[0]
 
     ss.display(style='cpk', single=True)
-    ss.display(style='bs', single=True)
-    ss.display(style='pd', single=False)
+    ss.display(style='sb', single=True)
+    ss.display(style='pd', single=True) # fix
 
     #ss.screenshot(style='cpk', single=True, fname='cpk3.png', verbose=True)
     #ss.screenshot(style='sb', single=False, fname='sb3.png', verbose=True)
@@ -53,29 +53,32 @@ if __name__ == '__main__':
     
     ss4yss = DisulfideList([], 'tmp')
     ss4yss = PDB_SS['4yys']
-    ss4yss.screenshot(style='sb', fname='ss4yss.png')
+    #ss4yss.screenshot(style='sb', fname='ss4yss.png')
 
-    ss4yss.display('cpk')
-    ss4yss.display('bs')
-    ss4yss.display('sb')
-    ss4yss.display('pd')
+    #ss4yss.display('cpk')
+    #ss4yss.display('bs')
+    #ss4yss.display('sb')
+    #ss4yss.display('pd')
+    ss4yss.display_overlay()
     
-    sslist = DisulfideList([], 'last16')
-    sslist = PDB_SS[:12]
-    sslist.screenshot(style='sb', fname='last12.png')
+    sslist = DisulfideList([], 'last8')
+    sslist = PDB_SS[:8]
+    #sslist.screenshot(style='sb', fname='last12.png')
 
-    #sslist.display('pd')
-   # sslist.display_overlay()
+    sslist.display(style='bs')
+    sslist.display(style='pd')
+
+    #sslist.display_overlay()
 
     #ss1j5h = DisulfideList([], 'ss1j5h')
     #ss1j5h = PDB_SS['1j5h']
-    #ss1j5h.display('sb')
-    #ss1j5h.display('pd')
+    #ss1j5h.display(style='sb')
+    #ss1j5h.display(style='pd')
 
     #PDB_SS.display_overlay('1j5h')
     #PDB_SS.display_overlay('4yys')
     
-    ss6fuf = PDB_SS['6fuf']
-    ss6fuf.display(style='bs')
+    #ss6fuf = PDB_SS['6fuf']
+    #ss6fuf.display(style='bs')
 
     exit()
