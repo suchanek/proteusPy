@@ -46,8 +46,8 @@ def cmap_vector(steps):
     rgbcol = numpy.zeros(shape=(steps, 3))
     norm = linspace(0.0, 1.0, steps)
 
-    #colormap possible values = viridis, jet, spectral
-    rgb_all = cm.spectral(norm, bytes=True) 
+    # colormap possible values = viridis, jet, spectral
+    rgb_all = cm.jet(norm, bytes=True) 
     i = 0
     
     for rgb in rgb_all:
@@ -233,6 +233,7 @@ class DisulfideList(UserList):
                 pl.subplot(r,c)
                 if i < tot_ss:
                     pl.enable_anti_aliasing('msaa')
+                    pl.view_isometric()
                     ss = ssList[i]
                     src = ss.pdb_id
                     enrg = ss.energy
@@ -322,7 +323,7 @@ class DisulfideList(UserList):
         
         # pl.view_isometric()
         pl.add_camera_orientation_widget()
-        pl.camera_position = CAMERA_POS
+        # pl.camera_position = CAMERA_POS
         # pl.add_axes()
         
         mycol = numpy.zeros(shape=(tot_ss, 3))
@@ -331,7 +332,7 @@ class DisulfideList(UserList):
         i = 0
         for ss in ssbonds:
             color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
-            ss._render(pl, style='st', bondcolor=color)
+            ss._render(pl, style='plain', bondcolor=color)
             i += 1
 
         pl.reset_camera()
@@ -522,7 +523,7 @@ class Disulfide:
 
         return res
 
-    def _render(self, pvplot: pv.Plotter(), style='bs', 
+    def _render(self, pvplot: pv.Plotter(), style='bs', plain=False,
             bondcolor=BOND_COLOR, bs_scale=BS_SCALE, spec=SPECULARITY, 
             specpow=SPEC_POWER) -> pv.Plotter:
         ''' 
@@ -544,7 +545,8 @@ class Disulfide:
         # bond connection table with atoms in the specific order shown above: 
         # returned by ss.get_internal_coords()
         
-        bond_conn = numpy.array(
+        def draw_bonds(pvp, radius=BOND_RADIUS, style='sb', bcolor=BOND_COLOR):
+            bond_conn = numpy.array(
             [
                 [0, 1], # n-ca
                 [1, 2], # ca-c
@@ -562,31 +564,31 @@ class Disulfide:
                 [14,6],   # cprev_dist-n_dist
                 [8,15]    # c-nnext_dist
             ])
-        
-        # colors for the bonds. Index into ATOM_COLORS array
-        bond_split_colors = numpy.array(
-            [
-                ('N', 'C'),
-                ('C', 'C'),
-                ('C', 'O'),
-                ('C', 'C'),
-                ('C', 'SG'),
-                ('N', 'C'),
-                ('C', 'C'),
-                ('C', 'O'),
-                ('C', 'C'),
-                ('C', 'SG'),
-                ('SG', 'SG'),
-                # prev and next C-N bonds - color by atom Z
-                ('Z', 'Z'),
-                ('Z', 'Z'),
-                ('Z', 'Z'),
-                ('Z', 'Z')
-            ]
-        )
-
-        def draw_bonds(pvp, radius=BOND_RADIUS, plain=False, pd=False):
+            
+            # colors for the bonds. Index into ATOM_COLORS array
+            bond_split_colors = numpy.array(
+                [
+                    ('N', 'C'),
+                    ('C', 'C'),
+                    ('C', 'O'),
+                    ('C', 'C'),
+                    ('C', 'SG'),
+                    ('N', 'C'),
+                    ('C', 'C'),
+                    ('C', 'O'),
+                    ('C', 'C'),
+                    ('C', 'SG'),
+                    ('SG', 'SG'),
+                    # prev and next C-N bonds - color by atom Z
+                    ('Z', 'Z'),
+                    ('Z', 'Z'),
+                    ('Z', 'Z'),
+                    ('Z', 'Z')
+                ]
+            )
             # work through connectivity and colors
+            orig_col = dest_col = bcolor
+
             for i in range(len(bond_conn)):
                 bond = bond_conn[i]
 
@@ -595,12 +597,7 @@ class Disulfide:
                 dest = bond[1]
 
                 col = bond_split_colors[i]
-                if not plain:
-                    orig_col = ATOM_COLORS[col[0]]
-                    dest_col = ATOM_COLORS[col[1]]
-                else:
-                    orig_col = dest_col = BOND_COLOR
-                
+
                 # get the coords
                 prox_pos = coords[orig]
                 distal_pos = coords[dest]
@@ -620,14 +617,20 @@ class Disulfide:
                 cyl1 = pv.Cylinder(origin1, direction, radius=radius, height=height)
                 cyl2 = pv.Cylinder(origin2, direction, radius=radius, height=height)
                 
+                if style == 'plain':
+                    orig_col = dest_col = bcolor
+                
                 # proximal-distal red/green coloring
-                if pd == True:
+                elif style == 'pd':
                     if i <= 4 or i == 11 or i == 12:
-                        orig_color = dest_color = 'red'
+                        orig_col = dest_col = 'red'
                     else:
-                        orig_color = dest_color = 'green'
+                        orig_col = dest_col= 'green'
                     if i == 10:
-                        orig_color = dest_color = 'yellow'
+                        orig_col = dest_col= 'yellow'
+                else:
+                    orig_col = ATOM_COLORS[col[0]]
+                    dest_col = ATOM_COLORS[col[1]]
                 
                 pvp.add_mesh(cyl1, color=orig_col)
                 pvp.add_mesh(cyl2, color=dest_col)
@@ -656,16 +659,16 @@ class Disulfide:
                 pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], 
                                 smooth_shading=True, specular=spec, specular_power=specpow)
                 i += 1
-            pvp = draw_bonds(pvp)
+            pvp = draw_bonds(pvp, style='bs')
 
         elif style == 'sb': # splitbonds
-            pvp = draw_bonds(pvp),
+            pvp = draw_bonds(pvp, style='sb')
         
         elif style == 'pd': # proximal-distal
-            pvp = draw_bonds(pvp, pd=True)
+            pvp = draw_bonds(pvp, style='pd')
 
         else: # plain
-            pvp = draw_bonds(pvp, plain=True)
+            pvp = draw_bonds(pvp, style='plain', bcolor=bondcolor)
             
         return pvp
 
@@ -676,12 +679,13 @@ class Disulfide:
         
         near_range, far_range = self.compute_extents()
         
-        if single:
+        if single == True:
             _pl = pv.Plotter(window_size=WINSIZE)
             _pl.add_title(title=title, font_size=FONTSIZE)
             _pl.enable_anti_aliasing('msaa')
             _pl.add_camera_orientation_widget()
-            _pl = self._render(_pl, style=style, bondcolor=BOND_COLOR, 
+            _pl.view_isometric()
+            _pl = self._render(_pl, style=style, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
             _pl.reset_camera()
             _pl.show()
@@ -703,20 +707,24 @@ class Disulfide:
             pl.add_title(title=title, font_size=FONTSIZE)
             self._render(pl, style='pd', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+            pl.view_isometric()
 
             pl.subplot(1,0)
             pl.add_title(title=title, font_size=FONTSIZE)
             self._render(pl, style='bs', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
-            
+            pl.view_isometric()
+
             pl.subplot(1,1)
             pl.add_title(title=title, font_size=FONTSIZE)
             self._render(pl, style='sb', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
-            
+            pl.view_isometric()
+
             pl.link_views()
             pl.reset_camera()
             pl.show()
+        return
     
     def screenshot(self, single=True, style='sb', fname='ssbond.png',
                    verbose=False):
@@ -734,6 +742,7 @@ class Disulfide:
             pl.add_camera_orientation_widget()
             pl = self._render(pl, style=style, bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+            pl.view_isometric()
             pl.reset_camera()
             pl.show(auto_close=False)
             pl.screenshot(fname)
@@ -750,11 +759,13 @@ class Disulfide:
             pl.add_camera_orientation_widget()
             self._render(pl, style='cpk', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+            pl.view_isometric()
 
             pl.subplot(0,1)
             pl.add_title(title=title, font_size=FONTSIZE)
             self._render(pl, style='pd', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+            pl.view_isometric()
 
             pl.subplot(1,0)
             pl.add_title(title=title, font_size=FONTSIZE)
@@ -765,7 +776,8 @@ class Disulfide:
             pl.add_title(title=title, font_size=FONTSIZE)
             self._render(pl, style='sb', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
-            
+            pl.view_isometric()
+
             pl.link_views()
             pl.reset_camera()
             pl.show(auto_close=False)
