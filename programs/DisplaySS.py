@@ -30,8 +30,22 @@ import pyvista as pv
 from pyvista import Plotter
 from proteusPy.Disulfide import *
 
-def showit(ss: Disulfide):
+def SS_DisplayTest(ss: Disulfide):
     ss.display(single=True, style='bs')
+    ss.display(style='cpk')
+    ss.display(style='sb', single=True)
+    ss.display(style='pd', single=False)
+    ss.screenshot(style='cpk', single=True, fname='cpk3.png', verbose=True)
+    ss.screenshot(style='sb', single=False, fname='sb3.png', verbose=True)
+    return
+
+def SSlist_DisplayTest(sslist):
+    sslist.display(style='cpk')
+    sslist.display(style='bs')
+    sslist.display(style='sb')
+    sslist.display(style='pd')
+    sslist.display_overlay()
+    sslist.screenshot(style='pd', fname='sslist.png')
 
 if __name__ == '__main__':
     PDB_SS = None
@@ -40,13 +54,8 @@ if __name__ == '__main__':
     # one disulfide from the database
     ss = Disulfide()
     ss = PDB_SS[0]
-
-    ss.display(style='cpk', single=True)
-    ss.display(style='sb', single=True)
-    ss.display(style='pd', single=False) # fix
-
-    ss.screenshot(style='cpk', single=True, fname='cpk3.png', verbose=True)
-    ss.screenshot(style='sb', single=False, fname='sb3.png', verbose=True)
+    SS_DisplayTest(ss)
+    
 
     # get all disulfides for one structure. Make a 
     # DisulfideList object to hold it
@@ -54,30 +63,13 @@ if __name__ == '__main__':
     ss4yss = DisulfideList([], 'tmp')
     ss4yss = PDB_SS['4yys']
 
-    ss4yss.display('cpk')
-    ss4yss.display('bs')
-    ss4yss.display('sb')
-    ss4yss.display('pd')
-    ss4yss.display_overlay()
-    ss4yss.screenshot(style='pd', fname='ss4yss.png')
+    SSlist_DisplayTest(ss4yss)
 
-    
     sslist = DisulfideList([], 'last8')
     sslist = PDB_SS[:8]
-    #sslist.screenshot(style='sb', fname='last12.png')
-
-    sslist.display(style='bs')
-    sslist.display(style='pd')
-
-    sslist.display_overlay()
-
-    #ss1j5h = DisulfideList([], 'ss1j5h')
-    #ss1j5h = PDB_SS['1j5h']
-    #ss1j5h.display(style='sb')
-    #ss1j5h.display(style='pd')
-
-    #PDB_SS.display_overlay('1j5h')
-    #PDB_SS.display_overlay('4yys')
+    
+    PDB_SS.display_overlay('1j5h')
+    PDB_SS.display_overlay('4yys')
     
     #ss6fuf = PDB_SS['6fuf']
     #ss6fuf.display(style='bs')

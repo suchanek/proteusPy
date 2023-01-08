@@ -44,5 +44,13 @@ from proteusPy.Disulfide import  cmap_vector, check_chains, Distance_RMS, Torsio
 
 #from proteusPy.Disulfide import DisulfideList
 from proteusPy.DisulfideLoader import DisulfideLoader
+from Bio.PDB import Select
+
+class CysSelect(Select):
+    def accept_residue(self, residue):
+        if residue.get_name() == 'CYS':
+            return True
+        else:
+            return False
 
 # end of file
