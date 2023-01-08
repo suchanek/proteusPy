@@ -3,13 +3,9 @@
 # Part of the program Proteus, a program for the analysis and modeling of 
 # protein structures, with an emphasis on disulfide bonds.
 # Author: Eric G. Suchanek, PhD
-# Last revision: 1/4/2023
-# Cα Cβ Sγ
+# Last revision: 1/7/2023
 
 import math
-
-from matplotlib import cm
-from numpy import linspace
 
 from proteusPy import *
 from proteusPy.atoms import *
@@ -17,7 +13,7 @@ from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideGlobals import *
 from proteusPy.proteusGlobals import *
 
-from Bio.PDB import Select, Vector, PDBParser, PDBList
+from Bio.PDB import Vector, PDBParser, PDBList
 from Bio.PDB.vectors import calc_dihedral
 
 import pyvista as pv
@@ -29,8 +25,14 @@ _ANG_INIT = -180.0
 # tqdm progress bar width
 _PBAR_COLS = 100
 
+# columns for the torsions file dataframe.
+df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist', 'psi_dist']
+
 # make a colormap in vector space from starting color to
 # ending color
+
+from matplotlib import cm
+from numpy import linspace
 
 def cmap_vector(steps):
     '''
@@ -57,13 +59,6 @@ def cmap_vector(steps):
         i += 1
 
     return rgbcol
-
-class CysSelect(Select):
-    def accept_residue(self, residue):
-        if residue.get_name() == 'CYS':
-            return True
-        else:
-            return False
 
 # DisulfideList Class definition.
 # I extend UserList to handle lists of Disulfide objects.
@@ -214,7 +209,7 @@ class DisulfideList(UserList):
                 
         ssList = self.data
         tot_ss = len(ssList) # number off ssbonds
-        if tot_ss < 4:
+        if tot_ss <= 4:
             cols = 2
         elif tot_ss == 3:
             cols = 3
@@ -242,6 +237,7 @@ class DisulfideList(UserList):
                     pl.add_title(title=title, font_size=FONTSIZE)
                     ss._render(pl, style=style, bondcolor=BOND_COLOR, 
                                    bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+                    pl.view_isometric()
                 i += 1
         
         pl.link_views()
@@ -286,7 +282,8 @@ class DisulfideList(UserList):
                     pl.add_title(title=title, font_size=FONTSIZE)
 
                     ss._render(pl, style=style, bondcolor=BOND_COLOR, 
-                              bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)  
+                              bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+                    pl.view_isometric()
                 i += 1
 
         pl.enable_anti_aliasing('fxaa')
@@ -318,7 +315,6 @@ class DisulfideList(UserList):
         pl = pv.Plotter(window_size=WINSIZE)
         pl.add_title(title=title, font_size=FONTSIZE)
         pl.enable_anti_aliasing('msaa')
-        
         pl.add_camera_orientation_widget()
 
         mycol = numpy.zeros(shape=(tot_ss, 3))
@@ -328,9 +324,9 @@ class DisulfideList(UserList):
         for ss in ssbonds:
             color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
             ss._render(pl, style='plain', bondcolor=color)
-            pl.view_isometric()
             i += 1
 
+        pl.view_isometric()
         pl.reset_camera()
         pl.show()
 
@@ -532,7 +528,7 @@ class Disulfide:
             Updated pv.Plotter() object.
         '''
         
-        radius = BOND_RADIUS
+        bradius = BOND_RADIUS
         coords = self.internal_coords()
         
         atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C', 'SG', 'Z', 'Z', 'Z', 'Z')
@@ -541,7 +537,7 @@ class Disulfide:
         # bond connection table with atoms in the specific order shown above: 
         # returned by ss.get_internal_coords()
         
-        def draw_bonds(pvp, radius=BOND_RADIUS, style='sb', bcolor=BOND_COLOR):
+        def draw_bonds(pvp, bradius=BOND_RADIUS, style='sb', bcolor=BOND_COLOR):
             bond_conn = numpy.array(
             [
                 [0, 1], # n-ca
@@ -607,12 +603,8 @@ class Disulfide:
                 origin1 = prox_pos + 0.25 * direction # the cylinder origin is actually in the middle so we translate
                 origin2 = prox_pos + 0.75 * direction # the cylinder origin is actually in the middle so we translate
                 
-                cap1 = pv.Sphere(center=prox_pos, radius=radius)
-                cap2 = pv.Sphere(center=distal_pos, radius=radius)
+                bondradius = bradius
 
-                cyl1 = pv.Cylinder(origin1, direction, radius=radius, height=height)
-                cyl2 = pv.Cylinder(origin2, direction, radius=radius, height=height)
-                
                 if style == 'plain':
                     orig_col = dest_col = bcolor
                 
@@ -627,7 +619,16 @@ class Disulfide:
                 else:
                     orig_col = ATOM_COLORS[col[0]]
                     dest_col = ATOM_COLORS[col[1]]
+
+                if i >= 11:
+                    bondradius = bradius * .5
                 
+                cap1 = pv.Sphere(center=prox_pos, radius=bondradius)
+                cap2 = pv.Sphere(center=distal_pos, radius=bondradius)
+
+                cyl1 = pv.Cylinder(origin1, direction, radius=bondradius, height=height)
+                cyl2 = pv.Cylinder(origin2, direction, radius=bondradius, height=height)
+                 
                 pvp.add_mesh(cyl1, color=orig_col)
                 pvp.add_mesh(cyl2, color=dest_col)
                 pvp.add_mesh(cap1, color=orig_col)
@@ -655,6 +656,9 @@ class Disulfide:
             i = 0
             for atom in atoms:
                 rad = ATOM_RADII_CPK[atom] * bs_scale
+                if i > 11:
+                    rad *= .5
+                
                 pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], 
                             smooth_shading=True, specular=spec, specular_power=specpow)
                 i += 1
@@ -1430,7 +1434,6 @@ def DownloadDisulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR,
 
 def build_torsion_df(SSList: DisulfideList) -> pd.DataFrame:
     # create a dataframe with the following columns for the disulfide conformations extracted from the structure
-    df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist', 'psi_dist']
     SS_df = pd.DataFrame(columns=df_cols)
 
     pbar = tqdm(SSList, ncols=_PBAR_COLS, miniters=400000)
@@ -1511,7 +1514,6 @@ def ExtractDisulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
 
     # create a dataframe with the following columns for the disulfide conformations extracted from the structure
     
-    df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist', 'psi_dist']
     SS_df = pd.DataFrame(columns=df_cols)
 
     # define a tqdm progressbar using the fully loaded entrylist list. If numb is passed then

@@ -160,7 +160,20 @@ class DisulfideLoader:
         ssbonds = self[pdbid]
         ssbonds.display_overlay()
 
-    def display(self, style='bs', viewstyle=''):
+    def display(self, index, style='bs'):
+        ''' 
+        Display the Disulfides
+        Argument:
+            self
+        Returns:
+            None. Updates internal object.
+        '''
+        
+        ssList = self.SSList[index]
+        ssList.display(style=style)
+
+
+    def Odisplay(self, style='bs'):
         ''' 
         Display the Disulfides
         Argument:
@@ -185,7 +198,6 @@ class DisulfideLoader:
                 if i < tot_ss:
                     pl.enable_anti_aliasing('msaa')
                     pl.view_isometric()
-                    #pl.add_axes()
                     ss = ssList[i]
                     src = ss.pdb_id
                     enrg = ss.energy
