@@ -3,15 +3,16 @@
 # Part of the program Proteus, a program for the analysis and modeling of 
 # protein structures, with an emphasis on disulfide bonds.
 # Author: Eric G. Suchanek, PhD
-# Last revision: 1/7/2023
+# Last revision: 1/9/2023
 
 import math
 
 from proteusPy import *
 from proteusPy.atoms import *
+from proteusPy.proteusGlobals import *
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideGlobals import *
-from proteusPy.proteusGlobals import *
+from proteusPy.DisulfideList import DisulfideList
 
 from Bio.PDB import Vector, PDBParser, PDBList
 from Bio.PDB.vectors import calc_dihedral
@@ -26,309 +27,15 @@ _ANG_INIT = -180.0
 _PBAR_COLS = 100
 
 # columns for the torsions file dataframe.
-df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist', 'psi_dist']
+Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', \
+           'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
+           'psi_dist']
 
 # make a colormap in vector space from starting color to
 # ending color
 
-from matplotlib import cm
-from numpy import linspace
+#from proteusPy import cmap_vector
 
-def cmap_vector(steps):
-    '''
-    Return an RGB array of steps rows
-    
-    Argument:
-        steps: number of RGB elements to return
-
-    Returns: 
-        steps X 3 array of RGB values.
-    '''
-
-    rgbcol = numpy.zeros(shape=(steps, 3))
-    norm = linspace(0.0, 1.0, steps)
-
-    # colormap possible values = viridis, jet, spectral
-    rgb_all = cm.jet(norm, bytes=True) 
-    i = 0
-    
-    for rgb in rgb_all:
-        rgbcol[i][0] = rgb[0]
-        rgbcol[i][1] = rgb[1]
-        rgbcol[i][2] = rgb[2]
-        i += 1
-
-    return rgbcol
-
-# DisulfideList Class definition.
-# I extend UserList to handle lists of Disulfide objects.
-# Indexing and slicing are supported, sorting is based on energy
-class DisulfideList(UserList):
-    '''
-    Class provides a sortable list for Disulfide objects.
-    Indexing and slicing are supported, and normal list operations like .insert, .append and .extend.
-    The DisulfideList object must be initialized with an iterable (tuple, list) and a name.
-    
-    The class can also render Disulfides to a pyVista window using the DisulfideList.display() 
-    method. See below for examples.\n
-
-    Examples:
-        from proteusPy.Disulfide import DisulfideList, Disulfide, DisulfideLoader
-        
-        # instantiate some variables
-        SS = Disulfide()
-        # Note: the list is initialized with an iterable and a name (optional)
-        SSlist = DisulfideList([],'ss')
-
-        PDB_SS = DisulfideLoader()  # load the Disulfide database\n
-        SS = PDB_SS[0]              # returns a Disulfide object at index 0
-        SSlist = PDB_SS['4yys']     # returns a DisulfideList containing all
-                                    #  disulfides for 4yys\n
-
-        SSlist = PDB_SS[:8]         # get SS bonds for the last 8 structures\n
-        SSlist.display('sb')        # render the disulfides in 'split bonds' style\n
-
-        # make some empty disulfidesx
-        ss1 = Disulfide('ss1')
-        ss2 = Disulfide('ss2')
-
-        # make a DisulfideList containing ss1, named 'tmp'
-        sslist = DisulfideList([ss1], 'tmp')
-        sslist.append(ss2)
-
-        # extract the first disulfide
-        ss1 = PDB_SS[0]
-        print(f'{ss1.pprint_all()}')
-
-        # grab a list of disulfides via slicing
-        subset = DisulfideList(PDB_SS[0:10],'subset')
-        subset.display(style='sb')      # display the disulfides in 'split bond' style
-        subset.display_overlay()        # display all disulfides overlaid in stick style
-        subset.screenshot(style='sb', fname='subset.png')  # save a screenshot.
-    '''
-    
-    def __init__(self, iterable, id):
-        self.pdb_id = id
-        super().__init__(self.validate_ss(item) for item in iterable)
-
-    def __getitem__(self, item):
-        if isinstance(item, slice):
-            indices = range(*item.indices(len(self.data)))
-            name = self.data[0].pdb_id
-            sublist = [self.data[i] for i in indices]
-            return DisulfideList(sublist, name)    
-        return UserList.__getitem__(self, item)
-    
-    def __setitem__(self, index, item):
-        self.data[index] = self.validate_ss(item)
-
-    def insert(self, index, item):
-        self.data.insert(index, self.validate_ss(item))
-
-    def append(self, item):
-        self.data.append(self.validate_ss(item))
-
-    def extend(self, other):
-        if isinstance(other, type(self)):
-            self.data.extend(other)
-        else:
-            self.data.extend(self._validate_ss(item) for item in other)
-    
-    def validate_ss(self, value):
-        if isinstance(value, (Disulfide)):
-            return value
-        raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
-    
-    def set_id(self, value):
-        self.pdb_id = value
-    
-    def get_id(self):
-        return self.pdb_id
-
-    def get_chains(self):
-        '''
-        Return the chain IDs for chains within the given Disulfide.
-        '''
-        res_dict = {'xxx'}
-        sslist = self.data
-
-        for ss in sslist:
-            pchain = ss.proximal_chain
-            dchain = ss.distal_chain
-            res_dict.update(pchain)
-            res_dict.update(dchain)
-        
-        res_dict.remove('xxx')
-
-        return res_dict
-
-    def has_chain(self, chain) -> bool:
-        '''
-        Returns True if given chain contained in Disulfide, False otherwise.
-        '''
-        
-        chns = {'xxx'}
-        chns = self.get_chains()
-        if chain in chns:
-            return True
-        else:
-            return False
-
-    def by_chain(self, chain: str):
-        '''
-        Return a DisulfideList from the input chain identifier.
-
-        Arguments:
-            chain: str - chain identifier, 'A', 'B, etc
-        Returns:
-            DisulfideList containing disulfides within that chain.
-        '''
-        
-        reslist = DisulfideList([], chain)
-        sslist = self.data
-
-        for ss in sslist:
-            pchain = ss.proximal_chain
-            dchain = ss.distal_chain
-            if pchain == dchain:
-                if pchain == chain:
-                    reslist.append(ss)
-            else:
-                print(f'Cross chain SS: {ss.print_compact}:')
-        return reslist
-    
-    def display(self, style='bs'):
-        ''' 
-            Display a window showing the list of disulfides in the given style.
-            Argument:
-                self
-                style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd'
-            Returns:
-                Window displaying the Disulfides.
-        '''
-                
-        ssList = self.data
-        tot_ss = len(ssList) # number off ssbonds
-        if tot_ss <= 4:
-            cols = 2
-        elif tot_ss == 3:
-            cols = 3
-        else:
-            cols = 4
-        
-        rows = (tot_ss + 1) // cols
-        i = 0
-
-        WINSIZE = (512 * cols, 512 * rows)
-        pl = pv.Plotter(window_size=WINSIZE, shape=(rows, cols))
-        pl.add_camera_orientation_widget()
-
-        for r in range(rows):
-            for c in range(cols):
-                pl.subplot(r,c)
-                if i < tot_ss:
-                    pl.enable_anti_aliasing('msaa')
-                    pl.view_isometric()
-                    ss = ssList[i]
-                    src = ss.pdb_id
-                    enrg = ss.energy
-                    near_range, far_range = ss.compute_extents()
-                    title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol'
-                    pl.add_title(title=title, font_size=FONTSIZE)
-                    ss._render(pl, style=style, bondcolor=BOND_COLOR, 
-                                   bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
-                    pl.view_isometric()
-                i += 1
-        
-        pl.link_views()
-        pl.reset_camera()
-        pl.show()
-    
-    def screenshot(self, style='bs', fname='sslist.png'):
-        ''' 
-            Save the interactive window displaying the list of disulfides in the given style.
-            Argument:
-                self
-                style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd'
-                fname: filename for the resulting image file.
-            Returns:
-                Image file saved to disk.
-        '''
-                
-        ssList = self.data
-        tot_ss = len(ssList) # number off ssbonds
-        if tot_ss < 4:
-            cols = 2
-        elif tot_ss == 3:
-            cols = 3
-        else:
-            cols = 4
-        
-        rows = (tot_ss + 1) // cols
-        i = 0
-
-        WINSIZE = (512 * cols, 512 * rows)
-        pl = pv.Plotter(window_size=WINSIZE, shape=(rows, cols))
-        pl.add_camera_orientation_widget()
-
-        for r in range(rows):
-            for c in range(cols):
-                pl.subplot(r,c)
-                if i < tot_ss:
-                    ss = ssList[i]
-                    src = ss.pdb_id
-                    enrg = ss.energy
-                    title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol'
-                    pl.add_title(title=title, font_size=FONTSIZE)
-
-                    ss._render(pl, style=style, bondcolor=BOND_COLOR, 
-                              bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
-                    pl.view_isometric()
-                i += 1
-
-        pl.enable_anti_aliasing('fxaa')
-        pl.link_views()
-        pl.reset_camera()
-
-        pl.show(auto_close=False)
-        pl.screenshot(fname)
-    
-    def display_overlay(self):
-        ''' 
-        Display all disulfides in the list overlaid in stick mode against
-        a common coordinate frames. This allows us to see all of the disulfides
-        at one time in a single view. Colors vary smoothy between bonds.
-        
-        Arguments:
-            PDB_SS: DisulfideLoader object initialized with the database.
-            pdbid: the actual PDB id string
-
-        Returns: None.    
-        ''' 
-        id = self.pdb_id
-        ssbonds = self.data
-        tot_ss = len(ssbonds) # number off ssbonds
-
-        tot_ss = len(ssbonds) # number off ssbonds
-        title = f'Disulfides for SS list {id}: ({tot_ss} total)'
-
-        pl = pv.Plotter(window_size=WINSIZE)
-        pl.add_title(title=title, font_size=FONTSIZE)
-        pl.enable_anti_aliasing('msaa')
-        pl.add_camera_orientation_widget()
-
-        mycol = numpy.zeros(shape=(tot_ss, 3))
-        mycol = cmap_vector(tot_ss)
-
-        i = 0
-        for ss in ssbonds:
-            color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
-            ss._render(pl, style='plain', bondcolor=color)
-            i += 1
-
-        pl.view_isometric()
-        pl.reset_camera()
-        pl.show()
 
 # Class definition for a Disulfide bond. 
 class Disulfide:
@@ -338,8 +45,9 @@ class Disulfide:
     The Disulfide Bond is characterized by the atomic coordinates N, Cα, Cβ, C', Sγ 
     for both residues, the dihedral angles Χ1 - Χ5 for the disulfide bond conformation,
     a name, proximal resiude number and distal residue number, and conformational energy.
-    All atomic coordinates are represented by the BIO.PDB.Vector class. The class uses the
-    internal methods to initialize dihedral angles and approximate energy upon initialization.
+    All atomic coordinates are represented by the BIO.PDB.Vector class. The class uses
+    the internal methods to initialize dihedral angles and approximate energy upon
+    initialization.
 
     """
     def __init__(self, name="SSBOND"):
@@ -414,7 +122,8 @@ class Disulfide:
         self.chi5 = _ANG_INIT
 
         # I initialize an array for the torsions which will be used for comparisons
-        self.dihedrals = numpy.array((_ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT), "d")
+        self.dihedrals = numpy.array((_ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT,
+         							_ANG_INIT), "d")
 
     def internal_coords(self) -> numpy.array:
         res_array = numpy.zeros(shape=(16,3))
@@ -469,7 +178,8 @@ class Disulfide:
             ))
             return res_array
         else:
-            mess = f'-> Disulfide.internal_coords(): Invalid argument. Unable to find residue: {resnumb} '
+            mess = f'-> Disulfide.internal_coords(): Invalid argument. \
+             Unable to find residue: {resnumb} '
             raise DisulfideConstructionWarning(mess)
     
     def get_chains(self):
@@ -486,6 +196,9 @@ class Disulfide:
     
     def reset(self) -> None:
         self.__init__(self)
+
+    def copy(self):
+        return copy.deepcopy(self)
     
     def compute_extents(self, dim='z'):
         ic = self.internal_coords()
@@ -519,11 +232,15 @@ class Disulfide:
             bondcolor=BOND_COLOR, bs_scale=BS_SCALE, spec=SPECULARITY, 
             specpow=SPEC_POWER) -> pv.Plotter:
         ''' 
-        Update the passed pyVista plotter() object with the mesh data for the input Disulfide Bond
+        Update the passed pyVista plotter() object with the mesh data for the
+        input Disulfide Bond.
+        
         Arguments:
             pvpplot: pyvista.Plotter() object
-            style: 'bs', 'st', 'cpk', 'plain', 'cov': Whether to render as CPK, ball-and-stick or stick.
-            Bonds are colored by atom color, unless 'plain' is specified.
+            style: 'bs', 'st', 'cpk', 'plain', 'cov': Whether to render as CPK,
+            ball-and-stick or stick. Bonds are colored by atom color, unless 'plain'
+            is specified.
+            
         Returns:
             Updated pv.Plotter() object.
         '''
@@ -531,7 +248,8 @@ class Disulfide:
         bradius = BOND_RADIUS
         coords = self.internal_coords()
         
-        atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C', 'SG', 'Z', 'Z', 'Z', 'Z')
+        atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C', 'SG', 'Z',
+        		 'Z', 'Z', 'Z')
         pvp = pvplot
         
         # bond connection table with atoms in the specific order shown above: 
@@ -600,8 +318,9 @@ class Disulfide:
                 # and vector length. divide by 2 since split bond
                 height = math.dist(prox_pos, distal_pos) / 2.0
 
-                origin1 = prox_pos + 0.25 * direction # the cylinder origin is actually in the middle so we translate
-                origin2 = prox_pos + 0.75 * direction # the cylinder origin is actually in the middle so we translate
+				# the cylinder origin is actually in the middle so we translate
+                origin1 = prox_pos + 0.25 * direction 
+                origin2 = prox_pos + 0.75 * direction
                 
                 bondradius = bradius
 
@@ -659,8 +378,9 @@ class Disulfide:
                 if i > 11:
                     rad *= .5
                 
-                pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), color=ATOM_COLORS[atom], 
-                            smooth_shading=True, specular=spec, specular_power=specpow)
+                pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), 
+                			 color=ATOM_COLORS[atom], smooth_shading=True, 
+                			 specular=spec, specular_power=specpow)
                 i += 1
             pvp = draw_bonds(pvp, style='bs')
 
@@ -1033,7 +753,8 @@ class Disulfide:
         
         
         self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
-        self.torsion_array = numpy.array((self.chi1, self.chi2, self.chi3, self.chi4, self.chi5))
+        self.torsion_array = numpy.array((self.chi1, self.chi2, self.chi3, self.chi4,
+         								self.chi5))
 
         # calculate and set the SS bond torsional energy
         self.compute_torsional_energy()
@@ -1090,9 +811,12 @@ class Disulfide:
 
     def set_dihedrals(self, chi1, chi2, chi3, chi4, chi5):
         '''
-        Sets the 5 dihedral angles chi1 - chi5 for the Disulfide object and computes the torsional energy.
+        Sets the 5 dihedral angles chi1 - chi5 for the Disulfide object and 
+        computes the torsional energy.
         
-        Arguments: chi, chi2, chi3, chi4, chi5 - Dihedral angles in degrees (-180 - 180) for the Disulfide conformation.
+        Arguments: chi, chi2, chi3, chi4, chi5 - Dihedral angles in degrees 
+        (-180 - 180) for the Disulfide conformation.
+        
         Returns: None
         '''
         self.chi1 = chi1
@@ -1164,7 +888,9 @@ class Disulfide:
     def compute_local_coords(self):
         """
         Compute the internal coordinates for a properly initialized Disulfide Object.
+        
         Arguments: SS initialized Disulfide object
+        
         Returns: None, modifies internal state of the input
         """
 
@@ -1278,8 +1004,8 @@ class Disulfide:
 # Class defination ends
 def Torsion_RMS(ss1, ss2):
     '''
-    Calculate the 5D Euclidean distance for 2 Disulfide torsion_vector objects. This is used
-    to compare Disulfide Bond torsion angles to determine their torsional 
+    Calculate the 5D Euclidean distance for 2 Disulfide torsion_vector objects.
+    This is used to compare Disulfide Bond torsion angles to determine their torsional 
     'distance'.
     
     Arguments: p1, p2 Vector objects of dimensionality 5 (5D)
@@ -1301,7 +1027,9 @@ def Distance_RMS(ss1, ss2):
     ic2 = ss2.internal_coords()
 
     totsq = 0.0
-    # only take coords for the proximal and distal disfulfides, not the prev/next residues.
+    # only take coords for the proximal and distal disfulfides, not the 
+    # prev/next residues.
+    
     for i in range(12):
         p1 = ic1[i]
         p2 = ic2[i]
@@ -1433,8 +1161,10 @@ def DownloadDisulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR,
     return
 
 def build_torsion_df(SSList: DisulfideList) -> pd.DataFrame:
-    # create a dataframe with the following columns for the disulfide conformations extracted from the structure
-    SS_df = pd.DataFrame(columns=df_cols)
+    # create a dataframe with the following columns for the disulfide 
+    # conformations extracted from the structure
+    
+    SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
 
     pbar = tqdm(SSList, ncols=_PBAR_COLS, miniters=400000)
     for ss in pbar:
@@ -1478,9 +1208,9 @@ def ExtractDisulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
         SS2 = DisulfideList([], '4yys')
 
         PDB_SS = DisulfideLoader()
-        SS1 = PDB_SS[0]         <-- returns a Disulfide object at index 0
-        SS2 = PDB_SS['4yys']    <-- returns a DisulfideList containing all disulfides for 4yys
-        SS3 = PDB_SS[:10]       <-- returns a DisulfideList containing the slice
+        SS1 = PDB_SS[0]       <-- returns a Disulfide object at index 0
+        SS2 = PDB_SS['4yys']  <-- returns a DisulfideList containing disulfides for 4yys
+        SS3 = PDB_SS[:10]     <-- returns a DisulfideList containing the slice
     '''
 
     entrylist = []
@@ -1512,12 +1242,15 @@ def ExtractDisulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     for entry in ss_filelist:
         entrylist.append(name_to_id(entry))
 
-    # create a dataframe with the following columns for the disulfide conformations extracted from the structure
+    # create a dataframe with the following columns for the disulfide conformations 
+    # extracted from the structure
     
-    SS_df = pd.DataFrame(columns=df_cols)
+    SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
 
-    # define a tqdm progressbar using the fully loaded entrylist list. If numb is passed then
+    # define a tqdm progressbar using the fully loaded entrylist list. 
+    # If numb is passed then
     # only do the last numb entries.
+    
     if numb > 0:
         pbar = tqdm(entrylist[:numb], ncols=_PBAR_COLS)
     else:
@@ -1529,7 +1262,8 @@ def ExtractDisulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
 
         # returns an empty list if none are found.
         sslist = DisulfideList([], entry)
-        sslist = load_disulfides_from_id(entry, model_numb=0, verbose=verbose, quiet=quiet, pdb_dir=pdbdir)
+        sslist = load_disulfides_from_id(entry, model_numb=0, verbose=verbose, 
+        								 quiet=quiet, pdb_dir=pdbdir)
         if len(sslist) > 0:
             for ss in sslist:
                 All_ss_list.append(ss)
@@ -1583,7 +1317,8 @@ def ExtractDisulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     end = time.time()
     elapsed = end - start
 
-    print(f'Disulfide Extraction complete! Elapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)')
+    print(f'Disulfide Extraction complete! Elapsed time:\
+    	 {datetime.timedelta(seconds=elapsed)} (h:m:s)')
 
     # return to original directory
     os.chdir(cwd)
@@ -1656,7 +1391,8 @@ def load_disulfides_from_id(struct_name: str,
             chain2_id = pair[3]
 
             if not proximal.isnumeric() or not distal.isnumeric():
-                mess = f' -> Cannot parse SSBond record (non-numeric IDs): {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring.'
+                mess = f' -> Cannot parse SSBond record (non-numeric IDs):\
+                 {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring.'
                 warnings.warn(mess, DisulfideConstructionWarning)
                 continue
             else:
@@ -1664,7 +1400,8 @@ def load_disulfides_from_id(struct_name: str,
                 distal = int(distal)
             
             if proximal == distal:
-                mess = f' -> Cannot parse SSBond record (proximal == distal): {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring.'
+                mess = f' -> Cannot parse SSBond record (proximal == distal):\
+                 {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring.'
                 warnings.warn(mess, DisulfideConstructionWarning)
                 continue
 
@@ -1672,13 +1409,15 @@ def load_disulfides_from_id(struct_name: str,
             _chainb = model[chain2_id]
 
             if (_chaina is None) or (_chainb is None):
-                mess = f' -> NULL chain(s): {struct_name}: {proximal} {chain1_id} - {distal} {chain2_id}, ignoring!'
+                mess = f' -> NULL chain(s): {struct_name}: {proximal} {chain1_id}\
+                 - {distal} {chain2_id}, ignoring!'
                 warnings.warn(mess, DisulfideConstructionWarning)
                 continue
 
             if (chain1_id != chain2_id):
                 if verbose:
-                    mess = (f' -> Cross Chain SS for: Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}')
+                    mess = (f' -> Cross Chain SS for: Prox: {proximal} {chain1_id}\
+                     Dist: {distal} {chain2_id}')
                     warnings.warn(mess, DisulfideConstructionWarning)
                     pass # was break
 
@@ -1687,7 +1426,8 @@ def load_disulfides_from_id(struct_name: str,
                 dist_res = _chainb[distal]
                 
             except KeyError:
-                mess = f'Cannot parse SSBond record (KeyError): {struct_name} Prox:  {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring!'
+                mess = f'Cannot parse SSBond record (KeyError): {struct_name} Prox:\
+                  {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring!'
                 warnings.warn(mess, DisulfideConstructionWarning)
                 continue
             
@@ -1695,15 +1435,18 @@ def load_disulfides_from_id(struct_name: str,
             # initialize SS bond from the proximal, distal coordinates
             
             if _chaina[proximal].is_disordered() or _chainb[distal].is_disordered():
-                mess = f'Disordered chain(s): {struct_name}: {proximal} {chain1_id} - {distal} {chain2_id}, ignoring!'
+                mess = f'Disordered chain(s): {struct_name}: {proximal} {chain1_id}\
+                 - {distal} {chain2_id}, ignoring!'
                 warnings.warn(mess, DisulfideConstructionWarning)
                 continue
             else:
                 if verbose:
-                    print(f' -> SSBond: {i}: {struct_name}: {proximal} {chain1_id} - {distal} {chain2_id}')
+                    print(f' -> SSBond: {i}: {struct_name}: {proximal} {chain1_id}\
+                     - {distal} {chain2_id}')
                 ssbond_name = f'{struct_name}_{proximal}{chain1_id}_{distal}{chain2_id}'       
                 new_ss = Disulfide(ssbond_name)
-                new_ss.initialize_disulfide_from_chain(_chaina, _chainb, proximal, distal, quiet=quiet)
+                new_ss.initialize_disulfide_from_chain(_chaina, _chainb, proximal,
+                 distal, quiet=quiet)
                 SSList.append(new_ss)
         i += 1
     return SSList
@@ -1770,7 +1513,8 @@ def check_header_from_file(filename: str,
 
         if not proximal.isnumeric() or not distal.isnumeric():
             if verbose:
-                print(f' ! Cannot parse SSBond record (non-numeric IDs): {struct_name} Prox:  {proximal} {chain1_id} Dist: {distal} {chain2_id}')
+                print(f' ! Cannot parse SSBond record (non-numeric IDs):\
+                 {struct_name} Prox:  {proximal} {chain1_id} Dist: {distal} {chain2_id}')
             continue # was pass
         else:
             proximal = int(proximal)
@@ -1784,14 +1528,16 @@ def check_header_from_file(filename: str,
 
         if (chain1_id != chain2_id):
             if verbose:
-                print(f' -> Cross Chain SS for: Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}')
+                print(f' -> Cross Chain SS for: Prox: {proximal} {chain1_id} Dist:\
+                 {distal} {chain2_id}')
                 pass # was break
 
         try:
             prox_res = _chaina[proximal]
             dist_res = _chainb[distal]
         except KeyError:
-            print(f' ! Cannot parse SSBond record (KeyError): {struct_name} Prox:  <{proximal}> {chain1_id} Dist: <{distal}> {chain2_id}')
+            print(f' ! Cannot parse SSBond record (KeyError): {struct_name} Prox:\
+              <{proximal}> {chain1_id} Dist: <{distal}> {chain2_id}')
             continue
          
         # make a new Disulfide object, name them based on proximal and distal
@@ -1801,10 +1547,12 @@ def check_header_from_file(filename: str,
                 continue
             else:
                 if verbose:
-                   print(f' -> SSBond: {i}: {struct_name}: {proximal} {chain1_id} - {distal} {chain2_id}')
+                   print(f' -> SSBond: {i}: {struct_name}: {proximal} {chain1_id}\
+                    - {distal} {chain2_id}')
         else:
             if dbg:
-                print(f' -> NULL chain(s): {struct_name}: {proximal} {chain1_id} - {distal} {chain2_id}')
+                print(f' -> NULL chain(s): {struct_name}: {proximal} {chain1_id}\
+                 - {distal} {chain2_id}')
         i += 1
     return True
 
@@ -1829,7 +1577,8 @@ def check_header_from_id(struct_name: str,
 
         verbose: print info while parsing
 
-    Returns: True if the proximal and distal residues are CYS and there are no cross-chain SS bonds
+    Returns: True if the proximal and distal residues are CYS and there 
+    		 are no cross-chain SS bonds
 
     Example:
       Assuming the PDB_DIR has the pdb5rsa.ent file in place calling:
@@ -1848,7 +1597,8 @@ def check_header_from_id(struct_name: str,
     bondlist = []
     i = 0
 
-    # get a list of tuples containing the proximal, distal residue IDs for all SSBonds in the chain.
+    # get a list of tuples containing the proximal, distal residue IDs for 
+    # all SSBonds in the chain.
     bondlist = parse_ssbond_header_rec(ssbond_dict)
     
     if len(bondlist) == 0:
@@ -1875,7 +1625,8 @@ def check_header_from_id(struct_name: str,
 
             if prox_residue.get_resname() != 'CYS' or dist_residue.get_resname() != 'CYS':
                 if (verbose):
-                    print(f'build_disulfide() requires CYS at both residues: {prox_residue.get_resname()} {dist_residue.get_resname()}')
+                    print(f'build_disulfide() requires CYS at both residues:\
+                     {prox_residue.get_resname()} {dist_residue.get_resname()}')
                 return False
         except KeyError:
             if (dbg):
@@ -1883,17 +1634,21 @@ def check_header_from_id(struct_name: str,
                 return False
  
         if verbose:
-            print(f' -> SSBond: {i}: {struct_name}: {proximal} {chain1} - {distal} {chain2}')
+            print(f' -> SSBond: {i}: {struct_name}: {proximal} {chain1} - {distal}\
+             {chain2}')
 
         i += 1
     return True
 
 def check_chains(pdbid, pdbdir, verbose=True):
-    '''Returns True if structure has multiple chains of identical length, False otherwise'''
+    '''Returns True if structure has multiple chains of identical length,\
+     False otherwise'''
 
     parser = PDBParser(PERMISSIVE=True)
     structure = parser.get_structure(pdbid, file=f'{pdbdir}pdb{pdbid}.ent')
-    ssbond_dict = structure.header['ssbond'] # dictionary of tuples with SSBond prox and distal
+    
+    # dictionary of tuples with SSBond prox and distal
+    ssbond_dict = structure.header['ssbond']
     
     if verbose:
         print(f'ssbond dict: {ssbond_dict}')
