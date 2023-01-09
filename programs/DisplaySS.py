@@ -54,7 +54,7 @@ if __name__ == '__main__':
     # one disulfide from the database
     ss = Disulfide()
     ss = PDB_SS[0]
-    SS_DisplayTest(ss)
+    #SS_DisplayTest(ss)
     
 
     # get all disulfides for one structure. Make a 
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     ss4yss = DisulfideList([], 'tmp')
     ss4yss = PDB_SS['4yys']
 
-    SSlist_DisplayTest(ss4yss)
+    #SSlist_DisplayTest(ss4yss)
 
     sslist = DisulfideList([], 'last8')
     sslist = PDB_SS[:8]

@@ -22,7 +22,6 @@ import numpy
 import pandas as pd
 from tqdm import tqdm
 from numpy import cos
-from collections import UserList
 
 from Bio.PDB.vectors import calc_dihedral, calc_angle
 
@@ -40,11 +39,14 @@ from proteusPy.residue import build_residue, get_backbone_from_chain, to_alpha, 
 #from proteusPy.Disulfide import CysSelect, Disulfide
 from proteusPy.Disulfide import name_to_id, todeg, torad, build_torsion_df, distance3d
 from proteusPy.Disulfide import parse_ssbond_header_rec, DownloadDisulfides, ExtractDisulfides
-from proteusPy.Disulfide import  cmap_vector, check_chains, Distance_RMS, Torsion_RMS
+from proteusPy.Disulfide import  check_chains, Distance_RMS, Torsion_RMS
 
 #from proteusPy.Disulfide import DisulfideList
 from proteusPy.DisulfideLoader import DisulfideLoader
 from Bio.PDB import Select
+
+from matplotlib import cm
+from numpy import linspace
 
 class CysSelect(Select):
     def accept_residue(self, residue):
@@ -52,5 +54,32 @@ class CysSelect(Select):
             return True
         else:
             return False
+
+
+def cmap_vector(steps):
+    '''
+    Return an RGB array of steps rows
+    
+    Argument:
+        steps: number of RGB elements to return
+
+    Returns: 
+        steps X 3 array of RGB values.
+    '''
+
+    rgbcol = numpy.zeros(shape=(steps, 3))
+    norm = linspace(0.0, 1.0, steps)
+
+    # colormap possible values = viridis, jet, spectral
+    rgb_all = cm.jet(norm, bytes=True) 
+    i = 0
+    
+    for rgb in rgb_all:
+        rgbcol[i][0] = rgb[0]
+        rgbcol[i][1] = rgb[1]
+        rgbcol[i][2] = rgb[2]
+        i += 1
+
+    return rgbcol
 
 # end of file

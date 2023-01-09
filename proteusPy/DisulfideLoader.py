@@ -1,7 +1,7 @@
 from proteusPy import *
 from proteusPy.atoms import *
 from proteusPy.Disulfide import check_chains
-from proteusPy.Disulfide import DisulfideList
+from proteusPy.Disulfide import DisulfideList, Torsion_DF_Cols
 from proteusPy.DisulfideExceptions import *
 
 import pyvista as pv
@@ -45,8 +45,8 @@ class DisulfideLoader:
         self.QUIET = quiet
 
         # create a dataframe with the following columns for the disulfide conformations extracted from the structure
-        df_cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist', 'psi_dist']
-        SS_df = pd.DataFrame(columns=df_cols, index=['source'])
+        Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist', 'psi_dist']
+        SS_df = pd.DataFrame(columns=Torsion_DF_Cols, index=['source'])
         _SSList = DisulfideList([], 'ALL_PDB_SS')
 
         idlist = []
@@ -143,6 +143,10 @@ class DisulfideLoader:
     
     def copy(self):
         return copy.deepcopy(self)
+
+    def get_by_name(self, name):
+        sslist = self.SSList
+        return sslist.get_by_name(name)
     
     def display_overlay(self, pdbid: str):
         ''' 
