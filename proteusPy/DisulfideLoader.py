@@ -1,3 +1,4 @@
+import proteusPy
 from proteusPy import *
 from proteusPy.atoms import *
 from proteusPy.Disulfide import check_chains
@@ -131,7 +132,7 @@ class DisulfideLoader:
             return copy.deepcopy(self.TorsionDF)
     
     def validate_ss(self, value):
-        if isinstance(value, (Disulfide)):
+        if isinstance(value, (proteusPy.Disulfide.Disulfide)):
             return value
         raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
 
@@ -145,8 +146,15 @@ class DisulfideLoader:
         return copy.deepcopy(self)
 
     def get_by_name(self, name):
-        sslist = self.SSList
-        return sslist.get_by_name(name)
+        _sslist = DisulfideList([], 'tmp')
+        _sslist = self.SSList
+        res = None
+
+        for ss in _sslist:
+            id = ss.name
+            if id == name:
+                res = ss.copy()
+        return res
     
     def display_overlay(self, pdbid: str):
         ''' 
@@ -175,43 +183,5 @@ class DisulfideLoader:
         
         ssList = self.SSList[index]
         ssList.display(style=style)
-
-
-    def Odisplay(self, style='bs'):
-        ''' 
-        Display the Disulfides
-        Argument:
-            self
-        Returns:
-            None. Updates internal object.
-        '''
-        
-        ssList = self.SSList
-        tot_ss = len(ssList) # number off ssbonds
-
-        cols = 2
-        rows = (tot_ss + 1) // cols
-        i = 0
-
-        pl = pv.Plotter(window_size=WINSIZE, shape=(rows, cols))
-        pl.add_camera_orientation_widget()
-
-        for r in range(rows):
-            for c in range(cols):
-                pl.subplot(r,c)
-                if i < tot_ss:
-                    pl.enable_anti_aliasing('msaa')
-                    pl.view_isometric()
-                    ss = ssList[i]
-                    src = ss.pdb_id
-                    enrg = ss.energy
-                    title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol'
-                    pl.add_title(title=title, font_size=FONTSIZE)
-                    pl = ss._render(pl, style=style)
-                    near_range, far_range = ss.compute_extents()
-                i += 1        
-        pl.link_views()
-        pl.reset_camera()
-        pl.show()
 
 # class ends

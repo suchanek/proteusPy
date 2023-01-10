@@ -3,7 +3,7 @@
 # Indexing and slicing are supported, sorting is based on energy
 # Author Eric G. Suchanek, PhD
 # A part of the proteusPy molecular modeling and analysis suite by
-# Eric G. Suchanek
+# Eric G. Suchanek, PhD
 # Last modification: 12/9/2023 -egs-
 
 import proteusPy
@@ -11,7 +11,6 @@ import proteusPy
 from proteusPy import *
 import pyvista as pv
 from collections import UserList
-#from proteusPy.Disulfide import Disulfide
 
 class DisulfideList(UserList):
     '''
