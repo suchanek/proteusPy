@@ -11,17 +11,12 @@ import os
 import glob
 import warnings
 import copy
-import shutil
 
-import pickle
 import time
 import datetime
 import math
-import numpy
 
-import pandas as pd
-from tqdm import tqdm
-from numpy import cos
+import numpy
 
 from Bio.PDB.vectors import calc_dihedral, calc_angle
 
@@ -81,17 +76,5 @@ def cmap_vector(steps):
         i += 1
 
     return rgbcol
-
-def grid_dimensions(n):
-    # Calculate the square root of the number of images
-    root = math.sqrt(n)
-    # If the square root is a whole number, return that as the number of rows and columns
-    if root == int(root):
-        return int(root), int(root)
-    # If the square root is not a whole number, round up and return that as the number of columns
-    # and calculate the number of rows as the number of images divided by the number of columns
-    else:
-        columns = math.ceil(root)
-        return int(n / columns), int(columns)
 
 # end of file

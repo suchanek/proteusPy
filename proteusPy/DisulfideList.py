@@ -7,10 +7,29 @@
 # Last modification: 12/9/2023 -egs-
 
 import proteusPy
-
 from proteusPy import *
+
 import pyvista as pv
 from collections import UserList
+
+def grid_dimensions(n):
+    '''
+    Calculate rows and columns for the given needed to display
+    a given number of disulfides in a square aspect.
+
+    Arguments: n
+    Returns: rows, columns
+    '''
+    
+    root = math.sqrt(n)
+    # If the square root is a whole number, return that as the number of rows and columns
+    if root == int(root):
+        return int(root), int(root)
+    # If the square root is not a whole number, round up and return that as the number of columns
+    # and calculate the number of rows as the number of images divided by the number of columns
+    else:
+        columns = math.ceil(root)
+        return int(n / columns), int(columns)
 
 
 class DisulfideList(UserList):
@@ -107,7 +126,6 @@ class DisulfideList(UserList):
             if id == name:
                 res = ss.copy()
         return res
-
 
     def get_chains(self):
         '''
@@ -229,7 +247,7 @@ class DisulfideList(UserList):
             print(f'Saving file: {fname}')
         pl.screenshot(fname)
     
-    def display_overlay(self):
+    def display_overlay(self, screenshot=False, ssfname='ss_overlay.png'):
         ''' 
         Display all disulfides in the list overlaid in stick mode against
         a common coordinate frames. This allows us to see all of the disulfides
@@ -264,4 +282,12 @@ class DisulfideList(UserList):
 
         pl.view_isometric()
         pl.reset_camera()
-        pl.show()
+        if screenshot:
+            pl.show(auto_close=False) # allows for manipulation
+            pl.screenshot(ssfname)
+        else:
+            pl.show()
+
+# end of file
+
+        

@@ -12,6 +12,7 @@
 #
 
 import shutil
+
 from proteusPy.Disulfide import Extract_Disulfides
 
 # the locations below represent the actual location on the dev drive.
@@ -42,8 +43,7 @@ Extract_Disulfides(numb=1000, pdbdir=PDB, modeldir=MODELS,
                 verbose=False, quiet=True)
 '''
 
-Extract_Disulfides(numb=1000, pdbdir=PDB, 
-                modeldir=MODELS,
+Extract_Disulfides(numb=1000, pdbdir=PDB, modeldir=MODELS,
                 verbose=False, quiet=True)
 
 update = True

@@ -5,8 +5,9 @@ from proteusPy.Disulfide import Check_chains
 from proteusPy.Disulfide import DisulfideList, Torsion_DF_Cols
 from proteusPy.DisulfideExceptions import *
 
+import pandas as pd
 import pyvista as pv
-
+import pickle
 class DisulfideLoader:
     '''
     This class loads .pkl files created from the Extract_Disulfides() routine 
