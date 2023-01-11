@@ -31,7 +31,7 @@ from pyvista import Plotter
 from proteusPy.Disulfide import *
 
 def SS_DisplayTest(ss: Disulfide):
-    ss.display(single=True, style='bs')
+    ss.display(style='bs', single='False')
     ss.display(style='cpk')
     ss.display(style='sb', single=True)
     ss.display(style='pd', single=False)
@@ -60,19 +60,23 @@ if __name__ == '__main__':
     # get all disulfides for one structure. Make a 
     # DisulfideList object to hold it
     
-    ss4yss = DisulfideList([], 'tmp')
+    ss4yss = DisulfideList([], '4yss')
     ss4yss = PDB_SS['4yys']
 
     #SSlist_DisplayTest(ss4yss)
 
     sslist = DisulfideList([], 'last8')
-    sslist = PDB_SS[:16]
-    sslist.display()
+    sslist = PDB_SS[:12]
+    sslist.display_overlay()
+
+    #SSlist_DisplayTest(sslist)
+
+    #sslist.display()
     
-    PDB_SS.display_overlay('1j5h')
-    PDB_SS.display_overlay('4yys')
+    #PDB_SS.display_overlay('1j5h')
+    #PDB_SS.display_overlay('4yys')
     
-    #ss6fuf = PDB_SS['6fuf']
-    #ss6fuf.display(style='bs')
+    ss6fuf = PDB_SS['6fuf']
+    ss6fuf.display(style='sb')
 
     exit()

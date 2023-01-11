@@ -6,6 +6,10 @@
 # Last revision: 1/9/2023
 
 import math
+from math import cos
+
+import pickle
+from tqdm import tqdm
 
 from proteusPy import *
 from proteusPy.atoms import *
@@ -17,6 +21,7 @@ from proteusPy.DisulfideList import DisulfideList
 from Bio.PDB import Vector, PDBParser, PDBList
 from Bio.PDB.vectors import calc_dihedral
 
+import pandas as pd
 import pyvista as pv
 
 # float init for class 
@@ -85,6 +90,10 @@ class Disulfide:
         self.n_dist = Vector(0,0,0)
         self.c_dist = Vector(0,0,0)
         self.o_dist = Vector(0,0,0)
+
+        # set when we can't find previous or next prox or distal
+        # C' or N atoms.
+        self.missing_atoms = False
 
         # need these to calculate backbone dihedral angles
         self.c_prev_prox = Vector(0,0,0)
@@ -247,6 +256,7 @@ class Disulfide:
         
         bradius = BOND_RADIUS
         coords = self.internal_coords()
+        missing_atoms = self.missing_atoms
         
         atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C', 'SG', 'Z',
         		 'Z', 'Z', 'Z')
@@ -255,7 +265,7 @@ class Disulfide:
         # bond connection table with atoms in the specific order shown above: 
         # returned by ss.get_internal_coords()
         
-        def draw_bonds(pvp, bradius=BOND_RADIUS, style='sb', bcolor=BOND_COLOR):
+        def draw_bonds(pvp, bradius=BOND_RADIUS, style='sb', bcolor=BOND_COLOR, missing=True):
             bond_conn = numpy.array(
             [
                 [0, 1], # n-ca
@@ -300,6 +310,9 @@ class Disulfide:
             orig_col = dest_col = bcolor
 
             for i in range(len(bond_conn)):
+                if i > 10 and missing_atoms == True:
+                    continue
+                
                 bond = bond_conn[i]
 
                 # get the indices for the origin and destination atoms
@@ -340,7 +353,7 @@ class Disulfide:
                     dest_col = ATOM_COLORS[col[1]]
 
                 if i >= 11:
-                    bondradius = bradius * .5
+                    bondradius = bradius * .75
                 
                 cap1 = pv.Sphere(center=prox_pos, radius=bondradius)
                 cap2 = pv.Sphere(center=distal_pos, radius=bondradius)
@@ -353,7 +366,7 @@ class Disulfide:
                 pvp.add_mesh(cap1, color=orig_col)
                 pvp.add_mesh(cap2, color=dest_col)
 
-            return pvp
+            return pvp # end draw_bonds
         
         if style=='cpk':
             i = 0
@@ -385,13 +398,13 @@ class Disulfide:
             pvp = draw_bonds(pvp, style='bs')
 
         elif style == 'sb': # splitbonds
-            pvp = draw_bonds(pvp, style='sb')
+            pvp = draw_bonds(pvp, style='sb', missing=missing_atoms)
         
         elif style == 'pd': # proximal-distal
-            pvp = draw_bonds(pvp, style='pd')
+            pvp = draw_bonds(pvp, style='pd', missing=missing_atoms)
 
         else: # plain
-            pvp = draw_bonds(pvp, style='plain', bcolor=bondcolor)
+            pvp = draw_bonds(pvp, style='plain', bcolor=bondcolor, missing=missing_atoms)
             
         return pvp
 
@@ -737,6 +750,7 @@ class Disulfide:
         except Exception:
             mess = f'Missing coords for: {id} {prox-1} or {dist+1} for SS {proximal}-{distal}'
             cprev_prox = nnext_prox = cprev_dist = nnext_dist = Vector(-1.0, -1.0, -1.0)
+            self.missing_atoms = True
             warnings.warn(mess, DisulfideConstructionWarning)
 
         # update the positions and conformation
