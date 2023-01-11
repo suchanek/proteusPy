@@ -45,19 +45,21 @@ Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi
 # Class definition for a Disulfide bond. 
 class Disulfide:
     """
-    This class provides an object representing a physical disulfide bond that is either
-    extracted from the RCSB protein databank or built using the proteusPy.Turtle3D
-    The Disulfide Bond is characterized by the atomic coordinates N, Cα, Cβ, C', Sγ 
-    for both residues, the dihedral angles Χ1 - Χ5 for the disulfide bond conformation,
-    a name, proximal resiude number and distal residue number, and conformational energy.
-    All atomic coordinates are represented by the BIO.PDB.Vector class. The class uses
-    the internal methods to initialize dihedral angles and approximate energy upon
-    initialization.
+    This class provides an object representing a physical disulfide bond 
+    that is either extracted from the RCSB protein databank or built 
+    using the proteusPy.Turtle3D. The Disulfide Bond is characterized 
+    by the atomic coordinates N, Cα, Cβ, C', Sγ for both residues, the 
+    dihedral angles Χ1 - Χ5 for the disulfide bond conformation,a name, 
+    proximal resiude number and distal residue number, and conformational 
+    energy. All atomic coordinates are represented by the BIO.PDB.Vector 
+    class. The class uses the internal methods to initialize dihedral 
+    angles and approximate energy upon initialization.
 
     """
     def __init__(self, name="SSBOND"):
         """
-        Initialize the class. All positions are set to the origin. The optional string name may be passed.
+        Initialize the class. All positions are set to the origin. 
+        The optional string name may be passed.
         """
         self.name = name
         self.proximal = -1
@@ -71,7 +73,8 @@ class Disulfide:
         self.PERMISSIVE = bool(True)
         self.QUIET = bool(True)
         self.ca_distance = _FLOAT_INIT
-        self.torsion_array = numpy.array((_ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT))
+        self.torsion_array = numpy.array((_ANG_INIT, _ANG_INIT, _ANG_INIT, 
+        								_ANG_INIT, _ANG_INIT))
         self.phiprox = _ANG_INIT
         self.psiprox = _ANG_INIT
         self.phidist = _ANG_INIT
@@ -130,9 +133,9 @@ class Disulfide:
         self.chi4 = _ANG_INIT
         self.chi5 = _ANG_INIT
 
-        # I initialize an array for the torsions which will be used for comparisons
-        self.dihedrals = numpy.array((_ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT,
-         							_ANG_INIT), "d")
+        # Initialize an array for the torsions which will be used for comparisons
+        self.dihedrals = numpy.array((_ANG_INIT, _ANG_INIT, _ANG_INIT,
+        							 _ANG_INIT, _ANG_INIT), "d")
 
     def internal_coords(self) -> numpy.array:
         res_array = numpy.zeros(shape=(16,3))
@@ -258,14 +261,15 @@ class Disulfide:
         coords = self.internal_coords()
         missing_atoms = self.missing_atoms
         
-        atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C', 'SG', 'C',
-        		 'N', 'C', 'N')
+        atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C',
+        		 'SG', 'C', 'N', 'C', 'N')
         pvp = pvplot
         
         # bond connection table with atoms in the specific order shown above: 
         # returned by ss.get_internal_coords()
         
-        def draw_bonds(pvp, bradius=BOND_RADIUS, style='sb', bcolor=BOND_COLOR, missing=True):
+        def draw_bonds(pvp, bradius=BOND_RADIUS, style='sb', 
+        			   bcolor=BOND_COLOR, missing=True):
             bond_conn = numpy.array(
             [
                 [0, 1], # n-ca
@@ -331,7 +335,8 @@ class Disulfide:
                 # and vector length. divide by 2 since split bond
                 height = math.dist(prox_pos, distal_pos) / 2.0
 
-				# the cylinder origins are actually in the middle so we translate
+				# the cylinder origins are actually in the 
+				# middle so we translate
                 
                 origin = prox_pos + 0.5 * direction # for a single plain bond
                 origin1 = prox_pos + 0.25 * direction 
@@ -411,7 +416,8 @@ class Disulfide:
             pvp = draw_bonds(pvp, style='pd', missing=missing_atoms)
 
         else: # plain
-            pvp = draw_bonds(pvp, style='plain', bcolor=bondcolor, missing=missing_atoms)
+            pvp = draw_bonds(pvp, style='plain', bcolor=bondcolor, 
+            				missing=missing_atoms)
             
         return pvp
 
@@ -501,24 +507,28 @@ class Disulfide:
 
             pl.add_camera_orientation_widget()
             self._render(pl, style='cpk', bondcolor=BOND_COLOR, 
-                        bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+                        bs_scale=BS_SCALE, spec=SPECULARITY, 
+                        specpow=SPEC_POWER)
             pl.view_isometric()
 
             pl.subplot(0,1)
             pl.add_title(title=title, font_size=FONTSIZE)
             self._render(pl, style='pd', bondcolor=BOND_COLOR, 
-                        bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+                        bs_scale=BS_SCALE, spec=SPECULARITY, 
+                        specpow=SPEC_POWER)
             pl.view_isometric()
 
             pl.subplot(1,0)
             pl.add_title(title=title, font_size=FONTSIZE)
             self._render(pl, style='bs', bondcolor=BOND_COLOR, 
-                        bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+                        bs_scale=BS_SCALE, spec=SPECULARITY, 
+                        specpow=SPEC_POWER)
             
             pl.subplot(1,1)
             pl.add_title(title=title, font_size=FONTSIZE)
             self._render(pl, style='sb', bondcolor=BOND_COLOR, 
-                        bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+                        bs_scale=BS_SCALE, spec=SPECULARITY, 
+                        specpow=SPEC_POWER)
             pl.view_isometric()
 
             pl.link_views()
@@ -665,7 +675,8 @@ class Disulfide:
     def get_full_id(self):
         return((self.proximal_residue_fullid, self.distal_residue_fullid))
     
-    def initialize_disulfide_from_chain(self, chain1, chain2, proximal, distal, quiet=True):
+    def initialize_disulfide_from_chain(self, chain1, chain2, proximal, 
+    									distal, quiet=True):
         '''
         Initialize a new Disulfide object with atomic coordinates from the proximal and 
         distal coordinates, typically taken from a PDB file.
@@ -1025,9 +1036,9 @@ class Disulfide:
 # Class defination ends
 def Torsion_RMS(ss1, ss2):
     '''
-    Calculate the 5D Euclidean distance for 2 Disulfide torsion_vector objects.
-    This is used to compare Disulfide Bond torsion angles to determine their torsional 
-    'distance'.
+    Calculate the 5D Euclidean distance for 2 Disulfide torsion_vector
+    objects. This is used to compare Disulfide Bond torsion angles to 
+    determine their torsional 'distance'.
     
     Arguments: p1, p2 Vector objects of dimensionality 5 (5D)
     Returns: Distance
@@ -1042,7 +1053,8 @@ def Torsion_RMS(ss1, ss2):
 
 def Distance_RMS(ss1, ss2):
     '''
-    Calculate the RMS distance between the internal coordinates between two Disulfides
+    Calculate the RMS distance between the internal coordinates between 
+    two Disulfides
     '''
     ic1 = ss1.internal_coords()
     ic2 = ss2.internal_coords()
@@ -1201,13 +1213,14 @@ def build_torsion_df(SSList: DisulfideList) -> pd.DataFrame:
 
 def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR, 
                         modeldir=MODEL_DIR, picklefile=SS_PICKLE_FILE, 
-                        torsionfile=SS_TORSIONS_FILE, problemfile=PROBLEM_ID_FILE,
+                        torsionfile=SS_TORSIONS_FILE, 
+                        problemfile=PROBLEM_ID_FILE,
                         dictfile=SS_DICT_PICKLE_FILE) -> None:
     '''
-    This function creates .pkl files needed for the DisulfideLoader class. The Disulfide 
-    objects are contained in a DisulfideList object and Dict within these files. 
-    In addition, .csv files containing all of the torsions for the disulfides and 
-    problem IDs are written.
+    This function creates .pkl files needed for the DisulfideLoader class. 
+    The Disulfide objects are contained in a DisulfideList object and 
+    Dict within these files. In addition, .csv files containing all of 
+    the torsions for the disulfides and problem IDs are written.
 
     Arguments:
         numb:           number of entries to process, defaults to all
@@ -1230,7 +1243,8 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
 
         PDB_SS = DisulfideLoader()
         SS1 = PDB_SS[0]       <-- returns a Disulfide object at index 0
-        SS2 = PDB_SS['4yys']  <-- returns a DisulfideList containing disulfides for 4yys
+        SS2 = PDB_SS['4yys']  <-- returns a DisulfideList containing disulfides 
+        						  for 4yys
         SS3 = PDB_SS[:10]     <-- returns a DisulfideList containing the slice
     '''
 
@@ -1288,9 +1302,11 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
         if len(sslist) > 0:
             for ss in sslist:
                 All_ss_list.append(ss)
-                new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, 
-                          ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance, ss.phiprox, 
+                new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, 
+                		  ss.chi1, ss.chi2, ss.chi3, ss.chi4, ss.chi5, 
+                		  ss.energy, ss.ca_distance, ss.phiprox, 
                           ss.psiprox, ss.phidist, ss.psidist]
+                          
                 # add the row to the end of the dataframe
                 SS_df.loc[len(SS_df.index)] = new_row.copy() # deep copy
             All_ss_dict[entry] = sslist
@@ -1607,7 +1623,8 @@ def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0,
     '''
 
     parser = PDBParser(PERMISSIVE=True, QUIET=True)
-    structure = parser.get_structure(struct_name, file=f'{pdb_dir}pdb{struct_name}.ent')
+    structure = parser.get_structure(struct_name, 
+    								 file=f'{pdb_dir}pdb{struct_name}.ent')
     model = structure[0]
 
     ssbond_dict = structure.header['ssbond'] # NB: this requires the modified code
