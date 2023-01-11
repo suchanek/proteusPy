@@ -4,7 +4,7 @@
 # Subject to the GNU public license.
 # Cα Cβ Sγ Χ1 - Χ5 Χ
 
-__Version__ = "0.7dev"
+__version__ = "0.8dev"
 
 import sys
 import os
@@ -25,24 +25,24 @@ from numpy import cos
 
 from Bio.PDB.vectors import calc_dihedral, calc_angle
 
-from proteusPy.proteusGlobals import *
-from proteusPy.proteusPyWarning import *
+from .proteusGlobals import *
+from .proteusPyWarning import *
 
-from proteusPy.DisulfideGlobals import *
-from proteusPy.atoms import *
-from proteusPy.DisulfideExceptions import DisulfideIOException, DisulfideConstructionWarning, DisulfideConstructionException
+from .DisulfideGlobals import *
+from .atoms import *
+from .DisulfideExceptions import DisulfideIOException, DisulfideConstructionWarning, DisulfideConstructionException
 
-from proteusPy.turtle3D import Turtle3D
-from proteusPy.turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN
-from proteusPy.residue import build_residue, get_backbone_from_chain, to_alpha, to_carbonyl, to_nitrogen, to_oxygen
+from .turtle3D import Turtle3D
+from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN
+from .residue import build_residue, get_backbone_from_chain, to_alpha, to_carbonyl, to_nitrogen, to_oxygen
 
-#from proteusPy.Disulfide import CysSelect, Disulfide
-from proteusPy.Disulfide import name_to_id, todeg, torad, build_torsion_df, distance3d
-from proteusPy.Disulfide import parse_ssbond_header_rec, DownloadDisulfides, ExtractDisulfides
-from proteusPy.Disulfide import  check_chains, Distance_RMS, Torsion_RMS
+#from .Disulfide import Disulfide
+from .Disulfide import todeg, torad, distance3d
+from .Disulfide import Download_Disulfides, Extract_Disulfides
+from .Disulfide import  Check_chains, Distance_RMS, Torsion_RMS
 
-#from proteusPy.Disulfide import DisulfideList
-from proteusPy.DisulfideLoader import DisulfideLoader
+#from .Disulfide import DisulfideList
+from .DisulfideLoader import DisulfideLoader
 from Bio.PDB import Select
 
 from matplotlib import cm
@@ -81,5 +81,17 @@ def cmap_vector(steps):
         i += 1
 
     return rgbcol
+
+def grid_dimensions(n):
+    # Calculate the square root of the number of images
+    root = math.sqrt(n)
+    # If the square root is a whole number, return that as the number of rows and columns
+    if root == int(root):
+        return int(root), int(root)
+    # If the square root is not a whole number, round up and return that as the number of columns
+    # and calculate the number of rows as the number of images divided by the number of columns
+    else:
+        columns = math.ceil(root)
+        return int(n / columns), int(columns)
 
 # end of file

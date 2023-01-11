@@ -12,6 +12,7 @@ from proteusPy import *
 import pyvista as pv
 from collections import UserList
 
+
 class DisulfideList(UserList):
     '''
     Class provides a sortable list for Disulfide objects.
@@ -160,7 +161,7 @@ class DisulfideList(UserList):
                 print(f'Cross chain SS: {ss.print_compact}:')
         return reslist
     
-    def display(self, style='bs'):
+    def _render(self, style='sb') -> pv.Plotter:
         ''' 
             Display a window showing the list of disulfides in the given style.
             Argument:
@@ -169,17 +170,11 @@ class DisulfideList(UserList):
             Returns:
                 Window displaying the Disulfides.
         '''
-                
+     
         ssList = self.data
         tot_ss = len(ssList) # number off ssbonds
-        if tot_ss <= 4:
-            cols = 2
-        elif tot_ss == 3:
-            cols = 3
-        else:
-            cols = 4
         
-        rows = (tot_ss + 1) // cols
+        rows, cols = grid_dimensions(tot_ss)
         i = 0
 
         WINSIZE = (512 * cols, 512 * rows)
@@ -205,9 +200,17 @@ class DisulfideList(UserList):
         
         pl.link_views()
         pl.reset_camera()
+        return pl
+
+    def display(self, style='sb'):
+        pl = pv.Plotter()
+        pl = self._render(style)
         pl.show()
+
+
+        #pl.show()
     
-    def screenshot(self, style='bs', fname='sslist.png'):
+    def screenshot(self, style='bs', fname='sslist.png', verbose=True):
         ''' 
             Save the interactive window displaying the list of disulfides in the given style.
             Argument:
@@ -217,43 +220,13 @@ class DisulfideList(UserList):
             Returns:
                 Image file saved to disk.
         '''
-                
-        ssList = self.data
-        tot_ss = len(ssList) # number off ssbonds
-        if tot_ss <= 4:
-            cols = 2
-        elif tot_ss == 3:
-            cols = 3
-        else:
-            cols = 4
-        
-        rows = (tot_ss + 1) // cols
-        i = 0
 
-        WINSIZE = (512 * cols, 512 * rows)
-        pl = pv.Plotter(window_size=WINSIZE, shape=(rows, cols))
-        pl.add_camera_orientation_widget()
-
-        for r in range(rows):
-            for c in range(cols):
-                pl.subplot(r,c)
-                if i < tot_ss:
-                    ss = ssList[i]
-                    src = ss.pdb_id
-                    enrg = ss.energy
-                    title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol'
-                    pl.add_title(title=title, font_size=FONTSIZE)
-
-                    ss._render(pl, style=style, bondcolor=BOND_COLOR, 
-                              bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
-                    pl.view_isometric()
-                i += 1
-
-        pl.enable_anti_aliasing('fxaa')
-        pl.link_views()
-        pl.reset_camera()
-
+        pl = pv.Plotter()
+        pl = self._render(style=style)
         pl.show(auto_close=False)
+
+        if verbose:
+            print(f'Saving file: {fname}')
         pl.screenshot(fname)
     
     def display_overlay(self):

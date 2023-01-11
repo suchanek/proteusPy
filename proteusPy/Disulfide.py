@@ -1088,7 +1088,7 @@ def parse_ssbond_header_rec(ssbond_dict: dict) -> list:
 # with the ID list generated from: http://www.rcsb.org/
 #
 
-def DownloadDisulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR, 
+def Download_Disulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR, 
                        verbose=False, reset=False) -> None:
     '''
     Function reads a comma separated list of PDB IDs and downloads them
@@ -1178,7 +1178,7 @@ def build_torsion_df(SSList: DisulfideList) -> pd.DataFrame:
     
     return SS_df.copy()
 
-def ExtractDisulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR, 
+def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR, 
                         modeldir=MODEL_DIR, picklefile=SS_PICKLE_FILE, 
                         torsionfile=SS_TORSIONS_FILE, problemfile=PROBLEM_ID_FILE,
                         dictfile=SS_DICT_PICKLE_FILE) -> None:
@@ -1200,9 +1200,9 @@ def ExtractDisulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
         dictfile:       name of the .pkl file
     
     Example:
-        from proteusPy.Disulfide import ExtractDisulfides, DisulfideLoader, DisulfideList
+        from proteusPy.Disulfide import Extract_Disulfides, DisulfideLoader, DisulfideList
 
-        ExtractDisulfides(numb=500, pdbdir=PDB_DIR, verbose=False, quiet=True)
+        Extract_Disulfides(numb=500, pdbdir=PDB_DIR, verbose=False, quiet=True)
 
         SS1 = DisulfideList([],'All_SS')
         SS2 = DisulfideList([], '4yys')
@@ -1640,7 +1640,7 @@ def check_header_from_id(struct_name: str,
         i += 1
     return True
 
-def check_chains(pdbid, pdbdir, verbose=True):
+def Check_chains(pdbid, pdbdir, verbose=True):
     '''Returns True if structure has multiple chains of identical length,\
      False otherwise'''
 
