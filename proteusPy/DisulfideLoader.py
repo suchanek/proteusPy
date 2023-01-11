@@ -1,7 +1,7 @@
 import proteusPy
 from proteusPy import *
 from proteusPy.atoms import *
-from proteusPy.Disulfide import check_chains
+from proteusPy.Disulfide import Check_chains
 from proteusPy.Disulfide import DisulfideList, Torsion_DF_Cols
 from proteusPy.DisulfideExceptions import *
 
@@ -9,7 +9,7 @@ import pyvista as pv
 
 class DisulfideLoader:
     '''
-    This class loads .pkl files created from the ExtractDisulfides() routine 
+    This class loads .pkl files created from the Extract_Disulfides() routine 
     and initializes itself with their contents. The Disulfide objects are contained
     in a DisulfideList object and Dict. This makes it possible to access the disulfides by
     array index or PDB structure ID. The class can also render Disulfides to a pyVista

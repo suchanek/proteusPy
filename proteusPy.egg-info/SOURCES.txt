@@ -3,6 +3,8 @@ setup.py
 proteusPy/Disulfide.py
 proteusPy/DisulfideExceptions.py
 proteusPy/DisulfideGlobals.py
+proteusPy/DisulfideList.py
+proteusPy/DisulfideLoader.py
 proteusPy/ProteusGlobals.py
 proteusPy/ProteusPyWarning.py
 proteusPy/Residue.py
@@ -12,6 +14,7 @@ proteusPy/atoms.py
 proteusPy/disulfide.py
 proteusPy/proteusGlobals.py
 proteusPy/proteusPyWarning.py
+proteusPy/r.py
 proteusPy/residue.py
 proteusPy/turtle3D.py
 proteusPy.egg-info/PKG-INFO

@@ -66,7 +66,8 @@ if __name__ == '__main__':
     #SSlist_DisplayTest(ss4yss)
 
     sslist = DisulfideList([], 'last8')
-    sslist = PDB_SS[:8]
+    sslist = PDB_SS[:16]
+    sslist.display()
     
     PDB_SS.display_overlay('1j5h')
     PDB_SS.display_overlay('4yys')
