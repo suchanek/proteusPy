@@ -3,7 +3,7 @@
 # Part of the program Proteus, a program for the analysis and modeling of 
 # protein structures, with an emphasis on disulfide bonds.
 # Author: Eric G. Suchanek, PhD
-# Last revision: 1/9/2023
+# Last revision: 1/11/2023
 
 import math
 from math import cos
@@ -246,7 +246,7 @@ class Disulfide:
         
         Arguments:
             pvpplot: pyvista.Plotter() object
-            style: 'bs', 'st', 'cpk', 'plain', 'cov': Whether to render as CPK,
+            style: 'bs', 'st', 'cpk', 'plain': Whether to render as CPK,
             ball-and-stick or stick. Bonds are colored by atom color, unless 'plain'
             is specified.
             
@@ -258,8 +258,8 @@ class Disulfide:
         coords = self.internal_coords()
         missing_atoms = self.missing_atoms
         
-        atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C', 'SG', 'Z',
-        		 'Z', 'Z', 'Z')
+        atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C', 'SG', 'C',
+        		 'N', 'C', 'N')
         pvp = pvplot
         
         # bond connection table with atoms in the specific order shown above: 
@@ -277,8 +277,8 @@ class Disulfide:
                 [7, 8], # ca-c
                 [8, 9], # c-o
                 [7, 10], # ca-cb
-                [10, 11], #cb-sg
-                [5, 11],   #sg -sg
+                [10, 11], # cb-sg
+                [5, 11],  # sg -sg
                 [12, 0],  # cprev_prox-n
                 [2, 13],  # c-nnext_prox
                 [14,6],   # cprev_dist-n_dist
@@ -300,19 +300,19 @@ class Disulfide:
                     ('C', 'SG'),
                     ('SG', 'SG'),
                     # prev and next C-N bonds - color by atom Z
-                    ('Z', 'Z'),
-                    ('Z', 'Z'),
-                    ('Z', 'Z'),
-                    ('Z', 'Z')
+                    ('C', 'N'),
+                    ('C', 'N'),
+                    ('C', 'N'),
+                    ('C', 'N')
                 ]
             )
             # work through connectivity and colors
             orig_col = dest_col = bcolor
 
             for i in range(len(bond_conn)):
-                if i > 10 and missing_atoms == True:
+                if i > 10 and missing_atoms == True: # skip missing atoms
                     continue
-                
+
                 bond = bond_conn[i]
 
                 # get the indices for the origin and destination atoms
@@ -331,7 +331,9 @@ class Disulfide:
                 # and vector length. divide by 2 since split bond
                 height = math.dist(prox_pos, distal_pos) / 2.0
 
-				# the cylinder origin is actually in the middle so we translate
+				# the cylinder origins are actually in the middle so we translate
+                
+                origin = prox_pos + 0.5 * direction # for a single plain bond
                 origin1 = prox_pos + 0.25 * direction 
                 origin2 = prox_pos + 0.75 * direction
                 
@@ -352,17 +354,22 @@ class Disulfide:
                     orig_col = ATOM_COLORS[col[0]]
                     dest_col = ATOM_COLORS[col[1]]
 
-                if i >= 11:
-                    bondradius = bradius * .75
+                if i >= 11: # prev and next residue atoms for phi/psi calcs
+                    bondradius = bradius * .75 # make smaller to distinguish
                 
                 cap1 = pv.Sphere(center=prox_pos, radius=bondradius)
                 cap2 = pv.Sphere(center=distal_pos, radius=bondradius)
 
+                cyl = pv.Cylinder(origin, direction, radius=bondradius, height=height*2.0)
                 cyl1 = pv.Cylinder(origin1, direction, radius=bondradius, height=height)
                 cyl2 = pv.Cylinder(origin2, direction, radius=bondradius, height=height)
-                 
-                pvp.add_mesh(cyl1, color=orig_col)
-                pvp.add_mesh(cyl2, color=dest_col)
+
+                if style == 'plain': 
+                    pvp.add_mesh(cyl, color=orig_col)
+                else:
+                    pvp.add_mesh(cyl1, color=orig_col)
+                    pvp.add_mesh(cyl2, color=dest_col)
+        
                 pvp.add_mesh(cap1, color=orig_col)
                 pvp.add_mesh(cap2, color=dest_col)
 
@@ -389,7 +396,7 @@ class Disulfide:
             for atom in atoms:
                 rad = ATOM_RADII_CPK[atom] * bs_scale
                 if i > 11:
-                    rad *= .5
+                    rad = rad * .75
                 
                 pvp.add_mesh(pv.Sphere(center=coords[i], radius=rad), 
                 			 color=ATOM_COLORS[atom], smooth_shading=True, 
@@ -1465,10 +1472,8 @@ def load_disulfides_from_id(struct_name: str,
         i += 1
     return SSList
 
-def check_header_from_file(filename: str,
-                            model_numb = 0, 
-                            verbose = False,
-                            dbg = False) -> bool:
+def check_header_from_file(filename: str, model_numb = 0, 
+                            verbose = False, dbg = False) -> bool:
 
     '''
     Loads all Disulfides by PDB ID and initializes the Disulfide objects.
@@ -1527,8 +1532,9 @@ def check_header_from_file(filename: str,
 
         if not proximal.isnumeric() or not distal.isnumeric():
             if verbose:
-                print(f' ! Cannot parse SSBond record (non-numeric IDs):\
-                 {struct_name} Prox:  {proximal} {chain1_id} Dist: {distal} {chain2_id}')
+                mess = f' ! Cannot parse SSBond record (non-numeric IDs):\
+                 {struct_name} Prox:  {proximal} {chain1_id} Dist: {distal} {chain2_id}'
+                warnings.warn(mess, DisulfideParseWarning)
             continue # was pass
         else:
             proximal = int(proximal)
@@ -1542,8 +1548,9 @@ def check_header_from_file(filename: str,
 
         if (chain1_id != chain2_id):
             if verbose:
-                print(f' -> Cross Chain SS for: Prox: {proximal} {chain1_id} Dist:\
-                 {distal} {chain2_id}')
+                mess = f' -> Cross Chain SS for: Prox: {proximal} {chain1_id} Dist:\
+                       {distal} {chain2_id}'
+                warnings.warn(mess, DisulfideParseWarning)
                 pass # was break
 
         try:
@@ -1570,11 +1577,8 @@ def check_header_from_file(filename: str,
         i += 1
     return True
 
-def check_header_from_id(struct_name: str, 
-                            pdb_dir = '.',
-                            model_numb = 0, 
-                            verbose = False,
-                            dbg = False) -> bool:
+def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0, 
+                            verbose=False, dbg=False) -> bool:
     '''
     Loads all Disulfides by PDB ID and initializes the Disulfide objects.
     Assumes the file is downloaded in the pdb_dir path.

@@ -44,6 +44,7 @@ def SSlist_DisplayTest(sslist):
     sslist.display(style='bs')
     sslist.display(style='sb')
     sslist.display(style='pd')
+    sslist.display(style='plain')
     sslist.display_overlay()
     sslist.screenshot(style='pd', fname='sslist.png')
 
@@ -67,7 +68,7 @@ if __name__ == '__main__':
 
     sslist = DisulfideList([], 'last8')
     sslist = PDB_SS[:12]
-    sslist.display_overlay()
+    SSlist_DisplayTest(sslist)
 
     #SSlist_DisplayTest(sslist)
 
