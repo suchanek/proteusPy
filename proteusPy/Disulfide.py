@@ -139,28 +139,46 @@ class Disulfide:
 
     def internal_coords(self) -> numpy.array:
         res_array = numpy.zeros(shape=(16,3))
-
-        res_array = numpy.array((
-            self._n_prox.get_array(),
-            self._ca_prox.get_array(),
-            self._c_prox.get_array(), 
-            self._o_prox.get_array(), 
-            self._cb_prox.get_array(),
-            self._sg_prox.get_array(),
-            self._n_dist.get_array(),
-            self._ca_dist.get_array(),
-            self._c_dist.get_array(), 
-            self._o_dist.get_array(), 
-            self._cb_dist.get_array(),
-            self._sg_dist.get_array(),
-            self._c_prev_prox.get_array(),
-            self._n_next_prox.get_array(),
-            self._c_prev_dist.get_array(),
-            self._n_next_dist.get_array()
-        ))
+        if self.missing_atoms:
+            res_array = numpy.array((
+                self._n_prox.get_array(),
+                self._ca_prox.get_array(),
+                self._c_prox.get_array(),
+                self._o_prox.get_array(), 
+                self._cb_prox.get_array(),
+                self._sg_prox.get_array(),
+                self._n_dist.get_array(),
+                self._ca_dist.get_array(),
+                self._c_dist.get_array(), 
+                self._o_dist.get_array(), 
+                self._cb_dist.get_array(),
+                self._sg_dist.get_array(),
+                [0,0,0],
+                [0,0,0],
+                [0,0,0],
+                [0,0,0]
+            ))
+        else:
+            res_array = numpy.array((
+                self._n_prox.get_array(),
+                self._ca_prox.get_array(),
+                self._c_prox.get_array(), 
+                self._o_prox.get_array(), 
+                self._cb_prox.get_array(),
+                self._sg_prox.get_array(),
+                self._n_dist.get_array(),
+                self._ca_dist.get_array(),
+                self._c_dist.get_array(), 
+                self._o_dist.get_array(), 
+                self._cb_dist.get_array(),
+                self._sg_dist.get_array(),
+                self._c_prev_prox.get_array(),
+                self._n_next_prox.get_array(),
+                self._c_prev_dist.get_array(),
+                self._n_next_dist.get_array()
+            ))
         return res_array
     
-    @property
     def cofmass(self) -> numpy.array:
         res = numpy.zeros(shape=(16,3))
         res = self.internal_coords()
@@ -240,9 +258,9 @@ class Disulfide:
 
         return res
 
-    def _render(self, pvplot: pv.Plotter(), style='bs', plain=False,
+    def _render(self, pvplot: pv.Plotter, style='bs', plain=False,
             bondcolor=BOND_COLOR, bs_scale=BS_SCALE, spec=SPECULARITY, 
-            specpow=SPEC_POWER) -> pv.Plotter:
+            specpow=SPEC_POWER, translate=True) -> pv.Plotter:
         ''' 
         Update the passed pyVista plotter() object with the mesh data for the
         input Disulfide Bond.
@@ -250,8 +268,9 @@ class Disulfide:
         Arguments:
             pvpplot: pyvista.Plotter() object
             style: 'bs', 'st', 'cpk', 'plain': Whether to render as CPK,
-            ball-and-stick or stick. Bonds are colored by atom color, unless 'plain'
-            is specified.
+                                               ball-and-stick or stick. 
+                                               Bonds are colored by atom 
+                                               color, unless 'plain' is specified.
             
         Returns:
             Updated pv.Plotter() object.
@@ -260,6 +279,11 @@ class Disulfide:
         bradius = BOND_RADIUS
         coords = self.internal_coords()
         missing_atoms = self.missing_atoms
+
+        if translate:
+            cofmass = self.cofmass()
+            for i in range(16):
+                coords[i] = coords[i] - cofmass
         
         atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C',
         		 'SG', 'C', 'N', 'C', 'N')
@@ -360,7 +384,7 @@ class Disulfide:
                     dest_col = ATOM_COLORS[col[1]]
 
                 if i >= 11: # prev and next residue atoms for phi/psi calcs
-                    bondradius = bradius * .75 # make smaller to distinguish
+                    bondradius = bradius * .5 # make smaller to distinguish
                 
                 cap1 = pv.Sphere(center=prox_pos, radius=bondradius)
                 cap2 = pv.Sphere(center=distal_pos, radius=bondradius)

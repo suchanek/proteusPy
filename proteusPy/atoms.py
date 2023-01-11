@@ -36,7 +36,7 @@ ATOM_COLORS = {'O': 'red', 'C': 'grey', 'N': 'blue', 'S': 'yellow', 'H': 'white'
             'SG': 'yellow', 'CB': 'grey', 'FE': 'green', 'Z': 'silver'}
 
 BOND_RADIUS = .12
-BOND_COLOR = 'grey'
+BOND_COLOR = 'darkgrey'
 FONTSIZE = 10
 BS_SCALE = .25
 SPECULARITY = .7

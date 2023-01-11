@@ -57,7 +57,6 @@ if __name__ == '__main__':
     ss = PDB_SS[0]
     #SS_DisplayTest(ss)
     
-
     # get all disulfides for one structure. Make a 
     # DisulfideList object to hold it
     

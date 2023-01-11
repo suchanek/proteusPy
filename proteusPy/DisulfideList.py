@@ -277,7 +277,7 @@ class DisulfideList(UserList):
         i = 0
         for ss in ssbonds:
             color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
-            ss._render(pl, style='plain', bondcolor=color)
+            ss._render(pl, style='plain', bondcolor=color, translate=False)
             i += 1
 
         pl.view_isometric()
