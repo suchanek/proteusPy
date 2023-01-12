@@ -11,6 +11,9 @@ from math import cos
 import pickle
 from tqdm import tqdm
 
+import pandas as pd
+import pyvista as pv
+
 from proteusPy import *
 from proteusPy.atoms import *
 from proteusPy.proteusGlobals import *
@@ -20,9 +23,6 @@ from proteusPy.DisulfideList import DisulfideList
 
 from Bio.PDB import Vector, PDBParser, PDBList
 from Bio.PDB.vectors import calc_dihedral
-
-import pandas as pd
-import pyvista as pv
 
 # float init for class 
 _FLOAT_INIT = -999.9
@@ -74,7 +74,7 @@ class Disulfide:
         self.QUIET = bool(True)
         self.ca_distance = _FLOAT_INIT
         self.torsion_array = numpy.array((_ANG_INIT, _ANG_INIT, _ANG_INIT, 
-        								_ANG_INIT, _ANG_INIT))
+        								  _ANG_INIT, _ANG_INIT))
         self.phiprox = _ANG_INIT
         self.psiprox = _ANG_INIT
         self.phidist = _ANG_INIT
@@ -105,7 +105,7 @@ class Disulfide:
         self.n_next_dist = Vector(0,0,0)
 
         # local coordinates for the Disulfide, computed using the Turtle3D in 
-        # Orientation #1 these are generally private.
+        # Orientation #1. these are generally private.
 
         self._n_prox = Vector(0,0,0)
         self._ca_prox = Vector(0,0,0)
@@ -135,10 +135,11 @@ class Disulfide:
 
         # Initialize an array for the torsions which will be used for comparisons
         self.dihedrals = numpy.array((_ANG_INIT, _ANG_INIT, _ANG_INIT,
-        							 _ANG_INIT, _ANG_INIT), "d")
+        							  _ANG_INIT, _ANG_INIT), "d")
 
     def internal_coords(self) -> numpy.array:
-        res_array = numpy.zeros(shape=(16,3))
+        # if we don't have the prior and next atoms we initialize those
+        # atoms to the origin so as to not effect the center of mass calculations
         if self.missing_atoms:
             res_array = numpy.array((
                 self._n_prox.get_array(),
@@ -180,8 +181,9 @@ class Disulfide:
         return res_array
     
     def cofmass(self) -> numpy.array:
-        res = numpy.zeros(shape=(16,3))
+        #res = numpy.zeros(shape=(16,3))
         res = self.internal_coords()
+
         return res.mean(axis=0)
 
     def internal_coords_res(self, resnumb) -> numpy.array:
@@ -271,18 +273,30 @@ class Disulfide:
                                                ball-and-stick or stick. 
                                                Bonds are colored by atom 
                                                color, unless 'plain' is specified.
+            plain: (bool) Flag indicating plain style, used internally
+            
+            bondcolor:  bond color for simple bonds, one of pyVista color types
+            
+            bs_scale: scale factor (0-1) to reduce the atom sizes for ball and stick
+            
+            spec:  specularity (0-1), where 1 is totally smooth and 0 is rough
+            
+            specpow: specular power - exponent used for specularity calculations
+
+            translate: (bool) - used internally to indicate whether to translate
+                        the disulfide to its geometric center of mass.
             
         Returns:
             Updated pv.Plotter() object.
         '''
         
-        bradius = BOND_RADIUS
+        _bradius = BOND_RADIUS
         coords = self.internal_coords()
         missing_atoms = self.missing_atoms
-
+        clen = coords.shape[0]
         if translate:
             cofmass = self.cofmass()
-            for i in range(16):
+            for i in range(clen):
                 coords[i] = coords[i] - cofmass
         
         atoms = ('N', 'C', 'C', 'O', 'C', 'SG', 'N', 'C', 'C', 'O', 'C',
@@ -356,7 +370,7 @@ class Disulfide:
                 # compute a direction vector
                 direction = distal_pos - prox_pos
 
-                # and vector length. divide by 2 since split bond
+                # compute vector length. divide by 2 since split bond
                 height = math.dist(prox_pos, distal_pos) / 2.0
 
 				# the cylinder origins are actually in the 
@@ -366,7 +380,7 @@ class Disulfide:
                 origin1 = prox_pos + 0.25 * direction 
                 origin2 = prox_pos + 0.75 * direction
                 
-                bondradius = bradius
+                bradius = _bradius
 
                 if style == 'plain':
                     orig_col = dest_col = bcolor
@@ -384,18 +398,17 @@ class Disulfide:
                     dest_col = ATOM_COLORS[col[1]]
 
                 if i >= 11: # prev and next residue atoms for phi/psi calcs
-                    bondradius = bradius * .5 # make smaller to distinguish
+                    bradius = _bradius * .5 # make smaller to distinguish
                 
-                cap1 = pv.Sphere(center=prox_pos, radius=bondradius)
-                cap2 = pv.Sphere(center=distal_pos, radius=bondradius)
+                cap1 = pv.Sphere(center=prox_pos, radius=bradius)
+                cap2 = pv.Sphere(center=distal_pos, radius=bradius)
 
-                cyl = pv.Cylinder(origin, direction, radius=bondradius, height=height*2.0)
-                cyl1 = pv.Cylinder(origin1, direction, radius=bondradius, height=height)
-                cyl2 = pv.Cylinder(origin2, direction, radius=bondradius, height=height)
-
-                if style == 'plain': 
+                if style == 'plain':
+                    cyl = pv.Cylinder(origin, direction, radius=bradius, height=height*2.0) 
                     pvp.add_mesh(cyl, color=orig_col)
                 else:
+                    cyl1 = pv.Cylinder(origin1, direction, radius=bradius, height=height)
+                    cyl2 = pv.Cylinder(origin2, direction, radius=bradius, height=height)
                     pvp.add_mesh(cyl1, color=orig_col)
                     pvp.add_mesh(cyl2, color=dest_col)
         
@@ -449,26 +462,23 @@ class Disulfide:
         src = self.pdb_id
         enrg = self.energy
         title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol'
-        
-        near_range, far_range = self.compute_extents()
-        
+                
         if single == True:
-            _pl = pv.Plotter(window_size=WINSIZE)
-            _pl.add_title(title=title, font_size=FONTSIZE)
-            _pl.enable_anti_aliasing('msaa')
-            _pl.add_camera_orientation_widget()
-            _pl.view_isometric()
-            _pl = self._render(_pl, style=style, 
-                        bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
-            _pl.reset_camera()
-            _pl.show()
+            pl = pv.Plotter(window_size=WINSIZE)
+            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.enable_anti_aliasing('msaa')
+            pl.add_camera_orientation_widget()
+            pl = self._render(pl, style=style, 
+                               bs_scale=BS_SCALE, spec=SPECULARITY, 
+                               specpow=SPEC_POWER)
+            pl.reset_camera()
+            pl.show()
 
         else:
             _WINSIZE = (1024, 1024)
             pl = pv.Plotter(window_size=_WINSIZE, shape=(2,2))
             pl.subplot(0,0)
             
-            #pl.add_axes()
             pl.add_title(title=title, font_size=FONTSIZE)
             pl.enable_anti_aliasing('msaa')
 
@@ -480,19 +490,16 @@ class Disulfide:
             pl.add_title(title=title, font_size=FONTSIZE)
             self._render(pl, style='pd', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
-            pl.view_isometric()
 
             pl.subplot(1,0)
             pl.add_title(title=title, font_size=FONTSIZE)
             self._render(pl, style='bs', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
-            pl.view_isometric()
 
             pl.subplot(1,1)
             pl.add_title(title=title, font_size=FONTSIZE)
             self._render(pl, style='sb', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
-            pl.view_isometric()
 
             pl.link_views()
             pl.reset_camera()
@@ -502,13 +509,14 @@ class Disulfide:
     def screenshot(self, single=True, style='sb', fname='ssbond.png',
                    verbose=False):
         src = self.pdb_id
+        ssname = self.name
         enrg = self.energy
-        title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol'
+        title = f'{src}: {ssname}: {enrg:.2f} kcal/mol'
         
-        near_range, far_range = self.compute_extents()
-        
+        if verbose:
+            print(f'Rendering screenshot...')
+
         if single:
-            print('entered')
             pl = pv.Plotter(window_size=WINSIZE)
             pl.add_title(title=title, font_size=FONTSIZE)
             pl.enable_anti_aliasing('msaa')
@@ -533,14 +541,12 @@ class Disulfide:
             self._render(pl, style='cpk', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, 
                         specpow=SPEC_POWER)
-            pl.view_isometric()
 
             pl.subplot(0,1)
             pl.add_title(title=title, font_size=FONTSIZE)
             self._render(pl, style='pd', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, 
                         specpow=SPEC_POWER)
-            pl.view_isometric()
 
             pl.subplot(1,0)
             pl.add_title(title=title, font_size=FONTSIZE)
@@ -553,7 +559,6 @@ class Disulfide:
             self._render(pl, style='sb', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, 
                         specpow=SPEC_POWER)
-            pl.view_isometric()
 
             pl.link_views()
             pl.reset_camera()
@@ -562,6 +567,32 @@ class Disulfide:
         
         if verbose:
             print(f'Saved: {fname}')
+
+    def make_movie(self, style='sb', fname='ssbond.mp4',
+                   verbose=False):
+        src = self.pdb_id
+        ssname = self.name
+        enrg = self.energy
+        title = f'{src}: {ssname}: {enrg:.2f} kcal/mol'
+        
+        if verbose:
+            print(f'Rendering animation...')
+
+        pl = pv.Plotter(window_size=WINSIZE, off_screen=True)
+        pl.open_movie(fname, quality=9)
+        path = pl.generate_orbital_path(n_points=360)
+
+        pl.add_title(title=title, font_size=FONTSIZE)
+        pl.enable_anti_aliasing('ssaa')
+        pl.add_camera_orientation_widget()
+        pl = self._render(pl, style=style, bondcolor=BOND_COLOR, 
+                    bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+        pl.reset_camera()
+        pl.orbit_on_path(path, write_frames=True)
+        pl.close()
+
+        if verbose:
+            print(f'Saved mp4 animation to: {fname}')
         
     # comparison operators, used for sorting. keyed to SS bond energy
     def __lt__(self, other):

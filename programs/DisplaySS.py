@@ -31,12 +31,12 @@ from pyvista import Plotter
 from proteusPy.Disulfide import *
 
 def SS_DisplayTest(ss: Disulfide):
-    ss.display(style='bs', single='False')
+    ss.display(style='bs', single=True)
     ss.display(style='cpk')
     ss.display(style='sb', single=True)
     ss.display(style='pd', single=False)
-    ss.screenshot(style='cpk', single=True, fname='cpk3.png', verbose=True)
-    ss.screenshot(style='sb', single=False, fname='sb3.png', verbose=True)
+    # ss.screenshot(style='cpk', single=True, fname='cpk3.png', verbose=True)
+    # ss.screenshot(style='sb', single=False, fname='sb3.png', verbose=True)
     return
 
 def SSlist_DisplayTest(sslist):
@@ -45,7 +45,7 @@ def SSlist_DisplayTest(sslist):
     sslist.display(style='sb')
     sslist.display(style='pd')
     sslist.display(style='plain')
-    sslist.display_overlay()
+    sslist.display_overlay(movie=True, fname='overlay.mp4')
     sslist.screenshot(style='pd', fname='sslist.png')
 
 if __name__ == '__main__':
@@ -55,6 +55,7 @@ if __name__ == '__main__':
     # one disulfide from the database
     ss = Disulfide()
     ss = PDB_SS[0]
+    #ss.make_movie(fname='ss_sb.mp4', style='cpk', verbose=True)
     #SS_DisplayTest(ss)
     
     # get all disulfides for one structure. Make a 
@@ -63,11 +64,11 @@ if __name__ == '__main__':
     ss4yss = DisulfideList([], '4yss')
     ss4yss = PDB_SS['4yys']
 
-    #SSlist_DisplayTest(ss4yss)
+    SSlist_DisplayTest(ss4yss)
 
-    sslist = DisulfideList([], 'last8')
+    sslist = DisulfideList([], 'last12')
     sslist = PDB_SS[:12]
-    SSlist_DisplayTest(sslist)
+    sslist.display_overlay()
 
     #SSlist_DisplayTest(sslist)
 
@@ -77,6 +78,6 @@ if __name__ == '__main__':
     #PDB_SS.display_overlay('4yys')
     
     ss6fuf = PDB_SS['6fuf']
-    ss6fuf.display(style='sb')
+    #ss6fuf.display(style='sb')
 
     exit()
