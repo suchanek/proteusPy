@@ -246,8 +246,10 @@ class DisulfideList(UserList):
         if verbose:
             print(f'Saving file: {fname}')
         pl.screenshot(fname)
-    
-    def display_overlay(self, screenshot=False, ssfname='ss_overlay.png'):
+        
+    def display_overlay(self, screenshot=False, movie=False, 
+                        verbose=True,
+                        fname='ss_overlay.png'):
         ''' 
         Display all disulfides in the list overlaid in stick mode against
         a common coordinate frames. This allows us to see all of the disulfides
@@ -266,7 +268,11 @@ class DisulfideList(UserList):
         tot_ss = len(ssbonds) # number off ssbonds
         title = f'Disulfides for SS list {id}: ({tot_ss} total)'
 
-        pl = pv.Plotter(window_size=WINSIZE)
+        if movie:
+            pl = pv.Plotter(window_size=WINSIZE, off_screen=True)
+        else:
+            pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
+
         pl.add_title(title=title, font_size=FONTSIZE)
         pl.enable_anti_aliasing('msaa')
         pl.add_camera_orientation_widget()
@@ -280,13 +286,25 @@ class DisulfideList(UserList):
             ss._render(pl, style='plain', bondcolor=color, translate=False)
             i += 1
 
-        pl.view_isometric()
         pl.reset_camera()
+
         if screenshot:
             pl.show(auto_close=False) # allows for manipulation
-            pl.screenshot(ssfname)
+            pl.screenshot(fname)
+        elif movie:
+            if verbose:
+                print(f'Saving mp4 animation to: {fname}')
+                
+            pl.open_movie(fname, quality=9)
+            path = pl.generate_orbital_path(n_points=360)
+            pl.orbit_on_path(path, write_frames=True)
+            pl.close()
+
+            if verbose:
+                print(f'Saved mp4 animation to: {fname}')
         else:
             pl.show()
+
 
 # end of file
 
