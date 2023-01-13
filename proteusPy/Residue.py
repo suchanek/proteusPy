@@ -1,6 +1,6 @@
 # Residue.py
-# Functions to manipulate the 3D turtle relative to atoms in Residues. Based on the original
-# work in the program Proteus.
+# Functions to manipulate the 3D turtle relative to atoms in Residues. 
+# Based on the original work in the program Proteus.
 # This implementation utilises the Vector class from the Biopython module: BIO.PDB
 # Author: Eric G. Suchanek PhD
 # Last Modification: 11/22/2022

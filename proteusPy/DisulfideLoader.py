@@ -1,3 +1,11 @@
+#
+# DisulfideLoader class definition
+# This class embodies functions used to load Disulfide Bonds extracted from the
+# RCSB Protein Databank and initialize the DisulfideLoader with the Disulfide
+# lists and dictionary.
+# Author: Eric G. Suchanek, PhD.
+# Last modification: 1/13/23
+
 import proteusPy
 from proteusPy import *
 from proteusPy.atoms import *

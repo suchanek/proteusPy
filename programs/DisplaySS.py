@@ -46,7 +46,7 @@ def SSlist_DisplayTest(sslist):
     sslist.display(style='pd')
     sslist.display(style='plain')
     sslist.display_overlay(movie=True, fname='overlay.mp4')
-    sslist.screenshot(style='pd', fname='sslist.png')
+    sslist.screenshot(style='sb', fname='sslist.png')
 
 if __name__ == '__main__':
     PDB_SS = None
@@ -64,11 +64,13 @@ if __name__ == '__main__':
     ss4yss = DisulfideList([], '4yss')
     ss4yss = PDB_SS['4yys']
 
-    SSlist_DisplayTest(ss4yss)
+    #SSlist_DisplayTest(ss4yss)
 
     sslist = DisulfideList([], 'last12')
     sslist = PDB_SS[:12]
-    sslist.display_overlay()
+    sslist.display_overlay(movie=True, fname='overlay.mp4')
+
+    #sslist.display_overlay()
 
     #SSlist_DisplayTest(sslist)
 
