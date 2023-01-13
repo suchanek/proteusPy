@@ -56,10 +56,12 @@ class Disulfide:
     angles and approximate energy upon initialization.
 
     """
-    def __init__(self, name="SSBOND"):
+    def __init__(self, name: str="SSBOND") -> None:
         """
         Initialize the class. All positions are set to the origin. 
         The optional string name may be passed.
+        :param name: str Disufide Name
+        :return: None
         """
         self.name = name
         self.proximal = -1
@@ -80,7 +82,9 @@ class Disulfide:
         self.phidist = _ANG_INIT
         self.psidist = _ANG_INIT
 
-        # global coordinates for the Disulfide, typically as returned from the PDB file
+        # global coordinates for the Disulfide, typically as 
+        # returned from the PDB file
+
         self.n_prox = Vector(0,0,0)
         self.ca_prox = Vector(0,0,0)
         self.c_prox = Vector(0,0,0)
@@ -138,6 +142,15 @@ class Disulfide:
         							  _ANG_INIT, _ANG_INIT), "d")
 
     def internal_coords(self) -> numpy.array:
+        '''
+        Return the internal coordinates for the Disulfide.
+        If there are missing atoms the extra atoms for the proximal
+        and distal N and C are set to [0,0,0]. This is needed for the center of
+        mass calculations, used when rendering.
+        
+        :return: numpy.Array containing the coordinates, [16][3].
+
+        '''
         # if we don't have the prior and next atoms we initialize those
         # atoms to the origin so as to not effect the center of mass calculations
         if self.missing_atoms:
@@ -181,12 +194,25 @@ class Disulfide:
         return res_array
     
     def cofmass(self) -> numpy.array:
-        #res = numpy.zeros(shape=(16,3))
-        res = self.internal_coords()
+        '''
+        Returns the geometric center of mass for the internal coordinates of
+        the given Disulfide. Missing atoms are not included.
 
+        :return: numpy.array CenterOfMass 
+
+        '''
+        res = self.internal_coords()
         return res.mean(axis=0)
 
     def internal_coords_res(self, resnumb) -> numpy.array:
+        '''
+        Returns the internal coordinates for the internal coordinates of
+        the given Disulfide. Missing atoms are not included.
+
+        :
+        :return: numpy.array CenterOfMass 
+
+        '''
         res_array = numpy.zeros(shape=(6,3))
 
         if resnumb == self.proximal:
@@ -199,6 +225,7 @@ class Disulfide:
                 self._sg_prox.get_array(),
             ))
             return res_array
+
         elif resnumb == self.distal:
             res_array = numpy.array((
                 self._n_dist.get_array(),
@@ -214,22 +241,32 @@ class Disulfide:
              Unable to find residue: {resnumb} '
             raise DisulfideConstructionWarning(mess)
     
-    def get_chains(self):
+    def get_chains(self) -> tuple:
+        '''
+        Return the proximal and distal chain IDs for the Disulfide.
+        :return: tuple containing proximal and distal chain IDs
+        '''
         prox = self.proximal_chain
         dist = self.distal_chain
         return tuple(prox, dist)
     
     def same_chains(self) -> bool:
+        '''
+        Return True if the proximal and distal residues have the same 
+        chain ID else False.
+        :return: True if the same chain else False
+        '''
         (prox, dist) = self.get_chains()
-        if prox == dist:
-            return True
-        else:
-            return False
-    
+        return prox == dist
+        
     def reset(self) -> None:
         self.__init__(self)
 
     def copy(self):
+        '''
+        Return a copy of the Disulfide object
+        '''
+        
         return copy.deepcopy(self)
     
     def compute_extents(self, dim='z'):

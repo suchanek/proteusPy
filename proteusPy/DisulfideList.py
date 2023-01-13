@@ -1,10 +1,10 @@
-# DisulfideList Class definition.
+# DisulfideList Class definition
 # I extend UserList to handle lists of Disulfide objects.
 # Indexing and slicing are supported, sorting is based on energy
 # Author Eric G. Suchanek, PhD
 # A part of the proteusPy molecular modeling and analysis suite by
 # Eric G. Suchanek, PhD
-# Last modification: 12/9/2023 -egs-
+# Last modification: 12/13/2023 -egs-
 
 import proteusPy
 from proteusPy import *
@@ -245,7 +245,12 @@ class DisulfideList(UserList):
 
         if verbose:
             print(f'Saving file: {fname}')
+        
         pl.screenshot(fname)
+        
+        if verbose:
+            print(f'Saved file: {fname}')
+        
         
     def display_overlay(self, screenshot=False, movie=False, 
                         verbose=True,
@@ -275,7 +280,7 @@ class DisulfideList(UserList):
 
         pl.add_title(title=title, font_size=FONTSIZE)
         pl.enable_anti_aliasing('msaa')
-        pl.add_camera_orientation_widget()
+        pl.add_axes()
 
         mycol = numpy.zeros(shape=(tot_ss, 3))
         mycol = proteusPy.cmap_vector(tot_ss)
