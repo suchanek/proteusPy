@@ -8,7 +8,6 @@
 
 import proteusPy
 from proteusPy import *
-from proteusPy.ProteusGlobals import WINSIZE
 from proteusPy.atoms import *
 
 import pyvista as pv

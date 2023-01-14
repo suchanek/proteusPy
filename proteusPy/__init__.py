@@ -20,7 +20,7 @@ from numpy import linspace
 import numpy
 
 from Bio.PDB.vectors import calc_dihedral, calc_angle
-from Bio.PDB import Select
+from Bio.PDB import Select, Vector
 
 from .proteusPyWarning import *
 from .ProteusGlobals import *
@@ -32,15 +32,12 @@ from .turtle3D import Turtle3D
 from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN
 from .residue import build_residue, get_backbone_from_chain, to_alpha, to_carbonyl, to_nitrogen, to_oxygen
 
-from .Disulfide import todeg, torad, distance3d
+from .Disulfide import todeg, torad
 from .Disulfide import Download_Disulfides, Extract_Disulfides
-from .Disulfide import  Check_chains, Distance_RMS, Torsion_RMS
+from .Disulfide import Check_chains, Distance_RMS, Torsion_RMS
 
 from .DisulfideLoader import DisulfideLoader
 from .atoms import *
-
-
-
 
 class CysSelect(Select):
     def accept_residue(self, residue):
@@ -49,23 +46,48 @@ class CysSelect(Select):
         else:
             return False
 
+def distance3d(p1: Vector, p2: Vector):
+    '''
+    Calculate the 3D Euclidean distance for 2 Vector objects
+    
+    :param p1, p2: Vector objects of dimensionality 3
+    :return distance: float Distance between two points
+
+    Example:
+
+    >>> from proteusPy import distance3d
+    >>> from Bio.PDB import Vector
+    >>> p1 = Vector(1, 0, 0)
+    >>> p2 = Vector(0, 1, 0)
+    >>> distance3d(p1,p2)
+    1.4142135623730951
+
+    '''
+
+    _p1 = p1.get_array()
+    _p2 = p2.get_array()
+    if (len(_p1) != 3 or len(_p2) != 3):
+        raise ProteusPyWarning("distance3d() requires vectors of length 3!")
+    d = math.dist(_p1, _p2)
+    return d
+
 
 def cmap_vector(steps):
     '''
-    Return an RGB array of steps rows
+    Return an RGB array of steps rows using
     
     Argument:
-        steps: number of RGB elements to return
+        :param steps: int - number of RGB elements to return
 
     Returns: 
-        steps X 3 array of RGB values.
+        :return: numpy.array [steps][3] array of RGB values.
     '''
 
     rgbcol = numpy.zeros(shape=(steps, 3))
     norm = linspace(0.0, 1.0, steps)
 
     # colormap possible values = viridis, jet, spectral
-    rgb_all = cm.jet(norm, bytes=True) 
+    rgb_all = cm.tab20(norm, bytes=True) 
     i = 0
     
     for rgb in rgb_all:

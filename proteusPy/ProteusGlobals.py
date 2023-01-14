@@ -11,8 +11,6 @@ MODEL_DIR = f'{PDB_DIR}models/'
 
 ORIENT_BACKBONE = 2
 ORIENT_SIDECHAIN = 1
-WINSIZE = (1024, 1024)
-
 # Cα Cβ Sγ Χ1 - Χ5 Χ
 
 
