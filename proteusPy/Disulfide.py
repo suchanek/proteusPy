@@ -18,7 +18,7 @@ import pyvista as pv
 
 from proteusPy import *
 from proteusPy.atoms import *
-from proteusPy.ProteusGlobals import *
+
 from proteusPy.data import *
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideList import DisulfideList
@@ -32,6 +32,7 @@ _ANG_INIT = -180.0
 
 # tqdm progress bar width
 _PBAR_COLS = 100
+WINSIZE = (1024, 1024)
 
 # columns for the torsions file dataframe.
 global Torsion_DF_Cols
@@ -39,11 +40,6 @@ global Torsion_DF_Cols
 Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', \
            'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
            'psi_dist']
-
-# make a colormap in vector space from starting color to
-# ending color
-
-#from proteusPy import cmap_vector
 
 
 # Class definition for a Disulfide bond. 
@@ -316,35 +312,36 @@ class Disulfide:
             specpow=SPEC_POWER, translate=True) -> pv.Plotter:
         ''' 
         Update the passed pyVista plotter() object with the mesh data for the
-        input Disulfide Bond.
+        input Disulfide Bond. Used internally
         
         Arguments:
-            pvpplot: pyvista.Plotter() object
-            style: 'bs', 'st', 'cpk', 'plain': Whether to render as CPK,
+            :param pvpplot: pyvista.Plotter() object
+            :param style: 'bs', 'st', 'cpk', 'plain': Whether to render as CPK,
                                                ball-and-stick or stick. 
                                                Bonds are colored by atom 
                                                color, unless 'plain' is specified.
-            plain: (bool) Flag indicating plain style, used internally
+            :param plain: bool Flag indicating plain style, used internally
             
-            bondcolor:  bond color for simple bonds, one of pyVista color types
+            :param bondcolor:  bond color for simple bonds, one of pyVista color types
             
-            bs_scale: scale factor (0-1) to reduce the atom sizes for ball and stick
+            :param bs_scale: float scale factor (0-1) to reduce the atom sizes for ball and stick
             
-            spec:  specularity (0-1), where 1 is totally smooth and 0 is rough
+            :param spec:  float specularity (0-1), where 1 is totally smooth and 0 is rough
             
-            specpow: specular power - exponent used for specularity calculations
+            :param specpow: int specular power - exponent used for specularity calculations
 
-            translate: (bool) - used internally to indicate whether to translate
+            :param translate: bool Flag used internally to indicate whether to translate
                         the disulfide to its geometric center of mass.
             
-        Returns:
-            Updated pv.Plotter() object.
+        :return: pv.Plotter Updated pv.Plotter() object.
+            
         '''
         
         _bradius = BOND_RADIUS
         coords = self.internal_coords()
         missing_atoms = self.missing_atoms
         clen = coords.shape[0]
+        
         if translate:
             cofmass = self.cofmass()
             for i in range(clen):
@@ -359,6 +356,19 @@ class Disulfide:
         
         def draw_bonds(pvp, bradius=BOND_RADIUS, style='sb', 
         			   bcolor=BOND_COLOR, missing=True):
+            '''
+            Generate the appropriate pyvista cylinder objects to represent a particular
+            disulfide bond. This utilizes a connection table for the starting and ending
+            atoms and a color table for the bond colors.
+
+            :param pvp: pyVista.Plotter - input plotter object to be updated
+            :param bradius: float - bond radius
+            :param style: str - bond style. One of sb, plain, pd
+            :param bcolor: pyvista color object
+            :param missing: bool - True if atoms are missing, False othersie
+            :return pvp: pyvista.Plotter - Updated Plotter object
+
+            '''
             bond_conn = numpy.array(
             [
                 [0, 1], # n-ca
@@ -510,6 +520,16 @@ class Disulfide:
         return pvp
 
     def display(self, single=True, style='sb'):
+        '''
+        Display the Disulfide bond in the specific rendering style.
+        :param single: bool - Display the bond in a single panel in the specific style.
+        :param style: str - One of 
+            'sb' - split bonds
+            'bs' - ball and stick
+            'cpk' - CPK style
+            'pd' - Proximal/Distal style - Red=proximal, Green=Distal
+            'plain' - boring single color
+        '''
         src = self.pdb_id
         enrg = self.energy
         title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol'
@@ -526,7 +546,6 @@ class Disulfide:
             pl.show()
 
         else:
-            WINSIZE = (1024, 1024)
             pl = pv.Plotter(window_size=WINSIZE, shape=(2,2))
             pl.subplot(0,0)
             
@@ -557,8 +576,7 @@ class Disulfide:
             pl.show()
         return
     
-    def screenshot(self, single=True, style='sb', fname='ssbond.png',
-                   verbose=False):
+    def screenshot(self, single=True, style='sb', fname='ssbond.png', verbose=False):
         src = self.pdb_id
         ssname = self.name
         enrg = self.energy
@@ -1202,20 +1220,6 @@ def Distance_RMS(ss1, ss2):
 
     return(math.sqrt(totsq))
 
-def distance3d(p1: Vector, p2: Vector):
-    '''
-    Calculate the 3D Euclidean distance for 2 Vector objects
-    
-    Arguments: p1, p2 Vector objects of dimensionality 3 (3D)
-    Returns: Distance
-    '''
-    _p1 = p1.get_array()
-    _p2 = p2.get_array()
-    if (len(_p1) != 3 or len(_p2) != 3):
-        raise ProteusPyWarning("--> distance3d() requires vectors of length 3!")
-    d = math.dist(_p1, _p2)
-    return d
-
 def name_to_id(fname: str):
     '''return an entry id for filename pdb1crn.ent -> 1crn'''
     ent = fname[3:-4]
@@ -1324,12 +1328,20 @@ def Download_Disulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR,
     return
 
 def build_torsion_df(SSList: DisulfideList) -> pd.DataFrame:
+    '''
+    Create a dataframe containing the input DisulfideList torsional parameters,
+    ca-ca distance, energy, and phi-psi angles. This can take a while for the
+    entire database.
+
+    :param SSList: DisulfideList - input list of Disulfides
+    :return: pandas.Dataframe containing the torsions
+    '''
     # create a dataframe with the following columns for the disulfide 
     # conformations extracted from the structure
     
     SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
 
-    pbar = tqdm(SSList, ncols=_PBAR_COLS, miniters=400000)
+    pbar = tqdm(SSList, ncols=_PBAR_COLS)
     for ss in pbar:
         #pbar.set_postfix({'ID': ss.name}) # update the progress bar
 
@@ -1337,7 +1349,7 @@ def build_torsion_df(SSList: DisulfideList) -> pd.DataFrame:
         		ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance,
                 ss.psiprox, ss.psiprox, ss.phidist, ss.psidist]
         # add the row to the end of the dataframe
-        SS_df.loc[len(SS_df.index)] = new_row.copy() # deep copy
+        SS_df.loc[len(SS_df.index)] = new_row # deep copy
     
     return SS_df.copy()
 
@@ -1363,19 +1375,99 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
         problemfile:    name of the .csv file containing problem ids
         dictfile:       name of the .pkl file
     
-    Example:
-        from proteusPy.Disulfide import Extract_Disulfides, DisulfideLoader, DisulfideList
+    Examples:
+    >>> from proteusPy.Disulfide import Disulfide 
+    >>> from proteusPy.DisulfideLoader import DisulfideLoader
+    >>> from proteusPy.DisulfideList import DisulfideList
+        
+    # instantiate some variables
+    # Note: the list is initialized with an iterable and a name (optional)
 
-        Extract_Disulfides(numb=500, pdbdir=PDB_DIR, verbose=False, quiet=True)
+    >>> SS = Disulfide('tmp')
+    >>> SSlist = DisulfideList([],'ss')
 
-        SS1 = DisulfideList([],'All_SS')
-        SS2 = DisulfideList([], '4yys')
+    >>> PDB_SS = DisulfideLoader(verbose=True)  # load the Disulfide database
+    Reading disulfides from: /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_ss.pkl
+    Disulfides Read: 8210
+    Reading disulfide dict from: /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_ss_dict.pkl
+    Reading Torsion DF /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_SS_torsions.csv.
+    Read torsions DF.
+    PDB IDs parsed: 1000
+    Total Space Used: 2035005 bytes.
 
-        PDB_SS = DisulfideLoader()
-        SS1 = PDB_SS[0]       <-- returns a Disulfide object at index 0
-        SS2 = PDB_SS['4yys']  <-- returns a DisulfideList containing disulfides 
-        						  for 4yys
-        SS3 = PDB_SS[:10]     <-- returns a DisulfideList containing the slice
+    >>> SS = PDB_SS[0]              # returns a Disulfide object at index 0
+    >>> SS
+    <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>
+
+    >>> SS4yys = PDB_SS['4yys']     # returns a DisulfideList containing all
+    >>> SS4yys
+    [<Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>, <Disulfide 4yys_56A_98A SourceID: 4yys Proximal: 56 A Distal: 98 A>, <Disulfide 4yys_156A_207A SourceID: 4yys Proximal: 156 A Distal: 207 A>, <Disulfide 4yys_22B_65B SourceID: 4yys Proximal: 22 B Distal: 65 B>, <Disulfide 4yys_56B_98B SourceID: 4yys Proximal: 56 B Distal: 98 B>, <Disulfide 4yys_156B_207B SourceID: 4yys Proximal: 156 B Distal: 207 B>]
+
+    # make some empty disulfides
+    >>> ss1 = Disulfide('ss1')
+    >>> ss2 = Disulfide('ss2')
+
+    # make a DisulfideList containing ss1, named 'tmp'
+    >>> sslist = DisulfideList([ss1], 'tmp')
+    >>> sslist.append(ss2)
+
+    # extract the first disulfide
+    >>> ss1 = PDB_SS[0]
+    >>> ss1.pprint_all()
+    <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A
+     Proximal Chain fullID: <('4yys', 0, 'A', (' ', 22, ' '))> Distal Chain fullID: <('4yys', 0, 'A', (' ', 65, ' '))> 
+    Proximal Coordinates:
+       N: <Vector -2.36, -20.48, 5.21>
+       Cα: <Vector -2.10, -19.89, 3.90>
+       C: <Vector -1.12, -18.78, 4.12>
+       O: <Vector -1.30, -17.96, 5.03>
+       Cβ: <Vector -3.38, -19.31, 3.32>
+       Sγ: <Vector -3.24, -18.40, 1.76>
+       Cprev <Vector -2.67, -21.75, 5.36>
+       Nnext: <Vector -0.02, -18.76, 3.36>
+     Distal Coordinates:
+       N: <Vector -0.60, -18.71, -1.62>
+       Cα: <Vector -0.48, -19.10, -0.22>
+       C: <Vector 0.92, -19.52, 0.18>
+       O: <Vector 1.10, -20.09, 1.25>
+       Cβ: <Vector -1.48, -20.23, 0.08>
+       Sγ: <Vector -3.22, -19.69, 0.18>
+       Cprev <Vector -0.73, -17.44, -2.01>
+       Nnext: <Vector 1.92, -19.18, -0.63>
+    <BLANKLINE>
+     Proximal Internal Coordinates:
+       N: <Vector -0.41, 1.40, -0.00>
+       Cα: <Vector 0.00, 0.00, 0.00>
+       C: <Vector 1.50, 0.00, 0.00>
+       O: <Vector 2.12, 0.71, -0.80>
+       Cβ: <Vector -0.50, -0.70, -1.25>
+       Sγ: <Vector 0.04, -2.41, -1.50>
+       Cprev <Vector -2.67, -21.75, 5.36>
+       Nnext: <Vector -0.02, -18.76, 3.36>
+     Distal Internal Coordinates:
+       N: <Vector 1.04, -5.63, 1.17>
+       Cα: <Vector 1.04, -4.18, 1.31>
+       C: <Vector 1.72, -3.68, 2.57>
+       O: <Vector 1.57, -2.51, 2.92>
+       Cβ: <Vector -0.41, -3.66, 1.24>
+       Sγ: <Vector -1.14, -3.69, -0.43>
+       Cprev <Vector -0.73, -17.44, -2.01>
+       Nnext: <Vector 1.92, -19.18, -0.63>
+    <BLANKLINE>
+     Conformation: (Χ1-Χ5):  174.629°, 82.518°, -83.322°, -62.524° -73.827°  Energy: 1.696 kcal/mol >
+
+    # grab a list of disulfides via slicing
+    >>> subset = DisulfideList(PDB_SS[0:10],'subset')
+
+    >>> subset.display_overlay()        # display all disulfides overlaid in stick style
+
+    >>> subset.screenshot(style='sb', fname='subset.png')  # save a screenshot.
+    Saving file: subset.png
+    Saved file: subset.png
+
+    >>> SSlist = PDB_SS[:8]         # get SS bonds for the last 8 structures\n
+    SSlist.display('sb')        # render the disulfides in 'split bonds' style\n
+    
     '''
 
     entrylist = []
