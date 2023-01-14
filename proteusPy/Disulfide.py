@@ -1,11 +1,13 @@
-# Implementation for a Disulfide Bond Class object.
-# Based on the original C/C++ implementation by Eric G. Suchanek
-# Part of the program Proteus, a program for the analysis and modeling of 
+# Implementation for a Disulfide Bond structural object.
+# Based on the original C/C++ implementation by Eric G. Suchanek,
+# A part of the program Proteus, a program for the analysis and modeling of 
 # protein structures, with an emphasis on disulfide bonds.
 # Author: Eric G. Suchanek, PhD
 # Last revision: 1/11/2023
 
 import math
+import copy
+
 from math import cos
 
 import pickle
@@ -16,9 +18,9 @@ import pyvista as pv
 
 from proteusPy import *
 from proteusPy.atoms import *
-from proteusPy.proteusGlobals import *
+from proteusPy.ProteusGlobals import *
+from proteusPy.data import *
 from proteusPy.DisulfideExceptions import *
-from proteusPy.DisulfideGlobals import *
 from proteusPy.DisulfideList import DisulfideList
 
 from Bio.PDB import Vector, PDBParser, PDBList
@@ -260,16 +262,26 @@ class Disulfide:
         return prox == dist
         
     def reset(self) -> None:
+        '''
+        Resets the Disulfide object to its initialized state. All dihedrals and positions are reset.
+        :return: None
+        '''
         self.__init__(self)
 
     def copy(self):
         '''
         Return a copy of the Disulfide object
+        :return: copy of the object
         '''
         
         return copy.deepcopy(self)
     
     def compute_extents(self, dim='z'):
+        '''
+        Calculate the internal coordinate extents for the input axis.
+        :param dim: str x, y or z
+        :return: min, max - minimum and maximum for the input axis
+        '''
         ic = self.internal_coords()
         # set default index to 'z'
         idx = 2
@@ -512,8 +524,8 @@ class Disulfide:
             pl.show()
 
         else:
-            _WINSIZE = (1024, 1024)
-            pl = pv.Plotter(window_size=_WINSIZE, shape=(2,2))
+            WINSIZE = (1024, 1024)
+            pl = pv.Plotter(window_size=WINSIZE, shape=(2,2))
             pl.subplot(0,0)
             
             pl.add_title(title=title, font_size=FONTSIZE)
@@ -567,8 +579,8 @@ class Disulfide:
             pl.clear()
 
         else:
-            _WINSIZE = (1024, 1024)
-            pl = pv.Plotter(window_size=_WINSIZE, shape=(2,2))
+            WINSIZE = (1024, 1024)
+            pl = pv.Plotter(window_size=WINSIZE, shape=(2,2))
             pl.subplot(0,0)
             
             pl.add_title(title=title, font_size=FONTSIZE)
@@ -743,22 +755,46 @@ class Disulfide:
             # exceptions are fatal - raise again with new message (including line nr)
             raise DisulfideConstructionException(message) from None
 
-    def print_compact(self):
+    def print_compact(self) -> str:
+        '''
+        Return a compact representation of the Disulfide object
+        :return: string
+        '''
         return(f'{self.repr_ss_info()} {self.repr_ss_conformation()}')
 
     def repr_conformation(self):
+        '''
+        Return a string representation of the Disulfide object's conformation.
+        :return: string
+        '''
         return(f'{self.repr_ss_conformation()}')
     
     def repr_coords(self):
+        '''
+        Return a string representation of the Disulfide object's coordinates.
+        :return: string
+        '''
         return(f'{self.repr_ss_coords()}')
 
     def repr_internal_coords(self):
+        '''
+        Return a string representation of the Disulfide object's internal coordinaes.
+        :return: string
+        '''
         return(f'{self.repr_ss_local_coords()}')
 
     def repr_chain_ids(self):
+        '''
+        Return a string representation of the Disulfide object's chain ids.
+        :return: string
+        '''
         return(f'{self.repr_ss_chain_ids()}')
 
     def set_permissive(self, perm: bool) -> None:
+        '''
+        Sets PERMISSIVE flag for Disulfide parsing
+        :return: None
+        '''
         self.PERMISSIVE = perm
     
     def get_permissive(self) -> bool:
@@ -1304,7 +1340,7 @@ def build_torsion_df(SSList: DisulfideList) -> pd.DataFrame:
     return SS_df.copy()
 
 def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR, 
-                        modeldir=MODEL_DIR, picklefile=SS_PICKLE_FILE, 
+                        datadir=MODEL_DIR, picklefile=SS_PICKLE_FILE, 
                         torsionfile=SS_TORSIONS_FILE, 
                         problemfile=PROBLEM_ID_FILE,
                         dictfile=SS_DICT_PICKLE_FILE) -> None:
@@ -1319,7 +1355,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
         verbose:        more messages
         quiet:          turns of DisulfideConstruction warnings
         pdbdir:         path to PDB files
-        modeldir:       path to resulting .pkl files
+        datadir:       path to resulting .pkl files
         picklefile:     name of the disulfide .pkl file
         torsionfile:    name of the disulfide torsion file .csv created
         problemfile:    name of the .csv file containing problem ids
@@ -1414,15 +1450,15 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
         problem_df['id'] = problem_ids
 
         print(f'Found and removed: {len(problem_ids)} problem structures.')
-        print(f'Saving problem IDs to file: {modeldir}{problemfile}')
+        print(f'Saving problem IDs to file: {datadir}{problemfile}')
 
-        problem_df.to_csv(f'{modeldir}{problemfile}')
+        problem_df.to_csv(f'{datadir}{problemfile}')
     else:
         if verbose:
             print('No problems found.')
    
     # dump the all_ss array of disulfides to a .pkl file. ~520 MB.
-    fname = f'{modeldir}{picklefile}'
+    fname = f'{datadir}{picklefile}'
     print(f'Saving {len(All_ss_list)} Disulfides to file: {fname}')
     
     with open(fname, 'wb+') as f:
@@ -1430,7 +1466,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
 
     # dump the all_ss array of disulfides to a .pkl file. ~520 MB.
     dict_len = len(All_ss_dict)
-    fname = f'{modeldir}{dictfile}'
+    fname = f'{datadir}{dictfile}'
 
     print(f'Saving {len(All_ss_dict)} Disulfide-containing PDB IDs to file: {fname}')
 
@@ -1438,7 +1474,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
         pickle.dump(All_ss_dict, f)
 
     # save the torsions
-    fname = f'{modeldir}{torsionfile}'
+    fname = f'{datadir}{torsionfile}'
     print(f'Saving torsions to file: {fname}')
 
     SS_df.to_csv(fname)
@@ -1804,5 +1840,9 @@ def Check_chains(pdbid, pdbdir, verbose=True):
             if verbose:
                 print(f'Chains are equal length, assuming the same. {chain_lens}')
     return(same)
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
 
 # End of file

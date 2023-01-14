@@ -21,7 +21,7 @@ PDB_BASE = '/Users/egs/PDB/'
 
 # location of cleaned PDB files
 PDB = '/Users/egs/PDB/good/'
-REPO_MODELS = '/Users/egs/repos/proteusPy/proteusPy/pdb/models/'
+REPO_MODELS = '/Users/egs/repos/proteusPy/proteusPy/data/'
 
 # location of the compressed Disulfide .pkl files
 MODELS = f'{PDB_BASE}models/'
@@ -29,22 +29,22 @@ MODELS = f'{PDB_BASE}models/'
 # setting up specific pkl files for a small extraction. 
 # don't set these at all for the default extraction
 
-_SS_PICKLE_FILE = 'PDB_1000_ss.pkl'
-_SS_DICT_PICKLE_FILE = 'PDB_1000_ss_dict.pkl'
-_SS_TORSIONS_FILE = 'PDB_1000_SS_torsions.csv'
-_PROBLEM_ID_FILE = 'PDB_1000_SS_problems.csv'
+_SS_PICKLE_FILE = 'PDB_all_ss.pkl'
+_SS_DICT_PICKLE_FILE = 'PDB_all_ss_dict.pkl'
+_SS_TORSIONS_FILE = 'PDB_all_SS_torsions.csv'
+_PROBLEM_ID_FILE = 'PDB_all_SS_problems.csv'
 
-'''
-Extract_Disulfides(numb=1000, pdbdir=PDB, modeldir=MODELS,
+
+Extract_Disulfides(numb=1000, pdbdir=PDB, datadir=MODELS,
                 dictfile=_SS_DICT_PICKLE_FILE,
                 picklefile=_SS_PICKLE_FILE,
                 torsionfile=_SS_TORSIONS_FILE,
                 problemfile=_PROBLEM_ID_FILE,
                 verbose=False, quiet=True)
-'''
 
-Extract_Disulfides(numb=1000, pdbdir=PDB, modeldir=MODELS,
-                verbose=False, quiet=True)
+
+# Extract_Disulfides(numb=1000, pdbdir=PDB, datadir=MODELS,
+#                 verbose=False, quiet=True)
 
 update = True
 

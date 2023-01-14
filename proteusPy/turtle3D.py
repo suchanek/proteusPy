@@ -13,8 +13,7 @@ import math
 
 from Bio.PDB.vectors import Vector
 from Bio.PDB.vectors import calc_angle, calc_dihedral
-
-from  proteusPy.proteusGlobals import *
+from proteusPy.ProteusGlobals import ORIENT_BACKBONE, ORIENT_SIDECHAIN
 
 _DOWN_ = -1
 _UP_ = 1

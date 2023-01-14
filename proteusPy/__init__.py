@@ -1,10 +1,9 @@
-#
 # init for proteusPy package
 # Copyright (c) 2022 Eric G. Suchanek, PhD., all rights reserved
 # Subject to the GNU public license.
 # Cα Cβ Sγ Χ1 - Χ5 Χ
 
-__version__ = "0.8dev"
+__version__ = "0.9dev"
 
 import sys
 import os
@@ -16,32 +15,32 @@ import time
 import datetime
 import math
 
+from matplotlib import cm
+from numpy import linspace
 import numpy
 
 from Bio.PDB.vectors import calc_dihedral, calc_angle
+from Bio.PDB import Select
 
-from .proteusGlobals import *
 from .proteusPyWarning import *
+from .ProteusGlobals import *
 
-from .DisulfideGlobals import *
-from .atoms import *
+#from .DisulfideGlobals import *
 from .DisulfideExceptions import DisulfideIOException, DisulfideConstructionWarning, DisulfideConstructionException
 
 from .turtle3D import Turtle3D
 from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN
 from .residue import build_residue, get_backbone_from_chain, to_alpha, to_carbonyl, to_nitrogen, to_oxygen
 
-#from .Disulfide import Disulfide
 from .Disulfide import todeg, torad, distance3d
 from .Disulfide import Download_Disulfides, Extract_Disulfides
 from .Disulfide import  Check_chains, Distance_RMS, Torsion_RMS
 
-#from .Disulfide import DisulfideList
 from .DisulfideLoader import DisulfideLoader
-from Bio.PDB import Select
+from .atoms import *
 
-from matplotlib import cm
-from numpy import linspace
+
+
 
 class CysSelect(Select):
     def accept_residue(self, residue):

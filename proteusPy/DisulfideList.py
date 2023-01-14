@@ -8,6 +8,8 @@
 
 import proteusPy
 from proteusPy import *
+from proteusPy.ProteusGlobals import WINSIZE
+from proteusPy.atoms import *
 
 import pyvista as pv
 from collections import UserList
@@ -42,38 +44,41 @@ class DisulfideList(UserList):
     method. See below for examples.\n
 
     Examples:
-        from proteusPy.Disulfide import DisulfideList, Disulfide, DisulfideLoader
+        >>> from proteusPy.Disulfide import Disulfide 
+        >>> from proteusPy.DisulfideLoader import DisulfideLoader
+        >>> from proteusPy.DisulfideList import DisulfideList
         
         # instantiate some variables
-        SS = Disulfide()
         # Note: the list is initialized with an iterable and a name (optional)
-        SSlist = DisulfideList([],'ss')
 
-        PDB_SS = DisulfideLoader()  # load the Disulfide database\n
-        SS = PDB_SS[0]              # returns a Disulfide object at index 0
-        SSlist = PDB_SS['4yys']     # returns a DisulfideList containing all
-                                    #  disulfides for 4yys\n
+        >>> SS = Disulfide('tmp')
+        >>> SSlist = DisulfideList([],'ss')
 
-        SSlist = PDB_SS[:8]         # get SS bonds for the last 8 structures\n
-        SSlist.display('sb')        # render the disulfides in 'split bonds' style\n
+        >>> PDB_SS = DisulfideLoader()  # load the Disulfide database\n
+        >>> SS = PDB_SS[0]              # returns a Disulfide object at index 0
+        >>> SSlist = PDB_SS['4yys']     # returns a DisulfideList containing all
+                                        #  disulfides for 4yys\n
 
-        # make some empty disulfidesx
-        ss1 = Disulfide('ss1')
-        ss2 = Disulfide('ss2')
+        >>> SSlist = PDB_SS[:8]         # get SS bonds for the last 8 structures\n
+        >>> SSlist.display('sb')        # render the disulfides in 'split bonds' style\n
+
+        # make some empty disulfides
+        >>> ss1 = Disulfide('ss1')
+        >>> ss2 = Disulfide('ss2')
 
         # make a DisulfideList containing ss1, named 'tmp'
-        sslist = DisulfideList([ss1], 'tmp')
-        sslist.append(ss2)
+        >>> sslist = DisulfideList([ss1], 'tmp')
+        >>> sslist.append(ss2)
 
         # extract the first disulfide
-        ss1 = PDB_SS[0]
-        print(f'{ss1.pprint_all()}')
+        >>> ss1 = PDB_SS[0]
+        >>> print(f'{ss1.pprint_all()}')
 
         # grab a list of disulfides via slicing
-        subset = DisulfideList(PDB_SS[0:10],'subset')
-        subset.display(style='sb')      # display the disulfides in 'split bond' style
-        subset.display_overlay()        # display all disulfides overlaid in stick style
-        subset.screenshot(style='sb', fname='subset.png')  # save a screenshot.
+        >>> subset = DisulfideList(PDB_SS[0:10],'subset')
+        >>> subset.display(style='sb')      # display the disulfides in 'split bond' style
+        >>> subset.display_overlay()        # display all disulfides overlaid in stick style
+        >>> subset.screenshot(style='sb', fname='subset.png')  # save a screenshot.
     '''
     
     def __init__(self, iterable, id):
@@ -195,8 +200,9 @@ class DisulfideList(UserList):
         rows, cols = grid_dimensions(tot_ss)
         i = 0
 
-        WINSIZE = (512 * cols, 512 * rows)
-        pl = pv.Plotter(window_size=WINSIZE, shape=(rows, cols))
+        winsize = (512 * cols, 512 * rows)
+
+        pl = pv.Plotter(window_size=winsize, shape=(rows, cols))
         pl.add_camera_orientation_widget()
 
         for r in range(rows):
@@ -310,6 +316,9 @@ class DisulfideList(UserList):
         else:
             pl.show()
 
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
 
 # end of file
 

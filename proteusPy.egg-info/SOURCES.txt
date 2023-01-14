@@ -14,7 +14,6 @@ proteusPy/atoms.py
 proteusPy/disulfide.py
 proteusPy/proteusGlobals.py
 proteusPy/proteusPyWarning.py
-proteusPy/r.py
 proteusPy/residue.py
 proteusPy/turtle3D.py
 proteusPy.egg-info/PKG-INFO
