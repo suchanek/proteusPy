@@ -34,6 +34,8 @@ _ANG_INIT = -180.0
 _PBAR_COLS = 100
 
 # columns for the torsions file dataframe.
+global Torsion_DF_Cols
+
 Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', \
            'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
            'psi_dist']

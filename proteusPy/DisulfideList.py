@@ -19,8 +19,8 @@ def grid_dimensions(n):
     Calculate rows and columns for the given needed to display
     a given number of disulfides in a square aspect.
 
-    Arguments: n
-    Returns: rows, columns
+    :param n: int Number of Disulfides
+    :return: int rows, columns
     '''
     
     root = math.sqrt(n)
@@ -37,48 +37,67 @@ def grid_dimensions(n):
 class DisulfideList(UserList):
     '''
     Class provides a sortable list for Disulfide objects.
-    Indexing and slicing are supported, and normal list operations like .insert, .append and .extend.
-    The DisulfideList object must be initialized with an iterable (tuple, list) and a name.
+    Indexing and slicing are supported, and normal list operations like 
+    .insert, .append and .extend. The DisulfideList object must be initialized 
+    with an iterable (tuple, list) and a name.
     
-    The class can also render Disulfides to a pyVista window using the DisulfideList.display() 
-    method. See below for examples.\n
+    The class can also render Disulfides to a pyVista window using the 
+    DisulfideList.display() method. See below for examples.\n
 
     Examples:
-        >>> from proteusPy.Disulfide import Disulfide 
-        >>> from proteusPy.DisulfideLoader import DisulfideLoader
-        >>> from proteusPy.DisulfideList import DisulfideList
+    >>> from proteusPy.Disulfide import Disulfide 
+    >>> from proteusPy.DisulfideLoader import DisulfideLoader
+    >>> from proteusPy.DisulfideList import DisulfideList
         
-        # instantiate some variables
-        # Note: the list is initialized with an iterable and a name (optional)
+    # instantiate some variables
+    # Note: the list is initialized with an iterable and a name (optional)
 
-        >>> SS = Disulfide('tmp')
-        >>> SSlist = DisulfideList([],'ss')
+    >>> SS = Disulfide('tmp')
+    >>> SSlist = DisulfideList([],'ss')
 
-        >>> PDB_SS = DisulfideLoader()  # load the Disulfide database\n
-        >>> SS = PDB_SS[0]              # returns a Disulfide object at index 0
-        >>> SSlist = PDB_SS['4yys']     # returns a DisulfideList containing all
-                                        #  disulfides for 4yys\n
+    >>> PDB_SS = DisulfideLoader(verbose=True)  # load the Disulfide database
+    Reading disulfides from: /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_ss.pkl
+    Disulfides Read: 8210
+    Reading disulfide dict from: /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_ss_dict.pkl
+    Reading Torsion DF /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_SS_torsions.csv.
+    Read torsions DF.
+    PDB IDs parsed: 1000
+    Total Space Used: 2035005 bytes.
 
-        >>> SSlist = PDB_SS[:8]         # get SS bonds for the last 8 structures\n
-        >>> SSlist.display('sb')        # render the disulfides in 'split bonds' style\n
+    >>> SS = PDB_SS[0]              # returns a Disulfide object at index 0
+    >>> SS
+    <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>
 
-        # make some empty disulfides
-        >>> ss1 = Disulfide('ss1')
-        >>> ss2 = Disulfide('ss2')
+    >>> SS4yys = PDB_SS['4yys']     # returns a DisulfideList containing all
+                                    #  disulfides for 4yys\n
+    >>> SS4yys
+    DisulfideList([<Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>,
+               <Disulfide 4yys_56A_98A SourceID: 4yys Proximal: 56 A Distal: 98 A>,
+               <Disulfide 4yys_156A_207A SourceID: 4yys Proximal: 156 A Distal: 207 A>,
+               <Disulfide 4yys_22B_65B SourceID: 4yys Proximal: 22 B Distal: 65 B>,
+               <Disulfide 4yys_56B_98B SourceID: 4yys Proximal: 56 B Distal: 98 B>,
+               <Disulfide 4yys_156B_207B SourceID: 4yys Proximal: 156 B Distal: 207 B>])
+    
+    >>> SSlist = PDB_SS[:8]         # get SS bonds for the last 8 structures\n
+    >>> SSlist.display('sb')        # render the disulfides in 'split bonds' style\n
 
-        # make a DisulfideList containing ss1, named 'tmp'
-        >>> sslist = DisulfideList([ss1], 'tmp')
-        >>> sslist.append(ss2)
+    # make some empty disulfides
+    >>> ss1 = Disulfide('ss1')
+    >>> ss2 = Disulfide('ss2')
 
-        # extract the first disulfide
-        >>> ss1 = PDB_SS[0]
-        >>> print(f'{ss1.pprint_all()}')
+    # make a DisulfideList containing ss1, named 'tmp'
+    >>> sslist = DisulfideList([ss1], 'tmp')
+    >>> sslist.append(ss2)
 
-        # grab a list of disulfides via slicing
-        >>> subset = DisulfideList(PDB_SS[0:10],'subset')
-        >>> subset.display(style='sb')      # display the disulfides in 'split bond' style
-        >>> subset.display_overlay()        # display all disulfides overlaid in stick style
-        >>> subset.screenshot(style='sb', fname='subset.png')  # save a screenshot.
+    # extract the first disulfide
+    >>> ss1 = PDB_SS[0]
+    >>> print(f'{ss1.pprint_all()}')
+
+    # grab a list of disulfides via slicing
+    >>> subset = DisulfideList(PDB_SS[0:10],'subset')
+    >>> subset.display(style='sb')      # display the disulfides in 'split bond' style
+    >>> subset.display_overlay()        # display all disulfides overlaid in stick style
+    >>> subset.screenshot(style='sb', fname='subset.png')  # save a screenshot.
     '''
     
     def __init__(self, iterable, id):
