@@ -69,17 +69,8 @@ class DisulfideList(UserList):
     <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>
 
     >>> SS4yys = PDB_SS['4yys']     # returns a DisulfideList containing all
-                                    #  disulfides for 4yys\n
     >>> SS4yys
-    DisulfideList([<Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>,
-               <Disulfide 4yys_56A_98A SourceID: 4yys Proximal: 56 A Distal: 98 A>,
-               <Disulfide 4yys_156A_207A SourceID: 4yys Proximal: 156 A Distal: 207 A>,
-               <Disulfide 4yys_22B_65B SourceID: 4yys Proximal: 22 B Distal: 65 B>,
-               <Disulfide 4yys_56B_98B SourceID: 4yys Proximal: 56 B Distal: 98 B>,
-               <Disulfide 4yys_156B_207B SourceID: 4yys Proximal: 156 B Distal: 207 B>])
-    
-    >>> SSlist = PDB_SS[:8]         # get SS bonds for the last 8 structures\n
-    >>> SSlist.display('sb')        # render the disulfides in 'split bonds' style\n
+    [<Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>, <Disulfide 4yys_56A_98A SourceID: 4yys Proximal: 56 A Distal: 98 A>, <Disulfide 4yys_156A_207A SourceID: 4yys Proximal: 156 A Distal: 207 A>, <Disulfide 4yys_22B_65B SourceID: 4yys Proximal: 22 B Distal: 65 B>, <Disulfide 4yys_56B_98B SourceID: 4yys Proximal: 56 B Distal: 98 B>, <Disulfide 4yys_156B_207B SourceID: 4yys Proximal: 156 B Distal: 207 B>]
 
     # make some empty disulfides
     >>> ss1 = Disulfide('ss1')
@@ -91,13 +82,61 @@ class DisulfideList(UserList):
 
     # extract the first disulfide
     >>> ss1 = PDB_SS[0]
-    >>> print(f'{ss1.pprint_all()}')
+    >>> ss1.pprint_all()
+    <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A
+     Proximal Chain fullID: <('4yys', 0, 'A', (' ', 22, ' '))> Distal Chain fullID: <('4yys', 0, 'A', (' ', 65, ' '))> 
+    Proximal Coordinates:
+       N: <Vector -2.36, -20.48, 5.21>
+       Cα: <Vector -2.10, -19.89, 3.90>
+       C: <Vector -1.12, -18.78, 4.12>
+       O: <Vector -1.30, -17.96, 5.03>
+       Cβ: <Vector -3.38, -19.31, 3.32>
+       Sγ: <Vector -3.24, -18.40, 1.76>
+       Cprev <Vector -2.67, -21.75, 5.36>
+       Nnext: <Vector -0.02, -18.76, 3.36>
+     Distal Coordinates:
+       N: <Vector -0.60, -18.71, -1.62>
+       Cα: <Vector -0.48, -19.10, -0.22>
+       C: <Vector 0.92, -19.52, 0.18>
+       O: <Vector 1.10, -20.09, 1.25>
+       Cβ: <Vector -1.48, -20.23, 0.08>
+       Sγ: <Vector -3.22, -19.69, 0.18>
+       Cprev <Vector -0.73, -17.44, -2.01>
+       Nnext: <Vector 1.92, -19.18, -0.63>
+    <BLANKLINE>
+     Proximal Internal Coordinates:
+       N: <Vector -0.41, 1.40, -0.00>
+       Cα: <Vector 0.00, 0.00, 0.00>
+       C: <Vector 1.50, 0.00, 0.00>
+       O: <Vector 2.12, 0.71, -0.80>
+       Cβ: <Vector -0.50, -0.70, -1.25>
+       Sγ: <Vector 0.04, -2.41, -1.50>
+       Cprev <Vector -2.67, -21.75, 5.36>
+       Nnext: <Vector -0.02, -18.76, 3.36>
+     Distal Internal Coordinates:
+       N: <Vector 1.04, -5.63, 1.17>
+       Cα: <Vector 1.04, -4.18, 1.31>
+       C: <Vector 1.72, -3.68, 2.57>
+       O: <Vector 1.57, -2.51, 2.92>
+       Cβ: <Vector -0.41, -3.66, 1.24>
+       Sγ: <Vector -1.14, -3.69, -0.43>
+       Cprev <Vector -0.73, -17.44, -2.01>
+       Nnext: <Vector 1.92, -19.18, -0.63>
+    <BLANKLINE>
+     Conformation: (Χ1-Χ5):  174.629°, 82.518°, -83.322°, -62.524° -73.827°  Energy: 1.696 kcal/mol >
 
     # grab a list of disulfides via slicing
     >>> subset = DisulfideList(PDB_SS[0:10],'subset')
-    >>> subset.display(style='sb')      # display the disulfides in 'split bond' style
+
     >>> subset.display_overlay()        # display all disulfides overlaid in stick style
+
     >>> subset.screenshot(style='sb', fname='subset.png')  # save a screenshot.
+    Saving file: subset.png
+    Saved file: subset.png
+
+    >>> SSlist = PDB_SS[:8]         # get SS bonds for the last 8 structures\n
+    SSlist.display('sb')        # render the disulfides in 'split bonds' style\n
+
     '''
     
     def __init__(self, iterable, id):
