@@ -315,7 +315,7 @@ class Disulfide:
         input Disulfide Bond. Used internally
         
         Arguments:
-            :param pvpplot: pyvista.Plotter() object
+            :param pvpplot: pyvista.Plotter object
             :param style: 'bs', 'st', 'cpk', 'plain': Whether to render as CPK,
                                                ball-and-stick or stick. 
                                                Bonds are colored by atom 
@@ -529,6 +529,24 @@ class Disulfide:
             'cpk' - CPK style
             'pd' - Proximal/Distal style - Red=proximal, Green=Distal
             'plain' - boring single color
+
+        Example:
+        >>> import proteusPy
+        >>> from proteusPy.Disulfide import Disulfide
+        >>> from proteusPy.DisulfideLoader import DisulfideLoader
+
+        >>> PDB_SS = DisulfideLoader(verbose=True)
+        Reading disulfides from: /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_ss.pkl
+        Disulfides Read: 8210
+        Reading disulfide dict from: /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_ss_dict.pkl
+        Reading Torsion DF /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_SS_torsions.csv.
+        Read torsions DF.
+        PDB IDs parsed: 1000
+        Total Space Used: 2035005 bytes.
+
+        >>> ss = PDB_SS[0]
+        >>> ss.display(style='sb')
+
         '''
         src = self.pdb_id
         enrg = self.energy

@@ -106,7 +106,7 @@ def cmap_vector(steps):
     norm = linspace(0.0, 1.0, steps)
 
     # colormap possible values = viridis, jet, spectral
-    rgb_all = cm.tab20(norm, bytes=True) 
+    rgb_all = cm.jet(norm, bytes=True) 
     i = 0
     
     for rgb in rgb_all:
