@@ -24,7 +24,6 @@ from proteusPy.Disulfide import DisulfideList, Torsion_DF_Cols
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideGlobals import *
 
-
 class DisulfideLoader:
     '''
     This class loads .pkl files created from the Extract_Disulfides() routine 
