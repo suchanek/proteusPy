@@ -6,16 +6,25 @@
 # Author: Eric G. Suchanek, PhD.
 # Last modification: 1/13/23
 
-import proteusPy
-from proteusPy import *
-from proteusPy.atoms import *
-from proteusPy.Disulfide import Check_chains
-from proteusPy.Disulfide import DisulfideList, Torsion_DF_Cols
-from proteusPy.DisulfideExceptions import *
+import os
+import sys
+import copy
 
 import pandas as pd
 import pyvista as pv
 import pickle
+
+import proteusPy
+from proteusPy.ProteusGlobals import *
+from proteusPy.atoms import *
+from proteusPy.data import *
+
+from proteusPy.Disulfide import Check_chains
+from proteusPy.Disulfide import DisulfideList, Torsion_DF_Cols
+from proteusPy.DisulfideExceptions import *
+from proteusPy.DisulfideGlobals import *
+
+
 class DisulfideLoader:
     '''
     This class loads .pkl files created from the Extract_Disulfides() routine 
@@ -25,7 +34,8 @@ class DisulfideLoader:
     window using the DisulfideLoader.display() method. See below for examples.\n
 
     Example:
-        from proteusPy.Disulfide import DisulfideList, Disulfide, DisulfideLoader
+        from proteusPy.Disulfide import DisulfideList, Disulfide
+        from proteusPy.DiulfideLoader import DisulfideLoader
 
         SS1 = DisulfideList([],'tmp1')
         SS2 = DisulfideList([],'tmp2')
@@ -40,13 +50,13 @@ class DisulfideLoader:
 
     '''
 
-    def __init__(self, verbose=True, modeldir=MODEL_DIR, picklefile=SS_PICKLE_FILE, 
+    def __init__(self, verbose=True, datadir=DATA_DIR, picklefile=SS_PICKLE_FILE, 
                 pickle_dict_file=SS_DICT_PICKLE_FILE,
                 torsion_file=SS_TORSIONS_FILE, quiet=True):
-        self.ModelDir = modeldir
-        self.PickleFile = f'{modeldir}{picklefile}'
-        self.PickleDictFile = f'{modeldir}{pickle_dict_file}'
-        self.TorsionFile = f'{modeldir}{torsion_file}'
+        self.ModelDir = datadir
+        self.PickleFile = f'{datadir}{picklefile}'
+        self.PickleDictFile = f'{datadir}{pickle_dict_file}'
+        self.TorsionFile = f'{datadir}{torsion_file}'
         self.SSList = DisulfideList([], 'ALL_PDB_SS')
         self.SSDict = {}
         self.TorsionDF = pd.DataFrame()
@@ -55,7 +65,8 @@ class DisulfideLoader:
         self.QUIET = quiet
 
         # create a dataframe with the following columns for the disulfide conformations extracted from the structure
-        Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist', 'psi_dist']
+        #Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist', 'psi_dist']
+        
         SS_df = pd.DataFrame(columns=Torsion_DF_Cols, index=['source'])
         _SSList = DisulfideList([], 'ALL_PDB_SS')
 
@@ -63,7 +74,9 @@ class DisulfideLoader:
         if verbose:
             print(f'Reading disulfides from: {self.PickleFile}')
         with open(self.PickleFile, 'rb') as f:
-            self.SSList = pickle.load(f)
+            sslist = DisulfideList([], 'tmp')
+            sslist = pickle.load(f)
+            self.SSList = sslist.copy()
 
         self.TotalDisulfides = len(self.SSList)
         
@@ -194,3 +207,5 @@ class DisulfideLoader:
         ssList.display(style=style)
 
 # class ends
+
+# end of file

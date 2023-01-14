@@ -1,6 +1,6 @@
 # initialization for proteusPy pip setup
 from distutils.core import setup
-__version__ = '0.8dev'
+__version__ = '0.9dev'
 
 setup(name='proteusPy',
       version=__version__,

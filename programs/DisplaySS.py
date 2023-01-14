@@ -20,12 +20,6 @@ PDB = '/Users/egs/PDB/good/'
 # location of the compressed Disulfide .pkl files
 MODELS = f'{PDB_BASE}models/'
 
-# when running from the repo the local copy of the Disulfides is in ../pdb/models
-# PDB_BASE = '../pdb/'
-
-# location of the compressed Disulfide .pkl files
-# MODELS = f'{PDB_BASE}models/'
-
 import pyvista as pv
 from pyvista import Plotter
 from proteusPy.Disulfide import *
@@ -50,7 +44,7 @@ def SSlist_DisplayTest(sslist):
 
 if __name__ == '__main__':
     PDB_SS = None
-    PDB_SS = DisulfideLoader(verbose=True, modeldir=MODELS)
+    PDB_SS = DisulfideLoader(verbose=True)
     
     # one disulfide from the database
     ss = Disulfide()
@@ -68,7 +62,7 @@ if __name__ == '__main__':
 
     sslist = DisulfideList([], 'last12')
     sslist = PDB_SS[:12]
-    sslist.display_overlay(movie=True, fname='overlay.mp4')
+    sslist.display_overlay(movie=False, fname='overlay.mp4')
 
     #sslist.display_overlay()
 
