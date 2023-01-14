@@ -22,7 +22,7 @@ import numpy
 from Bio.PDB.vectors import calc_dihedral, calc_angle
 from Bio.PDB import Select, Vector
 
-from .proteusPyWarning import *
+from .proteusPyWarning import ProteusPyWarning
 from .ProteusGlobals import *
 
 #from .DisulfideGlobals import *
@@ -81,6 +81,25 @@ def cmap_vector(steps):
 
     Returns: 
         :return: numpy.array [steps][3] array of RGB values.
+
+    Example:
+    >>> import numpy
+    >>> from matplotlib import cm
+    >>> from proteusPy import cmap_vector
+    >>> cmap_vector(12)
+    array([[ 31., 119., 180.],
+       [174., 199., 232.],
+       [255., 187., 120.],
+       [152., 223., 138.],
+       [255., 152., 150.],
+       [197., 176., 213.],
+       [140.,  86.,  75.],
+       [227., 119., 194.],
+       [127., 127., 127.],
+       [188., 189.,  34.],
+       [ 23., 190., 207.],
+       [158., 218., 229.]])
+
     '''
 
     rgbcol = numpy.zeros(shape=(steps, 3))
@@ -97,5 +116,9 @@ def cmap_vector(steps):
         i += 1
 
     return rgbcol
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
 
 # end of file
