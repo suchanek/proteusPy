@@ -316,22 +316,28 @@ class Disulfide:
         
         Arguments:
             :param pvpplot: pyvista.Plotter object
-            :param style: 'bs', 'st', 'cpk', 'plain': Whether to render as CPK,
-                                               ball-and-stick or stick. 
-                                               Bonds are colored by atom 
-                                               color, unless 'plain' is specified.
-            :param plain: bool Flag indicating plain style, used internally
-            
-            :param bondcolor:  bond color for simple bonds, one of pyVista color types
-            
-            :param bs_scale: float scale factor (0-1) to reduce the atom sizes for ball and stick
-            
-            :param spec:  float specularity (0-1), where 1 is totally smooth and 0 is rough
-            
-            :param specpow: int specular power - exponent used for specularity calculations
+            :param style: 'bs', 'st', 'cpk', 'plain': 
+                Render as CPK, ball-and-stick or stick. 
+                Bonds are colored by atom color, unless 
+                'plain' is specified.
 
-            :param translate: bool Flag used internally to indicate whether to translate
-                        the disulfide to its geometric center of mass.
+            :param plain: bool Flag indicating plain style,
+                used internally
+            
+            :param bondcolor: bond color for simple bonds, 
+                one of pyVista color names
+            
+            :param bs_scale: float scale factor (0-1) to reduce the 
+                atom sizes for ball and stick
+            
+            :param spec:  float specularity (0-1), where 1 is 
+                totally smooth and 0 is rough
+            
+            :param specpow: int specular power - exponent used for 
+                specularity calculations
+
+            :param translate: bool Flag used internally to indicate 
+                we should translate the disulfide to its geometric center of mass.
             
         :return: pv.Plotter Updated pv.Plotter() object.
             
@@ -357,9 +363,10 @@ class Disulfide:
         def draw_bonds(pvp, bradius=BOND_RADIUS, style='sb', 
         			   bcolor=BOND_COLOR, missing=True):
             '''
-            Generate the appropriate pyvista cylinder objects to represent a particular
-            disulfide bond. This utilizes a connection table for the starting and ending
-            atoms and a color table for the bond colors.
+            Generate the appropriate pyVista cylinder objects to represent
+            a particular disulfide bond. This utilizes a connection table 
+            for the starting and ending atoms and a color table for the 
+            bond colors. Used internally.
 
             :param pvp: pyVista.Plotter - input plotter object to be updated
             :param bradius: float - bond radius
@@ -522,6 +529,7 @@ class Disulfide:
     def display(self, single=True, style='sb'):
         '''
         Display the Disulfide bond in the specific rendering style.
+        
         :param single: bool - Display the bond in a single panel in the specific style.
         :param style: str - One of 
             'sb' - split bonds
@@ -617,7 +625,6 @@ class Disulfide:
             pl.clear()
 
         else:
-            WINSIZE = (1024, 1024)
             pl = pv.Plotter(window_size=WINSIZE, shape=(2,2))
             pl.subplot(0,0)
             
