@@ -238,7 +238,7 @@ class DisulfideList(UserList):
                 if pchain == chain:
                     reslist.append(ss)
             else:
-                print(f'Cross chain SS: {ss.print_compact}:')
+                print(f'Cross chain SS: {ss.repr_compact}:')
         return reslist
     
     def _render(self, style='sb') -> pv.Plotter:

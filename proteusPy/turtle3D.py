@@ -509,10 +509,10 @@ class Turtle3D:
         
         if orientation == ORIENT_SIDECHAIN:
             self.orient(_ca, _cb, _n)
-            self.Orientation(ORIENT_SIDECHAIN)
+            self.Orientation = ORIENT_SIDECHAIN
         elif orientation == ORIENT_BACKBONE:
             self.orient(_ca, _c, _n)
-            self.Orientation(ORIENT_BACKBONE)
+            self.Orientation = ORIENT_BACKBONE
         return
 
     def to_local(self, global_vec) -> numpy.array:
