@@ -17,6 +17,7 @@ import pandas as pd
 import pyvista as pv
 
 from proteusPy import *
+
 from proteusPy.atoms import *
 
 from proteusPy.data import *
@@ -529,7 +530,7 @@ class Disulfide:
     def display(self, single=True, style='sb'):
         '''
         Display the Disulfide bond in the specific rendering style.
-        
+
         :param single: bool - Display the bond in a single panel in the specific style.
         :param style: str - One of 
             'sb' - split bonds
@@ -670,7 +671,7 @@ class Disulfide:
         title = f'{src}: {ssname}: {enrg:.2f} kcal/mol'
         
         if verbose:
-            print(f'Rendering animation...')
+            print(f'Rendering animation to {fname}...')
 
         pl = pv.Plotter(window_size=WINSIZE, off_screen=True)
         pl.open_movie(fname, quality=9)
@@ -762,7 +763,7 @@ class Disulfide:
         s1 = self.repr_ss_info()
         s4 = self.repr_ss_conformation()
         res = f'{s1} {s4}>'
-        return res
+        print(res)
 
     def pprint_all(self):
         """
@@ -800,7 +801,7 @@ class Disulfide:
             # exceptions are fatal - raise again with new message (including line nr)
             raise DisulfideConstructionException(message) from None
 
-    def print_compact(self) -> str:
+    def repr_compact(self) -> str:
         '''
         Return a compact representation of the Disulfide object
         :return: string
@@ -955,11 +956,9 @@ class Disulfide:
         self.chi4 = numpy.degrees(calc_dihedral(sg1, sg2, cb2, ca2))
         self.chi5 = numpy.degrees(calc_dihedral(sg2, cb2, ca2, n2))
 
-        
-        
-        self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
-        self.torsion_array = numpy.array((self.chi1, self.chi2, self.chi3, self.chi4,
-         								self.chi5))
+        self.ca_distance = proteusPy.distance3d(self.ca_prox, self.ca_dist)
+        self.torsion_array = numpy.array((self.chi1, self.chi2, self.chi3, 
+                                        self.chi4, self.chi5))
 
         # calculate and set the SS bond torsional energy
         self.compute_torsional_energy()
@@ -977,24 +976,43 @@ class Disulfide:
                       c_prev_prox: Vector, n_next_prox: Vector,
                       c_prev_dist: Vector, n_next_dist: Vector
                       ):
-        '''
-        Sets the atomic positions for all atoms in the disulfide bond.
-        Arguments:
-            n_prox
-            ca_prox
-            c_prox
-            o_prox
-            cb_prox
-            sg_prox
-            n_distal
-            ca_distal
-            c_distal
-            o_distal
-            cb_distal
-            sg_distal
-        Returns: None
-        '''
+        """
+        Sets the atomic positions for the Disulfide object
 
+        :param n_prox: proximal N position
+        :type n_prox: Vector
+        :param ca_prox: proximal Ca position
+        :type ca_prox: Vector
+        :param c_prox: proximal C' position
+        :type c_prox: Vector
+        :param o_prox: proximal O position
+        :type o_prox: Vector
+        :param cb_prox: proximal Cb position
+        :type cb_prox: Vector
+        :param sg_prox: proximal Sg position
+        :type sg_prox: Vector
+        :param n_dist: distal N position
+        :type n_dist: Vector
+        :param ca_dist: distal Ca position
+        :type ca_dist: Vector
+        :param c_dist: distal C' position
+        :type c_dist: Vector
+        :param o_dist: distal O position
+        :type o_dist: Vector
+        :param cb_dist: distal Cb position
+        :type cb_dist: Vector
+        :param sg_dist: distal Sg position
+        :type sg_dist: Vector
+        :param c_prev_prox: proximal-1 C'
+        :type c_prev_prox: Vector
+        :param n_next_prox: proximal+1 N
+        :type n_next_prox: Vector
+        :param c_prev_dist: distal-1 C'
+        :type c_prev_dist: Vector
+        :param n_next_dist: distal+1 N
+        :type n_next_dist: Vector
+        """
+        
         # deep copy
         self.n_prox = n_prox.copy()
         self.ca_prox = ca_prox.copy()
@@ -1014,16 +1032,24 @@ class Disulfide:
         self.c_prev_dist = c_prev_dist.copy()
         self.n_next_dist = n_next_dist.copy()
 
-    def set_dihedrals(self, chi1, chi2, chi3, chi4, chi5):
-        '''
+    def set_dihedrals(self, chi1: float, chi2: float, chi3: float,
+                    chi4: float, chi5: float):
+        """
         Sets the 5 dihedral angles chi1 - chi5 for the Disulfide object and 
         computes the torsional energy.
+
+        :param chi1: Chi1
+        :type chi1: float
+        :param chi2: Chi2
+        :type chi2: float
+        :param chi3: Chi3
+        :type chi3: float
+        :param chi4: Chi4
+        :type chi4: float
+        :param chi5: Chi5
+        :type chi5: float
+        """
         
-        Arguments: chi, chi2, chi3, chi4, chi5 - Dihedral angles in degrees 
-        (-180 - 180) for the Disulfide conformation.
-        
-        Returns: None
-        '''
         self.chi1 = chi1
         self.chi2 = chi2
         self.chi3 = chi3
