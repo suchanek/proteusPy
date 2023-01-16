@@ -132,7 +132,7 @@ class DisulfideLoader:
         self.SSList[index] = self.validate_ss(item)
 
     def getlist(self) -> DisulfideList:
-        return self.SSList
+        return copy.deepcopy(self.SSList)
     
     def getdict(self) -> dict:
         return copy.deepcopy(self.SSDict)
