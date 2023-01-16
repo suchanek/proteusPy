@@ -73,9 +73,9 @@ class DisulfideLoader:
         if verbose:
             print(f'Reading disulfides from: {self.PickleFile}')
         with open(self.PickleFile, 'rb') as f:
-            sslist = DisulfideList([], 'tmp')
+            #sslist = DisulfideList([], 'tmp')
             sslist = pickle.load(f)
-            self.SSList = sslist.copy()
+            self.SSList = sslist
 
         self.TotalDisulfides = len(self.SSList)
         
@@ -131,8 +131,8 @@ class DisulfideLoader:
     def __setitem__(self, index, item):
         self.SSList[index] = self.validate_ss(item)
 
-    def getlist(self):
-        return self.SSList.copy()
+    def getlist(self) -> DisulfideList:
+        return self.SSList
     
     def getdict(self) -> dict:
         return copy.deepcopy(self.SSDict)
