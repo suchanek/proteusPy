@@ -558,8 +558,7 @@ class Disulfide:
         '''
         src = self.pdb_id
         enrg = self.energy
-        title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: \
-            {enrg:.2f} kcal/mol Ca: {self.ca_distance:.2f} Å'
+        title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol Ca: {self.ca_distance:.2f} Å'
                 
         if single == True:
             pl = pv.Plotter(window_size=WINSIZE)
