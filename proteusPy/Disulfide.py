@@ -730,7 +730,7 @@ class Disulfide:
 
     def repr_ss_conformation(self):
         s4 = f'Conformation: (Χ1-Χ5):  {self.chi1:.3f}°, {self.chi2:.3f}°, {self.chi3:.3f}°, {self.chi4:.3f}° {self.chi5:.3f}° '
-        s5 = f'Energy: {self.energy:.3f} kcal/mol'
+        s5 = f'Energy: {self.energy:.3f} kcal/mol\n'
         stot = f'{s4} {s5}'
         return stot
 
@@ -739,15 +739,15 @@ class Disulfide:
         Representation for the Disulfide class, internal coordinates.
         """
         s2i = f'Proximal Internal Coords:\n   N: {self._n_prox}\n   Cα: {self._ca_prox}\n   C: {self._c_prox}\n   O: {self._o_prox}\n   Cβ: {self._cb_prox}\n   Sγ: {self._sg_prox}\n   Cprev {self.c_prev_prox}\n   Nnext: {self.n_next_prox}\n'
-        s3i = f'Distal Internal Coords:\n   N: {self._n_dist}\n   Cα: {self._ca_dist}\n   C: {self._c_dist}\n   O: {self._o_dist}\n   Cβ: {self._cb_dist}\n   Sγ: {self._sg_dist}\n   Cprev {self.c_prev_dist}\n   Nnext: {self.n_next_dist}\n\n'
-        stot = f'{s2i} {s3i}'
+        s3i = f'Distal Internal Coords:\n   N: {self._n_dist}\n   Cα: {self._ca_dist}\n   C: {self._c_dist}\n   O: {self._o_dist}\n   Cβ: {self._cb_dist}\n   Sγ: {self._sg_dist}\n   Cprev {self.c_prev_dist}\n   Nnext: {self.n_next_dist}\n'
+        stot = f'{s2i}{s3i}'
         return stot
     
     def repr_ss_chain_ids(self):
         return(f'Proximal Chain fullID: <{self.proximal_residue_fullid}> Distal Chain fullID: <{self.distal_residue_fullid}>')
 
     def repr_ss_ca_dist(self):
-        s1 = f'Ca Distance: {self.ca_distance}'
+        s1 = f'Ca Distance: {self.ca_distance:.3f} Å'
         return s1
     
     def __repr__(self):
@@ -770,7 +770,7 @@ class Disulfide:
         res = f'{s1} {s3} {s2}>'
         print(res)
 
-    def pprint_all(self):
+    def repr_all(self):
         """
         pretty print all info for a Disulfide
         """
@@ -780,9 +780,14 @@ class Disulfide:
         s3 = self.repr_ss_local_coords()
         s4 = self.repr_ss_conformation()
         s5 = self.repr_chain_ids()
-        res = f'{s1} {s5} {s2} {s3} {s4} >'
-        print(res)
+        s6 = self.repr_ss_ca_dist()
 
+        res = f'{s1} {s5} {s2} {s3} {s4} {s6}>'
+        return res
+
+    def pprint_all(self):
+        print(f'{self.repr_all()}')
+    
     def _handle_SS_exception(self, message):
         """Handle exception (PRIVATE).
 
