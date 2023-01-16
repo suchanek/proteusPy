@@ -738,14 +738,18 @@ class Disulfide:
         """
         Representation for the Disulfide class, internal coordinates.
         """
-        s2i = f'Proximal Internal Coordinates:\n   N: {self._n_prox}\n   Cα: {self._ca_prox}\n   C: {self._c_prox}\n   O: {self._o_prox}\n   Cβ: {self._cb_prox}\n   Sγ: {self._sg_prox}\n   Cprev {self.c_prev_prox}\n   Nnext: {self.n_next_prox}\n'
-        s3i = f'Distal Internal Coordinates:\n   N: {self._n_dist}\n   Cα: {self._ca_dist}\n   C: {self._c_dist}\n   O: {self._o_dist}\n   Cβ: {self._cb_dist}\n   Sγ: {self._sg_dist}\n   Cprev {self.c_prev_dist}\n   Nnext: {self.n_next_dist}\n\n'
+        s2i = f'Proximal Internal Coords:\n   N: {self._n_prox}\n   Cα: {self._ca_prox}\n   C: {self._c_prox}\n   O: {self._o_prox}\n   Cβ: {self._cb_prox}\n   Sγ: {self._sg_prox}\n   Cprev {self.c_prev_prox}\n   Nnext: {self.n_next_prox}\n'
+        s3i = f'Distal Internal Coords:\n   N: {self._n_dist}\n   Cα: {self._ca_dist}\n   C: {self._c_dist}\n   O: {self._o_dist}\n   Cβ: {self._cb_dist}\n   Sγ: {self._sg_dist}\n   Cprev {self.c_prev_dist}\n   Nnext: {self.n_next_dist}\n\n'
         stot = f'{s2i} {s3i}'
         return stot
     
     def repr_ss_chain_ids(self):
         return(f'Proximal Chain fullID: <{self.proximal_residue_fullid}> Distal Chain fullID: <{self.distal_residue_fullid}>')
 
+    def repr_ss_ca_dist(self):
+        s1 = f'Ca Distance: {self.ca_distance}'
+        return s1
+    
     def __repr__(self):
         """
         Representation for the Disulfide class
@@ -761,8 +765,9 @@ class Disulfide:
         """
         
         s1 = self.repr_ss_info()
-        s4 = self.repr_ss_conformation()
-        res = f'{s1} {s4}>'
+        s2 = self.repr_ss_ca_dist()
+        s3 = self.repr_ss_conformation()
+        res = f'{s1} {s3} {s2}>'
         print(res)
 
     def pprint_all(self):
@@ -1378,31 +1383,6 @@ def Download_Disulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR,
     os.chdir(cwd)
     return
 
-def build_torsion_df(SSList: DisulfideList) -> pd.DataFrame:
-    '''
-    Create a dataframe containing the input DisulfideList torsional parameters,
-    ca-ca distance, energy, and phi-psi angles. This can take a while for the
-    entire database.
-
-    :param SSList: DisulfideList - input list of Disulfides
-    :return: pandas.Dataframe containing the torsions
-    '''
-    # create a dataframe with the following columns for the disulfide 
-    # conformations extracted from the structure
-    
-    SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
-
-    pbar = tqdm(SSList, ncols=_PBAR_COLS)
-    for ss in pbar:
-        #pbar.set_postfix({'ID': ss.name}) # update the progress bar
-
-        new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, 
-        		ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance,
-                ss.psiprox, ss.psiprox, ss.phidist, ss.psidist]
-        # add the row to the end of the dataframe
-        SS_df.loc[len(SS_df.index)] = new_row # deep copy
-    
-    return SS_df.copy()
 
 def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR, 
                         datadir=MODEL_DIR, picklefile=SS_PICKLE_FILE, 
@@ -1528,7 +1508,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     # we use the specialized list class DisulfideList to contain our disulfides
     # we'll use a dict to store DisulfideList objects, indexed by the structure ID
     All_ss_dict = {}
-    All_ss_list = []
+    All_ss_list = DisulfideList([],'PDB_SS')
 
     start = time.time()
     cwd = os.getcwd()
@@ -1985,6 +1965,32 @@ def Check_chains(pdbid, pdbdir, verbose=True):
             if verbose:
                 print(f'Chains are equal length, assuming the same. {chain_lens}')
     return(same)
+
+def build_torsion_df(SSList: DisulfideList) -> pd.DataFrame:
+    '''
+    Create a dataframe containing the input DisulfideList torsional parameters,
+    ca-ca distance, energy, and phi-psi angles. This can take a while for the
+    entire database.
+
+    :param SSList: DisulfideList - input list of Disulfides
+    :return: pandas.Dataframe containing the torsions
+    '''
+    # create a dataframe with the following columns for the disulfide 
+    # conformations extracted from the structure
+    
+    SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
+
+    pbar = tqdm(SSList, ncols=_PBAR_COLS)
+    for ss in pbar:
+        #pbar.set_postfix({'ID': ss.name}) # update the progress bar
+
+        new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, 
+        		ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance,
+                ss.psiprox, ss.psiprox, ss.phidist, ss.psidist]
+        # add the row to the end of the dataframe
+        SS_df.loc[len(SS_df.index)] = new_row # deep copy
+    
+    return SS_df.copy()
 
 if __name__ == "__main__":
     import doctest

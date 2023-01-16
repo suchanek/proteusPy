@@ -6,12 +6,17 @@
 # Eric G. Suchanek, PhD
 # Last modification: 12/13/2023 -egs-
 
+import pandas as pd
+import tqdm
+
 import proteusPy
 from proteusPy import *
 from proteusPy.atoms import *
 
 import pyvista as pv
 from collections import UserList
+
+_PBAR_COLS = 100
 
 def grid_dimensions(n):
     '''
@@ -189,6 +194,14 @@ class DisulfideList(UserList):
                 res = ss.copy()
         return res
 
+    def min(self):
+        sslist = sorted(self.data)
+        return sslist[0]
+    
+    def max(self):
+        sslist = sorted(self.data)
+        return sslist[-1]
+    
     def get_chains(self):
         '''
         Return the chain IDs for chains within the given Disulfide.
@@ -376,6 +389,7 @@ class DisulfideList(UserList):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
+
 
 # end of file
 
