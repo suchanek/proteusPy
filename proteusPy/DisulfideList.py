@@ -66,7 +66,7 @@ class DisulfideList(UserList):
     Reading Torsion DF /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_SS_torsions.csv.
     Read torsions DF.
     PDB IDs parsed: 1000
-    Total Space Used: 2035005 bytes.
+    Total Space Used: 1969317 bytes.
 
     >>> SS = PDB_SS[0]              # returns a Disulfide object at index 0
     >>> SS
@@ -285,7 +285,7 @@ class DisulfideList(UserList):
                     src = ss.pdb_id
                     enrg = ss.energy
                     near_range, far_range = ss.compute_extents()
-                    title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol'
+                    title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol Ca: {ss.ca_distance:.2f}'
                     pl.add_title(title=title, font_size=FONTSIZE)
                     ss._render(pl, style=style, bondcolor=BOND_COLOR, 
                                    bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)

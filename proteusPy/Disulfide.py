@@ -17,7 +17,6 @@ import pandas as pd
 import pyvista as pv
 
 from proteusPy import *
-
 from proteusPy.atoms import *
 
 from proteusPy.data import *
@@ -551,7 +550,7 @@ class Disulfide:
         Reading Torsion DF /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_SS_torsions.csv.
         Read torsions DF.
         PDB IDs parsed: 1000
-        Total Space Used: 2035005 bytes.
+        Total Space Used: 1969317 bytes.
 
         >>> ss = PDB_SS[0]
         >>> ss.display(style='sb')
@@ -559,7 +558,8 @@ class Disulfide:
         '''
         src = self.pdb_id
         enrg = self.energy
-        title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol'
+        title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: \
+            {enrg:.2f} kcal/mol Ca: {self.ca_distance:.2f} Å'
                 
         if single == True:
             pl = pv.Plotter(window_size=WINSIZE)
@@ -1429,7 +1429,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     Reading Torsion DF /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_SS_torsions.csv.
     Read torsions DF.
     PDB IDs parsed: 1000
-    Total Space Used: 2035005 bytes.
+    Total Space Used: 1969317 bytes.
 
     >>> SS = PDB_SS[0]              # returns a Disulfide object at index 0
     >>> SS
@@ -1471,7 +1471,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
        Cprev <Vector -0.73, -17.44, -2.01>
        Nnext: <Vector 1.92, -19.18, -0.63>
     <BLANKLINE>
-     Proximal Internal Coordinates:
+     Proximal Internal Coords:
        N: <Vector -0.41, 1.40, -0.00>
        Cα: <Vector 0.00, 0.00, 0.00>
        C: <Vector 1.50, 0.00, 0.00>
@@ -1480,7 +1480,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
        Sγ: <Vector 0.04, -2.41, -1.50>
        Cprev <Vector -2.67, -21.75, 5.36>
        Nnext: <Vector -0.02, -18.76, 3.36>
-     Distal Internal Coordinates:
+    Distal Internal Coords:
        N: <Vector 1.04, -5.63, 1.17>
        Cα: <Vector 1.04, -4.18, 1.31>
        C: <Vector 1.72, -3.68, 2.57>
@@ -1489,8 +1489,8 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
        Sγ: <Vector -1.14, -3.69, -0.43>
        Cprev <Vector -0.73, -17.44, -2.01>
        Nnext: <Vector 1.92, -19.18, -0.63>
-    <BLANKLINE>
-     Conformation: (Χ1-Χ5):  174.629°, 82.518°, -83.322°, -62.524° -73.827°  Energy: 1.696 kcal/mol >
+     Conformation: (Χ1-Χ5):  174.629°, 82.518°, -83.322°, -62.524° -73.827°  Energy: 1.696 kcal/mol
+     Ca Distance: 4.502 Å>
 
     # grab a list of disulfides via slicing
     >>> subset = DisulfideList(PDB_SS[0:10],'subset')
