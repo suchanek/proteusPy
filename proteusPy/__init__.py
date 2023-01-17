@@ -1,7 +1,6 @@
-# init for proteusPy package
-# Copyright (c) 2022 Eric G. Suchanek, PhD., all rights reserved
-# Subject to the GNU public license.
-# Cα Cβ Sγ Χ1 - Χ5 Χ
+# Initialization for the proteusPy package
+# Copyright (c) 2023 Eric G. Suchanek, PhD., all rights reserved
+# Subject to the MIT public license.
 
 __version__ = "0.9dev"
 
@@ -25,19 +24,24 @@ from Bio.PDB import Select, Vector
 from .proteusPyWarning import ProteusPyWarning
 from .ProteusGlobals import *
 
-#from .DisulfideGlobals import *
 from .DisulfideExceptions import DisulfideIOException, DisulfideConstructionWarning, DisulfideConstructionException
 
 from .turtle3D import Turtle3D
 from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN
 from .residue import build_residue, get_backbone_from_chain, to_alpha, to_carbonyl, to_nitrogen, to_oxygen
 
-from .Disulfide import todeg, torad
 from .Disulfide import Download_Disulfides, Extract_Disulfides
 from .Disulfide import Check_chains, Distance_RMS, Torsion_RMS
 
 from .DisulfideLoader import DisulfideLoader
 from .atoms import *
+
+
+def torad(deg):
+    return(numpy.radians(deg))
+
+def todeg(rad):
+    return(numpy.degrees(rad))
 
 class CysSelect(Select):
     def accept_residue(self, residue):
@@ -116,9 +120,5 @@ def cmap_vector(steps):
         i += 1
 
     return rgbcol
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
 
 # end of file

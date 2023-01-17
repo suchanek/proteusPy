@@ -39,12 +39,12 @@ ATOM_COLORS = {'O': 'red', 'C': 'grey', 'N': 'blue', 'S': 'yellow', 'H': 'white'
 
 BOND_RADIUS = .12
 BOND_COLOR = 'darkgrey'
-FONTSIZE = 10
 BS_SCALE = .25
 SPECULARITY = .7
 SPEC_POWER = 80
 CAMERA_SCALE = .5
 
+FONTSIZE = 8
 WINFRAME = 512 # single panel width
 WINSIZE = (1024, 1024)
 CAMERA_POS = ((0, 0, -10), (0,0,0), (0,1,0))
