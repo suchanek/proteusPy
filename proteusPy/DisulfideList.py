@@ -128,7 +128,7 @@ class DisulfideList(UserList):
        Nnext: <Vector 1.92, -19.18, -0.63>
     <BLANKLINE>
      Conformation: (Χ1-Χ5):  174.629°, 82.518°, -83.322°, -62.524° -73.827°  Energy: 1.696 kcal/mol >
-
+     Ca Distance: 4.502 Å>
     # grab a list of disulfides via slicing
     >>> subset = DisulfideList(PDB_SS[0:10],'subset')
 
@@ -254,7 +254,7 @@ class DisulfideList(UserList):
                 print(f'Cross chain SS: {ss.repr_compact}:')
         return reslist
     
-    def _render(self, style='sb') -> pv.Plotter:
+    def _render(self, style) -> pv.Plotter:
         ''' 
             Display a window showing the list of disulfides in the given style.
             Argument:
@@ -263,47 +263,46 @@ class DisulfideList(UserList):
             Returns:
                 Window displaying the Disulfides.
         '''
-     
+        
         ssList = self.data
         tot_ss = len(ssList) # number off ssbonds
-        
         rows, cols = grid_dimensions(tot_ss)
-        i = 0
-
         winsize = (512 * cols, 512 * rows)
 
         pl = pv.Plotter(window_size=winsize, shape=(rows, cols))
-        pl.add_camera_orientation_widget()
+
+        i = 0
 
         for r in range(rows):
             for c in range(cols):
                 pl.subplot(r,c)
                 if i < tot_ss:
-                    pl.enable_anti_aliasing('msaa')
-                    pl.view_isometric()
                     ss = ssList[i]
                     src = ss.pdb_id
                     enrg = ss.energy
-                    near_range, far_range = ss.compute_extents()
                     title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol Ca: {ss.ca_distance:.2f}'
                     pl.add_title(title=title, font_size=FONTSIZE)
                     ss._render(pl, style=style, bondcolor=BOND_COLOR, 
                                    bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
-                    pl.view_isometric()
                 i += 1
-        
-        pl.link_views()
-        pl.reset_camera()
         return pl
 
     def display(self, style='sb'):
+        ssList = self.data
+        tot_ss = len(ssList) # number off ssbonds
+        
+        rows, cols = grid_dimensions(tot_ss)
+        winsize = (512 * cols, 512 * rows)
+        #pl = pv.Plotter(window_size=winsize, shape=(rows, cols))
         pl = pv.Plotter()
+
         pl = self._render(style)
+        pl.add_camera_orientation_widget()
+        pl.enable_anti_aliasing('msaa')
+        pl.link_views()
+        pl.reset_camera()
         pl.show()
-
-
-        #pl.show()
-    
+        
     def screenshot(self, style='bs', fname='sslist.png', verbose=True):
         ''' 
             Save the interactive window displaying the list of disulfides in the given style.
@@ -317,6 +316,10 @@ class DisulfideList(UserList):
 
         pl = pv.Plotter()
         pl = self._render(style=style)
+        
+        pl.enable_anti_aliasing('msaa')
+        pl.link_views()
+        pl.reset_camera()
         pl.show(auto_close=False)
 
         if verbose:

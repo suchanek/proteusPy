@@ -558,7 +558,7 @@ class Disulfide:
         '''
         src = self.pdb_id
         enrg = self.energy
-        title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol Ca: {self.ca_distance:.2f} Å'
+        title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Ca: {self.ca_distance:.2f} Å'
                 
         if single == True:
             pl = pv.Plotter(window_size=WINSIZE)
@@ -618,7 +618,7 @@ class Disulfide:
             pl.add_camera_orientation_widget()
             pl = self._render(pl, style=style, bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
-            pl.view_isometric()
+            #pl.view_isometric()
             pl.reset_camera()
             pl.show(auto_close=False)
             pl.screenshot(fname)
@@ -677,7 +677,7 @@ class Disulfide:
         path = pl.generate_orbital_path(n_points=360)
 
         pl.add_title(title=title, font_size=FONTSIZE)
-        pl.enable_anti_aliasing('ssaa')
+        pl.enable_anti_aliasing('msaa')
         pl.add_camera_orientation_widget()
         pl = self._render(pl, style=style, bondcolor=BOND_COLOR, 
                     bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
@@ -1284,12 +1284,6 @@ def name_to_id(fname: str):
     '''return an entry id for filename pdb1crn.ent -> 1crn'''
     ent = fname[3:-4]
     return ent
-
-def torad(deg):
-    return(numpy.radians(deg))
-
-def todeg(rad):
-    return(numpy.degrees(rad))
 
 def parse_ssbond_header_rec(ssbond_dict: dict) -> list:
     '''

@@ -25,7 +25,7 @@ from pyvista import Plotter
 from proteusPy.Disulfide import *
 
 def SS_DisplayTest(ss: Disulfide):
-    ss.display(style='bs', single=True)
+    ss.display(style='bs', single=False)
     ss.display(style='cpk')
     ss.display(style='sb', single=True)
     ss.display(style='pd', single=False)
@@ -62,11 +62,11 @@ if __name__ == '__main__':
 
     sslist = DisulfideList([], 'last12')
     sslist = PDB_SS[:12]
-    sslist.display_overlay(movie=False, fname='overlay.mp4')
+    #sslist.display_overlay(movie=False, fname='overlay.mp4')
 
     #sslist.display_overlay()
 
-    #SSlist_DisplayTest(sslist)
+    SSlist_DisplayTest(sslist)
 
     #sslist.display()
     
