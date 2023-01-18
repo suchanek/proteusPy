@@ -6,6 +6,7 @@
 import pandas as pd
 from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideLoader import DisulfideLoader
+from proteusPy.DisulfideList import DisulfideList
 
 import pyvista as pv
 from pyvista import set_plot_theme
@@ -21,7 +22,6 @@ PDB = '/Users/egs/PDB/good/'
 MODELS = f'{PDB_BASE}models/'
 
 import pyvista as pv
-from pyvista import Plotter
 from proteusPy.Disulfide import *
 
 def SS_DisplayTest(ss: Disulfide):
@@ -29,7 +29,7 @@ def SS_DisplayTest(ss: Disulfide):
     ss.display(style='cpk')
     ss.display(style='sb', single=True)
     ss.display(style='pd', single=False)
-    # ss.screenshot(style='cpk', single=True, fname='cpk3.png', verbose=True)
+    ss.screenshot(style='cpk', single=True, fname='cpk3.png', verbose=True)
     # ss.screenshot(style='sb', single=False, fname='sb3.png', verbose=True)
     return
 
@@ -39,7 +39,7 @@ def SSlist_DisplayTest(sslist):
     sslist.display(style='sb')
     sslist.display(style='pd')
     sslist.display(style='plain')
-    sslist.display_overlay(movie=True, fname='overlay.mp4')
+    sslist.display_overlay(movie=False, fname='overlay.mp4')
     sslist.screenshot(style='sb', fname='sslist.png')
 
 if __name__ == '__main__':
@@ -49,7 +49,11 @@ if __name__ == '__main__':
     # one disulfide from the database
     ss = Disulfide()
     ss = PDB_SS[0]
+    ss.display(single=True)
+    ss.display(single=False)
+    
     #ss.make_movie(fname='ss_sb.mp4', style='cpk', verbose=True)
+    
     #SS_DisplayTest(ss)
     
     # get all disulfides for one structure. Make a 
@@ -64,9 +68,7 @@ if __name__ == '__main__':
     sslist = PDB_SS[:12]
     #sslist.display_overlay(movie=False, fname='overlay.mp4')
 
-    #sslist.display_overlay()
-
-    SSlist_DisplayTest(sslist)
+    #SSlist_DisplayTest(sslist)
 
     #sslist.display()
     

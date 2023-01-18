@@ -22,7 +22,7 @@ from Bio.PDB.vectors import calc_dihedral, calc_angle
 from Bio.PDB import Select, Vector
 
 from .proteusPyWarning import ProteusPyWarning
-from .ProteusGlobals import *
+from .ProteusGlobals import PDB_DIR, MODEL_DIR
 
 from .DisulfideExceptions import DisulfideIOException, DisulfideConstructionWarning, DisulfideConstructionException
 
@@ -30,12 +30,10 @@ from .turtle3D import Turtle3D
 from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN
 from .residue import build_residue, get_backbone_from_chain, to_alpha, to_carbonyl, to_nitrogen, to_oxygen
 
-from .Disulfide import Download_Disulfides, Extract_Disulfides
-from .Disulfide import Check_chains, Distance_RMS, Torsion_RMS
+from .Disulfide import Download_Disulfides, Extract_Disulfides, Check_chains
 
 from .DisulfideLoader import DisulfideLoader
 from .atoms import *
-
 
 def torad(deg):
     return(numpy.radians(deg))
@@ -49,6 +47,10 @@ class CysSelect(Select):
             return True
         else:
             return False
+
+
+def dist_squared(a,b):
+    return numpy.sum(numpy.square(numpy.subtract(a,b)))
 
 def distance3d(p1: Vector, p2: Vector):
     '''

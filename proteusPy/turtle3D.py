@@ -12,11 +12,14 @@ import math
 
 from Bio.PDB.vectors import Vector
 from Bio.PDB.vectors import calc_angle, calc_dihedral
-from proteusPy.ProteusGlobals import ORIENT_BACKBONE, ORIENT_SIDECHAIN
+from proteusPy import *
 
 _DOWN_ = -1
 _UP_ = 1
 _ORIENTATION_INIT = -1
+
+ORIENT_BACKBONE = 2
+ORIENT_SIDECHAIN = 1
 
 # Class Definition begins
 class Turtle3D:
