@@ -191,7 +191,12 @@ class DisulfideList(UserList):
             id = ss.name
             if id == name:
                 res = ss.copy()
+                break
         return res
+
+    def minmax(self):
+        sslist = sorted(self.data)
+        return sslist[0], sslist[-1]
 
     def min(self):
         sslist = sorted(self.data)
