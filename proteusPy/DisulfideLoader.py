@@ -169,12 +169,9 @@ class DisulfideLoader:
     def get_by_name(self, name):
         _sslist = DisulfideList([], 'tmp')
         _sslist = self.SSList
-        res = None
 
-        for ss in _sslist:
-            id = ss.name
-            if id == name:
-                res = ss.copy()
+        res = _sslist.get_by_name(name)
+
         return res
     
     def display_overlay(self, pdbid: str):

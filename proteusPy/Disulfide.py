@@ -41,6 +41,11 @@ Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi
            'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
            'psi_dist']
 
+def torad(deg):
+    return(numpy.radians(deg))
+
+def todeg(rad):
+    return(numpy.degrees(rad))
 
 # Class definition for a Disulfide bond. 
 class Disulfide:

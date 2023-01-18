@@ -14,6 +14,7 @@
 import shutil
 
 from proteusPy.Disulfide import Extract_Disulfides
+from proteusPy import torad, todeg
 
 # the locations below represent the actual location on the dev drive.
 # location for PDB repository
@@ -35,7 +36,7 @@ _SS_TORSIONS_FILE = 'PDB_all_SS_torsions.csv'
 _PROBLEM_ID_FILE = 'PDB_all_SS_problems.csv'
 
 
-Extract_Disulfides(numb=1000, pdbdir=PDB, datadir=MODELS,
+Extract_Disulfides(numb=-1, pdbdir=PDB, datadir=MODELS,
                 dictfile=_SS_DICT_PICKLE_FILE,
                 picklefile=_SS_PICKLE_FILE,
                 torsionfile=_SS_TORSIONS_FILE,
