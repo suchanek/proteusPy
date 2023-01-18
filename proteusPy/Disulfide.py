@@ -309,7 +309,7 @@ class Disulfide:
 
     def _render(self, pvplot: pv.Plotter, style='bs', plain=False,
             bondcolor=BOND_COLOR, bs_scale=BS_SCALE, spec=SPECULARITY, 
-            specpow=SPEC_POWER, translate=True) -> pv.Plotter:
+            specpow=SPEC_POWER, translate=True):
         ''' 
         Update the passed pyVista plotter() object with the mesh data for the
         input Disulfide Bond. Used internally
@@ -524,7 +524,7 @@ class Disulfide:
             pvp = draw_bonds(pvp, style='plain', bcolor=bondcolor, 
             				missing=missing_atoms)
             
-        return pvp
+        return
 
     def display(self, single=True, style='sb'):
         '''
@@ -561,15 +561,15 @@ class Disulfide:
         title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Ca: {self.ca_distance:.2f} Å'
                 
         if single == True:
-            pl = pv.Plotter(window_size=WINSIZE)
-            pl.add_title(title=title, font_size=FONTSIZE)
-            pl.enable_anti_aliasing('msaa')
-            pl.add_camera_orientation_widget()
-            pl = self._render(pl, style=style, 
-                               bs_scale=BS_SCALE, spec=SPECULARITY, 
-                               specpow=SPEC_POWER)
-            pl.reset_camera()
-            pl.show()
+            _pl = pv.Plotter(window_size=WINSIZE)
+            _pl.add_title(title=title, font_size=FONTSIZE)
+            _pl.enable_anti_aliasing('msaa')
+            _pl.add_camera_orientation_widget()            
+
+            self._render(_pl, style=style, bs_scale=BS_SCALE, 
+                        spec=SPECULARITY, specpow=SPEC_POWER)        
+            _pl.reset_camera()
+            _pl.show()
 
         else:
             pl = pv.Plotter(window_size=WINSIZE, shape=(2,2))
@@ -579,23 +579,31 @@ class Disulfide:
             pl.enable_anti_aliasing('msaa')
 
             pl.add_camera_orientation_widget()
+            
             self._render(pl, style='cpk', bondcolor=BOND_COLOR, 
-                        bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+                        bs_scale=BS_SCALE, spec=SPECULARITY, 
+                        specpow=SPEC_POWER)
 
             pl.subplot(0,1)
             pl.add_title(title=title, font_size=FONTSIZE)
-            self._render(pl, style='pd', bondcolor=BOND_COLOR, 
-                        bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+            
+            self._render(pl, style='bs', bondcolor=BOND_COLOR, 
+                        bs_scale=BS_SCALE, spec=SPECULARITY, 
+                        specpow=SPEC_POWER)
 
             pl.subplot(1,0)
             pl.add_title(title=title, font_size=FONTSIZE)
-            self._render(pl, style='bs', bondcolor=BOND_COLOR, 
-                        bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+            
+            self._render(pl, style='sb', bondcolor=BOND_COLOR, 
+                        bs_scale=BS_SCALE, spec=SPECULARITY, 
+                        specpow=SPEC_POWER)
 
             pl.subplot(1,1)
             pl.add_title(title=title, font_size=FONTSIZE)
-            self._render(pl, style='sb', bondcolor=BOND_COLOR, 
-                        bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+            
+            self._render(pl, style='pd', bondcolor=BOND_COLOR, 
+                        bs_scale=BS_SCALE, spec=SPECULARITY, 
+                        specpow=SPEC_POWER)
 
             pl.link_views()
             pl.reset_camera()
@@ -618,7 +626,6 @@ class Disulfide:
             pl.add_camera_orientation_widget()
             pl = self._render(pl, style=style, bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
-            #pl.view_isometric()
             pl.reset_camera()
             pl.show(auto_close=False)
             pl.screenshot(fname)
@@ -1241,44 +1248,54 @@ class Disulfide:
 
         self.compute_torsional_energy()
 
+    def Torsion_length(self) -> float:
+        """
+        Compute the Euclidean length of the Disulfide's Chi1-Chi5 torsion angles.
+        """
+        tors = self.torsion_array
+        dist = math.dist(tors, tors)
+
+        return dist
+
+    def Torsion_RMS(self, other):
+        '''
+        Calculate the 5D Euclidean distance between self and another Disulfide
+        object. This is used to compare Disulfide Bond torsion angles to 
+        determine their torsional similarity via a Euclidean distance metric.
+        
+        Arguments: p1, p2 Vector objects of dimensionality 5 (5D)
+        Returns: Distance
+        '''
+
+        _p1 = self.torsion_array
+        _p2 = other.torsion_array
+        if (len(_p1) != 5 or len(_p2) != 5):
+            raise ProteusPyWarning("--> distance5d() requires vectors of length 5!")
+        d = math.dist(_p1, _p2)
+        return d
+
+    def Distance_RMS(self, other):
+        '''
+        Calculate the RMS distance between the internal coordinates between 
+        two Disulfides
+        '''
+        ic1 = self.internal_coords()
+        ic2 = other.internal_coords()
+
+        totsq = 0.0
+        # only take coords for the proximal and distal disfulfides, not the 
+        # prev/next residues.
+        
+        for i in range(12):
+            p1 = ic1[i]
+            p2 = ic2[i]
+            totsq += math.dist(p1, p2)**2
+        
+        totsq /= 12
+
+        return(math.sqrt(totsq))
+
 # Class defination ends
-def Torsion_RMS(ss1, ss2):
-    '''
-    Calculate the 5D Euclidean distance for 2 Disulfide torsion_vector
-    objects. This is used to compare Disulfide Bond torsion angles to 
-    determine their torsional 'distance'.
-    
-    Arguments: p1, p2 Vector objects of dimensionality 5 (5D)
-    Returns: Distance
-    '''
-
-    _p1 = ss1.torsion_array
-    _p2 = ss2.torsion_array
-    if (len(_p1) != 5 or len(_p2) != 5):
-        raise ProteusPyWarning("--> distance5d() requires vectors of length 5!")
-    d = math.dist(_p1, _p2)
-    return d
-
-def Distance_RMS(ss1, ss2):
-    '''
-    Calculate the RMS distance between the internal coordinates between 
-    two Disulfides
-    '''
-    ic1 = ss1.internal_coords()
-    ic2 = ss2.internal_coords()
-
-    totsq = 0.0
-    # only take coords for the proximal and distal disfulfides, not the 
-    # prev/next residues.
-    
-    for i in range(12):
-        p1 = ic1[i]
-        p2 = ic2[i]
-        totsq += math.dist(p1, p2)**2
-    
-    totsq /= 12
-
-    return(math.sqrt(totsq))
 
 def name_to_id(fname: str):
     '''return an entry id for filename pdb1crn.ent -> 1crn'''

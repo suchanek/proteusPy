@@ -37,7 +37,6 @@ def grid_dimensions(n):
         columns = math.ceil(root)
         return int(n / columns), int(columns)
 
-
 class DisulfideList(UserList):
     '''
     Class provides a sortable list for Disulfide objects.
@@ -108,7 +107,7 @@ class DisulfideList(UserList):
        Cprev <Vector -0.73, -17.44, -2.01>
        Nnext: <Vector 1.92, -19.18, -0.63>
     <BLANKLINE>
-     Proximal Internal Coordinates:
+     Proximal Internal Coords:
        N: <Vector -0.41, 1.40, -0.00>
        Cα: <Vector 0.00, 0.00, 0.00>
        C: <Vector 1.50, 0.00, 0.00>
@@ -117,7 +116,7 @@ class DisulfideList(UserList):
        Sγ: <Vector 0.04, -2.41, -1.50>
        Cprev <Vector -2.67, -21.75, 5.36>
        Nnext: <Vector -0.02, -18.76, 3.36>
-     Distal Internal Coordinates:
+    Distal Internal Coords:
        N: <Vector 1.04, -5.63, 1.17>
        Cα: <Vector 1.04, -4.18, 1.31>
        C: <Vector 1.72, -3.68, 2.57>
@@ -126,9 +125,9 @@ class DisulfideList(UserList):
        Sγ: <Vector -1.14, -3.69, -0.43>
        Cprev <Vector -0.73, -17.44, -2.01>
        Nnext: <Vector 1.92, -19.18, -0.63>
-    <BLANKLINE>
-     Conformation: (Χ1-Χ5):  174.629°, 82.518°, -83.322°, -62.524° -73.827°  Energy: 1.696 kcal/mol >
+     Conformation: (Χ1-Χ5):  174.629°, 82.518°, -83.322°, -62.524° -73.827°  Energy: 1.696 kcal/mol
      Ca Distance: 4.502 Å>
+
     # grab a list of disulfides via slicing
     >>> subset = DisulfideList(PDB_SS[0:10],'subset')
 
@@ -253,7 +252,45 @@ class DisulfideList(UserList):
             else:
                 print(f'Cross chain SS: {ss.repr_compact}:')
         return reslist
-    
+
+    def get_torsion_array(self):
+        """
+        
+        """
+        sslist = self.data
+        tot = len(sslist)
+        res = numpy.zeros(shape=(tot, 5))
+        idx = 0
+
+        for ss in sslist:
+            row = ss.torsion_array
+            res[idx] = row
+            idx += 1
+        return res
+
+    def Torsion_RMS(self):
+        '''
+        Calculate the RMS distance in torsion space between all pairs in the
+        DisulfideList
+        '''
+        sslist = self.data
+        tot = len(sslist)
+
+        totsq = 0.0
+        for ss1 in sslist:
+            tors1 = ss1.torsion_array
+            total1 = 0
+            for ss2 in sslist:
+                tors2 = ss2.torsion_array
+                total1 += proteusPy.dist_squared(tors1, tors2)
+        
+            totsq = totsq + (total1 / tot)
+
+        return(math.sqrt(totsq/tot**2))
+
+    # Rendering engine calculates and instantiates all bond 
+    # cylinders and atomic sphere meshes. Called by all high level routines
+
     def _render(self, style) -> pv.Plotter:
         ''' 
             Display a window showing the list of disulfides in the given style.
@@ -288,12 +325,6 @@ class DisulfideList(UserList):
         return pl
 
     def display(self, style='sb'):
-        ssList = self.data
-        tot_ss = len(ssList) # number off ssbonds
-        
-        rows, cols = grid_dimensions(tot_ss)
-        winsize = (512 * cols, 512 * rows)
-        #pl = pv.Plotter(window_size=winsize, shape=(rows, cols))
         pl = pv.Plotter()
 
         pl = self._render(style)
@@ -316,7 +347,7 @@ class DisulfideList(UserList):
 
         pl = pv.Plotter()
         pl = self._render(style=style)
-        
+
         pl.enable_anti_aliasing('msaa')
         pl.link_views()
         pl.reset_camera()
@@ -330,7 +361,8 @@ class DisulfideList(UserList):
         if verbose:
             print(f'Saved file: {fname}')
         
-        
+        return
+    
     def display_overlay(self, screenshot=False, movie=False, 
                         verbose=True,
                         fname='ss_overlay.png'):
@@ -388,6 +420,8 @@ class DisulfideList(UserList):
                 print(f'Saved mp4 animation to: {fname}')
         else:
             pl.show()
+        
+        return
 
 if __name__ == "__main__":
     import doctest
