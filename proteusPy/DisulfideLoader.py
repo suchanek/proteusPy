@@ -33,7 +33,8 @@ class DisulfideLoader:
     window using the DisulfideLoader.display() method. See below for examples.\n
 
     Example:
-        from proteusPy.Disulfide import DisulfideList, Disulfide
+        from proteusPy.Disulfide import Disulfide
+        from proteusPy.DisulfideList import DisulfideList
         from proteusPy.DiulfideLoader import DisulfideLoader
 
         SS1 = DisulfideList([],'tmp1')

@@ -1869,7 +1869,7 @@ def check_header_from_file(filename: str, model_numb = 0,
 def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0, 
                             verbose=False, dbg=False) -> bool:
     '''
-    Loads all Disulfides by PDB ID and initializes the Disulfide objects.
+    Loads the Disulfides by PDB ID and initializes the Disulfide objects.
     Assumes the file is downloaded in the pdb_dir path.
     
     NB: Requires EGS-Modified BIO.parse_pdb_header.py 
@@ -1985,32 +1985,6 @@ def Check_chains(pdbid, pdbdir, verbose=True):
             if verbose:
                 print(f'Chains are equal length, assuming the same. {chain_lens}')
     return(same)
-
-def build_torsion_df(SSList: DisulfideList) -> pd.DataFrame:
-    '''
-    Create a dataframe containing the input DisulfideList torsional parameters,
-    ca-ca distance, energy, and phi-psi angles. This can take a while for the
-    entire database.
-
-    :param SSList: DisulfideList - input list of Disulfides
-    :return: pandas.Dataframe containing the torsions
-    '''
-    # create a dataframe with the following columns for the disulfide 
-    # conformations extracted from the structure
-    
-    SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
-
-    pbar = tqdm(SSList, ncols=_PBAR_COLS)
-    for ss in pbar:
-        #pbar.set_postfix({'ID': ss.name}) # update the progress bar
-
-        new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, 
-        		ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance,
-                ss.psiprox, ss.psiprox, ss.phidist, ss.psidist]
-        # add the row to the end of the dataframe
-        SS_df.loc[len(SS_df.index)] = new_row # deep copy
-    
-    return SS_df.copy()
 
 if __name__ == "__main__":
     import doctest

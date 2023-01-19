@@ -15,6 +15,7 @@ from proteusPy.atoms import *
 
 import pyvista as pv
 from collections import UserList
+from tqdm import tqdm
 
 _PBAR_COLS = 100
 
@@ -36,6 +37,10 @@ def grid_dimensions(n):
     else:
         columns = math.ceil(root)
         return int(n / columns), int(columns)
+
+Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', \
+           'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
+           'psi_dist']
 
 class DisulfideList(UserList):
     '''
@@ -195,6 +200,13 @@ class DisulfideList(UserList):
         return res
 
     def minmax(self):
+        """
+        Return the Disulfides with the minimum and maximum energies
+        from the DisulfideList.
+        
+        :return: Minimum, Maximum
+        :rtype: Disulfide
+        """
         sslist = sorted(self.data)
         return sslist[0], sslist[-1]
 
@@ -258,19 +270,46 @@ class DisulfideList(UserList):
                 print(f'Cross chain SS: {ss.repr_compact}:')
         return reslist
 
+    def build_torsion_df(self) -> pd.DataFrame:
+        '''
+        Create a dataframe containing the input DisulfideList torsional parameters,
+        ca-ca distance, energy, and phi-psi angles. This can take a while for the
+        entire database.
+
+        :param SSList: DisulfideList - input list of Disulfides
+        :return: pandas.Dataframe containing the torsions
+        '''
+        # create a dataframe with the following columns for the disulfide 
+        # conformations extracted from the structure
+        
+        SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
+        sslist = self.data
+
+        pbar = tqdm(sslist, ncols=_PBAR_COLS)
+        for ss in pbar:
+            #pbar.set_postfix({'ID': ss.name}) # update the progress bar
+
+            new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, 
+                    ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance,
+                    ss.psiprox, ss.psiprox, ss.phidist, ss.psidist]
+            # add the row to the end of the dataframe
+            SS_df.loc[len(SS_df.index)] = new_row
+        
+        return SS_df
+
     def get_torsion_array(self):
         """
-        
+        Returns an rows X 5 array representing the dihedral angles
+        in the given disulfide list.
+
         """
         sslist = self.data
         tot = len(sslist)
         res = numpy.zeros(shape=(tot, 5))
-        idx = 0
 
-        for ss in sslist:
+        for idx, ss in zip(range(tot), sslist):
             row = ss.torsion_array
             res[idx] = row
-            idx += 1
         return res
 
     def Torsion_RMS(self):
