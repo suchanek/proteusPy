@@ -42,6 +42,8 @@ Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi
            'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
            'psi_dist']
 
+Distance_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'energy', 'ca_distance']
+
 class DisulfideList(UserList):
     '''
     Class provides a sortable list for Disulfide objects.
@@ -135,16 +137,7 @@ class DisulfideList(UserList):
 
     # grab a list of disulfides via slicing
     >>> subset = DisulfideList(PDB_SS[0:10],'subset')
-
     >>> subset.display_overlay()        # display all disulfides overlaid in stick style
-
-    >>> subset.screenshot(style='sb', fname='subset.png')  # save a screenshot.
-    Saving file: subset.png
-    Saved file: subset.png
-
-    >>> SSlist = PDB_SS[:8]         # get SS bonds for the last 8 structures\n
-    SSlist.display('sb')        # render the disulfides in 'split bonds' style\n
-
     '''
     
     def __init__(self, iterable, id):
@@ -179,12 +172,14 @@ class DisulfideList(UserList):
             return value
         raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
     
-    def set_id(self, value):
+    @property
+    def id(self):
+        return(self.pdb_id)
+    
+    @id.setter
+    def id(self, value):
         self.pdb_id = value
     
-    def get_id(self):
-        return self.pdb_id
-
     def get_by_name(self, name):
         '''
         Returns the Disulfide with the given name from the list.
@@ -269,7 +264,11 @@ class DisulfideList(UserList):
             else:
                 print(f'Cross chain SS: {ss.repr_compact}:')
         return reslist
-
+    
+    @property
+    def torsion_df(self):
+        return self.build_torsion_df()
+    
     def build_torsion_df(self) -> pd.DataFrame:
         '''
         Create a dataframe containing the input DisulfideList torsional parameters,
@@ -297,6 +296,37 @@ class DisulfideList(UserList):
         
         return SS_df
 
+    @property
+    def distance_df(self):
+        return self.build_distance_df()
+    
+    def build_distance_df(self) -> pd.DataFrame:
+        """
+        Create a dataframe containing the input DisulfideList ca-ca distance, energy. 
+        This can take several minutes for the entire database.
+
+        :return: DataFrame containing Ca distances
+        :rtype: pd.DataFrame
+        """
+        
+        # create a dataframe with the following columns for the disulfide 
+        # conformations extracted from the structure
+        
+        SS_df = pd.DataFrame(columns=Distance_DF_Cols)
+        sslist = self.data
+
+        pbar = tqdm(sslist, ncols=_PBAR_COLS)
+        for ss in pbar:
+            new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.energy, ss.ca_distance]
+            # add the row to the end of the dataframe
+            SS_df.loc[len(SS_df.index)] = new_row
+        
+        return SS_df
+
+    @property
+    def torsion_array(self):
+        return(self.get_torsion_array())
+    
     def get_torsion_array(self):
         """
         Returns an rows X 5 array representing the dihedral angles
@@ -363,8 +393,8 @@ class DisulfideList(UserList):
                     enrg = ss.energy
                     title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol Ca: {ss.ca_distance:.2f}'
                     pl.add_title(title=title, font_size=FONTSIZE)
-                    ss._render(pl, style=style, bondcolor=BOND_COLOR, 
-                                   bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+                    ss._render(pl, style=style, bondcolor=BOND_COLOR, bs_scale=BS_SCALE, 
+                            spec=SPECULARITY, specpow=SPEC_POWER)
                 i += 1
         return pl
 
@@ -440,11 +470,9 @@ class DisulfideList(UserList):
         mycol = numpy.zeros(shape=(tot_ss, 3))
         mycol = proteusPy.cmap_vector(tot_ss)
 
-        i = 0
-        for ss in ssbonds:
+        for i, ss in zip(range(tot_ss), ssbonds):
             color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
             ss._render(pl, style='plain', bondcolor=color, translate=False)
-            i += 1
 
         pl.reset_camera()
 
