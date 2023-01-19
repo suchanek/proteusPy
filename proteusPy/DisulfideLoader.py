@@ -52,7 +52,7 @@ class DisulfideLoader:
 
     def __init__(self, verbose=True, datadir=DATA_DIR, picklefile=SS_PICKLE_FILE, 
                 pickle_dict_file=SS_DICT_PICKLE_FILE,
-                torsion_file=SS_TORSIONS_FILE, quiet=True):
+                torsion_file=SS_TORSIONS_FILE, quiet=True, subset=False):
         self.ModelDir = datadir
         self.PickleFile = f'{datadir}{picklefile}'
         self.PickleDictFile = f'{datadir}{pickle_dict_file}'
@@ -69,12 +69,17 @@ class DisulfideLoader:
         
         SS_df = pd.DataFrame(columns=Torsion_DF_Cols, index=['source'])
         _SSList = DisulfideList([], 'ALL_PDB_SS')
-
         idlist = []
+
+        if subset:
+            self.PickleFile = f'{datadir}PDB_1000_ss.pkl'
+            self.PickleDictFile = f'{datadir}PDB_1000_ss_dict.pkl'
+            self.TorsionFile = f'{datadir}PDB_1000_SS_torsions.csv'
+        
         if verbose:
             print(f'Reading disulfides from: {self.PickleFile}')
+        
         with open(self.PickleFile, 'rb') as f:
-            #sslist = DisulfideList([], 'tmp')
             sslist = pickle.load(f)
             self.SSList = sslist
 
