@@ -14,7 +14,6 @@
 import shutil
 
 from proteusPy.Disulfide import Extract_Disulfides
-from proteusPy import torad, todeg
 
 # the locations below represent the actual location on the dev drive.
 # location for PDB repository
@@ -30,13 +29,13 @@ MODELS = f'{PDB_BASE}models/'
 # setting up specific pkl files for a small extraction. 
 # don't set these at all for the default extraction
 
-_SS_PICKLE_FILE = 'PDB_all_ss.pkl'
-_SS_DICT_PICKLE_FILE = 'PDB_all_ss_dict.pkl'
-_SS_TORSIONS_FILE = 'PDB_all_SS_torsions.csv'
-_PROBLEM_ID_FILE = 'PDB_all_SS_problems.csv'
+_SS_PICKLE_FILE = 'PDB_1000_ss.pkl'
+_SS_DICT_PICKLE_FILE = 'PDB_1000_ss_dict.pkl'
+_SS_TORSIONS_FILE = 'PDB_1000_SS_torsions.csv'
+_PROBLEM_ID_FILE = 'PDB_1000_SS_problems.csv'
 
 
-Extract_Disulfides(numb=-1, pdbdir=PDB, datadir=MODELS,
+Extract_Disulfides(numb=1000, pdbdir=PDB, datadir=MODELS,
                 dictfile=_SS_DICT_PICKLE_FILE,
                 picklefile=_SS_PICKLE_FILE,
                 torsionfile=_SS_TORSIONS_FILE,
@@ -44,10 +43,10 @@ Extract_Disulfides(numb=-1, pdbdir=PDB, datadir=MODELS,
                 verbose=False, quiet=True)
 
 
-# Extract_Disulfides(numb=1000, pdbdir=PDB, datadir=MODELS,
+# Extract_Disulfides(numb=-1, pdbdir=PDB, datadir=MODELS,
 #                 verbose=False, quiet=True)
 
-update = True
+update = False
 
 if update:
     print(f'Copying: {MODELS} to {REPO_MODELS}')
