@@ -65,16 +65,17 @@ class DisulfideLoader:
         self.QUIET = quiet
 
         # create a dataframe with the following columns for the disulfide conformations extracted from the structure
-        #Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist', 'psi_dist']
+        # Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 
+        # 'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist', 'psi_dist']
         
         SS_df = pd.DataFrame(columns=Torsion_DF_Cols, index=['source'])
         _SSList = DisulfideList([], 'ALL_PDB_SS')
         idlist = []
 
         if subset:
-            self.PickleFile = f'{datadir}PDB_1000_ss.pkl'
-            self.PickleDictFile = f'{datadir}PDB_1000_ss_dict.pkl'
-            self.TorsionFile = f'{datadir}PDB_1000_SS_torsions.csv'
+            self.PickleFile = f'{datadir}PDB_subset_ss.pkl'
+            self.PickleDictFile = f'{datadir}PDB_subset_ss_dict.pkl'
+            self.TorsionFile = f'{datadir}PDB_subset_SS_torsions.csv'
         
         if verbose:
             print(f'Reading disulfides from: {self.PickleFile}')
