@@ -44,7 +44,7 @@ def SSlist_DisplayTest(sslist):
 
 if __name__ == '__main__':
     PDB_SS = None
-    PDB_SS = DisulfideLoader(verbose=True)
+    PDB_SS = DisulfideLoader(verbose=True, subset=True)
     
     # one disulfide from the database
     ss = Disulfide()

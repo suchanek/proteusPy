@@ -65,7 +65,7 @@ class DisulfideList(UserList):
     >>> SS = Disulfide('tmp')
     >>> SSlist = DisulfideList([],'ss')
 
-    >>> PDB_SS = DisulfideLoader(verbose=True)  # load the Disulfide database
+    >>> PDB_SS = DisulfideLoader(verbose=True, subset=True)  # load the Disulfide database
     Reading disulfides from: /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_ss.pkl
     Disulfides Read: 8210
     Reading disulfide dict from: /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_ss_dict.pkl
@@ -77,7 +77,6 @@ class DisulfideList(UserList):
     >>> SS = PDB_SS[0]              # returns a Disulfide object at index 0
     >>> SS
     <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>
-
     >>> SS4yys = PDB_SS['4yys']     # returns a DisulfideList containing all
     >>> SS4yys
     [<Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>, <Disulfide 4yys_56A_98A SourceID: 4yys Proximal: 56 A Distal: 98 A>, <Disulfide 4yys_156A_207A SourceID: 4yys Proximal: 156 A Distal: 207 A>, <Disulfide 4yys_22B_65B SourceID: 4yys Proximal: 22 B Distal: 65 B>, <Disulfide 4yys_56B_98B SourceID: 4yys Proximal: 56 B Distal: 98 B>, <Disulfide 4yys_156B_207B SourceID: 4yys Proximal: 156 B Distal: 207 B>]
@@ -135,7 +134,7 @@ class DisulfideList(UserList):
      Conformation: (Χ1-Χ5):  174.629°, 82.518°, -83.322°, -62.524° -73.827°  Energy: 1.696 kcal/mol
      Ca Distance: 4.502 Å>
 
-    # grab a list of disulfides via slicing
+    # get a list of disulfides via slicing
     >>> subset = DisulfideList(PDB_SS[0:10],'subset')
     >>> subset.display_overlay()        # display all disulfides overlaid in stick style
     '''
@@ -194,7 +193,7 @@ class DisulfideList(UserList):
                 break
         return res
 
-    def minmax(self):
+    def minmax_energy(self):
         """
         Return the Disulfides with the minimum and maximum energies
         from the DisulfideList.
@@ -322,6 +321,19 @@ class DisulfideList(UserList):
             SS_df.loc[len(SS_df.index)] = new_row
         
         return SS_df
+
+    def minmax_distance(self):
+        """
+        """
+        distance_df = self.build_distance_df()
+        distance_df.sort_values(by=['ca_distance'], ascending=True, inplace=True)
+        ssmin_id = distance_df.iloc[0]['ss_id']
+        ssmax_id = distance_df.iloc[-1]['ss_id']
+
+        ssmin = self.get_by_name(ssmin_id)
+        ssmax = self.get_by_name(ssmax_id)
+
+        return ssmin, ssmax
 
     @property
     def torsion_array(self):
