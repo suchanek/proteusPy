@@ -39,7 +39,7 @@ global Torsion_DF_Cols
 
 Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', \
            'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
-           'psi_dist']
+           'psi_dist', 'torsion_length']
 
 def torad(deg):
     return(numpy.radians(deg))
@@ -142,9 +142,7 @@ class Disulfide:
         self.chi4 = _ANG_INIT
         self.chi5 = _ANG_INIT
 
-        # Initialize an array for the torsions which will be used for comparisons
-        self.dihedrals = numpy.array((_ANG_INIT, _ANG_INIT, _ANG_INIT,
-        							  _ANG_INIT, _ANG_INIT), "d")
+        self.torsion_length = _FLOAT_INIT
 
     def internal_coords(self) -> numpy.array:
         '''
@@ -980,6 +978,7 @@ class Disulfide:
         self.ca_distance = proteusPy.distance3d(self.ca_prox, self.ca_dist)
         self.torsion_array = numpy.array((self.chi1, self.chi2, self.chi3, 
                                         self.chi4, self.chi5))
+        self.torsion_length = self.Torsion_length()
 
         # calculate and set the SS bond torsional energy
         self.compute_torsional_energy()
@@ -1100,11 +1099,17 @@ class Disulfide:
         self.proximal = proximal
         self.distal = distal
 
-    def Distance_RMS(self, other):
-        '''
+    def Distance_RMS(self, other) -> float:
+        """
         Calculate the RMS distance between the internal coordinates
         of self and another Disulfide
-        '''
+
+        :param other: Comparison Disulfide
+        :type other: Disulfide
+        :return: RMS distance
+        :rtype: float
+        """
+        x
         ic1 = self.internal_coords()
         ic2 = other.internal_coords()
 
@@ -1255,22 +1260,32 @@ class Disulfide:
 
     def Torsion_length(self) -> float:
         """
-        Compute the Euclidean length of the Disulfide's Chi1-Chi5 torsion angles.
+        Compute the 5-D Euclidean length of the Disulfide
+        Chi1-Chi5 torsion angles. Sets internal state
+    
+        :return: length
+        :rtype: float
         """
-        tors = self.torsion_array
-        dist = math.dist(tors, tors)
 
+        tors = self.torsion_array
+        tors2 = tors * tors
+        dist = math.sqrt(sum(tors2))
+
+        self.torsion_length = dist
         return dist
 
     def Torsion_RMS(self, other):
-        '''
+        """
         Calculate the 5D Euclidean distance between self and another Disulfide
         object. This is used to compare Disulfide Bond torsion angles to 
         determine their torsional similarity via a Euclidean distance metric.
-        
-        Arguments: p1, p2 Vector objects of dimensionality 5 (5D)
-        Returns: Distance
-        '''
+
+        :param other: other Disulfide to compare
+        :type other: Disulfide
+        :raises ProteusPyWarning: Warning if other object is not a Disulfide
+        :return: RMS distance between the two Disulfides
+        :rtype: float
+        """
 
         _p1 = self.torsion_array
         _p2 = other.torsion_array
@@ -1280,10 +1295,14 @@ class Disulfide:
         return d
 
     def Distance_RMS(self, other):
-        '''
+        """
         Calculate the RMS distance between the internal coordinates between 
         two Disulfides
-        '''
+
+        :param other: other Disulfide to compare
+        :type other: Disulfide
+        """
+        
         ic1 = self.internal_coords()
         ic2 = other.internal_coords()
 
@@ -1333,14 +1352,31 @@ def parse_ssbond_header_rec(ssbond_dict: dict) -> list:
 
 def Download_Disulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR, 
                        verbose=False, reset=False) -> None:
-    '''
-    Function reads a comma separated list of PDB IDs and downloads them
+    """
+    Reads a comma separated list of PDB IDs and downloads them
     to the pdb_home path. 
 
     Used to download the list of proteins containing at least one SS bond
-    with the ID list generated from: http://www.rcsb.org/
-    '''
+    with the ID list generated from: http://www.rcsb.org/.
 
+    This is the primary data loader for the proteusPy Disulfide 
+    analysis package. The list of IDs represents files in the 
+    RCSB containing > 1 disulfide bond, and it contains
+    over 39000 structures. The total download takes about 12 hours. The
+    function keeps track of downloaded files so it's possible to interrupt and
+    restart the download without duplicating effort.
+
+    :param pdb_home: Path for downloaded files, defaults to PDB_DIR
+    :type pdb_home: str, optional
+    :param model_home: Path for extracted data, defaults to MODEL_DIR
+    :type model_home: str, optional
+    :param verbose: Verbose, defaults to False
+    :type verbose: bool, optional
+    :param reset: reset the downloaded file list, defaults to False
+    :type reset: bool, optional
+    :raises DisulfideIOException: Exceptions raised for file errors
+    """
+    
     start = time.time()
     donelines = []
     SS_done = []
@@ -1578,7 +1614,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
                 new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, 
                 		  ss.chi1, ss.chi2, ss.chi3, ss.chi4, ss.chi5, 
                 		  ss.energy, ss.ca_distance, ss.phiprox, 
-                          ss.psiprox, ss.phidist, ss.psidist]
+                          ss.psiprox, ss.phidist, ss.psidist, ss.torsion_length]
                           
                 # add the row to the end of the dataframe
                 SS_df.loc[len(SS_df.index)] = new_row.copy() # deep copy
