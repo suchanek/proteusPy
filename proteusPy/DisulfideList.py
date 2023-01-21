@@ -40,7 +40,7 @@ def grid_dimensions(n):
 
 Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', \
            'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
-           'psi_dist']
+           'psi_dist', 'torsion_length']
 
 Distance_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'energy', 'ca_distance']
 
@@ -285,11 +285,9 @@ class DisulfideList(UserList):
 
         pbar = tqdm(sslist, ncols=_PBAR_COLS)
         for ss in pbar:
-            #pbar.set_postfix({'ID': ss.name}) # update the progress bar
-
             new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, 
                     ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance,
-                    ss.psiprox, ss.psiprox, ss.phidist, ss.psidist]
+                    ss.psiprox, ss.psiprox, ss.phidist, ss.psidist, ss.torsion_distance]
             # add the row to the end of the dataframe
             SS_df.loc[len(SS_df.index)] = new_row
         

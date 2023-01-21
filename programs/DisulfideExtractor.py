@@ -1,6 +1,6 @@
 # DisulfideExtractor.py
 # Author: Eric G. Suchanek, PhD.
-# Last modification: 12/3/22 -egs-
+# Last modification: 1/21/23 -egs-
 #
 # Purpose:
 # This program processes all the PDB *.ent files in PDB_DIR and creates an array of 
@@ -26,8 +26,12 @@ REPO_MODELS = '/Users/egs/repos/proteusPy/proteusPy/data/'
 # location of the compressed Disulfide .pkl files
 MODELS = f'{PDB_BASE}models/'
 
-# setting up specific pkl files for a small extraction. 
-# don't set these at all for the default extraction
+# setting up specific pkl files for a small extraction.
+# you must use these exact names, regardless of the number
+# extracted in order for the DisulfideLoader class to load them
+# correctly. 
+#
+# don't set these at all for the default total extraction
 
 _SS_PICKLE_FILE = 'PDB_subset_ss.pkl'
 _SS_DICT_PICKLE_FILE = 'PDB_subset_ss_dict.pkl'
@@ -35,14 +39,15 @@ _SS_TORSIONS_FILE = 'PDB_subset_SS_torsions.csv'
 _PROBLEM_ID_FILE = 'PDB_subset_SS_problems.csv'
 
 
-Extract_Disulfides(numb=5000, pdbdir=PDB, datadir=MODELS,
+Extract_Disulfides(numb=2500, pdbdir=PDB, datadir=MODELS,
                 dictfile=_SS_DICT_PICKLE_FILE,
                 picklefile=_SS_PICKLE_FILE,
                 torsionfile=_SS_TORSIONS_FILE,
                 problemfile=_PROBLEM_ID_FILE,
                 verbose=False, quiet=True)
 
-
+# total extraction uses numb=-1 and takes about 1.5 hours on
+# my 2021 MacbookPro M1 Pro computer.
 # Extract_Disulfides(numb=-1, pdbdir=PDB, datadir=MODELS,
 #                 verbose=False, quiet=True)
 
