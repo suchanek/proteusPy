@@ -35,6 +35,9 @@ from .Disulfide import Download_Disulfides, Extract_Disulfides, Check_chains
 from .DisulfideLoader import DisulfideLoader
 from .atoms import *
 
+"""
+.. include:: ./README.md
+"""
 def torad(deg):
     return(numpy.radians(deg))
 

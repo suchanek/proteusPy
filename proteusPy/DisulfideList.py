@@ -19,13 +19,33 @@ from tqdm import tqdm
 
 _PBAR_COLS = 100
 
-def grid_dimensions(n):
+def atest():
     '''
     Calculate rows and columns for the given needed to display
     a given number of disulfides in a square aspect.
 
     :param n: int Number of Disulfides
+    :param y: int Number of Disulfides
     :return: int rows, columns
+    '''
+    return
+
+def grid_dimensions(n):
+    '''
+    Calculate rows and columns for the given needed to display
+    a given number of disulfides in a square aspect.
+
+    Parameters
+    ----------
+    n : int
+        Number of Disulfides
+    y : float
+        Number of bosons
+
+    Returns
+    -------
+    int
+        rows, columns
     '''
     
     root = math.sqrt(n)
@@ -59,8 +79,7 @@ class DisulfideList(UserList):
     >>> from proteusPy.DisulfideLoader import DisulfideLoader
     >>> from proteusPy.DisulfideList import DisulfideList
         
-    # instantiate some variables
-    # Note: the list is initialized with an iterable and a name (optional)
+    Instantiate some variables. Note: the list is initialized with an iterable and a name (optional)
 
     >>> SS = Disulfide('tmp')
     >>> SSlist = DisulfideList([],'ss')
@@ -73,15 +92,15 @@ class DisulfideList(UserList):
     >>> SS4yys
     [<Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>, <Disulfide 4yys_56A_98A SourceID: 4yys Proximal: 56 A Distal: 98 A>, <Disulfide 4yys_156A_207A SourceID: 4yys Proximal: 156 A Distal: 207 A>, <Disulfide 4yys_22B_65B SourceID: 4yys Proximal: 22 B Distal: 65 B>, <Disulfide 4yys_56B_98B SourceID: 4yys Proximal: 56 B Distal: 98 B>, <Disulfide 4yys_156B_207B SourceID: 4yys Proximal: 156 B Distal: 207 B>]
 
-    # make some empty disulfides
+    Make some empty disulfides
     >>> ss1 = Disulfide('ss1')
     >>> ss2 = Disulfide('ss2')
 
-    # make a DisulfideList containing ss1, named 'tmp'
+    Make a DisulfideList containing ss1, named 'tmp'
     >>> sslist = DisulfideList([ss1], 'tmp')
     >>> sslist.append(ss2)
 
-    # extract the first disulfide
+    Extract the first disulfide
     >>> ss1 = PDB_SS[0]
     >>> ss1.pprint_all()
     <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A
@@ -133,7 +152,18 @@ class DisulfideList(UserList):
     >>> subset.display_overlay()        # display all disulfides overlaid in stick style
     '''
     
-    def __init__(self, iterable, id):
+    def __init__(self, iterable, id: str):
+        '''
+        Initialize a DisulfideList object.
+
+        Parameters
+        ----------
+        iterable : iterable
+            Must be a valid iterable like []
+        id : str
+            Name of the list.        
+        '''
+
         self.pdb_id = id
         super().__init__(self.validate_ss(item) for item in iterable)
 
@@ -149,9 +179,29 @@ class DisulfideList(UserList):
         self.data[index] = self.validate_ss(item)
 
     def insert(self, index, item):
+        '''
+        Insert a Disulfide into the list at the specified index
+
+        Parameters
+        ----------
+        index : int
+            Index insertion point
+        item : Disulfide
+            Disulfide to insert
+        '''
         self.data.insert(index, self.validate_ss(item))
 
     def append(self, item):
+        '''
+        Append a Disulfide at the end of the list.
+
+        Parameters
+        ----------
+        index : int
+            Index insertion point
+        item : Disulfide
+            Disulfide to insert
+        '''
         self.data.append(self.validate_ss(item))
 
     def extend(self, other):
@@ -160,12 +210,12 @@ class DisulfideList(UserList):
         else:
             self.data.extend(self._validate_ss(item) for item in other)
     
-    def Ovalidate_ss(self, value):
-        if isinstance(value, (proteusPy.Disulfide.Disulfide)):
+    def validate_ss(self, value):
+        if isinstance(value, type(self)):
             return value
         raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
 
-    def validate_ss(self, value):
+    def Ovalidate_ss(self, value):
         return value
     
     def pprint(self):
@@ -186,10 +236,21 @@ class DisulfideList(UserList):
     
     @property
     def id(self):
+        '''
+        PDB ID of the list
+        '''
         return(self.pdb_id)
     
     @id.setter
     def id(self, value):
+        '''
+        Set the DisulfideList ID
+
+        Parameters
+        ----------
+        value : str
+            List ID
+        '''
         self.pdb_id = value
     
     def get_by_name(self, name):
@@ -207,21 +268,39 @@ class DisulfideList(UserList):
         return res
 
     def minmax_energy(self):
-        """
+        '''
         Return the Disulfides with the minimum and maximum energies
         from the DisulfideList.
-        
-        :return: Minimum, Maximum
-        :rtype: Disulfide
-        """
+
+        Returns
+        -------
+        Disulfide
+            Disulfide with the given ID
+        '''
         sslist = sorted(self.data)
         return sslist[0], sslist[-1]
 
     def min(self):
+        '''
+        Return Disulfide from the list with the minimum energy
+
+        Returns
+        -------
+        Disulfide
+            Disulfide with the minimum energy.
+        '''
         sslist = sorted(self.data)
         return sslist[0]
     
     def max(self):
+        '''
+        Return Disulfide from the list with the maximum energy
+
+        Returns
+        -------
+        Disulfide
+            Disulfide with the maximum energy.
+        '''
         sslist = sorted(self.data)
         return sslist[-1]
     
