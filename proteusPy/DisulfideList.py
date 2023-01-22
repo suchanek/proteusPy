@@ -65,15 +65,7 @@ class DisulfideList(UserList):
     >>> SS = Disulfide('tmp')
     >>> SSlist = DisulfideList([],'ss')
 
-    >>> PDB_SS = DisulfideLoader(verbose=True, subset=True)  # load the Disulfide database
-    Reading disulfides from: /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_ss.pkl
-    Disulfides Read: 8210
-    Reading disulfide dict from: /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_ss_dict.pkl
-    Reading Torsion DF /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_SS_torsions.csv.
-    Read torsions DF.
-    PDB IDs parsed: 1000
-    Total Space Used: 1969317 bytes.
-
+    >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)  # load the Disulfide database
     >>> SS = PDB_SS[0]              # returns a Disulfide object at index 0
     >>> SS
     <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>
@@ -132,9 +124,11 @@ class DisulfideList(UserList):
        Cprev <Vector -0.73, -17.44, -2.01>
        Nnext: <Vector 1.92, -19.18, -0.63>
      Conformation: (Χ1-Χ5):  174.629°, 82.518°, -83.322°, -62.524° -73.827°  Energy: 1.696 kcal/mol
-     Ca Distance: 4.502 Å>
+     Cα Distance: 4.502 Å 
+     Torsion length: 231.531 deg 
+    >
 
-    # get a list of disulfides via slicing
+    Get a list of disulfides via slicing
     >>> subset = DisulfideList(PDB_SS[0:10],'subset')
     >>> subset.display_overlay()        # display all disulfides overlaid in stick style
     '''
@@ -166,10 +160,29 @@ class DisulfideList(UserList):
         else:
             self.data.extend(self._validate_ss(item) for item in other)
     
-    def validate_ss(self, value):
+    def Ovalidate_ss(self, value):
         if isinstance(value, (proteusPy.Disulfide.Disulfide)):
             return value
         raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
+
+    def validate_ss(self, value):
+        return value
+    
+    def pprint(self):
+        '''
+        Pretty print self.
+        '''
+        sslist = self.data
+        for ss in sslist:
+            ss.pprint()
+    
+    def pprint_all(self):
+        '''
+        Pretty print full disulfide descriptions in self.
+        '''
+        sslist = self.data
+        for ss in sslist:
+            ss.pprint_all()
     
     @property
     def id(self):
