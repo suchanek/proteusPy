@@ -4,6 +4,7 @@
 # protein structures, with an emphasis on disulfide bonds.
 # Author: Eric G. Suchanek, PhD
 # Last revision: 1/11/2023
+# Cα
 
 import math
 import copy
@@ -62,12 +63,14 @@ class Disulfide:
 
     """
     def __init__(self, name: str="SSBOND") -> None:
-        """
-        Initialize the class. All positions are set to the origin. 
-        The optional string name may be passed.
-        :param name: str Disufide Name
-        :return: None
-        """
+        '''
+        __init__ Initialize the class to defined internal values.
+
+        Parameters
+        ----------
+        name : str, optional
+            Disulfide name, by default "SSBOND"
+        '''
         self.name = name
         self.proximal = -1
         self.distal = -1
@@ -146,14 +149,17 @@ class Disulfide:
 
     def internal_coords(self) -> numpy.array:
         '''
-        Return the internal coordinates for the Disulfide.
+        internal_coords Returns the internal coordinates for the Disulfide.
         If there are missing atoms the extra atoms for the proximal
         and distal N and C are set to [0,0,0]. This is needed for the center of
         mass calculations, used when rendering.
         
-        :return: numpy.Array containing the coordinates, [16][3].
-
+        Returns
+        -------
+        numpy.array
+            containing the coordinates, [16][3].
         '''
+        
         # if we don't have the prior and next atoms we initialize those
         # atoms to the origin so as to not effect the center of mass calculations
         if self.missing_atoms:
@@ -198,12 +204,13 @@ class Disulfide:
     
     def cofmass(self) -> numpy.array:
         '''
+
         Returns the geometric center of mass for the internal coordinates of
         the given Disulfide. Missing atoms are not included.
 
-        :return: numpy.array CenterOfMass 
+        :return: numpy.array 3D array for the center of mass.
+        ''' 
 
-        '''
         res = self.internal_coords()
         return res.mean(axis=0)
 
@@ -212,9 +219,20 @@ class Disulfide:
         Returns the internal coordinates for the internal coordinates of
         the given Disulfide. Missing atoms are not included.
 
-        :
-        :return: numpy.array CenterOfMass 
+        Parameters
+        ----------
+        resnumb : int
+            Residue number for disulfide
 
+        Returns
+        -------
+        numpy.array
+            Array containing the internal coordinates for the disulfide
+
+        Raises
+        ------
+        DisulfideConstructionWarning
+            Warning raised if the residue number is invalid
         '''
         res_array = numpy.zeros(shape=(6,3))
 
@@ -243,11 +261,15 @@ class Disulfide:
             mess = f'-> Disulfide.internal_coords(): Invalid argument. \
              Unable to find residue: {resnumb} '
             raise DisulfideConstructionWarning(mess)
-    
+
     def get_chains(self) -> tuple:
         '''
         Return the proximal and distal chain IDs for the Disulfide.
-        :return: tuple containing proximal and distal chain IDs
+
+        Returns
+        -------
+        tuple
+            (proximal, distal) chain IDs
         '''
         prox = self.proximal_chain
         dist = self.distal_chain
@@ -255,24 +277,33 @@ class Disulfide:
     
     def same_chains(self) -> bool:
         '''
-        Return True if the proximal and distal residues have the same 
-        chain ID else False.
-        :return: True if the same chain else False
+        Function checks if the Disulfide is cross-chain or not.
+
+        Returns
+        -------
+        bool
+            True if the proximal and distal residues are on the same chains,
+            False otherwise.
         '''
+
         (prox, dist) = self.get_chains()
         return prox == dist
         
     def reset(self) -> None:
         '''
-        Resets the Disulfide object to its initialized state. All dihedrals and positions are reset.
-        :return: None
+        Resets the disulfide object to its initial state. All distances, 
+        angles and positions are reset. The name is unchanged.
         '''
         self.__init__(self)
 
     def copy(self):
         '''
-        Return a copy of the Disulfide object
-        :return: copy of the object
+        Copy the Disulfide
+
+        Returns
+        -------
+        Disulfide
+            A copy of self.
         '''
         
         return copy.deepcopy(self)
@@ -280,8 +311,16 @@ class Disulfide:
     def compute_extents(self, dim='z'):
         '''
         Calculate the internal coordinate extents for the input axis.
-        :param dim: str x, y or z
-        :return: min, max - minimum and maximum for the input axis
+
+        Parameters
+        ----------
+        dim : str, optional
+            Axis, one of 'x', 'y', 'z', by default 'z'
+
+        Returns
+        -------
+        float
+            min, max
         '''
         ic = self.internal_coords()
         # set default index to 'z'
@@ -299,6 +338,15 @@ class Disulfide:
         return _min, _max
 
     def bounding_box(self):
+        '''
+        Return the bounding box array for the given disulfide
+
+        Returns
+        -------
+        numpy.Array(3,2)
+            Array containing the min, max for X, Y, and Z respectively. Does not currently
+            take the atom's radius into account.
+        '''
         res = numpy.zeros(shape=(3, 2))
         xmin, xmax = self.compute_extents('x')
         ymin, ymax = self.compute_extents('y')
@@ -313,37 +361,41 @@ class Disulfide:
     def _render(self, pvplot: pv.Plotter, style='bs', plain=False,
             bondcolor=BOND_COLOR, bs_scale=BS_SCALE, spec=SPECULARITY, 
             specpow=SPEC_POWER, translate=True):
-        ''' 
+        '''
         Update the passed pyVista plotter() object with the mesh data for the
         input Disulfide Bond. Used internally
-        
-        Arguments:
-            :param pvpplot: pyvista.Plotter object
-            :param style: 'bs', 'st', 'cpk', 'plain': 
-                Render as CPK, ball-and-stick or stick. 
-                Bonds are colored by atom color, unless 
-                'plain' is specified.
 
-            :param plain: bool Flag indicating plain style,
-                used internally
-            
-            :param bondcolor: bond color for simple bonds, 
-                one of pyVista color names
-            
-            :param bs_scale: float scale factor (0-1) to reduce the 
-                atom sizes for ball and stick
-            
-            :param spec:  float specularity (0-1), where 1 is 
-                totally smooth and 0 is rough
-            
-            :param specpow: int specular power - exponent used for 
-                specularity calculations
+        Parameters
+        ----------
+        pvplot : pv.Plotter
+            pyvista.Plotter object
+        style : str, optional
+            Rendering style, by default 'bs'.
+            One of 'bs', 'st', 'cpk', Render as 
+            CPK, ball-and-stick or stick. Bonds 
+            are colored by atom color, unless 
+            'plain' is specified.
+        plain : bool, optional
+            Used internally, by default False
+        bondcolor : pyVista color name, optional
+            bond color for simple bonds, by default BOND_COLOR
+        bs_scale : float, optional
+            scale factor (0-1) to reduce the 
+            atom sizes for ball and stick, by default BS_SCALE
+        spec : float, optional
+            specularity (0-1), where 1 is totally smooth 
+            and 0 is rough, by default SPECULARITY
+        specpow : int, optional
+            exponent used for 
+            specularity calculations, by default SPEC_POWER
+        translate : bool, optional
+            Flag used internally to indicate if we should translate 
+            the disulfide to its geometric center of mass, by default True.
 
-            :param translate: bool Flag used internally to indicate 
-                we should translate the disulfide to its geometric center of mass.
-            
-        :return: pv.Plotter Updated pv.Plotter() object.
-            
+        Returns
+        -------
+        pv.Plotter
+            Updated pv.Plotter object with atoms and bonds.
         '''
         
         _bradius = BOND_RADIUS
@@ -371,13 +423,22 @@ class Disulfide:
             for the starting and ending atoms and a color table for the 
             bond colors. Used internally.
 
-            :param pvp: pyVista.Plotter - input plotter object to be updated
-            :param bradius: float - bond radius
-            :param style: str - bond style. One of sb, plain, pd
-            :param bcolor: pyvista color object
-            :param missing: bool - True if atoms are missing, False othersie
-            :return pvp: pyvista.Plotter - Updated Plotter object
-
+            Parameters
+            ----------
+            pvp: pyVista.Plotter 
+                input plotter object to be updated
+            bradius: float
+                bond radius
+            style: str
+                bond style. One of sb, plain, pd
+            bcolor: pyvista color
+            missing: bool
+                True if atoms are missing, False othersie
+            
+            Returns
+            -------
+            pvp: pyvista.Plotter
+                Updated Plotter object.
             '''
             bond_conn = numpy.array(
             [
@@ -533,8 +594,12 @@ class Disulfide:
         '''
         Display the Disulfide bond in the specific rendering style.
 
-        :param single: bool - Display the bond in a single panel in the specific style.
-        :param style: str - One of 
+        Parameters
+        ----------
+        single: bool 
+            Display the bond in a single panel in the specific style.
+        style: str
+            One of 
             'sb' - split bonds
             'bs' - ball and stick
             'cpk' - CPK style
@@ -546,7 +611,7 @@ class Disulfide:
         >>> from proteusPy.Disulfide import Disulfide
         >>> from proteusPy.DisulfideLoader import DisulfideLoader
 
-        >>> PDB_SS = DisulfideLoader(verbose=True)
+        >>> PDB_SS = DisulfideLoader(verbose=True, subset=True)
         Reading disulfides from: /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_ss.pkl
         Disulfides Read: 8210
         Reading disulfide dict from: /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_ss_dict.pkl
@@ -557,7 +622,6 @@ class Disulfide:
 
         >>> ss = PDB_SS[0]
         >>> ss.display(style='sb')
-
         '''
         src = self.pdb_id
         enrg = self.energy
@@ -614,6 +678,26 @@ class Disulfide:
         return
     
     def screenshot(self, single=True, style='sb', fname='ssbond.png', verbose=False):
+        '''
+        Create and save a screenshot of the Disulfide in the given style
+        and filename
+
+        Parameters
+        ----------
+        single : bool, optional
+            Display a single vs panel view, by default True
+        style : str, optional
+            One of 
+            'sb' - split bonds
+            'bs' - ball and stick
+            'cpk' - CPK style
+            'pd' - Proximal/Distal style - Red=proximal, Green=Distal
+            'plain' - boring single color, by default 'sb'
+        fname : str, optional
+            output filename, by default 'ssbond.png'
+        verbose : bool, optional
+            Verbosity, by default False.
+        '''
         src = self.pdb_id
         ssname = self.name
         enrg = self.energy
@@ -673,7 +757,27 @@ class Disulfide:
             print(f'Saved: {fname}')
 
     def make_movie(self, style='sb', fname='ssbond.mp4',
-                   verbose=False):
+                   verbose=False, steps=360):
+        '''
+        Create and save an animation for the given Disulfide in the 
+        given style and filename.
+
+        Parameters
+        ----------
+        style : str, optional
+            One of 
+            'sb' - split bonds
+            'bs' - ball and stick
+            'cpk' - CPK style
+            'pd' - Proximal/Distal style - Red=proximal, Green=Distal
+            'plain' - boring single color, by default 'sb'
+        fname : str, optional
+            output filename, by default 'ssbond.png'
+        verbose : bool, optional
+            Verbosity, by default False.
+        steps : int
+            Number of steps for the rotation, by default 360.
+        '''
         src = self.pdb_id
         ssname = self.name
         enrg = self.energy
@@ -684,7 +788,7 @@ class Disulfide:
 
         pl = pv.Plotter(window_size=WINSIZE, off_screen=True)
         pl.open_movie(fname, quality=9)
-        path = pl.generate_orbital_path(n_points=360)
+        path = pl.generate_orbital_path(n_points=steps)
 
         pl.add_title(title=title, font_size=FONTSIZE)
         pl.enable_anti_aliasing('msaa')
@@ -756,7 +860,7 @@ class Disulfide:
         return(f'Proximal Chain fullID: <{self.proximal_residue_fullid}> Distal Chain fullID: <{self.distal_residue_fullid}>')
 
     def repr_ss_ca_dist(self):
-        s1 = f'Ca Distance: {self.ca_distance:.3f} Å'
+        s1 = f'Cα Distance: {self.ca_distance:.3f} Å'
         return s1
     
     def __repr__(self):
@@ -768,9 +872,9 @@ class Disulfide:
         res = f'{s1}>'
         return res
 
-    def pprint(self):
+    def pprint(self) -> None:
         """
-        pretty print general info for the Disulfide
+        Pretty print general info for the Disulfide
         """
         
         s1 = self.repr_ss_info()
@@ -779,9 +883,10 @@ class Disulfide:
         res = f'{s1} {s3} {s2}>'
         print(res)
 
-    def repr_all(self):
+    def repr_all(self) -> str:
         """
-        pretty print all info for a Disulfide
+        Return a string representation for all Disulfide information
+        contained in self.
         """
         
         s1 = self.repr_ss_info() + '\n'
@@ -794,16 +899,25 @@ class Disulfide:
         res = f'{s1} {s5} {s2} {s3} {s4} {s6}>'
         return res
 
-    def pprint_all(self):
+    def pprint_all(self) -> None:
         print(f'{self.repr_all()}')
     
-    def _handle_SS_exception(self, message):
-        """Handle exception (PRIVATE).
-
+    def _handle_SS_exception(self, message: str):
+        '''
         This method catches an exception that occurs in the Disulfide
         object (if PERMISSIVE), or raises it again, this time adding the
-        PDB line number to the error message.
-        """
+        PDB line number to the error message. (private).
+
+        Parameters
+        ----------
+        message : str
+            Error message
+
+        Raises
+        ------
+        DisulfideConstructionException
+            Fatal construction exception.
+        '''
         # message = "%s at line %i." % (message)
         message = f'{message}'
 
@@ -996,42 +1110,44 @@ class Disulfide:
                       c_prev_prox: Vector, n_next_prox: Vector,
                       c_prev_dist: Vector, n_next_dist: Vector
                       ):
-        """
-        Sets the atomic positions for the Disulfide object
+        '''
+        Set the atomic positions for all atoms in the Disulfide object.
 
-        :param n_prox: proximal N position
-        :type n_prox: Vector
-        :param ca_prox: proximal Ca position
-        :type ca_prox: Vector
-        :param c_prox: proximal C' position
-        :type c_prox: Vector
-        :param o_prox: proximal O position
-        :type o_prox: Vector
-        :param cb_prox: proximal Cb position
-        :type cb_prox: Vector
-        :param sg_prox: proximal Sg position
-        :type sg_prox: Vector
-        :param n_dist: distal N position
-        :type n_dist: Vector
-        :param ca_dist: distal Ca position
-        :type ca_dist: Vector
-        :param c_dist: distal C' position
-        :type c_dist: Vector
-        :param o_dist: distal O position
-        :type o_dist: Vector
-        :param cb_dist: distal Cb position
-        :type cb_dist: Vector
-        :param sg_dist: distal Sg position
-        :type sg_dist: Vector
-        :param c_prev_prox: proximal-1 C'
-        :type c_prev_prox: Vector
-        :param n_next_prox: proximal+1 N
-        :type n_next_prox: Vector
-        :param c_prev_dist: distal-1 C'
-        :type c_prev_dist: Vector
-        :param n_next_dist: distal+1 N
-        :type n_next_dist: Vector
-        """
+        Parameters
+        ----------
+        n_prox : Vector
+            Proximal N position
+        ca_prox : Vector
+            Proximal Ca position
+        c_prox : Vector
+            Proximal C' position
+        o_prox : Vector
+            Proximal O position
+        cb_prox : Vector
+            Proximal Cb position
+        sg_prox : Vector
+            Proximal Sg position
+        n_dist : Vector
+            Distal N position
+        ca_dist : Vector
+            Distal Ca position
+        c_dist : Vector
+            Distal C' position
+        o_dist : Vector
+            Distal O position
+        cb_dist : Vector
+            Distal Cb position
+        sg_dist : Vector
+            Distal Sg position
+        c_prev_prox : Vector
+            Proximal C'-1 position
+        n_next_prox : Vector
+            Proximal N+1 position
+        c_prev_dist : Vector
+            Distal C'-1 position
+        n_next_dist : Vector
+            Distal N+1 position
+        '''
         
         # deep copy
         self.n_prox = n_prox.copy()
@@ -1054,62 +1170,75 @@ class Disulfide:
 
     def set_dihedrals(self, chi1: float, chi2: float, chi3: float,
                     chi4: float, chi5: float):
-        """
-        Sets the 5 dihedral angles chi1 - chi5 for the Disulfide object and 
-        computes the torsional energy.
+        '''
+        Set the disulfide's dihedral angles, Chi1-Chi5. -180 - 180 degrees.
 
-        :param chi1: Chi1
-        :type chi1: float
-        :param chi2: Chi2
-        :type chi2: float
-        :param chi3: Chi3
-        :type chi3: float
-        :param chi4: Chi4
-        :type chi4: float
-        :param chi5: Chi5
-        :type chi5: float
-        """
+        Parameters
+        ----------
+        chi1 : float
+            Chi1
+        chi2 : float
+            Chi2
+        chi3 : float
+            Chi3
+        chi4 : float
+            Chi4
+        chi5 : float
+            Chi5
+        '''
         
         self.chi1 = chi1
         self.chi2 = chi2
         self.chi3 = chi3
         self.chi4 = chi4
         self.chi5 = chi5
-        self.dihedrals = list([chi1, chi2, chi3, chi4, chi5])
+        #self.dihedrals = list([chi1, chi2, chi3, chi4, chi5])
+        self.torsion_array = numpy.array(chi1, chi2, chi3, chi4, chi5)
         self.compute_torsional_energy()
 
     def set_name(self, namestr="Disulfide"):
         '''
-        Sets the Disulfide's name
-        Arguments: (str)namestr
-        Returns: none
+        Set's the Disulfide's name
+
+        Parameters
+        ----------
+        namestr : str, optional
+            Name, by default "Disulfide"
         '''
 
         self.name = namestr
 
-    def set_resnum(self, proximal, distal):
+    def set_resnum(self, proximal: int, distal: int) -> None:
         '''
-        Sets the Proximal and Distal Residue numbers for the Disulfide
-        Arguments: 
-            Proximal: Proximal residue number
-            Distal: Distal residue number
-        Returns: None
+        Set the proximal and residue numbers for the Disulfide.
+
+        Parameters
+        ----------
+        proximal : int
+            Proximal residue number
+        distal : int
+            Distal residue number
         '''
 
         self.proximal = proximal
         self.distal = distal
 
     def Distance_RMS(self, other) -> float:
-        """
+        '''
         Calculate the RMS distance between the internal coordinates
-        of self and another Disulfide
+        of self and another Disulfide.
 
-        :param other: Comparison Disulfide
-        :type other: Disulfide
-        :return: RMS distance
-        :rtype: float
-        """
-        x
+        Parameters
+        ----------
+        other : Disulfide
+            Comparison Disulfide
+
+        Returns
+        -------
+        float
+            RMS distance (A).
+        '''
+
         ic1 = self.internal_coords()
         ic2 = other.internal_coords()
 
@@ -1122,12 +1251,17 @@ class Disulfide:
         totsq /= 12
 
         return(math.sqrt(totsq))
-    
-    def compute_torsional_energy(self):
+
+    def compute_torsional_energy(self) -> float:
         '''
-        Compute the approximate torsional energy for the Disulfide's conformation.
-        Arguments: chi1, chi2, chi3, chi4, chi5 - the dihedral angles for the Disulfide
-        Returns: Energy (kcal/mol)
+        Compute the approximate torsional energy for the Disulfide's
+        conformation and sets its internal state.
+        
+        Returns
+        -------
+        float
+            Energy (kcal/mol)
+        
         '''
         # @TODO find citation for the ss bond energy calculation
         chi1 = self.chi1
@@ -1141,6 +1275,7 @@ class Disulfide:
         energy += 3.5 * cos(torad(2.0 * chi3)) + 0.6 * cos(torad(3.0 * chi3)) + 10.1
 
         self.energy = energy
+        return energy
 
     def compute_local_coords(self):
         """
@@ -1198,16 +1333,18 @@ class Disulfide:
         self._sg_dist = Vector(turt.to_local(sg2))
 
     def build_model(self, turtle: Turtle3D):
-        """
+        '''
         Build a model Disulfide based on the internal dihedral angles.
         Routine assumes turtle is in orientation #1 (at Ca, headed toward
         Cb, with N on left), builds disulfide, and updates the object's internal
-        coordinate state. It also adds the distal protein backbone,
+        coordinates. It also adds the distal protein backbone,
         and computes the disulfide conformational energy.
 
-        Arguments: turtle: Turtle3D object properly oriented for the build.
-        Returns: None. The Disulfide object's internal state is updated.
-        """
+        Parameters
+        ----------
+        turtle : Turtle3D
+            turtle in orientation #1 (at Ca, headed toward Cb, with N on left)
+        '''
 
         tmp = Turtle3D('tmp')
         tmp.copy_coords(turtle)
@@ -1255,17 +1392,18 @@ class Disulfide:
         self.n_dist = n
         self.ca_dist = ca
         self.c_dist = c
-
         self.compute_torsional_energy()
 
     def Torsion_length(self) -> float:
-        """
-        Compute the 5-D Euclidean length of the Disulfide
-        Chi1-Chi5 torsion angles. Sets internal state
-    
-        :return: length
-        :rtype: float
-        """
+        '''
+        Compute the 5D Euclidean length of the Disulfide object
+        and update the Disulfide internal state.
+
+        Returns
+        -------
+        float
+            Torsion length
+        '''
 
         tors = self.torsion_array
         tors2 = tors * tors
@@ -1274,18 +1412,27 @@ class Disulfide:
         self.torsion_length = dist
         return dist
 
-    def Torsion_RMS(self, other):
-        """
+    def Torsion_RMS(self, other) -> float:
+        '''
         Calculate the 5D Euclidean distance between self and another Disulfide
         object. This is used to compare Disulfide Bond torsion angles to 
         determine their torsional similarity via a Euclidean distance metric.
 
-        :param other: other Disulfide to compare
-        :type other: Disulfide
-        :raises ProteusPyWarning: Warning if other object is not a Disulfide
-        :return: RMS distance between the two Disulfides
-        :rtype: float
-        """
+        Parameters
+        ----------
+        other : Disulfide
+            Comparison Disulfide
+
+        Returns
+        -------
+        float
+            RMS distance (degrees)
+
+        Raises
+        ------
+        ProteusPyWarning
+            Warning if other is wrong type.
+        '''
 
         _p1 = self.torsion_array
         _p2 = other.torsion_array
@@ -1294,14 +1441,22 @@ class Disulfide:
         d = math.dist(_p1, _p2)
         return d
 
-    def Distance_RMS(self, other):
-        """
+    def Distance_RMS(self, other) -> float:
+        '''
         Calculate the RMS distance between the internal coordinates between 
         two Disulfides
 
-        :param other: other Disulfide to compare
-        :type other: Disulfide
-        """
+        Parameters
+        ----------
+        other : Disulfide
+            Comparison Disulfide
+        
+        Returns
+        -------
+        float
+            RMS distance (A)
+
+        '''
         
         ic1 = self.internal_coords()
         ic2 = other.internal_coords()
@@ -1321,21 +1476,39 @@ class Disulfide:
 
 # Class defination ends
 
-def name_to_id(fname: str):
-    '''return an entry id for filename pdb1crn.ent -> 1crn'''
+def name_to_id(fname: str) -> str:
+    '''
+    Returns the PDB ID from the filename.
+
+    Parameters
+    ----------
+    fname : str
+        PDB filename
+
+    Returns
+    -------
+    str
+        PDB ID
+    '''
     ent = fname[3:-4]
     return ent
 
 def parse_ssbond_header_rec(ssbond_dict: dict) -> list:
     '''
     Parse the SSBOND dict returned by parse_pdb_header. 
-    NB: Requires EGS-Modified BIO.parse_pdb_header.py 
+    NB: Requires EGS-Modified BIO.parse_pdb_header.py.
+    This is used internally.
 
-    Arguments: 
-        ssbond_dict: the input SSBOND dict
-    Returns: a list of tuples representing the proximal, distal residue 
-             ids for the disulfide.
+    Parameters
+    ----------
+    ssbond_dict : dict
+        the input SSBOND dict
 
+    Returns
+    -------
+    list
+        A list of tuples representing the proximal, 
+        distal residue ids for the Disulfide.
     '''
     disulfide_list = []
     for ssb in ssbond_dict.items():
@@ -1352,7 +1525,7 @@ def parse_ssbond_header_rec(ssbond_dict: dict) -> list:
 
 def Download_Disulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR, 
                        verbose=False, reset=False) -> None:
-    """
+    '''
     Reads a comma separated list of PDB IDs and downloads them
     to the pdb_home path. 
 
@@ -1366,17 +1539,22 @@ def Download_Disulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR,
     function keeps track of downloaded files so it's possible to interrupt and
     restart the download without duplicating effort.
 
-    :param pdb_home: Path for downloaded files, defaults to PDB_DIR
-    :type pdb_home: str, optional
-    :param model_home: Path for extracted data, defaults to MODEL_DIR
-    :type model_home: str, optional
-    :param verbose: Verbose, defaults to False
-    :type verbose: bool, optional
-    :param reset: reset the downloaded file list, defaults to False
-    :type reset: bool, optional
-    :raises DisulfideIOException: Exceptions raised for file errors
-    """
-    
+    Parameters
+    ----------
+    pdb_home : str, optional
+        Path for downloaded files, by default PDB_DIR
+    model_home : _type_, optional
+        Path for extracted data, by default MODEL_DIR
+    verbose : bool, optional
+        Verbose, by default False
+    reset : bool, optional
+        Reset the downloaded file list, by default False
+
+    Raises
+    ------
+    DisulfideIOException
+        Fatal exception for file I/O
+    '''
     start = time.time()
     donelines = []
     SS_done = []
@@ -1473,7 +1651,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     >>> SS = Disulfide('tmp')
     >>> SSlist = DisulfideList([],'ss')
 
-    >>> PDB_SS = DisulfideLoader(verbose=True)  # load the Disulfide database
+    >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)  # load the Disulfide database
     Reading disulfides from: /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_ss.pkl
     Disulfides Read: 8210
     Reading disulfide dict from: /Users/egs/repos/proteusPy/proteusPy/data/PDB_all_ss_dict.pkl
@@ -1482,11 +1660,11 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     PDB IDs parsed: 1000
     Total Space Used: 1969317 bytes.
 
-    >>> SS = PDB_SS[0]              # returns a Disulfide object at index 0
+    >>> SS = PDB_SS[0]
     >>> SS
     <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>
 
-    >>> SS4yys = PDB_SS['4yys']     # returns a DisulfideList containing all
+    >>> SS4yys = PDB_SS['4yys']     # returns a DisulfideList for ID 4yys
     >>> SS4yys
     [<Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>, <Disulfide 4yys_56A_98A SourceID: 4yys Proximal: 56 A Distal: 98 A>, <Disulfide 4yys_156A_207A SourceID: 4yys Proximal: 156 A Distal: 207 A>, <Disulfide 4yys_22B_65B SourceID: 4yys Proximal: 22 B Distal: 65 B>, <Disulfide 4yys_56B_98B SourceID: 4yys Proximal: 56 B Distal: 98 B>, <Disulfide 4yys_156B_207B SourceID: 4yys Proximal: 156 B Distal: 207 B>]
 
