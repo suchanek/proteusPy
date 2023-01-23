@@ -3,11 +3,11 @@ name: website
 # build the documentation whenever there are new commits on main
 on:
   push:
-    #branches:
-    #  - main
+    branches:
+      - main
     # Alternative: only build for tags.
-     tags:
-       - '*'
+    # tags:
+    #   - '*'
 
 # security: restrict permissions for CI jobs.
 permissions:
@@ -25,6 +25,7 @@ jobs:
 
       # ADJUST THIS: install all dependencies (including pdoc)
       - run: pip install -e .
+      - run: pip install pdoc
       # ADJUST THIS: build your documentation into docs/.
       # We use a custom build script for pdoc itself, ideally you just run `pdoc -o docs/ ...` here.
       - run: pdoc -o docs/ .../proteusPy
