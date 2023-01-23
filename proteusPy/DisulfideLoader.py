@@ -18,8 +18,9 @@ from proteusPy.ProteusGlobals import *
 from proteusPy.atoms import *
 from proteusPy.data import *
 
-from proteusPy.Disulfide import Check_chains
-from proteusPy.Disulfide import DisulfideList, Torsion_DF_Cols
+from proteusPy.DisulfideList import DisulfideList
+from proteusPy.Disulfide import Torsion_DF_Cols, Disulfide
+
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideGlobals import *
 
@@ -138,7 +139,7 @@ class DisulfideLoader:
         return res
     
     def __setitem__(self, index, item):
-        self.SSList[index] = self.validate_ss(item)
+        self.SSList[index] = self._validate_ss(item)
 
     def getlist(self) -> DisulfideList:
         '''
@@ -167,6 +168,23 @@ class DisulfideLoader:
         :raises DisulfideParseWarning: Raised if not found
         :return: Torsions Dataframe
         :rtype: pd.DataFrame
+
+        Example:
+        >>> from proteusPy.DisulfideLoader import DisulfideLoader
+        >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
+        >>> Tor_DF = PDB_SS.getTorsions()
+        >>> Tor_DF.describe()
+                   proximal        distal          chi1  ...      phi_dist      psi_dist  torsion_length
+        count  20388.000000  20388.000000  20388.000000  ...  20388.000000  20388.000000    20388.000000
+        mean     228.653669    276.699725    -47.223657  ...    -98.269685     71.775539      232.040004
+        std      277.715590    278.536401    103.051449  ...     42.210630     95.174035       56.448557
+        min        1.000000      1.000000   -179.992436  ...   -180.000000   -180.000000      102.031030
+        25%       44.000000     96.000000    -92.336057  ...   -123.879165    -15.480013      185.416776
+        50%      137.000000    194.000000    -64.393960  ...   -100.109755    121.884044      231.106505
+        75%      317.000000    361.000000    -43.165496  ...    -73.975350    144.165192      271.616908
+        max     5045.000000   5070.000000    179.998579  ...    179.337160    179.980177      368.630494
+        <BLANKLINE>
+        [8 rows x 14 columns]
         '''
         res_df = pd.DataFrame()
 
@@ -182,21 +200,49 @@ class DisulfideLoader:
         else:
             return copy.deepcopy(self.TorsionDF)
     
-    def validate_ss(self, value):
-        if isinstance(value, (proteusPy.Disulfide.Disulfide)):
+    def _validate_ss(self, value):
+        if isinstance(value, (Disulfide)):
             return value
         raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
+    
+    @property
+    def quiet(self) -> bool:
+        '''
+        The loader quiet state
 
-    def set_quiet(self, perm: bool) -> None:
+        :return: quiet parameter
+        :rtype: bool
+        '''
+        return self.QUIET
+
+    @quiet.setter
+    def quiet(self, perm: bool) -> None:
+        '''
+        Sets the quiet attribute for the loader. This silences many of the BIO.PDB warnings.
+
+        :param perm: True or False
+        :type perm: bool
+        '''
         self.QUIET = perm
     
-    def get_quiet(self) -> bool:
-        return self.QUIET
-    
     def copy(self):
+        '''
+        Return a copy of self
+
+        :return: Copy of self
+        :rtype: proteusPy.DisulfideLoader
+        '''
         return copy.deepcopy(self)
 
-    def get_by_name(self, name):
+    def get_by_name(self, name: str) -> DisulfideList:
+        '''
+        Return a list of Disulfides for a given PDBID.
+
+        :param name: PDBID
+        :type name: str
+        :return: _description_
+        :rtype: proteusPy.DisulfideList
+        '''
         _sslist = DisulfideList([], 'tmp')
         _sslist = self.SSList
 
@@ -206,15 +252,26 @@ class DisulfideLoader:
     
     def display_overlay(self, pdbid: str):
         ''' 
-        Render all disulfides for a given PDB ID overlaid in stick mode against
-        a common coordinate frames. This allows us to see all of the disulfides
+        Display all disulfides for a given PDB ID overlaid in stick mode against
+        a common coordinate frame. This allows us to see all of the disulfides
         at one time in a single view. Colors vary smoothy between bonds.
         
         Arguments:
-            PDB_SS: DisulfideLoader object initialized with the database.
+            self: DisulfideLoader object initialized with the database.
             pdbid: the actual PDB id string
 
-        Returns: None.    
+        Returns: None.
+
+        Example:
+        >>> from proteusPy.Disulfide import Disulfide 
+        >>> from proteusPy.DisulfideLoader import DisulfideLoader
+        >>> from proteusPy.DisulfideList import DisulfideList
+            
+        Instantiate the Loader with the SS database subset.
+
+        >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)  # load the Disulfide database
+        >>> SS = PDB_SS[:4]
+        >>> SS.display_overlay()
         ''' 
 
         ssbonds = self[pdbid]
