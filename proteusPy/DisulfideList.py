@@ -7,56 +7,17 @@
 # Last modification: 12/13/2023 -egs-
 
 import pandas as pd
-import tqdm
+import pyvista as pv
+
+from collections import UserList
+from tqdm import tqdm
 
 import proteusPy
 from proteusPy import *
 from proteusPy.atoms import *
-
-import pyvista as pv
-from collections import UserList
-from tqdm import tqdm
+from proteusPy.utility import grid_dimensions
 
 _PBAR_COLS = 100
-
-def atest():
-    '''
-    Calculate rows and columns for the given needed to display
-    a given number of disulfides in a square aspect.
-
-    :param n: int Number of Disulfides
-    :param y: int Number of Disulfides
-    :return: int rows, columns
-    '''
-    return
-
-def grid_dimensions(n):
-    '''
-    Calculate rows and columns for the given needed to display
-    a given number of disulfides in a square aspect.
-
-    Parameters
-    ----------
-    n : int
-        Number of Disulfides
-    y : float
-        Number of bosons
-
-    Returns
-    -------
-    int
-        rows, columns
-    '''
-    
-    root = math.sqrt(n)
-    # If the square root is a whole number, return that as the number of rows and columns
-    if root == int(root):
-        return int(root), int(root)
-    # If the square root is not a whole number, round up and return that as the number of columns
-    # and calculate the number of rows as the number of images divided by the number of columns
-    else:
-        columns = math.ceil(root)
-        return int(n / columns), int(columns)
 
 Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', \
            'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
@@ -66,9 +27,9 @@ Distance_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'energy', 'ca_dista
 
 class DisulfideList(UserList):
     '''
-    Class provides a sortable list for Disulfide objects.
+    The class provides a sortable list for Disulfide objects.
     Indexing and slicing are supported, and normal list operations like 
-    .insert, .append and .extend. The DisulfideList object must be initialized 
+    ``.insert()``, ``.append()`` and ``.extend().`` The DisulfideList object must be initialized 
     with an iterable (tuple, list) and a name.
     
     The class can also render Disulfides to a pyVista window using the 
@@ -83,11 +44,11 @@ class DisulfideList(UserList):
 
     >>> SS = Disulfide('tmp')
     >>> SSlist = DisulfideList([],'ss')
-
     >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)  # load the Disulfide database
     >>> SS = PDB_SS[0]              # returns a Disulfide object at index 0
     >>> SS
     <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>
+    
     >>> SS4yys = PDB_SS['4yys']     # returns a DisulfideList containing all
     >>> SS4yys
     [<Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>, <Disulfide 4yys_56A_98A SourceID: 4yys Proximal: 56 A Distal: 98 A>, <Disulfide 4yys_156A_207A SourceID: 4yys Proximal: 156 A Distal: 207 A>, <Disulfide 4yys_22B_65B SourceID: 4yys Proximal: 22 B Distal: 65 B>, <Disulfide 4yys_56B_98B SourceID: 4yys Proximal: 56 B Distal: 98 B>, <Disulfide 4yys_156B_207B SourceID: 4yys Proximal: 156 B Distal: 207 B>]
@@ -143,27 +104,26 @@ class DisulfideList(UserList):
        Cprev <Vector -0.73, -17.44, -2.01>
        Nnext: <Vector 1.92, -19.18, -0.63>
      Conformation: (Χ1-Χ5):  174.629°, 82.518°, -83.322°, -62.524° -73.827°  Energy: 1.696 kcal/mol
-     Cα Distance: 4.502 Å 
-     Torsion length: 231.531 deg 
-    >
+     Cα Distance: 4.502 Å
+     Torsion length: 231.531 deg>
 
     Get a list of disulfides via slicing
     >>> subset = DisulfideList(PDB_SS[0:10],'subset')
-    >>> subset.display_overlay()        # display all disulfides overlaid in stick style
+    
+    Display the subset disulfides overlaid onto the same coordinate frame.
+
+    >>> subset.display_overlay()
     '''
     
     def __init__(self, iterable, id: str):
         '''
-        Initialize a DisulfideList object.
+        Initialize the DisulfideList
 
-        Parameters
-        ----------
-        iterable : iterable
-            Must be a valid iterable like []
-        id : str
-            Name of the list.        
+        :param iterable: iterable
+        :type iterable: iterable
+        :param id: Name for the list
+        :type id: str
         '''
-
         self.pdb_id = id
         super().__init__(self.validate_ss(item) for item in iterable)
 
@@ -178,44 +138,45 @@ class DisulfideList(UserList):
     def __setitem__(self, index, item):
         self.data[index] = self.validate_ss(item)
 
-    def insert(self, index, item):
-        '''
-        Insert a Disulfide into the list at the specified index
-
-        Parameters
-        ----------
-        index : int
-            Index insertion point
-        item : Disulfide
-            Disulfide to insert
-        '''
-        self.data.insert(index, self.validate_ss(item))
-
     def append(self, item):
         '''
-        Append a Disulfide at the end of the list.
+        Append the list with item
 
-        Parameters
-        ----------
-        index : int
-            Index insertion point
-        item : Disulfide
-            Disulfide to insert
+        :param item: Disulfide to add
+        :type item: Disulfide
         '''
         self.data.append(self.validate_ss(item))
 
     def extend(self, other):
+        '''
+        Extend the Disulfide list with other.
+
+        :param other: extension
+        :type item: DisulfideList
+        '''
+
         if isinstance(other, type(self)):
             self.data.extend(other)
         else:
             self.data.extend(self._validate_ss(item) for item in other)
     
-    def validate_ss(self, value):
+    def insert(self, index, item):
+        '''
+        Insert a Disulfide into the list at the specified index
+
+        :param index: insertion point
+        :type index: int
+        :param item: Disulfide to insert
+        :type item: Disulfide
+        '''
+        self.data.insert(index, self.validate_ss(item))
+
+    def Ovalidate_ss(self, value):
         if isinstance(value, type(self)):
             return value
         raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
 
-    def Ovalidate_ss(self, value):
+    def validate_ss(self, value):
         return value
     
     def pprint(self):
@@ -476,7 +437,6 @@ class DisulfideList(UserList):
             Returns:
                 Window displaying the Disulfides.
         '''
-        
         ssList = self.data
         tot_ss = len(ssList) # number off ssbonds
         rows, cols = grid_dimensions(tot_ss)
@@ -501,6 +461,12 @@ class DisulfideList(UserList):
         return pl
 
     def display(self, style='sb'):
+        '''
+        Display a window showing the list of disulfides in the given style.
+
+        :param style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd', defaults to 'sb'
+        :type style: str, optional
+        '''
         pl = pv.Plotter()
 
         pl = self._render(style)
@@ -509,16 +475,19 @@ class DisulfideList(UserList):
         pl.link_views()
         pl.reset_camera()
         pl.show()
-        
+ 
     def screenshot(self, style='bs', fname='sslist.png', verbose=True):
-        ''' 
-            Save the interactive window displaying the list of disulfides in the given style.
-            Argument:
-                self
-                style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd'
-                fname: filename for the resulting image file.
-            Returns:
-                Image file saved to disk.
+        '''
+        Save the interactive window displaying the list of 
+        disulfides in the given style. Position the disulfide then
+        close the window to save.
+
+        :param style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd', defaults to 'bs'
+        :type style: str, optional
+        :param fname: filename to save image, defaults to 'sslist.png'
+        :type fname: str, optional
+        :param verbose: Verbose reporting, defaults to True
+        :type verbose: bool, optional
         '''
 
         pl = pv.Plotter()
