@@ -16,6 +16,7 @@ proteusPy/proteusGlobals.py
 proteusPy/proteusPyWarning.py
 proteusPy/residue.py
 proteusPy/turtle3D.py
+proteusPy/utility.py
 proteusPy.egg-info/PKG-INFO
 proteusPy.egg-info/SOURCES.txt
 proteusPy.egg-info/dependency_links.txt
