@@ -111,6 +111,7 @@ class DisulfideList(UserList):
     >>> subset = DisulfideList(PDB_SS[0:10],'subset')
     
     Display the subset disulfides overlaid onto the same coordinate frame.
+    The disulfides are colored individually to facilitate inspection.
 
     >>> subset.display_overlay()
     '''
@@ -119,10 +120,23 @@ class DisulfideList(UserList):
         '''
         Initialize the DisulfideList
 
-        :param iterable: iterable
+        :param iterable: an iterable e.g. []
         :type iterable: iterable
         :param id: Name for the list
         :type id: str
+
+        Example:
+        >>> from proteusPy.DisulfideList import DisulfideList
+        >>> from proteusPy.Disulfide import Disulfide
+        >>> ss1 = Disulfide('ss1')
+        >>> ss2 = Disulfide('ss2')
+        >>> ss3 = Disulfide('ss3')
+        >>> sslist = DisulfideList([ss1, ss2], 'sslist')
+        >>> sslist
+        [<Disulfide ss1 SourceID:  Proximal: -1  Distal: -1 >, <Disulfide ss2 SourceID:  Proximal: -1  Distal: -1 >]
+        >>> sslist.append(ss3)
+        >>> sslist
+        [<Disulfide ss1 SourceID:  Proximal: -1  Distal: -1 >, <Disulfide ss2 SourceID:  Proximal: -1  Distal: -1 >, <Disulfide ss3 SourceID:  Proximal: -1  Distal: -1 >]
         '''
         self.pdb_id = id
         super().__init__(self.validate_ss(item) for item in iterable)
