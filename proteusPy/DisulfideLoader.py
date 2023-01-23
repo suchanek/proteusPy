@@ -4,9 +4,8 @@
 # RCSB Protein Databank and initialize the DisulfideLoader with the Disulfide
 # lists and dictionary.
 # Author: Eric G. Suchanek, PhD.
-# Last modification: 1/13/23
+# Last modification: 1/22/23
 
-import os
 import sys
 import copy
 
@@ -26,28 +25,29 @@ from proteusPy.DisulfideGlobals import *
 
 class DisulfideLoader:
     '''
-    This class loads .pkl files created from the Extract_Disulfides() routine 
+    This class loads .pkl files created from the proteusPy.Disulfide.Extract_Disulfides() routine 
     and initializes itself with their contents. The Disulfide objects are contained
-    in a DisulfideList object and Dict. This makes it possible to access the disulfides by
-    array index or PDB structure ID. The class can also render Disulfides to a pyVista
-    window using the DisulfideLoader.display() method. See below for examples.\n
+    in a DisulfideList object and Dict, and their torsions and distances stored in a .csv file.
+    This makes it possible to access the disulfides by array index or PDB structure ID. 
+    The class can also render Disulfides to a pyVista window using the 
+    DisulfideLoader.display() method. See below for examples.\n
 
     Example:
-        from proteusPy.Disulfide import Disulfide
-        from proteusPy.DisulfideList import DisulfideList
-        from proteusPy.DiulfideLoader import DisulfideLoader
+        >>> from proteusPy.Disulfide import Disulfide
+        >>> from proteusPy.DisulfideList import DisulfideList
+        >>> from proteusPy.DisulfideLoader import DisulfideLoader
 
-        SS1 = DisulfideList([],'tmp1')
-        SS2 = DisulfideList([],'tmp2')
-
-        PDB_SS = DisulfideLoader()
-        SS1 = PDB_SS[0]         # returns a Disulfide object at index 0
-        SS2 = PDB_SS['4yys']    # returns a DisulfideList containing all disulfides for 4yys
-        SS3 = PDB_SS[:10]       # returns a DisulfideList containing the slice
-
-        SSlist = PDB_SS[:8]     # get SS bonds for the last 8 structures
-        SSlist.display('sb')    # render the disulfides in 'split bonds' style
-
+        >>> SS1 = DisulfideList([],'tmp1')
+        >>> SS2 = DisulfideList([],'tmp2')
+        >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
+        >>> SS1 = PDB_SS[0]
+        >>> SS1
+        <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>
+        >>> SS2 = PDB_SS['4yys']
+        >>> SS2
+        [<Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>, <Disulfide 4yys_56A_98A SourceID: 4yys Proximal: 56 A Distal: 98 A>, <Disulfide 4yys_156A_207A SourceID: 4yys Proximal: 156 A Distal: 207 A>, <Disulfide 4yys_22B_65B SourceID: 4yys Proximal: 22 B Distal: 65 B>, <Disulfide 4yys_56B_98B SourceID: 4yys Proximal: 56 B Distal: 98 B>, <Disulfide 4yys_156B_207B SourceID: 4yys Proximal: 156 B Distal: 207 B>]
+        >>> SSlist = PDB_SS[:4]
+        >>> SSlist.display(style='sb') 
     '''
 
     def __init__(self, verbose=True, datadir=DATA_DIR, picklefile=SS_PICKLE_FILE, 
@@ -63,7 +63,9 @@ class DisulfideLoader:
         self.TotalDisulfides = 0
         self.IDList = []
         self.QUIET = quiet
-
+        '''
+        Initialize the class.
+        '''
         # create a dataframe with the following columns for the disulfide conformations extracted from the structure
         # Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 
         # 'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist', 'psi_dist']
@@ -139,12 +141,33 @@ class DisulfideLoader:
         self.SSList[index] = self.validate_ss(item)
 
     def getlist(self) -> DisulfideList:
+        '''
+        Return the list of Disulfides contained in the class.
+
+        :return: Disulfide list
+        :rtype: DisulfideList
+        '''
         return copy.deepcopy(self.SSList)
     
     def getdict(self) -> dict:
+        '''
+        Return the Disulfide Dict contained in the class.
+
+        :return: Disulfide Dict
+        :rtype: dict
+        '''
         return copy.deepcopy(self.SSDict)
 
     def getTorsions(self, pdbID=None) -> pd.DataFrame:
+        '''
+        Return the torsions, distances and energies defined by Disulfide.Torsion_DF_cols
+
+        :param pdbID: pdbID, defaults to None, meaning return entire dataset.
+        :type pdbID: str, optional
+        :raises DisulfideParseWarning: Raised if not found
+        :return: Torsions Dataframe
+        :rtype: pd.DataFrame
+        '''
         res_df = pd.DataFrame()
 
         if pdbID:
@@ -210,5 +233,9 @@ class DisulfideLoader:
         ssList.display(style=style)
 
 # class ends
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
 
 # end of file
