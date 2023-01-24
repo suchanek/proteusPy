@@ -14,12 +14,14 @@ import pyvista as pv
 import pickle
 
 import proteusPy
-from proteusPy.ProteusGlobals import *
+from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR
 from proteusPy.atoms import *
-from proteusPy.data import *
+
+from proteusPy.data import SS_PICKLE_FILE, SS_TORSIONS_FILE, SS_DICT_PICKLE_FILE, DATA_DIR
 
 from proteusPy.DisulfideList import DisulfideList
-from proteusPy.Disulfide import Torsion_DF_Cols, Disulfide
+from proteusPy.Disulfide import Torsion_DF_Cols
+from proteusPy.Disulfide import Disulfide
 
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideGlobals import *
@@ -34,26 +36,37 @@ class DisulfideLoader:
     DisulfideLoader.display() method. See below for examples.\n
 
     Example:
-        >>> import proteusPy
-        >>> from proteusPy.Disulfide import Disulfide
-        >>> from proteusPy.DisulfideLoader import DisulfideLoader
-        >>> from proteusPy.DisulfideList import DisulfideList
-        >>> SS1 = DisulfideList([],'tmp1')
-        >>> SS2 = DisulfideList([],'tmp2')
-        >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
-        >>> SS1 = PDB_SS[0]
-        >>> SS1
-        <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>
-        >>> SS2 = PDB_SS['4yys']
-        >>> SS2
-        [<Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>, <Disulfide 4yys_56A_98A SourceID: 4yys Proximal: 56 A Distal: 98 A>, <Disulfide 4yys_156A_207A SourceID: 4yys Proximal: 156 A Distal: 207 A>, <Disulfide 4yys_22B_65B SourceID: 4yys Proximal: 22 B Distal: 65 B>, <Disulfide 4yys_56B_98B SourceID: 4yys Proximal: 56 B Distal: 98 B>, <Disulfide 4yys_156B_207B SourceID: 4yys Proximal: 156 B Distal: 207 B>]
-        >>> SSlist = PDB_SS[:4]
-        >>> SSlist.display(style='sb') 
+    >>> import proteusPy
+    >>> from proteusPy.Disulfide import Disulfide
+    >>> from proteusPy.DisulfideLoader import DisulfideLoader
+    >>> from proteusPy.DisulfideList import DisulfideList
+    >>> SS1 = DisulfideList([],'tmp1')
+    >>> SS2 = DisulfideList([],'tmp2')
+    >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
+    >>> SS1 = PDB_SS[0]
+    >>> SS1
+    <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>
+    >>> SS2 = PDB_SS['4yys']
+    >>> SS2
+    [<Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>, <Disulfide 4yys_56A_98A SourceID: 4yys Proximal: 56 A Distal: 98 A>, <Disulfide 4yys_156A_207A SourceID: 4yys Proximal: 156 A Distal: 207 A>, <Disulfide 4yys_22B_65B SourceID: 4yys Proximal: 22 B Distal: 65 B>, <Disulfide 4yys_56B_98B SourceID: 4yys Proximal: 56 B Distal: 98 B>, <Disulfide 4yys_156B_207B SourceID: 4yys Proximal: 156 B Distal: 207 B>]
+    >>> SSlist = PDB_SS[:4]
+    >>> SSlist.display(style='sb') 
     '''
 
     def __init__(self, verbose=True, datadir=DATA_DIR, picklefile=SS_PICKLE_FILE, 
                 pickle_dict_file=SS_DICT_PICKLE_FILE,
                 torsion_file=SS_TORSIONS_FILE, quiet=True, subset=False):
+        '''
+        Initializing the class initiates loading either the entire Disulfide dataset,
+        or the 'subset', which consists of the first 5000 PDB structures. The subset
+        is useful for testing and debugging since it doesn't require nearly as much
+        memory or time. The name for the subset file is hard-coded. One can pass a
+        different data directory and file names for the pickle files. These different
+        directories would be established with the proteusPy.Disulfide.Extract_Disulfides() function.
+        function.
+        
+        '''
+
         self.ModelDir = datadir
         self.PickleFile = f'{datadir}{picklefile}'
         self.PickleDictFile = f'{datadir}{pickle_dict_file}'
@@ -64,9 +77,7 @@ class DisulfideLoader:
         self.TotalDisulfides = 0
         self.IDList = []
         self.QUIET = quiet
-        '''
-        Initialize the class.
-        '''
+        
         # create a dataframe with the following columns for the disulfide conformations extracted from the structure
         # Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 
         # 'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist', 'psi_dist']
