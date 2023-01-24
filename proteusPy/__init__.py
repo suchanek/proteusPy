@@ -24,6 +24,7 @@ import copy
 import time
 import datetime
 import math
+import numpy
 
 from Bio.PDB.vectors import calc_dihedral, calc_angle
 from Bio.PDB import Select, Vector

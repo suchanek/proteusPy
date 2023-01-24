@@ -5,6 +5,7 @@
 # A part of the proteusPy molecular modeling and analysis suite by
 # Eric G. Suchanek, PhD
 # Last modification: 12/13/2023 -egs-
+import numpy
 
 import pandas as pd
 import pyvista as pv

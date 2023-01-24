@@ -7,6 +7,7 @@
 # Cα
 
 import math
+import numpy
 import copy
 
 from math import cos
