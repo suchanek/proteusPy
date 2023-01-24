@@ -30,7 +30,8 @@ jobs:
       
       # ADJUST THIS: build your documentation into docs/.
       # We use a custom build script for pdoc itself, ideally you just run `pdoc -o docs/ ...` here.
-      - run: pdoc -o docs ../proteusPy
+      # - run: pdoc -o docs ../proteusPy
+        - run: pwd
       - uses: actions/upload-pages-artifact@v1
         with:
           path: docs/
@@ -38,7 +39,7 @@ jobs:
   # Deploy the artifact to GitHub pages.
   # This is a separate job so that only actions/deploy-pages has the necessary permissions.
   deploy:
-    needs: build
+    #needs: build
     runs-on: ubuntu-latest
     permissions:
       pages: write
