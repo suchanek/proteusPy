@@ -3,8 +3,8 @@
 # A part of the program Proteus, a program for the analysis and modeling of 
 # protein structures, with an emphasis on disulfide bonds.
 # Author: Eric G. Suchanek, PhD
-# Last revision: 1/11/2023
-# Cα
+# Last revision: 1/24/2023
+# Cα N, Cα, Cβ, C', Sγ Å
 
 import math
 import numpy
@@ -21,7 +21,9 @@ import pyvista as pv
 from proteusPy import *
 from proteusPy.atoms import *
 
-from proteusPy.data import *
+from proteusPy.data import SS_DICT_PICKLE_FILE, SS_ID_FILE
+from proteusPy.data import SS_PICKLE_FILE, SS_TORSIONS_FILE, PROBLEM_ID_FILE
+
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideList import DisulfideList
 
@@ -47,16 +49,32 @@ Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi
 # Class definition for a Disulfide bond. 
 class Disulfide:
     """
+    This class provides a Python object representing a physical disulfide bond 
+    either extracted from the RCSB protein databank or built using the 
+    proteusPy.Turtle3D() class. The disulfide bond is characterized 
+    by:
+    * Atomic coordinates for the atoms N, Cα, Cβ, C', Sγ for both residues. 
+    These are stored as both raw atomic coordinates as read from the RCSB file 
+    and internal local coordinates.
+    * The dihedral angles Χ1 - Χ5 for the disulfide bond
+    * A name, by default {pdb_id}{prox_resnumb}{prox_chain}_{distal_resnum}{distal_chain} 
+    * Proximal residue number
+    * Distal residue number
+    * Approximate torsional energy (kcal/mol)
+    * Vector length of the dihedral angles (degrees) defined as $\\sqrt()
+    * Cα - Cα distance (Å)
+    * The previous C' and next N for both the proximal and distal residues. These are needed
+    to calculate the backbone dihedral angles Φ and Ψ.
     
-    This class provides an object representing a physical disulfide bond 
-    that is either extracted from the RCSB protein databank or built 
-    using the proteusPy.Turtle3D. The Disulfide Bond is characterized 
-    by the atomic coordinates N, Cα, Cβ, C', Sγ for both residues, the 
-    dihedral angles Χ1 - Χ5 for the disulfide bond conformation,a name, 
-    proximal resiude number and distal residue number, and conformational 
-    energy. All atomic coordinates are represented by the BIO.PDB.Vector 
-    class. The class uses the internal methods to initialize dihedral 
-    angles and approximate energy upon initialization.
+    The class also provides the means to display disulfides in a variety of display styles:
+    * 'sb' - Split Bonds style - bonds colored by their atom type
+    * 'bs' - Ball and Stick style - split bond coloring with small atoms
+    * 'cpk' - CPK style rendering, colored by atom type:
+        * Carbon   - Grey
+        * Nitrogen - Blue
+        * Sulfur   - Yellow
+        * Oxygen   - Red
+        * Hydrogen - White 
 
     """
     def __init__(self, name: str="SSBOND") -> None:
