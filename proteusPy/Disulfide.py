@@ -4,7 +4,7 @@
 # protein structures, with an emphasis on disulfide bonds.
 # Author: Eric G. Suchanek, PhD
 # Last revision: 1/24/2023
-# Cα N, Cα, Cβ, C', Sγ Å
+# Cα N, Cα, Cβ, C', Sγ Å °
 
 import math
 import numpy
@@ -18,6 +18,7 @@ from tqdm import tqdm
 import pandas as pd
 import pyvista as pv
 
+import proteusPy
 from proteusPy import *
 from proteusPy.atoms import *
 
@@ -49,9 +50,9 @@ Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi
 # Class definition for a Disulfide bond. 
 class Disulfide:
     """
-    This class provides a Python object representing a physical disulfide bond 
+    This class provides a Python object and methods representing a physical disulfide bond 
     either extracted from the RCSB protein databank or built using the 
-    proteusPy.Turtle3D() class. The disulfide bond is characterized 
+    [proteusPy.Turtle3D()](turtle3D.html) class. The disulfide bond is characterized 
     by:
     * Atomic coordinates for the atoms N, Cα, Cβ, C', Sγ for both residues. 
     These are stored as both raw atomic coordinates as read from the RCSB file 
@@ -61,20 +62,29 @@ class Disulfide:
     * Proximal residue number
     * Distal residue number
     * Approximate torsional energy (kcal/mol)
-    * Vector length of the dihedral angles (degrees) defined as $\\sqrt()
+    * Euclidean length of the dihedral angles (degrees) defined as:
+    $$\\sqrt(\\sum \\chi_{1}^{2} + \\chi_{2}^{2} + \\chi_{3}^{2} + \\chi_{4}^{2} + \\chi_{5}^{2})$$
     * Cα - Cα distance (Å)
     * The previous C' and next N for both the proximal and distal residues. These are needed
     to calculate the backbone dihedral angles Φ and Ψ.
+    * Backbone dihedral angles Φ and Ψ, when possible. Not all structures are complete and
+    in those cases the atoms needed may be undefined. In this case the Φ and Ψ angles are set
+    to -180°.
     
-    The class also provides the means to display disulfides in a variety of display styles:
+    The class also provides a rendering pipeline using the [PyVista](https://pyvista.org) library, and 
+    can display disulfides interactively in a variety of display styles:
     * 'sb' - Split Bonds style - bonds colored by their atom type
     * 'bs' - Ball and Stick style - split bond coloring with small atoms
+    * 'pd' - Proximal/Distal style - bonds colored *Red* for proximal residue and *Green* for
+    the distal residue.
     * 'cpk' - CPK style rendering, colored by atom type:
         * Carbon   - Grey
         * Nitrogen - Blue
         * Sulfur   - Yellow
         * Oxygen   - Red
         * Hydrogen - White 
+    
+    Individual displays can be saved to a file, and animations created.
 
     """
     def __init__(self, name: str="SSBOND") -> None:
@@ -636,7 +646,8 @@ class Disulfide:
 
         >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
         >>> ss = PDB_SS[0]
-        >>> ss.display(style='sb')
+        >>> ss.display(style='cpk')
+        >>> ss.screenshot(style='cpk', fname='proteus_logo2.png')
         '''
         src = self.pdb_id
         enrg = self.energy
@@ -729,7 +740,7 @@ class Disulfide:
             pl.add_title(title=title, font_size=FONTSIZE)
             pl.enable_anti_aliasing('msaa')
             pl.add_camera_orientation_widget()
-            pl = self._render(pl, style=style, bondcolor=BOND_COLOR, 
+            self._render(pl, style=style, bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
             pl.reset_camera()
             pl.show(auto_close=False)
