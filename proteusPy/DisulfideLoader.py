@@ -34,10 +34,10 @@ class DisulfideLoader:
     DisulfideLoader.display() method. See below for examples.\n
 
     Example:
+        >>> import proteusPy
         >>> from proteusPy.Disulfide import Disulfide
-        >>> from proteusPy.DisulfideList import DisulfideList
         >>> from proteusPy.DisulfideLoader import DisulfideLoader
-
+        >>> from proteusPy.DisulfideList import DisulfideList
         >>> SS1 = DisulfideList([],'tmp1')
         >>> SS2 = DisulfideList([],'tmp2')
         >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
@@ -164,7 +164,8 @@ class DisulfideLoader:
         Return the torsions, distances and energies defined by Disulfide.Torsion_DF_cols
 
         :param pdbID: pdbID, defaults to None, meaning return entire dataset.
-        :type pdbID: str, optional
+        :type pdbID: str, optional used to extract for a specific PDB structure. If not specified
+            then return the entire dataset.
         :raises DisulfideParseWarning: Raised if not found
         :return: Torsions Dataframe
         :rtype: pd.DataFrame
@@ -174,17 +175,18 @@ class DisulfideLoader:
         >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
         >>> Tor_DF = PDB_SS.getTorsions()
         >>> Tor_DF.describe()
-                   proximal        distal          chi1  ...      phi_dist      psi_dist  torsion_length
-        count  20388.000000  20388.000000  20388.000000  ...  20388.000000  20388.000000    20388.000000
-        mean     228.653669    276.699725    -47.223657  ...    -98.269685     71.775539      232.040004
-        std      277.715590    278.536401    103.051449  ...     42.210630     95.174035       56.448557
-        min        1.000000      1.000000   -179.992436  ...   -180.000000   -180.000000      102.031030
-        25%       44.000000     96.000000    -92.336057  ...   -123.879165    -15.480013      185.416776
-        50%      137.000000    194.000000    -64.393960  ...   -100.109755    121.884044      231.106505
-        75%      317.000000    361.000000    -43.165496  ...    -73.975350    144.165192      271.616908
-        max     5045.000000   5070.000000    179.998579  ...    179.337160    179.980177      368.630494
+                   proximal        distal          chi1          chi2          chi3  ...      phi_prox      psi_prox      phi_dist      psi_dist  torsion_length
+        count  20388.000000  20388.000000  20388.000000  20388.000000  20388.000000  ...  20388.000000  20388.000000  20388.000000  20388.000000    20388.000000
+        mean     228.653669    276.699725    -47.223657     -6.145411     -5.015487  ...   -101.119674     68.591342    -98.269685     71.775539      232.040004
+        std      277.715590    278.536401    103.051449    108.724804     93.887448  ...     43.472827     96.286210     42.210630     95.174035       56.448557
+        min        1.000000      1.000000   -179.992436   -179.998685   -179.815947  ...   -180.000000   -180.000000   -180.000000   -180.000000      102.031030
+        25%       44.000000     96.000000    -92.336057    -87.053215    -88.274025  ...   -131.025124    -18.955461   -123.879165    -15.480013      185.416776
+        50%      137.000000    194.000000    -64.393960    -54.973207    -66.276147  ...   -104.003700    115.472312   -100.109755    121.884044      231.106505
+        75%      317.000000    361.000000    -43.165496     96.537644     93.371466  ...    -72.064985    141.260539    -73.975350    144.165192      271.616908
+        max     5045.000000   5070.000000    179.998579    179.992470    179.976934  ...    179.578735    179.972228    179.337160    179.980177      368.630494
         <BLANKLINE>
         [8 rows x 14 columns]
+
         '''
         res_df = pd.DataFrame()
 
@@ -234,15 +236,25 @@ class DisulfideLoader:
         '''
         return copy.deepcopy(self)
 
-    def get_by_name(self, name: str) -> DisulfideList:
+    def get_by_name(self, name: str) -> Disulfide:
         '''
-        Return a list of Disulfides for a given PDBID.
+        Return a Disulfide by its name
 
-        :param name: PDBID
-        :type name: str
-        :return: _description_
-        :rtype: proteusPy.DisulfideList
+        :param name: Disulfide name e.g. '4yys_22A_65A'
+        :return: Disulfide
+
+        >>> from proteusPy.Disulfide import Disulfide
+        >>> from proteusPy.DisulfideLoader import DisulfideLoader
+        >>> from proteusPy.DisulfideList import DisulfideList
+            
+        Instantiate the Loader with the SS database subset.
+
+        >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
+        >>> ss1 = PDB_SS.get_by_name('4yys_22A_65A')
+        >>> ss1
+        <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>
         '''
+
         _sslist = DisulfideList([], 'tmp')
         _sslist = self.SSList
 
@@ -250,7 +262,8 @@ class DisulfideLoader:
 
         return res
     
-    def display_overlay(self, pdbid: str):
+    def display_overlay(self, pdbid):
+        
         ''' 
         Display all disulfides for a given PDB ID overlaid in stick mode against
         a common coordinate frame. This allows us to see all of the disulfides
@@ -263,31 +276,37 @@ class DisulfideLoader:
         Returns: None.
 
         Example:
-        >>> from proteusPy.Disulfide import Disulfide 
+        >>> from proteusPy.Disulfide import Disulfide
         >>> from proteusPy.DisulfideLoader import DisulfideLoader
         >>> from proteusPy.DisulfideList import DisulfideList
             
         Instantiate the Loader with the SS database subset.
 
-        >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)  # load the Disulfide database
-        >>> SS = PDB_SS[:4]
-        >>> SS.display_overlay()
+        >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
+        
+        Display the Disulfides from the PDB ID 4yys, overlaid onto
+        a common reference (the proximal disulfides).
+
+        >>> PDB_SS.display_overlay('4yys')
+
+        You can also slice the loader and display as an overly.
+        >>> PDB_SS[:8].display_overlay()
+
         ''' 
 
         ssbonds = self[pdbid]
         ssbonds.display_overlay()
 
     def display(self, index, style='bs'):
-        ''' 
-        Display the Disulfides
-        Argument:
-            self
-        Returns:
-            None. Updates internal object.
         '''
-        
-        ssList = self.SSList[index]
-        ssList.display(style=style)
+        _summary_
+
+        :param index: _description_
+        :param style: _description_, defaults to 'bs'
+        '''
+        self.SSList[index].display(style)
+        #ssList = self.SSList[index]
+        #ssList.display(style=style)
 
 # class ends
 
