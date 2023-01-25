@@ -61,7 +61,16 @@ class Disulfide:
     * A name, by default {pdb_id}{prox_resnumb}{prox_chain}_{distal_resnum}{distal_chain} 
     * Proximal residue number
     * Distal residue number
-    * Approximate torsional energy (kcal/mol)
+    * Approximate torsional energy (kcal/mol):
+    
+    $$ 
+    E_{kcal/mol} \\approx 2.0 * cos(3.0 * \\chi_{1}) + cos(3.0 * \\chi_{5}) + cos(3.0 * \\chi_{2}) + 
+    $$
+
+    $$
+    cos(3.0 * \\chi_{4}) + 3.5 * cos(2.0 * \\chi_{3}) + 0.6 * cos(3.0 * \\chi_{3}) + 10.1 
+    $$
+
     * Euclidean length of the dihedral angles (degrees) defined as:
     $$\\sqrt(\\sum \\chi_{1}^{2} + \\chi_{2}^{2} + \\chi_{3}^{2} + \\chi_{4}^{2} + \\chi_{5}^{2})$$
     * Cα - Cα distance (Å)
