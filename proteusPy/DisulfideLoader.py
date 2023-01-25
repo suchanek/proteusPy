@@ -1,8 +1,10 @@
-#
-# DisulfideLoader class definition
-# This class embodies functions used to load Disulfide Bonds extracted from the
-# RCSB Protein Databank and initialize the DisulfideLoader with the Disulfide
-# lists and dictionary.
+'''
+This class embodies functions used to load Disulfide Bonds extracted from the
+RCSB Protein Databank, and initializes the DisulfideLoader with the Disulfide
+lists and dictionary.
+Author: Eric G. Suchanek, PhD.
+'''
+
 # Author: Eric G. Suchanek, PhD.
 # Last modification: 1/22/23
 
@@ -62,9 +64,8 @@ class DisulfideLoader:
         is useful for testing and debugging since it doesn't require nearly as much
         memory or time. The name for the subset file is hard-coded. One can pass a
         different data directory and file names for the pickle files. These different
-        directories would be established with the proteusPy.Disulfide.Extract_Disulfides() function.
+        directories would be established with the proteusPy.Disulfide.Extract_Disulfides function.
         function.
-        
         '''
 
         self.ModelDir = datadir
