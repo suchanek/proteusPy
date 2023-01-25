@@ -71,7 +71,12 @@ class Disulfide:
     cos(3.0 * \\chi_{4}) + 3.5 * cos(2.0 * \\chi_{3}) + 0.6 * cos(3.0 * \\chi_{3}) + 10.1 
     $$
     
-    The equation embodies the typical 3-fold rotation barriers associated with
+    The equation embodies the typical 3-fold rotation barriers associated with single bonds,
+    (Χ1, Χ5, Χ2, Χ4) and a high 2-fold barrier for Χ3, resulting from the partial double bond
+    character of the S-S bond. This property leads to two major disulfide families, characterized
+    by the sign of Χ3. *Left-handed* disulfides have Χ3 < 0° and *right-handed* disulfides have
+    Χ3 > 0°.
+
     * Euclidean length of the dihedral angles (degrees) defined as:
     $$\\sqrt(\\sum \\chi_{1}^{2} + \\chi_{2}^{2} + \\chi_{3}^{2} + \\chi_{4}^{2} + \\chi_{5}^{2})$$
     * Cα - Cα distance (Å)
@@ -81,8 +86,8 @@ class Disulfide:
     in those cases the atoms needed may be undefined. In this case the Φ and Ψ angles are set
     to -180°.
     
-    The class also provides a rendering pipeline using the [PyVista](https://pyvista.org) library, and 
-    can display disulfides interactively in a variety of display styles:
+    The class also provides a rendering capabilities using the excellent [PyVista](https://pyvista.org)
+    library, and can display disulfides interactively in a variety of display styles:
     * 'sb' - Split Bonds style - bonds colored by their atom type
     * 'bs' - Ball and Stick style - split bond coloring with small atoms
     * 'pd' - Proximal/Distal style - bonds colored *Red* for proximal residue and *Green* for

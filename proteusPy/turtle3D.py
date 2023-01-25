@@ -2,17 +2,18 @@
 #
 # Implementation of a 3D Turtle in Python.
 # Author: Eric G. Suchanek, PhD
-# A part of the program Proteus, https://github.com/suchanek/proteus,
+# A part of the program proteusPy, https://github.com/suchanek/proteusPy,
 # a program for the manipulation and analysis of macromolecules
 # Based on the C implementation originally authored by Eric G. Suchanek PhD 1990
-# 
+# Last modification 1/25/23 -egs-
 
 import numpy
 import math
 
 from Bio.PDB.vectors import Vector
 from Bio.PDB.vectors import calc_angle, calc_dihedral
-from proteusPy import *
+#from proteusPy import *
+from proteusPy.ProteusGlobals import ORIENT_BACKBONE, ORIENT_SIDECHAIN
 
 _DOWN_ = -1
 _UP_ = 1
@@ -44,8 +45,10 @@ class Turtle3D:
         self._recording = False
         self._tape = []
     
-    def new(self, name: str, pos: Vector, head: Vector, left=Vector(0,1,0), 
-            up=Vector(0,0,1), pen='up', recording=False):
+    def new(self, name: str, pos: Vector, head=Vector(1,0,0), 
+            left=Vector(0,1,0), 
+            up=Vector(0,0,1), 
+            pen='up', recording=False):
         self.Name = name
         self.Position = pos
         self.Heading = head
@@ -280,16 +283,16 @@ class Turtle3D:
     @Name.setter
     def Name(self, name):
         """
-        Set the Turtle'Name.
+        Set the Turtle's name.
         
         """
         self._name = name
     
     def move(self, distance):
         """
-        Move the Turtle distance (Angstroms), in direction of Heading
+        Move the Turtle distance (Å), in direction of Heading
 
-        :param distance: Amount to move
+        :param distance: Amount to move (Å)
         :type distance: float
         """
         self._position = self._position + self._heading * distance
