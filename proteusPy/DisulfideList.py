@@ -1,3 +1,13 @@
+'''
+This class extends the UserList class to provide a sortable list for Disulfide objects.
+Indexing and slicing are supported, as well as normal list operations like 
+``.insert()``, ``.append()`` and ``.extend().`` The DisulfideList object is initialized 
+with an iterable (tuple, list) and a name.
+
+The class can also render Disulfides to a pyVista window using the 
+DisulfideList.display() method.
+'''
+
 # DisulfideList Class definition
 # I extend UserList to handle lists of Disulfide objects.
 # Indexing and slicing are supported, sorting is based on energy
