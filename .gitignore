@@ -7,5 +7,3 @@ proteusPy/pdb/.DS_Store
 proteusPy/pdb/models/ss_completed.txt
 
 *.pkl
-*.png
-*.mp4
