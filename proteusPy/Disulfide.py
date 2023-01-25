@@ -52,7 +52,7 @@ class Disulfide:
     """
     This class provides a Python object and methods representing a physical disulfide bond 
     either extracted from the RCSB protein databank or built using the 
-    [proteusPy.Turtle3D()](turtle3D.html) class. The disulfide bond is characterized 
+    [proteusPy.Turtle3D](turtle3D.html) class. The disulfide bond is characterized 
     by:
     * Atomic coordinates for the atoms N, Cα, Cβ, C', Sγ for both residues. 
     These are stored as both raw atomic coordinates as read from the RCSB file 
@@ -70,7 +70,8 @@ class Disulfide:
     $$
     cos(3.0 * \\chi_{4}) + 3.5 * cos(2.0 * \\chi_{3}) + 0.6 * cos(3.0 * \\chi_{3}) + 10.1 
     $$
-
+    
+    The equation embodies the typical 3-fold rotation barriers associated with
     * Euclidean length of the dihedral angles (degrees) defined as:
     $$\\sqrt(\\sum \\chi_{1}^{2} + \\chi_{2}^{2} + \\chi_{3}^{2} + \\chi_{4}^{2} + \\chi_{5}^{2})$$
     * Cα - Cα distance (Å)
