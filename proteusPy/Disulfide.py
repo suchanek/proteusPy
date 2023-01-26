@@ -662,7 +662,8 @@ class Disulfide:
         >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
         >>> ss = PDB_SS[0]
         >>> ss.display(style='cpk')
-        >>> ss.screenshot(style='cpk', fname='proteus_logo2.png')
+        
+        ss.screenshot(style='cpk', fname='proteus_logo2.png')
         '''
         src = self.pdb_id
         enrg = self.energy
