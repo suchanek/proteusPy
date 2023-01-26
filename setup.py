@@ -23,5 +23,5 @@ setup(name='proteusPy',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.9'],
       include_package_data=True,
-      package_data={'': ['data/*.csv', 'data/*.pkl', 'data/*.txt', 'data/*.py']},
+      package_data={'': ['data/*.csv', 'data/*.pkl', 'data/*.txt', 'data/*.py', 'data/PDB_all_ss.pkl']},
       zip_safe=False)
