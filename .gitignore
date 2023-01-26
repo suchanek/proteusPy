@@ -6,3 +6,5 @@ proteusPy/.DS_Store
 proteusPy/pdb/.DS_Store
 proteusPy/pdb/models/ss_completed.txt
 *.mp4
+dist/*.gz
+dist/proteusPy-0.23.dev0.tar.gz
