@@ -1,4 +1,5 @@
 README.md
+setup.cfg
 setup.py
 proteusPy/Disulfide.py
 proteusPy/DisulfideExceptions.py
@@ -21,4 +22,5 @@ proteusPy.egg-info/PKG-INFO
 proteusPy.egg-info/SOURCES.txt
 proteusPy.egg-info/dependency_links.txt
 proteusPy.egg-info/not-zip-safe
+proteusPy.egg-info/requires.txt
 proteusPy.egg-info/top_level.txt

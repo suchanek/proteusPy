@@ -1,6 +1,6 @@
 # initialization for proteusPy pip setup
-from distutils.core import setup
-__version__ = '0.92dev'
+from setuptools import setup, find_packages
+__version__ = '0.1dev'
 
 setup(name='proteusPy',
       version=__version__,
@@ -9,5 +9,8 @@ setup(name='proteusPy',
       author='Eric G. Suchanek, PhD',
       author_email='suchanek@mac.com',
       license='MIT',
-      packages=['proteusPy'],
+      packages=find_packages(include=['proteusPy']),
+      keywords='proteus suchanek',
+      install_requires=['pandas', 'numpy', 'matplotlib', 'pyvista', 'biopython', 'python>=3.9'],
+      source='https://github.com/suchanek/proteusPy/',
       zip_safe=False)
