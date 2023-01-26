@@ -1,6 +1,6 @@
 # initialization for proteusPy pip setup
 from setuptools import setup, find_packages
-__version__ = '0.22dev'
+__version__ = '0.23dev'
 
 from pathlib import Path
 this_directory = Path(__file__).parent
@@ -16,7 +16,7 @@ setup(name='proteusPy',
       license='MIT',
       packages=find_packages(include=['proteusPy']),
       keywords='proteus suchanek',
-      install_requires=['pandas', 'numpy', 'matplotlib', 'pyvista', 'biopython'],
+      install_requires=['pandas', 'numpy', 'matplotlib', 'pyvista'],
       source='https://github.com/suchanek/proteusPy/',
       classifiers=[
         'Programming Language :: Python',
