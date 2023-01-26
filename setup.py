@@ -1,6 +1,6 @@
 # initialization for proteusPy pip setup
 from setuptools import setup, find_packages
-__version__ = '0.2dev'
+__version__ = '0.21dev'
 
 setup(name='proteusPy',
       version=__version__,
