@@ -1,0 +1,6 @@
+pandas
+numpy
+matplotlib
+pyvista
+biopython
+python>=3.9

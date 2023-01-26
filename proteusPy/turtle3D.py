@@ -312,7 +312,7 @@ class Turtle3D:
 
         self._up[0] = cosang * self._up[0] - sinang * self._left[0]
         self._up[1] = cosang * self._up[1] - sinang * self._left[1]
-        self._up[2] = cosang * self._up[2]- sinang * self._left[2]
+        self._up[2] = cosang * self._up[2] - sinang * self._left[2]
         self.up = Vector(self._up)
 
         self._left[0] = cosang * self._left[0] + sinang * self._up[0]
@@ -432,10 +432,10 @@ class Turtle3D:
         either orientation 1 or 2.
 
         :param chain: list of Residues in the model, eg: chain = model['A']
-        :type chain: _type_
+        :type chain: str
         :param resnumb: residue number
         :type resnumb: int
-        :param orientation: 1 - at Ca heading towards Cb with N at the left or \
+        :param orientation: 1 - at Ca heading towards Cb with N at the left or
             2 - at Ca heading towards C with N at the left
         :type orientation: int
         """
