@@ -1,6 +1,6 @@
 # DisulfideExtractor.py
 # Author: Eric G. Suchanek, PhD.
-# Last modification: 1/21/23 -egs-
+# Last modification: 1/24/23 -egs-
 #
 # Purpose:
 # This program processes all the PDB *.ent files in PDB_DIR and creates an array of 
@@ -19,12 +19,13 @@ from proteusPy.Disulfide import Extract_Disulfides
 # location for PDB repository
 PDB_BASE = '/Users/egs/PDB/'
 
-# location of cleaned PDB files
+# location of cleaned PDB files, created with DisulfideDownloader.py
 PDB = '/Users/egs/PDB/good/'
-REPO_MODELS = '/Users/egs/repos/proteusPy/proteusPy/data/'
+REPO_MODELS = '/Users/egs/repos/proteusPy/data/'
+MODULE_MODELS = '/Users/egs/repos/proteusPy/proteusPy/data/'
 
 # location of the compressed Disulfide .pkl files
-MODELS = f'{PDB_BASE}models/'
+DATA = f'{PDB_BASE}data/'
 
 # setting up specific pkl files for a small extraction.
 # you must use these exact names, regardless of the number
@@ -39,7 +40,7 @@ _SS_TORSIONS_FILE = 'PDB_subset_SS_torsions.csv'
 _PROBLEM_ID_FILE = 'PDB_subset_SS_problems.csv'
 
 
-Extract_Disulfides(numb=2500, pdbdir=PDB, datadir=MODELS,
+Extract_Disulfides(numb=2500, pdbdir=PDB, datadir=DATA,
                 dictfile=_SS_DICT_PICKLE_FILE,
                 picklefile=_SS_PICKLE_FILE,
                 torsionfile=_SS_TORSIONS_FILE,
@@ -56,5 +57,8 @@ update = True
 if update:
     print(f'Copying: {MODELS} to {REPO_MODELS}')
     shutil.copytree(MODELS, REPO_MODELS, dirs_exist_ok=True)
+
+    print(f'Copying: {MODELS} to {MODULE_MODELS}')
+    shutil.copytree(MODELS, MODULE_MODELS, dirs_exist_ok=True)
 
 # end of file

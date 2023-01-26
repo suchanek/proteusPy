@@ -11,6 +11,6 @@ setup(name='proteusPy',
       license='MIT',
       packages=find_packages(include=['proteusPy']),
       keywords='proteus suchanek',
-      install_requires=['pandas', 'numpy', 'matplotlib', 'pyvista', 'biopython', 'python>=3.9'],
+      install_requires=['pandas', 'numpy', 'matplotlib', 'pyvista', 'biopython'],
       source='https://github.com/suchanek/proteusPy/',
       zip_safe=False)
