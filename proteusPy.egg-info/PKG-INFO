@@ -15,5 +15,5 @@ Classifier: Programming Language :: Python :: 3.9
 
 *NB:* This distribution is actively being developed and will be difficult to implement locally unless the BioPython patch is applied. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1. 1/26/23 -egs
 
-Eric G. Suchanek, PhD. [suchanek@mac.com](mailto:suchanek@mac.com)
+Eric G. Suchanek, PhD. mailto:suchanek@mac.com
 
