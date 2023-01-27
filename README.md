@@ -7,16 +7,16 @@
    - Activate the environment
 2. Install git-lfs
    - https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage
-   - From a shell prompt: git-lfs track "*.csv"
-   - From a shell prompt: git-lfs track "*.pkl"
-   - From a shell prompt: git-lfs track "*.mp4"
+   - From a shell prompt: git-lfs track "\\*.csv"
+   - From a shell prompt: git-lfs track "\\*.pkl"
+   - From a shell prompt: git-lfs track "\\*.mp4"
 3. Build the environment
    - Using pyPi:
-    - python3 -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ proteusPy
-    - From gitHub:
-      - git clone https://github.com/suchanek/proteusPy/proteusPy.git
-        - cd into the repo
-        - pip install .
+   - python3 -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ proteusPy
+   - From gitHub:
+     - git clone https://github.com/suchanek/proteusPy/proteusPy.git
+     - cd into the repo
+     - pip install .
   
 
 ## Publications
