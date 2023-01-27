@@ -1,6 +1,6 @@
 # initialization for proteusPy pip setup
 from setuptools import setup, find_packages
-__version__ = '0.24dev'
+__version__ = '0.241dev'
 
 from pathlib import Path
 this_directory = Path(__file__).parent
