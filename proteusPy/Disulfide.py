@@ -1,9 +1,12 @@
-# Implementation for a Disulfide Bond structural object.
-# Based on the original C/C++ implementation by Eric G. Suchanek,
-# A part of the program Proteus, a program for the analysis and modeling of 
-# protein structures, with an emphasis on disulfide bonds.
-# Author: Eric G. Suchanek, PhD
-# Last revision: 1/24/2023
+'''
+Implementation for a Disulfide Bond structural object.
+Based on the original C/C++ implementation by Eric G. Suchanek,
+A part of the program proteusPy, a Python package for the analysis and modeling of 
+protein structures, with an emphasis on disulfide bonds. \n
+Author: Eric G. Suchanek, PhD
+Last revision: 1/26/2023
+'''
+
 # Cα N, Cα, Cβ, C', Sγ Å °
 
 import math
