@@ -13,11 +13,11 @@ steps:
     with:
       python-version: "3.9*"
   - name: Install pypa/build
-      run: >-
-        python -m
-        pip install
-        build
-        --user
+    run: >-
+      python -m
+      pip install
+      build
+      --user
   - name: Install proteusPy
     run: >-
       python -m
