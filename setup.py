@@ -1,6 +1,6 @@
 # initialization for proteusPy pip setup
 from setuptools import setup, find_packages
-__version__ = '0.241dev'
+__version__ = '0.25dev'
 
 from pathlib import Path
 this_directory = Path(__file__).parent
@@ -27,5 +27,5 @@ setup(name='proteusPy',
         'Topic :: Scientific/Engineering :: Chemistry',
         'Programming Language :: Python :: 3.9'],
       include_package_data=True,
-      package_data={'': ['data/*.txt', 'data/*.py']},
+      package_data={'': ['data/*.txt', 'data/*.py', 'data/*.json']},
       zip_safe=False)
