@@ -2,6 +2,8 @@
 This class embodies functions used to load Disulfide Bonds extracted from the
 RCSB Protein Databank, and initializes the DisulfideLoader with the Disulfide
 lists and dictionary.
+
+This file is part of the proteusPy package.
 Author: Eric G. Suchanek, PhD.
 '''
 
@@ -30,9 +32,9 @@ from proteusPy.DisulfideGlobals import *
 
 class DisulfideLoader:
     '''
-    This class loads .pkl files created from the proteusPy.Disulfide.Extract_Disulfides() routine 
+    This class loads files created from the proteusPy.Disulfide.Extract_Disulfides() routine 
     and initializes itself with their contents. The Disulfide objects are contained
-    in a DisulfideList object and Dict, and their torsions and distances stored in a .csv file.
+    in a proteuPy.DisulfideList.DisulfideList object and Dict, and their torsions and distances stored in a .csv file.
     This makes it possible to access the disulfides by array index or PDB structure ID. 
     The class can also render Disulfides to a pyVista window using the 
     DisulfideLoader.display() method. See below for examples.\n

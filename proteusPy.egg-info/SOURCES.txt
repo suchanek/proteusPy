@@ -34,3 +34,4 @@ proteusPy/data/PDB_subset_ss_dict.pkl
 proteusPy/data/__init__.py
 proteusPy/data/ss_completed.txt
 proteusPy/data/ss_ids.txt
+proteusPy/data/ss_query.json

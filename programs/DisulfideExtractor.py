@@ -21,8 +21,8 @@ PDB_BASE = '/Users/egs/PDB/'
 
 # location of cleaned PDB files, created with DisulfideDownloader.py
 PDB = '/Users/egs/PDB/good/'
-REPO_MODELS = '/Users/egs/repos/proteusPy/data/'
-MODULE_MODELS = '/Users/egs/repos/proteusPy/proteusPy/data/'
+REPO_DATA = '/Users/egs/repos/proteusPy/data/'
+MODULE_DATA = '/Users/egs/repos/proteusPy/proteusPy/data/'
 
 # location of the compressed Disulfide .pkl files
 DATA = f'{PDB_BASE}data/'
@@ -49,16 +49,16 @@ Extract_Disulfides(numb=2500, pdbdir=PDB, datadir=DATA,
 
 # total extraction uses numb=-1 and takes about 1.5 hours on
 # my 2021 MacbookPro M1 Pro computer.
-# Extract_Disulfides(numb=-1, pdbdir=PDB, datadir=MODELS,
+# Extract_Disulfides(numb=-1, pdbdir=PDB, datadir=DATA,
 #                 verbose=False, quiet=True)
 
 update = True
 
 if update:
-    print(f'Copying: {MODELS} to {REPO_MODELS}')
-    shutil.copytree(MODELS, REPO_MODELS, dirs_exist_ok=True)
+    print(f'Copying: {DATA} to {REPO_DATA}')
+    shutil.copytree(DATA, REPO_DATA, dirs_exist_ok=True)
 
-    print(f'Copying: {MODELS} to {MODULE_MODELS}')
-    shutil.copytree(MODELS, MODULE_MODELS, dirs_exist_ok=True)
+    print(f'Copying: {DATA} to {MODULE_DATA}')
+    shutil.copytree(DATA, MODULE_DATA, dirs_exist_ok=True)
 
 # end of file
