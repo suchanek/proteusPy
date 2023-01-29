@@ -1,17 +1,22 @@
-# DisulfideExtractor.py
-# Author: Eric G. Suchanek, PhD.
-# Last modification: 1/24/23 -egs-
-#
-# Purpose:
-# This program processes all the PDB *.ent files in PDB_DIR and creates an array of 
-# Disulfide objects representing the Disulfide bonds contained in the scanned directory. 
-# Outputs are saved in MODEL_DIR:
-# 1) SS_PICKLE_FILE: The list of Disulfide objects initialized from the PDB file scan
-# 2) SS_TORSIONS_FILE: a .csv containing the SS torsions for the disulfides scanned
-# 3) PROBLEM_ID: a .csv containining the problem ids.
-#
+'''
+DisulfideExtractor.py
+Author: Eric G. Suchanek, PhD.
+Last modification: 1/24/23 -egs-
+
+Purpose:
+This program processes all the PDB *.ent files in PDB_DIR and creates an array of 
+Disulfide objects representing the Disulfide bonds contained in the scanned directory. 
+Outputs are saved in MODEL_DIR:
+- SS_PICKLE_FILE: The list of Disulfide objects initialized from the PDB file scan
+- SS_TORSIONS_FILE: a .csv containing the SS torsions for the disulfides scanned
+- PROBLEM_ID: a .csv containining the problem ids.
+
+'''
 
 import shutil
+from shutil import copytree, ignore_patterns
+import time
+import datetime
 
 from proteusPy.Disulfide import Extract_Disulfides
 
@@ -39,13 +44,17 @@ _SS_DICT_PICKLE_FILE = 'PDB_subset_ss_dict.pkl'
 _SS_TORSIONS_FILE = 'PDB_subset_SS_torsions.csv'
 _PROBLEM_ID_FILE = 'PDB_subset_SS_problems.csv'
 
+start = time.time()
+Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB, datadir=DATA)
 
-Extract_Disulfides(numb=2500, pdbdir=PDB, datadir=DATA,
+'''
+Extract_Disulfides(numb=1000, pdbdir=PDB, datadir=DATA,
                 dictfile=_SS_DICT_PICKLE_FILE,
                 picklefile=_SS_PICKLE_FILE,
                 torsionfile=_SS_TORSIONS_FILE,
                 problemfile=_PROBLEM_ID_FILE,
                 verbose=False, quiet=True)
+'''
 
 # total extraction uses numb=-1 and takes about 1.5 hours on
 # my 2021 MacbookPro M1 Pro computer.
@@ -56,9 +65,14 @@ update = True
 
 if update:
     print(f'Copying: {DATA} to {REPO_DATA}')
-    shutil.copytree(DATA, REPO_DATA, dirs_exist_ok=True)
+    copytree(DATA, REPO_DATA, dirs_exist_ok=True, ignore=ignore_patterns('*_all_*'))
 
     print(f'Copying: {DATA} to {MODULE_DATA}')
-    shutil.copytree(DATA, MODULE_DATA, dirs_exist_ok=True)
+    copytree(DATA, MODULE_DATA, dirs_exist_ok=True, ignore=ignore_patterns('*_all_*'))
+
+end = time.time()
+
+elapsed = end - start
+print(f'Complete. Elapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)')
 
 # end of file
