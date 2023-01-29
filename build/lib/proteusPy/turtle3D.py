@@ -1,17 +1,20 @@
-# Turtle3D.py
-#
-# Implementation of a 3D Turtle in Python.
-# Author: Eric G. Suchanek, PhD
-# A part of the program proteusPy, https://github.com/suchanek/proteusPy,
-# a program for the manipulation and analysis of macromolecules
-# Based on the C implementation originally authored by Eric G. Suchanek PhD 1990
-# Last modification 1/25/23 -egs-
+'''
+Implementation of a 3D Turtle in Python.
+
+A part of the program proteusPy, https://github.com/suchanek/proteusPy, a Python packages for the 
+manipulation and analysis of macromolecules. Based on the C implementation originally authored 
+by Eric G. Suchanek PhD, 1990.
+
+'''
+
+# Last modification 1/27/23 -egs-
 
 import numpy
 import math
 
 from Bio.PDB.vectors import Vector
 from Bio.PDB.vectors import calc_angle, calc_dihedral
+
 #from proteusPy import *
 from proteusPy.ProteusGlobals import ORIENT_BACKBONE, ORIENT_SIDECHAIN
 
@@ -45,14 +48,27 @@ class Turtle3D:
         self._recording = False
         self._tape = []
     
-    def new(self, name: str, pos: Vector, head=Vector(1,0,0), 
+    def new(self, name: str, pos: Vector, 
+            head=Vector(1,0,0), 
             left=Vector(0,1,0), 
             up=Vector(0,0,1), 
             pen='up', recording=False):
+        '''
+        Initialize a Turtle with a name and initial position
+
+        :param name: Turtle's Name
+        :param pos: Turtle's Position 
+        :param head: Turtle's Heading vector, defaults to Vector(1,0,0)
+        :param left: Turtle's Left vector, defaults to Vector(0,1,0)
+        :param up: Turtle's Up vector, defaults to Vector(0,0,1)
+        :param pen: Pen state, defaults to 'up'
+        :param recording: _description_, defaults to False
+        '''
         self.Name = name
         self.Position = pos
         self.Heading = head
         self.Left = left
+        self.Up = up
         self.Pen = pen
         self.Recording = recording
 
@@ -83,7 +99,7 @@ class Turtle3D:
         Arguments: None
         Returns: None
         """
-        self.__init__(self)
+        self.__init__(self,)
     
     @property
     def Orientation(self):
@@ -288,7 +304,7 @@ class Turtle3D:
         """
         self._name = name
     
-    def move(self, distance):
+    def move(self, distance: float):
         """
         Move the Turtle distance (Å), in direction of Heading
 
@@ -383,13 +399,18 @@ class Turtle3D:
         self._heading[2] = self._heading[2] * cosang - self._up[2] * sinang
         self.heading = Vector(self._heading)
 
-
         self._up[0] = self._up[0] * cosang + self._heading[0] * sinang
         self._up[1] = self._up[1] * cosang + self._heading[1] * sinang
         self._up[2] = self._up[2] * cosang + self._heading[2] * sinang
         self.up = Vector(self._up)
     
     def unit(self, v):
+        '''
+        Return a unit vector for the input vector.
+
+        :param v: Input Vector
+        :return: Unit Vector
+        '''
         norm = numpy.linalg.norm(v)
         if norm == 0: 
             return v
