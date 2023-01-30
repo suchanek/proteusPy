@@ -1478,6 +1478,7 @@ class Disulfide:
         self.ca_dist = ca
         self.c_dist = c
         self.compute_torsional_energy()
+        self.compute_local_coords()
 
     def Torsion_length(self) -> float:
         '''
