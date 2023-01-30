@@ -26,7 +26,7 @@ from tqdm import tqdm
 import proteusPy
 from proteusPy import *
 from proteusPy.atoms import *
-from proteusPy.utility import grid_dimensions
+from proteusPy.utility import grid_dimensions, distance_squared
 
 _PBAR_COLS = 100
 
@@ -444,7 +444,7 @@ class DisulfideList(UserList):
             total1 = 0
             for ss2 in sslist:
                 tors2 = ss2.torsion_array
-                total1 += proteusPy.dist_squared(tors1, tors2)
+                total1 += distance_squared(tors1, tors2)
         
             totsq = totsq + (total1 / tot)
 

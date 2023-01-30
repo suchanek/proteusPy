@@ -118,7 +118,6 @@ def grid_dimensions(n):
         columns = math.ceil(root)
         return int(n / columns), int(columns)
 
-
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

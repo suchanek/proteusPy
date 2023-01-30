@@ -1,14 +1,78 @@
-# initialization for proteusPy pip setup
-from setuptools import setup, find_packages
-__version__ = '0.25dev'
+"""setuptools based setup script for proteusPy.
+
+This uses setuptools which is now the standard python mechanism for
+installing packages. If you have downloaded and uncompressed the
+proteusPy source code, or fetched it from git, for the simplest
+installation just type the command::
+
+    python setup.py install
+
+However, you would normally install the latest proteusPy release from
+the PyPI archive with::
+
+    python -m pip install --index-url https://test.pypi.org/simple/ proteusPy
+
+For more in-depth instructions, see the installation section of the
+proteusPy documentation, linked to from:
+
+http://suchanek.github.io/proteusPy/
+
+This code is in alpha pre-release.
+"""
+import sys
+import os
+
+try:
+    from setuptools import setup
+    from setuptools import Command
+    from setuptools import Extension
+except ImportError:
+    sys.exit(
+        "We need the Python library setuptools to be installed. "
+        "Try running: python -m ensurepip"
+    )
+
+if "bdist_wheel" in sys.argv:
+    try:
+        import wheel  # noqa: F401
+    except ImportError:
+        sys.exit(
+            "We need both setuptools AND wheel packages installed "
+            "for bdist_wheel to work. Try running: pip install wheel"
+        )
+
+# Make sure we have the right Python version.
+MIN_PY_VER = (3, 8)
+if sys.version_info[:2] < MIN_PY_VER:
+    sys.stderr.write(
+        ("ERROR: proteusPy requires Python %i.%i or later. " % MIN_PY_VER)
+        + ("Python %d.%d detected.\n" % sys.version_info[:2])
+    )
+    sys.exit(1)
+
+def can_import(module_name):
+    """Check we can import the requested module."""
+    try:
+        return __import__(module_name)
+    except ImportError:
+        return None
 
 from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
+# We now define the Biopython version number in Bio/__init__.py
+# Here we can't use "import Bio" then "Bio.__version__" as that would
+# tell us the version of Biopython already installed (if any).
+
+__version__ = "Undefined"
+for line in open("proteusPy/__init__.py"):
+    if line.startswith("__version__"):
+        exec(line.strip())
+
 setup(name='proteusPy',
       version=__version__,
-      description='proteusPy - protein structure analysis tools',
+      description='proteusPy - Protein Structure Analysis and Modeling Tools',
       long_description=long_description,
       long_description_content_type='text/markdown',
       url='https://github.com/suchanek/proteusPy/',
@@ -19,13 +83,25 @@ setup(name='proteusPy',
       keywords='proteus suchanek',
       install_requires=['pandas', 'numpy', 'matplotlib', 'pyvista'],
       source='https://github.com/suchanek/proteusPy/',
+      project_urls={
+        "Documentation": "https://suchanek.github.io/proteusPy/",
+        "Source": "https://github.com/suchanek/proteusPy/",
+        "Tracker": "https://github.com/suchanek/proteusPy/issues",
+      },
       classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
+        'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Bio-Informatics',
         'Topic :: Scientific/Engineering :: Chemistry',
         'Programming Language :: Python :: 3.9'],
       include_package_data=True,
       package_data={'': ['data/*.txt', 'data/*.py', 'data/*.json']},
+      python_requires=">=%i.%i" % MIN_PY_VER,
       zip_safe=False)

@@ -80,6 +80,47 @@
 proteusPy    </h1>
 
                         <div class="docstring"><p><em>proteusPy</em> is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide Bonds. This package reprises my molecular modeling program <a href="https://doi.org/10.1021/bi00368a023">Proteus</a>, and relies on the <a href="https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html">Turtle3D</a> class. The turtle implements the functions <code>Move</code>, <code>Roll</code>, <code>Yaw</code>, <code>Pitch</code> and <code>Turn</code> for movement in a three-dimensional space. The <a href="https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html">Disulfide</a> class implements methods to analyze the protein structure stabilizing element known as a <em>Disulfide Bond</em>. This class and its underlying methods are being used to perform a structural analysis of over 292,000 disulfide-bond containing proteins in the RCSB protein data bank.</p>
+
+<h3 id="virtual-environment-installationcreation">Virtual Environment Installation/Creation</h3>
+
+<ol>
+<li>Install Anaconda (<a href="http://anaconda.org">http://anaconda.org</a>)
+<ul>
+<li>Create a new environment using python 3.9</li>
+<li>Activate the environment</li>
+</ul></li>
+<li>Install git-lfs
+<ul>
+<li><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage">https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage</a></a></li>
+<li>From a shell prompt: git-lfs track "<em>.csv"</li>
+<li>From a shell prompt: git-lfs track "</em>.pkl"</li>
+<li>From a shell prompt: git-lfs track "*.mp4"</li>
+</ul></li>
+<li>Build the environment
+<ul>
+<li>Using pyPi:</li>
+<li>python3 -m pip install --index-url <a href="https://test.pypi.org/simple/"><a href="https://test.pypi.org/simple/">https://test.pypi.org/simple/</a></a> --extra-index-url <a href="https://pypi.org/simple/"><a href="https://pypi.org/simple/">https://pypi.org/simple/</a></a> proteusPy</li>
+<li>From gitHub:
+<ul>
+<li>git clone <a href="https://github.com/suchanek/proteusPy/proteusPy.git"><a href="https://github.com/suchanek/proteusPy/proteusPy.git"><a href="https://github.com/suchanek/proteusPy/proteusPy.git">https://github.com/suchanek/proteusPy/proteusPy.git</a></a></a></li>
+<li>cd into the repo</li>
+<li>pip install .</li>
+</ul></li>
+</ul></li>
+</ol>
+
+<h4 id="publications">Publications</h4>
+
+<ul>
+<li><a href="https://doi.org/10.1021/bi00368a023">https://doi.org/10.1021/bi00368a023</a></li>
+<li><a href="https://doi.org/10.1021/bi00368a024">https://doi.org/10.1021/bi00368a024</a></li>
+<li><a href="https://doi.org/10.1016/0092-8674(92)90140-8">https://doi.org/10.1016/0092-8674(92)90140-8</a></li>
+<li><a href="http://dx.doi.org/10.2174/092986708783330566">http://dx.doi.org/10.2174/092986708783330566</a></li>
+</ul>
+
+<p><em>NB:</em> This distribution is actively being developed and will be difficult to implement locally unless the BioPython patch is applied. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1. 1/26/23 -egs</p>
+
+<p>Eric G. Suchanek, PhD. mailto:suchanek@mac.com</p>
 </div>
 
                         <input id="mod-proteusPy-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -87,14 +128,14 @@ proteusPy    </h1>
                         <label class="view-source-button" for="mod-proteusPy-view-source"><span>View Source</span></label>
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="sd">.. include:: ./README.md</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="sd">.. include:: ../README.md</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="c1"># Initialization for the proteusPy package</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="c1"># Copyright (c) 2023 Eric G. Suchanek, PhD., all rights reserved</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="c1"># Subject to the MIT public license.</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.25dev&quot;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.26dev&quot;</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="kn">import</span> <span class="nn">sys</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="kn">import</span> <span class="nn">os</span>
