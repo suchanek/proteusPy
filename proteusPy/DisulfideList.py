@@ -342,6 +342,9 @@ class DisulfideList(UserList):
                 print(f'Cross chain SS: {ss.repr_compact}:')
         return reslist
     
+    def length(self):
+        return(len(self.data))
+    
     @property
     def torsion_df(self):
         return self.build_torsion_df()
