@@ -1478,6 +1478,7 @@ class Disulfide:
         self.ca_dist = ca
         self.c_dist = c
         self.compute_torsional_energy()
+        self.compute_local_coords()
 
     def Torsion_length(self) -> float:
         '''
@@ -1558,6 +1559,39 @@ class Disulfide:
         totsq /= 12
 
         return(math.sqrt(totsq))
+
+    def Torsion_neighbors(self, others, cutoff):
+        '''
+        Returns list of Disulfides within the cutoff in the others list.
+
+        :param others: DisulfideList to search
+        :param cutoff: Dihedral angle degree cutoff
+        :return: DisulfideList within the cutoff
+        '''
+        
+        res = DisulfideList([], 'neighbors')
+        for ss in others:
+            dist = self.Torsion_RMS(ss)
+            if dist <= cutoff:
+                res.append(ss)
+        return res
+
+    def Distance_neighbors(self, others, cutoff):
+        '''
+        Returns list of Disulfides within the cutoff in the others list.
+
+        :param others: DisulfideList to search
+        :param cutoff: Distance cutoff (A)
+        :return: DisulfideList within the cutoff
+        '''
+        
+        res = DisulfideList([], 'neighbors')
+        for ss in others:
+            dist = self.Distance_RMS(ss)
+            if dist <= cutoff:
+                res.append(ss)
+        return res
+
 
 # Class defination ends
 

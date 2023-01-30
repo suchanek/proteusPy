@@ -342,6 +342,9 @@ class DisulfideList(UserList):
                 print(f'Cross chain SS: {ss.repr_compact}:')
         return reslist
     
+    def length(self):
+        return(len(self.data))
+    
     @property
     def torsion_df(self):
         return self.build_torsion_df()
@@ -365,7 +368,7 @@ class DisulfideList(UserList):
         for ss in pbar:
             new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, 
                     ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance,
-                    ss.psiprox, ss.psiprox, ss.phidist, ss.psidist, ss.torsion_distance]
+                    ss.psiprox, ss.psiprox, ss.phidist, ss.psidist, ss.torsion_length]
             # add the row to the end of the dataframe
             SS_df.loc[len(SS_df.index)] = new_row
         
