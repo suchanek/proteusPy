@@ -365,7 +365,7 @@ class DisulfideList(UserList):
         for ss in pbar:
             new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, 
                     ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance,
-                    ss.psiprox, ss.psiprox, ss.phidist, ss.psidist, ss.torsion_distance]
+                    ss.psiprox, ss.psiprox, ss.phidist, ss.psidist, ss.torsion_length]
             # add the row to the end of the dataframe
             SS_df.loc[len(SS_df.index)] = new_row
         
