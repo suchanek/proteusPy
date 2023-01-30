@@ -45,16 +45,16 @@ _SS_TORSIONS_FILE = 'PDB_subset_SS_torsions.csv'
 _PROBLEM_ID_FILE = 'PDB_subset_SS_problems.csv'
 
 start = time.time()
-Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB, datadir=DATA)
+#Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB, datadir=DATA)
 
-'''
+
 Extract_Disulfides(numb=1000, pdbdir=PDB, datadir=DATA,
                 dictfile=_SS_DICT_PICKLE_FILE,
                 picklefile=_SS_PICKLE_FILE,
                 torsionfile=_SS_TORSIONS_FILE,
                 problemfile=_PROBLEM_ID_FILE,
                 verbose=False, quiet=True)
-'''
+
 
 # total extraction uses numb=-1 and takes about 1.5 hours on
 # my 2021 MacbookPro M1 Pro computer.
