@@ -2,12 +2,6 @@ MANIFEST.in
 README.md
 setup.cfg
 setup.py
-data/PDB_all_SS_torsions.csv
-data/PDB_all_ss.pkl
-data/PDB_all_ss_dict.pkl
-data/PDB_subset_SS_torsions.csv
-data/PDB_subset_ss.pkl
-data/PDB_subset_ss_dict.pkl
 proteusPy/Disulfide.py
 proteusPy/DisulfideExceptions.py
 proteusPy/DisulfideGlobals.py

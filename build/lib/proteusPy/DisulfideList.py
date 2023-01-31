@@ -14,7 +14,7 @@ DisulfideList.display() method.
 # Author Eric G. Suchanek, PhD
 # A part of the proteusPy molecular modeling and analysis suite by
 # Eric G. Suchanek, PhD
-# Last modification: 12/13/2023 -egs-
+# Last modification: 1/30/2023 -egs-
 import numpy
 
 import pandas as pd
@@ -26,7 +26,7 @@ from tqdm import tqdm
 import proteusPy
 from proteusPy import *
 from proteusPy.atoms import *
-from proteusPy.utility import grid_dimensions, distance_squared
+from proteusPy.utility import grid_dimensions, distance_squared, cmap_vector
 
 _PBAR_COLS = 100
 
@@ -537,8 +537,7 @@ class DisulfideList(UserList):
         return
     
     def display_overlay(self, screenshot=False, movie=False, 
-                        verbose=True,
-                        fname='ss_overlay.png'):
+                        verbose=True, fname='ss_overlay.png'):
         ''' 
         Display all disulfides in the list overlaid in stick mode against
         a common coordinate frames. This allows us to see all of the disulfides
@@ -567,7 +566,7 @@ class DisulfideList(UserList):
         pl.add_axes()
 
         mycol = numpy.zeros(shape=(tot_ss, 3))
-        mycol = proteusPy.cmap_vector(tot_ss)
+        mycol = cmap_vector(tot_ss)
 
         for i, ss in zip(range(tot_ss), ssbonds):
             color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
