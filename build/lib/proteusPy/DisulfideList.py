@@ -433,7 +433,7 @@ class DisulfideList(UserList):
             res[idx] = row
         return res
 
-    def Torsion_RMS(self):
+    def Torsion_Distance(self):
         '''
         Calculate the RMS distance in torsion space between all pairs in the
         DisulfideList

@@ -183,7 +183,7 @@
                                 <a class="function" href="#Disulfide.Torsion_length">Torsion_length</a>
                         </li>
                         <li>
-                                <a class="function" href="#Disulfide.Torsion_RMS">Torsion_RMS</a>
+                                <a class="function" href="#Disulfide.Torsion_Distance">Torsion_Distance</a>
                         </li>
                         <li>
                                 <a class="function" href="#Disulfide.Torsion_neighbors">Torsion_neighbors</a>
@@ -1747,7 +1747,7 @@ Last revision: 1/27/2023</p>
 </span><span id="L-1498"><a href="#L-1498"><span class="linenos">1498</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">torsion_length</span> <span class="o">=</span> <span class="n">dist</span>
 </span><span id="L-1499"><a href="#L-1499"><span class="linenos">1499</span></a>        <span class="k">return</span> <span class="n">dist</span>
 </span><span id="L-1500"><a href="#L-1500"><span class="linenos">1500</span></a>
-</span><span id="L-1501"><a href="#L-1501"><span class="linenos">1501</span></a>    <span class="k">def</span> <span class="nf">Torsion_RMS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="L-1501"><a href="#L-1501"><span class="linenos">1501</span></a>    <span class="k">def</span> <span class="nf">Torsion_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 </span><span id="L-1502"><a href="#L-1502"><span class="linenos">1502</span></a>        <span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-1503"><a href="#L-1503"><span class="linenos">1503</span></a><span class="sd">        Calculate the 5D Euclidean distance between self and another Disulfide</span>
 </span><span id="L-1504"><a href="#L-1504"><span class="linenos">1504</span></a><span class="sd">        object. This is used to compare Disulfide Bond torsion angles to </span>
@@ -1820,7 +1820,7 @@ Last revision: 1/27/2023</p>
 </span><span id="L-1571"><a href="#L-1571"><span class="linenos">1571</span></a>        
 </span><span id="L-1572"><a href="#L-1572"><span class="linenos">1572</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">DisulfideList</span><span class="p">([],</span> <span class="s1">&#39;neighbors&#39;</span><span class="p">)</span>
 </span><span id="L-1573"><a href="#L-1573"><span class="linenos">1573</span></a>        <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">others</span><span class="p">:</span>
-</span><span id="L-1574"><a href="#L-1574"><span class="linenos">1574</span></a>            <span class="n">dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Torsion_RMS</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span>
+</span><span id="L-1574"><a href="#L-1574"><span class="linenos">1574</span></a>            <span class="n">dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Torsion_Distance</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span>
 </span><span id="L-1575"><a href="#L-1575"><span class="linenos">1575</span></a>            <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;=</span> <span class="n">cutoff</span><span class="p">:</span>
 </span><span id="L-1576"><a href="#L-1576"><span class="linenos">1576</span></a>                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span>
 </span><span id="L-1577"><a href="#L-1577"><span class="linenos">1577</span></a>        <span class="k">return</span> <span class="n">res</span>
@@ -4049,7 +4049,7 @@ Last revision: 1/27/2023</p>
 </span><span id="Disulfide-1499"><a href="#Disulfide-1499"><span class="linenos">1499</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">torsion_length</span> <span class="o">=</span> <span class="n">dist</span>
 </span><span id="Disulfide-1500"><a href="#Disulfide-1500"><span class="linenos">1500</span></a>        <span class="k">return</span> <span class="n">dist</span>
 </span><span id="Disulfide-1501"><a href="#Disulfide-1501"><span class="linenos">1501</span></a>
-</span><span id="Disulfide-1502"><a href="#Disulfide-1502"><span class="linenos">1502</span></a>    <span class="k">def</span> <span class="nf">Torsion_RMS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="Disulfide-1502"><a href="#Disulfide-1502"><span class="linenos">1502</span></a>    <span class="k">def</span> <span class="nf">Torsion_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 </span><span id="Disulfide-1503"><a href="#Disulfide-1503"><span class="linenos">1503</span></a>        <span class="sd">&#39;&#39;&#39;</span>
 </span><span id="Disulfide-1504"><a href="#Disulfide-1504"><span class="linenos">1504</span></a><span class="sd">        Calculate the 5D Euclidean distance between self and another Disulfide</span>
 </span><span id="Disulfide-1505"><a href="#Disulfide-1505"><span class="linenos">1505</span></a><span class="sd">        object. This is used to compare Disulfide Bond torsion angles to </span>
@@ -4122,7 +4122,7 @@ Last revision: 1/27/2023</p>
 </span><span id="Disulfide-1572"><a href="#Disulfide-1572"><span class="linenos">1572</span></a>        
 </span><span id="Disulfide-1573"><a href="#Disulfide-1573"><span class="linenos">1573</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">DisulfideList</span><span class="p">([],</span> <span class="s1">&#39;neighbors&#39;</span><span class="p">)</span>
 </span><span id="Disulfide-1574"><a href="#Disulfide-1574"><span class="linenos">1574</span></a>        <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">others</span><span class="p">:</span>
-</span><span id="Disulfide-1575"><a href="#Disulfide-1575"><span class="linenos">1575</span></a>            <span class="n">dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Torsion_RMS</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span>
+</span><span id="Disulfide-1575"><a href="#Disulfide-1575"><span class="linenos">1575</span></a>            <span class="n">dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Torsion_Distance</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span>
 </span><span id="Disulfide-1576"><a href="#Disulfide-1576"><span class="linenos">1576</span></a>            <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;=</span> <span class="n">cutoff</span><span class="p">:</span>
 </span><span id="Disulfide-1577"><a href="#Disulfide-1577"><span class="linenos">1577</span></a>                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span>
 </span><span id="Disulfide-1578"><a href="#Disulfide-1578"><span class="linenos">1578</span></a>        <span class="k">return</span> <span class="n">res</span>
@@ -6357,45 +6357,45 @@ and update the Disulfide internal state.</p>
 
 
                             </div>
-                            <div id="Disulfide.Torsion_RMS" class="classattr">
-                                        <input id="Disulfide.Torsion_RMS-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                            <div id="Disulfide.Torsion_Distance" class="classattr">
+                                        <input id="Disulfide.Torsion_Distance-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">Torsion_RMS</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">other</span></span><span class="return-annotation">) -> <span class="nb">float</span>:</span></span>
+        <span class="name">Torsion_Distance</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">other</span></span><span class="return-annotation">) -> <span class="nb">float</span>:</span></span>
 
-                <label class="view-source-button" for="Disulfide.Torsion_RMS-view-source"><span>View Source</span></label>
+                <label class="view-source-button" for="Disulfide.Torsion_Distance-view-source"><span>View Source</span></label>
 
     </div>
-    <a class="headerlink" href="#Disulfide.Torsion_RMS"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Disulfide.Torsion_RMS-1502"><a href="#Disulfide.Torsion_RMS-1502"><span class="linenos">1502</span></a>    <span class="k">def</span> <span class="nf">Torsion_RMS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span id="Disulfide.Torsion_RMS-1503"><a href="#Disulfide.Torsion_RMS-1503"><span class="linenos">1503</span></a>        <span class="sd">&#39;&#39;&#39;</span>
-</span><span id="Disulfide.Torsion_RMS-1504"><a href="#Disulfide.Torsion_RMS-1504"><span class="linenos">1504</span></a><span class="sd">        Calculate the 5D Euclidean distance between self and another Disulfide</span>
-</span><span id="Disulfide.Torsion_RMS-1505"><a href="#Disulfide.Torsion_RMS-1505"><span class="linenos">1505</span></a><span class="sd">        object. This is used to compare Disulfide Bond torsion angles to </span>
-</span><span id="Disulfide.Torsion_RMS-1506"><a href="#Disulfide.Torsion_RMS-1506"><span class="linenos">1506</span></a><span class="sd">        determine their torsional similarity via a Euclidean distance metric.</span>
-</span><span id="Disulfide.Torsion_RMS-1507"><a href="#Disulfide.Torsion_RMS-1507"><span class="linenos">1507</span></a>
-</span><span id="Disulfide.Torsion_RMS-1508"><a href="#Disulfide.Torsion_RMS-1508"><span class="linenos">1508</span></a><span class="sd">        Parameters</span>
-</span><span id="Disulfide.Torsion_RMS-1509"><a href="#Disulfide.Torsion_RMS-1509"><span class="linenos">1509</span></a><span class="sd">        ----------</span>
-</span><span id="Disulfide.Torsion_RMS-1510"><a href="#Disulfide.Torsion_RMS-1510"><span class="linenos">1510</span></a><span class="sd">        other : Disulfide</span>
-</span><span id="Disulfide.Torsion_RMS-1511"><a href="#Disulfide.Torsion_RMS-1511"><span class="linenos">1511</span></a><span class="sd">            Comparison Disulfide</span>
-</span><span id="Disulfide.Torsion_RMS-1512"><a href="#Disulfide.Torsion_RMS-1512"><span class="linenos">1512</span></a>
-</span><span id="Disulfide.Torsion_RMS-1513"><a href="#Disulfide.Torsion_RMS-1513"><span class="linenos">1513</span></a><span class="sd">        Returns</span>
-</span><span id="Disulfide.Torsion_RMS-1514"><a href="#Disulfide.Torsion_RMS-1514"><span class="linenos">1514</span></a><span class="sd">        -------</span>
-</span><span id="Disulfide.Torsion_RMS-1515"><a href="#Disulfide.Torsion_RMS-1515"><span class="linenos">1515</span></a><span class="sd">        float</span>
-</span><span id="Disulfide.Torsion_RMS-1516"><a href="#Disulfide.Torsion_RMS-1516"><span class="linenos">1516</span></a><span class="sd">            RMS distance (degrees)</span>
-</span><span id="Disulfide.Torsion_RMS-1517"><a href="#Disulfide.Torsion_RMS-1517"><span class="linenos">1517</span></a>
-</span><span id="Disulfide.Torsion_RMS-1518"><a href="#Disulfide.Torsion_RMS-1518"><span class="linenos">1518</span></a><span class="sd">        Raises</span>
-</span><span id="Disulfide.Torsion_RMS-1519"><a href="#Disulfide.Torsion_RMS-1519"><span class="linenos">1519</span></a><span class="sd">        ------</span>
-</span><span id="Disulfide.Torsion_RMS-1520"><a href="#Disulfide.Torsion_RMS-1520"><span class="linenos">1520</span></a><span class="sd">        ProteusPyWarning</span>
-</span><span id="Disulfide.Torsion_RMS-1521"><a href="#Disulfide.Torsion_RMS-1521"><span class="linenos">1521</span></a><span class="sd">            Warning if other is wrong type.</span>
-</span><span id="Disulfide.Torsion_RMS-1522"><a href="#Disulfide.Torsion_RMS-1522"><span class="linenos">1522</span></a><span class="sd">        &#39;&#39;&#39;</span>
-</span><span id="Disulfide.Torsion_RMS-1523"><a href="#Disulfide.Torsion_RMS-1523"><span class="linenos">1523</span></a>
-</span><span id="Disulfide.Torsion_RMS-1524"><a href="#Disulfide.Torsion_RMS-1524"><span class="linenos">1524</span></a>        <span class="n">_p1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">torsion_array</span>
-</span><span id="Disulfide.Torsion_RMS-1525"><a href="#Disulfide.Torsion_RMS-1525"><span class="linenos">1525</span></a>        <span class="n">_p2</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">torsion_array</span>
-</span><span id="Disulfide.Torsion_RMS-1526"><a href="#Disulfide.Torsion_RMS-1526"><span class="linenos">1526</span></a>        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_p1</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">5</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">_p2</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">5</span><span class="p">):</span>
-</span><span id="Disulfide.Torsion_RMS-1527"><a href="#Disulfide.Torsion_RMS-1527"><span class="linenos">1527</span></a>            <span class="k">raise</span> <span class="n">ProteusPyWarning</span><span class="p">(</span><span class="s2">&quot;--&gt; distance5d() requires vectors of length 5!&quot;</span><span class="p">)</span>
-</span><span id="Disulfide.Torsion_RMS-1528"><a href="#Disulfide.Torsion_RMS-1528"><span class="linenos">1528</span></a>        <span class="n">d</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">_p1</span><span class="p">,</span> <span class="n">_p2</span><span class="p">)</span>
-</span><span id="Disulfide.Torsion_RMS-1529"><a href="#Disulfide.Torsion_RMS-1529"><span class="linenos">1529</span></a>        <span class="k">return</span> <span class="n">d</span>
+    <a class="headerlink" href="#Disulfide.Torsion_Distance"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Disulfide.Torsion_Distance-1502"><a href="#Disulfide.Torsion_Distance-1502"><span class="linenos">1502</span></a>    <span class="k">def</span> <span class="nf">Torsion_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="Disulfide.Torsion_Distance-1503"><a href="#Disulfide.Torsion_Distance-1503"><span class="linenos">1503</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="Disulfide.Torsion_Distance-1504"><a href="#Disulfide.Torsion_Distance-1504"><span class="linenos">1504</span></a><span class="sd">        Calculate the 5D Euclidean distance between self and another Disulfide</span>
+</span><span id="Disulfide.Torsion_Distance-1505"><a href="#Disulfide.Torsion_Distance-1505"><span class="linenos">1505</span></a><span class="sd">        object. This is used to compare Disulfide Bond torsion angles to </span>
+</span><span id="Disulfide.Torsion_Distance-1506"><a href="#Disulfide.Torsion_Distance-1506"><span class="linenos">1506</span></a><span class="sd">        determine their torsional similarity via a Euclidean distance metric.</span>
+</span><span id="Disulfide.Torsion_Distance-1507"><a href="#Disulfide.Torsion_Distance-1507"><span class="linenos">1507</span></a>
+</span><span id="Disulfide.Torsion_Distance-1508"><a href="#Disulfide.Torsion_Distance-1508"><span class="linenos">1508</span></a><span class="sd">        Parameters</span>
+</span><span id="Disulfide.Torsion_Distance-1509"><a href="#Disulfide.Torsion_Distance-1509"><span class="linenos">1509</span></a><span class="sd">        ----------</span>
+</span><span id="Disulfide.Torsion_Distance-1510"><a href="#Disulfide.Torsion_Distance-1510"><span class="linenos">1510</span></a><span class="sd">        other : Disulfide</span>
+</span><span id="Disulfide.Torsion_Distance-1511"><a href="#Disulfide.Torsion_Distance-1511"><span class="linenos">1511</span></a><span class="sd">            Comparison Disulfide</span>
+</span><span id="Disulfide.Torsion_Distance-1512"><a href="#Disulfide.Torsion_Distance-1512"><span class="linenos">1512</span></a>
+</span><span id="Disulfide.Torsion_Distance-1513"><a href="#Disulfide.Torsion_Distance-1513"><span class="linenos">1513</span></a><span class="sd">        Returns</span>
+</span><span id="Disulfide.Torsion_Distance-1514"><a href="#Disulfide.Torsion_Distance-1514"><span class="linenos">1514</span></a><span class="sd">        -------</span>
+</span><span id="Disulfide.Torsion_Distance-1515"><a href="#Disulfide.Torsion_Distance-1515"><span class="linenos">1515</span></a><span class="sd">        float</span>
+</span><span id="Disulfide.Torsion_Distance-1516"><a href="#Disulfide.Torsion_Distance-1516"><span class="linenos">1516</span></a><span class="sd">            RMS distance (degrees)</span>
+</span><span id="Disulfide.Torsion_Distance-1517"><a href="#Disulfide.Torsion_Distance-1517"><span class="linenos">1517</span></a>
+</span><span id="Disulfide.Torsion_Distance-1518"><a href="#Disulfide.Torsion_Distance-1518"><span class="linenos">1518</span></a><span class="sd">        Raises</span>
+</span><span id="Disulfide.Torsion_Distance-1519"><a href="#Disulfide.Torsion_Distance-1519"><span class="linenos">1519</span></a><span class="sd">        ------</span>
+</span><span id="Disulfide.Torsion_Distance-1520"><a href="#Disulfide.Torsion_Distance-1520"><span class="linenos">1520</span></a><span class="sd">        ProteusPyWarning</span>
+</span><span id="Disulfide.Torsion_Distance-1521"><a href="#Disulfide.Torsion_Distance-1521"><span class="linenos">1521</span></a><span class="sd">            Warning if other is wrong type.</span>
+</span><span id="Disulfide.Torsion_Distance-1522"><a href="#Disulfide.Torsion_Distance-1522"><span class="linenos">1522</span></a><span class="sd">        &#39;&#39;&#39;</span>
+</span><span id="Disulfide.Torsion_Distance-1523"><a href="#Disulfide.Torsion_Distance-1523"><span class="linenos">1523</span></a>
+</span><span id="Disulfide.Torsion_Distance-1524"><a href="#Disulfide.Torsion_Distance-1524"><span class="linenos">1524</span></a>        <span class="n">_p1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">torsion_array</span>
+</span><span id="Disulfide.Torsion_Distance-1525"><a href="#Disulfide.Torsion_Distance-1525"><span class="linenos">1525</span></a>        <span class="n">_p2</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">torsion_array</span>
+</span><span id="Disulfide.Torsion_Distance-1526"><a href="#Disulfide.Torsion_Distance-1526"><span class="linenos">1526</span></a>        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_p1</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">5</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">_p2</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">5</span><span class="p">):</span>
+</span><span id="Disulfide.Torsion_Distance-1527"><a href="#Disulfide.Torsion_Distance-1527"><span class="linenos">1527</span></a>            <span class="k">raise</span> <span class="n">ProteusPyWarning</span><span class="p">(</span><span class="s2">&quot;--&gt; distance5d() requires vectors of length 5!&quot;</span><span class="p">)</span>
+</span><span id="Disulfide.Torsion_Distance-1528"><a href="#Disulfide.Torsion_Distance-1528"><span class="linenos">1528</span></a>        <span class="n">d</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">_p1</span><span class="p">,</span> <span class="n">_p2</span><span class="p">)</span>
+</span><span id="Disulfide.Torsion_Distance-1529"><a href="#Disulfide.Torsion_Distance-1529"><span class="linenos">1529</span></a>        <span class="k">return</span> <span class="n">d</span>
 </span></pre></div>
 
 
@@ -6443,7 +6443,7 @@ determine their torsional similarity via a Euclidean distance metric.</p>
 </span><span id="Disulfide.Torsion_neighbors-1572"><a href="#Disulfide.Torsion_neighbors-1572"><span class="linenos">1572</span></a>        
 </span><span id="Disulfide.Torsion_neighbors-1573"><a href="#Disulfide.Torsion_neighbors-1573"><span class="linenos">1573</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">DisulfideList</span><span class="p">([],</span> <span class="s1">&#39;neighbors&#39;</span><span class="p">)</span>
 </span><span id="Disulfide.Torsion_neighbors-1574"><a href="#Disulfide.Torsion_neighbors-1574"><span class="linenos">1574</span></a>        <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">others</span><span class="p">:</span>
-</span><span id="Disulfide.Torsion_neighbors-1575"><a href="#Disulfide.Torsion_neighbors-1575"><span class="linenos">1575</span></a>            <span class="n">dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Torsion_RMS</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span>
+</span><span id="Disulfide.Torsion_neighbors-1575"><a href="#Disulfide.Torsion_neighbors-1575"><span class="linenos">1575</span></a>            <span class="n">dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Torsion_Distance</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span>
 </span><span id="Disulfide.Torsion_neighbors-1576"><a href="#Disulfide.Torsion_neighbors-1576"><span class="linenos">1576</span></a>            <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;=</span> <span class="n">cutoff</span><span class="p">:</span>
 </span><span id="Disulfide.Torsion_neighbors-1577"><a href="#Disulfide.Torsion_neighbors-1577"><span class="linenos">1577</span></a>                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span>
 </span><span id="Disulfide.Torsion_neighbors-1578"><a href="#Disulfide.Torsion_neighbors-1578"><span class="linenos">1578</span></a>        <span class="k">return</span> <span class="n">res</span>
