@@ -120,7 +120,7 @@
                                 <a class="function" href="#DisulfideList.get_torsion_array">get_torsion_array</a>
                         </li>
                         <li>
-                                <a class="function" href="#DisulfideList.Torsion_RMS">Torsion_RMS</a>
+                                <a class="function" href="#DisulfideList.Torsion_Distance">Torsion_Distance</a>
                         </li>
                         <li>
                                 <a class="function" href="#DisulfideList.display">display</a>
@@ -598,7 +598,7 @@ with an iterable (tuple, list) and a name.</p>
 </span><span id="L-433"><a href="#L-433"><span class="linenos">433</span></a>            <span class="n">res</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span>
 </span><span id="L-434"><a href="#L-434"><span class="linenos">434</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-435"><a href="#L-435"><span class="linenos">435</span></a>
-</span><span id="L-436"><a href="#L-436"><span class="linenos">436</span></a>    <span class="k">def</span> <span class="nf">Torsion_RMS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-436"><a href="#L-436"><span class="linenos">436</span></a>    <span class="k">def</span> <span class="nf">Torsion_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-437"><a href="#L-437"><span class="linenos">437</span></a>        <span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-438"><a href="#L-438"><span class="linenos">438</span></a><span class="sd">        Calculate the RMS distance in torsion space between all pairs in the</span>
 </span><span id="L-439"><a href="#L-439"><span class="linenos">439</span></a><span class="sd">        DisulfideList</span>
@@ -1178,7 +1178,7 @@ with an iterable (tuple, list) and a name.</p>
 </span><span id="DisulfideList-434"><a href="#DisulfideList-434"><span class="linenos">434</span></a>            <span class="n">res</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span>
 </span><span id="DisulfideList-435"><a href="#DisulfideList-435"><span class="linenos">435</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="DisulfideList-436"><a href="#DisulfideList-436"><span class="linenos">436</span></a>
-</span><span id="DisulfideList-437"><a href="#DisulfideList-437"><span class="linenos">437</span></a>    <span class="k">def</span> <span class="nf">Torsion_RMS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DisulfideList-437"><a href="#DisulfideList-437"><span class="linenos">437</span></a>    <span class="k">def</span> <span class="nf">Torsion_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideList-438"><a href="#DisulfideList-438"><span class="linenos">438</span></a>        <span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-439"><a href="#DisulfideList-439"><span class="linenos">439</span></a><span class="sd">        Calculate the RMS distance in torsion space between all pairs in the</span>
 </span><span id="DisulfideList-440"><a href="#DisulfideList-440"><span class="linenos">440</span></a><span class="sd">        DisulfideList</span>
@@ -2178,36 +2178,36 @@ in the given disulfide list.</p>
 
 
                             </div>
-                            <div id="DisulfideList.Torsion_RMS" class="classattr">
-                                        <input id="DisulfideList.Torsion_RMS-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                            <div id="DisulfideList.Torsion_Distance" class="classattr">
+                                        <input id="DisulfideList.Torsion_Distance-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">Torsion_RMS</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
+        <span class="name">Torsion_Distance</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
 
-                <label class="view-source-button" for="DisulfideList.Torsion_RMS-view-source"><span>View Source</span></label>
+                <label class="view-source-button" for="DisulfideList.Torsion_Distance-view-source"><span>View Source</span></label>
 
     </div>
-    <a class="headerlink" href="#DisulfideList.Torsion_RMS"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.Torsion_RMS-437"><a href="#DisulfideList.Torsion_RMS-437"><span class="linenos">437</span></a>    <span class="k">def</span> <span class="nf">Torsion_RMS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList.Torsion_RMS-438"><a href="#DisulfideList.Torsion_RMS-438"><span class="linenos">438</span></a>        <span class="sd">&#39;&#39;&#39;</span>
-</span><span id="DisulfideList.Torsion_RMS-439"><a href="#DisulfideList.Torsion_RMS-439"><span class="linenos">439</span></a><span class="sd">        Calculate the RMS distance in torsion space between all pairs in the</span>
-</span><span id="DisulfideList.Torsion_RMS-440"><a href="#DisulfideList.Torsion_RMS-440"><span class="linenos">440</span></a><span class="sd">        DisulfideList</span>
-</span><span id="DisulfideList.Torsion_RMS-441"><a href="#DisulfideList.Torsion_RMS-441"><span class="linenos">441</span></a><span class="sd">        &#39;&#39;&#39;</span>
-</span><span id="DisulfideList.Torsion_RMS-442"><a href="#DisulfideList.Torsion_RMS-442"><span class="linenos">442</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
-</span><span id="DisulfideList.Torsion_RMS-443"><a href="#DisulfideList.Torsion_RMS-443"><span class="linenos">443</span></a>        <span class="n">tot</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sslist</span><span class="p">)</span>
-</span><span id="DisulfideList.Torsion_RMS-444"><a href="#DisulfideList.Torsion_RMS-444"><span class="linenos">444</span></a>
-</span><span id="DisulfideList.Torsion_RMS-445"><a href="#DisulfideList.Torsion_RMS-445"><span class="linenos">445</span></a>        <span class="n">totsq</span> <span class="o">=</span> <span class="mf">0.0</span>
-</span><span id="DisulfideList.Torsion_RMS-446"><a href="#DisulfideList.Torsion_RMS-446"><span class="linenos">446</span></a>        <span class="k">for</span> <span class="n">ss1</span> <span class="ow">in</span> <span class="n">sslist</span><span class="p">:</span>
-</span><span id="DisulfideList.Torsion_RMS-447"><a href="#DisulfideList.Torsion_RMS-447"><span class="linenos">447</span></a>            <span class="n">tors1</span> <span class="o">=</span> <span class="n">ss1</span><span class="o">.</span><span class="n">torsion_array</span>
-</span><span id="DisulfideList.Torsion_RMS-448"><a href="#DisulfideList.Torsion_RMS-448"><span class="linenos">448</span></a>            <span class="n">total1</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="DisulfideList.Torsion_RMS-449"><a href="#DisulfideList.Torsion_RMS-449"><span class="linenos">449</span></a>            <span class="k">for</span> <span class="n">ss2</span> <span class="ow">in</span> <span class="n">sslist</span><span class="p">:</span>
-</span><span id="DisulfideList.Torsion_RMS-450"><a href="#DisulfideList.Torsion_RMS-450"><span class="linenos">450</span></a>                <span class="n">tors2</span> <span class="o">=</span> <span class="n">ss2</span><span class="o">.</span><span class="n">torsion_array</span>
-</span><span id="DisulfideList.Torsion_RMS-451"><a href="#DisulfideList.Torsion_RMS-451"><span class="linenos">451</span></a>                <span class="n">total1</span> <span class="o">+=</span> <span class="n">distance_squared</span><span class="p">(</span><span class="n">tors1</span><span class="p">,</span> <span class="n">tors2</span><span class="p">)</span>
-</span><span id="DisulfideList.Torsion_RMS-452"><a href="#DisulfideList.Torsion_RMS-452"><span class="linenos">452</span></a>        
-</span><span id="DisulfideList.Torsion_RMS-453"><a href="#DisulfideList.Torsion_RMS-453"><span class="linenos">453</span></a>            <span class="n">totsq</span> <span class="o">=</span> <span class="n">totsq</span> <span class="o">+</span> <span class="p">(</span><span class="n">total1</span> <span class="o">/</span> <span class="n">tot</span><span class="p">)</span>
-</span><span id="DisulfideList.Torsion_RMS-454"><a href="#DisulfideList.Torsion_RMS-454"><span class="linenos">454</span></a>
-</span><span id="DisulfideList.Torsion_RMS-455"><a href="#DisulfideList.Torsion_RMS-455"><span class="linenos">455</span></a>        <span class="k">return</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">totsq</span><span class="o">/</span><span class="n">tot</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+    <a class="headerlink" href="#DisulfideList.Torsion_Distance"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.Torsion_Distance-437"><a href="#DisulfideList.Torsion_Distance-437"><span class="linenos">437</span></a>    <span class="k">def</span> <span class="nf">Torsion_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DisulfideList.Torsion_Distance-438"><a href="#DisulfideList.Torsion_Distance-438"><span class="linenos">438</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.Torsion_Distance-439"><a href="#DisulfideList.Torsion_Distance-439"><span class="linenos">439</span></a><span class="sd">        Calculate the RMS distance in torsion space between all pairs in the</span>
+</span><span id="DisulfideList.Torsion_Distance-440"><a href="#DisulfideList.Torsion_Distance-440"><span class="linenos">440</span></a><span class="sd">        DisulfideList</span>
+</span><span id="DisulfideList.Torsion_Distance-441"><a href="#DisulfideList.Torsion_Distance-441"><span class="linenos">441</span></a><span class="sd">        &#39;&#39;&#39;</span>
+</span><span id="DisulfideList.Torsion_Distance-442"><a href="#DisulfideList.Torsion_Distance-442"><span class="linenos">442</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+</span><span id="DisulfideList.Torsion_Distance-443"><a href="#DisulfideList.Torsion_Distance-443"><span class="linenos">443</span></a>        <span class="n">tot</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sslist</span><span class="p">)</span>
+</span><span id="DisulfideList.Torsion_Distance-444"><a href="#DisulfideList.Torsion_Distance-444"><span class="linenos">444</span></a>
+</span><span id="DisulfideList.Torsion_Distance-445"><a href="#DisulfideList.Torsion_Distance-445"><span class="linenos">445</span></a>        <span class="n">totsq</span> <span class="o">=</span> <span class="mf">0.0</span>
+</span><span id="DisulfideList.Torsion_Distance-446"><a href="#DisulfideList.Torsion_Distance-446"><span class="linenos">446</span></a>        <span class="k">for</span> <span class="n">ss1</span> <span class="ow">in</span> <span class="n">sslist</span><span class="p">:</span>
+</span><span id="DisulfideList.Torsion_Distance-447"><a href="#DisulfideList.Torsion_Distance-447"><span class="linenos">447</span></a>            <span class="n">tors1</span> <span class="o">=</span> <span class="n">ss1</span><span class="o">.</span><span class="n">torsion_array</span>
+</span><span id="DisulfideList.Torsion_Distance-448"><a href="#DisulfideList.Torsion_Distance-448"><span class="linenos">448</span></a>            <span class="n">total1</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="DisulfideList.Torsion_Distance-449"><a href="#DisulfideList.Torsion_Distance-449"><span class="linenos">449</span></a>            <span class="k">for</span> <span class="n">ss2</span> <span class="ow">in</span> <span class="n">sslist</span><span class="p">:</span>
+</span><span id="DisulfideList.Torsion_Distance-450"><a href="#DisulfideList.Torsion_Distance-450"><span class="linenos">450</span></a>                <span class="n">tors2</span> <span class="o">=</span> <span class="n">ss2</span><span class="o">.</span><span class="n">torsion_array</span>
+</span><span id="DisulfideList.Torsion_Distance-451"><a href="#DisulfideList.Torsion_Distance-451"><span class="linenos">451</span></a>                <span class="n">total1</span> <span class="o">+=</span> <span class="n">distance_squared</span><span class="p">(</span><span class="n">tors1</span><span class="p">,</span> <span class="n">tors2</span><span class="p">)</span>
+</span><span id="DisulfideList.Torsion_Distance-452"><a href="#DisulfideList.Torsion_Distance-452"><span class="linenos">452</span></a>        
+</span><span id="DisulfideList.Torsion_Distance-453"><a href="#DisulfideList.Torsion_Distance-453"><span class="linenos">453</span></a>            <span class="n">totsq</span> <span class="o">=</span> <span class="n">totsq</span> <span class="o">+</span> <span class="p">(</span><span class="n">total1</span> <span class="o">/</span> <span class="n">tot</span><span class="p">)</span>
+</span><span id="DisulfideList.Torsion_Distance-454"><a href="#DisulfideList.Torsion_Distance-454"><span class="linenos">454</span></a>
+</span><span id="DisulfideList.Torsion_Distance-455"><a href="#DisulfideList.Torsion_Distance-455"><span class="linenos">455</span></a>        <span class="k">return</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">totsq</span><span class="o">/</span><span class="n">tot</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
 </span></pre></div>
 
 

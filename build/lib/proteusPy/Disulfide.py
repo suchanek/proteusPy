@@ -1498,7 +1498,7 @@ class Disulfide:
         self.torsion_length = dist
         return dist
 
-    def Torsion_RMS(self, other) -> float:
+    def Torsion_Distance(self, other) -> float:
         '''
         Calculate the 5D Euclidean distance between self and another Disulfide
         object. This is used to compare Disulfide Bond torsion angles to 
@@ -1571,7 +1571,7 @@ class Disulfide:
         
         res = DisulfideList([], 'neighbors')
         for ss in others:
-            dist = self.Torsion_RMS(ss)
+            dist = self.Torsion_Distance(ss)
             if dist <= cutoff:
                 res.append(ss)
         return res
