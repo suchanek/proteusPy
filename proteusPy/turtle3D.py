@@ -621,9 +621,11 @@ class Turtle3D:
         self.Orientation = 2 # sets the orientation flag
         return
 
+# class definition ends
+
 def test_turtle():
     '''
-    Tests the turtle.
+    Tests the turtle move, roll, yaw, pitch and turn.
 
     >>> import proteusPy
     >>> from proteusPy.turtle3D import Turtle3D
