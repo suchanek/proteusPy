@@ -1,13 +1,13 @@
 '''
 Implementation of a 3D Turtle in Python.
 
-A part of the program proteusPy, https://github.com/suchanek/proteusPy, a Python packages for the 
-manipulation and analysis of macromolecules. Based on the C implementation originally authored 
-by Eric G. Suchanek PhD, 1990.
+A part of the program proteusPy, https://github.com/suchanek/proteusPy, 
+a Python packages for the manipulation and analysis of macromolecules. 
+Based on the C implementation originally authored by Eric G. Suchanek PhD, 1990.
 
 '''
 
-# Last modification 1/27/23 -egs-
+# Last modification 2/2/23 -egs-
 
 import numpy
 import math
@@ -74,8 +74,8 @@ class Turtle3D:
 
     def copy_coords(self, source):
         '''
-        Copy the Position, Heading, Left and Up coordinate system from the input source into self.
-        Argument: source: Turtle3D
+        Copy the Position, Heading, Left and Up coordinate system from 
+        the input source into self. Argument: source: Turtle3D
         Returns: None
         '''
 
@@ -99,7 +99,7 @@ class Turtle3D:
         Arguments: None
         Returns: None
         """
-        self.__init__(self,)
+        self.__init__()
     
     @property
     def Orientation(self):
@@ -326,14 +326,21 @@ class Turtle3D:
         cosang = numpy.cos(ang)
         sinang = numpy.sin(ang)
 
-        self._up[0] = cosang * self._up[0] - sinang * self._left[0]
-        self._up[1] = cosang * self._up[1] - sinang * self._left[1]
-        self._up[2] = cosang * self._up[2] - sinang * self._left[2]
+        lold = self._left.copy()
+        uold = self._up.copy()
+
+        self._up[0] = cosang * uold[0] - sinang * lold[0]
+        self._up[1] = cosang * uold[1] - sinang * lold[1]
+        self._up[2] = cosang * uold[2] - sinang * lold[2]
+        self._up = self.unit(self._up)
+
         self.up = Vector(self._up)
 
-        self._left[0] = cosang * self._left[0] + sinang * self._up[0]
-        self._left[1] = cosang * self._left[1] + sinang * self._up[1]
-        self._left[2] = cosang * self._left[2] + sinang * self._up[2]
+        self._left[0] = cosang * lold[0] + sinang * uold[0]
+        self._left[1] = cosang * lold[1] + sinang * uold[1]
+        self._left[2] = cosang * lold[2] + sinang * uold[2]
+        self._left = self.unit(self._left)
+        
         self.left = Vector(self._left)
 
     def yaw(self, angle):
@@ -349,14 +356,19 @@ class Turtle3D:
         cosang = numpy.cos(ang)
         sinang = numpy.sin(ang)
 
-        self._heading[0] = cosang * self._heading[0] + sinang * self._left[0]
-        self._heading[1] = cosang * self._heading[1] + sinang * self._left[1]
-        self._heading[2] = cosang * self._heading[2] + sinang * self._left[2]
+        lold = self._left.copy()
+        hold = self._heading.copy()
+        
+        self._heading[0] = cosang * hold[0] + sinang * lold[0]
+        self._heading[1] = cosang * hold[1] + sinang * lold[1]
+        self._heading[2] = cosang * hold[2] + sinang * lold[2]
+        self._heading = self.unit(self._heading)
         self.heading = Vector(self._heading)
 
-        self._left[0] = cosang * self._left[0] - sinang * self._heading[0]
-        self._left[1] = cosang * self._left[1] - sinang * self._heading[1]
-        self._left[2] = cosang * self._left[2] - sinang * self._heading[2]
+        self._left[0] = cosang * lold[0] - sinang * hold[0]
+        self._left[1] = cosang * lold[1] - sinang * hold[1]
+        self._left[2] = cosang * lold[2] - sinang * hold[2]
+        self._left = self.unit(self._left)
         self.left = Vector(self._left)
 
     def turn(self, angle):
@@ -372,14 +384,20 @@ class Turtle3D:
         cosang = numpy.cos(ang)
         sinang = numpy.sin(ang)
 
-        self._heading[0] = cosang * self._heading[0] + sinang * self._left[0]
-        self._heading[1] = cosang * self._heading[1] + sinang * self._left[1]
-        self._heading[2] = cosang * self._heading[2] + sinang * self._left[2]
+        heading = self._heading.copy()
+        left = self._left.copy()
+
+        self._heading[0] = cosang * heading[0] + sinang * left[0]
+        self._heading[1] = cosang * heading[1] + sinang * left[1]
+        self._heading[2] = cosang * heading[2] + sinang * left[2]
+
+        self._heading = self.unit(self._heading)
         self.heading = Vector(self._heading)
 
-        self._left[0] = cosang * self._left[0] - sinang * self._heading[0]
-        self._left[1] = cosang * self._left[1] - sinang * self._heading[1]
-        self._left[2] = cosang * self._left[2] - sinang * self._heading[2]
+        self._left[0] = cosang * left[0] - sinang * heading[0]
+        self._left[1] = cosang * left[1] - sinang * heading[1]
+        self._left[2] = cosang * left[2] - sinang * heading[2]
+        self._left = self.unit(self._left)
         self.left = Vector(self._left)
 
     def pitch(self, angle):
@@ -390,18 +408,23 @@ class Turtle3D:
         :type angle: float
         """
         
+        up = self._up.copy()
+        heading = self._heading.copy()
+
         ang = angle * math.pi / 180.0
         cosang = numpy.cos(ang)
         sinang = numpy.sin(ang)
 
-        self._heading[0] = self._heading[0] * cosang - self._up[0] * sinang
-        self._heading[1] = self._heading[1] * cosang - self._up[1] * sinang
-        self._heading[2] = self._heading[2] * cosang - self._up[2] * sinang
+        self._heading[0] = heading[0] * cosang - up[0] * sinang
+        self._heading[1] = heading[1] * cosang - up[1] * sinang
+        self._heading[2] = heading[2] * cosang - up[2] * sinang
+        self._heading = self.unit(self._heading)
         self.heading = Vector(self._heading)
 
-        self._up[0] = self._up[0] * cosang + self._heading[0] * sinang
-        self._up[1] = self._up[1] * cosang + self._heading[1] * sinang
-        self._up[2] = self._up[2] * cosang + self._heading[2] * sinang
+        self._up[0] = up[0] * cosang + heading[0] * sinang
+        self._up[1] = up[1] * cosang + heading[1] * sinang
+        self._up[2] = up[2] * cosang + heading[2] * sinang
+        self._up = self.unit(self._up)
         self.up = Vector(self._up)
     
     def unit(self, v):
@@ -555,7 +578,7 @@ class Turtle3D:
     
     def __repr__(self):
         """Return Turtle 3D coordinates."""
-        return f"<Turtle: {self.Name}\n Position: {self.Position},\n Heading: {self.Heading} \n Left: {self.Left} \n Up: {self.Up}\n Orientation: {self.Orientation}\n Pen: {self.Pen} \n Recording: {self._recording}>"
+        return f"<Turtle: {self._name}\n Position: {self._position},\n Heading: {self._heading} \n Left: {self._left} \n Up: {self._up}\n Orientation: {self._orientation}\n Pen: {self._pen} \n Recording: {self._recording}>"
 
     def bbone_to_schain(self):
         '''
@@ -569,13 +592,13 @@ class Turtle3D:
         Returns: modified Turtle3D
         '''
 
-        assert self._orientation == 2, f'bbone_to_schain() requires Turtle3D to be in orientation #2'
+        # assert self._orientation == 2, f'bbone_to_schain() requires Turtle3D to be in orientation #2'
 
         self.roll(240.0)
         self.pitch(180.0)
         self.yaw(110.0)
         self.roll(240.0)
-        self.Orientation(1) # sets the orientation flag
+        self.Orientation = 1 # sets the orientation flag
 
     def schain_to_bbone(self):
         '''
@@ -587,13 +610,13 @@ class Turtle3D:
         Returns: modified Turtle3D
         '''
 
-        assert self._orientation == 1, f'schain_to_bbone() requires Turtle3D to be in orientation #1'
+        # assert self._orientation == 1, f'schain_to_bbone() requires Turtle3D to be in orientation #1'
 
         self.pitch(180.0)
         self.roll(240.0)
         self.yaw(110.0)
         self.roll(120.0)
-        self.Orientation(2) # sets the orientation flag
+        self.Orientation = 2 # sets the orientation flag
         return
 
 # End of file

@@ -1,10 +1,11 @@
 '''
 This class provides an implementation for a Disulfide Bond structural object.
-Based on the original C/C++ implementation by Eric G. Suchanek,
-A part of the program proteusPy, a Python package for the analysis and modeling of 
-protein structures, with an emphasis on disulfide bonds. \n
+Based on the original C/C++ implementation by Eric G. Suchanek.
+
+This class is part of the program proteusPy, a Python package for 
+the analysis and modeling of protein structures, with an emphasis on disulfide bonds. \n
 Author: Eric G. Suchanek, PhD
-Last revision: 1/27/2023
+Last revision: 2/1/2023
 '''
 
 # Cα N, Cα, Cβ, C', Sγ Å °
@@ -30,6 +31,7 @@ from proteusPy.data import SS_PICKLE_FILE, SS_TORSIONS_FILE, PROBLEM_ID_FILE
 
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideList import DisulfideList
+from proteusPy.utility import distance3d
 
 from Bio.PDB import Vector, PDBParser, PDBList
 from Bio.PDB.vectors import calc_dihedral
@@ -153,6 +155,7 @@ class Disulfide:
         # set when we can't find previous or next prox or distal
         # C' or N atoms.
         self.missing_atoms = False
+        self.modelled = False
 
         # need these to calculate backbone dihedral angles
         self.c_prev_prox = Vector(0,0,0)
@@ -190,8 +193,8 @@ class Disulfide:
         self.chi5 = _ANG_INIT
 
         self.torsion_length = _FLOAT_INIT
-
-       
+    
+  
     # comparison operators, used for sorting. keyed to SS bond energy
     def __lt__(self, other):
         if isinstance(other, Disulfide):
@@ -271,7 +274,13 @@ class Disulfide:
         coords = self.internal_coords()
         missing_atoms = self.missing_atoms
         clen = coords.shape[0]
-        
+
+        model = self.modelled
+        if model:
+            all_atoms = False
+        else:
+            all_atoms = True
+
         if translate:
             cofmass = self.cofmass()
             for i in range(clen):
@@ -285,7 +294,7 @@ class Disulfide:
         # returned by ss.get_internal_coords()
         
         def draw_bonds(pvp, bradius=BOND_RADIUS, style='sb', 
-        			   bcolor=BOND_COLOR, missing=True):
+        			   bcolor=BOND_COLOR, missing=True, all_atoms=True):
             '''
             Generate the appropriate pyVista cylinder objects to represent
             a particular disulfide bond. This utilizes a connection table 
@@ -313,7 +322,7 @@ class Disulfide:
             pvp: pyvista.Plotter
                 Updated Plotter object.
             '''
-            bond_conn = numpy.array(
+            _bond_conn = numpy.array(
             [
                 [0, 1], # n-ca
                 [1, 2], # ca-c
@@ -331,9 +340,27 @@ class Disulfide:
                 [14,6],   # cprev_dist-n_dist
                 [8,15]    # c-nnext_dist
             ])
+
+            # modeled disulfides only have backbone atoms since
+            # phi and psi are undefined, which makes the carbonyl
+            # oxygen (O) undefined as well. Their previous and next N
+            # are also undefined.
+
+            _bond_conn_backbone = numpy.array(
+            [
+                [0, 1], # n-ca
+                [1, 2], # ca-c
+                [1, 4], # ca-cb
+                [4, 5], # cb-sg
+                [6, 7], # n-ca
+                [7, 8], # ca-c
+                [7, 10], # ca-cb
+                [10, 11], # cb-sg
+                [5, 11],  # sg -sg
+            ])
             
             # colors for the bonds. Index into ATOM_COLORS array
-            bond_split_colors = numpy.array(
+            _bond_split_colors = numpy.array(
                 [
                     ('N', 'C'),
                     ('C', 'C'),
@@ -353,13 +380,35 @@ class Disulfide:
                     ('C', 'N')
                 ]
             )
+
+            _bond_split_colors_backbone = numpy.array(
+                [
+                    ('N', 'C'),
+                    ('C', 'C'),
+                    ('C', 'C'),
+                    ('C', 'SG'),
+                    ('N', 'C'),
+                    ('C', 'C'),
+                    ('C', 'C'),
+                    ('C', 'SG'),
+                    ('SG', 'SG'),
+                ]
+            )
             # work through connectivity and colors
             orig_col = dest_col = bcolor
 
-            for i in range(len(bond_conn)):
-                if i > 10 and missing_atoms == True: # skip missing atoms
-                    continue
+            if all_atoms:
+                bond_conn = _bond_conn
+                bond_split_colors = _bond_split_colors
+            else:
+                bond_conn = _bond_conn_backbone
+                bond_split_colors = _bond_split_colors_backbone
 
+            for i in range(len(bond_conn)):
+                if all_atoms:
+                    if i > 10 and missing_atoms == True: # skip missing atoms
+                        continue
+                
                 bond = bond_conn[i]
 
                 # get the indices for the origin and destination atoms
@@ -449,17 +498,20 @@ class Disulfide:
                 			 color=ATOM_COLORS[atom], smooth_shading=True, 
                 			 specular=spec, specular_power=specpow)
                 i += 1
-            pvp = draw_bonds(pvp, style='bs')
+            pvp = draw_bonds(pvp, style='bs', missing=missing_atoms, 
+                            all_atoms=all_atoms)
 
         elif style == 'sb': # splitbonds
-            pvp = draw_bonds(pvp, style='sb', missing=missing_atoms)
+            pvp = draw_bonds(pvp, style='sb', missing=missing_atoms, 
+                            all_atoms=all_atoms)
         
         elif style == 'pd': # proximal-distal
-            pvp = draw_bonds(pvp, style='pd', missing=missing_atoms)
+            pvp = draw_bonds(pvp, style='pd', missing=missing_atoms, 
+                            all_atoms=all_atoms)
 
         else: # plain
             pvp = draw_bonds(pvp, style='plain', bcolor=bondcolor, 
-            				missing=missing_atoms)
+                            missing=missing_atoms, all_atoms=all_atoms)
             
         return
 
@@ -518,7 +570,7 @@ class Disulfide:
 
         return res
 
-    def build_model(self, turtle: Turtle3D):
+    def build_model(self):
         '''
         Build a model Disulfide based on the internal dihedral angles.
         Routine assumes turtle is in orientation #1 (at Ca, headed toward
@@ -533,7 +585,7 @@ class Disulfide:
         '''
 
         tmp = Turtle3D('tmp')
-        tmp.copy_coords(turtle)
+        tmp.Orientation = 1
 
         n = Vector(0, 0, 0)
         ca = Vector(0, 0, 0)
@@ -547,32 +599,35 @@ class Disulfide:
         self.n_prox = n
         self.ca_prox = ca
         self.c_prox = c
+        self.cb_prox = cb
 
         tmp.bbone_to_schain()
         tmp.move(1.53)
         tmp.roll(self.chi1)
         tmp.yaw(112.8)
-        self.cb_prox = tmp._position
+        self.cb_prox = Vector(tmp._position)
 
         tmp.move(1.86)
         tmp.roll(self.chi2)
         tmp.yaw(103.8)
-        self.sg_prox = tmp._position
+        self.sg_prox = Vector(tmp._position)
 
         tmp.move(2.044)
         tmp.roll(self.chi3)
         tmp.yaw(103.8)
-        self.sg_dist = tmp._position
+        self.sg_dist = Vector(tmp._position)
 
         tmp.move(1.86)
         tmp.roll(self.chi4)
         tmp.yaw(112.8)
-        self.cb_dist = tmp._position
+        self.cb_dist = Vector(tmp._position)
 
         tmp.move(1.53)
         tmp.roll(self.chi5)
         tmp.pitch(180.0)
+
         tmp.schain_to_bbone()
+
         n, ca, cb, c = build_residue(tmp)
 
         self.n_dist = n
@@ -580,6 +635,13 @@ class Disulfide:
         self.c_dist = c
         self.compute_torsional_energy()
         self.compute_local_coords()
+        self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
+        self.torsion_array = numpy.array((self.chi1, self.chi2, self.chi3, 
+                                        self.chi4, self.chi5))
+        self.torsion_length = self.Torsion_length()
+        
+        self.missing_atoms = True
+        self.modelled = True
     
     def cofmass(self) -> numpy.array:
         '''
@@ -754,6 +816,7 @@ class Disulfide:
         '''
         src = self.pdb_id
         enrg = self.energy
+
         title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Ca: {self.ca_distance:.2f} Å'
                 
         if single == True:
@@ -806,7 +869,7 @@ class Disulfide:
             pl.show()
         return
     
-    def Distance_neighbors(self, others, cutoff):
+    def Distance_neighbors(self, others: DisulfideList, cutoff: float):
         '''
         Returns list of Disulfides within the cutoff in the others list.
 
@@ -1478,9 +1541,9 @@ class Disulfide:
         self.chi3 = chi3
         self.chi4 = chi4
         self.chi5 = chi5
-        #self.dihedrals = list([chi1, chi2, chi3, chi4, chi5])
-        self.torsion_array = numpy.array(chi1, chi2, chi3, chi4, chi5)
+        self.torsion_array = numpy.array([chi1, chi2, chi3, chi4, chi5])
         self.compute_torsional_energy()
+        self.Torsion_length()
 
     def set_name(self, namestr="Disulfide"):
         '''
@@ -1522,8 +1585,6 @@ class Disulfide:
         '''
 
         tors = self.torsion_array
-        tors += 180.0
-
         tors2 = tors * tors
         dist = math.sqrt(sum(tors2))
 
