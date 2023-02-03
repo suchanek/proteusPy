@@ -573,7 +573,9 @@ class Disulfide:
 
         return res
 
-    def build_model(self):
+
+    def build_model(self, chi1: float, chi2: float, 
+                    chi3: float, chi4: float, chi5: float):
         '''
         Build a model Disulfide based on the internal dihedral angles.
         Routine assumes turtle is in orientation #1 (at Ca, headed toward
@@ -581,11 +583,17 @@ class Disulfide:
         coordinates. It also adds the distal protein backbone,
         and computes the disulfide conformational energy.
 
-        Parameters
-        ----------
-        turtle : Turtle3D
-            turtle in orientation #1 (at Ca, headed toward Cb, with N on left)
+        :param chi1: Chi1 (degrees)
+        :param chi2: Chi1 (degrees)
+        :param chi3: Chi1 (degrees)
+        :param chi4: Chi1 (degrees)
+        :param chi5: Chi1 (degrees)
         '''
+
+        self.set_dihedrals(chi1, chi2, chi3, chi4, chi5)
+        self.proximal = 1
+        self.distal = 2
+
 
         tmp = Turtle3D('tmp')
         tmp.Orientation = 1
@@ -818,9 +826,10 @@ class Disulfide:
         ss.screenshot(style='cpk', fname='proteus_logo2.png')
         '''
         src = self.pdb_id
+        name = self.name
         enrg = self.energy
 
-        title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Ca: {self.ca_distance:.2f} Å'
+        title = f'{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Ca: {self.ca_distance:.2f} Å'
                 
         if single == True:
             _pl = pv.Plotter(window_size=WINSIZE)
