@@ -15,6 +15,8 @@ DisulfideList.display() method.
 # A part of the proteusPy molecular modeling and analysis suite by
 # Eric G. Suchanek, PhD
 # Last modification: 1/30/2023 -egs-
+# Cα Cβ Sγ
+
 import numpy
 
 import pandas as pd
@@ -27,6 +29,7 @@ import proteusPy
 from proteusPy import *
 from proteusPy.atoms import *
 from proteusPy.utility import grid_dimensions, distance_squared, cmap_vector
+from proteusPy import Disulfide
 
 _PBAR_COLS = 100
 
@@ -239,7 +242,7 @@ class DisulfideList(UserList):
         '''
         self.pdb_id = value
     
-    def get_by_name(self, name):
+    def get_by_name(self, name) -> Disulfide:
         '''
         Returns the Disulfide with the given name from the list.
         '''
@@ -402,17 +405,35 @@ class DisulfideList(UserList):
         return SS_df
 
     def minmax_distance(self):
-        """
-        """
-        distance_df = self.build_distance_df()
-        distance_df.sort_values(by=['ca_distance'], ascending=True, inplace=True)
-        ssmin_id = distance_df.iloc[0]['ss_id']
-        ssmax_id = distance_df.iloc[-1]['ss_id']
+        '''
+        Return the Disulfides with the minimum and 
+        maximum Cα distances in the list.
 
-        ssmin = self.get_by_name(ssmin_id)
-        ssmax = self.get_by_name(ssmax_id)
+        :return: SSmin, SSmax
+        '''
 
-        return ssmin, ssmax
+        _min = 99999.9
+        _max = -99999.9
+
+        sslist = self.data
+        ssmin = 0
+        ssmax = 0
+        idx = 0
+
+        pbar = tqdm(sslist, ncols=_PBAR_COLS)
+        for ss in pbar:
+            dist = ss.ca_distance
+            
+            if dist >= _max:
+                ssmax = idx
+                _max = dist
+            
+            if dist <= _min:
+                ssmin = idx
+                _min = dist
+            idx += 1
+
+        return sslist[ssmin], sslist[ssmax]
 
     @property
     def torsion_array(self):
@@ -433,25 +454,87 @@ class DisulfideList(UserList):
             res[idx] = row
         return res
 
-    def Torsion_Distance(self):
+    def Avg_Distance(self):
         '''
-        Calculate the RMS distance in torsion space between all pairs in the
-        DisulfideList
+        Return the Average distance (A) between the atoms in the list.
+
+        :return: Average distance (A) between all atoms in the list
+
+        '''
+        sslist = self.data
+        tot = len(sslist)
+        cnt = 1
+
+        total = 0.0
+        for ss1 in sslist:
+            for ss2 in sslist:
+                if ss2 == ss1:
+                    continue
+                total += ss1.Distance_RMS(ss2)
+                cnt += 1
+
+        return total/cnt
+    
+    def Avg_Energy(self):
+        '''
+        Return the Average energy (kcal/mol) for the Disulfides in the list.
+
+        :return: Average distance (A) between all atoms in the list
+
         '''
         sslist = self.data
         tot = len(sslist)
 
-        totsq = 0.0
-        for ss1 in sslist:
-            tors1 = ss1.torsion_array
-            total1 = 0
-            for ss2 in sslist:
-                tors2 = ss2.torsion_array
-                total1 += distance_squared(tors1, tors2)
-        
-            totsq = totsq + (total1 / tot)
+        total = 0.0
+        for cnt, ss1 in zip(range(tot), sslist):
+            total += ss1.energy
 
-        return(math.sqrt(totsq/tot**2))
+        return total/tot
+    
+    def Avg_Torsion_Distance(self):
+        '''
+        Return the average distance in torsion space between all pairs in the
+        DisulfideList
+        '''
+        sslist = self.data
+        tot = len(sslist)
+        total = 0
+        cnt = 1
+
+        for ss1 in sslist:
+            for ss2 in sslist:
+                if ss2 == ss1:
+                    continue
+                total += ss1.Torsion_Distance(ss2)
+                cnt += 1
+        
+        return total/cnt
+    
+    def nearest_neighbors(self, chi1, chi2, chi3, chi4, chi5, cutoff: float):
+        '''
+        Given a torsional array of chi1-chi5, return list of Disulfides
+        within cutoff.
+
+        :param chi1: Chi1 (degrees)
+        :param chi2: Chi2 (degrees)
+        :param chi3: Chi3 (degrees)
+        :param chi4: Chi4 (degrees)
+        :param chi5: Chi5 (degrees)
+        :param cutoff: Cutoff, degrees
+        :return: DisulfideList of neighbors
+        '''
+
+        sslist = self.data
+        modelss = proteusPy.Disulfide.Disulfide('model')
+        modelss.set_dihedrals(chi1, chi2, chi3, chi4, chi5)
+        turt = Turtle3D('tmp')
+        turt.Orientation = ORIENT_SIDECHAIN
+
+        modelss.build_model(turt)
+        res = DisulfideList([], 'neighbors')
+        res = modelss.Torsion_neighbors(sslist, cutoff)
+
+        return res
 
     # Rendering engine calculates and instantiates all bond 
     # cylinders and atomic sphere meshes. Called by all high level routines
@@ -552,9 +635,10 @@ class DisulfideList(UserList):
         id = self.pdb_id
         ssbonds = self.data
         tot_ss = len(ssbonds) # number off ssbonds
+        avg_enrg = self.Avg_Energy()
+        avg_dist = self.Avg_Distance()
 
-        tot_ss = len(ssbonds) # number off ssbonds
-        title = f'Disulfides for SS list {id}: ({tot_ss} total)'
+        title = f'SS List: <{id}>: ({tot_ss} total), Energy: {avg_enrg:.3f} kcal/mol, Dist: {avg_dist:.3f} A'
 
         if movie:
             pl = pv.Plotter(window_size=WINSIZE, off_screen=True)
@@ -568,15 +652,27 @@ class DisulfideList(UserList):
         mycol = numpy.zeros(shape=(tot_ss, 3))
         mycol = cmap_vector(tot_ss)
 
+        # scale the overlay bond radii down so that we can see the individual elements better
+        # maximum 90% reduction
+
+        brad = BOND_RADIUS if tot_ss < 10 else BOND_RADIUS * .75
+        brad = brad if tot_ss < 25 else brad * .8
+        brad = brad if tot_ss < 50 else brad * .8
+        brad = brad if tot_ss < 100 else brad * .6
+
+        #print(f'Brad: {brad}')
+
         for i, ss in zip(range(tot_ss), ssbonds):
             color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
-            ss._render(pl, style='plain', bondcolor=color, translate=False)
+            ss._render(pl, style='plain', bondcolor=color, translate=False,
+                    bond_radius=brad)
 
         pl.reset_camera()
 
         if screenshot:
             pl.show(auto_close=False) # allows for manipulation
             pl.screenshot(fname)
+        
         elif movie:
             if verbose:
                 print(f'Saving mp4 animation to: {fname}')
