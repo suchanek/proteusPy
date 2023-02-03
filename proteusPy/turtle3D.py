@@ -12,6 +12,8 @@ Based on the C implementation originally authored by Eric G. Suchanek PhD, 1990.
 import numpy
 import math
 
+numpy.set_printoptions(suppress=True)
+
 from Bio.PDB.vectors import Vector
 from Bio.PDB.vectors import calc_angle, calc_dihedral
 
@@ -618,5 +620,91 @@ class Turtle3D:
         self.roll(120.0)
         self.Orientation = 2 # sets the orientation flag
         return
+
+def test_turtle():
+    '''
+    Tests the turtle.
+
+    >>> import proteusPy
+    >>> from proteusPy.turtle3D import Turtle3D
+    >>> turt = Turtle3D('test')
+    >>> turt.move(2.0)
+    >>> turt
+    <Turtle: test
+     Position: [2. 0. 0.],
+     Heading: [1. 0. 0.] 
+     Left: [0. 1. 0.] 
+     Up: [0. 0. 1.]
+     Orientation: -1
+     Pen: 1 
+     Recording: False>
+    >>> turt.roll(45.0)
+    >>> turt
+    <Turtle: test
+     Position: [2. 0. 0.],
+     Heading: [1. 0. 0.] 
+     Left: [0.         0.70710678 0.70710678] 
+     Up: [ 0.         -0.70710678  0.70710678]
+     Orientation: -1
+     Pen: 1 
+     Recording: False>
+    >>> turt.roll(45.0)
+    >>> turt
+    <Turtle: test
+     Position: [2. 0. 0.],
+     Heading: [1. 0. 0.] 
+     Left: [0. 0. 1.] 
+     Up: [ 0. -1.  0.]
+     Orientation: -1
+     Pen: 1 
+     Recording: False>
+    >>> turt.reset()
+    >>> turt.pitch(45.0)
+    >>> turt
+    <Turtle: 3D_Turtle
+     Position: [0. 0. 0.],
+     Heading: [ 0.70710678  0.         -0.70710678] 
+     Left: [0. 1. 0.] 
+     Up: [0.70710678 0.         0.70710678]
+     Orientation: -1
+     Pen: 1 
+     Recording: False>
+    >>> turt.pitch(45.0)
+    >>> turt
+    <Turtle: 3D_Turtle
+     Position: [0. 0. 0.],
+     Heading: [ 0.  0. -1.] 
+     Left: [0. 1. 0.] 
+     Up: [1. 0. 0.]
+     Orientation: -1
+     Pen: 1 
+     Recording: False>
+>>> turt.yaw(45.0)
+    >>> turt
+    <Turtle: 3D_Turtle
+     Position: [0. 0. 0.],
+     Heading: [-0.          0.70710678  0.70710678] 
+     Left: [-0.         -0.70710678  0.70710678] 
+     Up: [1. 0. 0.]
+     Orientation: -1
+     Pen: 1 
+     Recording: False>
+    >>> turt.yaw(45.0)
+    >>> turt
+    <Turtle: 3D_Turtle
+     Position: [0. 0. 0.],
+     Heading: [-0. -1.  0.] 
+     Left: [ 0. -0. -1.] 
+     Up: [1. 0. 0.]
+     Orientation: -1
+     Pen: 1 
+     Recording: False>
+
+    '''
+    return
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
 
 # End of file
