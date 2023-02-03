@@ -528,7 +528,6 @@ class DisulfideList(UserList):
         modelss = proteusPy.Disulfide.Disulfide('model')
         modelss.set_dihedrals(chi1, chi2, chi3, chi4, chi5)
         turt = Turtle3D('tmp')
-        turt.Orientation = ORIENT_SIDECHAIN
 
         modelss.build_model(turt)
         res = DisulfideList([], 'neighbors')

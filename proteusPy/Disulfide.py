@@ -107,7 +107,11 @@ class Disulfide:
     Individual displays can be saved to a file, and animations created.
 
     """
-    def __init__(self, name: str="SSBOND") -> None:
+    def __init__(self, name: str="SSBOND", proximal: int=-1,
+                distal: int=-1, proximal_chain: str='A',
+                distal_chain: str='A', pdb_id: str='',
+                quiet: bool=True, permissive: bool=True
+                ) -> None:
         '''
         __init__ Initialize the class to defined internal values.
 
@@ -117,17 +121,16 @@ class Disulfide:
             Disulfide name, by default "SSBOND"
         '''
         self.name = name
-        self.proximal = -1
-        self.distal = -1
+        self.proximal = proximal
+        self.distal = distal
         self.energy = _FLOAT_INIT
-        self.proximal_chain = str('')
-        self.distal_chain = str('')
-        self.pdb_id = str('')
-        self.chain_id = str('')
+        self.proximal_chain = proximal_chain
+        self.distal_chain = distal_chain
+        self.pdb_id = pdb_id
         self.proximal_residue_fullid = str('')
         self.distal_residue_fullid = str('')
-        self.PERMISSIVE = bool(True)
-        self.QUIET = bool(True)
+        self.PERMISSIVE = permissive
+        self.QUIET = quiet
         self.ca_distance = _FLOAT_INIT
         self.torsion_array = numpy.array((_ANG_INIT, _ANG_INIT, _ANG_INIT, 
         								  _ANG_INIT, _ANG_INIT))
@@ -1447,11 +1450,6 @@ class Disulfide:
         '''
         self.PERMISSIVE = perm
     
-    
-    
-    def set_chain_id(self, chain_id):
-        self.chain_id = chain_id
-
     def set_positions(self, n_prox: Vector, ca_prox: Vector, c_prox: Vector,
                       o_prox: Vector, cb_prox: Vector, sg_prox: Vector, 
                       n_dist: Vector, ca_dist: Vector, c_dist: Vector,
