@@ -2090,8 +2090,7 @@ def check_header_from_file(filename: str, model_numb = 0,
       Assuming the PDB_DIR has the pdb5rsa.ent file we can load the disulfides
       with the following:
 
-    from proteusPy.Disulfide import Disulfide, check_header_from_file
-
+    >>> from proteusPy.Disulfide import Disulfide, check_header_from_file
     >>> PDB_DIR = '/Users/egs/PDB/good/'
     >>> OK = False
     >>> OK = check_header_from_file(f'{PDB_DIR}pdb5rsa.ent', verbose=True)
@@ -2185,9 +2184,8 @@ def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0,
     NB: Requires EGS-Modified BIO.parse_pdb_header.py 
 
     :param struct_name: the name of the PDB entry.        
-    :param pdb_dir: path to the PDB files, PDB_DIR, by default '.'  
-    :param model_numb: model number to use, defaults to 0 for single 
-    structure files., by default 0
+    :param pdb_dir: path to the PDB files, PDB_DIR, by default current dir.  
+    :param model_numb: model number to use, defaults to 0 for single structure files., by default 0
     :param verbose: Verbose, by default False
     :param dbg: debugging flag, by default False
     :return: True if parsed correctly, False otherwise.
@@ -2195,19 +2193,18 @@ def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0,
     Example:
       Assuming the PDB_DIR has the pdb5rsa.ent file we can load the disulfides
       with the following:
-
-    from proteusPy.Disulfide import Disulfide, check_header_from_file
-
+    
+    >>> from proteusPy.Disulfide import Disulfide, check_header_from_file
     >>> PDB_DIR = '/Users/egs/PDB/good/'
     >>> OK = False
-    >>> OK = check_header_from_id('5rsa', pdb_dir=PDB_DIR, verbose=True)
+    >>> OK = check_header_from_id('5rsa', pdb_dir=PDB_DIR, verbose=True)    
      -> SSBond: 0: 5rsa: 26A - 84A
      -> SSBond: 1: 5rsa: 40A - 95A
      -> SSBond: 2: 5rsa: 58A - 110A
      -> SSBond: 3: 5rsa: 65A - 72A
    >>> OK
    True
-    '''
+   '''
 
     parser = PDBParser(PERMISSIVE=True, QUIET=True)
     structure = parser.get_structure(struct_name, 
