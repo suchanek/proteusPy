@@ -712,15 +712,10 @@ class DisulfideList(UserList):
         PDB_DIR defaults to os.getenv('PDB').
         To load the Disulfides from the PDB ID 5rsa we'd use the following:
         
-        >>> from proteusPy.DisulfideList import DisulfideList
-        Instantiate a Disulfide list. Note: the list is initialized with an iterable and a name (optional)
-        
+        >>> from proteusPy.DisulfideList import DisulfideList        
         >>> SSlist = DisulfideList([],'ss')
         >>> SSlist.load_disulfides_from_id('5rsa', verbose=False)
-        DisulfideList([<Disulfide 5rsa_26A_84A SourceID: 5rsa Proximal: 26 A Distal: 84 A>,
-               <Disulfide 5rsa_40A_95A SourceID: 5rsa Proximal: 40 A Distal: 95 A>,
-               <Disulfide 5rsa_58A_110A SourceID: 5rsa Proximal: 58 A Distal: 110 A>,
-               <Disulfide 5rsa_65A_72A SourceID: 5rsa Proximal: 65 A Distal: 72 A>])        
+        [<Disulfide 5rsa_26A_84A SourceID: 5rsa Proximal: 26 A Distal: 84 A>, <Disulfide 5rsa_40A_95A SourceID: 5rsa Proximal: 40 A Distal: 95 A>, <Disulfide 5rsa_58A_110A SourceID: 5rsa Proximal: 58 A Distal: 110 A>, <Disulfide 5rsa_65A_72A SourceID: 5rsa Proximal: 65 A Distal: 72 A>]
         '''
 
         i = 1
