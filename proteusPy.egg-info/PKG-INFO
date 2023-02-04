@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: proteusPy
-Version: 0.28.dev0
+Version: 0.29.dev0
 Summary: proteusPy - Protein Structure Analysis and Modeling Tools
 Home-page: https://github.com/suchanek/proteusPy/
 Author: Eric G. Suchanek, PhD
@@ -32,15 +32,15 @@ Description-Content-Type: text/markdown
 1. Install Anaconda (<http://anaconda.org>)
    - Create a new environment using python 3.9
    - Activate the environment
-2. Install git-lfs
-   - https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage
-   - From a shell prompt: git-lfs track "*.csv"
-   - From a shell prompt: git-lfs track "*.pkl"
-   - From a shell prompt: git-lfs track "*.mp4"
-3. Build the environment
+2. Build the environment. At this point it's probably best to clone the repo via github since it contains all
+   of the notebooks and test programs. Ultimately the distribution can be used from pyPi as a normal
+   package.
    - Using pyPi:
-   - python3 -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ proteusPy
+     - python3 -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ proteusPy
    - From gitHub:
+     - Install git-lfs
+       - https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage
+       - From a shell prompt: git-lfs track "*.csv" "*.pkl" "*.mp4"
      - git clone https://github.com/suchanek/proteusPy/proteusPy.git
      - cd into the repo
      - pip install .
