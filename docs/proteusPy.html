@@ -89,19 +89,21 @@ proteusPy    </h1>
 <li>Create a new environment using python 3.9</li>
 <li>Activate the environment</li>
 </ul></li>
-<li>Install git-lfs
+<li>Build the environment. At this point it's probably best to clone the repo via github since it contains all
+of the notebooks and test programs. Ultimately the distribution can be used from pyPi as a normal
+package.
 <ul>
-<li><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage">https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage</a></a></li>
-<li>From a shell prompt: git-lfs track "<em>.csv"</li>
-<li>From a shell prompt: git-lfs track "</em>.pkl"</li>
-<li>From a shell prompt: git-lfs track "*.mp4"</li>
+<li>Using pyPi:
+<ul>
+<li>python3 -m pip install --index-url <a href="https://test.pypi.org/simple/"><a href="https://test.pypi.org/simple/"><a href="https://test.pypi.org/simple/">https://test.pypi.org/simple/</a></a></a> --extra-index-url <a href="https://pypi.org/simple/"><a href="https://pypi.org/simple/"><a href="https://pypi.org/simple/">https://pypi.org/simple/</a></a></a> proteusPy</li>
 </ul></li>
-<li>Build the environment
-<ul>
-<li>Using pyPi:</li>
-<li>python3 -m pip install --index-url <a href="https://test.pypi.org/simple/"><a href="https://test.pypi.org/simple/">https://test.pypi.org/simple/</a></a> --extra-index-url <a href="https://pypi.org/simple/"><a href="https://pypi.org/simple/">https://pypi.org/simple/</a></a> proteusPy</li>
 <li>From gitHub:
 <ul>
+<li>Install git-lfs
+<ul>
+<li><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage">https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage</a></a></a></a></li>
+<li>From a shell prompt: git-lfs track "<em>.csv" "</em>.pkl" "*.mp4"</li>
+</ul></li>
 <li>git clone <a href="https://github.com/suchanek/proteusPy/proteusPy.git"><a href="https://github.com/suchanek/proteusPy/proteusPy.git"><a href="https://github.com/suchanek/proteusPy/proteusPy.git">https://github.com/suchanek/proteusPy/proteusPy.git</a></a></a></li>
 <li>cd into the repo</li>
 <li>pip install .</li>
@@ -135,7 +137,7 @@ proteusPy    </h1>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="c1"># Copyright (c) 2023 Eric G. Suchanek, PhD., all rights reserved</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="c1"># Subject to the MIT public license.</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.28dev&quot;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.29dev&quot;</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="kn">import</span> <span class="nn">sys</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="kn">import</span> <span class="nn">os</span>
