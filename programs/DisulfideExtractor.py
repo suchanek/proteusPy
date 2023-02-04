@@ -64,7 +64,7 @@ Extract_Disulfides(numb=1000, pdbdir=PDB, datadir=DATA,
 
 Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB, datadir=DATA)
 
-update = True
+update = False
 
 if update:
     print(f'Copying: {DATA} to {MODULE_DATA}')

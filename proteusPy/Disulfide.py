@@ -20,6 +20,8 @@ from tqdm import tqdm
 import pandas as pd
 import pyvista as pv
 
+pv.global_theme.color = 'white'
+
 import proteusPy
 from proteusPy import *
 from proteusPy.atoms import *
@@ -196,7 +198,6 @@ class Disulfide:
 
         self.torsion_length = _FLOAT_INIT
     
-  
     # comparison operators, used for sorting. keyed to SS bond energy
     def __lt__(self, other):
         if isinstance(other, Disulfide):
@@ -767,11 +768,7 @@ class Disulfide:
         Compute the approximate torsional energy for the Disulfide's
         conformation and sets its internal state.
         
-        Returns
-        -------
-        float
-            Energy (kcal/mol)
-        
+        :return: Energy (kcal/mol)
         '''
         # @TODO find citation for the ss bond energy calculation
 
@@ -791,24 +788,17 @@ class Disulfide:
         self.energy = energy
         return energy
 
-    
-    
-    def display(self, single=True, style='sb'):
+    def display(self, single=True, style='sb', light=True):
         '''
         Display the Disulfide bond in the specific rendering style.
 
-        Parameters
-        ----------
-        single: bool 
-            Display the bond in a single panel in the specific style.
-
-        style: str
-            One of: \n
-            'sb' - split bonds
-            'bs' - ball and stick
-            'cpk' - CPK style
-            'pd' - Proximal/Distal style - Red=proximal, Green=Distal
-            'plain' - boring single color
+        :param single: Display the bond in a single panel in the specific style. 
+        :style Rendering style: One of:
+            * 'sb' - split bonds
+            * 'bs' - ball and stick
+            * 'cpk' - CPK style
+            * 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
+            * 'plain' - boring single color
 
         Example:
         >>> import proteusPy
@@ -818,15 +808,19 @@ class Disulfide:
         >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
         >>> ss = PDB_SS[0]
         >>> ss.display(style='cpk')
-        
-        ss.screenshot(style='cpk', fname='proteus_logo2.png')
+        >>> ss.screenshot(style='bs', fname='proteus_logo_sb.png')
         '''
         src = self.pdb_id
         name = self.name
         enrg = self.energy
 
-        title = f'{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Ca: {self.ca_distance:.2f} Å'
-                
+        title = f'{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Tors: {self.torsion_length}'
+
+        if light:
+            pv.set_plot_theme('document')
+        else:
+            pv.set_plot_theme('dark')
+        
         if single == True:
             _pl = pv.Plotter(window_size=WINSIZE)
             _pl.add_title(title=title, font_size=FONTSIZE)
@@ -948,7 +942,8 @@ class Disulfide:
         '''
         Initialize a new Disulfide object with atomic coordinates from 
         the proximal and distal coordinates, typically taken from a PDB file.
-
+        This routine is primarily used internally when building the compressed
+        database.
 
         :param chain1: list of Residues in the model, eg: chain = model['A']
         :param chain2: list of Residues in the model, eg: chain = model['A']
@@ -1153,23 +1148,25 @@ class Disulfide:
     def make_movie(self, style='sb', fname='ssbond.mp4',
                    verbose=False, steps=360):
         '''
-        Create and save an animation for the given Disulfide in the 
-        given style and filename.
+        Create an animation for ```self``` rotating one revolution about the Y axis,
+        in the given ```style```, saving to ```filename```.
 
-        :param style: Rendering style, defaults to 'sb', One of:
+        :param style: Rendering style, defaults to 'sb', one of:
         * 'sb' - split bonds
         * 'bs' - ball and stick
         * 'cpk' - CPK style
         * 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
         * 'plain' - boring single color
-        :param fname: _description_, defaults to 'ssbond.mp4'
-        :param verbose: _description_, defaults to False
-        :param steps: _description_, defaults to 360
+        
+        :param fname: Output filename, defaults to 'ssbond.mp4'
+        :param verbose: Verbosity, defaults to False
+        :param steps: Number of steps for one complete rotation, defaults to 360.
         '''
         src = self.pdb_id
-        ssname = self.name
+        name = self.name
         enrg = self.energy
-        title = f'{src}: {ssname}: {enrg:.2f} kcal/mol'
+
+        title = f'{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Tors: {self.torsion_length:.2f}'
         
         if verbose:
             print(f'Rendering animation to {fname}...')
@@ -1189,7 +1186,6 @@ class Disulfide:
 
         if verbose:
             print(f'Saved mp4 animation to: {fname}')
-    
     
     def pprint(self) -> None:
         '''
@@ -1362,10 +1358,11 @@ class Disulfide:
         :param verbose: Verbosit, defaults to False
         '''
         src = self.pdb_id
-        ssname = self.name
+        name = self.name
         enrg = self.energy
-        title = f'{src}: {ssname}: {enrg:.2f} kcal/mol'
-        
+
+        title = f'{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Tors: {self.torsion_length:.2f}'
+
         if verbose:
             print(f'Rendering screenshot...')
 
@@ -1835,7 +1832,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     >>> subset.display_overlay()
 
     Take a screenshot. You can position the orientation, then close the window:
-    >>> subset.screenshot(style='sb', fname='subset.png')  # save a screenshot.
+    >>> subset.screenshot(style='sb', fname='subset.png')
     Saving file: subset.png
     Saved file: subset.png
 
@@ -1965,19 +1962,19 @@ def check_header_from_file(filename: str, model_numb = 0,
     NB: Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython/
 
     :param struct_name: the name of the PDB entry.
-    :param pdb_dir: path to the PDB files, defaults to ```GOOD_DIR```
+    :param pdb_dir: path to the PDB files, defaults to ```MODEL_DIR```
     :param model_numb: model number to use, defaults to 0 for single structure files.
     :param verbose: print info while parsing
     :return: a list of Disulfide objects initialized from the file.
     
     Example:
-      Assuming ```GOOD_DIR``` has the pdb5rsa.ent file we can load the disulfides
+      Assuming ```MODEL_DIR``` has the pdb5rsa.ent file we can load the disulfides
       with the following:
 
     >>> from proteusPy.Disulfide import Disulfide, check_header_from_file
-    >>> PDB_DIR = '/Users/egs/PDB/good/'
+    >>> MODEL_DIR = '/Users/egs/PDB/good/'
     >>> OK = False
-    >>> OK = check_header_from_file(f'{PDB_DIR}pdb5rsa.ent', verbose=True)
+    >>> OK = check_header_from_file(f'{MODEL_DIR}pdb5rsa.ent', verbose=True)
     -> check_header_from_file() - Parsing file: /Users/egs/PDB/good/pdb5rsa.ent:
      -> SSBond: 1: tmp: 26A - 84A
      -> SSBond: 2: tmp: 40A - 95A
@@ -2063,7 +2060,7 @@ def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0,
                         verbose=False, dbg=False) -> bool:
     '''
     Checks parsability PDB ID and initializes the Disulfide objects.
-    Assumes the file is downloaded in ```GOOD_DIR``` path.
+    Assumes the file is downloaded in ```MODEL_DIR``` path.
     
     NB: Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython/
 
@@ -2078,9 +2075,9 @@ def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0,
       Assuming the PDB_DIR has the pdb5rsa.ent file we can check the file thusly:
 
     >>> from proteusPy.Disulfide import Disulfide, check_header_from_id
-    >>> PDB_DIR = '/Users/egs/PDB/good/'
+    >>> MODEL_DIR = '/Users/egs/PDB/good/'
     >>> OK = False
-    >>> OK = check_header_from_id('5rsa', pdb_dir=PDB_DIR, verbose=True)
+    >>> OK = check_header_from_id('5rsa', pdb_dir=MODEL_DIR, verbose=True)
      -> SSBond: 1: 5rsa: 26A - 84A
      -> SSBond: 2: 5rsa: 40A - 95A
      -> SSBond: 3: 5rsa: 58A - 110A

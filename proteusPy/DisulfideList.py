@@ -30,7 +30,7 @@ from proteusPy import *
 from proteusPy.atoms import *
 from proteusPy.utility import grid_dimensions, cmap_vector
 from proteusPy import Disulfide
-from proteusPy.ProteusGlobals import GOOD_DIR
+from proteusPy.ProteusGlobals import MODEL_DIR
 from Bio.PDB import PDBParser
 
 _PBAR_COLS = 105
@@ -570,23 +570,27 @@ class DisulfideList(UserList):
                 i += 1
         return pl
 
-    def display(self, style='sb'):
+    def display(self, style='sb', light=True):
         '''
         Display a window showing the list of disulfides in the given style.
 
         :param style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd', defaults to 'sb'
         :type style: str, optional
         '''
-        pl = pv.Plotter()
+        if light:
+            pv.set_plot_theme('document')
+        else:
+            pv.set_plot_theme('dark')
 
-        pl = self._render(style)
+        pl = pv.Plotter()
         pl.add_camera_orientation_widget()
+        pl = self._render(style)
         pl.enable_anti_aliasing('msaa')
         pl.link_views()
         pl.reset_camera()
         pl.show()
  
-    def screenshot(self, style='bs', fname='sslist.png', verbose=True):
+    def screenshot(self, style='bs', fname='sslist.png', verbose=True, light=True):
         '''
         Save the interactive window displaying the list of 
         disulfides in the given style. Position the disulfide then
@@ -599,6 +603,10 @@ class DisulfideList(UserList):
         :param verbose: Verbose reporting, defaults to True
         :type verbose: bool, optional
         '''
+        if light:
+            pv.set_plot_theme('document')
+        else:
+            pv.set_plot_theme('dark')
 
         pl = pv.Plotter()
         pl = self._render(style=style)
@@ -619,7 +627,7 @@ class DisulfideList(UserList):
         return
     
     def display_overlay(self, screenshot=False, movie=False, 
-                        verbose=True, fname='ss_overlay.png'):
+                        verbose=True, fname='ss_overlay.png', light=True):
         ''' 
         Display all disulfides in the list overlaid in stick mode against
         a common coordinate frames. This allows us to see all of the disulfides
@@ -638,6 +646,11 @@ class DisulfideList(UserList):
         avg_dist = self.Avg_Distance()
 
         title = f'SS List: <{id}>: ({tot_ss} total), Energy: {avg_enrg:.3f} kcal/mol, Dist: {avg_dist:.3f} A'
+
+        if light:
+            pv.set_plot_theme('document')
+        else:
+            pv.set_plot_theme('dark')
 
         if movie:
             pl = pv.Plotter(window_size=WINSIZE, off_screen=True)
@@ -689,7 +702,7 @@ class DisulfideList(UserList):
         return
 
     def load_disulfides_from_id(self, struct_name: str, 
-                            pdb_dir = GOOD_DIR,
+                            pdb_dir = MODEL_DIR,
                             model_numb = 0, 
                             verbose = False,
                             quiet=False,
@@ -701,7 +714,7 @@ class DisulfideList(UserList):
         *NB:* Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython
 
         :param struct_name: the name of the PDB entry.
-        :param pdb_dir: path to the PDB files, defaults to GOOD_DIR - this is: PDB_DIR/good and are
+        :param pdb_dir: path to the PDB files, defaults to MODEL_DIR - this is: PDB_DIR/good and are
         the pre-parsed PDB files that have been scanned by the DisulfideDownloader program.
         :param model_numb: model number to use, defaults to 0 for single structure files.
         :param verbose: print info while parsing
