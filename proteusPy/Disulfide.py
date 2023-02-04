@@ -576,7 +576,7 @@ class Disulfide:
     def build_model(self, chi1: float, chi2: float, 
                     chi3: float, chi4: float, chi5: float):
         '''
-        Build a model Disulfide based on the internal dihedral angles.
+        Build a model Disulfide based on the input dihedral angles.
         Routine assumes turtle is in orientation #1 (at Ca, headed toward
         Cb, with N on left), builds disulfide, and updates the object's internal
         coordinates. It also adds the distal protein backbone,
@@ -592,7 +592,6 @@ class Disulfide:
         self.set_dihedrals(chi1, chi2, chi3, chi4, chi5)
         self.proximal = 1
         self.distal = 2
-
 
         tmp = Turtle3D('tmp')
         tmp.Orientation = 1
@@ -707,8 +706,6 @@ class Disulfide:
         _min = ic[:, idx].min()
         _max = ic[:, idx].max()
         return _min, _max
-
-    
 
     def compute_local_coords(self):
         """
@@ -1576,15 +1573,8 @@ def name_to_id(fname: str) -> str:
     '''
     Returns the PDB ID from the filename.
 
-    Parameters
-    ----------
-    fname : str
-        PDB filename
-
-    Returns
-    -------
-    str
-        PDB ID
+    :param fname: Complete PDB filename
+    :return: PDB ID
     '''
     ent = fname[3:-4]
     return ent
@@ -1595,16 +1585,11 @@ def parse_ssbond_header_rec(ssbond_dict: dict) -> list:
     NB: Requires EGS-Modified BIO.parse_pdb_header.py.
     This is used internally.
 
-    Parameters
-    ----------
-    ssbond_dict : dict
-        the input SSBOND dict
+    :param ssbond_dict: the input SSBOND dict
 
-    Returns
-    -------
-    list
-        A list of tuples representing the proximal, 
+    :return: A list of tuples representing the proximal, 
         distal residue ids for the Disulfide.
+        
     '''
     disulfide_list = []
     for ssb in ssbond_dict.items():
@@ -1619,28 +1604,15 @@ def parse_ssbond_header_rec(ssbond_dict: dict) -> list:
 # with the ID list generated from: http://www.rcsb.org/
 #
 
-def Download_Disulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR, 
-                       verbose=False, reset=False) -> None:
-    '''
-    Reads a comma separated list of PDB IDs and downloads them
-    to the pdb_home path. 
-
-    Used to download the list of proteins containing at least one SS bond
-    with the ID list generated from: http://www.rcsb.org/.
-
-    This is the primary data loader for the proteusPy Disulfide 
-    analysis package. The list of IDs represents files in the 
-    RCSB containing > 1 disulfide bond, and it contains
-    over 39000 structures. The total download takes about 12 hours. The
-    function keeps track of downloaded files so it's possible to interrupt and
-    restart the download without duplicating effort.
+'''
+    
 
     Parameters
     ----------
     pdb_home : str, optional
-        Path for downloaded files, by default PDB_DIR
+        
     model_home : str, optional
-        Path for extracted data, by default MODEL_DIR
+        , by default MODEL_DIR
     verbose : bool, optional
         Verbose, by default False
     reset : bool, optional
@@ -1650,6 +1622,28 @@ def Download_Disulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR,
     ------
     DisulfideIOException
         Fatal exception for file I/O
+    '''
+def Download_Disulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR, 
+                       verbose=False, reset=False) -> None:
+    '''
+    Reads a comma separated list of PDB IDs and downloads them
+    to the pdb_home path. 
+
+    This utility function is used to download proteins containing at least 
+    one SS bond with the ID list generated from: http://www.rcsb.org/.
+
+    This is the primary data loader for the proteusPy Disulfide 
+    analysis package. The list of IDs represents files in the 
+    RCSB containing > 1 disulfide bond, and it contains
+    over 39000 structures. The total download takes about 12 hours. The
+    function keeps track of downloaded files so it's possible to interrupt and
+    restart the download without duplicating effort.
+
+    :param pdb_home: Path for downloaded files, defaults to PDB_DIR
+    :param model_home: Path for extracted data, defaults to MODEL_DIR
+    :param verbose: Verbosity, defaults to False
+    :param reset: Reset the downloaded files index. Used to restart the download.
+    :raises DisulfideIOException: _description_
     '''
     start = time.time()
     donelines = []
@@ -1725,19 +1719,18 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     Dict within these files. In addition, .csv files containing all of 
     the torsions for the disulfides and problem IDs are written.
 
-    Parameters
-    ----------
-        numb:           number of entries to process, defaults to all
-        verbose:        more messages
-        quiet:          turns of DisulfideConstruction warnings
-        pdbdir:         path to PDB files
-        datadir:        path to resulting .pkl files
-        picklefile:     name of the disulfide .pkl file
-        torsionfile:    name of the disulfide torsion file .csv created
-        problemfile:    name of the .csv file containing problem ids
-        dictfile:       name of the .pkl file
+    :param numb:           number of entries to process, defaults to all
+    :param verbose:        more messages
+    :param quiet:          turns of DisulfideConstruction warnings
+    :param pdbdir:         path to PDB files
+    :param datadir:        path to resulting .pkl files
+    :param picklefile:     name of the disulfide .pkl file
+    :param torsionfile:    name of the disulfide torsion file .csv created
+    :param problemfile:    name of the .csv file containing problem ids
+    :param dictfile:       name of the .pkl file
     
-    Examples:
+    The following examples illustrate some basic functions of the disulfide classes:
+
     >>> from proteusPy.Disulfide import Disulfide 
     >>> from proteusPy.DisulfideLoader import DisulfideLoader
     >>> from proteusPy.DisulfideList import DisulfideList
@@ -1746,24 +1739,37 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
 
     >>> SS = Disulfide('tmp')
     >>> SSlist = DisulfideList([],'ss')
-    >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)  # load the Disulfide database
+    
+    Load the Disulfide subset database. This contains around 8300 disulfides and loads
+    fairly quickly.
+
+    >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
+
+    The dataset can be indexed numerically, up to index: PDB_SS.Length(). Get the first SS:
     >>> SS = PDB_SS[0]
     >>> SS
     <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>
 
-    >>> SS4yys = PDB_SS['4yys']     # returns a DisulfideList for ID 4yys
+    The dataset can also be indexed by PDB ID. Get the DisulfideList for ID 4yys:
+
+    >>> SS4yys = PDB_SS['4yys']
     >>> SS4yys
     [<Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>, <Disulfide 4yys_56A_98A SourceID: 4yys Proximal: 56 A Distal: 98 A>, <Disulfide 4yys_156A_207A SourceID: 4yys Proximal: 156 A Distal: 207 A>, <Disulfide 4yys_22B_65B SourceID: 4yys Proximal: 22 B Distal: 65 B>, <Disulfide 4yys_56B_98B SourceID: 4yys Proximal: 56 B Distal: 98 B>, <Disulfide 4yys_156B_207B SourceID: 4yys Proximal: 156 B Distal: 207 B>]
 
-    Make some empty disulfides
+    Make some empty disulfides:
+
     >>> ss1 = Disulfide('ss1')
     >>> ss2 = Disulfide('ss2')
 
-    Make a DisulfideList containing ss1, named 'tmp'
+    Make a DisulfideList containing ss1, named 'tmp':
+
     >>> sslist = DisulfideList([ss1], 'tmp')
+
+    Append ss2:
     >>> sslist.append(ss2)
 
-    Extract the first disulfide and print it.
+    Extract the first disulfide and print it:
+
     >>> ss1 = PDB_SS[0]
     >>> ss1.pprint_all()
     <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A
@@ -1809,14 +1815,20 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
      Cα Distance: 4.502 Å
      Torsion length: 231.531 deg>
 
-    Get a list of disulfides via slicing and display them:
+    # Cα N, Cα, Cβ, C', Sγ Å °
+
+    Get a list of disulfides via slicing and display them oriented against a common
+    reference frame (the proximal N, Cα, C').
+
     >>> subset = DisulfideList(PDB_SS[0:10],'subset')
     >>> subset.display_overlay()
 
-    Take a screenshot. You can position the orientation, then close the window.
+    Take a screenshot. You can position the orientation, then close the window:
     >>> subset.screenshot(style='sb', fname='subset.png')  # save a screenshot.
     Saving file: subset.png
     Saved file: subset.png
+
+    Browse the documentation for more functionality. The display functions are particularly useful.
     '''
 
     entrylist = []
@@ -2192,8 +2204,10 @@ def check_header_from_file(filename: str, model_numb = 0,
         i += 1
     return True
 
-def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0, 
-                            verbose=False, dbg=False) -> bool:
+
+
+def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0,
+                        verbose=False, dbg=False) -> bool:
     '''
     Loads the Disulfides by PDB ID and initializes the Disulfide objects.
     Assumes the file is downloaded in the pdb_dir path.
@@ -2217,8 +2231,7 @@ def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0,
     -------
     bool
         True if parses normally, false otherwise.
-    '''
-
+'''
     parser = PDBParser(PERMISSIVE=True, QUIET=True)
     structure = parser.get_structure(struct_name, 
     								 file=f'{pdb_dir}pdb{struct_name}.ent')
@@ -2272,10 +2285,17 @@ def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0,
         i += 1
     return True
 
-def Check_chains(pdbid, pdbdir, verbose=True):
-    '''Returns True if structure has multiple chains of identical length,\
-     False otherwise'''
+''''''
 
+def Check_chains(pdbid, pdbdir, verbose=True):
+    '''
+    Returns True if structure has multiple chains of identical length,
+    False otherwise. Primarily internal use.
+
+    :param pdbid: PDBID identifier
+    :param pdbdir: PDB directory containing structures
+    :param verbose: Verbosity, defaults to True
+    '''
     parser = PDBParser(PERMISSIVE=True)
     structure = parser.get_structure(pdbid, file=f'{pdbdir}pdb{pdbid}.ent')
     
