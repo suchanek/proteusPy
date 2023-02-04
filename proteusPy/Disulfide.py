@@ -1,9 +1,9 @@
 '''
-This module is part of the program proteusPy, a Python package for 
+This module is part of the proteusPy package, a Python package for 
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
-Based on the original C/C++ implementation by Eric G. Suchanek. \n
+This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 Author: Eric G. Suchanek, PhD
-Last revision: 2/1/2023
+Last revision: 2/4/2023
 '''
 
 # Cα N, Cα, Cβ, C', Sγ Å °
@@ -21,7 +21,7 @@ import pandas as pd
 import pyvista as pv
 
 import proteusPy
-from proteusPy import *
+# from proteusPy import *
 from proteusPy.atoms import *
 
 from proteusPy.data import SS_DICT_PICKLE_FILE, SS_ID_FILE
@@ -30,6 +30,7 @@ from proteusPy.data import SS_PICKLE_FILE, SS_TORSIONS_FILE, PROBLEM_ID_FILE
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.utility import distance3d
+from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR
 
 from Bio.PDB import Vector, PDBParser, PDBList
 from Bio.PDB.vectors import calc_dihedral
@@ -48,7 +49,6 @@ global Torsion_DF_Cols
 Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', \
            'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
            'psi_dist', 'torsion_length']
-
 
 # Class definition for a Disulfide bond. 
 class Disulfide:
@@ -1551,13 +1551,46 @@ class Disulfide:
         Returns list of Disulfides within the angular cutoff in the others list.
         This routine is used to find Disulfides having the same torsion length
         within the others list. This is used to find families of Disulfides with
-        similar conformations. *NB* the routine will not distinguish between +/-
+        similar conformations. Assumes self is properly initialized.
+        
+        *NB* The routine will not distinguish between +/-
         dihedral angles. *i.e.* [-60, -60, -90, -60, -60] would have the same
         torsion length as [60, 60, 90, 60, 60], two clearly different structures.
 
         :param others: DisulfideList to search
         :param cutoff: Dihedral angle degree cutoff
         :return: DisulfideList within the cutoff
+
+        Example:
+        In this example we load the disulfide database subset, find the disulfides with
+        the lowest and highest energies, and then find the nearest conformational neighbors.
+        Finally, we display the neighbors overlaid against a common reference frame.
+
+        >>> import proteusPy
+        >>> from proteusPy.DisulfideLoader import DisulfideLoader
+        >>> from proteusPy.DisulfideList import DisulfideList
+        >>> from proteusPy.Disulfide import Disulfide
+        >>> PDB_SS = None
+        >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
+        >>> ss_list = DisulfideList([], 'tmp')
+
+        We point to the complete list to search for lowest and highest energies.
+        >>> sslist = PDB_SS.SSList
+        >>> ssmin_enrg, ssmax_enrg = PDB_SS.SSList.minmax_energy()
+
+        Make an empty list and find the nearest neighbors within 10 degrees avg RMS in
+        sidechain dihedral angle space.
+
+        >>> low_energy_neighbors = DisulfideList([],'Neighbors')
+        >>> low_energy_neighbors = ssmin_enrg.Torsion_neighbors(sslist, 10)
+
+        Display the number found, and then display them overlaid onto their common reference frame.
+
+        >>> tot = low_energy_neighbors.length()
+        >>> print(f'Neighbors: {tot}')
+        Neighbors: 6
+        >>> low_energy_neighbors.display_overlay()
+
         '''
         
         res = DisulfideList([], 'neighbors')
@@ -1586,7 +1619,6 @@ def parse_ssbond_header_rec(ssbond_dict: dict) -> list:
     This is used internally.
 
     :param ssbond_dict: the input SSBOND dict
-
     :return: A list of tuples representing the proximal, 
         distal residue ids for the Disulfide.
         
@@ -2078,7 +2110,7 @@ def check_header_from_file(filename: str, model_numb = 0,
     Checks the Disulfides by PDB ID and initializes the Disulfide objects.
     Assumes the file is downloaded in the pdb_dir path.
     
-    NB: Requires EGS-Modified BIO.parse_pdb_header.py 
+    NB: Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython/
 
     :param struct_name: the name of the PDB entry.
     :param pdb_dir: path to the PDB files, defaults to PDB_DIR
@@ -2178,32 +2210,31 @@ def check_header_from_file(filename: str, model_numb = 0,
 def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0,
                         verbose=False, dbg=False) -> bool:
     '''
-    Loads the Disulfides by PDB ID and initializes the Disulfide objects.
+    Checks parsability PDB ID and initializes the Disulfide objects.
     Assumes the file is downloaded in the pdb_dir path.
     
-    NB: Requires EGS-Modified BIO.parse_pdb_header.py 
+    NB: Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython/
 
-    :param struct_name: the name of the PDB entry.        
-    :param pdb_dir: path to the PDB files, PDB_DIR, by default current dir.  
-    :param model_numb: model number to use, defaults to 0 for single structure files., by default 0
-    :param verbose: Verbose, by default False
-    :param dbg: debugging flag, by default False
-    :return: True if parsed correctly, False otherwise.
-
-    Example:
-      Assuming the PDB_DIR has the pdb5rsa.ent file we can load the disulfides
-      with the following:
+    :param struct_name: the name of the PDB entry.
+    :param pdb_dir: path to the PDB files, defaults to PDB_DIR
+    :param model_numb: model number to use, defaults to 0 for single structure files.
+    :param verbose: print info while parsing
+    :param dbg: Debugging Flag
+    :return: True if OK, False otherwise
     
-    >>> from proteusPy.Disulfide import Disulfide, check_header_from_file
+    Example:
+      Assuming the PDB_DIR has the pdb5rsa.ent file we can check the file thusly:
+
+    >>> from proteusPy.Disulfide import Disulfide, check_header_from_id
     >>> PDB_DIR = '/Users/egs/PDB/good/'
     >>> OK = False
-    >>> OK = check_header_from_id('5rsa', pdb_dir=PDB_DIR, verbose=True)    
-     -> SSBond: 0: 5rsa: 26A - 84A
-     -> SSBond: 1: 5rsa: 40A - 95A
-     -> SSBond: 2: 5rsa: 58A - 110A
-     -> SSBond: 3: 5rsa: 65A - 72A
-   >>> OK
-   True
+    >>> OK = check_header_from_id('5rsa', pdb_dir=PDB_DIR, verbose=True)
+     -> SSBond: 1: 5rsa: 26A - 84A
+     -> SSBond: 2: 5rsa: 40A - 95A
+     -> SSBond: 3: 5rsa: 58A - 110A
+     -> SSBond: 4: 5rsa: 65A - 72A
+    >>> OK
+    True
    '''
 
     parser = PDBParser(PERMISSIVE=True, QUIET=True)
@@ -2253,7 +2284,7 @@ def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0,
                 return False
  
         if verbose:
-            print(f' -> SSBond: {i}: {struct_name}: {proximal}{chain1} - {distal}{chain2}')
+            print(f' -> SSBond: {i+1}: {struct_name}: {proximal}{chain1} - {distal}{chain2}')
 
         i += 1
     return True
