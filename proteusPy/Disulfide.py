@@ -1604,25 +1604,6 @@ def parse_ssbond_header_rec(ssbond_dict: dict) -> list:
 # with the ID list generated from: http://www.rcsb.org/
 #
 
-'''
-    
-
-    Parameters
-    ----------
-    pdb_home : str, optional
-        
-    model_home : str, optional
-        , by default MODEL_DIR
-    verbose : bool, optional
-        Verbose, by default False
-    reset : bool, optional
-        Reset the downloaded file list, by default False
-
-    Raises
-    ------
-    DisulfideIOException
-        Fatal exception for file I/O
-    '''
 def Download_Disulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR, 
                        verbose=False, reset=False) -> None:
     '''
@@ -1955,20 +1936,13 @@ def load_disulfides_from_id(struct_name: str,
     Loads the Disulfides by PDB ID and initializes the Disulfide objects.
     Assumes the file is downloaded in the pdb_dir path.
     
-    *NB:* Requires EGS-Modified BIO.parse_pdb_header.py 
+    *NB:* Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython
 
-    Parameters
-    ----------        
-        struct_name: the name of the PDB entry.
-
-        pdb_dir: path to the PDB files, defaults to PDB_DIR
-
-        model_numb: model number to use, defaults to 0 for single
-        structure files.
-
-        verbose: print info while parsing
-
-    Returns: a list of Disulfide objects initialized from the file.
+    :param struct_name: the name of the PDB entry.
+    :param pdb_dir: path to the PDB files, defaults to PDB_DIR
+    :param model_numb: model number to use, defaults to 0 for single structure files.
+    :param verbose: print info while parsing
+    :return: a list of Disulfide objects initialized from the file.
     
     Example:
     PDB_DIR defaults to os.getenv('PDB').
@@ -2101,32 +2075,34 @@ def check_header_from_file(filename: str, model_numb = 0,
                             verbose = False, dbg = False) -> bool:
 
     '''
-    Loads all Disulfides by PDB ID and initializes the Disulfide objects.
+    Checks the Disulfides by PDB ID and initializes the Disulfide objects.
     Assumes the file is downloaded in the pdb_dir path.
     
     NB: Requires EGS-Modified BIO.parse_pdb_header.py 
 
-    Parameters:
-    ----------
-
-        struct_name: the name of the PDB entry.
-
-        pdb_dir: path to the PDB files, defaults to PDB_DIR
-
-        model_numb: model number to use, defaults to 0 for single
-        structure files.
-
-        verbose: print info while parsing
-
-    Returns: a list of Disulfide objects initialized from the file.
+    :param struct_name: the name of the PDB entry.
+    :param pdb_dir: path to the PDB files, defaults to PDB_DIR
+    :param model_numb: model number to use, defaults to 0 for single structure files.
+    :param verbose: print info while parsing
+    :return: a list of Disulfide objects initialized from the file.
+    
     Example:
-      Assuming the PDB_DIR has the pdb5rsa.ent file in place calling:
+      Assuming the PDB_DIR has the pdb5rsa.ent file we can load the disulfides
+      with the following:
 
-      SS_list = []
-      SS_list = load_disulfides_from_id('5rsa', verbose=True)
+    from proteusPy.Disulfide import Disulfide, check_header_from_file
 
-      loads the Disulfides from the file and initialize the disulfide objects, returning
-      them in the result. '''
+    >>> PDB_DIR = '/Users/egs/PDB/good/'
+    >>> OK = False
+    >>> OK = check_header_from_file(f'{PDB_DIR}pdb5rsa.ent', verbose=True)
+    -> check_header_from_file() - Parsing file: /Users/egs/PDB/good/pdb5rsa.ent:
+     -> SSBond: 1: tmp: 26A - 84A
+     -> SSBond: 2: tmp: 40A - 95A
+     -> SSBond: 3: tmp: 58A - 110A
+     -> SSBond: 4: tmp: 65A - 72A
+    >>> OK
+    True
+    '''
 
     i = 1
     proximal = distal = -1
@@ -2175,8 +2151,7 @@ def check_header_from_file(filename: str, model_numb = 0,
 
         if (chain1_id != chain2_id):
             if verbose:
-                mess = f' -> Cross Chain SS for: Prox: {proximal} {chain1_id} Dist:\
-                       {distal} {chain2_id}'
+                mess = f' -> Cross Chain SS for: Prox: {proximal}{chain1_id} Dist: {distal}{chain2_id}'
                 warnings.warn(mess, DisulfideParseWarning)
                 pass # was break
 
@@ -2184,8 +2159,7 @@ def check_header_from_file(filename: str, model_numb = 0,
             prox_res = _chaina[proximal]
             dist_res = _chainb[distal]
         except KeyError:
-            print(f' ! Cannot parse SSBond record (KeyError): {struct_name} Prox:\
-              <{proximal}> {chain1_id} Dist: <{distal}> {chain2_id}')
+            print(f' ! Cannot parse SSBond record (KeyError): {struct_name} Prox: <{proximal}> {chain1_id} Dist: <{distal}> {chain2_id}')
             continue
          
         # make a new Disulfide object, name them based on proximal and distal
@@ -2195,12 +2169,10 @@ def check_header_from_file(filename: str, model_numb = 0,
                 continue
             else:
                 if verbose:
-                   print(f' -> SSBond: {i}: {struct_name}: {proximal} {chain1_id}\
-                    - {distal} {chain2_id}')
+                   print(f' -> SSBond: {i}: {struct_name}: {proximal}{chain1_id} - {distal}{chain2_id}')
         else:
             if dbg:
-                print(f' -> NULL chain(s): {struct_name}: {proximal} {chain1_id}\
-                 - {distal} {chain2_id}')
+                print(f' -> NULL chain(s): {struct_name}: {proximal}{chain1_id} - {distal}{chain2_id}')
         i += 1
     return True
 
@@ -2213,16 +2185,14 @@ def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0,
     NB: Requires EGS-Modified BIO.parse_pdb_header.py 
 
     :param struct_name: the name of the PDB entry.        
-    :param pdb_dir: path to the PDB files, PDB_DIR, by default '.'
-        
-    :param model_numb: model number to use, defaults to 0 for
-    single structure files., by default 0
-        
+    :param pdb_dir: path to the PDB files, PDB_DIR, by default '.'  
+    :param model_numb: model number to use, defaults to 0 for single 
+    structure files., by default 0
     :param verbose: Verbose, by default False
     :param dbg: debugging flag, by default False
-
     :return: True if parsed correctly, False otherwise.
-'''
+    '''
+
     parser = PDBParser(PERMISSIVE=True, QUIET=True)
     structure = parser.get_structure(struct_name, 
     								 file=f'{pdb_dir}pdb{struct_name}.ent')
