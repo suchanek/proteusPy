@@ -584,10 +584,10 @@ class Disulfide:
         and computes the disulfide conformational energy.
 
         :param chi1: Chi1 (degrees)
-        :param chi2: Chi1 (degrees)
-        :param chi3: Chi1 (degrees)
-        :param chi4: Chi1 (degrees)
-        :param chi5: Chi1 (degrees)
+        :param chi2: Chi2 (degrees)
+        :param chi3: Chi3 (degrees)
+        :param chi4: Chi4 (degrees)
+        :param chi5: Chi5 (degrees)
         '''
 
         self.set_dihedrals(chi1, chi2, chi3, chi4, chi5)
