@@ -1714,14 +1714,14 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
                         problemfile=PROBLEM_ID_FILE,
                         dictfile=SS_DICT_PICKLE_FILE) -> None:
     '''
-    This function creates .pkl files needed for the DisulfideLoader class. 
+    This function creates .pkl files needed for the proteusPy.DisulfideLoader.DisulfideLoader class. 
     The Disulfide objects are contained in a DisulfideList object and 
     Dict within these files. In addition, .csv files containing all of 
     the torsions for the disulfides and problem IDs are written.
 
     :param numb:           number of entries to process, defaults to all
     :param verbose:        more messages
-    :param quiet:          turns of DisulfideConstruction warnings
+    :param quiet:          turns off DisulfideConstruction warnings
     :param pdbdir:         path to PDB files
     :param datadir:        path to resulting .pkl files
     :param picklefile:     name of the disulfide .pkl file
@@ -2204,8 +2204,6 @@ def check_header_from_file(filename: str, model_numb = 0,
         i += 1
     return True
 
-
-
 def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0,
                         verbose=False, dbg=False) -> bool:
     '''
@@ -2214,23 +2212,16 @@ def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0,
     
     NB: Requires EGS-Modified BIO.parse_pdb_header.py 
 
-    Parameters
-    ----------
-    struct_name : str
-        the name of the PDB entry.\n
-    pdb_dir : str, optional
-        path to the PDB files, defaults to PDB_DIR, by default '.'\n
-    model_numb : int, optional
-        model number to use, defaults to 0 for single structure files., by default 0 \n
-    verbose : bool, optional
-        Verbose, by default False\n
-    dbg : bool, optional
-        debugging flag, by default False
+    :param struct_name: the name of the PDB entry.        
+    :param pdb_dir: path to the PDB files, PDB_DIR, by default '.'
+        
+    :param model_numb: model number to use, defaults to 0 for
+    single structure files., by default 0
+        
+    :param verbose: Verbose, by default False
+    :param dbg: debugging flag, by default False
 
-    Returns
-    -------
-    bool
-        True if parses normally, false otherwise.
+    :return: True if parsed correctly, False otherwise.
 '''
     parser = PDBParser(PERMISSIVE=True, QUIET=True)
     structure = parser.get_structure(struct_name, 
