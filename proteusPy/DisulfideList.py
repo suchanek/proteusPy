@@ -28,8 +28,10 @@ from tqdm import tqdm
 import proteusPy
 from proteusPy import *
 from proteusPy.atoms import *
-from proteusPy.utility import grid_dimensions, distance_squared, cmap_vector
+from proteusPy.utility import grid_dimensions, cmap_vector
 from proteusPy import Disulfide
+from proteusPy.ProteusGlobals import GOOD_DIR
+from Bio.PDB import PDBParser
 
 _PBAR_COLS = 105
 
@@ -147,10 +149,10 @@ class DisulfideList(UserList):
         >>> ss3 = Disulfide('ss3')
         >>> sslist = DisulfideList([ss1, ss2], 'sslist')
         >>> sslist
-        [<Disulfide ss1 SourceID:  Proximal: -1  Distal: -1 >, <Disulfide ss2 SourceID:  Proximal: -1  Distal: -1 >]
+        [<Disulfide ss1 SourceID:  Proximal: -1 A Distal: -1 A>, <Disulfide ss2 SourceID:  Proximal: -1 A Distal: -1 A>]
         >>> sslist.append(ss3)
         >>> sslist
-        [<Disulfide ss1 SourceID:  Proximal: -1  Distal: -1 >, <Disulfide ss2 SourceID:  Proximal: -1  Distal: -1 >, <Disulfide ss3 SourceID:  Proximal: -1  Distal: -1 >]
+        [<Disulfide ss1 SourceID:  Proximal: -1 A Distal: -1 A>, <Disulfide ss2 SourceID:  Proximal: -1 A Distal: -1 A>, <Disulfide ss3 SourceID:  Proximal: -1 A Distal: -1 A>]
         '''
         self.pdb_id = id
         super().__init__(self.validate_ss(item) for item in iterable)
@@ -685,6 +687,135 @@ class DisulfideList(UserList):
             pl.show()
         
         return
+
+    def load_disulfides_from_id(self, struct_name: str, 
+                            pdb_dir = GOOD_DIR,
+                            model_numb = 0, 
+                            verbose = False,
+                            quiet=False,
+                            dbg = False) -> list:
+        '''
+        Loads the Disulfides by PDB ID and initializes the Disulfide objects.
+        Assumes the file is downloaded in the pdb_dir path.
+        
+        *NB:* Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython
+
+        :param struct_name: the name of the PDB entry.
+        :param pdb_dir: path to the PDB files, defaults to GOOD_DIR - this is: PDB_DIR/good and are
+        the pre-parsed PDB files that have been scanned by the DisulfideDownloader program.
+        :param model_numb: model number to use, defaults to 0 for single structure files.
+        :param verbose: print info while parsing
+        :return: a list of Disulfide objects initialized from the file.
+        
+        Example:
+
+        PDB_DIR defaults to os.getenv('PDB').
+        To load the Disulfides from the PDB ID 5rsa we'd use the following:
+        
+        >>> from proteusPy.DisulfideList import DisulfideList
+        Instantiate a Disulfide list. Note: the list is initialized with an iterable and a name (optional)
+        
+        >>> SSlist = DisulfideList([],'ss')
+        >>> SSlist.load_disulfides_from_id('5rsa', verbose=False)
+        DisulfideList([<Disulfide 5rsa_26A_84A SourceID: 5rsa Proximal: 26 A Distal: 84 A>,
+               <Disulfide 5rsa_40A_95A SourceID: 5rsa Proximal: 40 A Distal: 95 A>,
+               <Disulfide 5rsa_58A_110A SourceID: 5rsa Proximal: 58 A Distal: 110 A>,
+               <Disulfide 5rsa_65A_72A SourceID: 5rsa Proximal: 65 A Distal: 72 A>])        
+        '''
+
+        i = 1
+        proximal = distal = -1
+        SSList = DisulfideList([], struct_name)
+        _chaina = None
+        _chainb = None
+
+        parser = PDBParser(PERMISSIVE=True)
+        
+        # Biopython uses the Structure -> Model -> Chain hierarchy to organize
+        # structures. All are iterable.
+
+        structure = parser.get_structure(struct_name, file=f'{pdb_dir}pdb{struct_name}.ent')
+        model = structure[model_numb]
+
+        if verbose:
+            print(f'-> load_disulfide_from_id() - Parsing structure: {struct_name}:')
+
+        ssbond_dict = structure.header['ssbond'] # NB: this requires the modified code
+
+        # list of tuples with (proximal distal chaina chainb)
+        ssbonds = proteusPy.Disulfide.parse_ssbond_header_rec(ssbond_dict) 
+
+        with warnings.catch_warnings():
+            if quiet:
+                #warnings.filterwarnings("ignore", category=DisulfideConstructionWarning)
+                warnings.filterwarnings("ignore")
+            for pair in ssbonds:
+                # in the form (proximal, distal, chain)
+                proximal = pair[0] 
+                distal = pair[1]      
+                chain1_id = pair[2]
+                chain2_id = pair[3]
+
+                if not proximal.isnumeric() or not distal.isnumeric():
+                    mess = f' -> Cannot parse SSBond record (non-numeric IDs):\
+                    {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring.'
+                    warnings.warn(mess, DisulfideConstructionWarning)
+                    continue
+                else:
+                    proximal = int(proximal)
+                    distal = int(distal)
+                
+                if proximal == distal:
+                    mess = f' -> Cannot parse SSBond record (proximal == distal):\
+                    {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring.'
+                    warnings.warn(mess, DisulfideConstructionWarning)
+                    continue
+
+                _chaina = model[chain1_id]
+                _chainb = model[chain2_id]
+
+                if (_chaina is None) or (_chainb is None):
+                    mess = f' -> NULL chain(s): {struct_name}: {proximal} {chain1_id}\
+                    - {distal} {chain2_id}, ignoring!'
+                    warnings.warn(mess, DisulfideConstructionWarning)
+                    continue
+
+                if (chain1_id != chain2_id):
+                    if verbose:
+                        mess = (f' -> Cross Chain SS for: Prox: {proximal} {chain1_id}\
+                        Dist: {distal} {chain2_id}')
+                        warnings.warn(mess, DisulfideConstructionWarning)
+                        pass # was break
+
+                try:
+                    prox_res = _chaina[proximal]
+                    dist_res = _chainb[distal]
+                    
+                except KeyError:
+                    mess = f'Cannot parse SSBond record (KeyError): {struct_name} Prox:\
+                    {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring!'
+                    warnings.warn(mess, DisulfideConstructionWarning)
+                    continue
+                
+                # make a new Disulfide object, name them based on proximal and distal
+                # initialize SS bond from the proximal, distal coordinates
+                
+                if _chaina[proximal].is_disordered() or _chainb[distal].is_disordered():
+                    mess = f'Disordered chain(s): {struct_name}: {proximal} {chain1_id}\
+                    - {distal} {chain2_id}, ignoring!'
+                    warnings.warn(mess, DisulfideConstructionWarning)
+                    continue
+                else:
+                    if verbose:
+                        print(f' -> SSBond: {i}: {struct_name}: {proximal} {chain1_id}\
+                        - {distal} {chain2_id}')
+                    ssbond_name = f'{struct_name}_{proximal}{chain1_id}_{distal}{chain2_id}'       
+                    new_ss = proteusPy.Disulfide.Disulfide(ssbond_name)
+                    new_ss.initialize_disulfide_from_chain(_chaina, _chainb, proximal,
+                    distal, quiet=quiet)
+                    SSList.append(new_ss)
+            i += 1
+        return copy.deepcopy(SSList)
 
 if __name__ == "__main__":
     import doctest
