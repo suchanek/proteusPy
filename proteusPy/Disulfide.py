@@ -1891,7 +1891,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
 
         # returns an empty list if none are found.
         sslist = DisulfideList([], entry)
-        sslist = load_disulfides_from_id(entry, model_numb=0, verbose=verbose, 
+        sslist.load_disulfides_from_id(entry, model_numb=0, verbose=verbose, 
         								 quiet=quiet, pdb_dir=pdbdir)
         if len(sslist) > 0:
             for ss in sslist:
@@ -1965,13 +1965,13 @@ def check_header_from_file(filename: str, model_numb = 0,
     NB: Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython/
 
     :param struct_name: the name of the PDB entry.
-    :param pdb_dir: path to the PDB files, defaults to PDB_DIR
+    :param pdb_dir: path to the PDB files, defaults to ```GOOD_DIR```
     :param model_numb: model number to use, defaults to 0 for single structure files.
     :param verbose: print info while parsing
     :return: a list of Disulfide objects initialized from the file.
     
     Example:
-      Assuming the PDB_DIR has the pdb5rsa.ent file we can load the disulfides
+      Assuming ```GOOD_DIR``` has the pdb5rsa.ent file we can load the disulfides
       with the following:
 
     >>> from proteusPy.Disulfide import Disulfide, check_header_from_file
@@ -2063,7 +2063,7 @@ def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0,
                         verbose=False, dbg=False) -> bool:
     '''
     Checks parsability PDB ID and initializes the Disulfide objects.
-    Assumes the file is downloaded in the pdb_dir path.
+    Assumes the file is downloaded in ```GOOD_DIR``` path.
     
     NB: Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython/
 

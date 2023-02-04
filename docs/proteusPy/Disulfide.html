@@ -2133,7 +2133,7 @@ Last revision: 2/4/2023</p>
 </span><span id="L-1891"><a href="#L-1891"><span class="linenos">1891</span></a>
 </span><span id="L-1892"><a href="#L-1892"><span class="linenos">1892</span></a>        <span class="c1"># returns an empty list if none are found.</span>
 </span><span id="L-1893"><a href="#L-1893"><span class="linenos">1893</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="n">DisulfideList</span><span class="p">([],</span> <span class="n">entry</span><span class="p">)</span>
-</span><span id="L-1894"><a href="#L-1894"><span class="linenos">1894</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="n">load_disulfides_from_id</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">model_numb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> 
+</span><span id="L-1894"><a href="#L-1894"><span class="linenos">1894</span></a>        <span class="n">sslist</span><span class="o">.</span><span class="n">load_disulfides_from_id</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">model_numb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> 
 </span><span id="L-1895"><a href="#L-1895"><span class="linenos">1895</span></a>        								 <span class="n">quiet</span><span class="o">=</span><span class="n">quiet</span><span class="p">,</span> <span class="n">pdb_dir</span><span class="o">=</span><span class="n">pdbdir</span><span class="p">)</span>
 </span><span id="L-1896"><a href="#L-1896"><span class="linenos">1896</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sslist</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
 </span><span id="L-1897"><a href="#L-1897"><span class="linenos">1897</span></a>            <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">sslist</span><span class="p">:</span>
@@ -2207,13 +2207,13 @@ Last revision: 2/4/2023</p>
 </span><span id="L-1965"><a href="#L-1965"><span class="linenos">1965</span></a><span class="sd">    NB: Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython/</span>
 </span><span id="L-1966"><a href="#L-1966"><span class="linenos">1966</span></a>
 </span><span id="L-1967"><a href="#L-1967"><span class="linenos">1967</span></a><span class="sd">    :param struct_name: the name of the PDB entry.</span>
-</span><span id="L-1968"><a href="#L-1968"><span class="linenos">1968</span></a><span class="sd">    :param pdb_dir: path to the PDB files, defaults to PDB_DIR</span>
+</span><span id="L-1968"><a href="#L-1968"><span class="linenos">1968</span></a><span class="sd">    :param pdb_dir: path to the PDB files, defaults to ```GOOD_DIR```</span>
 </span><span id="L-1969"><a href="#L-1969"><span class="linenos">1969</span></a><span class="sd">    :param model_numb: model number to use, defaults to 0 for single structure files.</span>
 </span><span id="L-1970"><a href="#L-1970"><span class="linenos">1970</span></a><span class="sd">    :param verbose: print info while parsing</span>
 </span><span id="L-1971"><a href="#L-1971"><span class="linenos">1971</span></a><span class="sd">    :return: a list of Disulfide objects initialized from the file.</span>
 </span><span id="L-1972"><a href="#L-1972"><span class="linenos">1972</span></a><span class="sd">    </span>
 </span><span id="L-1973"><a href="#L-1973"><span class="linenos">1973</span></a><span class="sd">    Example:</span>
-</span><span id="L-1974"><a href="#L-1974"><span class="linenos">1974</span></a><span class="sd">      Assuming the PDB_DIR has the pdb5rsa.ent file we can load the disulfides</span>
+</span><span id="L-1974"><a href="#L-1974"><span class="linenos">1974</span></a><span class="sd">      Assuming ```GOOD_DIR``` has the pdb5rsa.ent file we can load the disulfides</span>
 </span><span id="L-1975"><a href="#L-1975"><span class="linenos">1975</span></a><span class="sd">      with the following:</span>
 </span><span id="L-1976"><a href="#L-1976"><span class="linenos">1976</span></a>
 </span><span id="L-1977"><a href="#L-1977"><span class="linenos">1977</span></a><span class="sd">    &gt;&gt;&gt; from proteusPy.Disulfide import Disulfide, check_header_from_file</span>
@@ -2305,7 +2305,7 @@ Last revision: 2/4/2023</p>
 </span><span id="L-2063"><a href="#L-2063"><span class="linenos">2063</span></a>                        <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dbg</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 </span><span id="L-2064"><a href="#L-2064"><span class="linenos">2064</span></a>    <span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-2065"><a href="#L-2065"><span class="linenos">2065</span></a><span class="sd">    Checks parsability PDB ID and initializes the Disulfide objects.</span>
-</span><span id="L-2066"><a href="#L-2066"><span class="linenos">2066</span></a><span class="sd">    Assumes the file is downloaded in the pdb_dir path.</span>
+</span><span id="L-2066"><a href="#L-2066"><span class="linenos">2066</span></a><span class="sd">    Assumes the file is downloaded in ```GOOD_DIR``` path.</span>
 </span><span id="L-2067"><a href="#L-2067"><span class="linenos">2067</span></a><span class="sd">    </span>
 </span><span id="L-2068"><a href="#L-2068"><span class="linenos">2068</span></a><span class="sd">    NB: Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython/</span>
 </span><span id="L-2069"><a href="#L-2069"><span class="linenos">2069</span></a>
@@ -6795,7 +6795,7 @@ restart the download without duplicating effort.</p>
 </span><span id="Extract_Disulfides-1892"><a href="#Extract_Disulfides-1892"><span class="linenos">1892</span></a>
 </span><span id="Extract_Disulfides-1893"><a href="#Extract_Disulfides-1893"><span class="linenos">1893</span></a>        <span class="c1"># returns an empty list if none are found.</span>
 </span><span id="Extract_Disulfides-1894"><a href="#Extract_Disulfides-1894"><span class="linenos">1894</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="n">DisulfideList</span><span class="p">([],</span> <span class="n">entry</span><span class="p">)</span>
-</span><span id="Extract_Disulfides-1895"><a href="#Extract_Disulfides-1895"><span class="linenos">1895</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="n">load_disulfides_from_id</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">model_numb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> 
+</span><span id="Extract_Disulfides-1895"><a href="#Extract_Disulfides-1895"><span class="linenos">1895</span></a>        <span class="n">sslist</span><span class="o">.</span><span class="n">load_disulfides_from_id</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">model_numb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> 
 </span><span id="Extract_Disulfides-1896"><a href="#Extract_Disulfides-1896"><span class="linenos">1896</span></a>        								 <span class="n">quiet</span><span class="o">=</span><span class="n">quiet</span><span class="p">,</span> <span class="n">pdb_dir</span><span class="o">=</span><span class="n">pdbdir</span><span class="p">)</span>
 </span><span id="Extract_Disulfides-1897"><a href="#Extract_Disulfides-1897"><span class="linenos">1897</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sslist</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
 </span><span id="Extract_Disulfides-1898"><a href="#Extract_Disulfides-1898"><span class="linenos">1898</span></a>            <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">sslist</span><span class="p">:</span>
@@ -7039,13 +7039,13 @@ reference frame (the proximal N, Cα, C').</p>
 </span><span id="check_header_from_file-1966"><a href="#check_header_from_file-1966"><span class="linenos">1966</span></a><span class="sd">    NB: Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython/</span>
 </span><span id="check_header_from_file-1967"><a href="#check_header_from_file-1967"><span class="linenos">1967</span></a>
 </span><span id="check_header_from_file-1968"><a href="#check_header_from_file-1968"><span class="linenos">1968</span></a><span class="sd">    :param struct_name: the name of the PDB entry.</span>
-</span><span id="check_header_from_file-1969"><a href="#check_header_from_file-1969"><span class="linenos">1969</span></a><span class="sd">    :param pdb_dir: path to the PDB files, defaults to PDB_DIR</span>
+</span><span id="check_header_from_file-1969"><a href="#check_header_from_file-1969"><span class="linenos">1969</span></a><span class="sd">    :param pdb_dir: path to the PDB files, defaults to ```GOOD_DIR```</span>
 </span><span id="check_header_from_file-1970"><a href="#check_header_from_file-1970"><span class="linenos">1970</span></a><span class="sd">    :param model_numb: model number to use, defaults to 0 for single structure files.</span>
 </span><span id="check_header_from_file-1971"><a href="#check_header_from_file-1971"><span class="linenos">1971</span></a><span class="sd">    :param verbose: print info while parsing</span>
 </span><span id="check_header_from_file-1972"><a href="#check_header_from_file-1972"><span class="linenos">1972</span></a><span class="sd">    :return: a list of Disulfide objects initialized from the file.</span>
 </span><span id="check_header_from_file-1973"><a href="#check_header_from_file-1973"><span class="linenos">1973</span></a><span class="sd">    </span>
 </span><span id="check_header_from_file-1974"><a href="#check_header_from_file-1974"><span class="linenos">1974</span></a><span class="sd">    Example:</span>
-</span><span id="check_header_from_file-1975"><a href="#check_header_from_file-1975"><span class="linenos">1975</span></a><span class="sd">      Assuming the PDB_DIR has the pdb5rsa.ent file we can load the disulfides</span>
+</span><span id="check_header_from_file-1975"><a href="#check_header_from_file-1975"><span class="linenos">1975</span></a><span class="sd">      Assuming ```GOOD_DIR``` has the pdb5rsa.ent file we can load the disulfides</span>
 </span><span id="check_header_from_file-1976"><a href="#check_header_from_file-1976"><span class="linenos">1976</span></a><span class="sd">      with the following:</span>
 </span><span id="check_header_from_file-1977"><a href="#check_header_from_file-1977"><span class="linenos">1977</span></a>
 </span><span id="check_header_from_file-1978"><a href="#check_header_from_file-1978"><span class="linenos">1978</span></a><span class="sd">    &gt;&gt;&gt; from proteusPy.Disulfide import Disulfide, check_header_from_file</span>
@@ -7144,7 +7144,7 @@ Assumes the file is downloaded in the pdb_dir path.</p>
 
 <ul>
 <li><strong>struct_name</strong>:  the name of the PDB entry.</li>
-<li><strong>pdb_dir</strong>:  path to the PDB files, defaults to PDB_DIR</li>
+<li><strong>pdb_dir</strong>:  path to the PDB files, defaults to <code>GOOD_DIR</code></li>
 <li><strong>model_numb</strong>:  model number to use, defaults to 0 for single structure files.</li>
 <li><strong>verbose</strong>:  print info while parsing</li>
 </ul>
@@ -7156,7 +7156,7 @@ Assumes the file is downloaded in the pdb_dir path.</p>
 </blockquote>
 
 <p>Example:
-  Assuming the PDB_DIR has the pdb5rsa.ent file we can load the disulfides
+  Assuming <code>GOOD_DIR</code> has the pdb5rsa.ent file we can load the disulfides
   with the following:</p>
 
 <div class="pdoc-code codehilite">
@@ -7192,7 +7192,7 @@ Assumes the file is downloaded in the pdb_dir path.</p>
 </span><span id="check_header_from_id-2064"><a href="#check_header_from_id-2064"><span class="linenos">2064</span></a>                        <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dbg</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 </span><span id="check_header_from_id-2065"><a href="#check_header_from_id-2065"><span class="linenos">2065</span></a>    <span class="sd">&#39;&#39;&#39;</span>
 </span><span id="check_header_from_id-2066"><a href="#check_header_from_id-2066"><span class="linenos">2066</span></a><span class="sd">    Checks parsability PDB ID and initializes the Disulfide objects.</span>
-</span><span id="check_header_from_id-2067"><a href="#check_header_from_id-2067"><span class="linenos">2067</span></a><span class="sd">    Assumes the file is downloaded in the pdb_dir path.</span>
+</span><span id="check_header_from_id-2067"><a href="#check_header_from_id-2067"><span class="linenos">2067</span></a><span class="sd">    Assumes the file is downloaded in ```GOOD_DIR``` path.</span>
 </span><span id="check_header_from_id-2068"><a href="#check_header_from_id-2068"><span class="linenos">2068</span></a><span class="sd">    </span>
 </span><span id="check_header_from_id-2069"><a href="#check_header_from_id-2069"><span class="linenos">2069</span></a><span class="sd">    NB: Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython/</span>
 </span><span id="check_header_from_id-2070"><a href="#check_header_from_id-2070"><span class="linenos">2070</span></a>
@@ -7273,7 +7273,7 @@ Assumes the file is downloaded in the pdb_dir path.</p>
 
 
             <div class="docstring"><p>Checks parsability PDB ID and initializes the Disulfide objects.
-Assumes the file is downloaded in the pdb_dir path.</p>
+Assumes the file is downloaded in <code>GOOD_DIR</code> path.</p>
 
 <p>NB: Requires EGS-Modified BIO.parse_pdb_header.py from <a href="https://github.com/suchanek/biopython/">https://github.com/suchanek/biopython/</a></p>
 
