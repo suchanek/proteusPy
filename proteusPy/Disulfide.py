@@ -41,7 +41,7 @@ _FLOAT_INIT = -999.9
 _ANG_INIT = -180.0
 
 # tqdm progress bar width
-_PBAR_COLS = 100
+_PBAR_COLS = 105
 WINSIZE = (1024, 1024)
 
 # columns for the torsions file dataframe.

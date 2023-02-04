@@ -31,7 +31,7 @@ from proteusPy.atoms import *
 from proteusPy.utility import grid_dimensions, distance_squared, cmap_vector
 from proteusPy import Disulfide
 
-_PBAR_COLS = 100
+_PBAR_COLS = 105
 
 Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', \
            'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
@@ -526,10 +526,8 @@ class DisulfideList(UserList):
 
         sslist = self.data
         modelss = proteusPy.Disulfide.Disulfide('model')
-        modelss.set_dihedrals(chi1, chi2, chi3, chi4, chi5)
-        turt = Turtle3D('tmp')
 
-        modelss.build_model(turt)
+        modelss.build_model(chi1, chi2, chi3, chi4, chi5)
         res = DisulfideList([], 'neighbors')
         res = modelss.Torsion_neighbors(sslist, cutoff)
 

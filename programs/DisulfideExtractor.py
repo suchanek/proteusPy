@@ -45,31 +45,31 @@ _SS_TORSIONS_FILE = 'PDB_subset_SS_torsions.csv'
 _PROBLEM_ID_FILE = 'PDB_subset_SS_problems.csv'
 
 start = time.time()
-Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB, datadir=DATA)
 
-'''
+# the following performs an extraction of 1000 SS and saves them with
+# the correct filenames to be read as 'subset'. Do not change the filenames
+# defined above
+
 Extract_Disulfides(numb=1000, pdbdir=PDB, datadir=DATA,
                 dictfile=_SS_DICT_PICKLE_FILE,
                 picklefile=_SS_PICKLE_FILE,
                 torsionfile=_SS_TORSIONS_FILE,
                 problemfile=_PROBLEM_ID_FILE,
                 verbose=False, quiet=True)
-'''
-
 
 # total extraction uses numb=-1 and takes about 1.5 hours on
 # my 2021 MacbookPro M1 Pro computer.
 # Extract_Disulfides(numb=-1, pdbdir=PDB, datadir=DATA,
 #                 verbose=False, quiet=True)
 
+Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB, datadir=DATA)
+
 update = True
 
 if update:
-    print(f'Copying: {DATA} to {REPO_DATA}')
-    copytree(DATA, REPO_DATA, dirs_exist_ok=True, ignore=ignore_patterns('*_all_*'))
-
     print(f'Copying: {DATA} to {MODULE_DATA}')
-    copytree(DATA, MODULE_DATA, dirs_exist_ok=True, ignore=ignore_patterns('*_all_*'))
+    # copytree(DATA, MODULE_DATA, dirs_exist_ok=True, ignore=ignore_patterns('*_all_*'))
+    copytree(DATA, MODULE_DATA, dirs_exist_ok=True)
 
 end = time.time()
 
