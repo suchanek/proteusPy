@@ -2191,6 +2191,22 @@ def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0,
     :param verbose: Verbose, by default False
     :param dbg: debugging flag, by default False
     :return: True if parsed correctly, False otherwise.
+
+    Example:
+      Assuming the PDB_DIR has the pdb5rsa.ent file we can load the disulfides
+      with the following:
+
+    from proteusPy.Disulfide import Disulfide, check_header_from_file
+
+    >>> PDB_DIR = '/Users/egs/PDB/good/'
+    >>> OK = False
+    >>> OK = check_header_from_id('5rsa', pdb_dir=PDB_DIR, verbose=True)
+     -> SSBond: 0: 5rsa: 26A - 84A
+     -> SSBond: 1: 5rsa: 40A - 95A
+     -> SSBond: 2: 5rsa: 58A - 110A
+     -> SSBond: 3: 5rsa: 65A - 72A
+   >>> OK
+   True
     '''
 
     parser = PDBParser(PERMISSIVE=True, QUIET=True)
@@ -2240,8 +2256,7 @@ def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0,
                 return False
  
         if verbose:
-            print(f' -> SSBond: {i}: {struct_name}: {proximal} {chain1} - {distal}\
-             {chain2}')
+            print(f' -> SSBond: {i}: {struct_name}: {proximal}{chain1} - {distal}{chain2}')
 
         i += 1
     return True
