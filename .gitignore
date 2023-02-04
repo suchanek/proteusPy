@@ -6,4 +6,3 @@ proteusPy/.DS_Store
 proteusPy/pdb/.DS_Store
 proteusPy/pdb/models/ss_completed.txt
 *.mp4
-dist/*.gz
