@@ -1,9 +1,7 @@
 '''
-This class provides an implementation for a Disulfide Bond structural object.
-Based on the original C/C++ implementation by Eric G. Suchanek.
-
-This class is part of the program proteusPy, a Python package for 
-the analysis and modeling of protein structures, with an emphasis on disulfide bonds. \n
+This module is part of the program proteusPy, a Python package for 
+the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
+Based on the original C/C++ implementation by Eric G. Suchanek. \n
 Author: Eric G. Suchanek, PhD
 Last revision: 2/1/2023
 '''
@@ -57,8 +55,9 @@ class Disulfide:
     """
     This class provides a Python object and methods representing a physical disulfide bond 
     either extracted from the RCSB protein databank or built using the 
-    [proteusPy.Turtle3D](turtle3D.html) class. The disulfide bond is characterized 
-    by:
+    [proteusPy.Turtle3D](turtle3D.html) class. The disulfide bond is an important
+    intermolecular stabilizing structural element and is characterized by:
+
     * Atomic coordinates for the atoms N, Cα, Cβ, C', Sγ for both residues. 
     These are stored as both raw atomic coordinates as read from the RCSB file 
     and internal local coordinates.
@@ -66,7 +65,7 @@ class Disulfide:
     * A name, by default {pdb_id}{prox_resnumb}{prox_chain}_{distal_resnum}{distal_chain} 
     * Proximal residue number
     * Distal residue number
-    * Approximate torsional energy (kcal/mol):
+    * Approximate bond torsional energy (kcal/mol):
     
     $$ 
     E_{kcal/mol} \\approx 2.0 * cos(3.0 * \\chi_{1}) + cos(3.0 * \\chi_{5}) + cos(3.0 * \\chi_{2}) + 
