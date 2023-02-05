@@ -87,6 +87,7 @@ class DisulfideLoader:
         
         SS_df = pd.DataFrame(columns=Torsion_DF_Cols, index=['source'])
         _SSList = DisulfideList([], 'ALL_PDB_SS')
+
         idlist = []
 
         if subset:
@@ -283,11 +284,9 @@ class DisulfideLoader:
         a common coordinate frame. This allows us to see all of the disulfides
         at one time in a single view. Colors vary smoothy between bonds.
         
-        Arguments:
-            self: DisulfideLoader object initialized with the database.
-            pdbid: the actual PDB id string
-
-        Returns: None.
+        :param self: DisulfideLoader object initialized with the database.
+        :param pdbid: the PDB id string, e.g. 4yys
+        :return: None
 
         Example:
         >>> from proteusPy.Disulfide import Disulfide
@@ -298,7 +297,7 @@ class DisulfideLoader:
 
         >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
         
-        Display the Disulfides from the PDB ID 4yys, overlaid onto
+        Display the Disulfides from the PDB ID ```4yys```, overlaid onto
         a common reference (the proximal disulfides).
 
         >>> PDB_SS.display_overlay('4yys')
@@ -310,18 +309,7 @@ class DisulfideLoader:
 
         ssbonds = self[pdbid]
         ssbonds.display_overlay()
-
-    def display(self, index, style='bs'):
-        '''
-        _summary_
-
-        :param index: _description_
-        :param style: _description_, defaults to 'bs'
-        '''
-        self.SSList[index].display(style)
-        #ssList = self.SSList[index]
-        #ssList.display(style=style)
-
+       
 # class ends
 
 if __name__ == "__main__":
