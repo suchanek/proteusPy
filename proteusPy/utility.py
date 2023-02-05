@@ -14,6 +14,7 @@ from matplotlib import cm
 from proteusPy.proteusPyWarning import ProteusPyWarning
 
 from Bio.PDB.vectors import Vector
+from Bio.PDB import PDBParser
 
 def distance_squared(p1: numpy.array, p2: numpy.array) -> numpy.array:
     '''
@@ -117,6 +118,49 @@ def grid_dimensions(n):
     else:
         columns = math.ceil(root)
         return int(n / columns), int(columns)
+
+def Check_chains(pdbid, pdbdir, verbose=True):
+    '''
+    Returns True if structure has multiple chains of identical length,
+    False otherwise. Primarily internal use.
+
+    :param pdbid: PDBID identifier
+    :param pdbdir: PDB directory containing structures
+    :param verbose: Verbosity, defaults to True
+    '''
+    parser = PDBParser(PERMISSIVE=True)
+    structure = parser.get_structure(pdbid, file=f'{pdbdir}pdb{pdbid}.ent')
+    
+    # dictionary of tuples with SSBond prox and distal
+    ssbond_dict = structure.header['ssbond']
+    
+    if verbose:
+        print(f'ssbond dict: {ssbond_dict}')
+
+    same = False
+    model = structure[0]
+    chainlist = model.get_list()
+
+    if len(chainlist) > 1:
+        chain_lens = []
+        if verbose:
+            print(f'multiple chains. {chainlist}')
+        for chain in chainlist:
+            chain_length = len(chain.get_list())
+            chain_id = chain.get_id()
+            if verbose:
+                print(f'Chain: {chain_id}, length: {chain_length}')
+            chain_lens.append(chain_length)
+
+        if numpy.min(chain_lens) != numpy.max(chain_lens):
+            same = False
+            if verbose:
+                print(f'chain lengths are unequal: {chain_lens}')
+        else:
+            same = True
+            if verbose:
+                print(f'Chains are equal length, assuming the same. {chain_lens}')
+    return(same)
 
 if __name__ == "__main__":
     import doctest

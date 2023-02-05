@@ -1819,8 +1819,8 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
 
     Take a screenshot. You can position the orientation, then close the window:
     >>> subset.screenshot(style='sb', fname='subset.png')
-    Saving file: subset.png
-    Saved file: subset.png
+    ---> screenshot(): Saving file: subset.png
+    ---> screenshot(): Saved file: subset.png
 
     Browse the documentation for more functionality. The display functions are particularly useful.
     '''
@@ -2124,50 +2124,6 @@ def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0,
         i += 1
     return True
 
-''''''
-
-def Check_chains(pdbid, pdbdir, verbose=True):
-    '''
-    Returns True if structure has multiple chains of identical length,
-    False otherwise. Primarily internal use.
-
-    :param pdbid: PDBID identifier
-    :param pdbdir: PDB directory containing structures
-    :param verbose: Verbosity, defaults to True
-    '''
-    parser = PDBParser(PERMISSIVE=True)
-    structure = parser.get_structure(pdbid, file=f'{pdbdir}pdb{pdbid}.ent')
-    
-    # dictionary of tuples with SSBond prox and distal
-    ssbond_dict = structure.header['ssbond']
-    
-    if verbose:
-        print(f'ssbond dict: {ssbond_dict}')
-
-    same = False
-    model = structure[0]
-    chainlist = model.get_list()
-
-    if len(chainlist) > 1:
-        chain_lens = []
-        if verbose:
-            print(f'multiple chains. {chainlist}')
-        for chain in chainlist:
-            chain_length = len(chain.get_list())
-            chain_id = chain.get_id()
-            if verbose:
-                print(f'Chain: {chain_id}, length: {chain_length}')
-            chain_lens.append(chain_length)
-
-        if numpy.min(chain_lens) != numpy.max(chain_lens):
-            same = False
-            if verbose:
-                print(f'chain lengths are unequal: {chain_lens}')
-        else:
-            same = True
-            if verbose:
-                print(f'Chains are equal length, assuming the same. {chain_lens}')
-    return(same)
 
 if __name__ == "__main__":
     import doctest

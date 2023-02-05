@@ -31,7 +31,7 @@ from proteusPy.data import SS_PICKLE_FILE, SS_TORSIONS_FILE, PROBLEM_ID_FILE
 
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideList import DisulfideList
-from proteusPy.utility import distance3d
+from proteusPy.utility import distance3d, distance_squared
 
 from Bio.PDB import Vector, PDBParser, PDBList
 from Bio.PDB.vectors import calc_dihedral
@@ -1604,20 +1604,9 @@ class Disulfide:
         object. This is used to compare Disulfide Bond torsion angles to 
         determine their torsional similarity via a Euclidean distance metric.
 
-        Parameters
-        ----------
-        other : Disulfide
-            Comparison Disulfide
-
-        Returns
-        -------
-        float
-            RMS distance (degrees)
-
-        Raises
-        ------
-        ProteusPyWarning
-            Warning if other is wrong type.
+        :param other : Comparison Disulfide
+        :return: RMS distance (degrees)
+        :raise: ProteusPyWarning - Warning if other is wrong type.
         '''
 
         _p1 = self.torsion_array
@@ -1649,16 +1638,9 @@ def name_to_id(fname: str) -> str:
     '''
     Returns the PDB ID from the filename.
 
-    Parameters
-    ----------
-    fname : str
-        PDB filename
-
-    Returns
-    -------
-    str
-        PDB ID
+    :param fname: : PDB filename
     '''
+
     ent = fname[3:-4]
     return ent
 
@@ -1668,16 +1650,9 @@ def parse_ssbond_header_rec(ssbond_dict: dict) -> list:
     NB: Requires EGS-Modified BIO.parse_pdb_header.py.
     This is used internally.
 
-    Parameters
-    ----------
-    ssbond_dict : dict
-        the input SSBOND dict
-
-    Returns
-    -------
-    list
-        A list of tuples representing the proximal, 
-        distal residue ids for the Disulfide.
+    :param ssbond_dict: the input SSBOND dict
+    :return: A list of tuples representing the proximal, 
+    distal residue ids for the Disulfide.
     '''
     disulfide_list = []
     for ssb in ssbond_dict.items():
@@ -1708,22 +1683,13 @@ def Download_Disulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR,
     function keeps track of downloaded files so it's possible to interrupt and
     restart the download without duplicating effort.
 
-    Parameters
-    ----------
-    pdb_home : str, optional
-        Path for downloaded files, by default PDB_DIR
-    model_home : str, optional
-        Path for extracted data, by default MODEL_DIR
-    verbose : bool, optional
-        Verbose, by default False
-    reset : bool, optional
-        Reset the downloaded file list, by default False
-
-    Raises
-    ------
-    DisulfideIOException
-        Fatal exception for file I/O
+    :param pdb_home: str, Path for downloaded files, by default PDB_DIR        
+    :param model_home: Path for extracted data, by default MODEL_DIR, optional    
+    :param verbose: Verbose, by default False, optional   
+    :param reset: Reset the downloaded file list, by default False, optional
+    :raises: DisulfideIOException - Fatal exception for file I/O
     '''
+    
     start = time.time()
     donelines = []
     SS_done = []

@@ -6,7 +6,7 @@
 # Copyright (c) 2023 Eric G. Suchanek, PhD., all rights reserved
 # Subject to the MIT public license.
 
-__version__ = "0.29dev"
+__version__ = "0.30dev"
 
 import sys
 import os
@@ -31,10 +31,10 @@ from .turtle3D import Turtle3D
 from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN
 from .residue import build_residue, get_backbone_from_chain, to_alpha, to_carbonyl, to_nitrogen, to_oxygen
 
-from .Disulfide import Download_Disulfides, Extract_Disulfides, Check_chains
+from .Disulfide import Download_Disulfides, Extract_Disulfides
 from .DisulfideLoader import DisulfideLoader
 
 from .atoms import *
-from .utility import distance_squared, distance3d, cmap_vector
+from .utility import distance_squared, distance3d, cmap_vector, Check_chains
 
 # end of file
