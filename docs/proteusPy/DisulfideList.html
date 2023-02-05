@@ -377,9 +377,9 @@ with an iterable (tuple, list) and a name.</p>
 </span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a>    
 </span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a>    <span class="k">def</span> <span class="nf">Avg_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a>        <span class="sd">&#39;&#39;&#39;</span>
-</span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a><span class="sd">        Return the Average distance (A) between the atoms in the list.</span>
+</span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a><span class="sd">        Return the Average distance (Å) between the atoms in the list.</span>
 </span><span id="L-210"><a href="#L-210"><span class="linenos">210</span></a>
-</span><span id="L-211"><a href="#L-211"><span class="linenos">211</span></a><span class="sd">        :return: Average distance (A) between all atoms in the list</span>
+</span><span id="L-211"><a href="#L-211"><span class="linenos">211</span></a><span class="sd">        :return: Average distance (Å) between all atoms in the list</span>
 </span><span id="L-212"><a href="#L-212"><span class="linenos">212</span></a>
 </span><span id="L-213"><a href="#L-213"><span class="linenos">213</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="L-214"><a href="#L-214"><span class="linenos">214</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
@@ -400,7 +400,7 @@ with an iterable (tuple, list) and a name.</p>
 </span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a>        <span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a><span class="sd">        Return the Average energy (kcal/mol) for the Disulfides in the list.</span>
 </span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a>
-</span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a><span class="sd">        :return: Average distance (A) between all atoms in the list</span>
+</span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a><span class="sd">        :return: Average energy (kcal/mol) between all atoms in the list</span>
 </span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a>
 </span><span id="L-234"><a href="#L-234"><span class="linenos">234</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="L-235"><a href="#L-235"><span class="linenos">235</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
@@ -443,7 +443,7 @@ with an iterable (tuple, list) and a name.</p>
 </span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a>    
 </span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a>    <span class="k">def</span> <span class="nf">build_distance_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 </span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a><span class="sd">        Create a dataframe containing the input DisulfideList ca-ca distance, energy. </span>
+</span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a><span class="sd">        Create a dataframe containing the input DisulfideList Cα-Cα distance, energy. </span>
 </span><span id="L-276"><a href="#L-276"><span class="linenos">276</span></a><span class="sd">        This can take several minutes for the entire database.</span>
 </span><span id="L-277"><a href="#L-277"><span class="linenos">277</span></a>
 </span><span id="L-278"><a href="#L-278"><span class="linenos">278</span></a><span class="sd">        :return: DataFrame containing Ca distances</span>
@@ -1190,9 +1190,9 @@ with an iterable (tuple, list) and a name.</p>
 </span><span id="DisulfideList-207"><a href="#DisulfideList-207"><span class="linenos">207</span></a>    
 </span><span id="DisulfideList-208"><a href="#DisulfideList-208"><span class="linenos">208</span></a>    <span class="k">def</span> <span class="nf">Avg_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideList-209"><a href="#DisulfideList-209"><span class="linenos">209</span></a>        <span class="sd">&#39;&#39;&#39;</span>
-</span><span id="DisulfideList-210"><a href="#DisulfideList-210"><span class="linenos">210</span></a><span class="sd">        Return the Average distance (A) between the atoms in the list.</span>
+</span><span id="DisulfideList-210"><a href="#DisulfideList-210"><span class="linenos">210</span></a><span class="sd">        Return the Average distance (Å) between the atoms in the list.</span>
 </span><span id="DisulfideList-211"><a href="#DisulfideList-211"><span class="linenos">211</span></a>
-</span><span id="DisulfideList-212"><a href="#DisulfideList-212"><span class="linenos">212</span></a><span class="sd">        :return: Average distance (A) between all atoms in the list</span>
+</span><span id="DisulfideList-212"><a href="#DisulfideList-212"><span class="linenos">212</span></a><span class="sd">        :return: Average distance (Å) between all atoms in the list</span>
 </span><span id="DisulfideList-213"><a href="#DisulfideList-213"><span class="linenos">213</span></a>
 </span><span id="DisulfideList-214"><a href="#DisulfideList-214"><span class="linenos">214</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideList-215"><a href="#DisulfideList-215"><span class="linenos">215</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
@@ -1213,7 +1213,7 @@ with an iterable (tuple, list) and a name.</p>
 </span><span id="DisulfideList-230"><a href="#DisulfideList-230"><span class="linenos">230</span></a>        <span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-231"><a href="#DisulfideList-231"><span class="linenos">231</span></a><span class="sd">        Return the Average energy (kcal/mol) for the Disulfides in the list.</span>
 </span><span id="DisulfideList-232"><a href="#DisulfideList-232"><span class="linenos">232</span></a>
-</span><span id="DisulfideList-233"><a href="#DisulfideList-233"><span class="linenos">233</span></a><span class="sd">        :return: Average distance (A) between all atoms in the list</span>
+</span><span id="DisulfideList-233"><a href="#DisulfideList-233"><span class="linenos">233</span></a><span class="sd">        :return: Average energy (kcal/mol) between all atoms in the list</span>
 </span><span id="DisulfideList-234"><a href="#DisulfideList-234"><span class="linenos">234</span></a>
 </span><span id="DisulfideList-235"><a href="#DisulfideList-235"><span class="linenos">235</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideList-236"><a href="#DisulfideList-236"><span class="linenos">236</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
@@ -1256,7 +1256,7 @@ with an iterable (tuple, list) and a name.</p>
 </span><span id="DisulfideList-273"><a href="#DisulfideList-273"><span class="linenos">273</span></a>    
 </span><span id="DisulfideList-274"><a href="#DisulfideList-274"><span class="linenos">274</span></a>    <span class="k">def</span> <span class="nf">build_distance_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 </span><span id="DisulfideList-275"><a href="#DisulfideList-275"><span class="linenos">275</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="DisulfideList-276"><a href="#DisulfideList-276"><span class="linenos">276</span></a><span class="sd">        Create a dataframe containing the input DisulfideList ca-ca distance, energy. </span>
+</span><span id="DisulfideList-276"><a href="#DisulfideList-276"><span class="linenos">276</span></a><span class="sd">        Create a dataframe containing the input DisulfideList Cα-Cα distance, energy. </span>
 </span><span id="DisulfideList-277"><a href="#DisulfideList-277"><span class="linenos">277</span></a><span class="sd">        This can take several minutes for the entire database.</span>
 </span><span id="DisulfideList-278"><a href="#DisulfideList-278"><span class="linenos">278</span></a>
 </span><span id="DisulfideList-279"><a href="#DisulfideList-279"><span class="linenos">279</span></a><span class="sd">        :return: DataFrame containing Ca distances</span>
@@ -2017,9 +2017,9 @@ The disulfides are colored individually to facilitate inspection.</p>
     <a class="headerlink" href="#DisulfideList.Avg_Distance"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.Avg_Distance-208"><a href="#DisulfideList.Avg_Distance-208"><span class="linenos">208</span></a>    <span class="k">def</span> <span class="nf">Avg_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideList.Avg_Distance-209"><a href="#DisulfideList.Avg_Distance-209"><span class="linenos">209</span></a>        <span class="sd">&#39;&#39;&#39;</span>
-</span><span id="DisulfideList.Avg_Distance-210"><a href="#DisulfideList.Avg_Distance-210"><span class="linenos">210</span></a><span class="sd">        Return the Average distance (A) between the atoms in the list.</span>
+</span><span id="DisulfideList.Avg_Distance-210"><a href="#DisulfideList.Avg_Distance-210"><span class="linenos">210</span></a><span class="sd">        Return the Average distance (Å) between the atoms in the list.</span>
 </span><span id="DisulfideList.Avg_Distance-211"><a href="#DisulfideList.Avg_Distance-211"><span class="linenos">211</span></a>
-</span><span id="DisulfideList.Avg_Distance-212"><a href="#DisulfideList.Avg_Distance-212"><span class="linenos">212</span></a><span class="sd">        :return: Average distance (A) between all atoms in the list</span>
+</span><span id="DisulfideList.Avg_Distance-212"><a href="#DisulfideList.Avg_Distance-212"><span class="linenos">212</span></a><span class="sd">        :return: Average distance (Å) between all atoms in the list</span>
 </span><span id="DisulfideList.Avg_Distance-213"><a href="#DisulfideList.Avg_Distance-213"><span class="linenos">213</span></a>
 </span><span id="DisulfideList.Avg_Distance-214"><a href="#DisulfideList.Avg_Distance-214"><span class="linenos">214</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideList.Avg_Distance-215"><a href="#DisulfideList.Avg_Distance-215"><span class="linenos">215</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
@@ -2038,12 +2038,12 @@ The disulfides are colored individually to facilitate inspection.</p>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Return the Average distance (A) between the atoms in the list.</p>
+            <div class="docstring"><p>Return the Average distance (Å) between the atoms in the list.</p>
 
 <h6 id="returns">Returns</h6>
 
 <blockquote>
-  <p>Average distance (A) between all atoms in the list</p>
+  <p>Average distance (Å) between all atoms in the list</p>
 </blockquote>
 </div>
 
@@ -2064,7 +2064,7 @@ The disulfides are colored individually to facilitate inspection.</p>
 </span><span id="DisulfideList.Avg_Energy-230"><a href="#DisulfideList.Avg_Energy-230"><span class="linenos">230</span></a>        <span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.Avg_Energy-231"><a href="#DisulfideList.Avg_Energy-231"><span class="linenos">231</span></a><span class="sd">        Return the Average energy (kcal/mol) for the Disulfides in the list.</span>
 </span><span id="DisulfideList.Avg_Energy-232"><a href="#DisulfideList.Avg_Energy-232"><span class="linenos">232</span></a>
-</span><span id="DisulfideList.Avg_Energy-233"><a href="#DisulfideList.Avg_Energy-233"><span class="linenos">233</span></a><span class="sd">        :return: Average distance (A) between all atoms in the list</span>
+</span><span id="DisulfideList.Avg_Energy-233"><a href="#DisulfideList.Avg_Energy-233"><span class="linenos">233</span></a><span class="sd">        :return: Average energy (kcal/mol) between all atoms in the list</span>
 </span><span id="DisulfideList.Avg_Energy-234"><a href="#DisulfideList.Avg_Energy-234"><span class="linenos">234</span></a>
 </span><span id="DisulfideList.Avg_Energy-235"><a href="#DisulfideList.Avg_Energy-235"><span class="linenos">235</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideList.Avg_Energy-236"><a href="#DisulfideList.Avg_Energy-236"><span class="linenos">236</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
@@ -2083,7 +2083,7 @@ The disulfides are colored individually to facilitate inspection.</p>
 <h6 id="returns">Returns</h6>
 
 <blockquote>
-  <p>Average distance (A) between all atoms in the list</p>
+  <p>Average energy (kcal/mol) between all atoms in the list</p>
 </blockquote>
 </div>
 
@@ -2173,7 +2173,7 @@ DisulfideList</p>
     <a class="headerlink" href="#DisulfideList.build_distance_df"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.build_distance_df-274"><a href="#DisulfideList.build_distance_df-274"><span class="linenos">274</span></a>    <span class="k">def</span> <span class="nf">build_distance_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 </span><span id="DisulfideList.build_distance_df-275"><a href="#DisulfideList.build_distance_df-275"><span class="linenos">275</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="DisulfideList.build_distance_df-276"><a href="#DisulfideList.build_distance_df-276"><span class="linenos">276</span></a><span class="sd">        Create a dataframe containing the input DisulfideList ca-ca distance, energy. </span>
+</span><span id="DisulfideList.build_distance_df-276"><a href="#DisulfideList.build_distance_df-276"><span class="linenos">276</span></a><span class="sd">        Create a dataframe containing the input DisulfideList Cα-Cα distance, energy. </span>
 </span><span id="DisulfideList.build_distance_df-277"><a href="#DisulfideList.build_distance_df-277"><span class="linenos">277</span></a><span class="sd">        This can take several minutes for the entire database.</span>
 </span><span id="DisulfideList.build_distance_df-278"><a href="#DisulfideList.build_distance_df-278"><span class="linenos">278</span></a>
 </span><span id="DisulfideList.build_distance_df-279"><a href="#DisulfideList.build_distance_df-279"><span class="linenos">279</span></a><span class="sd">        :return: DataFrame containing Ca distances</span>
@@ -2196,7 +2196,7 @@ DisulfideList</p>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Create a dataframe containing the input DisulfideList ca-ca distance, energy. 
+            <div class="docstring"><p>Create a dataframe containing the input DisulfideList Cα-Cα distance, energy. 
 This can take several minutes for the entire database.</p>
 
 <h6 id="returns">Returns</h6>
