@@ -3,7 +3,6 @@
 # Subject to the GNU public license.
 
 import os
-import proteusPy
 
 # absolute location for the disulfide .pkl files
 _abspath = os.path.dirname(os.path.abspath(__file__))
