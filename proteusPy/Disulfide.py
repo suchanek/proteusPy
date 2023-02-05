@@ -658,10 +658,7 @@ class Disulfide:
         Returns the geometric center of mass for the internal coordinates of
         the given Disulfide. Missing atoms are not included.
 
-        Returns
-        -------
-        numpy.array: \n
-            3D array for the geometric center of mass
+        :return: 3D array for the geometric center of mass
         '''
 
         res = self.internal_coords()
@@ -669,30 +666,20 @@ class Disulfide:
     
     def copy(self):
         '''
-        Copy the Disulfide
+        Copy the Disulfide.
 
-        Returns
-        -------
-        Disulfide \n
-            A copy of self.
+        :return: A copy of self.  
         '''
-        
         return copy.deepcopy(self)
     
     def compute_extents(self, dim='z'):
         '''
         Calculate the internal coordinate extents for the input axis.
-
-        Parameters
-        ----------
-        dim : str, optional
-            Axis, one of 'x', 'y', 'z', by default 'z'
-
-        Returns
-        -------
-        float \n
-            min, max
+        
+        :param dim: Axis, one of 'x', 'y', 'z', by default 'z'
+        :return: min, max
         '''
+
         ic = self.internal_coords()
         # set default index to 'z'
         idx = 2
@@ -793,12 +780,13 @@ class Disulfide:
         Display the Disulfide bond in the specific rendering style.
 
         :param single: Display the bond in a single panel in the specific style. 
-        :style Rendering style: One of:
+        :param style:  Rendering style: One of:
             * 'sb' - split bonds
             * 'bs' - ball and stick
             * 'cpk' - CPK style
             * 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
             * 'plain' - boring single color
+        :light: If True, light background, if False, dark
 
         Example:
         >>> import proteusPy
@@ -814,7 +802,7 @@ class Disulfide:
         name = self.name
         enrg = self.energy
 
-        title = f'{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Tors: {self.torsion_length}'
+        title = f'{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Tors: {self.torsion_length:.2f}°'
 
         if light:
             pv.set_plot_theme('document')
@@ -914,8 +902,7 @@ class Disulfide:
         '''
         Return the proximal and distal chain IDs for the Disulfide.
 
-        :return: tuple \n
-            (proximal, distal) chain IDs
+        :return: tuple (proximal, distal) chain IDs
         '''
         prox = self.proximal_chain
         dist = self.distal_chain
@@ -950,8 +937,7 @@ class Disulfide:
         :param proximal: proximal residue sequence ID
         :param distal: distal residue sequence ID
         :param quiet: Quiet or noisy parsing, defaults to True
-        :raises DisulfideConstructionWarning: _description_
-        :raises DisulfideConstructionWarning: _description_
+        :raises DisulfideConstructionWarning: Raised when not parsed correctly
         '''
         id = chain1.get_full_id()[0]
         self.pdb_id = id
@@ -1158,7 +1144,7 @@ class Disulfide:
         * 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
         * 'plain' - boring single color
         
-        :param fname: Output filename, defaults to 'ssbond.mp4'
+        :param fname: Output filename, defaults to ```ssbond.mp4```
         :param verbose: Verbosity, defaults to False
         :param steps: Number of steps for one complete rotation, defaults to 360.
         '''
@@ -1527,19 +1513,19 @@ class Disulfide:
 
     def Torsion_Distance(self, other) -> float:
         '''
-        Calculate the 5D Euclidean distance between self and another Disulfide
+        Calculate the 5D Euclidean distance between ```self``` and another Disulfide
         object. This is used to compare Disulfide Bond torsion angles to 
-        determine their torsional similarity via a Euclidean distance metric.
+        determine their torsional similarity via a 5-Dimensional Euclidean distance metric.
 
         :param other: Comparison Disulfide
-        :raises ProteusPyWarning: Warning if other is the wrong type
-        :return: Euclidean distance (Degrees) between self and other torsions
+        :raises ProteusPyWarning: Warning if ```other``` is not a Disulfide object
+        :return: Euclidean distance (Degrees) between ```self``` and ```other```.
         '''
 
-        _p1 = self.torsion_array
-        _p2 = other.torsion_array
+        _p1 = self.torsion_array + 180.0
+        _p2 = other.torsion_array + 180.0 
         if (len(_p1) != 5 or len(_p2) != 5):
-            raise ProteusPyWarning("--> distance5d() requires vectors of length 5!")
+            raise ProteusPyWarning("--> Torsion_Distance() requires vectors of length 5!")
         d = math.dist(_p1, _p2)
         return d
 
@@ -1554,7 +1540,7 @@ class Disulfide:
         dihedral angles. *i.e.* [-60, -60, -90, -60, -60] would have the same
         torsion length as [60, 60, 90, 60, 60], two clearly different structures.
 
-        :param others: DisulfideList to search
+        :param others: ```DisulfideList``` to search
         :param cutoff: Dihedral angle degree cutoff
         :return: DisulfideList within the cutoff
 
@@ -1583,7 +1569,7 @@ class Disulfide:
 
         Display the number found, and then display them overlaid onto their common reference frame.
 
-        >>> tot = low_energy_neighbors.length()
+        >>> tot = low_energy_neighbors.length
         >>> print(f'Neighbors: {tot}')
         Neighbors: 6
         >>> low_energy_neighbors.display_overlay()

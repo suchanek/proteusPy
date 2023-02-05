@@ -14,8 +14,8 @@ DisulfideList.display() method.
 # Author Eric G. Suchanek, PhD
 # A part of the proteusPy molecular modeling and analysis suite by
 # Eric G. Suchanek, PhD
-# Last modification: 1/30/2023 -egs-
-# Cα Cβ Sγ
+# Last modification: 2/4/2023 -egs-
+# Cα N, Cα, Cβ, C', Sγ Å °
 
 import numpy
 
@@ -61,11 +61,11 @@ class DisulfideList(UserList):
     >>> SS = Disulfide('tmp')
     >>> SSlist = DisulfideList([],'ss')
     >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)  # load the Disulfide database
-    >>> SS = PDB_SS[0]              # returns a Disulfide object at index 0
+    >>> SS = PDB_SS[0]
     >>> SS
     <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>
     
-    >>> SS4yys = PDB_SS['4yys']     # returns a DisulfideList containing all
+    >>> SS4yys = PDB_SS['4yys']
     >>> SS4yys
     [<Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>, <Disulfide 4yys_56A_98A SourceID: 4yys Proximal: 56 A Distal: 98 A>, <Disulfide 4yys_156A_207A SourceID: 4yys Proximal: 156 A Distal: 207 A>, <Disulfide 4yys_22B_65B SourceID: 4yys Proximal: 22 B Distal: 65 B>, <Disulfide 4yys_56B_98B SourceID: 4yys Proximal: 56 B Distal: 98 B>, <Disulfide 4yys_156B_207B SourceID: 4yys Proximal: 156 B Distal: 207 B>]
 
@@ -154,6 +154,7 @@ class DisulfideList(UserList):
         >>> sslist
         [<Disulfide ss1 SourceID:  Proximal: -1 A Distal: -1 A>, <Disulfide ss2 SourceID:  Proximal: -1 A Distal: -1 A>, <Disulfide ss3 SourceID:  Proximal: -1 A Distal: -1 A>]
         '''
+        
         self.pdb_id = id
         super().__init__(self.validate_ss(item) for item in iterable)
 
@@ -168,294 +169,41 @@ class DisulfideList(UserList):
     def __setitem__(self, index, item):
         self.data[index] = self.validate_ss(item)
 
-    def append(self, item):
-        '''
-        Append the list with item
+    # Rendering engine calculates and instantiates all bond 
+    # cylinders and atomic sphere meshes. Called by all high level routines
 
-        :param item: Disulfide to add
-        :type item: Disulfide
+    def _render(self, style) -> pv.Plotter:
+        ''' 
+            Display a window showing the list of disulfides in the given style.
+            Argument:
+                self
+                style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd'
+            Returns:
+                Window displaying the Disulfides.
         '''
-        self.data.append(self.validate_ss(item))
+        ssList = self.data
+        name = self.id
+        tot_ss = len(ssList) # number off ssbonds
+        rows, cols = grid_dimensions(tot_ss)
+        winsize = (512 * cols, 512 * rows)
 
-    def extend(self, other):
-        '''
-        Extend the Disulfide list with other.
+        pl = pv.Plotter(window_size=winsize, shape=(rows, cols))
+        i = 0
 
-        :param other: extension
-        :type item: DisulfideList
-        '''
-
-        if isinstance(other, type(self)):
-            self.data.extend(other)
-        else:
-            self.data.extend(self._validate_ss(item) for item in other)
+        for r in range(rows):
+            for c in range(cols):
+                pl.subplot(r,c)
+                if i < tot_ss:
+                    ss = ssList[i]
+                    src = ss.pdb_id
+                    enrg = ss.energy
+                    title = f'{src} {name}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Cα: {ss.ca_distance:.2f} Å Tors: {ss.torsion_length:.2f}'
+                    pl.add_title(title=title, font_size=FONTSIZE)
+                    ss._render(pl, style=style, bondcolor=BOND_COLOR, bs_scale=BS_SCALE, 
+                            spec=SPECULARITY, specpow=SPEC_POWER)
+                i += 1
+        return pl
     
-    def insert(self, index, item):
-        '''
-        Insert a Disulfide into the list at the specified index
-
-        :param index: insertion point
-        :type index: int
-        :param item: Disulfide to insert
-        :type item: Disulfide
-        '''
-        self.data.insert(index, self.validate_ss(item))
-
-    def Ovalidate_ss(self, value):
-        if isinstance(value, type(self)):
-            return value
-        raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
-
-    def validate_ss(self, value):
-        return value
-    
-    def pprint(self):
-        '''
-        Pretty print self.
-        '''
-        sslist = self.data
-        for ss in sslist:
-            ss.pprint()
-    
-    def pprint_all(self):
-        '''
-        Pretty print full disulfide descriptions in self.
-        '''
-        sslist = self.data
-        for ss in sslist:
-            ss.pprint_all()
-    
-    @property
-    def id(self):
-        '''
-        PDB ID of the list
-        '''
-        return(self.pdb_id)
-    
-    @id.setter
-    def id(self, value):
-        '''
-        Set the DisulfideList ID
-
-        Parameters
-        ----------
-        value : str
-            List ID
-        '''
-        self.pdb_id = value
-    
-    def get_by_name(self, name) -> Disulfide:
-        '''
-        Returns the Disulfide with the given name from the list.
-        '''
-        sslist = self.data
-        res = None
-
-        for ss in sslist:
-            id = ss.name
-            if id == name:
-                res = ss.copy()
-                break
-        return res
-
-    def minmax_energy(self):
-        '''
-        Return the Disulfides with the minimum and maximum energies
-        from the DisulfideList.
-
-        Returns
-        -------
-        Disulfide
-            Disulfide with the given ID
-        '''
-        sslist = sorted(self.data)
-        return sslist[0], sslist[-1]
-
-    def min(self):
-        '''
-        Return Disulfide from the list with the minimum energy
-
-        Returns
-        -------
-        Disulfide
-            Disulfide with the minimum energy.
-        '''
-        sslist = sorted(self.data)
-        return sslist[0]
-    
-    def max(self):
-        '''
-        Return Disulfide from the list with the maximum energy
-
-        Returns
-        -------
-        Disulfide
-            Disulfide with the maximum energy.
-        '''
-        sslist = sorted(self.data)
-        return sslist[-1]
-    
-    def get_chains(self):
-        '''
-        Return the chain IDs for chains within the given Disulfide.
-        '''
-        res_dict = {'xxx'}
-        sslist = self.data
-
-        for ss in sslist:
-            pchain = ss.proximal_chain
-            dchain = ss.distal_chain
-            res_dict.update(pchain)
-            res_dict.update(dchain)
-        
-        res_dict.remove('xxx')
-
-        return res_dict
-
-    def has_chain(self, chain) -> bool:
-        '''
-        Returns True if given chain contained in Disulfide, False otherwise.
-        '''
-        
-        chns = {'xxx'}
-        chns = self.get_chains()
-        if chain in chns:
-            return True
-        else:
-            return False
-
-    def by_chain(self, chain: str):
-        '''
-        Return a DisulfideList from the input chain identifier.
-
-        Arguments:
-            chain: str - chain identifier, 'A', 'B, etc
-        Returns:
-            DisulfideList containing disulfides within that chain.
-        '''
-        
-        reslist = DisulfideList([], chain)
-        sslist = self.data
-
-        for ss in sslist:
-            pchain = ss.proximal_chain
-            dchain = ss.distal_chain
-            if pchain == dchain:
-                if pchain == chain:
-                    reslist.append(ss)
-            else:
-                print(f'Cross chain SS: {ss.repr_compact}:')
-        return reslist
-    
-    def length(self):
-        return(len(self.data))
-    
-    @property
-    def torsion_df(self):
-        return self.build_torsion_df()
-    
-    def build_torsion_df(self) -> pd.DataFrame:
-        '''
-        Create a dataframe containing the input DisulfideList torsional parameters,
-        ca-ca distance, energy, and phi-psi angles. This can take a while for the
-        entire database.
-
-        :param SSList: DisulfideList - input list of Disulfides
-        :return: pandas.Dataframe containing the torsions
-        '''
-        # create a dataframe with the following columns for the disulfide 
-        # conformations extracted from the structure
-        
-        SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
-        sslist = self.data
-
-        pbar = tqdm(sslist, ncols=_PBAR_COLS)
-        for ss in pbar:
-            new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, 
-                    ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance,
-                    ss.psiprox, ss.psiprox, ss.phidist, ss.psidist, ss.torsion_length]
-            # add the row to the end of the dataframe
-            SS_df.loc[len(SS_df.index)] = new_row
-        
-        return SS_df
-
-    @property
-    def distance_df(self):
-        return self.build_distance_df()
-    
-    def build_distance_df(self) -> pd.DataFrame:
-        """
-        Create a dataframe containing the input DisulfideList ca-ca distance, energy. 
-        This can take several minutes for the entire database.
-
-        :return: DataFrame containing Ca distances
-        :rtype: pd.DataFrame
-        """
-        
-        # create a dataframe with the following columns for the disulfide 
-        # conformations extracted from the structure
-        
-        SS_df = pd.DataFrame(columns=Distance_DF_Cols)
-        sslist = self.data
-
-        pbar = tqdm(sslist, ncols=_PBAR_COLS)
-        for ss in pbar:
-            new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.energy, ss.ca_distance]
-            # add the row to the end of the dataframe
-            SS_df.loc[len(SS_df.index)] = new_row
-        
-        return SS_df
-
-    def minmax_distance(self):
-        '''
-        Return the Disulfides with the minimum and 
-        maximum Cα distances in the list.
-
-        :return: SSmin, SSmax
-        '''
-
-        _min = 99999.9
-        _max = -99999.9
-
-        sslist = self.data
-        ssmin = 0
-        ssmax = 0
-        idx = 0
-
-        pbar = tqdm(sslist, ncols=_PBAR_COLS)
-        for ss in pbar:
-            dist = ss.ca_distance
-            
-            if dist >= _max:
-                ssmax = idx
-                _max = dist
-            
-            if dist <= _min:
-                ssmin = idx
-                _min = dist
-            idx += 1
-
-        return sslist[ssmin], sslist[ssmax]
-
-    @property
-    def torsion_array(self):
-        return(self.get_torsion_array())
-    
-    def get_torsion_array(self):
-        """
-        Returns an rows X 5 array representing the dihedral angles
-        in the given disulfide list.
-
-        """
-        sslist = self.data
-        tot = len(sslist)
-        res = numpy.zeros(shape=(tot, 5))
-
-        for idx, ss in zip(range(tot), sslist):
-            row = ss.torsion_array
-            res[idx] = row
-        return res
-
     def Avg_Distance(self):
         '''
         Return the Average distance (A) between the atoms in the list.
@@ -488,7 +236,7 @@ class DisulfideList(UserList):
         tot = len(sslist)
 
         total = 0.0
-        for cnt, ss1 in zip(range(tot), sslist):
+        for ss1 in sslist:
             total += ss1.energy
 
         return total/tot
@@ -512,71 +260,99 @@ class DisulfideList(UserList):
         
         return total/cnt
     
-    def nearest_neighbors(self, chi1, chi2, chi3, chi4, chi5, cutoff: float):
+    def append(self, item):
         '''
-        Given a torsional array of chi1-chi5, return list of Disulfides
-        within cutoff.
+        Append the list with item
 
-        :param chi1: Chi1 (degrees)
-        :param chi2: Chi2 (degrees)
-        :param chi3: Chi3 (degrees)
-        :param chi4: Chi4 (degrees)
-        :param chi5: Chi5 (degrees)
-        :param cutoff: Cutoff, degrees
-        :return: DisulfideList of neighbors
+        :param item: Disulfide to add
+        :type item: Disulfide
         '''
+        self.data.append(self.validate_ss(item))
+    
+    
+    def build_distance_df(self) -> pd.DataFrame:
+        """
+        Create a dataframe containing the input DisulfideList ca-ca distance, energy. 
+        This can take several minutes for the entire database.
 
+        :return: DataFrame containing Ca distances
+        :rtype: pd.DataFrame
+        """
+        
+        # create a dataframe with the following columns for the disulfide 
+        # conformations extracted from the structure
+        
+        SS_df = pd.DataFrame(columns=Distance_DF_Cols)
         sslist = self.data
-        modelss = proteusPy.Disulfide.Disulfide('model')
 
-        modelss.build_model(chi1, chi2, chi3, chi4, chi5)
-        res = DisulfideList([], 'neighbors')
-        res = modelss.Torsion_neighbors(sslist, cutoff)
+        pbar = tqdm(sslist, ncols=_PBAR_COLS)
+        for ss in pbar:
+            new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.energy, ss.ca_distance]
+            # add the row to the end of the dataframe
+            SS_df.loc[len(SS_df.index)] = new_row
+        
+        return SS_df
 
-        return res
-
-    # Rendering engine calculates and instantiates all bond 
-    # cylinders and atomic sphere meshes. Called by all high level routines
-
-    def _render(self, style) -> pv.Plotter:
-        ''' 
-            Display a window showing the list of disulfides in the given style.
-            Argument:
-                self
-                style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd'
-            Returns:
-                Window displaying the Disulfides.
+    def build_torsion_df(self) -> pd.DataFrame:
         '''
-        ssList = self.data
-        tot_ss = len(ssList) # number off ssbonds
-        rows, cols = grid_dimensions(tot_ss)
-        winsize = (512 * cols, 512 * rows)
+        Create a dataframe containing the input DisulfideList torsional parameters,
+        ca-ca distance, energy, and phi-psi angles. This can take a while for the
+        entire database.
 
-        pl = pv.Plotter(window_size=winsize, shape=(rows, cols))
+        :param SSList: DisulfideList - input list of Disulfides
+        :return: pandas.Dataframe containing the torsions
+        '''
+        # create a dataframe with the following columns for the disulfide 
+        # conformations extracted from the structure
+        
+        SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
+        sslist = self.data
 
-        i = 0
+        pbar = tqdm(sslist, ncols=_PBAR_COLS)
+        for ss in pbar:
+            new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, 
+                    ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance,
+                    ss.psiprox, ss.psiprox, ss.phidist, ss.psidist, ss.torsion_length]
+            # add the row to the end of the dataframe
+            SS_df.loc[len(SS_df.index)] = new_row
+        
+        return SS_df
 
-        for r in range(rows):
-            for c in range(cols):
-                pl.subplot(r,c)
-                if i < tot_ss:
-                    ss = ssList[i]
-                    src = ss.pdb_id
-                    enrg = ss.energy
-                    title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol Ca: {ss.ca_distance:.2f}'
-                    pl.add_title(title=title, font_size=FONTSIZE)
-                    ss._render(pl, style=style, bondcolor=BOND_COLOR, bs_scale=BS_SCALE, 
-                            spec=SPECULARITY, specpow=SPEC_POWER)
-                i += 1
-        return pl
+    def by_chain(self, chain: str):
+        '''
+        Return a DisulfideList from the input chain identifier.
 
+        :param chain: chain identifier, 'A', 'B, etc
+        :return: DisulfideList containing disulfides within that chain.
+        '''
+        
+        reslist = DisulfideList([], chain)
+        sslist = self.data
+
+        for ss in sslist:
+            pchain = ss.proximal_chain
+            dchain = ss.distal_chain
+            if pchain == dchain:
+                if pchain == chain:
+                    reslist.append(ss)
+            else:
+                print(f'Cross chain SS: {ss.repr_compact}:')
+        return reslist
+    
     def display(self, style='sb', light=True):
         '''
-        Display a window showing the list of disulfides in the given style.
+        Display the Disulfide list in the specific rendering style.
 
-        :param style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd', defaults to 'sb'
-        :type style: str, optional
+        :param single: Display the bond in a single panel in the specific style. 
+        :param style:  Rendering style: One of:
+            * 'sb' - split bonds
+            * 'bs' - ball and stick
+            * 'cpk' - CPK style
+            * 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
+            * 'plain' - boring single color
+        :light: If True, light background, if False, dark
         '''
+
         if light:
             pv.set_plot_theme('document')
         else:
@@ -590,62 +366,31 @@ class DisulfideList(UserList):
         pl.reset_camera()
         pl.show()
  
-    def screenshot(self, style='bs', fname='sslist.png', verbose=True, light=True):
-        '''
-        Save the interactive window displaying the list of 
-        disulfides in the given style. Position the disulfide then
-        close the window to save.
-
-        :param style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd', defaults to 'bs'
-        :type style: str, optional
-        :param fname: filename to save image, defaults to 'sslist.png'
-        :type fname: str, optional
-        :param verbose: Verbose reporting, defaults to True
-        :type verbose: bool, optional
-        '''
-        if light:
-            pv.set_plot_theme('document')
-        else:
-            pv.set_plot_theme('dark')
-
-        pl = pv.Plotter()
-        pl = self._render(style=style)
-
-        pl.enable_anti_aliasing('msaa')
-        pl.link_views()
-        pl.reset_camera()
-        pl.show(auto_close=False)
-
-        if verbose:
-            print(f'Saving file: {fname}')
-        
-        pl.screenshot(fname)
-        
-        if verbose:
-            print(f'Saved file: {fname}')
-        
-        return
+    @property
+    def distance_df(self):
+        return self.build_distance_df()
     
     def display_overlay(self, screenshot=False, movie=False, 
                         verbose=True, fname='ss_overlay.png', light=True):
-        ''' 
+        '''
         Display all disulfides in the list overlaid in stick mode against
         a common coordinate frames. This allows us to see all of the disulfides
         at one time in a single view. Colors vary smoothy between bonds.
-        
-        Arguments:
-            PDB_SS: DisulfideLoader object initialized with the database.
-            pdbid: the actual PDB id string
 
-        Returns: None.    
-        ''' 
+        :param screenshot: Save a screenshot, defaults to False
+        :param movie: Save a movie, defaults to False
+        :param verbose: Verbosity, defaults to True
+        :param fname: Filename to save for the movie or screenshot, defaults to 'ss_overlay.png'
+        :param light: Background color, defaults to True for White. False for Dark.
+        '''
+
         id = self.pdb_id
         ssbonds = self.data
         tot_ss = len(ssbonds) # number off ssbonds
         avg_enrg = self.Avg_Energy()
         avg_dist = self.Avg_Distance()
 
-        title = f'SS List: <{id}>: ({tot_ss} total), Energy: {avg_enrg:.3f} kcal/mol, Dist: {avg_dist:.3f} A'
+        title = f'SS List: <{id}>: ({tot_ss} total), Avg. Energy: {avg_enrg:.3f} kcal/mol, Avg Distance: {avg_dist:.3f} Å'
 
         if light:
             pv.set_plot_theme('document')
@@ -701,6 +446,115 @@ class DisulfideList(UserList):
         
         return
 
+    def extend(self, other):
+        '''
+        Extend the Disulfide list with other.
+
+        :param other: extension
+        :type item: DisulfideList
+        '''
+
+        if isinstance(other, type(self)):
+            self.data.extend(other)
+        else:
+            self.data.extend(self._validate_ss(item) for item in other)
+
+    def get_by_name(self, name) -> Disulfide:
+        '''
+        Returns the Disulfide with the given name from the list.
+        '''
+        sslist = self.data
+        res = None
+
+        for ss in sslist:
+            id = ss.name
+            if id == name:
+                res = ss.copy()
+                break
+        return res
+    
+    def get_chains(self):
+        '''
+        Return the chain IDs for chains within the given Disulfide.
+        :return: Chain IDs for given Disulfide
+        '''
+
+        res_dict = {'xxx'}
+        sslist = self.data
+
+        for ss in sslist:
+            pchain = ss.proximal_chain
+            dchain = ss.distal_chain
+            res_dict.update(pchain)
+            res_dict.update(dchain)
+        
+        res_dict.remove('xxx')
+
+        return res_dict
+
+    def get_torsion_array(self):
+        """
+        Returns an rows X 5 array representing the dihedral angles
+        in the given disulfide list.
+
+        """
+        sslist = self.data
+        tot = len(sslist)
+        res = numpy.zeros(shape=(tot, 5))
+
+        for idx, ss in zip(range(tot), sslist):
+            row = ss.torsion_array
+            res[idx] = row
+        return res
+
+    def has_chain(self, chain) -> bool:
+        '''
+        Returns True if given chain contained in Disulfide, False otherwise.
+        :return: Returns True if given chain contained in Disulfide, False otherwise.
+        '''
+        
+        chns = {'xxx'}
+        chns = self.get_chains()
+        if chain in chns:
+            return True
+        else:
+            return False
+
+    @property
+    def id(self):
+        '''
+        PDB ID of the list
+        '''
+        return(self.pdb_id)
+    
+    @id.setter
+    def id(self, value):
+        '''
+        Set the DisulfideList ID
+
+        Parameters
+        ----------
+        value : str
+            List ID
+        '''
+        self.pdb_id = value
+    
+
+    def insert(self, index, item):
+        '''
+        Insert a Disulfide into the list at the specified index
+
+        :param index: insertion point
+        :type index: int
+        :param item: Disulfide to insert
+        :type item: Disulfide
+        '''
+        self.data.insert(index, self.validate_ss(item))
+
+    @property
+    def length(self):
+        return(len(self.data))
+    
     def load_disulfides_from_id(self, struct_name: str, 
                             pdb_dir = MODEL_DIR,
                             model_numb = 0, 
@@ -825,10 +679,162 @@ class DisulfideList(UserList):
             i += 1
         return copy.deepcopy(SSList)
 
+    def min(self):
+        '''
+        Return Disulfide from the list with the minimum energy
+
+        :return: Disulfide with the minimum energy.
+        '''
+        sslist = sorted(self.data)
+        return sslist[0]
+    
+    def max(self):
+        '''
+        Return Disulfide from the list with the maximum energy
+        
+        :return: Disulfide with the maximum energy.
+        '''
+        sslist = sorted(self.data)
+        return sslist[-1]
+    
+    def minmax_distance(self):
+        '''
+        Return the Disulfides with the minimum and 
+        maximum Cα distances in the list.
+
+        :return: SSmin, SSmax
+        '''
+
+        _min = 99999.9
+        _max = -99999.9
+
+        sslist = self.data
+        ssmin = 0
+        ssmax = 0
+        idx = 0
+
+        pbar = tqdm(sslist, ncols=_PBAR_COLS)
+        for ss in pbar:
+            dist = ss.ca_distance
+            
+            if dist >= _max:
+                ssmax = idx
+                _max = dist
+            
+            if dist <= _min:
+                ssmin = idx
+                _min = dist
+            idx += 1
+
+        return sslist[ssmin], sslist[ssmax]
+
+    def minmax_energy(self):
+        '''
+        Return the Disulfides with the minimum and maximum energies
+        from the DisulfideList.
+
+        :return: Disulfide with the given ID            
+        '''
+        sslist = sorted(self.data)
+        return sslist[0], sslist[-1]
+
+    def nearest_neighbors(self, chi1: float, chi2: float, chi3: float, 
+                        chi4: float, chi5: float, cutoff: float):
+        '''
+        Given a torsional array of chi1-chi5, return list of Disulfides
+        within cutoff. 
+
+        :param chi1: Chi1 (degrees)
+        :param chi2: Chi2 (degrees)
+        :param chi3: Chi3 (degrees)
+        :param chi4: Chi4 (degrees)
+        :param chi5: Chi5 (degrees)
+        :param cutoff: Distance cutoff, degrees
+        :return: DisulfideList of neighbors
+        '''
+
+        sslist = self.data
+        modelss = proteusPy.Disulfide.Disulfide('model')
+
+        modelss.build_model(chi1, chi2, chi3, chi4, chi5)
+        res = DisulfideList([], 'neighbors')
+        res = modelss.Torsion_neighbors(sslist, cutoff)
+
+        return res
+
+    def pprint(self):
+        '''
+        Pretty print self.
+        '''
+        sslist = self.data
+        for ss in sslist:
+            ss.pprint()
+    
+    def pprint_all(self):
+        '''
+        Pretty print full disulfide descriptions in self.
+        '''
+        sslist = self.data
+        for ss in sslist:
+            ss.pprint_all()
+    
+    def screenshot(self, style='bs', fname='sslist.png', verbose=True, light=True):
+        '''
+        Save the interactive window displaying the list of 
+        disulfides in the given style. Position the disulfide then
+        close the window to save.
+
+        :param style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd', defaults to 'bs'
+        :type style: str, optional
+        :param fname: filename to save image, defaults to 'sslist.png'
+        :type fname: str, optional
+        :param verbose: Verbose reporting, defaults to True
+        :type verbose: bool, optional
+        :param light: True for white display, False for dark.
+        :type light: bool, optional
+        '''
+
+        if light:
+            pv.set_plot_theme('document')
+        else:
+            pv.set_plot_theme('dark')
+
+        pl = pv.Plotter()
+        pl = self._render(style=style)
+
+        pl.enable_anti_aliasing('msaa')
+        pl.link_views()
+        pl.reset_camera()
+        pl.show(auto_close=False)
+
+        if verbose:
+            print(f'---> screenshot(): Saving file: {fname}')
+        
+        pl.screenshot(fname)
+        
+        if verbose:
+            print(f'---> screenshot(): Saved file: {fname}')
+        
+        return
+
+    @property
+    def torsion_df(self):
+        return self.build_torsion_df()
+    
+    @property
+    def torsion_array(self):
+        return(self.get_torsion_array())
+    
+    
+    
+    
+        
+    def validate_ss(self, value):
+        return value
+    
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
-
 
 # end of file
 
