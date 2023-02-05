@@ -209,9 +209,6 @@
             <li>
                     <a class="function" href="#check_header_from_id">check_header_from_id</a>
             </li>
-            <li>
-                    <a class="function" href="#Check_chains">Check_chains</a>
-            </li>
     </ul>
 
 
@@ -2061,8 +2058,8 @@ Last revision: 2/4/2023</p>
 </span><span id="L-1819"><a href="#L-1819"><span class="linenos">1819</span></a>
 </span><span id="L-1820"><a href="#L-1820"><span class="linenos">1820</span></a><span class="sd">    Take a screenshot. You can position the orientation, then close the window:</span>
 </span><span id="L-1821"><a href="#L-1821"><span class="linenos">1821</span></a><span class="sd">    &gt;&gt;&gt; subset.screenshot(style=&#39;sb&#39;, fname=&#39;subset.png&#39;)</span>
-</span><span id="L-1822"><a href="#L-1822"><span class="linenos">1822</span></a><span class="sd">    Saving file: subset.png</span>
-</span><span id="L-1823"><a href="#L-1823"><span class="linenos">1823</span></a><span class="sd">    Saved file: subset.png</span>
+</span><span id="L-1822"><a href="#L-1822"><span class="linenos">1822</span></a><span class="sd">    ---&gt; screenshot(): Saving file: subset.png</span>
+</span><span id="L-1823"><a href="#L-1823"><span class="linenos">1823</span></a><span class="sd">    ---&gt; screenshot(): Saved file: subset.png</span>
 </span><span id="L-1824"><a href="#L-1824"><span class="linenos">1824</span></a>
 </span><span id="L-1825"><a href="#L-1825"><span class="linenos">1825</span></a><span class="sd">    Browse the documentation for more functionality. The display functions are particularly useful.</span>
 </span><span id="L-1826"><a href="#L-1826"><span class="linenos">1826</span></a><span class="sd">    &#39;&#39;&#39;</span>
@@ -2366,56 +2363,12 @@ Last revision: 2/4/2023</p>
 </span><span id="L-2124"><a href="#L-2124"><span class="linenos">2124</span></a>        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
 </span><span id="L-2125"><a href="#L-2125"><span class="linenos">2125</span></a>    <span class="k">return</span> <span class="kc">True</span>
 </span><span id="L-2126"><a href="#L-2126"><span class="linenos">2126</span></a>
-</span><span id="L-2127"><a href="#L-2127"><span class="linenos">2127</span></a><span class="sd">&#39;&#39;&#39;&#39;&#39;&#39;</span>
-</span><span id="L-2128"><a href="#L-2128"><span class="linenos">2128</span></a>
-</span><span id="L-2129"><a href="#L-2129"><span class="linenos">2129</span></a><span class="k">def</span> <span class="nf">Check_chains</span><span class="p">(</span><span class="n">pdbid</span><span class="p">,</span> <span class="n">pdbdir</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="L-2130"><a href="#L-2130"><span class="linenos">2130</span></a>    <span class="sd">&#39;&#39;&#39;</span>
-</span><span id="L-2131"><a href="#L-2131"><span class="linenos">2131</span></a><span class="sd">    Returns True if structure has multiple chains of identical length,</span>
-</span><span id="L-2132"><a href="#L-2132"><span class="linenos">2132</span></a><span class="sd">    False otherwise. Primarily internal use.</span>
-</span><span id="L-2133"><a href="#L-2133"><span class="linenos">2133</span></a>
-</span><span id="L-2134"><a href="#L-2134"><span class="linenos">2134</span></a><span class="sd">    :param pdbid: PDBID identifier</span>
-</span><span id="L-2135"><a href="#L-2135"><span class="linenos">2135</span></a><span class="sd">    :param pdbdir: PDB directory containing structures</span>
-</span><span id="L-2136"><a href="#L-2136"><span class="linenos">2136</span></a><span class="sd">    :param verbose: Verbosity, defaults to True</span>
-</span><span id="L-2137"><a href="#L-2137"><span class="linenos">2137</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-2138"><a href="#L-2138"><span class="linenos">2138</span></a>    <span class="n">parser</span> <span class="o">=</span> <span class="n">PDBParser</span><span class="p">(</span><span class="n">PERMISSIVE</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="L-2139"><a href="#L-2139"><span class="linenos">2139</span></a>    <span class="n">structure</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">pdbid</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">pdbdir</span><span class="si">}</span><span class="s1">pdb</span><span class="si">{</span><span class="n">pdbid</span><span class="si">}</span><span class="s1">.ent&#39;</span><span class="p">)</span>
-</span><span id="L-2140"><a href="#L-2140"><span class="linenos">2140</span></a>    
-</span><span id="L-2141"><a href="#L-2141"><span class="linenos">2141</span></a>    <span class="c1"># dictionary of tuples with SSBond prox and distal</span>
-</span><span id="L-2142"><a href="#L-2142"><span class="linenos">2142</span></a>    <span class="n">ssbond_dict</span> <span class="o">=</span> <span class="n">structure</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;ssbond&#39;</span><span class="p">]</span>
-</span><span id="L-2143"><a href="#L-2143"><span class="linenos">2143</span></a>    
-</span><span id="L-2144"><a href="#L-2144"><span class="linenos">2144</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-2145"><a href="#L-2145"><span class="linenos">2145</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ssbond dict: </span><span class="si">{</span><span class="n">ssbond_dict</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-</span><span id="L-2146"><a href="#L-2146"><span class="linenos">2146</span></a>
-</span><span id="L-2147"><a href="#L-2147"><span class="linenos">2147</span></a>    <span class="n">same</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="L-2148"><a href="#L-2148"><span class="linenos">2148</span></a>    <span class="n">model</span> <span class="o">=</span> <span class="n">structure</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="L-2149"><a href="#L-2149"><span class="linenos">2149</span></a>    <span class="n">chainlist</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_list</span><span class="p">()</span>
-</span><span id="L-2150"><a href="#L-2150"><span class="linenos">2150</span></a>
-</span><span id="L-2151"><a href="#L-2151"><span class="linenos">2151</span></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chainlist</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-</span><span id="L-2152"><a href="#L-2152"><span class="linenos">2152</span></a>        <span class="n">chain_lens</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-2153"><a href="#L-2153"><span class="linenos">2153</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-2154"><a href="#L-2154"><span class="linenos">2154</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;multiple chains. </span><span class="si">{</span><span class="n">chainlist</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-</span><span id="L-2155"><a href="#L-2155"><span class="linenos">2155</span></a>        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chainlist</span><span class="p">:</span>
-</span><span id="L-2156"><a href="#L-2156"><span class="linenos">2156</span></a>            <span class="n">chain_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">get_list</span><span class="p">())</span>
-</span><span id="L-2157"><a href="#L-2157"><span class="linenos">2157</span></a>            <span class="n">chain_id</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
-</span><span id="L-2158"><a href="#L-2158"><span class="linenos">2158</span></a>            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-2159"><a href="#L-2159"><span class="linenos">2159</span></a>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Chain: </span><span class="si">{</span><span class="n">chain_id</span><span class="si">}</span><span class="s1">, length: </span><span class="si">{</span><span class="n">chain_length</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-</span><span id="L-2160"><a href="#L-2160"><span class="linenos">2160</span></a>            <span class="n">chain_lens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain_length</span><span class="p">)</span>
-</span><span id="L-2161"><a href="#L-2161"><span class="linenos">2161</span></a>
-</span><span id="L-2162"><a href="#L-2162"><span class="linenos">2162</span></a>        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">chain_lens</span><span class="p">)</span> <span class="o">!=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">chain_lens</span><span class="p">):</span>
-</span><span id="L-2163"><a href="#L-2163"><span class="linenos">2163</span></a>            <span class="n">same</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="L-2164"><a href="#L-2164"><span class="linenos">2164</span></a>            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-2165"><a href="#L-2165"><span class="linenos">2165</span></a>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;chain lengths are unequal: </span><span class="si">{</span><span class="n">chain_lens</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-</span><span id="L-2166"><a href="#L-2166"><span class="linenos">2166</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="L-2167"><a href="#L-2167"><span class="linenos">2167</span></a>            <span class="n">same</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="L-2168"><a href="#L-2168"><span class="linenos">2168</span></a>            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-2169"><a href="#L-2169"><span class="linenos">2169</span></a>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Chains are equal length, assuming the same. </span><span class="si">{</span><span class="n">chain_lens</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-</span><span id="L-2170"><a href="#L-2170"><span class="linenos">2170</span></a>    <span class="k">return</span><span class="p">(</span><span class="n">same</span><span class="p">)</span>
-</span><span id="L-2171"><a href="#L-2171"><span class="linenos">2171</span></a>
-</span><span id="L-2172"><a href="#L-2172"><span class="linenos">2172</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="L-2173"><a href="#L-2173"><span class="linenos">2173</span></a>    <span class="kn">import</span> <span class="nn">doctest</span>
-</span><span id="L-2174"><a href="#L-2174"><span class="linenos">2174</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
-</span><span id="L-2175"><a href="#L-2175"><span class="linenos">2175</span></a>
-</span><span id="L-2176"><a href="#L-2176"><span class="linenos">2176</span></a><span class="c1"># End of file</span>
+</span><span id="L-2127"><a href="#L-2127"><span class="linenos">2127</span></a>
+</span><span id="L-2128"><a href="#L-2128"><span class="linenos">2128</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="L-2129"><a href="#L-2129"><span class="linenos">2129</span></a>    <span class="kn">import</span> <span class="nn">doctest</span>
+</span><span id="L-2130"><a href="#L-2130"><span class="linenos">2130</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</span><span id="L-2131"><a href="#L-2131"><span class="linenos">2131</span></a>
+</span><span id="L-2132"><a href="#L-2132"><span class="linenos">2132</span></a><span class="c1"># End of file</span>
 </span></pre></div>
 
 
@@ -6686,8 +6639,8 @@ restart the download without duplicating effort.</p>
 </span><span id="Extract_Disulfides-1820"><a href="#Extract_Disulfides-1820"><span class="linenos">1820</span></a>
 </span><span id="Extract_Disulfides-1821"><a href="#Extract_Disulfides-1821"><span class="linenos">1821</span></a><span class="sd">    Take a screenshot. You can position the orientation, then close the window:</span>
 </span><span id="Extract_Disulfides-1822"><a href="#Extract_Disulfides-1822"><span class="linenos">1822</span></a><span class="sd">    &gt;&gt;&gt; subset.screenshot(style=&#39;sb&#39;, fname=&#39;subset.png&#39;)</span>
-</span><span id="Extract_Disulfides-1823"><a href="#Extract_Disulfides-1823"><span class="linenos">1823</span></a><span class="sd">    Saving file: subset.png</span>
-</span><span id="Extract_Disulfides-1824"><a href="#Extract_Disulfides-1824"><span class="linenos">1824</span></a><span class="sd">    Saved file: subset.png</span>
+</span><span id="Extract_Disulfides-1823"><a href="#Extract_Disulfides-1823"><span class="linenos">1823</span></a><span class="sd">    ---&gt; screenshot(): Saving file: subset.png</span>
+</span><span id="Extract_Disulfides-1824"><a href="#Extract_Disulfides-1824"><span class="linenos">1824</span></a><span class="sd">    ---&gt; screenshot(): Saved file: subset.png</span>
 </span><span id="Extract_Disulfides-1825"><a href="#Extract_Disulfides-1825"><span class="linenos">1825</span></a>
 </span><span id="Extract_Disulfides-1826"><a href="#Extract_Disulfides-1826"><span class="linenos">1826</span></a><span class="sd">    Browse the documentation for more functionality. The display functions are particularly useful.</span>
 </span><span id="Extract_Disulfides-1827"><a href="#Extract_Disulfides-1827"><span class="linenos">1827</span></a><span class="sd">    &#39;&#39;&#39;</span>
@@ -6954,8 +6907,8 @@ reference frame (the proximal N, Cα, C').</p>
 
 <div class="pdoc-code codehilite">
 <pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">subset</span><span class="o">.</span><span class="n">screenshot</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s1">&#39;sb&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s1">&#39;subset.png&#39;</span><span class="p">)</span>
-<span class="go">Saving file: subset.png</span>
-<span class="go">Saved file: subset.png</span>
+<span class="go">---&gt; screenshot(): Saving file: subset.png</span>
+<span class="go">---&gt; screenshot(): Saved file: subset.png</span>
 </code></pre>
 </div>
 
@@ -7255,76 +7208,6 @@ Assumes the file is downloaded in <code>MODEL_DIR</code> path.</p>
 <span class="go">True</span>
 </code></pre>
 </div>
-</div>
-
-
-                </section>
-                <section id="Check_chains">
-                            <input id="Check_chains-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">Check_chains</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">pdbid</span>, </span><span class="param"><span class="n">pdbdir</span>, </span><span class="param"><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="Check_chains-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#Check_chains"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Check_chains-2130"><a href="#Check_chains-2130"><span class="linenos">2130</span></a><span class="k">def</span> <span class="nf">Check_chains</span><span class="p">(</span><span class="n">pdbid</span><span class="p">,</span> <span class="n">pdbdir</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="Check_chains-2131"><a href="#Check_chains-2131"><span class="linenos">2131</span></a>    <span class="sd">&#39;&#39;&#39;</span>
-</span><span id="Check_chains-2132"><a href="#Check_chains-2132"><span class="linenos">2132</span></a><span class="sd">    Returns True if structure has multiple chains of identical length,</span>
-</span><span id="Check_chains-2133"><a href="#Check_chains-2133"><span class="linenos">2133</span></a><span class="sd">    False otherwise. Primarily internal use.</span>
-</span><span id="Check_chains-2134"><a href="#Check_chains-2134"><span class="linenos">2134</span></a>
-</span><span id="Check_chains-2135"><a href="#Check_chains-2135"><span class="linenos">2135</span></a><span class="sd">    :param pdbid: PDBID identifier</span>
-</span><span id="Check_chains-2136"><a href="#Check_chains-2136"><span class="linenos">2136</span></a><span class="sd">    :param pdbdir: PDB directory containing structures</span>
-</span><span id="Check_chains-2137"><a href="#Check_chains-2137"><span class="linenos">2137</span></a><span class="sd">    :param verbose: Verbosity, defaults to True</span>
-</span><span id="Check_chains-2138"><a href="#Check_chains-2138"><span class="linenos">2138</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="Check_chains-2139"><a href="#Check_chains-2139"><span class="linenos">2139</span></a>    <span class="n">parser</span> <span class="o">=</span> <span class="n">PDBParser</span><span class="p">(</span><span class="n">PERMISSIVE</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="Check_chains-2140"><a href="#Check_chains-2140"><span class="linenos">2140</span></a>    <span class="n">structure</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="n">pdbid</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">pdbdir</span><span class="si">}</span><span class="s1">pdb</span><span class="si">{</span><span class="n">pdbid</span><span class="si">}</span><span class="s1">.ent&#39;</span><span class="p">)</span>
-</span><span id="Check_chains-2141"><a href="#Check_chains-2141"><span class="linenos">2141</span></a>    
-</span><span id="Check_chains-2142"><a href="#Check_chains-2142"><span class="linenos">2142</span></a>    <span class="c1"># dictionary of tuples with SSBond prox and distal</span>
-</span><span id="Check_chains-2143"><a href="#Check_chains-2143"><span class="linenos">2143</span></a>    <span class="n">ssbond_dict</span> <span class="o">=</span> <span class="n">structure</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;ssbond&#39;</span><span class="p">]</span>
-</span><span id="Check_chains-2144"><a href="#Check_chains-2144"><span class="linenos">2144</span></a>    
-</span><span id="Check_chains-2145"><a href="#Check_chains-2145"><span class="linenos">2145</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Check_chains-2146"><a href="#Check_chains-2146"><span class="linenos">2146</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;ssbond dict: </span><span class="si">{</span><span class="n">ssbond_dict</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-</span><span id="Check_chains-2147"><a href="#Check_chains-2147"><span class="linenos">2147</span></a>
-</span><span id="Check_chains-2148"><a href="#Check_chains-2148"><span class="linenos">2148</span></a>    <span class="n">same</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="Check_chains-2149"><a href="#Check_chains-2149"><span class="linenos">2149</span></a>    <span class="n">model</span> <span class="o">=</span> <span class="n">structure</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</span><span id="Check_chains-2150"><a href="#Check_chains-2150"><span class="linenos">2150</span></a>    <span class="n">chainlist</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_list</span><span class="p">()</span>
-</span><span id="Check_chains-2151"><a href="#Check_chains-2151"><span class="linenos">2151</span></a>
-</span><span id="Check_chains-2152"><a href="#Check_chains-2152"><span class="linenos">2152</span></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chainlist</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-</span><span id="Check_chains-2153"><a href="#Check_chains-2153"><span class="linenos">2153</span></a>        <span class="n">chain_lens</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="Check_chains-2154"><a href="#Check_chains-2154"><span class="linenos">2154</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Check_chains-2155"><a href="#Check_chains-2155"><span class="linenos">2155</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;multiple chains. </span><span class="si">{</span><span class="n">chainlist</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-</span><span id="Check_chains-2156"><a href="#Check_chains-2156"><span class="linenos">2156</span></a>        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chainlist</span><span class="p">:</span>
-</span><span id="Check_chains-2157"><a href="#Check_chains-2157"><span class="linenos">2157</span></a>            <span class="n">chain_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">get_list</span><span class="p">())</span>
-</span><span id="Check_chains-2158"><a href="#Check_chains-2158"><span class="linenos">2158</span></a>            <span class="n">chain_id</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
-</span><span id="Check_chains-2159"><a href="#Check_chains-2159"><span class="linenos">2159</span></a>            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Check_chains-2160"><a href="#Check_chains-2160"><span class="linenos">2160</span></a>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Chain: </span><span class="si">{</span><span class="n">chain_id</span><span class="si">}</span><span class="s1">, length: </span><span class="si">{</span><span class="n">chain_length</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-</span><span id="Check_chains-2161"><a href="#Check_chains-2161"><span class="linenos">2161</span></a>            <span class="n">chain_lens</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain_length</span><span class="p">)</span>
-</span><span id="Check_chains-2162"><a href="#Check_chains-2162"><span class="linenos">2162</span></a>
-</span><span id="Check_chains-2163"><a href="#Check_chains-2163"><span class="linenos">2163</span></a>        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">chain_lens</span><span class="p">)</span> <span class="o">!=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">chain_lens</span><span class="p">):</span>
-</span><span id="Check_chains-2164"><a href="#Check_chains-2164"><span class="linenos">2164</span></a>            <span class="n">same</span> <span class="o">=</span> <span class="kc">False</span>
-</span><span id="Check_chains-2165"><a href="#Check_chains-2165"><span class="linenos">2165</span></a>            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Check_chains-2166"><a href="#Check_chains-2166"><span class="linenos">2166</span></a>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;chain lengths are unequal: </span><span class="si">{</span><span class="n">chain_lens</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-</span><span id="Check_chains-2167"><a href="#Check_chains-2167"><span class="linenos">2167</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="Check_chains-2168"><a href="#Check_chains-2168"><span class="linenos">2168</span></a>            <span class="n">same</span> <span class="o">=</span> <span class="kc">True</span>
-</span><span id="Check_chains-2169"><a href="#Check_chains-2169"><span class="linenos">2169</span></a>            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Check_chains-2170"><a href="#Check_chains-2170"><span class="linenos">2170</span></a>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Chains are equal length, assuming the same. </span><span class="si">{</span><span class="n">chain_lens</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-</span><span id="Check_chains-2171"><a href="#Check_chains-2171"><span class="linenos">2171</span></a>    <span class="k">return</span><span class="p">(</span><span class="n">same</span><span class="p">)</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Returns True if structure has multiple chains of identical length,
-False otherwise. Primarily internal use.</p>
-
-<h6 id="parameters">Parameters</h6>
-
-<ul>
-<li><strong>pdbid</strong>:  PDBID identifier</li>
-<li><strong>pdbdir</strong>:  PDB directory containing structures</li>
-<li><strong>verbose</strong>:  Verbosity, defaults to True</li>
-</ul>
 </div>
 
 

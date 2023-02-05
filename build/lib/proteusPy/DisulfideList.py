@@ -28,10 +28,10 @@ from tqdm import tqdm
 import proteusPy
 from proteusPy import *
 from proteusPy.atoms import *
-from proteusPy.utility import grid_dimensions, distance_squared, cmap_vector
+from proteusPy.utility import grid_dimensions, cmap_vector
 from proteusPy import Disulfide
 
-_PBAR_COLS = 100
+_PBAR_COLS = 105
 
 Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', \
            'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
