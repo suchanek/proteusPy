@@ -206,9 +206,9 @@ class DisulfideList(UserList):
     
     def Avg_Distance(self):
         '''
-        Return the Average distance (A) between the atoms in the list.
+        Return the Average distance (Å) between the atoms in the list.
 
-        :return: Average distance (A) between all atoms in the list
+        :return: Average distance (Å) between all atoms in the list
 
         '''
         sslist = self.data
@@ -229,7 +229,7 @@ class DisulfideList(UserList):
         '''
         Return the Average energy (kcal/mol) for the Disulfides in the list.
 
-        :return: Average distance (A) between all atoms in the list
+        :return: Average energy (kcal/mol) between all atoms in the list
 
         '''
         sslist = self.data
@@ -272,7 +272,7 @@ class DisulfideList(UserList):
     
     def build_distance_df(self) -> pd.DataFrame:
         """
-        Create a dataframe containing the input DisulfideList ca-ca distance, energy. 
+        Create a dataframe containing the input DisulfideList Cα-Cα distance, energy. 
         This can take several minutes for the entire database.
 
         :return: DataFrame containing Ca distances
