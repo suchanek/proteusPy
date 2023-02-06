@@ -686,7 +686,11 @@ class DisulfideList(UserList):
                     distal, quiet=quiet)
                     SSList.append(new_ss)
             i += 1
-        return copy.deepcopy(SSList)
+
+        self.data = copy.deepcopy(SSList)
+        self.pdb_id = struct_name
+
+        return
 
     def min(self):
         '''

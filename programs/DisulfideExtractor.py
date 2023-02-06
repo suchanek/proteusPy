@@ -30,7 +30,7 @@ REPO_DATA = '/Users/egs/repos/proteusPy/data/'
 MODULE_DATA = '/Users/egs/repos/proteusPy/proteusPy/data/'
 
 # location of the compressed Disulfide .pkl files
-DATA = f'{PDB_BASE}data/'
+DATA_DIR = f'{PDB_BASE}data/'
 
 # setting up specific pkl files for a small extraction.
 # you must use these exact names, regardless of the number
@@ -50,26 +50,28 @@ start = time.time()
 # the correct filenames to be read as 'subset'. Do not change the filenames
 # defined above
 
-Extract_Disulfides(numb=1000, pdbdir=PDB, datadir=DATA,
+Extract_Disulfides(numb=1000, pdbdir=PDB, datadir=DATA_DIR,
                 dictfile=_SS_DICT_PICKLE_FILE,
                 picklefile=_SS_PICKLE_FILE,
                 torsionfile=_SS_TORSIONS_FILE,
                 problemfile=_PROBLEM_ID_FILE,
-                verbose=False, quiet=True)
+                verbose=False, quiet=True,
+                dist_cutoff=9.0)
 
 # total extraction uses numb=-1 and takes about 1.5 hours on
 # my 2021 MacbookPro M1 Pro computer.
 # Extract_Disulfides(numb=-1, pdbdir=PDB, datadir=DATA,
 #                 verbose=False, quiet=True)
 
-Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB, datadir=DATA)
+Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB, 
+                datadir=DATA_DIR, dist_cutoff=9.0)
 
 update = False
 
 if update:
-    print(f'Copying: {DATA} to {MODULE_DATA}')
+    print(f'Copying: {DATA_DIR} to {MODULE_DATA}')
     # copytree(DATA, MODULE_DATA, dirs_exist_ok=True, ignore=ignore_patterns('*_all_*'))
-    copytree(DATA, MODULE_DATA, dirs_exist_ok=True)
+    copytree(DATA_DIR, MODULE_DATA, dirs_exist_ok=True)
 
 end = time.time()
 

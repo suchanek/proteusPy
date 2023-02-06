@@ -56,4 +56,6 @@ def DisulfideLoader(ssfilename='./ss_ids.txt'):
 
     print(f'Overall count processed: {count}')
 
+os.chdir(PDB_DIR)
+DisulfideLoader()
 #
