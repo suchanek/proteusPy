@@ -197,7 +197,7 @@ class DisulfideList(UserList):
                     ss = ssList[i]
                     src = ss.pdb_id
                     enrg = ss.energy
-                    title = f'{src} {name}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Cα: {ss.ca_distance:.2f} Å Tors: {ss.torsion_length:.2f}'
+                    title = f'{src} {name}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f} Cα: {ss.ca_distance:.2f} Å Tors: {ss.torsion_length:.2f}'
                     pl.add_title(title=title, font_size=FONTSIZE)
                     ss._render(pl, style=style, bondcolor=BOND_COLOR, bs_scale=BS_SCALE, 
                             spec=SPECULARITY, specpow=SPEC_POWER)
@@ -569,7 +569,8 @@ class DisulfideList(UserList):
                             model_numb = 0, 
                             verbose = False,
                             quiet=False,
-                            dbg = False) -> list:
+                            dbg = False
+                            ):
         '''
         Loads the Disulfides by PDB ID and initializes ```self``` with the list of Disulfide objects.
         Assumes the file is downloaded in the pdb_dir path.
