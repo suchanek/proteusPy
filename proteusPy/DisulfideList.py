@@ -571,7 +571,7 @@ class DisulfideList(UserList):
                             quiet=False,
                             dbg = False) -> list:
         '''
-        Loads the Disulfides by PDB ID and initializes the Disulfide objects.
+        Loads the Disulfides by PDB ID and initializes ```self``` with the list of Disulfide objects.
         Assumes the file is downloaded in the pdb_dir path.
         
         *NB:* Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython
@@ -589,7 +589,7 @@ class DisulfideList(UserList):
         To load the Disulfides from the PDB ID 5rsa we'd use the following:
         
         >>> from proteusPy.DisulfideList import DisulfideList        
-        >>> SSlist = DisulfideList([],'ss')
+        >>> SSlist = DisulfideList([],'5rsa')
         >>> SSlist.load_disulfides_from_id('5rsa', verbose=False)
         [<Disulfide 5rsa_26A_84A SourceID: 5rsa Proximal: 26 A Distal: 84 A>, <Disulfide 5rsa_40A_95A SourceID: 5rsa Proximal: 40 A Distal: 95 A>, <Disulfide 5rsa_58A_110A SourceID: 5rsa Proximal: 58 A Distal: 110 A>, <Disulfide 5rsa_65A_72A SourceID: 5rsa Proximal: 65 A Distal: 72 A>]
         '''
@@ -628,7 +628,7 @@ class DisulfideList(UserList):
                 chain2_id = pair[3]
 
                 if not proximal.isnumeric() or not distal.isnumeric():
-                    mess = f' -> Cannot parse SSBond record (non-numeric IDs):\
+                    mess = f' -> load_disulfides_from_id(): Cannot parse SSBond record (non-numeric IDs):\
                     {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring.'
                     warnings.warn(mess, DisulfideConstructionWarning)
                     continue
@@ -637,7 +637,7 @@ class DisulfideList(UserList):
                     distal = int(distal)
                 
                 if proximal == distal:
-                    mess = f' -> Cannot parse SSBond record (proximal == distal):\
+                    mess = f' -> load_disulfides_from_id(): Cannot parse SSBond record (proximal == distal):\
                     {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring.'
                     warnings.warn(mess, DisulfideConstructionWarning)
                     continue
@@ -646,17 +646,17 @@ class DisulfideList(UserList):
                 _chainb = model[chain2_id]
 
                 if (_chaina is None) or (_chainb is None):
-                    mess = f' -> NULL chain(s): {struct_name}: {proximal} {chain1_id}\
+                    mess = f' -> load_disulfides_from_id(): NULL chain(s): {struct_name}: {proximal} {chain1_id}\
                     - {distal} {chain2_id}, ignoring!'
                     warnings.warn(mess, DisulfideConstructionWarning)
                     continue
 
                 if (chain1_id != chain2_id):
                     if verbose:
-                        mess = (f' -> Cross Chain SS for: Prox: {proximal} {chain1_id}\
+                        mess = (f' -> load_disulfides_from_id(): Cross Chain SS for: Prox: {proximal} {chain1_id}\
                         Dist: {distal} {chain2_id}')
                         warnings.warn(mess, DisulfideConstructionWarning)
-                        pass # was break
+                    pass # was break
 
                 try:
                     prox_res = _chaina[proximal]
@@ -682,8 +682,7 @@ class DisulfideList(UserList):
                         - {distal} {chain2_id}')
                     ssbond_name = f'{struct_name}_{proximal}{chain1_id}_{distal}{chain2_id}'       
                     new_ss = proteusPy.Disulfide.Disulfide(ssbond_name)
-                    new_ss.initialize_disulfide_from_chain(_chaina, _chainb, proximal,
-                    distal, quiet=quiet)
+                    new_ss.initialize_disulfide_from_chain(_chaina, _chainb, proximal, distal, quiet=quiet)
                     SSList.append(new_ss)
             i += 1
 

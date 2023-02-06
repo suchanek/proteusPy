@@ -1857,7 +1857,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
 
     # loop over ss_filelist, create disulfides and initialize them
     for entry in pbar:
-        pbar.set_postfix({'ID': entry, 'Bad': bad}) # update the progress bar
+        pbar.set_postfix({'ID': entry, 'Bad': bad, 'Ca': bad_dist}) # update the progress bar
 
         # returns an empty list if none are found.
         sslist = DisulfideList([], entry)
@@ -1907,7 +1907,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
 
     # dump the all_ss array of disulfides to a .pkl file. ~520 MB.
     fname = f'{datadir}{picklefile}'
-    print(f'Saving {len(All_ss_list)} Disulfides to file: {fname}')
+    print(f'-> Extract_Disulfides(): Saving {len(All_ss_list)} Disulfides to file: {fname}')
     
     with open(fname, 'wb+') as f:
         pickle.dump(All_ss_list, f)
@@ -1916,21 +1916,21 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     dict_len = len(All_ss_dict)
     fname = f'{datadir}{dictfile}'
 
-    print(f'Saving {len(All_ss_dict)} Disulfide-containing PDB IDs to file: {fname}')
+    print(f'-> Extract_Disulfides(): Saving {len(All_ss_dict)} Disulfide-containing PDB IDs to file: {fname}')
 
     with open(fname, 'wb+') as f:
         pickle.dump(All_ss_dict, f)
 
     # save the torsions
     fname = f'{datadir}{torsionfile}'
-    print(f'Saving torsions to file: {fname}')
+    print(f'-> Extract_Disulfides(): Saving torsions to file: {fname}')
 
     SS_df.to_csv(fname)
 
     end = time.time()
     elapsed = end - start
 
-    print(f'Disulfide Extraction complete! Elapsed time:\
+    print(f'-> Extract_Disulfides(): Disulfide Extraction complete! Elapsed time:\
     	 {datetime.timedelta(seconds=elapsed)} (h:m:s)')
 
     # return to original directory
