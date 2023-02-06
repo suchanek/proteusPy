@@ -1013,7 +1013,7 @@ class Disulfide:
         self.chi4 = numpy.degrees(calc_dihedral(sg1, sg2, cb2, ca2))
         self.chi5 = numpy.degrees(calc_dihedral(sg2, cb2, ca2, n2))
 
-        self.ca_distance = proteusPy.distance3d(self.ca_prox, self.ca_dist)
+        self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
         self.torsion_array = numpy.array((self.chi1, self.chi2, self.chi3, 
                                         self.chi4, self.chi5))
         self.torsion_length = self.Torsion_length()
@@ -1676,17 +1676,20 @@ def Download_Disulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR,
     os.chdir(cwd)
     return
 
-
 def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR, 
                         datadir=MODEL_DIR, picklefile=SS_PICKLE_FILE, 
                         torsionfile=SS_TORSIONS_FILE, 
                         problemfile=PROBLEM_ID_FILE,
-                        dictfile=SS_DICT_PICKLE_FILE) -> None:
+                        dictfile=SS_DICT_PICKLE_FILE,
+                        dist_cutoff=-1.0) -> None:
     '''
-    This function creates .pkl files needed for the proteusPy.DisulfideLoader.DisulfideLoader class. 
+    This function creates .pkl files needed for the 
+    proteusPy.DisulfideLoader.DisulfideLoader class. 
     The Disulfide objects are contained in a DisulfideList object and 
     Dict within these files. In addition, .csv files containing all of 
-    the torsions for the disulfides and problem IDs are written.
+    the torsions for the disulfides and problem IDs are written. The optional
+    dist_cutoff allows for removal of Disufides whose Cα-Cα distance is >
+    than the cutoff value. If it's -1 then keep all Disulfides.
 
     :param numb:           number of entries to process, defaults to all
     :param verbose:        more messages
@@ -1697,6 +1700,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     :param torsionfile:    name of the disulfide torsion file .csv created
     :param problemfile:    name of the .csv file containing problem ids
     :param dictfile:       name of the .pkl file
+    :param dist_cutoff:    Ca distance cutoff to reject a Disulfide.
     
     The following examples illustrate some basic functions of the disulfide classes:
 
@@ -1810,7 +1814,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
 
     entrylist = []
     problem_ids = []
-    bad = 0
+    bad = bad_dist = 0
 
     # we use the specialized list class DisulfideList to contain our disulfides
     # we'll use a dict to store DisulfideList objects, indexed by the structure ID
@@ -1861,6 +1865,12 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
         								 quiet=quiet, pdb_dir=pdbdir)
         if len(sslist) > 0:
             for ss in sslist:
+                dist = ss.ca_distance
+                # Ca distance cutoff
+                if dist >= dist_cutoff and dist_cutoff != -1.0:
+                    bad_dist += 1
+                    continue
+
                 All_ss_list.append(ss)
                 new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, 
                 		  ss.chi1, ss.chi2, ss.chi3, ss.chi4, ss.chi5, 
@@ -1874,21 +1884,27 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
             # at this point I really shouldn't have any bad non-parsible file
             bad += 1
             problem_ids.append(entry)
-            os.remove(f'pdb{entry}.ent')
+            #os.remove(f'pdb{entry}.ent')
     
     if bad > 0:
         prob_cols = ['id']
         problem_df = pd.DataFrame(columns=prob_cols)
         problem_df['id'] = problem_ids
 
-        print(f'Found and removed: {len(problem_ids)} problem structures.')
-        print(f'Saving problem IDs to file: {datadir}{problemfile}')
+        print(f'-> Extract_Disulfides(): Found and removed: {len(problem_ids)} non-parsable structures.')
+        print(f'-> Extract_Disulfides(): Saving problem IDs to file: {datadir}{problemfile}')
 
         problem_df.to_csv(f'{datadir}{problemfile}')
     else:
         if verbose:
+            print(': No non-parsable structures found.')
+
+    if bad_dist > 0:
+        print(f'-> Extract_Disulfides(): Found and ignored: {bad_dist} long SS bonds.')
+    else:
+        if verbose:
             print('No problems found.')
-   
+
     # dump the all_ss array of disulfides to a .pkl file. ~520 MB.
     fname = f'{datadir}{picklefile}'
     print(f'Saving {len(All_ss_list)} Disulfides to file: {fname}')
