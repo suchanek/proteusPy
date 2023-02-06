@@ -234,7 +234,7 @@ class Disulfide:
     def _render(self, pvplot: pv.Plotter, style='bs', plain=False,
             bondcolor=BOND_COLOR, bs_scale=BS_SCALE, spec=SPECULARITY, 
             specpow=SPEC_POWER, translate=True,
-            bond_radius=BOND_RADIUS):
+            bond_radius=BOND_RADIUS, res=100):
         '''
         Update the passed pyVista plotter() object with the mesh data for the
         input Disulfide Bond. Used internally
@@ -297,33 +297,23 @@ class Disulfide:
         # returned by ss.get_internal_coords()
         
         def draw_bonds(pvp, bradius=BOND_RADIUS, style='sb', 
-        			   bcolor=BOND_COLOR, missing=True, all_atoms=True):
+        			   bcolor=BOND_COLOR, missing=True, all_atoms=True,
+                       res=100):
             '''
             Generate the appropriate pyVista cylinder objects to represent
             a particular disulfide bond. This utilizes a connection table 
             for the starting and ending atoms and a color table for the 
             bond colors. Used internally.
 
-            Parameters
-            ----------
-            pvp: pyVista.Plotter 
-                input plotter object to be updated
-
-            bradius: float
-                bond radius
-
-            style: str
-                bond style. One of sb, plain, pd
-
-            bcolor: pyvista color
-
-            missing: bool
-                True if atoms are missing, False othersie
+            :param pvp: input plotter object to be updated
+            :param bradius: bond radius
+            :param style: bond style. One of sb, plain, pd
+            :param bcolor: pyvista color
+            :param missing: True if atoms are missing, False othersie
+            :param all_atoms: True if rendering O, False if only backbone rendered
             
-            Returns
-            -------
-            pvp: pyvista.Plotter
-                Updated Plotter object.
+            :return pvp: Updated Plotter object.
+                
             '''
             _bond_conn = numpy.array(
             [
@@ -464,8 +454,8 @@ class Disulfide:
                     cyl = pv.Cylinder(origin, direction, radius=bradius, height=height*2.0) 
                     pvp.add_mesh(cyl, color=orig_col)
                 else:
-                    cyl1 = pv.Cylinder(origin1, direction, radius=bradius, height=height)
-                    cyl2 = pv.Cylinder(origin2, direction, radius=bradius, height=height)
+                    cyl1 = pv.Cylinder(origin1, direction, radius=bradius, height=height, capping=False, resolution=res)
+                    cyl2 = pv.Cylinder(origin2, direction, radius=bradius, height=height, capping=False, resolution=res)
                     pvp.add_mesh(cyl1, color=orig_col)
                     pvp.add_mesh(cyl2, color=dest_col)
         
@@ -525,15 +515,9 @@ class Disulfide:
         object (if PERMISSIVE), or raises it again, this time adding the
         PDB line number to the error message. (private).
 
-        Parameters
-        ----------
-        message : str
-            Error message
-
-        Raises
-        ------
-        DisulfideConstructionException
-            Fatal construction exception.
+        :param message: Error message
+        :raises DisulfideConstructionException: Fatal construction exception.
+            
         '''
         # message = "%s at line %i." % (message)
         message = f'{message}'
@@ -557,10 +541,9 @@ class Disulfide:
 
         Returns
         -------
-        numpy.Array(3,2)
-
-            Array containing the min, max for X, Y, and Z respectively. 
-            Does not currently take the atom's radius into account.
+        :return: numpy.Array(3,2): Array containing the min, max for X, Y, and Z respectively. 
+        Does not currently take the atom's radius into account.
+    
         '''
         res = numpy.zeros(shape=(3, 2))
         xmin, xmax = self.compute_extents('x')
@@ -699,9 +682,8 @@ class Disulfide:
         """
         Compute the internal coordinates for a properly initialized Disulfide Object.
         
-        Arguments: SS initialized Disulfide object
-        
-        Returns: None, modifies internal state of the input
+        :param self: SS initialized Disulfide object
+        :returns: None, modifies internal state of the input
         """
 
         turt = Turtle3D('tmp')
@@ -1585,15 +1567,6 @@ class Disulfide:
 
 # Class defination ends
 
-def name_to_id(fname: str) -> str:
-    '''
-    Returns the PDB ID from the filename.
-
-    :param fname: Complete PDB filename
-    :return: PDB ID
-    '''
-    ent = fname[3:-4]
-    return ent
 
 def parse_ssbond_header_rec(ssbond_dict: dict) -> list:
     '''
@@ -1824,6 +1797,16 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
 
     Browse the documentation for more functionality. The display functions are particularly useful.
     '''
+
+    def name_to_id(fname: str) -> str:
+        '''
+        Returns the PDB ID from the filename.
+
+        :param fname: Complete PDB filename
+        :return: PDB ID
+        '''
+        ent = fname[3:-4]
+        return ent
 
     entrylist = []
     problem_ids = []

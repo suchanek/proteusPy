@@ -269,7 +269,6 @@ class DisulfideList(UserList):
         '''
         self.data.append(self.validate_ss(item))
     
-    
     def build_distance_df(self) -> pd.DataFrame:
         """
         Create a dataframe containing the input DisulfideList Cα-Cα distance, energy. 
@@ -296,7 +295,7 @@ class DisulfideList(UserList):
     def build_torsion_df(self) -> pd.DataFrame:
         '''
         Create a dataframe containing the input DisulfideList torsional parameters,
-        ca-ca distance, energy, and phi-psi angles. This can take a while for the
+        ca-ca distance, energy, and phi-psi angles. This can take several minutes for the
         entire database.
 
         :param SSList: DisulfideList - input list of Disulfides
@@ -367,7 +366,7 @@ class DisulfideList(UserList):
         pl.show()
  
     @property
-    def distance_df(self):
+    def distance_df(self) -> pd.DataFrame:
         return self.build_distance_df()
     
     def display_overlay(self, screenshot=False, movie=False, 
@@ -389,6 +388,15 @@ class DisulfideList(UserList):
         tot_ss = len(ssbonds) # number off ssbonds
         avg_enrg = self.Avg_Energy()
         avg_dist = self.Avg_Distance()
+
+        res = 100
+
+        if tot_ss > 100:
+            res = 60
+        if tot_ss > 200:
+            res = 30
+        if tot_ss > 300:
+            res = 8
 
         title = f'SS List: <{id}>: ({tot_ss} total), Avg. Energy: {avg_enrg:.3f} kcal/mol, Avg Distance: {avg_dist:.3f} Å'
 
@@ -418,11 +426,12 @@ class DisulfideList(UserList):
         brad = brad if tot_ss < 100 else brad * .6
 
         #print(f'Brad: {brad}')
+        pbar = tqdm(range(tot_ss), ncols=_PBAR_COLS)
 
-        for i, ss in zip(range(tot_ss), ssbonds):
+        for i, ss in zip(pbar, ssbonds):
             color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
             ss._render(pl, style='plain', bondcolor=color, translate=False,
-                    bond_radius=brad)
+                    bond_radius=brad, res=res)
 
         pl.reset_camera()
 
