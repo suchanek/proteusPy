@@ -84,7 +84,7 @@ class Disulfide:
     Χ3 > 0°.
 
     * Euclidean length of the dihedral angles (degrees) defined as:
-    $$\\sqrt(\\sum \\chi_{1}^{2} + \\chi_{2}^{2} + \\chi_{3}^{2} + \\chi_{4}^{2} + \\chi_{5}^{2})$$
+    $$\\sqrt(\\chi_{1}^{2} + \\chi_{2}^{2} + \\chi_{3}^{2} + \\chi_{4}^{2} + \\chi_{5}^{2})$$
     * Cα - Cα distance (Å)
     * The previous C' and next N for both the proximal and distal residues. These are needed
     to calculate the backbone dihedral angles Φ and Ψ.
