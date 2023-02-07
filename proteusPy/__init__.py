@@ -6,7 +6,7 @@
 # Copyright (c) 2023 Eric G. Suchanek, PhD., all rights reserved
 # Subject to the MIT public license.
 
-__version__ = "0.30dev"
+__version__ = "0.40dev"
 
 import sys
 import os
