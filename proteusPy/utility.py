@@ -12,6 +12,7 @@ import numpy
 from numpy import linspace
 from matplotlib import cm
 from proteusPy.proteusPyWarning import ProteusPyWarning
+from proteusPy.DisulfideList import DisulfideList
 
 from Bio.PDB.vectors import Vector
 from Bio.PDB import PDBParser
@@ -162,9 +163,55 @@ def Check_chains(pdbid, pdbdir, verbose=True):
                 print(f'Chains are equal length, assuming the same. {chain_lens}')
     return(same)
 
+def extract_firstchain_ss(sslist: DisulfideList, verbose=False) -> DisulfideList:
+    '''
+    Function extracts disulfides from the first chain found in
+
+    :param sslist: Starting SS list
+    :return: Pruned SS list
+    '''
+    id = ''
+    chainlist = []
+    pc = dc = ''
+    res = DisulfideList([], sslist.id)
+    xchain = 0
+
+    # build ist of chains
+    for ss in sslist:
+        pc = ss.proximal_chain
+        dc = ss.distal_chain
+        if pc != dc:
+            xchain += 1
+            if verbose:
+                print(f'Cross chain ss: {ss}')
+        chainlist.append(pc)
+    chain = chainlist[0]
+
+    for ss in sslist:
+        if ss.proximal_chain == chain:
+            res.append(ss)
+    
+    return res, xchain
+
+def prune_extra_ss(sslist: DisulfideList):
+    '''
+    Given a dict of disulfides, check for extra chains, grab only the disulfides from
+    the first chain and return a dict containing only the first chain disulfides
+
+    :param ssdict: input dictionary with disulfides
+    '''
+    xchain = 0
+
+    #print(f'Processing: {ss} with: {sslist}')
+    id = sslist.pdb_id
+    pruned_list = DisulfideList([], id)
+    pruned_list, xchain = extract_firstchain_ss(sslist)
+        
+    return copy.deepcopy(pruned_list), xchain
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
 
 # end of file
-
