@@ -165,14 +165,22 @@ class DisulfideLoader:
         '''
         return copy.deepcopy(self.SSList)
     
-    def getdict(self) -> dict:
+    def getdict(self, id=None) -> DisulfideList:
         '''
-        Return the Disulfide Dict contained in the class.
-
-        :return: Disulfide Dict
-        :rtype: dict
+        Return the Disulfide List contained in the ID.
+        :param id: PDB ID, e.g. '4yys'
+        :return: Disulfide List
         '''
-        return copy.deepcopy(self.SSDict)
+        if id is not None:
+            try:
+                sslist = self.SSDict[id]
+                return copy.deepcopy(sslist)
+            except:
+                mess = f'Invalid index {id}'
+                raise(ProteusPyWarning(mess))
+                return {}
+        else:
+            return copy.deepcopy(self.SSDict)
 
     def getTorsions(self, pdbID=None) -> pd.DataFrame:
         '''
