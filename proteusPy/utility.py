@@ -11,8 +11,10 @@ import math
 import numpy
 from numpy import linspace
 from matplotlib import cm
+
+import proteusPy
 from proteusPy.proteusPyWarning import ProteusPyWarning
-from proteusPy.DisulfideList import DisulfideList
+# from proteusPy.DisulfideList import DisulfideList
 
 from Bio.PDB.vectors import Vector
 from Bio.PDB import PDBParser
@@ -163,7 +165,7 @@ def Check_chains(pdbid, pdbdir, verbose=True):
                 print(f'Chains are equal length, assuming the same. {chain_lens}')
     return(same)
 
-def extract_firstchain_ss(sslist: DisulfideList, verbose=False) -> DisulfideList:
+def extract_firstchain_ss(sslist, verbose=False):
     '''
     Function extracts disulfides from the first chain found in
 
@@ -193,7 +195,7 @@ def extract_firstchain_ss(sslist: DisulfideList, verbose=False) -> DisulfideList
     
     return res, xchain
 
-def prune_extra_ss(sslist: DisulfideList):
+def prune_extra_ss(sslist):
     '''
     Given a dict of disulfides, check for extra chains, grab only the disulfides from
     the first chain and return a dict containing only the first chain disulfides
