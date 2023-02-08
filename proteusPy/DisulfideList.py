@@ -5,7 +5,8 @@ Indexing and slicing are supported, as well as normal list operations like
 with an iterable (tuple, list) and optional name and resolution.
 
 The class can also render disulfides to a pyVista window using the 
-[DisulfideList.display()](DisulfideList.html#DisulfideList.display)
+[DisulfideList.display()](DisulfideList.html#DisulfideList.display) or
+proteusPy.DisulfideList.display() or
 and [DisulfideList.display_overlay()](DisulfideList.html#DisulfideList.display_overlay) method.
 '''
 
