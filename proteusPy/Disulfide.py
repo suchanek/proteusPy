@@ -1611,7 +1611,7 @@ def Download_Disulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR,
     :param model_home: Path for extracted data, defaults to MODEL_DIR
     :param verbose: Verbosity, defaults to False
     :param reset: Reset the downloaded files index. Used to restart the download.
-    :raises DisulfideIOException: _description_
+    :raises DisulfideIOException: I/O error raised when the PDB file is not found.
     '''
     start = time.time()
     donelines = []
@@ -1684,11 +1684,11 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     '''
     This function creates .pkl files needed for the 
     proteusPy.DisulfideLoader.DisulfideLoader class. 
-    The Disulfide objects are contained in a DisulfideList object and 
-    Dict within these files. In addition, .csv files containing all of 
+    The ```Disulfide``` objects are contained in a ```DisulfideList``` object and 
+    ```Dict``` within these files. In addition, .csv files containing all of 
     the torsions for the disulfides and problem IDs are written. The optional
-    dist_cutoff allows for removal of Disufides whose Cα-Cα distance is >
-    than the cutoff value. If it's -1 then keep all Disulfides.
+    ```dist_cutoff``` allows for removal of Disufides whose Cα-Cα distance is >
+    than the cutoff value. If it's -1.0 then the function keeps all Disulfides.
 
     :param numb:           number of entries to process, defaults to all
     :param verbose:        more messages

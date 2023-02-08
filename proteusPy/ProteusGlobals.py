@@ -5,7 +5,7 @@
 import os
 
 PDB_DIR = os.getenv('PDB')
-MODEL_DIR = f'{PDB_DIR}/good/'
+MODEL_DIR = f'{PDB_DIR}good/'
 # global for initialization of dihedrals and energies
 
 ORIENT_BACKBONE = 2
