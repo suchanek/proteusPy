@@ -59,7 +59,7 @@ class DisulfideList(UserList):
     Instantiate some variables. Note: the list is initialized with an iterable and a name (optional)
 
     >>> SS = Disulfide('tmp')
-    >>> SSlist = DisulfideList([],'ss')
+    >>> SSlist = DisulfideList([],'ss', 2.5)
     >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)  # load the Disulfide database
     >>> SS = PDB_SS[0]
     >>> SS
@@ -132,7 +132,7 @@ class DisulfideList(UserList):
     >>> subset.display_overlay()
     '''
     
-    def __init__(self, iterable, id: str):
+    def __init__(self, iterable, id: str, res=-1.0):
         '''
         Initialize the DisulfideList
 
@@ -156,6 +156,7 @@ class DisulfideList(UserList):
         '''
         
         self.pdb_id = id
+        self.res = res
         super().__init__(self.validate_ss(item) for item in iterable)
 
     def __getitem__(self, item):
@@ -358,8 +359,8 @@ class DisulfideList(UserList):
             pv.set_plot_theme('dark')
 
         pl = pv.Plotter()
-        pl.add_camera_orientation_widget()
         pl = self._render(style)
+        pl.add_camera_orientation_widget()
         pl.enable_anti_aliasing('msaa')
         pl.link_views()
         pl.reset_camera()
@@ -388,6 +389,7 @@ class DisulfideList(UserList):
         tot_ss = len(ssbonds) # number off ssbonds
         avg_enrg = self.Avg_Energy()
         avg_dist = self.Avg_Distance()
+        resolution = self.resolution
 
         res = 100
 
@@ -398,7 +400,7 @@ class DisulfideList(UserList):
         if tot_ss > 300:
             res = 8
 
-        title = f'SS List: <{id}>: ({tot_ss} total), Avg. Energy: {avg_enrg:.3f} kcal/mol, Avg Distance: {avg_dist:.3f} Å'
+        title = f'<{id}> {resolution} Å: ({tot_ss} SS), Avg. Energy: {avg_enrg:.3f} kcal/mol, Avg Distance: {avg_dist:.3f} Å'
 
         if light:
             pv.set_plot_theme('document')
@@ -412,6 +414,8 @@ class DisulfideList(UserList):
 
         pl.add_title(title=title, font_size=FONTSIZE)
         pl.enable_anti_aliasing('msaa')
+        pl.add_camera_orientation_widget()
+
         pl.add_axes()
 
         mycol = numpy.zeros(shape=(tot_ss, 3))
@@ -548,7 +552,22 @@ class DisulfideList(UserList):
         '''
         self.pdb_id = value
     
+    @property
+    def resolution(self):
+        '''
+        Resolution of the parent sturcture (A)
+        '''
+        return(self.res)
+    
+    @resolution.setter
+    def resolution(self, value):
+        '''
+        Set the resolution of the list
 
+        :param value: Resolution (A)
+        '''
+        self.res = value
+    
     def insert(self, index, item):
         '''
         Insert a Disulfide into the list at the specified index
@@ -592,6 +611,7 @@ class DisulfideList(UserList):
         >>> from proteusPy.DisulfideList import DisulfideList        
         >>> SSlist = DisulfideList([],'5rsa')
         >>> SSlist.load_disulfides_from_id('5rsa', verbose=False)
+        >>> SSlist
         [<Disulfide 5rsa_26A_84A SourceID: 5rsa Proximal: 26 A Distal: 84 A>, <Disulfide 5rsa_40A_95A SourceID: 5rsa Proximal: 40 A Distal: 95 A>, <Disulfide 5rsa_58A_110A SourceID: 5rsa Proximal: 58 A Distal: 110 A>, <Disulfide 5rsa_65A_72A SourceID: 5rsa Proximal: 65 A Distal: 72 A>]
         '''
 
@@ -613,6 +633,9 @@ class DisulfideList(UserList):
             print(f'-> load_disulfide_from_id() - Parsing structure: {struct_name}:')
 
         ssbond_dict = structure.header['ssbond'] # NB: this requires the modified code
+        resolution = structure.header['resolution']
+        if resolution is not None:
+            SSList.resolution = resolution
 
         # list of tuples with (proximal distal chaina chainb)
         ssbonds = proteusPy.Disulfide.parse_ssbond_header_rec(ssbond_dict) 

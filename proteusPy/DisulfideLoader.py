@@ -8,7 +8,7 @@ Author: Eric G. Suchanek, PhD.
 '''
 
 # Author: Eric G. Suchanek, PhD.
-# Last modification: 1/22/23
+# Last modification: 2/7/23
 
 import sys
 import copy
@@ -81,7 +81,8 @@ class DisulfideLoader:
         self.IDList = []
         self.QUIET = quiet
         
-        # create a dataframe with the following columns for the disulfide conformations extracted from the structure
+        # create a dataframe with the following columns for the disulfide conformations 
+        # extracted from the structure
         # Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 
         # 'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist', 'psi_dist']
         
