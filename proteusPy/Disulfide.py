@@ -768,7 +768,7 @@ class Disulfide:
             * 'cpk' - CPK style
             * 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
             * 'plain' - boring single color
-        :light: If True, light background, if False, dark
+        :param light: If True, light background, if False, dark
 
         Example:
         >>> import proteusPy
@@ -1145,7 +1145,7 @@ class Disulfide:
 
         pl.add_title(title=title, font_size=FONTSIZE)
         pl.enable_anti_aliasing('msaa')
-        pl.add_camera_orientation_widget()
+        # pl.add_camera_orientation_widget()
         pl = self._render(pl, style=style, bondcolor=BOND_COLOR, 
                     bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
         pl.reset_camera()
@@ -1939,7 +1939,6 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
 
 def check_header_from_file(filename: str, model_numb = 0, 
                             verbose = False, dbg = False) -> bool:
-
     '''
     Checks the Disulfides by PDB ID and initializes the Disulfide objects.
     Assumes the file is downloaded in the pdb_dir path.
@@ -1950,7 +1949,7 @@ def check_header_from_file(filename: str, model_numb = 0,
     :param pdb_dir: path to the PDB files, defaults to ```MODEL_DIR```
     :param model_numb: model number to use, defaults to 0 for single structure files.
     :param verbose: print info while parsing
-    :return: a list of Disulfide objects initialized from the file.
+    :return: True if parsable
     
     Example:
       Assuming ```MODEL_DIR``` has the pdb5rsa.ent file we can load the disulfides
@@ -2025,8 +2024,8 @@ def check_header_from_file(filename: str, model_numb = 0,
             dist_res = _chainb[distal]
         except KeyError:
             print(f' ! Cannot parse SSBond record (KeyError): {struct_name} Prox: <{proximal}> {chain1_id} Dist: <{distal}> {chain2_id}')
-            continue
-         
+            return False
+        
         # make a new Disulfide object, name them based on proximal and distal
         # initialize SS bond from the proximal, distal coordinates
         if (_chaina is not None) and (_chainb is not None):
