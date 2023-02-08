@@ -781,10 +781,9 @@ class Disulfide:
         >>> ss.screenshot(style='bs', fname='proteus_logo_sb.png')
         '''
         src = self.pdb_id
-        name = self.name
         enrg = self.energy
 
-        title = f'{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Tors: {self.torsion_length:.2f}°'
+        title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Tors: {self.torsion_length:.2f}°'
 
         if light:
             pv.set_plot_theme('document')
