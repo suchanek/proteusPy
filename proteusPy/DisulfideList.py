@@ -4,14 +4,11 @@ Indexing and slicing are supported, as well as normal list operations like
 ``.insert()``, ``.append()`` and ``.extend().`` The DisulfideList object is initialized 
 with an iterable (tuple, list) and optional name and resolution.
 
-The class can also render Disulfides to a pyVista window using the 
-[DisulfideList.display()](disulfidelist.html#DisulfideList.display)
-and [DisulfideList.display_overlay()](disulfidelist.html#DisulfideList.display_overlay)  method.
+The class can also render disulfides to a pyVista window using the 
+[DisulfideList.display()](DisulfideList.html#DisulfideList.display)
+and [DisulfideList.display_overlay()](DisulfideList.html#DisulfideList.display_overlay) method.
 '''
-# [proteusPy.Turtle3D](turtle3D.html)
-# DisulfideList Class definition
-# I extend UserList to handle lists of Disulfide objects.
-# Indexing and slicing are supported, sorting is based on energy
+
 # Author Eric G. Suchanek, PhD
 # A part of the proteusPy molecular modeling and analysis suite by
 # Eric G. Suchanek, PhD
