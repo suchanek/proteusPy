@@ -33,6 +33,7 @@ from .residue import build_residue, get_backbone_from_chain, to_alpha, to_carbon
 
 from .Disulfide import Download_Disulfides, Extract_Disulfides
 from .DisulfideLoader import DisulfideLoader
+from .DisulfideList import load_disulfides_from_id
 
 from .atoms import *
 from .utility import distance_squared, distance3d, cmap_vector, Check_chains
