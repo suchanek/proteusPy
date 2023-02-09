@@ -79,7 +79,7 @@
                     <h1 class="modulename">
 proteusPy    </h1>
 
-                        <div class="docstring"><p><em>proteusPy</em> is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide Bonds. This package reprises my molecular modeling program <a href="https://doi.org/10.1021/bi00368a023">Proteus</a>, and relies on the <a href="https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html">Turtle3D</a> class. The turtle implements the functions <code>Move</code>, <code>Roll</code>, <code>Yaw</code>, <code>Pitch</code> and <code>Turn</code> for movement in a three-dimensional space. The <a href="https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html">Disulfide</a> class implements methods to analyze the protein structure stabilizing element known as a <em>Disulfide Bond</em>. This class and its underlying methods are being used to perform a structural analysis of over 292,000 disulfide-bond containing proteins in the RCSB protein data bank.</p>
+                        <div class="docstring"><p><em>proteusPy</em> is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide Bonds. This package reprises my molecular modeling program <a href="https://doi.org/10.1021/bi00368a023">Proteus</a>, and relies on the <a href="https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html">Turtle3D</a> class. The turtle implements the functions <code>Move</code>, <code>Roll</code>, <code>Yaw</code>, <code>Pitch</code> and <code>Turn</code> for movement in a three-dimensional space. The <a href="https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html">Disulfide</a> class implements methods to analyze the protein structure stabilizing element known as a <em>Disulfide Bond</em>. This class and its underlying methods are being used to perform a structural analysis of over 35,800 disulfide-bond containing proteins in the RCSB protein data bank.</p>
 
 <h3 id="virtual-environment-installationcreation">Virtual Environment Installation/Creation</h3>
 
@@ -89,19 +89,21 @@ proteusPy    </h1>
 <li>Create a new environment using python 3.9</li>
 <li>Activate the environment</li>
 </ul></li>
-<li>Install git-lfs
+<li>Build the environment. At this point it's probably best to clone the repo via github since it contains all
+of the notebooks and test programs. Ultimately the distribution can be used from pyPi as a normal
+package.
 <ul>
-<li><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage">https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage</a></a></li>
-<li>From a shell prompt: git-lfs track "<em>.csv"</li>
-<li>From a shell prompt: git-lfs track "</em>.pkl"</li>
-<li>From a shell prompt: git-lfs track "*.mp4"</li>
+<li>Using pyPi:
+<ul>
+<li>python3 -m pip install --index-url <a href="https://test.pypi.org/simple/"><a href="https://test.pypi.org/simple/"><a href="https://test.pypi.org/simple/">https://test.pypi.org/simple/</a></a></a> --extra-index-url <a href="https://pypi.org/simple/"><a href="https://pypi.org/simple/"><a href="https://pypi.org/simple/">https://pypi.org/simple/</a></a></a> proteusPy</li>
 </ul></li>
-<li>Build the environment
-<ul>
-<li>Using pyPi:</li>
-<li>python3 -m pip install --index-url <a href="https://test.pypi.org/simple/"><a href="https://test.pypi.org/simple/">https://test.pypi.org/simple/</a></a> --extra-index-url <a href="https://pypi.org/simple/"><a href="https://pypi.org/simple/">https://pypi.org/simple/</a></a> proteusPy</li>
 <li>From gitHub:
 <ul>
+<li>Install git-lfs
+<ul>
+<li><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage">https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage</a></a></a></a></li>
+<li>From a shell prompt: git-lfs track "<em>.csv" "</em>.pkl" "*.mp4"</li>
+</ul></li>
 <li>git clone <a href="https://github.com/suchanek/proteusPy/proteusPy.git"><a href="https://github.com/suchanek/proteusPy/proteusPy.git"><a href="https://github.com/suchanek/proteusPy/proteusPy.git">https://github.com/suchanek/proteusPy/proteusPy.git</a></a></a></li>
 <li>cd into the repo</li>
 <li>pip install .</li>
@@ -135,7 +137,7 @@ proteusPy    </h1>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="c1"># Copyright (c) 2023 Eric G. Suchanek, PhD., all rights reserved</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="c1"># Subject to the MIT public license.</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.28dev&quot;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.40dev&quot;</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="kn">import</span> <span class="nn">sys</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="kn">import</span> <span class="nn">os</span>
@@ -160,13 +162,14 @@ proteusPy    </h1>
 </span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a><span class="kn">from</span> <span class="nn">.turtle3D</span> <span class="kn">import</span> <span class="n">ORIENT_BACKBONE</span><span class="p">,</span> <span class="n">ORIENT_SIDECHAIN</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="kn">from</span> <span class="nn">.residue</span> <span class="kn">import</span> <span class="n">build_residue</span><span class="p">,</span> <span class="n">get_backbone_from_chain</span><span class="p">,</span> <span class="n">to_alpha</span><span class="p">,</span> <span class="n">to_carbonyl</span><span class="p">,</span> <span class="n">to_nitrogen</span><span class="p">,</span> <span class="n">to_oxygen</span>
 </span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a><span class="kn">from</span> <span class="nn">.Disulfide</span> <span class="kn">import</span> <span class="n">Download_Disulfides</span><span class="p">,</span> <span class="n">Extract_Disulfides</span><span class="p">,</span> <span class="n">Check_chains</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="kn">from</span> <span class="nn">.DisulfideLoader</span> <span class="kn">import</span> <span class="n">DisulfideLoader</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="kn">from</span> <span class="nn">.atoms</span> <span class="kn">import</span> <span class="o">*</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="kn">from</span> <span class="nn">.utility</span> <span class="kn">import</span> <span class="n">distance_squared</span><span class="p">,</span> <span class="n">distance3d</span><span class="p">,</span> <span class="n">cmap_vector</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>
-</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="c1"># end of file</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a><span class="kn">from</span> <span class="nn">.Disulfide</span> <span class="kn">import</span> <span class="n">Download_Disulfides</span><span class="p">,</span> <span class="n">Extract_Disulfides</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a><span class="kn">from</span> <span class="nn">.DisulfideLoader</span> <span class="kn">import</span> <span class="n">DisulfideLoader</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="kn">from</span> <span class="nn">.DisulfideList</span> <span class="kn">import</span> <span class="n">load_disulfides_from_id</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="kn">from</span> <span class="nn">.atoms</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a><span class="kn">from</span> <span class="nn">.utility</span> <span class="kn">import</span> <span class="n">distance_squared</span><span class="p">,</span> <span class="n">distance3d</span><span class="p">,</span> <span class="n">cmap_vector</span><span class="p">,</span> <span class="n">Check_chains</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="c1"># end of file</span>
 </span></pre></div>
 
 

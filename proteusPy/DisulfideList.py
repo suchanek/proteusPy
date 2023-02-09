@@ -859,7 +859,7 @@ def load_disulfides_from_id(struct_name: str,
                     - {distal} {chain2_id}')
                 ssbond_name = f'{struct_name}_{proximal}{chain1_id}_{distal}{chain2_id}'       
                 new_ss = proteusPy.Disulfide.Disulfide(ssbond_name)
-                new_ss.initialize_disulfide_from_chain(_chaina, _chainb, proximal, distal, quiet=quiet)
+                new_ss.initialize_disulfide_from_chain(_chaina, _chainb, proximal, distal, resolution, quiet=quiet)
                 SSList.append(new_ss)
         i += 1
     return copy.deepcopy(SSList)

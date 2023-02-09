@@ -63,8 +63,8 @@ Extract_Disulfides(numb=1000, pdbdir=PDB, datadir=DATA_DIR,
 # Extract_Disulfides(numb=-1, pdbdir=PDB, datadir=DATA,
 #                 verbose=False, quiet=True)
 
-Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB, 
-                datadir=DATA_DIR, dist_cutoff=9.0)
+#Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB, 
+#                datadir=DATA_DIR, dist_cutoff=9.0)
 
 update = False
 

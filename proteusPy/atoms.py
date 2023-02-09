@@ -46,5 +46,5 @@ CAMERA_SCALE = .5
 
 FONTSIZE = 8
 WINFRAME = 512 # single panel width
-WINSIZE = (1024, 1024)
+WINSIZE = (512, 512)
 CAMERA_POS = ((0, 0, -10), (0,0,0), (0,1,0))

@@ -160,6 +160,7 @@ class Disulfide:
         # C' or N atoms.
         self.missing_atoms = False
         self.modelled = False
+        self.resolution = -1.0
 
         # need these to calculate backbone dihedral angles
         self.c_prev_prox = Vector(0,0,0)
@@ -906,7 +907,7 @@ class Disulfide:
         return((self.proximal_residue_fullid, self.distal_residue_fullid))
 
     def initialize_disulfide_from_chain(self, chain1, chain2, proximal, 
-    									distal, quiet=True):
+    									distal, resolution, quiet=True):
         '''
         Initialize a new Disulfide object with atomic coordinates from 
         the proximal and distal coordinates, typically taken from a PDB file.
@@ -917,6 +918,7 @@ class Disulfide:
         :param chain2: list of Residues in the model, eg: chain = model['A']
         :param proximal: proximal residue sequence ID
         :param distal: distal residue sequence ID
+        :param resolution: structure resolution
         :param quiet: Quiet or noisy parsing, defaults to True
         :raises DisulfideConstructionWarning: Raised when not parsed correctly
         '''
@@ -936,6 +938,7 @@ class Disulfide:
 
         # set the objects proximal and distal values
         self.set_resnum(proximal, distal)
+        self.resolution = resolution
 
         self.proximal_chain = chain1.get_id()
         self.distal_chain = chain2.get_id()
@@ -1860,7 +1863,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
 
         # returns an empty list if none are found.
         sslist = DisulfideList([], entry)
-        sslist.load_disulfides_from_id(entry, model_numb=0, verbose=verbose, 
+        sslist = proteusPy.DisulfideList.load_disulfides_from_id(entry, model_numb=0, verbose=verbose, 
         								 quiet=quiet, pdb_dir=pdbdir)
         if len(sslist) > 0:
             for ss in sslist:
