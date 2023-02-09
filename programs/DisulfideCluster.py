@@ -8,7 +8,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 import plotly_express as px
-#import seaborn as sns
+import seaborn as sns
 
 import proteusPy
 from proteusPy import *
@@ -24,9 +24,9 @@ from pyvista import set_plot_theme
 plt.style.use('dark_background')
 
 # ipyvtklink
-pv.set_jupyter_backend('ipyvtklink')
+#pv.set_jupyter_backend('ipyvtklink')
 
-set_plot_theme('dark')
+set_plot_theme('document')
 
 # the locations below represent the actual location on the dev drive.
 # location for PDB repository
@@ -87,13 +87,24 @@ import seaborn as sns
 
 n_clusters = 6
 
-_cols = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']
+_cols = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'torsion_length']
+tor_df = SS_df[_cols].copy()
+
+# takes over an hour for full dataset
+from sklearn.cluster import AffinityPropagation
+import seaborn as sns
+n_clusters = 3
+
+_cols = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'torsion_length']
 tor_df = SS_df[_cols].copy()
 
 X = tor_df.copy()
 
-aff_model = AffinityPropagation(max_iter=50, random_state=25)
+aff_model = AffinityPropagation(max_iter=100, random_state=25)
 # takes 51 min with full dataset
 X['cluster'] = aff_model.fit_predict(X[['torsion_length']])
 
+fig, ax = plt.subplots()
+ax.set(title='Affinity Propagation')
+sns.scatterplot(x='chi1', y='torsion_length', data=X, hue='cluster', ax=ax, size=2)
 

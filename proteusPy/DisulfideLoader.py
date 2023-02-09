@@ -97,7 +97,7 @@ class DisulfideLoader:
             self.TorsionFile = f'{datadir}PDB_subset_SS_torsions.csv'
         
         if verbose:
-            print(f'Reading disulfides from: {self.PickleFile}')
+            print(f' --> DisulfideLoader(): Reading disulfides from: {self.PickleFile}', end='')
         
         with open(self.PickleFile, 'rb') as f:
             sslist = pickle.load(f)
@@ -106,8 +106,8 @@ class DisulfideLoader:
         self.TotalDisulfides = len(self.SSList)
         
         if verbose:
-            print(f'Disulfides Read: {self.TotalDisulfides}')
-            print(f'Reading disulfide dict from: {self.PickleDictFile}')
+            print(f' read: {self.TotalDisulfides}')
+            print(f' --> DisulfideLoader(): Reading disulfide dict from: {self.PickleDictFile}', end='')
         
         with open(self.PickleDictFile, 'rb') as f:
             self.SSDict = pickle.load(f)
@@ -128,7 +128,7 @@ class DisulfideLoader:
         if verbose:
             print(f'Read torsions DF.')
             print(f'PDB IDs parsed: {totalSS_dict}')
-            print(f'Total Space Used: {sys.getsizeof(self.SSList) + sys.getsizeof(self.SSDict) + sys.getsizeof(self.TorsionDF)} bytes.')
+            print(f'Total RAM Used: {sys.getsizeof(self.SSList) + sys.getsizeof(self.SSDict) + sys.getsizeof(self.TorsionDF)} bytes.')
         return
 
     # overload __getitem__ to handle slicing and indexing
