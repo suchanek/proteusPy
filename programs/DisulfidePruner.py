@@ -15,25 +15,17 @@ from Bio.PDB import *
 
 # for using from the repo we 
 import proteusPy
+
 from proteusPy import *
 from proteusPy.data import *
 from proteusPy.Disulfide import *
 
-# override any default PDB globals
-# location for PDB repository
-PDB_ROOT = '/Users/egs/PDB/'
-
-# location of cleaned PDB files - these are not stored in the repo
-PDB_GOOD = '/Users/egs/PDB/good/'
-
-# location of the compressed Disulfide .pkl files
-MODELS = f'{PDB_ROOT}models/'
+# override the default location for the stored disulfides, which defaults to DATA_DIR
+datadir = '/Users/egs/PDB/data/'
 
 # pyvista setup for notebooks
 #pv.set_jupyter_backend('ipyvtklink')
 #set_plot_theme('dark')
-
-PDB_DIR = '/Users/egs/PDB/good/'
 
 def extract_firstchain_ss(sslist: DisulfideList, verbose=False) -> DisulfideList:
     '''
@@ -86,11 +78,10 @@ def prune_extra_ss(sslist: DisulfideList):
 
 #Extract_Disulfides(numb=1000, pdbdir=PDB_GOOD, datadir=MODELS, verbose=False, quiet=False)
 
-PDB_SS = None
-#PDB_SS = DisulfideLoader(verbose=True, picklefile=SS_PICKLE_FILE, pickle_dict_file=SS_DICT_PICKLE_FILE,
-#                        torsion_file=SS_TORSIONS_FILE)
+start = time.time()
 
-PDB_SS = DisulfideLoader(verbose=True, subset=False)
+PDB_SS = None
+PDB_SS = DisulfideLoader(verbose=True, subset=False, datadir=datadir)
 
 # given the full dictionary, walk through all the keys (PDB ID)
 # for each PDB_ID SS list, find and extract the SS for the first chain
@@ -129,10 +120,8 @@ for _, pdbid_tuple in zip(pbar, enumerate(ssdict)):
     
 print(f'Pruned {removed_tot}, Xchain: {xchain_tot}')
 
-# dump the all_ss array of disulfides to a .pkl file. ~520 MB.
-datadir = '/Users/egs/PDB/data/'
-picklefile = 'PDB_SS_pruned_dict.pkl'
-
+# dump the dict of disulfides to a .pkl file. ~520 MB.
+picklefile = 'PDB_pruned_ss_dict.pkl'
 fname = f'{datadir}{picklefile}'
 
 with open(fname, 'wb+') as f:
@@ -152,10 +141,8 @@ for _, pdbid_tuple in zip(pbar, enumerate(pruned_dict)):
     
 print(f'Total SS: {pruned_list.length}')
 
-# dump the all_ss array of disulfides to a .pkl file. ~520 MB.
-datadir = '/Users/egs/PDB/data/'
-picklefile = 'PDB_SS_pruned_list.pkl'
-
+# dump the list of disulfides to a .pkl file. ~520 MB.
+picklefile = 'PDB_pruned_ss_list.pkl'
 fname = f'{datadir}{picklefile}'
 
 with open(fname, 'wb+') as f:
@@ -163,16 +150,19 @@ with open(fname, 'wb+') as f:
 
 # finally build and dump the torsions
 
-datadir = '/Users/egs/PDB/data/'
-torsfile = 'PDB_SS_pruned_torsions.csv'
+torsfile = 'PDB_pruned_ss_torsions.csv'
 fname = f'{datadir}{torsfile}'
-
 tot = len(pruned_list)
 
 tors_df = pd.DataFrame(columns=Torsion_DF_Cols)
 tors_df = pruned_list.build_torsion_df()
 
 tors_df.to_csv(fname)
+
+end = time.time()
+
+elapsed = end - start
+print(f'Complete. Elapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)')
 
 # end of file
 
