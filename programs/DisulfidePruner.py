@@ -1,9 +1,13 @@
-# DisulfideBond Playground
-# Playing with the DisulfideBond class
-# Author: Eric G. Suchanek, PhD.
-# (c) 2023 Eric G. Suchanek, PhD., All Rights Reserved
-# License: MIT
-# Last Modification: 1/30/23
+'''
+DisulfidePruner.py - program reads the .pkl files created with the ```DisulfideExtractor``` class, extracts the
+disulfides from the first chain only, and writes the subset of disulfides to *_subset.pkl files.
+
+Author: Eric G. Suchanek, PhD.
+(c) 2023 Eric G. Suchanek, PhD., All Rights Reserved
+License: MIT
+Last Modification: 2/9/23
+'''
+
 # Cα Cβ Sγ
 
 import pandas as pd
@@ -124,6 +128,8 @@ print(f'Pruned {removed_tot}, Xchain: {xchain_tot}')
 picklefile = 'PDB_pruned_ss_dict.pkl'
 fname = f'{datadir}{picklefile}'
 
+print(f'Writing: {fname}')
+
 with open(fname, 'wb+') as f:
     pickle.dump(pruned_dict, f)
 
@@ -132,6 +138,8 @@ pruned_list = DisulfideList([], 'PDB_SS_SINGLE_CHAIN')
 
 tot = len(pruned_dict)
 pbar = tqdm(range(tot), ncols=_PBAR_COLS)
+
+print(f'Building SS list...')
 
 for _, pdbid_tuple in zip(pbar, enumerate(pruned_dict)):
     # print(f'{k} {pdbid_tuple}')
@@ -142,8 +150,9 @@ for _, pdbid_tuple in zip(pbar, enumerate(pruned_dict)):
 print(f'Total SS: {pruned_list.length}')
 
 # dump the list of disulfides to a .pkl file. ~520 MB.
-picklefile = 'PDB_pruned_ss_list.pkl'
+picklefile = 'PDB_pruned_ss.pkl'
 fname = f'{datadir}{picklefile}'
+print(f'Writing: {fname}')
 
 with open(fname, 'wb+') as f:
     pickle.dump(pruned_list, f)
@@ -153,16 +162,20 @@ with open(fname, 'wb+') as f:
 torsfile = 'PDB_pruned_ss_torsions.csv'
 fname = f'{datadir}{torsfile}'
 tot = len(pruned_list)
-
 tors_df = pd.DataFrame(columns=Torsion_DF_Cols)
+
+print(f'Building torsion DF')
 tors_df = pruned_list.build_torsion_df()
 
+print(f'Writing: {fname}')
 tors_df.to_csv(fname)
 
 end = time.time()
 
 elapsed = end - start
 print(f'Complete. Elapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)')
+
+exit()
 
 # end of file
 

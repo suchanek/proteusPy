@@ -39,7 +39,7 @@ PDB = '/Users/egs/PDB/good/'
 MODELS = f'{PDB_BASE}data/'
 
 # default parameters will read from the package itself.
-PDB_SS = DisulfideLoader(verbose=True, subset=False)
+PDB_SS = DisulfideLoader(verbose=True, subset=True)
 
 
 # retrieve the torsions dataframe
