@@ -32,7 +32,7 @@ from proteusPy.data import SS_PICKLE_FILE, SS_TORSIONS_FILE, PROBLEM_ID_FILE
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.utility import distance3d
-from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR
+from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR, WINSIZE
 
 from Bio.PDB import Vector, PDBParser, PDBList
 from Bio.PDB.vectors import calc_dihedral
@@ -43,7 +43,6 @@ _ANG_INIT = -180.0
 
 # tqdm progress bar width
 _PBAR_COLS = 105
-WINSIZE = (1024, 1024)
 
 # columns for the torsions file dataframe.
 global Torsion_DF_Cols
@@ -1189,7 +1188,7 @@ class Disulfide:
         """
         Representation for the Disulfide class
         """
-        s1 = f'<Disulfide {self.name} SourceID: {self.pdb_id} Proximal: {self.proximal} {self.proximal_chain} Distal: {self.distal} {self.distal_chain}'
+        s1 = f'<Disulfide {self.name} SourceID: {self.pdb_id} Resolution: {self.resolution} Å, Proximal: {self.proximal} {self.proximal_chain} Distal: {self.distal} {self.distal_chain}'
         return s1
     
     def repr_ss_coords(self):

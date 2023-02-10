@@ -97,7 +97,7 @@ class DisulfideLoader:
             self.TorsionFile = f'{datadir}PDB_subset_SS_torsions.csv'
         
         if verbose:
-            print(f' --> DisulfideLoader(): Reading disulfides from: {self.PickleFile}', end='')
+            print(f' --> DisulfideLoader(): Reading disulfides from: {self.PickleFile}')
         
         with open(self.PickleFile, 'rb') as f:
             sslist = pickle.load(f)
@@ -106,8 +106,8 @@ class DisulfideLoader:
         self.TotalDisulfides = len(self.SSList)
         
         if verbose:
-            print(f' read: {self.TotalDisulfides}')
-            print(f' --> DisulfideLoader(): Reading disulfide dict from: {self.PickleDictFile}', end='')
+            print(f'  --> DisulfideLoader(): Read: {self.TotalDisulfides} disulfides')
+            print(f' --> DisulfideLoader(): Reading disulfide dict from: {self.PickleDictFile}')
         
         with open(self.PickleDictFile, 'rb') as f:
             self.SSDict = pickle.load(f)
@@ -117,7 +117,7 @@ class DisulfideLoader:
             totalSS_dict = len(self.IDList)
         
         if verbose:
-            print(f'Reading Torsion DF {self.TorsionFile}.')
+            print(f' --> DisulfideLoader(): Reading Torsion DF {self.TorsionFile}.')
         
         #tmpDF  = pd.read_csv(self.TorsionFile, index_col='source')
         tmpDF  = pd.read_csv(self.TorsionFile)
@@ -126,9 +126,9 @@ class DisulfideLoader:
         self.TorsionDF = tmpDF.copy()
 
         if verbose:
-            print(f'Read torsions DF.')
-            print(f'PDB IDs parsed: {totalSS_dict}')
-            print(f'Total RAM Used: {sys.getsizeof(self.SSList) + sys.getsizeof(self.SSDict) + sys.getsizeof(self.TorsionDF)} bytes.')
+            print(f' --> DisulfideLoader(): Read torsions DF.')
+            print(f' --> DisulfideLoader(): PDB IDs parsed: {totalSS_dict}')
+            print(f' --> DisulfideLoader(): Total RAM Used: {((sys.getsizeof(self.SSList) + sys.getsizeof(self.SSDict) + sys.getsizeof(self.TorsionDF)) / (1024 * 1024)):.2f} GB.')
         return
 
     # overload __getitem__ to handle slicing and indexing
@@ -137,8 +137,9 @@ class DisulfideLoader:
             indices = range(*item.indices(len(self.SSList)))
             # return [self.SSList[i] for i in indices]
             name = self.SSList[0].pdb_id
+            resolution = self.SSList[0].resolution
             sublist = [self.SSList[i] for i in indices]
-            return DisulfideList(sublist, name)
+            return DisulfideList(sublist, name, resolution)
         
         if isinstance(item, int):
             if (item < 0 or item >= self.TotalDisulfides):
