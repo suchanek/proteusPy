@@ -29,7 +29,7 @@ from proteusPy import *
 from proteusPy.atoms import *
 from proteusPy.utility import grid_dimensions, cmap_vector
 from proteusPy import Disulfide
-from proteusPy.ProteusGlobals import MODEL_DIR
+from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR, WINSIZE
 from Bio.PDB import PDBParser
 
 _PBAR_COLS = 105
@@ -62,11 +62,11 @@ class DisulfideList(UserList):
     >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)  # load the Disulfide database
     >>> SS = PDB_SS[0]
     >>> SS
-    <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>
+    <Disulfide 4yys_22A_65A SourceID: 4yys Resolution: 1.35 Å, Proximal: 22 A Distal: 65 A>
     
     >>> SS4yys = PDB_SS['4yys']
     >>> SS4yys
-    [<Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>, <Disulfide 4yys_56A_98A SourceID: 4yys Proximal: 56 A Distal: 98 A>, <Disulfide 4yys_156A_207A SourceID: 4yys Proximal: 156 A Distal: 207 A>, <Disulfide 4yys_22B_65B SourceID: 4yys Proximal: 22 B Distal: 65 B>, <Disulfide 4yys_56B_98B SourceID: 4yys Proximal: 56 B Distal: 98 B>, <Disulfide 4yys_156B_207B SourceID: 4yys Proximal: 156 B Distal: 207 B>]
+    [<Disulfide 4yys_22A_65A SourceID: 4yys Resolution: 1.35 Å, Proximal: 22 A Distal: 65 A>, <Disulfide 4yys_56A_98A SourceID: 4yys Resolution: 1.35 Å, Proximal: 56 A Distal: 98 A>, <Disulfide 4yys_156A_207A SourceID: 4yys Resolution: 1.35 Å, Proximal: 156 A Distal: 207 A>, <Disulfide 4yys_22B_65B SourceID: 4yys Resolution: 1.35 Å, Proximal: 22 B Distal: 65 B>, <Disulfide 4yys_56B_98B SourceID: 4yys Resolution: 1.35 Å, Proximal: 56 B Distal: 98 B>, <Disulfide 4yys_156B_207B SourceID: 4yys Resolution: 1.35 Å, Proximal: 156 B Distal: 207 B>]
 
     Make some empty disulfides
     >>> ss1 = Disulfide('ss1')
@@ -79,7 +79,7 @@ class DisulfideList(UserList):
     Extract the first disulfide
     >>> ss1 = PDB_SS[0]
     >>> ss1.pprint_all()
-    <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A
+    <Disulfide 4yys_22A_65A SourceID: 4yys Resolution: 1.35 Å, Proximal: 22 A Distal: 65 A
      Proximal Chain fullID: <('4yys', 0, 'A', (' ', 22, ' '))> Distal Chain fullID: <('4yys', 0, 'A', (' ', 65, ' '))> 
     Proximal Coordinates:
        N: <Vector -2.36, -20.48, 5.21>
@@ -148,10 +148,10 @@ class DisulfideList(UserList):
         >>> ss3 = Disulfide('ss3')
         >>> sslist = DisulfideList([ss1, ss2], 'sslist')
         >>> sslist
-        [<Disulfide ss1 SourceID:  Proximal: -1 A Distal: -1 A>, <Disulfide ss2 SourceID:  Proximal: -1 A Distal: -1 A>]
+        [<Disulfide ss1 SourceID:  Resolution: -1.0 Å, Proximal: -1 A Distal: -1 A>, <Disulfide ss2 SourceID:  Resolution: -1.0 Å, Proximal: -1 A Distal: -1 A>]
         >>> sslist.append(ss3)
         >>> sslist
-        [<Disulfide ss1 SourceID:  Proximal: -1 A Distal: -1 A>, <Disulfide ss2 SourceID:  Proximal: -1 A Distal: -1 A>, <Disulfide ss3 SourceID:  Proximal: -1 A Distal: -1 A>]
+        [<Disulfide ss1 SourceID:  Resolution: -1.0 Å, Proximal: -1 A Distal: -1 A>, <Disulfide ss2 SourceID:  Resolution: -1.0 Å, Proximal: -1 A Distal: -1 A>, <Disulfide ss3 SourceID:  Resolution: -1.0 Å, Proximal: -1 A Distal: -1 A>]
         '''
         
         self.pdb_id = id
@@ -444,7 +444,7 @@ class DisulfideList(UserList):
         
         elif movie:
             if verbose:
-                print(f'Saving mp4 animation to: {fname}')
+                print(f' -> display_overlay(): Saving mp4 animation to: {fname}')
                 
             pl.open_movie(fname, quality=9)
             path = pl.generate_orbital_path(n_points=360)
@@ -452,7 +452,7 @@ class DisulfideList(UserList):
             pl.close()
 
             if verbose:
-                print(f'Saved mp4 animation to: {fname}')
+                print(f' -> display_overlay(): Saved mp4 animation to: {fname}')
         else:
             pl.show()
         
@@ -765,7 +765,7 @@ def load_disulfides_from_id(struct_name: str,
     >>> SSlist = DisulfideList([],'5rsa')
     >>> SSlist = load_disulfides_from_id('5rsa', verbose=False)
     >>> SSlist
-    [<Disulfide 5rsa_26A_84A SourceID: 5rsa Proximal: 26 A Distal: 84 A>, <Disulfide 5rsa_40A_95A SourceID: 5rsa Proximal: 40 A Distal: 95 A>, <Disulfide 5rsa_58A_110A SourceID: 5rsa Proximal: 58 A Distal: 110 A>, <Disulfide 5rsa_65A_72A SourceID: 5rsa Proximal: 65 A Distal: 72 A>]
+    [<Disulfide 5rsa_26A_84A SourceID: 5rsa Resolution: 2.0 Å, Proximal: 26 A Distal: 84 A>, <Disulfide 5rsa_40A_95A SourceID: 5rsa Resolution: 2.0 Å, Proximal: 40 A Distal: 95 A>, <Disulfide 5rsa_58A_110A SourceID: 5rsa Resolution: 2.0 Å, Proximal: 58 A Distal: 110 A>, <Disulfide 5rsa_65A_72A SourceID: 5rsa Resolution: 2.0 Å, Proximal: 65 A Distal: 72 A>]
     '''
 
     i = 1
