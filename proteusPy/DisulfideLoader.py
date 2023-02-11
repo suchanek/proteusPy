@@ -49,10 +49,10 @@ class DisulfideLoader:
     >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
     >>> SS1 = PDB_SS[0]
     >>> SS1
-    <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>
+    <Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>
     >>> SS2 = PDB_SS['4yys']
     >>> SS2
-    [<Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>, <Disulfide 4yys_56A_98A SourceID: 4yys Proximal: 56 A Distal: 98 A>, <Disulfide 4yys_156A_207A SourceID: 4yys Proximal: 156 A Distal: 207 A>, <Disulfide 4yys_22B_65B SourceID: 4yys Proximal: 22 B Distal: 65 B>, <Disulfide 4yys_56B_98B SourceID: 4yys Proximal: 56 B Distal: 98 B>, <Disulfide 4yys_156B_207B SourceID: 4yys Proximal: 156 B Distal: 207 B>]
+    [<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_22B_65B, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56B_98B, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156B_207B, Source: 4yys, Resolution: 1.35 Å>]
     >>> SSlist = PDB_SS[:4]
     >>> SSlist.display(style='sb') 
     '''
@@ -109,7 +109,7 @@ class DisulfideLoader:
             self.SSList = sslist
 
         self.TotalDisulfides = len(self.SSList)
-        
+        '''
         if verbose:
             print(f'--> DisulfideLoader(): Reading disulfide dict from: {self.PickleDictFile}')
         
@@ -119,27 +119,28 @@ class DisulfideLoader:
                 idlist.append(key)
             self.IDList = idlist.copy()
             totalSS_dict = len(self.IDList)
-        
+        '''
         if verbose:
             print(f'--> DisulfideLoader(): Reading disulfide dict2 from: {self.PickleDictFile2}')
         
         with open(self.PickleDictFile2, 'rb') as f:
             self.SSDict2 = pickle.load(f)
-        
+            for key in self.SSDict2:
+                idlist.append(key)
+            self.IDList = idlist.copy()
+            totalSS_dict = len(self.IDList)
+
         if verbose:
             print(f'--> DisulfideLoader(): Reading Torsion DF from: {self.TorsionFile}.')
 
-        
-        #tmpDF  = pd.read_csv(self.TorsionFile, index_col='source')
         tmpDF  = pd.read_csv(self.TorsionFile)
         tmpDF.drop(tmpDF.columns[[0]], axis=1, inplace=True)
 
         self.TorsionDF = tmpDF.copy()
-            
-        print(f'Loading complete.\nSummary: \n PDB IDs parsed: {totalSS_dict}')
-        print(f' Disulfides loaded: {self.TotalDisulfides}')
-        print(f' Total RAM Used by dataset: {((sys.getsizeof(self.SSList) + sys.getsizeof(self.SSDict) + sys.getsizeof(self.TorsionDF)) / (1024 * 1024)):.2f} GB.')
-        
+        if verbose:    
+            print(f'Loading complete.\nSummary: \n PDB IDs parsed: {totalSS_dict}')
+            print(f' Disulfides loaded: {self.TotalDisulfides}')
+            print(f' Total RAM Used by dataset: {((sys.getsizeof(self.SSList) + sys.getsizeof(self.SSDict) + sys.getsizeof(self.TorsionDF)) / (1024 * 1024)):.2f} GB.')
         return
 
 
@@ -220,15 +221,15 @@ class DisulfideLoader:
         >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
         >>> Tor_DF = PDB_SS.getTorsions()
         >>> Tor_DF.describe()
-                   proximal        distal          chi1          chi2          chi3  ...      phi_prox      psi_prox      phi_dist      psi_dist  torsion_length
-        count  20388.000000  20388.000000  20388.000000  20388.000000  20388.000000  ...  20388.000000  20388.000000  20388.000000  20388.000000    20388.000000
-        mean     228.653669    276.699725    -47.223657     -6.145411     -5.015487  ...   -101.119674     68.591342    -98.269685     71.775539      232.040004
-        std      277.715590    278.536401    103.051449    108.724804     93.887448  ...     43.472827     96.286210     42.210630     95.174035       56.448557
-        min        1.000000      1.000000   -179.992436   -179.998685   -179.815947  ...   -180.000000   -180.000000   -180.000000   -180.000000      102.031030
-        25%       44.000000     96.000000    -92.336057    -87.053215    -88.274025  ...   -131.025124    -18.955461   -123.879165    -15.480013      185.416776
-        50%      137.000000    194.000000    -64.393960    -54.973207    -66.276147  ...   -104.003700    115.472312   -100.109755    121.884044      231.106505
-        75%      317.000000    361.000000    -43.165496     96.537644     93.371466  ...    -72.064985    141.260539    -73.975350    144.165192      271.616908
-        max     5045.000000   5070.000000    179.998579    179.992470    179.976934  ...    179.578735    179.972228    179.337160    179.980177      368.630494
+                  proximal       distal         chi1         chi2         chi3  ...     phi_prox     psi_prox     phi_dist     psi_dist  torsion_length
+        count  8210.000000  8210.000000  8210.000000  8210.000000  8210.000000  ...  8210.000000  8210.000000  8210.000000  8210.000000     8210.000000
+        mean    231.242875   280.309257   -46.635049    -4.363584    -4.438116  ...  -101.610350    69.281822   -98.354988    72.681350      233.892187
+        std     285.911354   284.999227   103.687677   110.144551    94.110252  ...    43.440895    95.468934    42.211145    95.374444       56.415414
+        min       1.000000     6.000000  -179.990815  -179.990782  -179.502078  ...  -180.000000  -180.000000  -180.000000  -180.000000      102.031030
+        25%      44.000000    96.000000   -91.432474   -86.794595   -88.431544  ...  -131.259716   -18.032679  -124.017966   -14.776966      187.399815
+        50%     138.000000   195.000000   -64.205495   -54.482183   -64.843442  ...  -105.365621   115.617182  -100.506678   122.338903      232.813196
+        75%     324.000000   364.000000   -41.621931   100.943649    93.532489  ...   -73.165302   140.628913   -73.916673   144.177030      273.123655
+        max    5045.000000  5070.000000   179.945970   179.987671   179.976934  ...   179.578735   179.972228   179.337160   179.971149      368.022621
         <BLANKLINE>
         [8 rows x 14 columns]
 
@@ -297,7 +298,7 @@ class DisulfideLoader:
         >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
         >>> ss1 = PDB_SS.get_by_name('4yys_22A_65A')
         >>> ss1
-        <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>
+        <Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>
         '''
 
         _sslist = DisulfideList([], 'tmp')
