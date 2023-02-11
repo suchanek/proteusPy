@@ -27,7 +27,7 @@ from proteusPy import *
 from proteusPy.atoms import *
 
 from proteusPy.data import SS_DICT_PICKLE_FILE, SS_ID_FILE
-from proteusPy.data import SS_PICKLE_FILE, SS_TORSIONS_FILE, PROBLEM_ID_FILE
+from proteusPy.data import SS_PICKLE_FILE, SS_DICT_PICKLE_FILE2, SS_TORSIONS_FILE, PROBLEM_ID_FILE
 
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideList import DisulfideList
@@ -1678,10 +1678,11 @@ def Download_Disulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR,
     return
 
 def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR, 
-                        datadir=MODEL_DIR, picklefile=SS_PICKLE_FILE, 
+                        datadir=MODEL_DIR, picklefile=SS_PICKLE_FILE,
                         torsionfile=SS_TORSIONS_FILE, 
                         problemfile=PROBLEM_ID_FILE,
                         dictfile=SS_DICT_PICKLE_FILE,
+                        dictfile_ind=SS_DICT_PICKLE_FILE2,
                         dist_cutoff=-1.0) -> None:
     '''
     This function creates .pkl files needed for the 
@@ -1821,6 +1822,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     # we'll use a dict to store DisulfideList objects, indexed by the structure ID
     All_ss_dict = {}
     All_ss_list = DisulfideList([],'PDB_SS')
+    All_ss_dict2 = {} # new dict of pointers to indices
 
     start = time.time()
     cwd = os.getcwd()
@@ -1858,6 +1860,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
 
     # loop over ss_filelist, create disulfides and initialize them
     for entry in pbar:
+        cnt = 0
         pbar.set_postfix({'ID': entry, 'Bad': bad, 'Ca': bad_dist}) # update the progress bar
 
         # returns an empty list if none are found.
@@ -1865,6 +1868,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
         sslist = proteusPy.DisulfideList.load_disulfides_from_id(entry, model_numb=0, verbose=verbose, 
         								 quiet=quiet, pdb_dir=pdbdir)
         if len(sslist) > 0:
+            sslist2 = [] # list to hold indices for ss_dict2
             for ss in sslist:
                 dist = ss.ca_distance
                 # Ca distance cutoff
@@ -1879,8 +1883,13 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
                           ss.psiprox, ss.phidist, ss.psidist, ss.torsion_length]
                           
                 # add the row to the end of the dataframe
+                sslist2.append(cnt)
                 SS_df.loc[len(SS_df.index)] = new_row.copy() # deep copy
+                cnt += 1
+
             All_ss_dict[entry] = sslist
+            All_ss_dict2[entry] = sslist2
+
         else:
             # at this point I really shouldn't have any bad non-parsible file
             bad += 1
@@ -1913,19 +1922,25 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     with open(fname, 'wb+') as f:
         pickle.dump(All_ss_list, f)
 
-    # dump the all_ss array of disulfides to a .pkl file. ~520 MB.
+    # dump the dict of disulfides to a .pkl file. ~520 MB.
     dict_len = len(All_ss_dict)
     fname = f'{datadir}{dictfile}'
-
-    print(f'-> Extract_Disulfides(): Saving {len(All_ss_dict)} Disulfide-containing PDB IDs to file: {fname}')
+    print(f'-> Extract_Disulfides(): Saving {dict_len} Disulfide-containing PDB IDs to file: {fname}')
 
     with open(fname, 'wb+') as f:
         pickle.dump(All_ss_dict, f)
 
+    # dump the dict2 disulfides to a .pkl file. ~520 MB.
+    dict_len = len(All_ss_dict2)
+    fname = f'{datadir}{dictfile_ind}'
+    print(f'-> Extract_Disulfides(): Saving {dict_len} Disulfide-containing PDB IDs to file: {fname}')
+
+    with open(fname, 'wb+') as f:
+        pickle.dump(All_ss_dict2, f)
+
     # save the torsions
     fname = f'{datadir}{torsionfile}'
     print(f'-> Extract_Disulfides(): Saving torsions to file: {fname}')
-
     SS_df.to_csv(fname)
 
     end = time.time()

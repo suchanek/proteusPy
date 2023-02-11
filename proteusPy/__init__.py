@@ -36,6 +36,7 @@ from .DisulfideLoader import DisulfideLoader
 from .DisulfideList import load_disulfides_from_id
 
 from .atoms import *
+from .data import *
 from .utility import distance_squared, distance3d, cmap_vector, Check_chains
 
 # end of file
