@@ -1,7 +1,7 @@
 '''
 DisulfideExtractor.py
 Author: Eric G. Suchanek, PhD.
-Last modification: 1/24/23 -egs-
+Last modification: 2/11/23 -egs-
 
 Purpose:
 This program processes all the PDB *.ent files in PDB_DIR and creates an array of 
@@ -10,7 +10,6 @@ Outputs are saved in MODEL_DIR:
 - SS_PICKLE_FILE: The list of Disulfide objects initialized from the PDB file scan
 - SS_TORSIONS_FILE: a .csv containing the SS torsions for the disulfides scanned
 - PROBLEM_ID: a .csv containining the problem ids.
-
 '''
 
 import shutil
@@ -25,7 +24,7 @@ from proteusPy.Disulfide import Extract_Disulfides
 PDB_BASE = '/Users/egs/PDB/'
 
 # location of cleaned PDB files, created with DisulfideDownloader.py
-PDB = '/Users/egs/PDB/good/'
+PDB_DIR = '/Users/egs/PDB/good/'
 REPO_DATA = '/Users/egs/repos/proteusPy/data/'
 MODULE_DATA = '/Users/egs/repos/proteusPy/proteusPy/data/'
 
@@ -47,27 +46,36 @@ _PROBLEM_ID_FILE = 'PDB_subset_problems.csv'
 
 start = time.time()
 
-# the following performs an extraction of 1000 SS and saves them with
+# The following performs an extraction of 1000 SS and saves them with
 # the correct filenames to be read as 'subset'. Do not change the filenames
 # defined above
 
-Extract_Disulfides(numb=1000, pdbdir=PDB, datadir=DATA_DIR,
+Extract_Disulfides(
+                numb=1000, 
+                pdbdir=PDB_DIR, 
+                datadir=DATA_DIR,
                 dictfile=_SS_DICT_PICKLE_FILE,
                 dictfile_ind=_SS_DICT_PICKLE_FILE_IND,
                 picklefile=_SS_PICKLE_FILE,
                 torsionfile=_SS_TORSIONS_FILE,
                 problemfile=_PROBLEM_ID_FILE,
                 verbose=False, quiet=True,
-                dist_cutoff=-1.0)
+                dist_cutoff=-1.0
+                )
 
 # total extraction uses numb=-1 and takes about 1.5 hours on
 # my 2021 MacbookPro M1 Pro computer.
 
-# Extract_Disulfides(numb=-1, pdbdir=PDB, datadir=DATA,
-#                 verbose=False, quiet=True)
+# Extract_Disulfides(numb=-1, pdbdir=PDB, datadir=DATA, verbose=False, quiet=True)
 
-#Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB, 
-#                datadir=DATA_DIR, dist_cutoff=-1.0)
+Extract_Disulfides(
+                numb=-1, 
+                verbose=False, 
+                quiet=True, 
+                pdbdir=PDB_DIR, 
+                datadir=DATA_DIR, 
+                dist_cutoff=-1.0
+                )
 
 update = True
 
