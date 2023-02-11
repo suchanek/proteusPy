@@ -5,7 +5,7 @@
 I describe the results of a structural analysis of Disulfide bonds contained in 35,819 proteins within the RCSB Protein databank, https://www.rcsb.org. These protein structures contained 120,697 Disulfide Bonds.  The analysis utilizes Python functions from my ``ProteusPy`` package https://github.com/suchanek/proteusPy/, which is built upon the excellent ``BioPython`` library (https://www.biopython.org). 
 
 ## Background
-This work represents a reprise of my original Disulfide modeling analysis conducted in 1986 ([publications](#publications) item 1) as part of my doctoral dissertation. Given the original Disulfide database contained only 2xx Disulfide Bonds I felt it would be interesting to revisit the RCSB and mine the thousands of new structures. The analysis would not have been possible withoug the creation and now ongoing development of ```proteusPy```, which represents a true, modern object-oriented rewrite of my original ```proteus``` code base. The ```C``` implemntation still exists and is available at https://github.com/suchanek/proteus/.
+This work represents a reprise of my original Disulfide modeling analysis conducted in 1986 ([publications](#publications) item 1) as part of my doctoral dissertation. Given the original Disulfide database contained only 2xx Disulfide Bonds I felt it would be interesting to revisit the RCSB and mine the thousands of new structures. The analysis would not have been possible withoug the creation and now ongoing development of ```proteusPy```, which represents a modern object-oriented rewrite of my original ```proteus``` code base. The ```C``` implemntation still exists and is available at https://github.com/suchanek/proteus/.
 
 The initial results are shown and described in the cells below.
 
@@ -63,3 +63,32 @@ When we filter by distance, we see the average $C_\alpha-C_\alpha$ distance for 
 
 We can extract and visualize the four longest structures and display them, as shown below. The individual windows display the disulfide bond in 'split-bond' style, where half of the bond is colored by the respective atom color. The window title indicates the approximate torsional energy (E kcal/mol), $C_\alpha-C_\alpha$ distance ($\AA$), and the torsion length (degrees). As is apparent, the $C_\beta-S_\gamma$ bond angles are almost linear. This suggests that the disulfide might not actually exist covalently, and could reflect errors in the original model.
 
+## Examine the Disulfide Torsions
+The disulfide bond's overall conformation is defined by the sidechain dihedral angles $\chi_{1}$-$\chi_{5}$. Since the S-S bond has electron delocalization, it exhibits some double-bond character with strong minima at $+90°$ and $-90°$. The *Left-handed* Disulfides have $\chi_{3}$ < 0.0° and the *Right-handed* have a $\chi_{3}$ > 0.0°.
+
+These torsion values along with the approximate torsional energy are stored in the DisulfideLoader() class and individually within each Disulfide object. We access them via the ``DisulfideList.getTorsions()`` function.
+
+We can get a quick look at their overall statistics using the ``Pandas.describe()`` function.
+
+### Examining torsions by Disulfide Handedness
+We split the dataset into these two families easily with Pandas.
+
+
+
+## Conclusions
+Conformational analysis of 294,222 disulfide bonds in 36,362 proteins contained in the RCSB confirms the predominant conformational classes first described in my initial analysis:
+- Left-Handed Spiral
+- Right-Handed Hook
+- Left-Handed Spiral
+  
+# Appendix
+## Data Cleaning
+* Parsing PDB files
+* Extracting disulfides
+* Removing redundant disulfides
+* 
+# Publications
+* https://doi.org/10.1021/bi00368a023
+* https://doi.org/10.1021/bi00368a024
+* https://doi.org/10.1016/0092-8674(92)90140-8
+* http://dx.doi.org/10.2174/092986708783330566

@@ -1188,7 +1188,7 @@ class Disulfide:
         """
         Representation for the Disulfide class
         """
-        s1 = f'<Disulfide {self.name} SourceID: {self.pdb_id} Resolution: {self.resolution} Å, Proximal: {self.proximal} {self.proximal_chain} Distal: {self.distal} {self.distal_chain}'
+        s1 = f'<Disulfide {self.name}, Source: {self.pdb_id}, Resolution: {self.resolution} Å'
         return s1
     
     def repr_ss_coords(self):
