@@ -12,7 +12,6 @@ Outputs are saved in MODEL_DIR:
 - PROBLEM_ID: a .csv containining the problem ids.
 '''
 
-import shutil
 from shutil import copytree, ignore_patterns
 import time
 import datetime
@@ -31,18 +30,16 @@ MODULE_DATA = '/Users/egs/repos/proteusPy/proteusPy/data/'
 # location of the compressed Disulfide .pkl files
 DATA_DIR = f'{PDB_BASE}data/'
 
-# setting up specific pkl files for a small extraction.
+# Setting up specific pkl files for a small extraction.
 # you must use these exact names, regardless of the number
 # extracted in order for the DisulfideLoader class to load them
 # correctly. 
 #
-# don't set these at all for the default total extraction
+# Don't set these at all for the default total extraction
+#
 
-_SS_PICKLE_FILE = 'PDB_subset_ss.pkl'
-_SS_DICT_PICKLE_FILE = 'PDB_subset_ss_dict.pkl'
-_SS_DICT_PICKLE_FILE_IND = 'PDB_subset_ss_dict_ind.pkl'
-_SS_TORSIONS_FILE = 'PDB_subset_torsions.csv'
-_PROBLEM_ID_FILE = 'PDB_subset_problems.csv'
+from proteusPy.data import SS_PROBLEM_SUBSET_ID_FILE, SS_SUBSET_DICT_PICKLE_FILE
+from proteusPy.data import SS_SUBSET_PICKLE_FILE, SS_SUBSET_TORSIONS_FILE
 
 start = time.time()
 
@@ -54,19 +51,16 @@ Extract_Disulfides(
                 numb=1000, 
                 pdbdir=PDB_DIR, 
                 datadir=DATA_DIR,
-                dictfile=_SS_DICT_PICKLE_FILE,
-                dictfile_ind=_SS_DICT_PICKLE_FILE_IND,
-                picklefile=_SS_PICKLE_FILE,
-                torsionfile=_SS_TORSIONS_FILE,
-                problemfile=_PROBLEM_ID_FILE,
+                dictfile=SS_SUBSET_DICT_PICKLE_FILE,
+                picklefile=SS_SUBSET_PICKLE_FILE,
+                torsionfile=SS_SUBSET_TORSIONS_FILE,
+                problemfile=SS_PROBLEM_SUBSET_ID_FILE,
                 verbose=False, quiet=True,
                 dist_cutoff=-1.0
                 )
 
 # total extraction uses numb=-1 and takes about 1.5 hours on
 # my 2021 MacbookPro M1 Pro computer.
-
-# Extract_Disulfides(numb=-1, pdbdir=PDB, datadir=DATA, verbose=False, quiet=True)
 
 Extract_Disulfides(
                 numb=-1, 
