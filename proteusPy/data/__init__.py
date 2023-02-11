@@ -15,4 +15,10 @@ SS_TORSIONS_FILE = 'PDB_all_SS_torsions.csv'
 PROBLEM_ID_FILE = 'PDB_all_SS_problems.csv'
 SS_ID_FILE = 'ss_ids.txt'
 
+SS_SUBSET_PICKLE_FILE = 'PDB_subset_ss.pkl'
+SS_SUBSET_DICT_PICKLE_FILE = 'PDB_subset_ss_dict.pkl'
+SS_SUBSET_DICT_PICKLE_FILE_IND = 'PDB_subset_ss_dict_ind.pkl'
+SS_SUBSET_TORSIONS_FILE = 'PDB_subset_torsions.csv'
+SS_PROBLEM_SUBSET_ID_FILE = 'PDB_subset_problems.csv'
+
 # end of file

@@ -57,11 +57,9 @@ class DisulfideLoader:
     >>> SSlist.display(style='sb') 
     '''
 
-    SS_DICT_PICKLE_FILE2 = f'{SS_DICT_PICKLE_FILE}_ind'
-
     def __init__(self, verbose=True, datadir=DATA_DIR, picklefile=SS_PICKLE_FILE, 
                 pickle_dict_file=SS_DICT_PICKLE_FILE,
-                pickle_dict_file2=SS_DICT_PICKLE_FILE2,
+                #pickle_dict_file2=SS_DICT_PICKLE_FILE2,
                 torsion_file=SS_TORSIONS_FILE, quiet=True, subset=False):
         '''
         Initializing the class initiates loading either the entire Disulfide dataset,
@@ -76,7 +74,7 @@ class DisulfideLoader:
         self.ModelDir = datadir
         self.PickleFile = f'{datadir}{picklefile}'
         self.PickleDictFile = f'{datadir}{pickle_dict_file}'
-        self.PickleDictFile2 = f'{datadir}{pickle_dict_file2}'
+        #self.PickleDictFile2 = f'{datadir}{pickle_dict_file2}'
         self.TorsionFile = f'{datadir}{torsion_file}'
         self.SSList = DisulfideList([], 'ALL_PDB_SS')
         self.SSDict = {}
@@ -96,10 +94,9 @@ class DisulfideLoader:
         idlist = []
 
         if subset:
-            self.PickleFile = f'{datadir}PDB_subset_ss.pkl'
-            self.PickleDictFile = f'{datadir}PDB_subset_ss_dict.pkl'
-            self.PickleDictFile2 = f'{datadir}PDB_subset_ss_dict_ind.pkl'
-            self.TorsionFile = f'{datadir}PDB_subset_SS_torsions.csv'
+            self.PickleFile = f'{datadir}{SS_SUBSET_PICKLE_FILE}'
+            self.PickleDictFile = f'{datadir}{SS_SUBSET_DICT_PICKLE_FILE}'
+            self.TorsionFile = f'{datadir}{SS_SUBSET_TORSIONS_FILE}'
         
         if verbose:
             print(f'--> DisulfideLoader(): Reading disulfides from: {self.PickleFile}')
@@ -121,11 +118,11 @@ class DisulfideLoader:
             totalSS_dict = len(self.IDList)
         '''
         if verbose:
-            print(f'--> DisulfideLoader(): Reading disulfide dict2 from: {self.PickleDictFile2}')
+            print(f'--> DisulfideLoader(): Reading disulfide dict2 from: {self.PickleDictFile}')
         
-        with open(self.PickleDictFile2, 'rb') as f:
-            self.SSDict2 = pickle.load(f)
-            for key in self.SSDict2:
+        with open(self.PickleDictFile, 'rb') as f:
+            self.SSDict = pickle.load(f)
+            for key in self.SSDict:
                 idlist.append(key)
             self.IDList = idlist.copy()
             totalSS_dict = len(self.IDList)
@@ -142,7 +139,6 @@ class DisulfideLoader:
             print(f' Disulfides loaded: {self.TotalDisulfides}')
             print(f' Total RAM Used by dataset: {((sys.getsizeof(self.SSList) + sys.getsizeof(self.SSDict) + sys.getsizeof(self.TorsionDF)) / (1024 * 1024)):.2f} GB.')
         return
-
 
     # overload __getitem__ to handle slicing and indexing
     def __getitem__(self, item):
@@ -162,14 +158,10 @@ class DisulfideLoader:
                 return self.SSList[item]
 
         try:
-            indices = self.SSDict2[item]
+            indices = self.SSDict[item]
             res = DisulfideList([],'tmp')
             sslist = self.SSList
-
-            tot = len(indices)
-            # res = DisulfideList([sslist[indices[i]] for i in range(tot)], 'tmp')
             res = DisulfideList([sslist[indices[i]] for i in indices], 'tmp')
-
 
         except KeyError:
             mess = f'! Cannot find key {item} in SSBond dict!'
@@ -197,7 +189,7 @@ class DisulfideLoader:
         if id is not None:
             try:
                 sslist = self.SSDict[id]
-                return copy.deepcopy(sslist)
+                return copy.deepcopy(self.SSList[id])
             except:
                 mess = f'Invalid index {id}'
                 raise(ProteusPyWarning(mess))

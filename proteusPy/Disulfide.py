@@ -1682,7 +1682,6 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
                         torsionfile=SS_TORSIONS_FILE, 
                         problemfile=PROBLEM_ID_FILE,
                         dictfile=SS_DICT_PICKLE_FILE,
-                        dictfile_ind=SS_DICT_PICKLE_FILE2,
                         dist_cutoff=-1.0) -> None:
     '''
     This function creates .pkl files needed for the 
@@ -1723,13 +1722,13 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     The dataset can be indexed numerically, up to index: PDB_SS.Length(). Get the first SS:
     >>> SS = PDB_SS[0]
     >>> SS
-    <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>
+    <Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>
 
     The dataset can also be indexed by PDB ID. Get the DisulfideList for ID 4yys:
 
     >>> SS4yys = PDB_SS['4yys']
     >>> SS4yys
-    [<Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A>, <Disulfide 4yys_56A_98A SourceID: 4yys Proximal: 56 A Distal: 98 A>, <Disulfide 4yys_156A_207A SourceID: 4yys Proximal: 156 A Distal: 207 A>, <Disulfide 4yys_22B_65B SourceID: 4yys Proximal: 22 B Distal: 65 B>, <Disulfide 4yys_56B_98B SourceID: 4yys Proximal: 56 B Distal: 98 B>, <Disulfide 4yys_156B_207B SourceID: 4yys Proximal: 156 B Distal: 207 B>]
+    [<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_22B_65B, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56B_98B, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156B_207B, Source: 4yys, Resolution: 1.35 Å>]
 
     Make some empty disulfides:
 
@@ -1747,7 +1746,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
 
     >>> ss1 = PDB_SS[0]
     >>> ss1.pprint_all()
-    <Disulfide 4yys_22A_65A SourceID: 4yys Proximal: 22 A Distal: 65 A
+    <Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å
      Proximal Chain fullID: <('4yys', 0, 'A', (' ', 22, ' '))> Distal Chain fullID: <('4yys', 0, 'A', (' ', 65, ' '))> 
     Proximal Coordinates:
        N: <Vector -2.36, -20.48, 5.21>
@@ -1922,6 +1921,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     with open(fname, 'wb+') as f:
         pickle.dump(All_ss_list, f)
 
+    '''
     # dump the dict of disulfides to a .pkl file. ~520 MB.
     dict_len = len(All_ss_dict)
     fname = f'{datadir}{dictfile}'
@@ -1929,11 +1929,12 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
 
     with open(fname, 'wb+') as f:
         pickle.dump(All_ss_dict, f)
+    '''
 
     # dump the dict2 disulfides to a .pkl file. ~520 MB.
     dict_len = len(All_ss_dict2)
-    fname = f'{datadir}{dictfile_ind}'
-    print(f'-> Extract_Disulfides(): Saving {dict_len} Disulfide-containing PDB IDs to file: {fname}')
+    fname = f'{datadir}{dictfile}'
+    print(f'-> Extract_Disulfides(): Saving indices of {dict_len} Disulfide-containing PDB IDs to file: {fname}')
 
     with open(fname, 'wb+') as f:
         pickle.dump(All_ss_dict2, f)

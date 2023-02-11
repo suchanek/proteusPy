@@ -93,8 +93,9 @@ PDB_SS = DisulfideLoader(verbose=True, subset=False, datadir=datadir)
 
 _PBAR_COLS = 105
 ssdict = {}
-ssdict = PDB_SS.SSDict
+ssdict = PDB_SS.SSDict2
 empty = DisulfideList([], 'empty')
+
 
 tot = len(ssdict)
 
@@ -115,7 +116,7 @@ for _, pdbid_tuple in zip(pbar, enumerate(ssdict)):
 
     # print(f'{k} {pdbid_tuple}')
     pdbid = pdbid_tuple[1]
-    sslist = ssdict[pdbid]
+    sslist = PDB_SS[pdbid]
     pruned, xchain = prune_extra_ss(sslist)
     removed = len(sslist) - len(pruned)
     removed_tot += removed
@@ -124,14 +125,6 @@ for _, pdbid_tuple in zip(pbar, enumerate(ssdict)):
     
 print(f'Pruned {removed_tot}, Xchain: {xchain_tot}')
 
-# dump the dict of disulfides to a .pkl file. ~520 MB.
-picklefile = 'PDB_pruned_ss_dict.pkl'
-fname = f'{datadir}{picklefile}'
-
-print(f'Writing: {fname}')
-
-with open(fname, 'wb+') as f:
-    pickle.dump(pruned_dict, f)
 
 # now build the SS list
 pruned_list = DisulfideList([], 'PDB_SS_SINGLE_CHAIN')
@@ -156,6 +149,22 @@ print(f'Writing: {fname}')
 
 with open(fname, 'wb+') as f:
     pickle.dump(pruned_list, f)
+
+# build the dict from the pruned list
+print(f'Building SS dict...')
+pruned_dict = {'xxx': empty}
+
+for ss, i in zip(pruned_list, range(pruned_list.length)):
+    pruned_dict.update({ss.pdb_id: i})
+
+# dump the dict of disulfides to a .pkl file. ~520 MB.
+picklefile = 'PDB_pruned_ss_dict.pkl'
+fname = f'{datadir}{picklefile}'
+
+print(f'Writing: {fname}')
+
+with open(fname, 'wb+') as f:
+    pickle.dump(pruned_dict, f)
 
 # finally build and dump the torsions
 
