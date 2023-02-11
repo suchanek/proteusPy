@@ -97,7 +97,7 @@ class DisulfideLoader:
             self.TorsionFile = f'{datadir}PDB_subset_SS_torsions.csv'
         
         if verbose:
-            print(f' --> DisulfideLoader(): Reading disulfides from: {self.PickleFile}')
+            print(f'--> DisulfideLoader(): Reading disulfides from: {self.PickleFile}')
         
         with open(self.PickleFile, 'rb') as f:
             sslist = pickle.load(f)
@@ -106,8 +106,7 @@ class DisulfideLoader:
         self.TotalDisulfides = len(self.SSList)
         
         if verbose:
-            print(f'  --> DisulfideLoader(): Read: {self.TotalDisulfides} disulfides')
-            print(f' --> DisulfideLoader(): Reading disulfide dict from: {self.PickleDictFile}')
+            print(f'--> DisulfideLoader(): Reading disulfide dict from: {self.PickleDictFile}')
         
         with open(self.PickleDictFile, 'rb') as f:
             self.SSDict = pickle.load(f)
@@ -117,19 +116,21 @@ class DisulfideLoader:
             totalSS_dict = len(self.IDList)
         
         if verbose:
-            print(f' --> DisulfideLoader(): Reading Torsion DF {self.TorsionFile}.')
+            print(f'--> DisulfideLoader(): Reading Torsion DF from: {self.TorsionFile}.')
+
         
         #tmpDF  = pd.read_csv(self.TorsionFile, index_col='source')
         tmpDF  = pd.read_csv(self.TorsionFile)
         tmpDF.drop(tmpDF.columns[[0]], axis=1, inplace=True)
 
         self.TorsionDF = tmpDF.copy()
-
-        if verbose:
-            print(f' --> DisulfideLoader(): Read torsions DF.')
-            print(f' --> DisulfideLoader(): PDB IDs parsed: {totalSS_dict}')
-            print(f' --> DisulfideLoader(): Total RAM Used: {((sys.getsizeof(self.SSList) + sys.getsizeof(self.SSDict) + sys.getsizeof(self.TorsionDF)) / (1024 * 1024)):.2f} GB.')
+            
+        print(f'Loading complete.\nSummary: \n PDB IDs parsed: {totalSS_dict}')
+        print(f' Disulfides loaded: {self.TotalDisulfides}')
+        print(f' Total RAM Used by dataset: {((sys.getsizeof(self.SSList) + sys.getsizeof(self.SSDict) + sys.getsizeof(self.TorsionDF)) / (1024 * 1024)):.2f} GB.')
+        
         return
+
 
     # overload __getitem__ to handle slicing and indexing
     def __getitem__(self, item):
