@@ -24,8 +24,14 @@ proteusPy.egg-info/dependency_links.txt
 proteusPy.egg-info/not-zip-safe
 proteusPy.egg-info/requires.txt
 proteusPy.egg-info/top_level.txt
+proteusPy/data/PDB_all_ss.pkl
+proteusPy/data/PDB_all_ss_dict.pkl
+proteusPy/data/PDB_all_ss_torsions.csv
+proteusPy/data/PDB_subset_SS_problems.csv
 proteusPy/data/PDB_subset_ss.pkl
 proteusPy/data/PDB_subset_ss_dict.pkl
+proteusPy/data/PDB_subset_ss_dict_ind.pkl
+proteusPy/data/PDB_subset_torsions.csv
 proteusPy/data/__init__.py
 proteusPy/data/ss_completed.txt
 proteusPy/data/ss_ids.txt
