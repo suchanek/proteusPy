@@ -102,6 +102,6 @@ setup(name='proteusPy',
         'Topic :: Scientific/Engineering :: Chemistry',
         'Programming Language :: Python :: 3.9'],
       include_package_data=True,
-      package_data={'': ['data/*.txt', 'data/*.py', 'data/*.json']},
+      package_data={'': ['data/*.txt', 'data/*.py', 'data/*.json', 'data/*.pkl', 'data/*.csv']},
       python_requires=">=%i.%i" % MIN_PY_VER,
       zip_safe=False)

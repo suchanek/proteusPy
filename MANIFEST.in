@@ -1,1 +1,2 @@
-include data/*.pkl data/*.csv
+include data/*.pkl 
+include data/*.csv
