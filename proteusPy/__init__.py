@@ -32,7 +32,7 @@ from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN
 from .residue import build_residue, get_backbone_from_chain, to_alpha, to_carbonyl, to_nitrogen, to_oxygen
 
 from .Disulfide import Download_Disulfides, Extract_Disulfides
-from .DisulfideLoader import DisulfideLoader
+from .DisulfideLoader import DisulfideLoader, load_PDB_SS
 from .DisulfideList import load_disulfides_from_id
 
 from .atoms import *

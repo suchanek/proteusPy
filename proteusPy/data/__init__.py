@@ -21,4 +21,7 @@ SS_SUBSET_DICT_PICKLE_FILE_IND = 'PDB_subset_ss_dict_ind.pkl'
 SS_SUBSET_TORSIONS_FILE = 'PDB_subset_torsions.csv'
 SS_PROBLEM_SUBSET_ID_FILE = 'PDB_subset_problems.csv'
 
+LOADER_FNAME = "PDB_SS_ALL_LOADER.pkl"
+LOADER_SUBSET_FNAME = "PDB_SS_SUBSET_LOADER.pkl"
+
 # end of file

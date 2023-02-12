@@ -3,7 +3,7 @@ This module is part of the proteusPy package, a Python package for
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 Author: Eric G. Suchanek, PhD
-Last revision: 2/9/2023
+Last revision: 2/12/2023
 '''
 
 # Cα N, Cα, Cβ, C', Sγ Å °
@@ -27,7 +27,7 @@ from proteusPy import *
 from proteusPy.atoms import *
 
 from proteusPy.data import SS_DICT_PICKLE_FILE, SS_ID_FILE
-from proteusPy.data import SS_PICKLE_FILE, SS_DICT_PICKLE_FILE2, SS_TORSIONS_FILE, PROBLEM_ID_FILE
+from proteusPy.data import SS_PICKLE_FILE, SS_TORSIONS_FILE, PROBLEM_ID_FILE
 
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideList import DisulfideList
@@ -109,16 +109,14 @@ class Disulfide:
     """
     def __init__(self, name: str="SSBOND", proximal: int=-1,
                 distal: int=-1, proximal_chain: str='A',
-                distal_chain: str='A', pdb_id: str='',
+                distal_chain: str='A', pdb_id: str='1egs',
                 quiet: bool=True, permissive: bool=True
                 ) -> None:
         '''
         __init__ Initialize the class to defined internal values.
 
-        Parameters
-        ----------
-        name : str, optional \n
-            Disulfide name, by default "SSBOND"
+        :param name: Disulfide name, by default "SSBOND"
+            
         '''
         self.name = name
         self.proximal = proximal

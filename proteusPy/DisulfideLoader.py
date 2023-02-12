@@ -22,6 +22,7 @@ from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR
 from proteusPy.atoms import *
 
 from proteusPy.data import SS_PICKLE_FILE, SS_TORSIONS_FILE, SS_DICT_PICKLE_FILE, DATA_DIR
+from proteusPy.data import LOADER_FNAME, LOADER_SUBSET_FNAME
 
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.Disulfide import Torsion_DF_Cols
@@ -163,7 +164,7 @@ class DisulfideLoader:
         '''
         Return the list of Disulfides contained in the class.
 
-        :return: Disulfide list
+        :return: DisulfideList
         :rtype: DisulfideList
         '''
         return copy.deepcopy(self.SSList)
@@ -235,6 +236,23 @@ class DisulfideLoader:
         '''
         self.QUIET = perm
     
+    def save(self, savepath=DATA_DIR, fname=LOADER_FNAME, verbose=False):
+        '''
+        Save a copy of the fully instantiated Loader to the specified file.
+
+        :param savepath: Path to save the file, defaults to DATA_DIR
+        :param fname: Filename, defaults to LOADER_FNAME
+        :param verbose: Verbosity, defaults to False
+        '''
+        _fname = f'{savepath}{fname}'
+        if verbose:
+            print(f'-> DisulfideLoader.save(): Writing {_fname}... ', end='')
+        
+        with open(_fname, 'wb+') as f:
+            pickle.dump(self, f)
+        if verbose:
+            print(f'done.')
+        
     def copy(self):
         '''
         Return a copy of self
@@ -305,6 +323,29 @@ class DisulfideLoader:
        
 # class ends
 
+def load_PDB_SS(loadpath=DATA_DIR, fname=LOADER_FNAME, verbose=False, subset=False):
+    '''
+    Load a copy of the fully instantiated Loader to the specified file.
+
+    :param load: Path to save the file, defaults to DATA_DIR
+    :param fname: Filename, defaults to LOADER_FNAME
+    :param verbose: Verbosity, defaults to False
+    :param subset: If True, load the subset DB, otherwise load the full database
+    '''
+    if subset:
+        fname=LOADER_SUBSET_FNAME
+    
+    _fname = f'{loadpath}{fname}'
+
+    if verbose:
+        print(f'-> load_PDB_SS(): Reading {_fname}... ', end='')
+    
+    with open(_fname, 'rb') as f:
+        res = pickle.load(f)
+    if verbose:
+        print(f'done.')
+    return res
+ 
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
