@@ -9,6 +9,7 @@ Copyright (c)2023 Eric G. Suchanek, PhD, all rights reserved
 
 import math
 import numpy
+import copy
 from numpy import linspace
 from matplotlib import cm
 
@@ -165,27 +166,33 @@ def Check_chains(pdbid, pdbdir, verbose=True):
                 print(f'Chains are equal length, assuming the same. {chain_lens}')
     return(same)
 
+# given the full dictionary, walk through all the keys (PDB ID)
+# for each PDB_ID SS list, find and extract the SS for the first chain
+# update the 'pruned' dict with the now shorter SS list
+
 def extract_firstchain_ss(sslist, verbose=False):
     '''
     Function extracts disulfides from the first chain found in
+    the SSdict, returns them as a DisulfideList along with the
+    number of Xchain disulfides.
 
     :param sslist: Starting SS list
-    :return: Pruned SS list
+    :return: (Pruned SS list, xchain) 
     '''
-    id = ''
+
     chainlist = []
     pc = dc = ''
-    res = DisulfideList([], sslist.id)
+    res = proteusPy.DisulfideList.DisulfideList([], sslist.id)
     xchain = 0
 
-    # build ist of chains
+    # build list of chains
     for ss in sslist:
         pc = ss.proximal_chain
         dc = ss.distal_chain
         if pc != dc:
             xchain += 1
             if verbose:
-                print(f'Cross chain ss: {ss}')
+                print(f'--> extract_firstchain_ss(): Cross chain ss: {ss}')
         chainlist.append(pc)
     chain = chainlist[0]
 
@@ -206,11 +213,10 @@ def prune_extra_ss(sslist):
 
     #print(f'Processing: {ss} with: {sslist}')
     id = sslist.pdb_id
-    pruned_list = DisulfideList([], id)
+    pruned_list = proteusPy.DisulfideList.DisulfideList([], id)
     pruned_list, xchain = extract_firstchain_ss(sslist)
         
     return copy.deepcopy(pruned_list), xchain
-
 
 if __name__ == "__main__":
     import doctest

@@ -75,8 +75,8 @@ update = True
 
 if update:
     print(f'Copying: {DATA_DIR} to {MODULE_DATA}')
-    # copytree(DATA_DIR, MODULE_DATA, dirs_exist_ok=True, ignore=ignore_patterns('*_all_*'))
-    copytree(DATA_DIR, MODULE_DATA, dirs_exist_ok=True)
+    copytree(DATA_DIR, MODULE_DATA, dirs_exist_ok=True, ignore=ignore_patterns('*_pruned_*'))
+    #copytree(DATA_DIR, MODULE_DATA, dirs_exist_ok=True)
 
 end = time.time()
 

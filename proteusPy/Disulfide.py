@@ -31,7 +31,7 @@ from proteusPy.data import SS_PICKLE_FILE, SS_DICT_PICKLE_FILE2, SS_TORSIONS_FIL
 
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideList import DisulfideList
-from proteusPy.utility import distance3d
+from proteusPy.utility import distance3d, prune_extra_ss
 from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR, WINSIZE
 
 from Bio.PDB import Vector, PDBParser, PDBList
@@ -42,7 +42,7 @@ _FLOAT_INIT = -999.9
 _ANG_INIT = -180.0
 
 # tqdm progress bar width
-_PBAR_COLS = 105
+_PBAR_COLS = 110
 
 # columns for the torsions file dataframe.
 global Torsion_DF_Cols
@@ -1857,15 +1857,18 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     else:
         pbar = tqdm(entrylist, ncols=_PBAR_COLS)
 
+    tot = 0
     # loop over ss_filelist, create disulfides and initialize them
     for entry in pbar:
         cnt = 0
-        pbar.set_postfix({'ID': entry, 'Bad': bad, 'Ca': bad_dist}) # update the progress bar
+        pbar.set_postfix({'ID': entry, 'Bad': bad, 'Ca': bad_dist, 'Cnt': tot}) # update the progress bar
 
         # returns an empty list if none are found.
-        sslist = DisulfideList([], entry)
-        sslist = proteusPy.DisulfideList.load_disulfides_from_id(entry, model_numb=0, verbose=verbose, 
+        _sslist = DisulfideList([], entry)
+        _sslist = proteusPy.DisulfideList.load_disulfides_from_id(entry, model_numb=0, verbose=verbose, 
         								 quiet=quiet, pdb_dir=pdbdir)
+        sslist, xchain = prune_extra_ss(_sslist)
+
         if len(sslist) > 0:
             sslist2 = [] # list to hold indices for ss_dict2
             for ss in sslist:
@@ -1885,6 +1888,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
                 sslist2.append(cnt)
                 SS_df.loc[len(SS_df.index)] = new_row.copy() # deep copy
                 cnt += 1
+                tot += 1
 
             All_ss_dict[entry] = sslist
             All_ss_dict2[entry] = sslist2
@@ -1906,7 +1910,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
         problem_df.to_csv(f'{datadir}{problemfile}')
     else:
         if verbose:
-            print(': No non-parsable structures found.')
+            print('-> Extract_Disulfides(): No non-parsable structures found.')
 
     if bad_dist > 0:
         print(f'-> Extract_Disulfides(): Found and ignored: {bad_dist} long SS bonds.')
@@ -1914,7 +1918,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
         if verbose:
             print('No problems found.')
 
-    # dump the all_ss array of disulfides to a .pkl file. ~520 MB.
+    # dump the all_ss list of disulfides to a .pkl file. ~520 MB.
     fname = f'{datadir}{picklefile}'
     print(f'-> Extract_Disulfides(): Saving {len(All_ss_list)} Disulfides to file: {fname}')
     

@@ -59,7 +59,6 @@ class DisulfideLoader:
 
     def __init__(self, verbose=True, datadir=DATA_DIR, picklefile=SS_PICKLE_FILE, 
                 pickle_dict_file=SS_DICT_PICKLE_FILE,
-                #pickle_dict_file2=SS_DICT_PICKLE_FILE2,
                 torsion_file=SS_TORSIONS_FILE, quiet=True, subset=False):
         '''
         Initializing the class initiates loading either the entire Disulfide dataset,
@@ -74,7 +73,6 @@ class DisulfideLoader:
         self.ModelDir = datadir
         self.PickleFile = f'{datadir}{picklefile}'
         self.PickleDictFile = f'{datadir}{pickle_dict_file}'
-        #self.PickleDictFile2 = f'{datadir}{pickle_dict_file2}'
         self.TorsionFile = f'{datadir}{torsion_file}'
         self.SSList = DisulfideList([], 'ALL_PDB_SS')
         self.SSDict = {}
@@ -88,9 +86,7 @@ class DisulfideLoader:
         # Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 
         # 'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist', 'psi_dist']
         
-        SS_df = pd.DataFrame(columns=Torsion_DF_Cols, index=['source'])
-        _SSList = DisulfideList([], 'ALL_PDB_SS')
-
+        # SS_df = pd.DataFrame(columns=Torsion_DF_Cols, index=['source'])
         idlist = []
 
         if subset:
@@ -106,17 +102,7 @@ class DisulfideLoader:
             self.SSList = sslist
 
         self.TotalDisulfides = len(self.SSList)
-        '''
-        if verbose:
-            print(f'--> DisulfideLoader(): Reading disulfide dict from: {self.PickleDictFile}')
         
-        with open(self.PickleDictFile, 'rb') as f:
-            self.SSDict = pickle.load(f)
-            for key in self.SSDict:
-                idlist.append(key)
-            self.IDList = idlist.copy()
-            totalSS_dict = len(self.IDList)
-        '''
         if verbose:
             print(f'--> DisulfideLoader(): Reading disulfide dict2 from: {self.PickleDictFile}')
         
@@ -140,11 +126,12 @@ class DisulfideLoader:
             print(f' Total RAM Used by dataset: {((sys.getsizeof(self.SSList) + sys.getsizeof(self.SSDict) + sys.getsizeof(self.TorsionDF)) / (1024 * 1024)):.2f} GB.')
         return
 
-    # overload __getitem__ to handle slicing and indexing
+    # overload __getitem__ to handle slicing and indexing, and access by name
     def __getitem__(self, item):
+        res = DisulfideList([], 'none')
+
         if isinstance(item, slice):
             indices = range(*item.indices(len(self.SSList)))
-            # return [self.SSList[i] for i in indices]
             name = self.SSList[0].pdb_id
             resolution = self.SSList[0].resolution
             sublist = [self.SSList[i] for i in indices]
@@ -152,20 +139,21 @@ class DisulfideLoader:
         
         if isinstance(item, int):
             if (item < 0 or item >= self.TotalDisulfides):
-                mess = f'DisulfideDataLoader error. Index {item} out of range 0-{self.TotalDisulfides - 1}'
+                mess = f'DisulfideLoader(): Index {item} out of range 0-{self.TotalDisulfides - 1}'
                 raise DisulfideException(mess)
             else:
                 return self.SSList[item]
 
         try:
             indices = self.SSDict[item]
-            res = DisulfideList([],'tmp')
+            res = DisulfideList([], item)
             sslist = self.SSList
-            res = DisulfideList([sslist[indices[i]] for i in indices], 'tmp')
+            res = DisulfideList([sslist[indices[i]] for i in indices], item)
 
         except KeyError:
-            mess = f'! Cannot find key {item} in SSBond dict!'
+            mess = f'DisulfideLoader(): Cannot find key {item} in SSBond dict!'
             raise DisulfideException(mess)
+
         return res
     
     def __setitem__(self, index, item):
