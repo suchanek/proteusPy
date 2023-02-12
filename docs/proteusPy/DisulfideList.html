@@ -238,11 +238,11 @@ and <a href="DisulfideList.html#DisulfideList.display_overlay">DisulfideList.dis
 </span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="sd">    &gt;&gt;&gt; PDB_SS = DisulfideLoader(verbose=False, subset=True)  # load the Disulfide database</span>
 </span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="sd">    &gt;&gt;&gt; SS = PDB_SS[0]</span>
 </span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="sd">    &gt;&gt;&gt; SS</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd">    &lt;Disulfide 4yys_22A_65A SourceID: 4yys Resolution: 1.35 Å, Proximal: 22 A Distal: 65 A&gt;</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="sd">    &lt;Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å&gt;</span>
 </span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">    </span>
 </span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="sd">    &gt;&gt;&gt; SS4yys = PDB_SS[&#39;4yys&#39;]</span>
 </span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd">    &gt;&gt;&gt; SS4yys</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">    [&lt;Disulfide 4yys_22A_65A SourceID: 4yys Resolution: 1.35 Å, Proximal: 22 A Distal: 65 A&gt;, &lt;Disulfide 4yys_56A_98A SourceID: 4yys Resolution: 1.35 Å, Proximal: 56 A Distal: 98 A&gt;, &lt;Disulfide 4yys_156A_207A SourceID: 4yys Resolution: 1.35 Å, Proximal: 156 A Distal: 207 A&gt;, &lt;Disulfide 4yys_22B_65B SourceID: 4yys Resolution: 1.35 Å, Proximal: 22 B Distal: 65 B&gt;, &lt;Disulfide 4yys_56B_98B SourceID: 4yys Resolution: 1.35 Å, Proximal: 56 B Distal: 98 B&gt;, &lt;Disulfide 4yys_156B_207B SourceID: 4yys Resolution: 1.35 Å, Proximal: 156 B Distal: 207 B&gt;]</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="sd">    [&lt;Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å&gt;, &lt;Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å&gt;, &lt;Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å&gt;, &lt;Disulfide 4yys_22B_65B, Source: 4yys, Resolution: 1.35 Å&gt;, &lt;Disulfide 4yys_56B_98B, Source: 4yys, Resolution: 1.35 Å&gt;, &lt;Disulfide 4yys_156B_207B, Source: 4yys, Resolution: 1.35 Å&gt;]</span>
 </span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>
 </span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="sd">    Make some empty disulfides</span>
 </span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="sd">    &gt;&gt;&gt; ss1 = Disulfide(&#39;ss1&#39;)</span>
@@ -255,7 +255,7 @@ and <a href="DisulfideList.html#DisulfideList.display_overlay">DisulfideList.dis
 </span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="sd">    Extract the first disulfide</span>
 </span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">    &gt;&gt;&gt; ss1 = PDB_SS[0]</span>
 </span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="sd">    &gt;&gt;&gt; ss1.pprint_all()</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="sd">    &lt;Disulfide 4yys_22A_65A SourceID: 4yys Resolution: 1.35 Å, Proximal: 22 A Distal: 65 A</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="sd">    &lt;Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å</span>
 </span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="sd">     Proximal Chain fullID: &lt;(&#39;4yys&#39;, 0, &#39;A&#39;, (&#39; &#39;, 22, &#39; &#39;))&gt; Distal Chain fullID: &lt;(&#39;4yys&#39;, 0, &#39;A&#39;, (&#39; &#39;, 65, &#39; &#39;))&gt; </span>
 </span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="sd">    Proximal Coordinates:</span>
 </span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="sd">       N: &lt;Vector -2.36, -20.48, 5.21&gt;</span>
@@ -941,7 +941,7 @@ and <a href="DisulfideList.html#DisulfideList.display_overlay">DisulfideList.dis
 </span><span id="L-765"><a href="#L-765"><span class="linenos">765</span></a><span class="sd">    &gt;&gt;&gt; SSlist = DisulfideList([],&#39;5rsa&#39;)</span>
 </span><span id="L-766"><a href="#L-766"><span class="linenos">766</span></a><span class="sd">    &gt;&gt;&gt; SSlist = load_disulfides_from_id(&#39;5rsa&#39;, verbose=False)</span>
 </span><span id="L-767"><a href="#L-767"><span class="linenos">767</span></a><span class="sd">    &gt;&gt;&gt; SSlist</span>
-</span><span id="L-768"><a href="#L-768"><span class="linenos">768</span></a><span class="sd">    [&lt;Disulfide 5rsa_26A_84A SourceID: 5rsa Resolution: 2.0 Å, Proximal: 26 A Distal: 84 A&gt;, &lt;Disulfide 5rsa_40A_95A SourceID: 5rsa Resolution: 2.0 Å, Proximal: 40 A Distal: 95 A&gt;, &lt;Disulfide 5rsa_58A_110A SourceID: 5rsa Resolution: 2.0 Å, Proximal: 58 A Distal: 110 A&gt;, &lt;Disulfide 5rsa_65A_72A SourceID: 5rsa Resolution: 2.0 Å, Proximal: 65 A Distal: 72 A&gt;]</span>
+</span><span id="L-768"><a href="#L-768"><span class="linenos">768</span></a><span class="sd">    [&lt;Disulfide 5rsa_26A_84A, Source: 5rsa, Resolution: 2.0 Å&gt;, &lt;Disulfide 5rsa_40A_95A, Source: 5rsa, Resolution: 2.0 Å&gt;, &lt;Disulfide 5rsa_58A_110A, Source: 5rsa, Resolution: 2.0 Å&gt;, &lt;Disulfide 5rsa_65A_72A, Source: 5rsa, Resolution: 2.0 Å&gt;]</span>
 </span><span id="L-769"><a href="#L-769"><span class="linenos">769</span></a><span class="sd">    &#39;&#39;&#39;</span>
 </span><span id="L-770"><a href="#L-770"><span class="linenos">770</span></a>
 </span><span id="L-771"><a href="#L-771"><span class="linenos">771</span></a>    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
@@ -1084,11 +1084,11 @@ and <a href="DisulfideList.html#DisulfideList.display_overlay">DisulfideList.dis
 </span><span id="DisulfideList-63"><a href="#DisulfideList-63"><span class="linenos"> 63</span></a><span class="sd">    &gt;&gt;&gt; PDB_SS = DisulfideLoader(verbose=False, subset=True)  # load the Disulfide database</span>
 </span><span id="DisulfideList-64"><a href="#DisulfideList-64"><span class="linenos"> 64</span></a><span class="sd">    &gt;&gt;&gt; SS = PDB_SS[0]</span>
 </span><span id="DisulfideList-65"><a href="#DisulfideList-65"><span class="linenos"> 65</span></a><span class="sd">    &gt;&gt;&gt; SS</span>
-</span><span id="DisulfideList-66"><a href="#DisulfideList-66"><span class="linenos"> 66</span></a><span class="sd">    &lt;Disulfide 4yys_22A_65A SourceID: 4yys Resolution: 1.35 Å, Proximal: 22 A Distal: 65 A&gt;</span>
+</span><span id="DisulfideList-66"><a href="#DisulfideList-66"><span class="linenos"> 66</span></a><span class="sd">    &lt;Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å&gt;</span>
 </span><span id="DisulfideList-67"><a href="#DisulfideList-67"><span class="linenos"> 67</span></a><span class="sd">    </span>
 </span><span id="DisulfideList-68"><a href="#DisulfideList-68"><span class="linenos"> 68</span></a><span class="sd">    &gt;&gt;&gt; SS4yys = PDB_SS[&#39;4yys&#39;]</span>
 </span><span id="DisulfideList-69"><a href="#DisulfideList-69"><span class="linenos"> 69</span></a><span class="sd">    &gt;&gt;&gt; SS4yys</span>
-</span><span id="DisulfideList-70"><a href="#DisulfideList-70"><span class="linenos"> 70</span></a><span class="sd">    [&lt;Disulfide 4yys_22A_65A SourceID: 4yys Resolution: 1.35 Å, Proximal: 22 A Distal: 65 A&gt;, &lt;Disulfide 4yys_56A_98A SourceID: 4yys Resolution: 1.35 Å, Proximal: 56 A Distal: 98 A&gt;, &lt;Disulfide 4yys_156A_207A SourceID: 4yys Resolution: 1.35 Å, Proximal: 156 A Distal: 207 A&gt;, &lt;Disulfide 4yys_22B_65B SourceID: 4yys Resolution: 1.35 Å, Proximal: 22 B Distal: 65 B&gt;, &lt;Disulfide 4yys_56B_98B SourceID: 4yys Resolution: 1.35 Å, Proximal: 56 B Distal: 98 B&gt;, &lt;Disulfide 4yys_156B_207B SourceID: 4yys Resolution: 1.35 Å, Proximal: 156 B Distal: 207 B&gt;]</span>
+</span><span id="DisulfideList-70"><a href="#DisulfideList-70"><span class="linenos"> 70</span></a><span class="sd">    [&lt;Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å&gt;, &lt;Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å&gt;, &lt;Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å&gt;, &lt;Disulfide 4yys_22B_65B, Source: 4yys, Resolution: 1.35 Å&gt;, &lt;Disulfide 4yys_56B_98B, Source: 4yys, Resolution: 1.35 Å&gt;, &lt;Disulfide 4yys_156B_207B, Source: 4yys, Resolution: 1.35 Å&gt;]</span>
 </span><span id="DisulfideList-71"><a href="#DisulfideList-71"><span class="linenos"> 71</span></a>
 </span><span id="DisulfideList-72"><a href="#DisulfideList-72"><span class="linenos"> 72</span></a><span class="sd">    Make some empty disulfides</span>
 </span><span id="DisulfideList-73"><a href="#DisulfideList-73"><span class="linenos"> 73</span></a><span class="sd">    &gt;&gt;&gt; ss1 = Disulfide(&#39;ss1&#39;)</span>
@@ -1101,7 +1101,7 @@ and <a href="DisulfideList.html#DisulfideList.display_overlay">DisulfideList.dis
 </span><span id="DisulfideList-80"><a href="#DisulfideList-80"><span class="linenos"> 80</span></a><span class="sd">    Extract the first disulfide</span>
 </span><span id="DisulfideList-81"><a href="#DisulfideList-81"><span class="linenos"> 81</span></a><span class="sd">    &gt;&gt;&gt; ss1 = PDB_SS[0]</span>
 </span><span id="DisulfideList-82"><a href="#DisulfideList-82"><span class="linenos"> 82</span></a><span class="sd">    &gt;&gt;&gt; ss1.pprint_all()</span>
-</span><span id="DisulfideList-83"><a href="#DisulfideList-83"><span class="linenos"> 83</span></a><span class="sd">    &lt;Disulfide 4yys_22A_65A SourceID: 4yys Resolution: 1.35 Å, Proximal: 22 A Distal: 65 A</span>
+</span><span id="DisulfideList-83"><a href="#DisulfideList-83"><span class="linenos"> 83</span></a><span class="sd">    &lt;Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å</span>
 </span><span id="DisulfideList-84"><a href="#DisulfideList-84"><span class="linenos"> 84</span></a><span class="sd">     Proximal Chain fullID: &lt;(&#39;4yys&#39;, 0, &#39;A&#39;, (&#39; &#39;, 22, &#39; &#39;))&gt; Distal Chain fullID: &lt;(&#39;4yys&#39;, 0, &#39;A&#39;, (&#39; &#39;, 65, &#39; &#39;))&gt; </span>
 </span><span id="DisulfideList-85"><a href="#DisulfideList-85"><span class="linenos"> 85</span></a><span class="sd">    Proximal Coordinates:</span>
 </span><span id="DisulfideList-86"><a href="#DisulfideList-86"><span class="linenos"> 86</span></a><span class="sd">       N: &lt;Vector -2.36, -20.48, 5.21&gt;</span>
@@ -1783,14 +1783,14 @@ with an iterable (tuple, list) and a name.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">PDB_SS</span> <span class="o">=</span> <span class="n">DisulfideLoader</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># load the Disulfide database</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">SS</span> <span class="o">=</span> <span class="n">PDB_SS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">SS</span>
-<span class="go">&lt;Disulfide 4yys_22A_65A SourceID: 4yys Resolution: 1.35 Å, Proximal: 22 A Distal: 65 A&gt;</span>
+<span class="go">&lt;Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å&gt;</span>
 </code></pre>
 </div>
 
 <div class="pdoc-code codehilite">
 <pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">SS4yys</span> <span class="o">=</span> <span class="n">PDB_SS</span><span class="p">[</span><span class="s1">&#39;4yys&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">SS4yys</span>
-<span class="go">[&lt;Disulfide 4yys_22A_65A SourceID: 4yys Resolution: 1.35 Å, Proximal: 22 A Distal: 65 A&gt;, &lt;Disulfide 4yys_56A_98A SourceID: 4yys Resolution: 1.35 Å, Proximal: 56 A Distal: 98 A&gt;, &lt;Disulfide 4yys_156A_207A SourceID: 4yys Resolution: 1.35 Å, Proximal: 156 A Distal: 207 A&gt;, &lt;Disulfide 4yys_22B_65B SourceID: 4yys Resolution: 1.35 Å, Proximal: 22 B Distal: 65 B&gt;, &lt;Disulfide 4yys_56B_98B SourceID: 4yys Resolution: 1.35 Å, Proximal: 56 B Distal: 98 B&gt;, &lt;Disulfide 4yys_156B_207B SourceID: 4yys Resolution: 1.35 Å, Proximal: 156 B Distal: 207 B&gt;]</span>
+<span class="go">[&lt;Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å&gt;, &lt;Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å&gt;, &lt;Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å&gt;, &lt;Disulfide 4yys_22B_65B, Source: 4yys, Resolution: 1.35 Å&gt;, &lt;Disulfide 4yys_56B_98B, Source: 4yys, Resolution: 1.35 Å&gt;, &lt;Disulfide 4yys_156B_207B, Source: 4yys, Resolution: 1.35 Å&gt;]</span>
 </code></pre>
 </div>
 
@@ -1815,7 +1815,7 @@ with an iterable (tuple, list) and a name.</p>
 <div class="pdoc-code codehilite">
 <pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">ss1</span> <span class="o">=</span> <span class="n">PDB_SS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ss1</span><span class="o">.</span><span class="n">pprint_all</span><span class="p">()</span>
-<span class="go">&lt;Disulfide 4yys_22A_65A SourceID: 4yys Resolution: 1.35 Å, Proximal: 22 A Distal: 65 A</span>
+<span class="go">&lt;Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å</span>
 <span class="go"> Proximal Chain fullID: &lt;(&#39;4yys&#39;, 0, &#39;A&#39;, (&#39; &#39;, 22, &#39; &#39;))&gt; Distal Chain fullID: &lt;(&#39;4yys&#39;, 0, &#39;A&#39;, (&#39; &#39;, 65, &#39; &#39;))&gt; </span>
 <span class="go">Proximal Coordinates:</span>
 <span class="go">   N: &lt;Vector -2.36, -20.48, 5.21&gt;</span>
@@ -3105,7 +3105,7 @@ close the window to save.</p>
 </span><span id="load_disulfides_from_id-766"><a href="#load_disulfides_from_id-766"><span class="linenos">766</span></a><span class="sd">    &gt;&gt;&gt; SSlist = DisulfideList([],&#39;5rsa&#39;)</span>
 </span><span id="load_disulfides_from_id-767"><a href="#load_disulfides_from_id-767"><span class="linenos">767</span></a><span class="sd">    &gt;&gt;&gt; SSlist = load_disulfides_from_id(&#39;5rsa&#39;, verbose=False)</span>
 </span><span id="load_disulfides_from_id-768"><a href="#load_disulfides_from_id-768"><span class="linenos">768</span></a><span class="sd">    &gt;&gt;&gt; SSlist</span>
-</span><span id="load_disulfides_from_id-769"><a href="#load_disulfides_from_id-769"><span class="linenos">769</span></a><span class="sd">    [&lt;Disulfide 5rsa_26A_84A SourceID: 5rsa Resolution: 2.0 Å, Proximal: 26 A Distal: 84 A&gt;, &lt;Disulfide 5rsa_40A_95A SourceID: 5rsa Resolution: 2.0 Å, Proximal: 40 A Distal: 95 A&gt;, &lt;Disulfide 5rsa_58A_110A SourceID: 5rsa Resolution: 2.0 Å, Proximal: 58 A Distal: 110 A&gt;, &lt;Disulfide 5rsa_65A_72A SourceID: 5rsa Resolution: 2.0 Å, Proximal: 65 A Distal: 72 A&gt;]</span>
+</span><span id="load_disulfides_from_id-769"><a href="#load_disulfides_from_id-769"><span class="linenos">769</span></a><span class="sd">    [&lt;Disulfide 5rsa_26A_84A, Source: 5rsa, Resolution: 2.0 Å&gt;, &lt;Disulfide 5rsa_40A_95A, Source: 5rsa, Resolution: 2.0 Å&gt;, &lt;Disulfide 5rsa_58A_110A, Source: 5rsa, Resolution: 2.0 Å&gt;, &lt;Disulfide 5rsa_65A_72A, Source: 5rsa, Resolution: 2.0 Å&gt;]</span>
 </span><span id="load_disulfides_from_id-770"><a href="#load_disulfides_from_id-770"><span class="linenos">770</span></a><span class="sd">    &#39;&#39;&#39;</span>
 </span><span id="load_disulfides_from_id-771"><a href="#load_disulfides_from_id-771"><span class="linenos">771</span></a>
 </span><span id="load_disulfides_from_id-772"><a href="#load_disulfides_from_id-772"><span class="linenos">772</span></a>    <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
@@ -3237,7 +3237,7 @@ To load the Disulfides from the PDB ID 5rsa we'd use the following:</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">SSlist</span> <span class="o">=</span> <span class="n">DisulfideList</span><span class="p">([],</span><span class="s1">&#39;5rsa&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">SSlist</span> <span class="o">=</span> <span class="n">load_disulfides_from_id</span><span class="p">(</span><span class="s1">&#39;5rsa&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">SSlist</span>
-<span class="go">[&lt;Disulfide 5rsa_26A_84A SourceID: 5rsa Resolution: 2.0 Å, Proximal: 26 A Distal: 84 A&gt;, &lt;Disulfide 5rsa_40A_95A SourceID: 5rsa Resolution: 2.0 Å, Proximal: 40 A Distal: 95 A&gt;, &lt;Disulfide 5rsa_58A_110A SourceID: 5rsa Resolution: 2.0 Å, Proximal: 58 A Distal: 110 A&gt;, &lt;Disulfide 5rsa_65A_72A SourceID: 5rsa Resolution: 2.0 Å, Proximal: 65 A Distal: 72 A&gt;]</span>
+<span class="go">[&lt;Disulfide 5rsa_26A_84A, Source: 5rsa, Resolution: 2.0 Å&gt;, &lt;Disulfide 5rsa_40A_95A, Source: 5rsa, Resolution: 2.0 Å&gt;, &lt;Disulfide 5rsa_58A_110A, Source: 5rsa, Resolution: 2.0 Å&gt;, &lt;Disulfide 5rsa_65A_72A, Source: 5rsa, Resolution: 2.0 Å&gt;]</span>
 </code></pre>
 </div>
 </div>

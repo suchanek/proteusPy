@@ -4,7 +4,6 @@ setup.cfg
 setup.py
 proteusPy/Disulfide.py
 proteusPy/DisulfideExceptions.py
-proteusPy/DisulfideGlobals.py
 proteusPy/DisulfideList.py
 proteusPy/DisulfideLoader.py
 proteusPy/ProteusGlobals.py
@@ -25,7 +24,6 @@ proteusPy.egg-info/dependency_links.txt
 proteusPy.egg-info/not-zip-safe
 proteusPy.egg-info/requires.txt
 proteusPy.egg-info/top_level.txt
-proteusPy/data/PDB_subset_SS_torsions.csv
 proteusPy/data/PDB_subset_ss.pkl
 proteusPy/data/PDB_subset_ss_dict.pkl
 proteusPy/data/__init__.py
