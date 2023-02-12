@@ -52,7 +52,7 @@ class DisulfideLoader:
     <Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>
     >>> SS2 = PDB_SS['4yys']
     >>> SS2
-    [<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_22B_65B, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56B_98B, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156B_207B, Source: 4yys, Resolution: 1.35 Å>]
+    [<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>]
     >>> SSlist = PDB_SS[:4]
     >>> SSlist.display(style='sb') 
     '''
@@ -168,23 +168,6 @@ class DisulfideLoader:
         '''
         return copy.deepcopy(self.SSList)
     
-    def getdict(self, id=None) -> DisulfideList:
-        '''
-        Return the Disulfide List contained in the ID.
-        :param id: PDB ID, e.g. '4yys'
-        :return: Disulfide List
-        '''
-        if id is not None:
-            try:
-                sslist = self.SSDict[id]
-                return copy.deepcopy(self.SSList[id])
-            except:
-                mess = f'Invalid index {id}'
-                raise(ProteusPyWarning(mess))
-                return {}
-        else:
-            return copy.deepcopy(self.SSDict)
-
     def getTorsions(self, pdbID=None) -> pd.DataFrame:
         '''
         Return the torsions, distances and energies defined by Disulfide.Torsion_DF_cols
@@ -201,18 +184,17 @@ class DisulfideLoader:
         >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
         >>> Tor_DF = PDB_SS.getTorsions()
         >>> Tor_DF.describe()
-                  proximal       distal         chi1         chi2         chi3  ...     phi_prox     psi_prox     phi_dist     psi_dist  torsion_length
-        count  8210.000000  8210.000000  8210.000000  8210.000000  8210.000000  ...  8210.000000  8210.000000  8210.000000  8210.000000     8210.000000
-        mean    231.242875   280.309257   -46.635049    -4.363584    -4.438116  ...  -101.610350    69.281822   -98.354988    72.681350      233.892187
-        std     285.911354   284.999227   103.687677   110.144551    94.110252  ...    43.440895    95.468934    42.211145    95.374444       56.415414
-        min       1.000000     6.000000  -179.990815  -179.990782  -179.502078  ...  -180.000000  -180.000000  -180.000000  -180.000000      102.031030
-        25%      44.000000    96.000000   -91.432474   -86.794595   -88.431544  ...  -131.259716   -18.032679  -124.017966   -14.776966      187.399815
-        50%     138.000000   195.000000   -64.205495   -54.482183   -64.843442  ...  -105.365621   115.617182  -100.506678   122.338903      232.813196
-        75%     324.000000   364.000000   -41.621931   100.943649    93.532489  ...   -73.165302   140.628913   -73.916673   144.177030      273.123655
-        max    5045.000000  5070.000000   179.945970   179.987671   179.976934  ...   179.578735   179.972228   179.337160   179.971149      368.022621
+                  proximal       distal         chi1         chi2         chi3         chi4  ...  ca_distance     phi_prox     psi_prox     phi_dist     psi_dist  torsion_length
+        count  3393.000000  3393.000000  3393.000000  3393.000000  3393.000000  3393.000000  ...  3393.000000  3393.000000  3393.000000  3393.000000  3393.000000     3393.000000
+        mean    231.513999   280.056587   -49.134436   -15.616297    -3.727982   -31.909496  ...     5.554563   -98.491326    63.029854   -95.890117    62.408772      225.242256
+        std     292.300344   293.503989    95.456284   104.318483    93.894477   103.553641  ...     1.489138    44.275097    99.266921    44.796764    97.231632       53.309336
+        min       1.000000     6.000000  -179.947368  -179.990782  -179.081812  -179.940602  ...     2.941898  -180.000000  -180.000000  -180.000000  -180.000000      116.478788
+        25%      48.000000    96.000000   -83.281768   -88.455019   -87.763001   -95.240905  ...     5.075491  -129.605300   -26.792543  -123.131231   -25.503215      181.929048
+        50%     136.000000   194.000000   -63.878076   -59.597437   -64.977491   -69.607516  ...     5.612046   -97.569676   112.772998   -97.956322   112.956483      225.617493
+        75%     310.000000   361.000000   -47.459809    82.078365    94.169603    69.488862  ...     6.112471   -69.670087   143.781003   -70.485076   142.808862      263.003492
+        max    2592.000000  2599.000000   179.918814   179.987671   179.554652   179.977181  ...    75.611323   177.021502   179.856474   178.886602   179.735964      368.022621
         <BLANKLINE>
         [8 rows x 14 columns]
-
         '''
         res_df = pd.DataFrame()
 
