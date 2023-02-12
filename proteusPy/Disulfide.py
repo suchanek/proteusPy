@@ -1872,8 +1872,8 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
         if len(sslist) > 0:
             sslist2 = [] # list to hold indices for ss_dict2
             for ss in sslist:
-                dist = ss.ca_distance
                 # Ca distance cutoff
+                dist = ss.ca_distance
                 if dist >= dist_cutoff and dist_cutoff != -1.0:
                     bad_dist += 1
                     continue
@@ -1890,7 +1890,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
                 cnt += 1
                 tot += 1
 
-            All_ss_dict[entry] = sslist
+            # All_ss_dict[entry] = sslist
             All_ss_dict2[entry] = sslist2
 
         else:
