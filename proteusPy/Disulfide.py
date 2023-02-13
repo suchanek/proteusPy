@@ -1202,9 +1202,8 @@ class Disulfide:
         """
         Representation for Disulfide conformation
         """
-        s4 = f'Conformation: (Χ1-Χ5):  {self.chi1:.3f}°, {self.chi2:.3f}°, {self.chi3:.3f}°, {self.chi4:.3f}° {self.chi5:.3f}° '
-        s5 = f'Energy: {self.energy:.3f} kcal/mol'
-        stot = f'{s4} {s5}'
+        s4 = f'Χ1-Χ5: {self.chi1:.2f}°, {self.chi2:.2f}°, {self.chi3:.2f}°, {self.chi4:.2f}° {self.chi5:.2f}°, {self.energy:.2f} kcal/mol'
+        stot = f'{s4}'
         return stot
 
     def repr_ss_local_coords(self):
@@ -1226,14 +1225,14 @@ class Disulfide:
         """
         Representation for Disulfide Ca distance
         """
-        s1 = f'Cα Distance: {self.ca_distance:.3f} Å'
+        s1 = f'Cα Distance: {self.ca_distance:.2f} Å'
         return s1
     
     def repr_ss_torsion_length(self):
         """
         Representation for Disulfide torsion length
         """
-        s1 = f'Torsion length: {self.torsion_length:.3f} deg'
+        s1 = f'Torsion length: {self.torsion_length:.2f} deg'
         return s1
     
     def repr_all(self) -> str:
