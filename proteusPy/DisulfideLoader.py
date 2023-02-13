@@ -34,7 +34,8 @@ from proteusPy.data import *
 class DisulfideLoader:
     '''
     This class loads files created from the proteusPy.Disulfide.Extract_Disulfides() routine 
-    and initializes itself with their contents. The Disulfide objects are contained
+    and initializes itself with their contents. This, then, represents the disulfide database itself and is
+    the primary means of accession. The Disulfide objects are contained
     in a proteuPy.DisulfideList.DisulfideList object and Dict, and their torsions and distances stored in a .csv file.
     This makes it possible to access the disulfides by array index or PDB structure ID. 
     The class can also render Disulfides to a pyVista window using the 
@@ -47,15 +48,27 @@ class DisulfideLoader:
     >>> from proteusPy.DisulfideList import DisulfideList
     >>> SS1 = DisulfideList([],'tmp1')
     >>> SS2 = DisulfideList([],'tmp2')
+    
     >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
     >>> SS1 = PDB_SS[0]
     >>> SS1
     <Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>
+    
+    Accessing by PDB_ID returns a list of Disulfides
     >>> SS2 = PDB_SS['4yys']
     >>> SS2
     [<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>]
+    
+    One can access individual disulfides by their name as well:
+    >>> SS3 = PDB_SS['4yys_56A_98A']
+    >>> SS3
+    <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>
+    
+    Finally, we can access disulfides by regular slicing:
     >>> SSlist = PDB_SS[:4]
     >>> SSlist.display(style='sb') 
+
+
     '''
 
     def __init__(self, verbose=True, datadir=DATA_DIR, picklefile=SS_PICKLE_FILE, 
@@ -152,14 +165,17 @@ class DisulfideLoader:
                 return self.SSList[item]
 
         try:
-            indices = self.SSDict[item]
+            indices = self.SSDict[item] # PDB_SS['4yys'] return a list of SS
             res = DisulfideList([], item)
             sslist = self.SSList
             res = DisulfideList([sslist[indices[i]] for i in indices], item)
 
         except KeyError:
-            mess = f'DisulfideLoader(): Cannot find key {item} in SSBond dict!'
-            raise DisulfideException(mess)
+            try:
+                res = self.SSList.get_by_name(item)
+            except: 
+                mess = f'DisulfideLoader(): Cannot find key {item} in SSBond dict!'
+                raise DisulfideException(mess)
 
         return res
     
