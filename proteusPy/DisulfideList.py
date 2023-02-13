@@ -194,6 +194,7 @@ class DisulfideList(UserList):
             for c in range(cols):
                 pl.subplot(r,c)
                 if i < tot_ss:
+                    ss = Disulfide()
                     ss = ssList[i]
                     src = ss.pdb_id
                     enrg = ss.energy

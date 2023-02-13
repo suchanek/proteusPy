@@ -96,16 +96,19 @@ class DisulfideLoader:
             self.TorsionFile = f'{datadir}{SS_SUBSET_TORSIONS_FILE}'
         
         if verbose:
-            print(f'--> DisulfideLoader(): Reading disulfides from: {self.PickleFile}')
+            print(f'--> DisulfideLoader(): Reading disulfides from: {self.PickleFile}... ', end='')
         
         with open(self.PickleFile, 'rb') as f:
             sslist = pickle.load(f)
             self.SSList = sslist
 
+        if verbose:
+            print(f'done.',)
+
         self.TotalDisulfides = len(self.SSList)
         
         if verbose:
-            print(f'--> DisulfideLoader(): Reading disulfide dict2 from: {self.PickleDictFile}')
+            print(f'--> DisulfideLoader(): Reading disulfide dict2 from: {self.PickleDictFile}...', end='')
         
         with open(self.PickleDictFile, 'rb') as f:
             self.SSDict = pickle.load(f)
@@ -115,7 +118,10 @@ class DisulfideLoader:
             totalSS_dict = len(self.IDList)
 
         if verbose:
-            print(f'--> DisulfideLoader(): Reading Torsion DF from: {self.TorsionFile}.')
+            print(f'done.',)
+
+        if verbose:
+            print(f'--> DisulfideLoader(): Reading Torsion DF from: {self.TorsionFile}...', end='')
 
         tmpDF  = pd.read_csv(self.TorsionFile)
         tmpDF.drop(tmpDF.columns[[0]], axis=1, inplace=True)
@@ -160,6 +166,20 @@ class DisulfideLoader:
     def __setitem__(self, index, item):
         self.SSList[index] = self._validate_ss(item)
 
+    def _validate_ss(self, value):
+        if isinstance(value, (Disulfide)):
+            return value
+        raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
+    
+    def copy(self):
+        '''
+        Return a copy of self
+
+        :return: Copy of self
+        :rtype: proteusPy.DisulfideLoader
+        '''
+        return copy.deepcopy(self)
+
     def getlist(self) -> DisulfideList:
         '''
         Return the list of Disulfides contained in the class.
@@ -169,6 +189,83 @@ class DisulfideLoader:
         '''
         return copy.deepcopy(self.SSList)
     
+    def get_by_name(self, name: str) -> Disulfide:
+        '''
+        Return a Disulfide by its name
+
+        :param name: Disulfide name e.g. '4yys_22A_65A'
+        :return: Disulfide
+
+        >>> from proteusPy.Disulfide import Disulfide
+        >>> from proteusPy.DisulfideLoader import Load_PDB_SS
+        >>> from proteusPy.DisulfideList import DisulfideList
+            
+        Instantiate the Loader with the SS database subset.
+
+        >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
+        >>> ss1 = PDB_SS.get_by_name('4yys_22A_65A')
+        >>> ss1
+        <Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>
+        '''
+
+        _sslist = DisulfideList([], 'tmp')
+        _sslist = self.SSList
+
+        res = _sslist.get_by_name(name)
+
+        return res
+    
+    def describe(self):
+        '''
+        Provides information about the Disulfide database contained in ```self```.
+        '''
+
+        tot = self.TotalDisulfides
+        pdbs = len(self.SSDict)
+        ram = (sys.getsizeof(self.SSList) + sys.getsizeof(self.SSDict) + sys.getsizeof(self.TorsionDF)) / (1024 * 1024)
+        ssMin, ssMax = self.SSList.minmax_energy()
+
+        print(f'========= RCSB Disulfide Database Summary {proteusPy.__version__} =========')
+        print(f'PDB IDs present: {pdbs}')
+        print(f'Disulfides loaded: {tot}')
+        print(f'Total RAM Used by dataset: {ram:.2f} GB.')
+        print(f'Best Disulfide: {ssMin.repr_compact()}')
+        print(f'Worst Disulfide: {ssMax.repr_compact()}')
+       
+    def display_overlay(self, pdbid):
+        
+        ''' 
+        Display all disulfides for a given PDB ID overlaid in stick mode against
+        a common coordinate frame. This allows us to see all of the disulfides
+        at one time in a single view. Colors vary smoothy between bonds.
+        
+        :param self: DisulfideLoader object initialized with the database.
+        :param pdbid: the PDB id string, e.g. 4yys
+        :return: None
+
+        Example:
+        >>> from proteusPy.Disulfide import Disulfide
+        >>> from proteusPy.DisulfideLoader import DisulfideLoader
+        >>> from proteusPy.DisulfideList import DisulfideList
+            
+        Instantiate the Loader with the SS database subset.
+
+        >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
+        
+        Display the Disulfides from the PDB ID ```4yys```, overlaid onto
+        a common reference (the proximal disulfides).
+
+        >>> PDB_SS.display_overlay('4yys')
+
+        You can also slice the loader and display as an overly.
+        >>> PDB_SS[:8].display_overlay()
+
+        ''' 
+
+        ssbonds = self[pdbid]
+        ssbonds.display_overlay()
+        return
+ 
     def getTorsions(self, pdbID=None) -> pd.DataFrame:
         '''
         Return the torsions, distances and energies defined by Disulfide.Torsion_DF_cols
@@ -211,11 +308,6 @@ class DisulfideLoader:
         else:
             return copy.deepcopy(self.TorsionDF)
     
-    def _validate_ss(self, value):
-        if isinstance(value, (Disulfide)):
-            return value
-        raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
-    
     @property
     def quiet(self) -> bool:
         '''
@@ -236,7 +328,7 @@ class DisulfideLoader:
         '''
         self.QUIET = perm
     
-    def save(self, savepath=DATA_DIR, fname=LOADER_FNAME, verbose=False):
+    def save(self, savepath=DATA_DIR, verbose=False, subset=False):
         '''
         Save a copy of the fully instantiated Loader to the specified file.
 
@@ -244,7 +336,13 @@ class DisulfideLoader:
         :param fname: Filename, defaults to LOADER_FNAME
         :param verbose: Verbosity, defaults to False
         '''
+        if subset:
+            fname = LOADER_SUBSET_FNAME
+        else:
+            fname = LOADER_FNAME
+
         _fname = f'{savepath}{fname}'
+
         if verbose:
             print(f'-> DisulfideLoader.save(): Writing {_fname}... ', end='')
         
@@ -252,99 +350,37 @@ class DisulfideLoader:
             pickle.dump(self, f)
         if verbose:
             print(f'done.')
-        
-    def copy(self):
-        '''
-        Return a copy of self
-
-        :return: Copy of self
-        :rtype: proteusPy.DisulfideLoader
-        '''
-        return copy.deepcopy(self)
-
-    def get_by_name(self, name: str) -> Disulfide:
-        '''
-        Return a Disulfide by its name
-
-        :param name: Disulfide name e.g. '4yys_22A_65A'
-        :return: Disulfide
-
-        >>> from proteusPy.Disulfide import Disulfide
-        >>> from proteusPy.DisulfideLoader import DisulfideLoader
-        >>> from proteusPy.DisulfideList import DisulfideList
-            
-        Instantiate the Loader with the SS database subset.
-
-        >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
-        >>> ss1 = PDB_SS.get_by_name('4yys_22A_65A')
-        >>> ss1
-        <Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>
-        '''
-
-        _sslist = DisulfideList([], 'tmp')
-        _sslist = self.SSList
-
-        res = _sslist.get_by_name(name)
-
-        return res
     
-    def display_overlay(self, pdbid):
-        
-        ''' 
-        Display all disulfides for a given PDB ID overlaid in stick mode against
-        a common coordinate frame. This allows us to see all of the disulfides
-        at one time in a single view. Colors vary smoothy between bonds.
-        
-        :param self: DisulfideLoader object initialized with the database.
-        :param pdbid: the PDB id string, e.g. 4yys
-        :return: None
-
-        Example:
-        >>> from proteusPy.Disulfide import Disulfide
-        >>> from proteusPy.DisulfideLoader import DisulfideLoader
-        >>> from proteusPy.DisulfideList import DisulfideList
-            
-        Instantiate the Loader with the SS database subset.
-
-        >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
-        
-        Display the Disulfides from the PDB ID ```4yys```, overlaid onto
-        a common reference (the proximal disulfides).
-
-        >>> PDB_SS.display_overlay('4yys')
-
-        You can also slice the loader and display as an overly.
-        >>> PDB_SS[:8].display_overlay()
-
-        ''' 
-
-        ssbonds = self[pdbid]
-        ssbonds.display_overlay()
-       
+    
+          
 # class ends
 
-def load_PDB_SS(loadpath=DATA_DIR, fname=LOADER_FNAME, verbose=False, subset=False):
+def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoader:
     '''
-    Load a copy of the fully instantiated Loader to the specified file.
+    Load the fully instantiated Disulfide database from the specified file. Use the
+    defaults unless you are building the database by hand.
 
-    :param load: Path to save the file, defaults to DATA_DIR
+    :param load: Path from which to load, defaults to DATA_DIR
     :param fname: Filename, defaults to LOADER_FNAME
     :param verbose: Verbosity, defaults to False
     :param subset: If True, load the subset DB, otherwise load the full database
     '''
     if subset:
-        fname=LOADER_SUBSET_FNAME
-    
-    _fname = f'{loadpath}{fname}'
+        _fname = f'{loadpath}{LOADER_SUBSET_FNAME}'
+    else:
+        _fname = f'{loadpath}{LOADER_FNAME}'
 
     if verbose:
         print(f'-> load_PDB_SS(): Reading {_fname}... ', end='')
-    
-    with open(_fname, 'rb') as f:
-        res = pickle.load(f)
-    if verbose:
-        print(f'done.')
-    return res
+    try:
+        with open(_fname, 'rb') as f:
+            res = pickle.load(f)
+        if verbose:
+            print(f'done.')
+        return res
+    except:
+        mess = f'-> load_PDB_SS(): cannot open file {_fname}'
+        raise DisulfideIOException(mess)
  
 if __name__ == "__main__":
     import doctest

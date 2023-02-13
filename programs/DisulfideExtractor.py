@@ -1,22 +1,26 @@
 '''
 DisulfideExtractor.py
-Author: Eric G. Suchanek, PhD.
-Last modification: 2/11/23 -egs-
 
 Purpose:
-This program processes all the PDB *.ent files in PDB_DIR and creates an array of 
-Disulfide objects representing the Disulfide bonds contained in the scanned directory. 
-Outputs are saved in MODEL_DIR:
-- SS_PICKLE_FILE: The list of Disulfide objects initialized from the PDB file scan
-- SS_TORSIONS_FILE: a .csv containing the SS torsions for the disulfides scanned
-- PROBLEM_ID: a .csv containining the problem ids.
+This program encapsulates the steps needed to extract disulfides from the PDB file repository,
+build the DisulfideLoader object, and save it into the proteusPy module data directory.
+
+Author: Eric G. Suchanek, PhD.
+Last revision: 2/12/23 -egs-
 '''
+
+import argparse
 
 from shutil import copytree, ignore_patterns
 import time
 import datetime
 
 from proteusPy.Disulfide import Extract_Disulfides
+from proteusPy.DisulfideLoader import DisulfideLoader
+
+from proteusPy.data import DATA_DIR
+from proteusPy.data import SS_PROBLEM_SUBSET_ID_FILE, SS_SUBSET_DICT_PICKLE_FILE
+from proteusPy.data import SS_SUBSET_PICKLE_FILE, SS_SUBSET_TORSIONS_FILE
 
 # the locations below represent the actual location on the dev drive.
 # location for PDB repository
@@ -24,64 +28,113 @@ PDB_BASE = '/Users/egs/PDB/'
 
 # location of cleaned PDB files, created with DisulfideDownloader.py
 PDB_DIR = '/Users/egs/PDB/good/'
-REPO_DATA = '/Users/egs/repos/proteusPy/data/'
 MODULE_DATA = '/Users/egs/repos/proteusPy/proteusPy/data/'
 
 # location of the compressed Disulfide .pkl files
 DATA_DIR = f'{PDB_BASE}data/'
 
-# Setting up specific pkl files for a small extraction.
-# you must use these exact names, regardless of the number
-# extracted in order for the DisulfideLoader class to load them
-# correctly. 
-#
-# Don't set these at all for the default total extraction
-#
-
-from proteusPy.data import SS_PROBLEM_SUBSET_ID_FILE, SS_SUBSET_DICT_PICKLE_FILE
-from proteusPy.data import SS_SUBSET_PICKLE_FILE, SS_SUBSET_TORSIONS_FILE
-
-start = time.time()
-
 # The following performs an extraction of 1000 SS and saves them with
 # the correct filenames to be read as 'subset'. Do not change the filenames
 # defined above
 
-Extract_Disulfides(
-                numb=1000, 
-                pdbdir=PDB_DIR, 
-                datadir=DATA_DIR,
-                dictfile=SS_SUBSET_DICT_PICKLE_FILE,
-                picklefile=SS_SUBSET_PICKLE_FILE,
-                torsionfile=SS_SUBSET_TORSIONS_FILE,
-                problemfile=SS_PROBLEM_SUBSET_ID_FILE,
-                verbose=False, quiet=True,
-                dist_cutoff=-1.0
-                )
+def extract(verbose, full, subset, cutoff):
+    if subset:
+        if verbose:
+            print('--> Extracting the SS subset...')
+        Extract_Disulfides(
+                        numb=1000, 
+                        pdbdir=PDB_DIR, 
+                        datadir=DATA_DIR,
+                        dictfile=SS_SUBSET_DICT_PICKLE_FILE,
+                        picklefile=SS_SUBSET_PICKLE_FILE,
+                        torsionfile=SS_SUBSET_TORSIONS_FILE,
+                        problemfile=SS_PROBLEM_SUBSET_ID_FILE,
+                        verbose=False, 
+                        quiet=True,
+                        dist_cutoff=cutoff
+                        )
 
-# total extraction uses numb=-1 and takes about 1.5 hours on
-# my 2021 MacbookPro M1 Pro computer.
+    # total extraction uses numb=-1 and takes about 1.5 hours on
+    # my 2021 MacbookPro M1 Pro computer.
 
-Extract_Disulfides(
-                numb=-1, 
-                verbose=False, 
-                quiet=True, 
-                pdbdir=PDB_DIR, 
-                datadir=DATA_DIR, 
-                dist_cutoff=-1.0
-                )
+    if full:
+        if verbose:
+            print('--> Extracting the SS full dataset. This will take ~1.5 hours.')
+        Extract_Disulfides(
+                        numb=-1, 
+                        verbose=False, 
+                        quiet=True, 
+                        pdbdir=PDB_DIR, 
+                        datadir=DATA_DIR, 
+                        dist_cutoff=cutoff
+                        )
+    return
 
-update = True
+def build(verbose, full, subset):
+    '''
+    Loads and saves a ```proteusPy.DisulfideLoader.DisulfideLoader``` object
+    to a .pkl file.
 
-if update:
-    print(f'Copying: {DATA_DIR} to {MODULE_DATA}')
-    copytree(DATA_DIR, MODULE_DATA, dirs_exist_ok=True, ignore=ignore_patterns('*_pruned_*'))
-    #copytree(DATA_DIR, MODULE_DATA, dirs_exist_ok=True)
+    :param verbose: Verbosity, boolean
+    :param full: Whether to load and save the full dataset, boolean
+    :param subset: Whether to load and save the subset database, boolean
+    '''
+    if full:
+        if verbose:
+            print('--> Building the packed loader for the full dataset...')
+        PDB_SS = DisulfideLoader(datadir=DATA_DIR, subset=False)
+        PDB_SS.save(savepath=DATA_DIR, subset=False, verbose=verbose)
 
-end = time.time()
+    if subset:
+        if verbose:
+            print('--> Building the packed loader for the Disulfide subset...')
+        PDB_SS = DisulfideLoader(datadir=DATA_DIR, subset=True)
+        PDB_SS.save(savepath=DATA_DIR, subset=True, verbose=verbose)
+    
+    return
 
-elapsed = end - start
-print(f'Complete. Elapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)')
-exit()
+###
+def main():
+    start = time.time()
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("-c", "--cutoff", help="distance cutoff for disulfide distance pruning", type=float, required=False)
+    parser.add_argument("-u", "--update", help="update the repo package", action=argparse.BooleanOptionalAction)
+    parser.add_argument("-v", "--verbose", help="level of verbosity", action=argparse.BooleanOptionalAction)
+    parser.add_argument("-e", "--extract", help="extract disulfides from the PDB structure files", action=argparse.BooleanOptionalAction)
+    parser.add_argument("-f", "--full", help="extract all disulfides from the PDB structure files", action=argparse.BooleanOptionalAction)
+    parser.add_argument("-b", "--build", help="rebuild the loader", action=argparse.BooleanOptionalAction)
+    parser.add_argument("-s", "--subset", help="rebuild the subset only", action=argparse.BooleanOptionalAction)
+
+    parser.set_defaults(update=True)
+    parser.set_defaults(verbose=True)
+    parser.set_defaults(extract=True)
+    parser.set_defaults(subset=True)
+    parser.set_defaults(build=True)
+    parser.set_defaults(full=False)
+    parser.set_defaults(cutoff=-1.0)
+
+    args = parser.parse_args()
+
+    if args.extract == True:
+        print(f'Extracting...')
+        extract(args.verbose, args.full, args.subset, args.cutoff)
+
+    if args.build == True:
+        print(f'Building...')
+        build(args.verbose, args.full, args.subset)
+
+    if args.update == True:
+        print(f'Copying: {DATA_DIR} to {MODULE_DATA}')
+        copytree(DATA_DIR, MODULE_DATA, dirs_exist_ok=True, ignore=ignore_patterns('*_pruned_*'))
+
+    end = time.time()
+
+    elapsed = end - start
+
+    print(f'Complete. Elapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)')
+
+main()
 
 # end of file
