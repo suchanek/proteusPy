@@ -36,8 +36,8 @@ class DisulfideLoader:
     This class loads files created from the proteusPy.Disulfide.Extract_Disulfides() routine 
     and initializes itself with their contents. This, then, represents the disulfide database itself and is
     the primary means of accession. The Disulfide objects are contained
-    in a proteuPy.DisulfideList.DisulfideList object and Dict, and their torsions and distances stored in a .csv file.
-    This makes it possible to access the disulfides by array index or PDB structure ID. 
+    in a proteuPy.DisulfideList.DisulfideList object and ```Dict```, and their torsions and distances stored in a .csv file.
+    This makes it possible to access the disulfides by array index, PDB structure ID or disulfide name.
     The class can also render Disulfides to a pyVista window using the 
     DisulfideLoader.display() method. See below for examples.\n
 
@@ -67,8 +67,6 @@ class DisulfideLoader:
     Finally, we can access disulfides by regular slicing:
     >>> SSlist = PDB_SS[:4]
     >>> SSlist.display(style='sb') 
-
-
     '''
 
     def __init__(self, verbose=True, datadir=DATA_DIR, picklefile=SS_PICKLE_FILE, 
@@ -76,11 +74,11 @@ class DisulfideLoader:
                 torsion_file=SS_TORSIONS_FILE, quiet=True, subset=False):
         '''
         Initializing the class initiates loading either the entire Disulfide dataset,
-        or the 'subset', which consists of the first 5000 PDB structures. The subset
+        or the 'subset', which consists of the first 1000 PDB structures. The subset
         is useful for testing and debugging since it doesn't require nearly as much
         memory or time. The name for the subset file is hard-coded. One can pass a
         different data directory and file names for the pickle files. These different
-        directories would be established with the proteusPy.Disulfide.Extract_Disulfides function.
+        directories are normally established with the proteusPy.Disulfide.Extract_Disulfides 
         function.
         '''
 
@@ -131,7 +129,7 @@ class DisulfideLoader:
             totalSS_dict = len(self.IDList)
 
         if verbose:
-            print(f'done.',)
+            print(f'done.')
 
         if verbose:
             print(f'--> DisulfideLoader(): Reading Torsion DF from: {self.TorsionFile}...', end='')
@@ -141,9 +139,8 @@ class DisulfideLoader:
 
         self.TorsionDF = tmpDF.copy()
         if verbose:    
-            print(f'Loading complete.\nSummary: \n PDB IDs parsed: {totalSS_dict}')
-            print(f' Disulfides loaded: {self.TotalDisulfides}')
-            print(f' Total RAM Used by dataset: {((sys.getsizeof(self.SSList) + sys.getsizeof(self.SSDict) + sys.getsizeof(self.TorsionDF)) / (1024 * 1024)):.2f} GB.')
+            print(f'Loading complete.')
+            self.describe()
         return
 
     # overload __getitem__ to handle slicing and indexing, and access by name
