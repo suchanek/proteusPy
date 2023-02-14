@@ -1,3 +1,13 @@
+'''
+This module is part of the proteusPy package, a Python package for 
+the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
+The filenames defined herein are used by the [DisulfideLoader](proteusPy.DisulfideLoader)
+class to build the disulfide database.
+
+Author: Eric G. Suchanek, PhD
+Last revision: 2/14/2023
+'''
+
 # init for proteusPy data module
 # Copyright (c) 2023 Eric G. Suchanek, PhD., all rights reserved
 # Subject to the GNU public license.
