@@ -60,6 +60,8 @@ class DisulfideLoader:
     >>> SS2 = DisulfideList([],'tmp2')
     
     >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
+
+    Accessing by index value:
     >>> SS1 = PDB_SS[0]
     >>> SS1
     <Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>
@@ -69,7 +71,7 @@ class DisulfideLoader:
     >>> SS2
     [<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>]
     
-    One can can access individual disulfides by their name:
+    Accessing individual disulfides by their name:
     >>> SS3 = PDB_SS['4yys_56A_98A']
     >>> SS3
     <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>
@@ -192,7 +194,7 @@ class DisulfideLoader:
         raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
     
     @property
-    def average_resolution(self) -> float:
+    def Average_Resolution(self) -> float:
         '''
         Compute and return the average structure resolution for the given list.
 
@@ -263,7 +265,7 @@ class DisulfideLoader:
         tot = self.TotalDisulfides
         pdbs = len(self.SSDict)
         ram = (sys.getsizeof(self.SSList) + sys.getsizeof(self.SSDict) + sys.getsizeof(self.TorsionDF)) / (1024 * 1024)
-        res = self.average_resolution
+        res = self.Average_Resolution
 
         ssMin, ssMax = self.SSList.minmax_energy()
         
@@ -402,7 +404,8 @@ class DisulfideLoader:
 def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoader:
     '''
     Load the fully instantiated Disulfide database from the specified file. Use the
-    defaults unless you are building the database by hand.
+    defaults unless you are building the database by hand. *This is the function
+    used to load the built database.*
 
     :param load: Path from which to load, defaults to DATA_DIR
     :param fname: Filename, defaults to LOADER_FNAME

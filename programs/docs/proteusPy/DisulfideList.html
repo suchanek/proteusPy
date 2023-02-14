@@ -60,10 +60,10 @@
                                 <a class="function" href="#DisulfideList.__init__">DisulfideList</a>
                         </li>
                         <li>
-                                <a class="function" href="#DisulfideList.Avg_Distance">Avg_Distance</a>
+                                <a class="function" href="#DisulfideList.Average_Distance">Average_Distance</a>
                         </li>
                         <li>
-                                <a class="function" href="#DisulfideList.Avg_Energy">Avg_Energy</a>
+                                <a class="function" href="#DisulfideList.Average_Energy">Average_Energy</a>
                         </li>
                         <li>
                                 <a class="function" href="#DisulfideList.Avg_Torsion_Distance">Avg_Torsion_Distance</a>
@@ -381,7 +381,7 @@ and <a href="DisulfideList.html#DisulfideList.display_overlay">DisulfideList.dis
 </span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a>                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
 </span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a>        <span class="k">return</span> <span class="n">pl</span>
 </span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a>    
-</span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a>    <span class="k">def</span> <span class="nf">Avg_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a>    <span class="k">def</span> <span class="nf">Average_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a>        <span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-210"><a href="#L-210"><span class="linenos">210</span></a><span class="sd">        Return the Average distance (Å) between the atoms in the list.</span>
 </span><span id="L-211"><a href="#L-211"><span class="linenos">211</span></a>
@@ -402,7 +402,7 @@ and <a href="DisulfideList.html#DisulfideList.display_overlay">DisulfideList.dis
 </span><span id="L-226"><a href="#L-226"><span class="linenos">226</span></a>
 </span><span id="L-227"><a href="#L-227"><span class="linenos">227</span></a>        <span class="k">return</span> <span class="n">total</span><span class="o">/</span><span class="n">cnt</span>
 </span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a>    
-</span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a>    <span class="k">def</span> <span class="nf">Avg_Energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a>    <span class="k">def</span> <span class="nf">Average_Energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a>        <span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a><span class="sd">        Return the Average energy (kcal/mol) for the Disulfides in the list.</span>
 </span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a>
@@ -563,8 +563,8 @@ and <a href="DisulfideList.html#DisulfideList.display_overlay">DisulfideList.dis
 </span><span id="L-387"><a href="#L-387"><span class="linenos">387</span></a>        <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdb_id</span>
 </span><span id="L-388"><a href="#L-388"><span class="linenos">388</span></a>        <span class="n">ssbonds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
 </span><span id="L-389"><a href="#L-389"><span class="linenos">389</span></a>        <span class="n">tot_ss</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ssbonds</span><span class="p">)</span> <span class="c1"># number off ssbonds</span>
-</span><span id="L-390"><a href="#L-390"><span class="linenos">390</span></a>        <span class="n">avg_enrg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Avg_Energy</span><span class="p">()</span>
-</span><span id="L-391"><a href="#L-391"><span class="linenos">391</span></a>        <span class="n">avg_dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Avg_Distance</span><span class="p">()</span>
+</span><span id="L-390"><a href="#L-390"><span class="linenos">390</span></a>        <span class="n">avg_enrg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Average_Energy</span><span class="p">()</span>
+</span><span id="L-391"><a href="#L-391"><span class="linenos">391</span></a>        <span class="n">avg_dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Average_Distance</span><span class="p">()</span>
 </span><span id="L-392"><a href="#L-392"><span class="linenos">392</span></a>        <span class="n">resolution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span>
 </span><span id="L-393"><a href="#L-393"><span class="linenos">393</span></a>
 </span><span id="L-394"><a href="#L-394"><span class="linenos">394</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="mi">100</span>
@@ -1228,7 +1228,7 @@ and <a href="DisulfideList.html#DisulfideList.display_overlay">DisulfideList.dis
 </span><span id="DisulfideList-206"><a href="#DisulfideList-206"><span class="linenos">206</span></a>                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
 </span><span id="DisulfideList-207"><a href="#DisulfideList-207"><span class="linenos">207</span></a>        <span class="k">return</span> <span class="n">pl</span>
 </span><span id="DisulfideList-208"><a href="#DisulfideList-208"><span class="linenos">208</span></a>    
-</span><span id="DisulfideList-209"><a href="#DisulfideList-209"><span class="linenos">209</span></a>    <span class="k">def</span> <span class="nf">Avg_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DisulfideList-209"><a href="#DisulfideList-209"><span class="linenos">209</span></a>    <span class="k">def</span> <span class="nf">Average_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideList-210"><a href="#DisulfideList-210"><span class="linenos">210</span></a>        <span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-211"><a href="#DisulfideList-211"><span class="linenos">211</span></a><span class="sd">        Return the Average distance (Å) between the atoms in the list.</span>
 </span><span id="DisulfideList-212"><a href="#DisulfideList-212"><span class="linenos">212</span></a>
@@ -1249,7 +1249,7 @@ and <a href="DisulfideList.html#DisulfideList.display_overlay">DisulfideList.dis
 </span><span id="DisulfideList-227"><a href="#DisulfideList-227"><span class="linenos">227</span></a>
 </span><span id="DisulfideList-228"><a href="#DisulfideList-228"><span class="linenos">228</span></a>        <span class="k">return</span> <span class="n">total</span><span class="o">/</span><span class="n">cnt</span>
 </span><span id="DisulfideList-229"><a href="#DisulfideList-229"><span class="linenos">229</span></a>    
-</span><span id="DisulfideList-230"><a href="#DisulfideList-230"><span class="linenos">230</span></a>    <span class="k">def</span> <span class="nf">Avg_Energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DisulfideList-230"><a href="#DisulfideList-230"><span class="linenos">230</span></a>    <span class="k">def</span> <span class="nf">Average_Energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideList-231"><a href="#DisulfideList-231"><span class="linenos">231</span></a>        <span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-232"><a href="#DisulfideList-232"><span class="linenos">232</span></a><span class="sd">        Return the Average energy (kcal/mol) for the Disulfides in the list.</span>
 </span><span id="DisulfideList-233"><a href="#DisulfideList-233"><span class="linenos">233</span></a>
@@ -1410,8 +1410,8 @@ and <a href="DisulfideList.html#DisulfideList.display_overlay">DisulfideList.dis
 </span><span id="DisulfideList-388"><a href="#DisulfideList-388"><span class="linenos">388</span></a>        <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdb_id</span>
 </span><span id="DisulfideList-389"><a href="#DisulfideList-389"><span class="linenos">389</span></a>        <span class="n">ssbonds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
 </span><span id="DisulfideList-390"><a href="#DisulfideList-390"><span class="linenos">390</span></a>        <span class="n">tot_ss</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ssbonds</span><span class="p">)</span> <span class="c1"># number off ssbonds</span>
-</span><span id="DisulfideList-391"><a href="#DisulfideList-391"><span class="linenos">391</span></a>        <span class="n">avg_enrg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Avg_Energy</span><span class="p">()</span>
-</span><span id="DisulfideList-392"><a href="#DisulfideList-392"><span class="linenos">392</span></a>        <span class="n">avg_dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Avg_Distance</span><span class="p">()</span>
+</span><span id="DisulfideList-391"><a href="#DisulfideList-391"><span class="linenos">391</span></a>        <span class="n">avg_enrg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Average_Energy</span><span class="p">()</span>
+</span><span id="DisulfideList-392"><a href="#DisulfideList-392"><span class="linenos">392</span></a>        <span class="n">avg_dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Average_Distance</span><span class="p">()</span>
 </span><span id="DisulfideList-393"><a href="#DisulfideList-393"><span class="linenos">393</span></a>        <span class="n">resolution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span>
 </span><span id="DisulfideList-394"><a href="#DisulfideList-394"><span class="linenos">394</span></a>
 </span><span id="DisulfideList-395"><a href="#DisulfideList-395"><span class="linenos">395</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="mi">100</span>
@@ -1947,37 +1947,37 @@ The disulfides are colored individually to facilitate inspection.</p>
 
 
                             </div>
-                            <div id="DisulfideList.Avg_Distance" class="classattr">
-                                        <input id="DisulfideList.Avg_Distance-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                            <div id="DisulfideList.Average_Distance" class="classattr">
+                                        <input id="DisulfideList.Average_Distance-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">Avg_Distance</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
+        <span class="name">Average_Distance</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
 
-                <label class="view-source-button" for="DisulfideList.Avg_Distance-view-source"><span>View Source</span></label>
+                <label class="view-source-button" for="DisulfideList.Average_Distance-view-source"><span>View Source</span></label>
 
     </div>
-    <a class="headerlink" href="#DisulfideList.Avg_Distance"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.Avg_Distance-209"><a href="#DisulfideList.Avg_Distance-209"><span class="linenos">209</span></a>    <span class="k">def</span> <span class="nf">Avg_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList.Avg_Distance-210"><a href="#DisulfideList.Avg_Distance-210"><span class="linenos">210</span></a>        <span class="sd">&#39;&#39;&#39;</span>
-</span><span id="DisulfideList.Avg_Distance-211"><a href="#DisulfideList.Avg_Distance-211"><span class="linenos">211</span></a><span class="sd">        Return the Average distance (Å) between the atoms in the list.</span>
-</span><span id="DisulfideList.Avg_Distance-212"><a href="#DisulfideList.Avg_Distance-212"><span class="linenos">212</span></a>
-</span><span id="DisulfideList.Avg_Distance-213"><a href="#DisulfideList.Avg_Distance-213"><span class="linenos">213</span></a><span class="sd">        :return: Average distance (Å) between all atoms in the list</span>
-</span><span id="DisulfideList.Avg_Distance-214"><a href="#DisulfideList.Avg_Distance-214"><span class="linenos">214</span></a>
-</span><span id="DisulfideList.Avg_Distance-215"><a href="#DisulfideList.Avg_Distance-215"><span class="linenos">215</span></a><span class="sd">        &#39;&#39;&#39;</span>
-</span><span id="DisulfideList.Avg_Distance-216"><a href="#DisulfideList.Avg_Distance-216"><span class="linenos">216</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
-</span><span id="DisulfideList.Avg_Distance-217"><a href="#DisulfideList.Avg_Distance-217"><span class="linenos">217</span></a>        <span class="n">tot</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sslist</span><span class="p">)</span>
-</span><span id="DisulfideList.Avg_Distance-218"><a href="#DisulfideList.Avg_Distance-218"><span class="linenos">218</span></a>        <span class="n">cnt</span> <span class="o">=</span> <span class="mi">1</span>
-</span><span id="DisulfideList.Avg_Distance-219"><a href="#DisulfideList.Avg_Distance-219"><span class="linenos">219</span></a>
-</span><span id="DisulfideList.Avg_Distance-220"><a href="#DisulfideList.Avg_Distance-220"><span class="linenos">220</span></a>        <span class="n">total</span> <span class="o">=</span> <span class="mf">0.0</span>
-</span><span id="DisulfideList.Avg_Distance-221"><a href="#DisulfideList.Avg_Distance-221"><span class="linenos">221</span></a>        <span class="k">for</span> <span class="n">ss1</span> <span class="ow">in</span> <span class="n">sslist</span><span class="p">:</span>
-</span><span id="DisulfideList.Avg_Distance-222"><a href="#DisulfideList.Avg_Distance-222"><span class="linenos">222</span></a>            <span class="k">for</span> <span class="n">ss2</span> <span class="ow">in</span> <span class="n">sslist</span><span class="p">:</span>
-</span><span id="DisulfideList.Avg_Distance-223"><a href="#DisulfideList.Avg_Distance-223"><span class="linenos">223</span></a>                <span class="k">if</span> <span class="n">ss2</span> <span class="o">==</span> <span class="n">ss1</span><span class="p">:</span>
-</span><span id="DisulfideList.Avg_Distance-224"><a href="#DisulfideList.Avg_Distance-224"><span class="linenos">224</span></a>                    <span class="k">continue</span>
-</span><span id="DisulfideList.Avg_Distance-225"><a href="#DisulfideList.Avg_Distance-225"><span class="linenos">225</span></a>                <span class="n">total</span> <span class="o">+=</span> <span class="n">ss1</span><span class="o">.</span><span class="n">Distance_RMS</span><span class="p">(</span><span class="n">ss2</span><span class="p">)</span>
-</span><span id="DisulfideList.Avg_Distance-226"><a href="#DisulfideList.Avg_Distance-226"><span class="linenos">226</span></a>                <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
-</span><span id="DisulfideList.Avg_Distance-227"><a href="#DisulfideList.Avg_Distance-227"><span class="linenos">227</span></a>
-</span><span id="DisulfideList.Avg_Distance-228"><a href="#DisulfideList.Avg_Distance-228"><span class="linenos">228</span></a>        <span class="k">return</span> <span class="n">total</span><span class="o">/</span><span class="n">cnt</span>
+    <a class="headerlink" href="#DisulfideList.Average_Distance"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.Average_Distance-209"><a href="#DisulfideList.Average_Distance-209"><span class="linenos">209</span></a>    <span class="k">def</span> <span class="nf">Average_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DisulfideList.Average_Distance-210"><a href="#DisulfideList.Average_Distance-210"><span class="linenos">210</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.Average_Distance-211"><a href="#DisulfideList.Average_Distance-211"><span class="linenos">211</span></a><span class="sd">        Return the Average distance (Å) between the atoms in the list.</span>
+</span><span id="DisulfideList.Average_Distance-212"><a href="#DisulfideList.Average_Distance-212"><span class="linenos">212</span></a>
+</span><span id="DisulfideList.Average_Distance-213"><a href="#DisulfideList.Average_Distance-213"><span class="linenos">213</span></a><span class="sd">        :return: Average distance (Å) between all atoms in the list</span>
+</span><span id="DisulfideList.Average_Distance-214"><a href="#DisulfideList.Average_Distance-214"><span class="linenos">214</span></a>
+</span><span id="DisulfideList.Average_Distance-215"><a href="#DisulfideList.Average_Distance-215"><span class="linenos">215</span></a><span class="sd">        &#39;&#39;&#39;</span>
+</span><span id="DisulfideList.Average_Distance-216"><a href="#DisulfideList.Average_Distance-216"><span class="linenos">216</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+</span><span id="DisulfideList.Average_Distance-217"><a href="#DisulfideList.Average_Distance-217"><span class="linenos">217</span></a>        <span class="n">tot</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sslist</span><span class="p">)</span>
+</span><span id="DisulfideList.Average_Distance-218"><a href="#DisulfideList.Average_Distance-218"><span class="linenos">218</span></a>        <span class="n">cnt</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span id="DisulfideList.Average_Distance-219"><a href="#DisulfideList.Average_Distance-219"><span class="linenos">219</span></a>
+</span><span id="DisulfideList.Average_Distance-220"><a href="#DisulfideList.Average_Distance-220"><span class="linenos">220</span></a>        <span class="n">total</span> <span class="o">=</span> <span class="mf">0.0</span>
+</span><span id="DisulfideList.Average_Distance-221"><a href="#DisulfideList.Average_Distance-221"><span class="linenos">221</span></a>        <span class="k">for</span> <span class="n">ss1</span> <span class="ow">in</span> <span class="n">sslist</span><span class="p">:</span>
+</span><span id="DisulfideList.Average_Distance-222"><a href="#DisulfideList.Average_Distance-222"><span class="linenos">222</span></a>            <span class="k">for</span> <span class="n">ss2</span> <span class="ow">in</span> <span class="n">sslist</span><span class="p">:</span>
+</span><span id="DisulfideList.Average_Distance-223"><a href="#DisulfideList.Average_Distance-223"><span class="linenos">223</span></a>                <span class="k">if</span> <span class="n">ss2</span> <span class="o">==</span> <span class="n">ss1</span><span class="p">:</span>
+</span><span id="DisulfideList.Average_Distance-224"><a href="#DisulfideList.Average_Distance-224"><span class="linenos">224</span></a>                    <span class="k">continue</span>
+</span><span id="DisulfideList.Average_Distance-225"><a href="#DisulfideList.Average_Distance-225"><span class="linenos">225</span></a>                <span class="n">total</span> <span class="o">+=</span> <span class="n">ss1</span><span class="o">.</span><span class="n">Distance_RMS</span><span class="p">(</span><span class="n">ss2</span><span class="p">)</span>
+</span><span id="DisulfideList.Average_Distance-226"><a href="#DisulfideList.Average_Distance-226"><span class="linenos">226</span></a>                <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span id="DisulfideList.Average_Distance-227"><a href="#DisulfideList.Average_Distance-227"><span class="linenos">227</span></a>
+</span><span id="DisulfideList.Average_Distance-228"><a href="#DisulfideList.Average_Distance-228"><span class="linenos">228</span></a>        <span class="k">return</span> <span class="n">total</span><span class="o">/</span><span class="n">cnt</span>
 </span></pre></div>
 
 
@@ -1992,32 +1992,32 @@ The disulfides are colored individually to facilitate inspection.</p>
 
 
                             </div>
-                            <div id="DisulfideList.Avg_Energy" class="classattr">
-                                        <input id="DisulfideList.Avg_Energy-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                            <div id="DisulfideList.Average_Energy" class="classattr">
+                                        <input id="DisulfideList.Average_Energy-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">Avg_Energy</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
+        <span class="name">Average_Energy</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
 
-                <label class="view-source-button" for="DisulfideList.Avg_Energy-view-source"><span>View Source</span></label>
+                <label class="view-source-button" for="DisulfideList.Average_Energy-view-source"><span>View Source</span></label>
 
     </div>
-    <a class="headerlink" href="#DisulfideList.Avg_Energy"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.Avg_Energy-230"><a href="#DisulfideList.Avg_Energy-230"><span class="linenos">230</span></a>    <span class="k">def</span> <span class="nf">Avg_Energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList.Avg_Energy-231"><a href="#DisulfideList.Avg_Energy-231"><span class="linenos">231</span></a>        <span class="sd">&#39;&#39;&#39;</span>
-</span><span id="DisulfideList.Avg_Energy-232"><a href="#DisulfideList.Avg_Energy-232"><span class="linenos">232</span></a><span class="sd">        Return the Average energy (kcal/mol) for the Disulfides in the list.</span>
-</span><span id="DisulfideList.Avg_Energy-233"><a href="#DisulfideList.Avg_Energy-233"><span class="linenos">233</span></a>
-</span><span id="DisulfideList.Avg_Energy-234"><a href="#DisulfideList.Avg_Energy-234"><span class="linenos">234</span></a><span class="sd">        :return: Average energy (kcal/mol) between all atoms in the list</span>
-</span><span id="DisulfideList.Avg_Energy-235"><a href="#DisulfideList.Avg_Energy-235"><span class="linenos">235</span></a>
-</span><span id="DisulfideList.Avg_Energy-236"><a href="#DisulfideList.Avg_Energy-236"><span class="linenos">236</span></a><span class="sd">        &#39;&#39;&#39;</span>
-</span><span id="DisulfideList.Avg_Energy-237"><a href="#DisulfideList.Avg_Energy-237"><span class="linenos">237</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
-</span><span id="DisulfideList.Avg_Energy-238"><a href="#DisulfideList.Avg_Energy-238"><span class="linenos">238</span></a>        <span class="n">tot</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sslist</span><span class="p">)</span>
-</span><span id="DisulfideList.Avg_Energy-239"><a href="#DisulfideList.Avg_Energy-239"><span class="linenos">239</span></a>
-</span><span id="DisulfideList.Avg_Energy-240"><a href="#DisulfideList.Avg_Energy-240"><span class="linenos">240</span></a>        <span class="n">total</span> <span class="o">=</span> <span class="mf">0.0</span>
-</span><span id="DisulfideList.Avg_Energy-241"><a href="#DisulfideList.Avg_Energy-241"><span class="linenos">241</span></a>        <span class="k">for</span> <span class="n">ss1</span> <span class="ow">in</span> <span class="n">sslist</span><span class="p">:</span>
-</span><span id="DisulfideList.Avg_Energy-242"><a href="#DisulfideList.Avg_Energy-242"><span class="linenos">242</span></a>            <span class="n">total</span> <span class="o">+=</span> <span class="n">ss1</span><span class="o">.</span><span class="n">energy</span>
-</span><span id="DisulfideList.Avg_Energy-243"><a href="#DisulfideList.Avg_Energy-243"><span class="linenos">243</span></a>
-</span><span id="DisulfideList.Avg_Energy-244"><a href="#DisulfideList.Avg_Energy-244"><span class="linenos">244</span></a>        <span class="k">return</span> <span class="n">total</span><span class="o">/</span><span class="n">tot</span>
+    <a class="headerlink" href="#DisulfideList.Average_Energy"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.Average_Energy-230"><a href="#DisulfideList.Average_Energy-230"><span class="linenos">230</span></a>    <span class="k">def</span> <span class="nf">Average_Energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DisulfideList.Average_Energy-231"><a href="#DisulfideList.Average_Energy-231"><span class="linenos">231</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.Average_Energy-232"><a href="#DisulfideList.Average_Energy-232"><span class="linenos">232</span></a><span class="sd">        Return the Average energy (kcal/mol) for the Disulfides in the list.</span>
+</span><span id="DisulfideList.Average_Energy-233"><a href="#DisulfideList.Average_Energy-233"><span class="linenos">233</span></a>
+</span><span id="DisulfideList.Average_Energy-234"><a href="#DisulfideList.Average_Energy-234"><span class="linenos">234</span></a><span class="sd">        :return: Average energy (kcal/mol) between all atoms in the list</span>
+</span><span id="DisulfideList.Average_Energy-235"><a href="#DisulfideList.Average_Energy-235"><span class="linenos">235</span></a>
+</span><span id="DisulfideList.Average_Energy-236"><a href="#DisulfideList.Average_Energy-236"><span class="linenos">236</span></a><span class="sd">        &#39;&#39;&#39;</span>
+</span><span id="DisulfideList.Average_Energy-237"><a href="#DisulfideList.Average_Energy-237"><span class="linenos">237</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+</span><span id="DisulfideList.Average_Energy-238"><a href="#DisulfideList.Average_Energy-238"><span class="linenos">238</span></a>        <span class="n">tot</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sslist</span><span class="p">)</span>
+</span><span id="DisulfideList.Average_Energy-239"><a href="#DisulfideList.Average_Energy-239"><span class="linenos">239</span></a>
+</span><span id="DisulfideList.Average_Energy-240"><a href="#DisulfideList.Average_Energy-240"><span class="linenos">240</span></a>        <span class="n">total</span> <span class="o">=</span> <span class="mf">0.0</span>
+</span><span id="DisulfideList.Average_Energy-241"><a href="#DisulfideList.Average_Energy-241"><span class="linenos">241</span></a>        <span class="k">for</span> <span class="n">ss1</span> <span class="ow">in</span> <span class="n">sslist</span><span class="p">:</span>
+</span><span id="DisulfideList.Average_Energy-242"><a href="#DisulfideList.Average_Energy-242"><span class="linenos">242</span></a>            <span class="n">total</span> <span class="o">+=</span> <span class="n">ss1</span><span class="o">.</span><span class="n">energy</span>
+</span><span id="DisulfideList.Average_Energy-243"><a href="#DisulfideList.Average_Energy-243"><span class="linenos">243</span></a>
+</span><span id="DisulfideList.Average_Energy-244"><a href="#DisulfideList.Average_Energy-244"><span class="linenos">244</span></a>        <span class="k">return</span> <span class="n">total</span><span class="o">/</span><span class="n">tot</span>
 </span></pre></div>
 
 
@@ -2347,8 +2347,8 @@ entire database.</p>
 </span><span id="DisulfideList.display_overlay-388"><a href="#DisulfideList.display_overlay-388"><span class="linenos">388</span></a>        <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdb_id</span>
 </span><span id="DisulfideList.display_overlay-389"><a href="#DisulfideList.display_overlay-389"><span class="linenos">389</span></a>        <span class="n">ssbonds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
 </span><span id="DisulfideList.display_overlay-390"><a href="#DisulfideList.display_overlay-390"><span class="linenos">390</span></a>        <span class="n">tot_ss</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ssbonds</span><span class="p">)</span> <span class="c1"># number off ssbonds</span>
-</span><span id="DisulfideList.display_overlay-391"><a href="#DisulfideList.display_overlay-391"><span class="linenos">391</span></a>        <span class="n">avg_enrg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Avg_Energy</span><span class="p">()</span>
-</span><span id="DisulfideList.display_overlay-392"><a href="#DisulfideList.display_overlay-392"><span class="linenos">392</span></a>        <span class="n">avg_dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Avg_Distance</span><span class="p">()</span>
+</span><span id="DisulfideList.display_overlay-391"><a href="#DisulfideList.display_overlay-391"><span class="linenos">391</span></a>        <span class="n">avg_enrg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Average_Energy</span><span class="p">()</span>
+</span><span id="DisulfideList.display_overlay-392"><a href="#DisulfideList.display_overlay-392"><span class="linenos">392</span></a>        <span class="n">avg_dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Average_Distance</span><span class="p">()</span>
 </span><span id="DisulfideList.display_overlay-393"><a href="#DisulfideList.display_overlay-393"><span class="linenos">393</span></a>        <span class="n">resolution</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span>
 </span><span id="DisulfideList.display_overlay-394"><a href="#DisulfideList.display_overlay-394"><span class="linenos">394</span></a>
 </span><span id="DisulfideList.display_overlay-395"><a href="#DisulfideList.display_overlay-395"><span class="linenos">395</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="mi">100</span>
