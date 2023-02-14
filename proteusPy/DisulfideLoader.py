@@ -104,12 +104,6 @@ class DisulfideLoader:
         self.IDList = []
         self.QUIET = quiet
         
-        # create a dataframe with the following columns for the disulfide conformations 
-        # extracted from the structure
-        # Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', 
-        # 'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist', 'psi_dist']
-        
-        # SS_df = pd.DataFrame(columns=Torsion_DF_Cols, index=['source'])
         idlist = []
 
         if subset:
@@ -154,6 +148,7 @@ class DisulfideLoader:
             self.describe()
         return
 
+    # 
     # overload __getitem__ to handle slicing and indexing, and access by name
     def __getitem__(self, item):
         res = DisulfideList([], 'none')
@@ -171,9 +166,10 @@ class DisulfideLoader:
                 raise DisulfideException(mess)
             else:
                 return self.SSList[item]
-
+        
         try:
-            indices = self.SSDict[item] # PDB_SS['4yys'] return a list of SS
+            # PDB_SS['4yys'] return a list of SS
+            indices = self.SSDict[item] 
             res = DisulfideList([], item)
             sslist = self.SSList
             res = DisulfideList([sslist[indices[i]] for i in indices], item)
@@ -182,11 +178,10 @@ class DisulfideLoader:
 
         except KeyError:
             try:
-                res = self.SSList.get_by_name(item)
+                res = self.SSList.get_by_name(item) # full disulfide name
             except: 
                 mess = f'DisulfideLoader(): Cannot find key {item} in SSBond dict!'
                 raise DisulfideException(mess)
-
         return res
     
     def __setitem__(self, index, item):
@@ -197,6 +192,7 @@ class DisulfideLoader:
             return value
         raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
     
+    @property
     def average_resolution(self) -> float:
         '''
         Compute and return the average structure resolution for the given list.
@@ -205,10 +201,11 @@ class DisulfideLoader:
         '''
         res = 0.0
         cnt = 1
-        ssdict = self.SSDict
+        idlist = self.IDList
+        sslist = self.SSList
 
-        for ssid,v in ssdict:
-            _res = ss.resolution
+        for id in idlist:
+            _res = self[id].resolution
             if _res is not None and res != -1.0:
                 res += _res
                 cnt += 1
@@ -267,10 +264,12 @@ class DisulfideLoader:
         pdbs = len(self.SSDict)
         ram = (sys.getsizeof(self.SSList) + sys.getsizeof(self.SSDict) + sys.getsizeof(self.TorsionDF)) / (1024 * 1024)
         ssMin, ssMax = self.SSList.minmax_energy()
+        res = self.average_resolution
 
         print(f'========= RCSB Disulfide Database Summary {proteusPy.__version__} =========')
         print(f'PDB IDs present: {pdbs}')
         print(f'Disulfides loaded: {tot}')
+        print(f'Average resolution: {res:.2f}')
         print(f'Total RAM Used by dataset: {ram:.2f} GB.')
         print(f'Best Disulfide: {ssMin.repr_compact()}')
         print(f'Worst Disulfide: {ssMax.repr_compact()}')
