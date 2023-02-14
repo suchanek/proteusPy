@@ -1,13 +1,13 @@
 '''
-This class extends the ```UserList``` class to provide a sortable list for Disulfide objects.
-Indexing and slicing are supported, as well as normal list operations like 
-``.insert()``, ``.append()`` and ``.extend().`` The ```DisulfideList``` object is initialized 
-with an iterable (tuple, list) and optional name and resolution.
+This module is part of the proteusPy package, a Python package for 
+the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
+This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
-The class can also render disulfides to a pyVista window using the 
-[DisulfideList.display()](DisulfideList.html#DisulfideList.display) or
-proteusPy.DisulfideList.display() or
-and [DisulfideList.display_overlay()](DisulfideList.html#DisulfideList.display_overlay) method.
+The module provides the implemntation and interface for the [DisulfideList](#DisulfideList)
+object, used within the proteusPy.Disulfide.Disulfide object.
+
+Author: Eric G. Suchanek, PhD
+Last revision: 2/14/2023
 '''
 
 # Author Eric G. Suchanek, PhD
@@ -48,7 +48,8 @@ class DisulfideList(UserList):
     with an iterable (tuple, list) and a name.
     
     The class can also render Disulfides to a pyVista window using the 
-    DisulfideList.display() method. See below for examples.\n
+    [display()](#DisulfideList.display) and [display_overlay()](#DisulfideList.display_overlay)methods.
+    See below for examples.\n
 
     Examples:
     >>> from proteusPy.Disulfide import Disulfide 

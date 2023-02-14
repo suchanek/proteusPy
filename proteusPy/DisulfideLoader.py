@@ -1,10 +1,9 @@
 '''
-This class embodies functions used to load Disulfide Bonds extracted from the
-RCSB Protein Databank, and initializes the DisulfideLoader with the Disulfide
-lists and dictionary.
-
-This file is part of the proteusPy package.
-Author: Eric G. Suchanek, PhD.
+This module is part of the proteusPy package, a Python package for 
+the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
+This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
+Author: Eric G. Suchanek, PhD
+Last revision: 2/14/2023
 '''
 
 # Author: Eric G. Suchanek, PhD.
@@ -33,15 +32,15 @@ from proteusPy.data import *
 
 class DisulfideLoader:
     '''
-    This class represents the disulfide database itself and is the primary means of accession. 
+    This class represents the disulfide database itself and is its primary means of accession. 
     The entirety of the RCSB disulfide database is stored within the class via a
-    proteusPy.DisulfideList.DisulfideList list, a ```Pandas``` .csv file, and a ```dict``` of
+    proteusPy.DisulfideList.DisulfideList, a ```Pandas``` .csv file, and a ```dict``` of
     indices mapping the PDB IDs into their respective list of disulfides. The datastructures allow
     simple, direct and flexible access to the disulfide structures contained herein. 
     This makes it possible to access the disulfides by array index, PDB structure ID or disulfide name.
     
-    The class can also render Disulfides to a pyVista window using the 
-    DisulfideLoader.display() method. See below for examples.\n
+    The class can also render Disulfides overlaid on a common coordinate systemto a pyVista window using the 
+    [display_overlay()](#DisulfideLoader.display_overlay) method. See below for examples.\n
     
     *Developer's Notes:*
     The .pkl files needed to instantiate this class and save it into its final .pkl file are
