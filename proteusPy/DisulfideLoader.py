@@ -33,13 +33,24 @@ from proteusPy.data import *
 
 class DisulfideLoader:
     '''
-    This class loads files created from the proteusPy.Disulfide.Extract_Disulfides() routine 
-    and initializes itself with their contents. This, then, represents the disulfide database itself and is
-    the primary means of accession. The Disulfide objects are contained
-    in a proteuPy.DisulfideList.DisulfideList object and ```Dict```, and their torsions and distances stored in a .csv file.
+    This class represents the disulfide database itself and is the primary means of accession. 
+    The entirety of the RCSB disulfide database is stored within the class via a
+    proteusPy.DisulfideList.DisulfideList list, a ```Pandas``` .csv file, and a ```dict``` of
+    indices mapping the PDB IDs into their respective list of disulfides. The datastructures allow
+    simple, direct and flexible access to the disulfide structures contained herein. 
     This makes it possible to access the disulfides by array index, PDB structure ID or disulfide name.
+    
     The class can also render Disulfides to a pyVista window using the 
     DisulfideLoader.display() method. See below for examples.\n
+    
+    *Developer's Notes:*
+    The .pkl files needed to instantiate this class and save it into its final .pkl file are
+    defined in the proteusPy.data class and should not be changed. Upon initialization the class
+    will load them and initialize itself. 
+    
+    The class loads files created from the proteusPy.Disulfide.Extract_Disulfides() routine 
+    and initializes itself with their contents. 
+    
 
     Example:
     >>> import proteusPy
@@ -54,12 +65,12 @@ class DisulfideLoader:
     >>> SS1
     <Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>
     
-    Accessing by PDB_ID returns a list of Disulfides
+    Accessing by PDB_ID returns a list of Disulfides:
     >>> SS2 = PDB_SS['4yys']
     >>> SS2
     [<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>]
     
-    One can access individual disulfides by their name as well:
+    One can can access individual disulfides by their name:
     >>> SS3 = PDB_SS['4yys_56A_98A']
     >>> SS3
     <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>
@@ -166,6 +177,8 @@ class DisulfideLoader:
             res = DisulfideList([], item)
             sslist = self.SSList
             res = DisulfideList([sslist[indices[i]] for i in indices], item)
+            # set the resolution for the resulting SS list
+            res.resolution = res[0].resolution
 
         except KeyError:
             try:
@@ -184,6 +197,23 @@ class DisulfideLoader:
             return value
         raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
     
+    def average_resolution(self) -> float:
+        '''
+        Compute and return the average structure resolution for the given list.
+
+        :return: Average resolution (A)
+        '''
+        res = 0.0
+        cnt = 1
+        ssdict = self.SSDict
+
+        for ssid,v in ssdict:
+            _res = ss.resolution
+            if _res is not None and res != -1.0:
+                res += _res
+                cnt += 1
+        return res / cnt
+
     def copy(self):
         '''
         Return a copy of self

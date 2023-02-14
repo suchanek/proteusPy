@@ -198,7 +198,7 @@ class DisulfideList(UserList):
                     ss = ssList[i]
                     src = ss.pdb_id
                     enrg = ss.energy
-                    title = f'{src} {name}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f} Cα: {ss.ca_distance:.2f} Å Tors: {ss.torsion_length:.2f}'
+                    title = f'{src} {name}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°'
                     pl.add_title(title=title, font_size=FONTSIZE)
                     ss._render(pl, style=style, bondcolor=BOND_COLOR, bs_scale=BS_SCALE, 
                             spec=SPECULARITY, specpow=SPEC_POWER)
@@ -269,6 +269,39 @@ class DisulfideList(UserList):
         :type item: Disulfide
         '''
         self.data.append(self.validate_ss(item))
+
+    def average_resolution(self) -> float:
+        '''
+        Compute and return the average structure resolution for the given list.
+
+        :return: Average resolution (A)
+        '''
+        res = 0.0
+        cnt = 1
+
+        for ss in self.data:
+            _res = ss.resolution
+            if _res is not None and res != -1.0:
+                res += _res
+                cnt += 1
+        return res / cnt
+
+    def average_energy(self) -> float:
+        '''
+        Compute and return the average torsional for the given list.
+
+        :return: Average resolution (A)
+        '''
+        energy = 0.0
+        cnt = 1
+
+        for ss in self.data:
+            energy += ss.energy
+            cnt += 1
+        
+        return energy / cnt
+
+
     
     def build_distance_df(self) -> pd.DataFrame:
         """

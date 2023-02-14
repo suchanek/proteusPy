@@ -935,7 +935,9 @@ class Disulfide:
 
         # set the objects proximal and distal values
         self.set_resnum(proximal, distal)
-        self.resolution = resolution
+    
+        if resolution is not None:
+            self.resolution = resolution
 
         self.proximal_chain = chain1.get_id()
         self.distal_chain = chain2.get_id()
@@ -1862,8 +1864,11 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
 
         # returns an empty list if none are found.
         _sslist = DisulfideList([], entry)
-        _sslist = proteusPy.DisulfideList.load_disulfides_from_id(entry, model_numb=0, verbose=verbose, 
-        								 quiet=quiet, pdb_dir=pdbdir)
+        _sslist = proteusPy.DisulfideList.load_disulfides_from_id(entry, 
+                                                                model_numb=0, 
+                                                                verbose=verbose, 
+                                                                quiet=quiet, 
+                                                                pdb_dir=pdbdir)
         sslist, xchain = prune_extra_ss(_sslist)
 
         if len(sslist) > 0:
