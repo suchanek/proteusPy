@@ -3,7 +3,7 @@ This module is part of the proteusPy package, a Python package for
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
-The module provides the implemntation and interface for the [DisulfideList](#DisulfideList)
+The module provides the implmentation and interface for the [DisulfideList](#DisulfideList)
 object, used extensively by proteusPy.Disulfide.Disulfide class.
 
 Author: Eric G. Suchanek, PhD
@@ -65,7 +65,9 @@ class DisulfideList(UserList):
     >>> SSlist = DisulfideList([],'ss', -1.0)
 
     Load the database. 
-    >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)  # load the Disulfide database
+    >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
+
+    Get the first disulfide via indexing.
     >>> SS = PDB_SS[0]
     >>> SS
     <Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>
@@ -74,7 +76,7 @@ class DisulfideList(UserList):
     >>> SS4yys
     [<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_22B_65B, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56B_98B, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156B_207B, Source: 4yys, Resolution: 1.35 Å>]
 
-    Make some empty disulfides
+    Make some empty disulfides.
     >>> ss1 = Disulfide('ss1')
     >>> ss2 = Disulfide('ss2')
 
@@ -131,7 +133,9 @@ class DisulfideList(UserList):
     Get a list of disulfides via slicing
     >>> subset = DisulfideList(PDB_SS[0:10],'subset')
     
-    Display the subset disulfides overlaid onto the same coordinate frame.
+    Display the subset disulfides overlaid onto the same coordinate frame,
+    (proximal N, Ca, C').
+
     The disulfides are colored individually to facilitate inspection.
 
     >>> subset.display_overlay()
@@ -215,7 +219,7 @@ class DisulfideList(UserList):
                 i += 1
         return pl
     
-    def Avg_Distance(self):
+    def Average_Distance(self):
         '''
         Return the Average distance (Å) between the atoms in the list.
 
@@ -236,7 +240,7 @@ class DisulfideList(UserList):
 
         return total/cnt
     
-    def Avg_Energy(self):
+    def Average_Energy(self):
         '''
         Return the Average energy (kcal/mol) for the Disulfides in the list.
 
@@ -251,26 +255,7 @@ class DisulfideList(UserList):
             total += ss1.energy
 
         return total/tot
-    
-    def Avg_Torsion_Distance(self):
-        '''
-        Return the average distance in torsion space between all pairs in the
-        DisulfideList
-        '''
-        sslist = self.data
-        tot = len(sslist)
-        total = 0
-        cnt = 1
-
-        for ss1 in sslist:
-            for ss2 in sslist:
-                if ss2 == ss1:
-                    continue
-                total += ss1.Torsion_Distance(ss2)
-                cnt += 1
-        
-        return total/cnt
-    
+   
     def append(self, item):
         '''
         Append the list with item
@@ -281,7 +266,7 @@ class DisulfideList(UserList):
         self.data.append(self.validate_ss(item))
 
     @property
-    def average_resolution(self) -> float:
+    def Average_Resolution(self) -> float:
         '''
         Compute and return the average structure resolution for the given list.
 
@@ -298,7 +283,7 @@ class DisulfideList(UserList):
         return res / cnt
 
     @property
-    def average_energy(self) -> float:
+    def Average_Energy(self) -> float:
         '''
         Compute and return the average torsional for the given list.
 
@@ -313,6 +298,27 @@ class DisulfideList(UserList):
         
         return energy / cnt
 
+    def Average_Torsion_Distance(self):
+        '''
+        Return the average distance in torsion space (degrees), between all pairs in the
+        DisulfideList
+
+        :return: Torsion Distance (degrees)
+        '''
+        sslist = self.data
+        tot = len(sslist)
+        total = 0
+        cnt = 1
+
+        for ss1 in sslist:
+            for ss2 in sslist:
+                if ss2 == ss1:
+                    continue
+                total += ss1.Torsion_Distance(ss2)
+                cnt += 1
+        
+        return total/cnt
+    
     def build_distance_df(self) -> pd.DataFrame:
         """
         Create a dataframe containing the input DisulfideList Cα-Cα distance, energy. 
@@ -430,8 +436,8 @@ class DisulfideList(UserList):
         id = self.pdb_id
         ssbonds = self.data
         tot_ss = len(ssbonds) # number off ssbonds
-        avg_enrg = self.Avg_Energy()
-        avg_dist = self.Avg_Distance()
+        avg_enrg = self.Average_Energy()
+        avg_dist = self.Average_Distance()
         resolution = self.resolution
 
         res = 100
