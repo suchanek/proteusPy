@@ -253,25 +253,28 @@ class DisulfideLoader:
         res = _sslist.get_by_name(name)
 
         return res
-    
+    # Cα N, Cα, Cβ, C', Sγ Å °
+
     def describe(self):
         '''
         Provides information about the Disulfide database contained in ```self```.
         '''
-
+        vers = proteusPy.__version__
         tot = self.TotalDisulfides
         pdbs = len(self.SSDict)
         ram = (sys.getsizeof(self.SSList) + sys.getsizeof(self.SSDict) + sys.getsizeof(self.TorsionDF)) / (1024 * 1024)
-        ssMin, ssMax = self.SSList.minmax_energy()
         res = self.average_resolution
 
-        print(f'========= RCSB Disulfide Database Summary {proteusPy.__version__} =========')
-        print(f'PDB IDs present: {pdbs}')
-        print(f'Disulfides loaded: {tot}')
-        print(f'Average resolution: {res:.2f}')
-        print(f'Total RAM Used by dataset: {ram:.2f} GB.')
-        print(f'Best Disulfide: {ssMin.repr_compact()}')
-        print(f'Worst Disulfide: {ssMax.repr_compact()}')
+        ssMin, ssMax = self.SSList.minmax_energy()
+        
+        print(f'    =========== RCSB Disulfide Database Summary ==============')
+        print(f'PDB IDs present:                    {pdbs}')
+        print(f'Disulfides loaded:                  {tot}')
+        print(f'Average resolution:                 {res:.2f} Å')
+        print(f'Lowest Energy Disulfide:            {ssMin.name}')
+        print(f'Highest Energy Disulfide:           {ssMax.name}')
+        print(f'Total RAM Used:                     {ram:.2f} GB.')
+        print(f'    ================= proteusPy: {vers} =======================')
        
     def display_overlay(self, pdbid):
         

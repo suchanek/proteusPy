@@ -4,7 +4,7 @@ the analysis and modeling of protein structures, with an emphasis on disulfide b
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
 The module provides the implemntation and interface for the [DisulfideList](#DisulfideList)
-object, used within the proteusPy.Disulfide.Disulfide object.
+object, used extensively by proteusPy.Disulfide.Disulfide class.
 
 Author: Eric G. Suchanek, PhD
 Last revision: 2/14/2023
@@ -43,9 +43,9 @@ Distance_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'energy', 'ca_dista
 class DisulfideList(UserList):
     '''
     The class provides a sortable list for Disulfide objects.
-    Indexing and slicing are supported, and normal list operations like 
+    Indexing and slicing are supported, as well as typical list operations like 
     ``.insert()``, ``.append()`` and ``.extend().`` The DisulfideList object must be initialized 
-    with an iterable (tuple, list) and a name.
+    with an iterable (tuple, list) and a name. Sorting is keyed by torsional energy.
     
     The class can also render Disulfides to a pyVista window using the 
     [display()](#DisulfideList.display) and [display_overlay()](#DisulfideList.display_overlay)methods.
@@ -59,8 +59,13 @@ class DisulfideList(UserList):
     Instantiate some variables. Note: the list is initialized with an iterable and a name (optional)
 
     >>> SS = Disulfide('tmp')
-    >>> SSlist = DisulfideList([],'ss', 2.5)
-    >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)  # load the Disulfide database
+
+    The list is initialized with an iterable, a name and resolution. Name and resolution
+    are optional.
+    >>> SSlist = DisulfideList([],'ss', -1.0)
+
+    Load the database. 
+    >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)  # load the Disulfide database
     >>> SS = PDB_SS[0]
     >>> SS
     <Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>
@@ -144,9 +149,13 @@ class DisulfideList(UserList):
         Example:
         >>> from proteusPy.DisulfideList import DisulfideList
         >>> from proteusPy.Disulfide import Disulfide
+
+        Initialize some empty disulfides.
         >>> ss1 = Disulfide('ss1')
         >>> ss2 = Disulfide('ss2')
         >>> ss3 = Disulfide('ss3')
+
+        Make a list containing the disulfides.
         >>> sslist = DisulfideList([ss1, ss2], 'sslist')
         >>> sslist
         [<Disulfide ss1 SourceID:  Resolution: -1.0 Å, Proximal: -1 A Distal: -1 A>, <Disulfide ss2 SourceID:  Resolution: -1.0 Å, Proximal: -1 A Distal: -1 A>]
@@ -271,6 +280,7 @@ class DisulfideList(UserList):
         '''
         self.data.append(self.validate_ss(item))
 
+    @property
     def average_resolution(self) -> float:
         '''
         Compute and return the average structure resolution for the given list.
@@ -287,6 +297,7 @@ class DisulfideList(UserList):
                 cnt += 1
         return res / cnt
 
+    @property
     def average_energy(self) -> float:
         '''
         Compute and return the average torsional for the given list.
@@ -302,8 +313,6 @@ class DisulfideList(UserList):
         
         return energy / cnt
 
-
-    
     def build_distance_df(self) -> pd.DataFrame:
         """
         Create a dataframe containing the input DisulfideList Cα-Cα distance, energy. 
