@@ -3,7 +3,7 @@ This module is part of the proteusPy package, a Python package for
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 Author: Eric G. Suchanek, PhD
-Last revision: 2/12/2023
+Last revision: 2/14/2023
 '''
 
 # Cα N, Cα, Cβ, C', Sγ Å °
