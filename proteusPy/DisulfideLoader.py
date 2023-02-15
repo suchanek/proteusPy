@@ -2,6 +2,7 @@
 This module is part of the proteusPy package, a Python package for 
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
+
 Author: Eric G. Suchanek, PhD
 Last revision: 2/14/2023
 '''
@@ -39,17 +40,13 @@ class DisulfideLoader:
     simple, direct and flexible access to the disulfide structures contained herein. 
     This makes it possible to access the disulfides by array index, PDB structure ID or disulfide name.
     
-    The class can also render Disulfides overlaid on a common coordinate systemto a pyVista window using the 
+    The class can also render Disulfides overlaid on a common coordinate system to a pyVista window using the 
     [display_overlay()](#DisulfideLoader.display_overlay) method. See below for examples.\n
     
     *Developer's Notes:*
     The .pkl files needed to instantiate this class and save it into its final .pkl file are
     defined in the proteusPy.data class and should not be changed. Upon initialization the class
     will load them and initialize itself. 
-    
-    The class loads files created from the proteusPy.Disulfide.Extract_Disulfides() routine 
-    and initializes itself with their contents. 
-    
 
     Example:
     >>> import proteusPy
@@ -407,7 +404,7 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
     defaults unless you are building the database by hand. *This is the function
     used to load the built database.*
 
-    :param load: Path from which to load, defaults to DATA_DIR
+    :param loadpath: Path from which to load, defaults to DATA_DIR
     :param fname: Filename, defaults to LOADER_FNAME
     :param verbose: Verbosity, defaults to False
     :param subset: If True, load the subset DB, otherwise load the full database

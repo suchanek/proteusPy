@@ -1,6 +1,8 @@
 '''
-This module is part of the proteusPy package, a Python package for 
+This module, *Disulfide*, is part of the proteusPy package, a Python package for 
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
+It represents the core of the current implementation of *proteusPy*.
+
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 Author: Eric G. Suchanek, PhD
 Last revision: 2/14/2023
@@ -755,7 +757,7 @@ class Disulfide:
         self.energy = energy
         return energy
 
-    def display(self, single=True, style='sb', light=True):
+    def display(self, single=True, style='sb', light=True, shadows=False):
         '''
         Display the Disulfide bond in the specific rendering style.
 
@@ -797,6 +799,8 @@ class Disulfide:
             self._render(_pl, style=style, bs_scale=BS_SCALE, 
                         spec=SPECULARITY, specpow=SPEC_POWER)        
             _pl.reset_camera()
+            if shadows == True:
+                _pl.enable_shadows()
             _pl.show()
 
         else:
@@ -835,6 +839,8 @@ class Disulfide:
 
             pl.link_views()
             pl.reset_camera()
+            if shadows == True:
+                pl.enable_shadows()
             pl.show()
         return
     
@@ -1310,7 +1316,7 @@ class Disulfide:
         (prox, dist) = self.get_chains()
         return prox == dist
 
-    def screenshot(self, single=True, style='sb', fname='ssbond.png', verbose=False):
+    def screenshot(self, single=True, style='sb', fname='ssbond.png', verbose=False, shadows=False, light=True):
         '''
         Create and save a screenshot of the Disulfide in the given style
         and filename
@@ -1324,6 +1330,7 @@ class Disulfide:
         * 'plain' - boring single color,
         :param fname: output filename,, defaults to 'ssbond.png'
         :param verbose: Verbosit, defaults to False
+        :param shadows: Enable shadows, defaults to False
         '''
         src = self.pdb_id
         name = self.name
@@ -1331,8 +1338,13 @@ class Disulfide:
 
         title = f'{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Tors: {self.torsion_length:.2f}'
 
+        if light:
+            pv.set_plot_theme('document')
+        else:
+            pv.set_plot_theme('dark')
+            
         if verbose:
-            print(f'Rendering screenshot...')
+            print(f'-> screenshot(): Rendering screenshot to file {fname}')
 
         if single:
             pl = pv.Plotter(window_size=WINSIZE)
@@ -1342,6 +1354,9 @@ class Disulfide:
             self._render(pl, style=style, bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
             pl.reset_camera()
+            if shadows:
+                pl.enable_shadows()
+            
             pl.show(auto_close=False)
             pl.screenshot(fname)
             pl.clear()
@@ -1378,6 +1393,9 @@ class Disulfide:
 
             pl.link_views()
             pl.reset_camera()
+            if shadows:
+                pl.enable_shadows()
+
             pl.show(auto_close=False)
             pl.screenshot(fname)
         
