@@ -10,6 +10,11 @@ Copyright (c)2023 Eric G. Suchanek, PhD, all rights reserved
 import math
 import numpy
 import copy
+import subprocess
+
+import os
+import requests
+
 from numpy import linspace
 from matplotlib import cm
 
@@ -217,6 +222,24 @@ def prune_extra_ss(sslist):
     pruned_list, xchain = extract_firstchain_ss(sslist)
         
     return copy.deepcopy(pruned_list), xchain
+
+def download_file(url, directory):
+    '''
+    Download the given URL to the input directory
+
+    :param url: File URL
+    :param directory: Directory path for saving.
+    '''
+    file_name = url.split("/")[-1]
+    file_path = os.path.join(directory, file_name)
+
+    if not os.path.exists(file_path):
+        print(f"Downloading {file_name}...")
+        command = ["wget", "-P", directory, url]
+        subprocess.run(command, check=True)
+        print("Download complete.")
+    else:
+        print(f"{file_name} already exists in {directory}.")
 
 if __name__ == "__main__":
     import doctest
