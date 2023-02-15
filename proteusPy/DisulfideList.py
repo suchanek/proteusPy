@@ -74,7 +74,7 @@ class DisulfideList(UserList):
     
     >>> SS4yys = PDB_SS['4yys']
     >>> SS4yys
-    [<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_22B_65B, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56B_98B, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156B_207B, Source: 4yys, Resolution: 1.35 Å>]
+    [<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>]
 
     Make some empty disulfides.
     >>> ss1 = Disulfide('ss1')
@@ -126,9 +126,9 @@ class DisulfideList(UserList):
        Sγ: <Vector -1.14, -3.69, -0.43>
        Cprev <Vector -0.73, -17.44, -2.01>
        Nnext: <Vector 1.92, -19.18, -0.63>
-     Conformation: (Χ1-Χ5):  174.629°, 82.518°, -83.322°, -62.524° -73.827°  Energy: 1.696 kcal/mol
-     Cα Distance: 4.502 Å
-     Torsion length: 231.531 deg>
+     Χ1-Χ5: 174.63°, 82.52°, -83.32°, -62.52° -73.83°, 1.70 kcal/mol
+     Cα Distance: 4.50 Å
+     Torsion length: 231.53 deg>
 
     Get a list of disulfides via slicing
     >>> subset = DisulfideList(PDB_SS[0:10],'subset')
@@ -162,10 +162,10 @@ class DisulfideList(UserList):
         Make a list containing the disulfides.
         >>> sslist = DisulfideList([ss1, ss2], 'sslist')
         >>> sslist
-        [<Disulfide ss1 SourceID:  Resolution: -1.0 Å, Proximal: -1 A Distal: -1 A>, <Disulfide ss2 SourceID:  Resolution: -1.0 Å, Proximal: -1 A Distal: -1 A>]
+        [<Disulfide ss1, Source: 1egs, Resolution: -1.0 Å>, <Disulfide ss2, Source: 1egs, Resolution: -1.0 Å>]
         >>> sslist.append(ss3)
         >>> sslist
-        [<Disulfide ss1 SourceID:  Resolution: -1.0 Å, Proximal: -1 A Distal: -1 A>, <Disulfide ss2 SourceID:  Resolution: -1.0 Å, Proximal: -1 A Distal: -1 A>, <Disulfide ss3 SourceID:  Resolution: -1.0 Å, Proximal: -1 A Distal: -1 A>]
+        [<Disulfide ss1, Source: 1egs, Resolution: -1.0 Å>, <Disulfide ss2, Source: 1egs, Resolution: -1.0 Å>, <Disulfide ss3, Source: 1egs, Resolution: -1.0 Å>]
         '''
         
         self.pdb_id = id
@@ -219,6 +219,7 @@ class DisulfideList(UserList):
                 i += 1
         return pl
     
+    @property
     def Average_Distance(self):
         '''
         Return the Average distance (Å) between the atoms in the list.
@@ -240,6 +241,7 @@ class DisulfideList(UserList):
 
         return total/cnt
     
+    @property
     def Average_Energy(self):
         '''
         Return the Average energy (kcal/mol) for the Disulfides in the list.
@@ -281,23 +283,8 @@ class DisulfideList(UserList):
                 res += _res
                 cnt += 1
         return res / cnt
-
+    
     @property
-    def Average_Energy(self) -> float:
-        '''
-        Compute and return the average torsional for the given list.
-
-        :return: Average torsional energy for the list (kcal/mol).
-        '''
-        energy = 0.0
-        cnt = 1
-
-        for ss in self.data:
-            energy += ss.energy
-            cnt += 1
-        
-        return energy / cnt
-
     def Average_Torsion_Distance(self):
         '''
         Return the average distance in torsion space (degrees), between all pairs in the
@@ -450,8 +437,8 @@ class DisulfideList(UserList):
         id = self.pdb_id
         ssbonds = self.data
         tot_ss = len(ssbonds) # number off ssbonds
-        avg_enrg = self.Average_Energy()
-        avg_dist = self.Average_Distance()
+        avg_enrg = self.Average_Energy
+        avg_dist = self.Average_Distance
         resolution = self.resolution
 
         res = 100
