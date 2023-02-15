@@ -257,6 +257,12 @@ class DisulfideLoader:
     def describe(self):
         '''
         Provides information about the Disulfide database contained in ```self```.
+
+        Example:
+        >>> from proteusPy.DisulfideLoader import Load_PDB_SS
+        >>> PDB_SS = Load_PDB_SS(verbose=True, subset=False)
+        >>> PDB_SS.describe()
+    
         '''
         vers = proteusPy.__version__
         tot = self.TotalDisulfides
