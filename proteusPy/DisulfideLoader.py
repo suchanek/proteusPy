@@ -262,7 +262,7 @@ class DisulfideLoader:
         >>> from proteusPy.DisulfideLoader import Load_PDB_SS
         >>> PDB_SS = Load_PDB_SS(verbose=True, subset=False)
         >>> PDB_SS.describe()
-    
+
         '''
         vers = proteusPy.__version__
         tot = self.TotalDisulfides
@@ -431,7 +431,8 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
     except:
         mess = f'-> load_PDB_SS(): cannot open file {_fname}'
         raise DisulfideIOException(mess)
- 
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
