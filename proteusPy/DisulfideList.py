@@ -287,7 +287,7 @@ class DisulfideList(UserList):
         '''
         Compute and return the average torsional for the given list.
 
-        :return: Average resolution (A)
+        :return: Average torsional energy for the list (kcal/mol).
         '''
         energy = 0.0
         cnt = 1
@@ -345,7 +345,7 @@ class DisulfideList(UserList):
     def build_torsion_df(self) -> pd.DataFrame:
         '''
         Create a dataframe containing the input DisulfideList torsional parameters,
-        ca-ca distance, energy, and phi-psi angles. This can take several minutes for the
+        Cα-Cα distance, energy, and phi-psi angles. This can take several minutes for the
         entire database.
 
         :param SSList: DisulfideList - input list of Disulfides
@@ -393,12 +393,12 @@ class DisulfideList(UserList):
         Display the Disulfide list in the specific rendering style.
 
         :param single: Display the bond in a single panel in the specific style. 
-        :param style:  Rendering style: One of:
-            * 'sb' - split bonds
-            * 'bs' - ball and stick
-            * 'cpk' - CPK style
-            * 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
-            * 'plain' - boring single color
+        :param style:  Rendering style: One of:\n
+            - 'sb' - split bonds
+            - 'bs' - ball and stick
+            - 'cpk' - CPK style
+            - 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
+            - 'plain' - boring single color
         :light: If True, light background, if False, dark
         '''
 
@@ -417,6 +417,20 @@ class DisulfideList(UserList):
  
     @property
     def distance_df(self) -> pd.DataFrame:
+        '''
+        Build and return the distance dataframe for the input list.
+        This can take considerable time for the entire list.
+
+        :return: Dataframe containing the Cα-Cα distances for the given list.
+
+        Example:
+        >>> from proteusPy.Disulfide import Disulfide 
+        >>> from proteusPy.DisulfideLoader import Load_PDB_SS
+        >>> from proteusPy.DisulfideList import DisulfideList
+
+        >>> PDB_SS = Load_PDB_SS()
+        
+        '''
         return self.build_distance_df()
     
     def display_overlay(self, screenshot=False, movie=False, 

@@ -1,3 +1,11 @@
+'''
+This file contains global declarations for the *proteusPy* package, a Python package for 
+the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
+
+Author: Eric G. Suchanek, PhD
+Last revision: 2/14/2023
+'''
+
 #
 # global directories for PDB files and the correspondig .pkl models
 # this is relative to the proteusPy package folder hierarchy!
