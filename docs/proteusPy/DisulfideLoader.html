@@ -289,11 +289,11 @@ Last revision: 2/14/2023</p>
 </span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a>        
 </span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a>        <span class="k">try</span><span class="p">:</span>
 </span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a>            <span class="c1"># PDB_SS[&#39;4yys&#39;] return a list of SS</span>
-</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>            <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SSDict</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> 
+</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a>            <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SSDict</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
 </span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a>            <span class="n">res</span> <span class="o">=</span> <span class="n">DisulfideList</span><span class="p">([],</span> <span class="n">item</span><span class="p">)</span>
 </span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a>            <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SSList</span>
-</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a>            <span class="n">res</span> <span class="o">=</span> <span class="n">DisulfideList</span><span class="p">([</span><span class="n">sslist</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">],</span> <span class="n">item</span><span class="p">)</span>
-</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a>            <span class="c1"># set the resolution for the resulting SS list</span>
+</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a>            <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a>                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sslist</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span>
 </span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a>            <span class="n">res</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">resolution</span>
 </span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a>
 </span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
@@ -384,7 +384,7 @@ Last revision: 2/14/2023</p>
 </span><span id="L-262"><a href="#L-262"><span class="linenos">262</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy.DisulfideLoader import Load_PDB_SS</span>
 </span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a><span class="sd">        &gt;&gt;&gt; PDB_SS = Load_PDB_SS(verbose=True, subset=False)</span>
 </span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a><span class="sd">        &gt;&gt;&gt; PDB_SS.describe()</span>
-</span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a><span class="sd">    </span>
+</span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a>
 </span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a>        <span class="n">vers</span> <span class="o">=</span> <span class="n">proteusPy</span><span class="o">.</span><span class="n">__version__</span>
 </span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a>        <span class="n">tot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TotalDisulfides</span>
@@ -553,12 +553,13 @@ Last revision: 2/14/2023</p>
 </span><span id="L-431"><a href="#L-431"><span class="linenos">431</span></a>    <span class="k">except</span><span class="p">:</span>
 </span><span id="L-432"><a href="#L-432"><span class="linenos">432</span></a>        <span class="n">mess</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;-&gt; load_PDB_SS(): cannot open file </span><span class="si">{</span><span class="n">_fname</span><span class="si">}</span><span class="s1">&#39;</span>
 </span><span id="L-433"><a href="#L-433"><span class="linenos">433</span></a>        <span class="k">raise</span> <span class="n">DisulfideIOException</span><span class="p">(</span><span class="n">mess</span><span class="p">)</span>
-</span><span id="L-434"><a href="#L-434"><span class="linenos">434</span></a> 
-</span><span id="L-435"><a href="#L-435"><span class="linenos">435</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="L-436"><a href="#L-436"><span class="linenos">436</span></a>    <span class="kn">import</span> <span class="nn">doctest</span>
-</span><span id="L-437"><a href="#L-437"><span class="linenos">437</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
-</span><span id="L-438"><a href="#L-438"><span class="linenos">438</span></a>
-</span><span id="L-439"><a href="#L-439"><span class="linenos">439</span></a><span class="c1"># end of file</span>
+</span><span id="L-434"><a href="#L-434"><span class="linenos">434</span></a>
+</span><span id="L-435"><a href="#L-435"><span class="linenos">435</span></a>
+</span><span id="L-436"><a href="#L-436"><span class="linenos">436</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="L-437"><a href="#L-437"><span class="linenos">437</span></a>    <span class="kn">import</span> <span class="nn">doctest</span>
+</span><span id="L-438"><a href="#L-438"><span class="linenos">438</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</span><span id="L-439"><a href="#L-439"><span class="linenos">439</span></a>
+</span><span id="L-440"><a href="#L-440"><span class="linenos">440</span></a><span class="c1"># end of file</span>
 </span></pre></div>
 
 
@@ -710,11 +711,11 @@ Last revision: 2/14/2023</p>
 </span><span id="DisulfideLoader-168"><a href="#DisulfideLoader-168"><span class="linenos">168</span></a>        
 </span><span id="DisulfideLoader-169"><a href="#DisulfideLoader-169"><span class="linenos">169</span></a>        <span class="k">try</span><span class="p">:</span>
 </span><span id="DisulfideLoader-170"><a href="#DisulfideLoader-170"><span class="linenos">170</span></a>            <span class="c1"># PDB_SS[&#39;4yys&#39;] return a list of SS</span>
-</span><span id="DisulfideLoader-171"><a href="#DisulfideLoader-171"><span class="linenos">171</span></a>            <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SSDict</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> 
+</span><span id="DisulfideLoader-171"><a href="#DisulfideLoader-171"><span class="linenos">171</span></a>            <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SSDict</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
 </span><span id="DisulfideLoader-172"><a href="#DisulfideLoader-172"><span class="linenos">172</span></a>            <span class="n">res</span> <span class="o">=</span> <span class="n">DisulfideList</span><span class="p">([],</span> <span class="n">item</span><span class="p">)</span>
 </span><span id="DisulfideLoader-173"><a href="#DisulfideLoader-173"><span class="linenos">173</span></a>            <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SSList</span>
-</span><span id="DisulfideLoader-174"><a href="#DisulfideLoader-174"><span class="linenos">174</span></a>            <span class="n">res</span> <span class="o">=</span> <span class="n">DisulfideList</span><span class="p">([</span><span class="n">sslist</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">],</span> <span class="n">item</span><span class="p">)</span>
-</span><span id="DisulfideLoader-175"><a href="#DisulfideLoader-175"><span class="linenos">175</span></a>            <span class="c1"># set the resolution for the resulting SS list</span>
+</span><span id="DisulfideLoader-174"><a href="#DisulfideLoader-174"><span class="linenos">174</span></a>            <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+</span><span id="DisulfideLoader-175"><a href="#DisulfideLoader-175"><span class="linenos">175</span></a>                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sslist</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span>
 </span><span id="DisulfideLoader-176"><a href="#DisulfideLoader-176"><span class="linenos">176</span></a>            <span class="n">res</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">resolution</span>
 </span><span id="DisulfideLoader-177"><a href="#DisulfideLoader-177"><span class="linenos">177</span></a>
 </span><span id="DisulfideLoader-178"><a href="#DisulfideLoader-178"><span class="linenos">178</span></a>        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
@@ -805,7 +806,7 @@ Last revision: 2/14/2023</p>
 </span><span id="DisulfideLoader-263"><a href="#DisulfideLoader-263"><span class="linenos">263</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy.DisulfideLoader import Load_PDB_SS</span>
 </span><span id="DisulfideLoader-264"><a href="#DisulfideLoader-264"><span class="linenos">264</span></a><span class="sd">        &gt;&gt;&gt; PDB_SS = Load_PDB_SS(verbose=True, subset=False)</span>
 </span><span id="DisulfideLoader-265"><a href="#DisulfideLoader-265"><span class="linenos">265</span></a><span class="sd">        &gt;&gt;&gt; PDB_SS.describe()</span>
-</span><span id="DisulfideLoader-266"><a href="#DisulfideLoader-266"><span class="linenos">266</span></a><span class="sd">    </span>
+</span><span id="DisulfideLoader-266"><a href="#DisulfideLoader-266"><span class="linenos">266</span></a>
 </span><span id="DisulfideLoader-267"><a href="#DisulfideLoader-267"><span class="linenos">267</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader-268"><a href="#DisulfideLoader-268"><span class="linenos">268</span></a>        <span class="n">vers</span> <span class="o">=</span> <span class="n">proteusPy</span><span class="o">.</span><span class="n">__version__</span>
 </span><span id="DisulfideLoader-269"><a href="#DisulfideLoader-269"><span class="linenos">269</span></a>        <span class="n">tot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TotalDisulfides</span>
@@ -1282,7 +1283,7 @@ function.</p>
 </span><span id="DisulfideLoader.describe-263"><a href="#DisulfideLoader.describe-263"><span class="linenos">263</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy.DisulfideLoader import Load_PDB_SS</span>
 </span><span id="DisulfideLoader.describe-264"><a href="#DisulfideLoader.describe-264"><span class="linenos">264</span></a><span class="sd">        &gt;&gt;&gt; PDB_SS = Load_PDB_SS(verbose=True, subset=False)</span>
 </span><span id="DisulfideLoader.describe-265"><a href="#DisulfideLoader.describe-265"><span class="linenos">265</span></a><span class="sd">        &gt;&gt;&gt; PDB_SS.describe()</span>
-</span><span id="DisulfideLoader.describe-266"><a href="#DisulfideLoader.describe-266"><span class="linenos">266</span></a><span class="sd">    </span>
+</span><span id="DisulfideLoader.describe-266"><a href="#DisulfideLoader.describe-266"><span class="linenos">266</span></a>
 </span><span id="DisulfideLoader.describe-267"><a href="#DisulfideLoader.describe-267"><span class="linenos">267</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader.describe-268"><a href="#DisulfideLoader.describe-268"><span class="linenos">268</span></a>        <span class="n">vers</span> <span class="o">=</span> <span class="n">proteusPy</span><span class="o">.</span><span class="n">__version__</span>
 </span><span id="DisulfideLoader.describe-269"><a href="#DisulfideLoader.describe-269"><span class="linenos">269</span></a>        <span class="n">tot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TotalDisulfides</span>

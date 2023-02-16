@@ -1875,9 +1875,9 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
         pbar = tqdm(entrylist, ncols=_PBAR_COLS)
 
     tot = 0
+    cnt = 0
     # loop over ss_filelist, create disulfides and initialize them
     for entry in pbar:
-        cnt = 0
         pbar.set_postfix({'ID': entry, 'Bad': bad, 'Ca': bad_dist, 'Cnt': tot}) # update the progress bar
 
         # returns an empty list if none are found.
@@ -1905,13 +1905,15 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
                           ss.psiprox, ss.phidist, ss.psidist, ss.torsion_length]
                           
                 # add the row to the end of the dataframe
-                sslist2.append(cnt)
                 SS_df.loc[len(SS_df.index)] = new_row.copy() # deep copy
+                sslist2.append(cnt)
                 cnt += 1
                 tot += 1
 
             # All_ss_dict[entry] = sslist
+            # print(f'Entry: {entry}. Dict indices: {sslist2}')
             All_ss_dict2[entry] = sslist2
+            # print(f'{entry} ss dict adding: {sslist2}')
 
         else:
             # at this point I really shouldn't have any bad non-parsible file
@@ -1946,6 +1948,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
         pickle.dump(All_ss_list, f)
 
     '''
+    SS_SUBSET_DICT_PICKLE_FILE
     # dump the dict of disulfides to a .pkl file. ~520 MB.
     dict_len = len(All_ss_dict)
     fname = f'{datadir}{dictfile}'
@@ -1956,6 +1959,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     '''
 
     # dump the dict2 disulfides to a .pkl file. ~520 MB.
+    print(f'Writing: {All_ss_dict2}')
     dict_len = len(All_ss_dict2)
     fname = f'{datadir}{dictfile}'
     print(f'-> Extract_Disulfides(): Saving indices of {dict_len} Disulfide-containing PDB IDs to file: {fname}')
