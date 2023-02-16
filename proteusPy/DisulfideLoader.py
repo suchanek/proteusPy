@@ -167,11 +167,11 @@ class DisulfideLoader:
         
         try:
             # PDB_SS['4yys'] return a list of SS
-            indices = self.SSDict[item] 
+            indices = self.SSDict[item]
             res = DisulfideList([], item)
             sslist = self.SSList
-            res = DisulfideList([sslist[indices[i]] for i in indices], item)
-            # set the resolution for the resulting SS list
+            for ind in indices:
+                res.append(sslist[ind])
             res.resolution = res[0].resolution
 
         except KeyError:
