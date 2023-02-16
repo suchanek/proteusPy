@@ -144,7 +144,7 @@ parser.add_argument("-f", "--full", help="extract all disulfides from the PDB st
 parser.add_argument("-b", "--build", help="rebuild the loader", action=argparse.BooleanOptionalAction)
 parser.add_argument("-s", "--subset", help="rebuild the subset only", action=argparse.BooleanOptionalAction)
 
-parser.set_defaults(all=False)
+parser.set_defaults(all=True)
 parser.set_defaults(update=True)
 parser.set_defaults(verbose=True)
 parser.set_defaults(extract=True)

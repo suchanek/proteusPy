@@ -1959,7 +1959,6 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     '''
 
     # dump the dict2 disulfides to a .pkl file. ~520 MB.
-    print(f'Writing: {All_ss_dict2}')
     dict_len = len(All_ss_dict2)
     fname = f'{datadir}{dictfile}'
     print(f'-> Extract_Disulfides(): Saving indices of {dict_len} Disulfide-containing PDB IDs to file: {fname}')
