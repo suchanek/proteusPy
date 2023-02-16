@@ -520,7 +520,7 @@ class DisulfideList(UserList):
         if isinstance(other, type(self)):
             self.data.extend(other)
         else:
-            self.data.extend(self._validate_ss(item) for item in other)
+            self.data.extend(self.validate_ss(item) for item in other)
 
     def get_by_name(self, name) -> Disulfide:
         '''
