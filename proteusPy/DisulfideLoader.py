@@ -199,6 +199,23 @@ class DisulfideLoader:
         '''
         res = 0.0
         cnt = 1
+        sslist = self.SSList
+
+        for ss in sslist:
+            _res = ss.resolution
+            if _res is not None and res != -1.0:
+                res += _res
+                cnt += 1
+        return res / cnt
+    
+    def oAverage_Resolution(self) -> float:
+        '''
+        Compute and return the average structure resolution for the given list.
+
+        :return: Average resolution (A)
+        '''
+        res = 0.0
+        cnt = 1
         idlist = self.IDList
         sslist = self.SSList
 
@@ -209,6 +226,22 @@ class DisulfideLoader:
                 cnt += 1
         return res / cnt
 
+    def build_ss_from_idlist(self, idlist):
+        '''
+        Given a list of PDBid, return a DisulfideList of Disulfides
+
+        :param idlist: List of PDBIDs, e.g. ['4yys', '2q7q']
+        :return: ProteusPy.DisulfideList.DisulfideList of ProteusPy.Disulfide.Disulfide
+        '''
+        res = DisulfideList([], 'tmp')
+        
+        for id in idlist:
+            for ss in self.SSList:
+                if ss.pdb_id == id:
+                    res.append(ss)
+                    break
+        return res
+    
     def copy(self):
         '''
         Return a copy of self
@@ -275,7 +308,7 @@ class DisulfideLoader:
         print(f'    =========== RCSB Disulfide Database Summary ==============')
         print(f'PDB IDs present:                    {pdbs}')
         print(f'Disulfides loaded:                  {tot}')
-        print(f'Average resolution:                 {res:.2f} Å')
+        print(f'Average structure resolution:       {res:.2f} Å')
         print(f'Lowest Energy Disulfide:            {ssMin.name}')
         print(f'Highest Energy Disulfide:           {ssMax.name}')
         print(f'Total RAM Used:                     {ram:.2f} GB.')
@@ -314,7 +347,8 @@ class DisulfideLoader:
         ssbonds = self[pdbid]
         ssbonds.display_overlay()
         return
- 
+    
+    
     def getTorsions(self, pdbID=None) -> pd.DataFrame:
         '''
         Return the torsions, distances and energies defined by Disulfide.Torsion_DF_cols
