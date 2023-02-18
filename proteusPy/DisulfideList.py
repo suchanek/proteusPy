@@ -451,7 +451,7 @@ class DisulfideList(UserList):
         if tot_ss > 300:
             res = 8
 
-        title = f'<{id}> {resolution} Å: ({tot_ss} SS), Avg E: {avg_enrg:.3f} kcal/mol, Avg Dist: {avg_dist:.3f} Å'
+        title = f'<{id}> {resolution} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å'
 
         if light:
             pv.set_plot_theme('document')
