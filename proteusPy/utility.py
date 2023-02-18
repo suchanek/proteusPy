@@ -5,10 +5,11 @@ License: MIT\n
 Copyright (c)2023 Eric G. Suchanek, PhD, all rights reserved
 '''
 
-# Last modification 1/22/23 -egs-
+# Last modification 2/18/23 -egs-
 
 import math
-import numpy
+import numpy as np
+
 import copy
 import subprocess
 
@@ -25,24 +26,24 @@ from proteusPy.proteusPyWarning import ProteusPyWarning
 from Bio.PDB.vectors import Vector
 from Bio.PDB import PDBParser
 
-def distance_squared(p1: numpy.array, p2: numpy.array) -> numpy.array:
+def distance_squared(p1: np.array, p2: np.array) -> np.array:
     '''
     Returns the square of the N-dimensional distance between the
     two arrays.
 
-    :param numpy.array p1: N-dimensional array 1
-    :param numpy.array p2: N-dimensional array 2
-    :return: numpy.array N-dimensional distance squared Å^2
+    :param np.array p1: N-dimensional array 1
+    :param np.array p2: N-dimensional array 2
+    :return: np.array N-dimensional distance squared Å^2
 
     Example:
 
     >>> from proteusPy.utility import distance_squared
-    >>> p1 = numpy.array([1.0, 0.0, 0.0])
-    >>> p2 = numpy.array([0, 1.0, 0])
+    >>> p1 = np.array([1.0, 0.0, 0.0])
+    >>> p2 = np.array([0, 1.0, 0])
     >>> distance_squared(p1, p2)
     2.0
     '''
-    return numpy.sum(numpy.square(numpy.subtract(p1, p2)))
+    return np.sum(np.square(np.subtract(p1, p2)))
 
 def distance3d(p1: Vector, p2: Vector) -> float:
     '''
@@ -73,7 +74,7 @@ def cmap_vector(steps):
     Return an RGB array of steps rows using the ```jet``` colormap.
     
     :param int steps: number of RGB elements to return
-    :return: numpy.array [steps][3] array of RGB values.
+    :return: np.array [steps][3] array of RGB values.
 
     Example:
     >>> from proteusPy.utility import cmap_vector
@@ -93,7 +94,7 @@ def cmap_vector(steps):
 
     '''
 
-    rgbcol = numpy.zeros(shape=(steps, 3))
+    rgbcol = np.zeros(shape=(steps, 3))
     norm = linspace(0.0, 1.0, steps)
 
     # colormap possible values = viridis, jet, spectral
@@ -161,7 +162,7 @@ def Check_chains(pdbid, pdbdir, verbose=True):
                 print(f'Chain: {chain_id}, length: {chain_length}')
             chain_lens.append(chain_length)
 
-        if numpy.min(chain_lens) != numpy.max(chain_lens):
+        if np.min(chain_lens) != np.max(chain_lens):
             same = False
             if verbose:
                 print(f'chain lengths are unequal: {chain_lens}')
@@ -241,18 +242,40 @@ def download_file(url, directory):
     else:
         print(f"{file_name} already exists in {directory}.")
 
-# ChatGPT input:
-# write a python function that takes a
-# pandas dataframe containing columns 'pdbid', 'chi1', 'chi2, 'chi3, 'chi4', 'chi5', 'ca_distance', 'torsion_length', 'energy'
-# and then adds additional columns labeled 'chi1_s', 'chi2_s', 'chi3_s', 'chi4_s', 'chi5_s' whose values are either -1 or 1 based
-# on the sign of the 'chi1', 'chi2, 'chi3', 'chi4', 'chi5' columns
-
 import pandas as pd
 
 def add_sign_columns(df):
+    """
+    Create new columns with the sign of each dehdral angle (chi1-chi5)
+    column and return a new DataFrame with the additional columns.
+    This is used to build disulfide classes.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The input DataFrame containing the dihedral angle (chi1-chi5) columns.
+        
+    Returns
+    -------
+    pandas.DataFrame
+        A new DataFrame containing the columns 'ss_id', 'chi1_s', 'chi2_s', 'chi3_s', 'chi4_s', 'chi5_s'
+        which represent the signs of the dihedral angle columns in the input DataFrame.
+        
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> data = {'ss_id': [1, 2, 3], 'chi1': [-2, 0.5, 1.3], 'chi2': [0.8, -1.5, 0], 
+    ...         'chi3': [-1, 2, 0.1], 'chi4': [0, 0.9, -1.1], 'chi5': [0.2, -0.6, -0.8]}
+    >>> df = pd.DataFrame(data)
+    >>> res_df = add_sign_columns(df)
+    >>> print(res_df)
+       ss_id  chi1_s  chi2_s  chi3_s  chi4_s  chi5_s
+    0      1      -1       1      -1       1       1
+    1      2       1      -1       1       1      -1
+    2      3       1       1       1      -1      -1
+    """
     # Create columns for the resulting DF
     tors_vector_cols = ['ss_id', 'chi1_s', 'chi2_s', 'chi3_s', 'chi4_s', 'chi5_s']
-
     res_df = pd.DataFrame(columns=tors_vector_cols)
     
     # Create new columns with the sign of each chi column
@@ -261,26 +284,119 @@ def add_sign_columns(df):
     df[sign_columns] = df[chi_columns].applymap(lambda x: 1 if x >= 0 else -1)
     res_df = df[tors_vector_cols].copy()
     return res_df
-
-'''
-    let's continue and take the resulting data frame and group it by columns 
-    'chi1_s', 'chi2_s', 'chi3_s', 'chi4_s', 'chi5_s' and return that as a new data frame
-'''
     
 def group_by_sign(df):
-    # Create new columns with the sign of each chi column
+    """Group a DataFrame by the sign of each dihedral angle (chi1-chi5) column.
+
+    This function creates new columns in the input DataFrame with the sign of each chi column, 
+    and groups the DataFrame by these new columns. The function returns the aggregated data, including 
+    the mean and standard deviation of the 'ca_distance', 'torsion_length', and 'energy' columns.
+
+    :param df: The input DataFrame to group by sign.
+    :type df: pandas.DataFrame
+    :return: The DataFrame grouped by sign, including means and standard deviations.
+    :rtype: pandas.DataFrame
+
+    :Example:
+
+    >>> df = pd.DataFrame({'chi1': [-0.5, 0.5, -0.5, 0.5],
+    ...                    'chi2': [-0.5, 0.5, -0.5, 0.5],
+    ...                    'chi3': [-0.5, 0.5, -0.5, 0.5],
+    ...                    'chi4': [0.5, -0.5, 0.5, -0.5],
+    ...                    'chi5': [0.5, -0.5, 0.5, -0.5],
+    ...                    'ca_distance': [1.0, 2.0, 3.0, 4.0],
+    ...                    'torsion_length': [5.0, 6.0, 7.0, 8.0],
+    ...                    'energy': [9.0, 10.0, 11.0, 12.0]})
+    >>> group_by_sign(df)
+      chi1_s chi2_s chi3_s chi4_s chi5_s  ca_distance_mean  ca_distance_std  torsion_length_mean  torsion_length_std  energy_mean  energy_std
+    0     -1     -1     -1      1      1               3.0              1.0                  7.0                 1.0         11.0        1.0
+    1     -1     -1     -1     -1     -1               1.0              NaN                  5.0                 NaN          9.0        NaN
+    2      1      1      1      1      1               4.0              NaN                  8.0                 NaN         12.0        NaN
+    3      1      1      1     -1     -1               2.0              NaN                  6.0                 NaN         10.0        NaN
+    """
     chi_columns = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']
     sign_columns = [col + '_s' for col in chi_columns]
     df[sign_columns] = df[chi_columns].applymap(lambda x: 1 if x >= 0 else -1)
 
-    # Group the DataFrame by the sign columns and return the aggregated data
     group_columns = sign_columns
     agg_columns = ['ca_distance', 'torsion_length', 'energy']
-    grouped = df.groupby(group_columns)[agg_columns].agg(['mean', 'std', 'count'])
+    grouped = df.groupby(group_columns)[agg_columns].agg(['mean', 'std'])
     grouped.columns = ['_'.join(col).strip() for col in grouped.columns.values]
     return grouped.reset_index()
 
 def create_classes(df):
+    """
+    Group the DataFrame by the sign of the chi columns and create a new class ID column for each unique grouping.
+
+    :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'torsion_length', and 'energy'.
+    :return: A pandas DataFrame containing columns 'class_id', 'ss_id', and 'count', where 'class_id' is a unique identifier for each grouping of chi signs, 'ss_id' is a list of all 'ss_id' values in that grouping, and 'count' is the number of rows in that grouping.
+    
+    >>> import pandas as pd
+    >>> df = pd.DataFrame({
+    ...    'ss_id': [1, 2, 3, 4, 5],
+    ...    'chi1': [1.0, -1.0, 1.0, 1.0, -1.0],
+    ...    'chi2': [-1.0, -1.0, -1.0, 1.0, 1.0],
+    ...    'chi3': [-1.0, 1.0, -1.0, 1.0, -1.0],
+    ...    'chi4': [1.0, -1.0, 1.0, -1.0, 1.0],
+    ...    'chi5': [1.0, -1.0, -1.0, -1.0, -1.0],
+    ...    'ca_distance': [3.1, 3.2, 3.3, 3.4, 3.5],
+    ...    'torsion_length': [120.1, 120.2, 120.3, 120.4, 120.5],
+    ...    'energy': [-2.3, -2.2, -2.1, -2.0, -1.9]
+    ... })
+    >>> create_classes(df)
+      class_id          ss_id  count
+    0    11111     [1, 3, 4]      3
+    1    -1111        [2, 5]      2
+    """
+    # Create new columns with the sign of each chi column
+    chi_columns = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']
+    sign_columns = [col + '_s' for col in chi_columns]
+    df[sign_columns] = df[chi_columns].applymap(lambda x: 1 if x >= 0 else -1)
+    
+    # Create a new column with the class ID for each row
+    class_id_column = 'class_id'
+    df[class_id_column] = (df[sign_columns] + 1).apply(lambda x: ''.join(x.astype(str)), axis=1)
+
+    # Group the DataFrame by the class ID and return the grouped data
+    grouped = df.groupby(class_id_column)['ss_id'].unique().reset_index()
+    grouped['count'] = grouped['ss_id'].apply(lambda x: len(x))
+    grouped['incidence'] = grouped['ss_id'].apply(lambda x: len(x)/len(df))
+    grouped['percentage'] = grouped['incidence'].apply(lambda x: 100 * x)
+
+    return grouped
+
+
+def Ncreate_classes(df):
+    """
+    Group disulfides based on their sidechain dihedral angles.
+    
+    Parameters:
+    -----------
+    :param df: DataFrame with columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 
+    'ca_distance', 'torsion_length', 'energy' representing secondary structure 
+    identifier, chi angles, torsion and energy values for each disulfide.
+    
+    :return: DataFrame with columns 'class_id', 'ss_id', 'count', 'incidence' and 'percentage'
+    representing the class ID, a list of PDB IDs in each class, 
+    the count of disulfides in each class, and the incidence of each class relative to 
+    the total number of disulfides in the input DataFrame.
+
+    Examples:
+    ---------
+    >>> import pandas as pd
+    >>> data = {'ss_id': ['pdb1', 'pdb2', 'pdb3', 'pdb4', 'pdb5'],
+    ...         'chi1': [1.0, 1.0, -1.0, -1.0, -1.0],
+    ...         'chi2': [-1.0, 1.0, -1.0, 1.0, 1.0],
+    ...         'chi3': [1.0, -1.0, 1.0, -1.0, 1.0],
+    ...         'chi4': [-1.0, 1.0, 1.0, -1.0, -1.0],
+    ...         'chi5': [1.0, -1.0, -1.0, 1.0, -1.0]}
+    >>> df = pd.DataFrame(data)
+    >>> create_classes(df)
+      class_id                   ss_id  count  incidence
+    0     -1-1-1  [pdb3, pdb4, pdb5]     3        0.6
+    1      1-1-1              [pdb1]     1        0.2
+    2     1-1--1                 [pdb2]     1        0.2
+    """
     # Create new columns with the sign of each chi column
     chi_columns = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']
     sign_columns = [col + '_s' for col in chi_columns]
@@ -293,8 +409,39 @@ def create_classes(df):
     # Group the DataFrame by the class ID and return the grouped data
     grouped = df.groupby(class_id_column)['ss_id'].unique().reset_index()
     grouped['count'] = grouped['ss_id'].apply(lambda x: len(x))
+    grouped['incidence'] = grouped['ss_id'].apply(lambda x: len(x)/len(df))
+    grouped['percentage'] = grouped['incidence'].apply(lambda x: 100 * x)
 
     return grouped
+
+def Ncreate_classes(df):
+    """
+    Group a DataFrame by the sign of each chi angle and return the grouped data with an additional column
+    representing the incidence of each class.
+
+    :param df: DataFrame with columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'torsion_length',
+               'energy' representing secondary structure identifier, chi angles, torsion and energy values for each
+               disulfide.
+    :return: DataFrame with columns 'class_id', 'ss_id', 'count', 'incidence' representing the class ID, a list of
+             secondary structure IDs in each class, the count of disulfides in each class, and the incidence of each class
+             relative to the total number of disulfides in the input DataFrame.
+    """
+    # Create new columns with the sign of each chi column
+    chi_columns = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']
+    sign_columns = [col + '_s' for col in chi_columns]
+    df[sign_columns] = df[chi_columns].applymap(lambda x: 1 if x >= 0 else -1)
+
+    # Create a new column with the class ID for each row
+    class_id_column = 'class_id'
+    df[class_id_column] = (df[sign_columns] + 1).apply(lambda x: ''.join(x.astype(str)), axis=1)
+
+    # Group the DataFrame by the class ID and return the grouped data
+    grouped = df.groupby(class_id_column)['ss_id'].unique().reset_index()
+    grouped['count'] = grouped['ss_id'].apply(lambda x: len(x))
+    grouped['incidence'] = grouped['count'] / len(df)
+
+    return grouped
+
 
 if __name__ == "__main__":
     import doctest

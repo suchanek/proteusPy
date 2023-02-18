@@ -1798,7 +1798,7 @@ Last revision: 2/14/2023</p>
 </span><span id="L-1560"><a href="#L-1560"><span class="linenos">1560</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy.DisulfideList import DisulfideList</span>
 </span><span id="L-1561"><a href="#L-1561"><span class="linenos">1561</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy.Disulfide import Disulfide</span>
 </span><span id="L-1562"><a href="#L-1562"><span class="linenos">1562</span></a><span class="sd">        &gt;&gt;&gt; PDB_SS = None</span>
-</span><span id="L-1563"><a href="#L-1563"><span class="linenos">1563</span></a><span class="sd">        &gt;&gt;&gt; PDB_SS = DisulfideLoader(verbose=False, subset=True)</span>
+</span><span id="L-1563"><a href="#L-1563"><span class="linenos">1563</span></a><span class="sd">        &gt;&gt;&gt; PDB_SS = Load_PDB_SS(verbose=False, subset=True)</span>
 </span><span id="L-1564"><a href="#L-1564"><span class="linenos">1564</span></a><span class="sd">        &gt;&gt;&gt; ss_list = DisulfideList([], &#39;tmp&#39;)</span>
 </span><span id="L-1565"><a href="#L-1565"><span class="linenos">1565</span></a>
 </span><span id="L-1566"><a href="#L-1566"><span class="linenos">1566</span></a><span class="sd">        We point to the complete list to search for lowest and highest energies.</span>
@@ -1815,7 +1815,7 @@ Last revision: 2/14/2023</p>
 </span><span id="L-1577"><a href="#L-1577"><span class="linenos">1577</span></a>
 </span><span id="L-1578"><a href="#L-1578"><span class="linenos">1578</span></a><span class="sd">        &gt;&gt;&gt; tot = low_energy_neighbors.length</span>
 </span><span id="L-1579"><a href="#L-1579"><span class="linenos">1579</span></a><span class="sd">        &gt;&gt;&gt; print(f&#39;Neighbors: {tot}&#39;)</span>
-</span><span id="L-1580"><a href="#L-1580"><span class="linenos">1580</span></a><span class="sd">        Neighbors: 6</span>
+</span><span id="L-1580"><a href="#L-1580"><span class="linenos">1580</span></a><span class="sd">        Neighbors: 2</span>
 </span><span id="L-1581"><a href="#L-1581"><span class="linenos">1581</span></a><span class="sd">        &gt;&gt;&gt; low_energy_neighbors.display_overlay()</span>
 </span><span id="L-1582"><a href="#L-1582"><span class="linenos">1582</span></a>
 </span><span id="L-1583"><a href="#L-1583"><span class="linenos">1583</span></a><span class="sd">        &#39;&#39;&#39;</span>
@@ -3933,7 +3933,7 @@ Last revision: 2/14/2023</p>
 </span><span id="Disulfide-1561"><a href="#Disulfide-1561"><span class="linenos">1561</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy.DisulfideList import DisulfideList</span>
 </span><span id="Disulfide-1562"><a href="#Disulfide-1562"><span class="linenos">1562</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy.Disulfide import Disulfide</span>
 </span><span id="Disulfide-1563"><a href="#Disulfide-1563"><span class="linenos">1563</span></a><span class="sd">        &gt;&gt;&gt; PDB_SS = None</span>
-</span><span id="Disulfide-1564"><a href="#Disulfide-1564"><span class="linenos">1564</span></a><span class="sd">        &gt;&gt;&gt; PDB_SS = DisulfideLoader(verbose=False, subset=True)</span>
+</span><span id="Disulfide-1564"><a href="#Disulfide-1564"><span class="linenos">1564</span></a><span class="sd">        &gt;&gt;&gt; PDB_SS = Load_PDB_SS(verbose=False, subset=True)</span>
 </span><span id="Disulfide-1565"><a href="#Disulfide-1565"><span class="linenos">1565</span></a><span class="sd">        &gt;&gt;&gt; ss_list = DisulfideList([], &#39;tmp&#39;)</span>
 </span><span id="Disulfide-1566"><a href="#Disulfide-1566"><span class="linenos">1566</span></a>
 </span><span id="Disulfide-1567"><a href="#Disulfide-1567"><span class="linenos">1567</span></a><span class="sd">        We point to the complete list to search for lowest and highest energies.</span>
@@ -3950,7 +3950,7 @@ Last revision: 2/14/2023</p>
 </span><span id="Disulfide-1578"><a href="#Disulfide-1578"><span class="linenos">1578</span></a>
 </span><span id="Disulfide-1579"><a href="#Disulfide-1579"><span class="linenos">1579</span></a><span class="sd">        &gt;&gt;&gt; tot = low_energy_neighbors.length</span>
 </span><span id="Disulfide-1580"><a href="#Disulfide-1580"><span class="linenos">1580</span></a><span class="sd">        &gt;&gt;&gt; print(f&#39;Neighbors: {tot}&#39;)</span>
-</span><span id="Disulfide-1581"><a href="#Disulfide-1581"><span class="linenos">1581</span></a><span class="sd">        Neighbors: 6</span>
+</span><span id="Disulfide-1581"><a href="#Disulfide-1581"><span class="linenos">1581</span></a><span class="sd">        Neighbors: 2</span>
 </span><span id="Disulfide-1582"><a href="#Disulfide-1582"><span class="linenos">1582</span></a><span class="sd">        &gt;&gt;&gt; low_energy_neighbors.display_overlay()</span>
 </span><span id="Disulfide-1583"><a href="#Disulfide-1583"><span class="linenos">1583</span></a>
 </span><span id="Disulfide-1584"><a href="#Disulfide-1584"><span class="linenos">1584</span></a><span class="sd">        &#39;&#39;&#39;</span>
@@ -6262,7 +6262,7 @@ determine their torsional similarity via a 5-Dimensional Euclidean distance metr
 </span><span id="Disulfide.Torsion_neighbors-1561"><a href="#Disulfide.Torsion_neighbors-1561"><span class="linenos">1561</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy.DisulfideList import DisulfideList</span>
 </span><span id="Disulfide.Torsion_neighbors-1562"><a href="#Disulfide.Torsion_neighbors-1562"><span class="linenos">1562</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy.Disulfide import Disulfide</span>
 </span><span id="Disulfide.Torsion_neighbors-1563"><a href="#Disulfide.Torsion_neighbors-1563"><span class="linenos">1563</span></a><span class="sd">        &gt;&gt;&gt; PDB_SS = None</span>
-</span><span id="Disulfide.Torsion_neighbors-1564"><a href="#Disulfide.Torsion_neighbors-1564"><span class="linenos">1564</span></a><span class="sd">        &gt;&gt;&gt; PDB_SS = DisulfideLoader(verbose=False, subset=True)</span>
+</span><span id="Disulfide.Torsion_neighbors-1564"><a href="#Disulfide.Torsion_neighbors-1564"><span class="linenos">1564</span></a><span class="sd">        &gt;&gt;&gt; PDB_SS = Load_PDB_SS(verbose=False, subset=True)</span>
 </span><span id="Disulfide.Torsion_neighbors-1565"><a href="#Disulfide.Torsion_neighbors-1565"><span class="linenos">1565</span></a><span class="sd">        &gt;&gt;&gt; ss_list = DisulfideList([], &#39;tmp&#39;)</span>
 </span><span id="Disulfide.Torsion_neighbors-1566"><a href="#Disulfide.Torsion_neighbors-1566"><span class="linenos">1566</span></a>
 </span><span id="Disulfide.Torsion_neighbors-1567"><a href="#Disulfide.Torsion_neighbors-1567"><span class="linenos">1567</span></a><span class="sd">        We point to the complete list to search for lowest and highest energies.</span>
@@ -6279,7 +6279,7 @@ determine their torsional similarity via a 5-Dimensional Euclidean distance metr
 </span><span id="Disulfide.Torsion_neighbors-1578"><a href="#Disulfide.Torsion_neighbors-1578"><span class="linenos">1578</span></a>
 </span><span id="Disulfide.Torsion_neighbors-1579"><a href="#Disulfide.Torsion_neighbors-1579"><span class="linenos">1579</span></a><span class="sd">        &gt;&gt;&gt; tot = low_energy_neighbors.length</span>
 </span><span id="Disulfide.Torsion_neighbors-1580"><a href="#Disulfide.Torsion_neighbors-1580"><span class="linenos">1580</span></a><span class="sd">        &gt;&gt;&gt; print(f&#39;Neighbors: {tot}&#39;)</span>
-</span><span id="Disulfide.Torsion_neighbors-1581"><a href="#Disulfide.Torsion_neighbors-1581"><span class="linenos">1581</span></a><span class="sd">        Neighbors: 6</span>
+</span><span id="Disulfide.Torsion_neighbors-1581"><a href="#Disulfide.Torsion_neighbors-1581"><span class="linenos">1581</span></a><span class="sd">        Neighbors: 2</span>
 </span><span id="Disulfide.Torsion_neighbors-1582"><a href="#Disulfide.Torsion_neighbors-1582"><span class="linenos">1582</span></a><span class="sd">        &gt;&gt;&gt; low_energy_neighbors.display_overlay()</span>
 </span><span id="Disulfide.Torsion_neighbors-1583"><a href="#Disulfide.Torsion_neighbors-1583"><span class="linenos">1583</span></a>
 </span><span id="Disulfide.Torsion_neighbors-1584"><a href="#Disulfide.Torsion_neighbors-1584"><span class="linenos">1584</span></a><span class="sd">        &#39;&#39;&#39;</span>
@@ -6322,7 +6322,7 @@ Finally, we display the neighbors overlaid against a common reference frame.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn"><a href="DisulfideList.html">proteusPy.DisulfideList</a></span> <span class="kn">import</span> <span class="n">DisulfideList</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn"><a href="">proteusPy.Disulfide</a></span> <span class="kn">import</span> <span class="n">Disulfide</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">PDB_SS</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">PDB_SS</span> <span class="o">=</span> <span class="n">DisulfideLoader</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">PDB_SS</span> <span class="o">=</span> <span class="n">Load_PDB_SS</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ss_list</span> <span class="o">=</span> <span class="n">DisulfideList</span><span class="p">([],</span> <span class="s1">&#39;tmp&#39;</span><span class="p">)</span>
 </code></pre>
 </div>
@@ -6349,7 +6349,7 @@ sidechain dihedral angle space.</p>
 <div class="pdoc-code codehilite">
 <pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">tot</span> <span class="o">=</span> <span class="n">low_energy_neighbors</span><span class="o">.</span><span class="n">length</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Neighbors: </span><span class="si">{</span><span class="n">tot</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="go">Neighbors: 6</span>
+<span class="go">Neighbors: 2</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">low_energy_neighbors</span><span class="o">.</span><span class="n">display_overlay</span><span class="p">()</span>
 </code></pre>
 </div>
