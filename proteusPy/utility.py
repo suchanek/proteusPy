@@ -107,16 +107,39 @@ def cmap_vector(steps):
         rgbcol[i][2] = rgb[2]
         i += 1
     return rgbcol
-   
+
+def get_jet_colormap(steps):
+    """
+    Returns an array of uniformly spaced RGB values using the 'jet' colormap.
+
+    :param steps: The number of steps in the output array.
+
+    :return: An array of uniformly spaced RGB values using the 'jet' colormap. The shape of the array is (steps, 3).
+    :rtype: numpy.ndarray
+
+    :example:
+        >>> get_jet_colormap(5)
+        array([[  0,   0, 128],
+               [  0, 128, 255],
+               [128, 255, 128],
+               [255, 255,   0],
+               [255, 128,   0]])
+    """
+    norm = np.linspace(0.0, 1.0, steps)
+    colormap = cm.get_cmap('jet', steps)
+    rgbcol = colormap(norm, bytes=True)[:,:3]
+
+    return rgbcol
+
+
+  
 def grid_dimensions(n):
     '''
     Calculate rows and columns for the given needed to display
     a given number of disulfides in a square aspect.
 
     :param n: Number of Disulfides
-    :type n: int
     :return: int rows, columns
-    :rtype: int
     '''
     
     root = math.sqrt(n)
@@ -250,19 +273,14 @@ def add_sign_columns(df):
     column and return a new DataFrame with the additional columns.
     This is used to build disulfide classes.
 
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        The input DataFrame containing the dihedral angle (chi1-chi5) columns.
+    :param df: pandas.DataFrame - The input DataFrame containing 
+    the dihedral angle (chi1-chi5) columns.
         
-    Returns
-    -------
-    pandas.DataFrame
-        A new DataFrame containing the columns 'ss_id', 'chi1_s', 'chi2_s', 'chi3_s', 'chi4_s', 'chi5_s'
-        which represent the signs of the dihedral angle columns in the input DataFrame.
+    :return: A new DataFrame containing the columns 'ss_id', 'chi1_s', 
+    'chi2_s', 'chi3_s', 'chi4_s', 'chi5_s' which represent the signs of 
+    the dihedral angle columns in the input DataFrame.
         
-    Examples
-    --------
+    :example:
     >>> import pandas as pd
     >>> data = {'ss_id': [1, 2, 3], 'chi1': [-2, 1.0, 1.3], 'chi2': [0.8, -1.5, 0], 
     ...         'chi3': [-1, 2, 0.1], 'chi4': [0, 0.9, -1.1], 'chi5': [0.2, -0.6, -0.8]}
@@ -299,7 +317,7 @@ def group_by_sign(df):
     :return: The DataFrame grouped by sign, including means and standard deviations.
     :rtype: pandas.DataFrame
 
-    Example:
+    :example:
     >>> df = pd.DataFrame({'pdbid': ['1ABC', '1DEF', '1GHI', '1HIK'],
     ...                    'chi1': [120.0, -45.0, 70.0, 90],
     ...                    'chi2': [90.0, 180.0, -120.0, -90],
@@ -339,7 +357,7 @@ def Create_classes(df):
 
     :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'torsion_length', and 'energy'.
     :return: A pandas DataFrame containing columns 'class_id', 'ss_id', and 'count', where 'class_id' is a unique identifier for each grouping of chi signs, 'ss_id' is a list of all 'ss_id' values in that grouping, and 'count' is the number of rows in that grouping.
-    
+    :example:
     >>> import pandas as pd
     >>> df = pd.DataFrame({
     ...    'ss_id': [1, 2, 3, 4, 5],
