@@ -11,7 +11,7 @@ Last revision: 2/14/2023
 # Cα N, Cα, Cβ, C', Sγ Å °
 
 import math
-import numpy
+import numpy as np
 import copy
 
 from math import cos
@@ -132,7 +132,7 @@ class Disulfide:
         self.PERMISSIVE = permissive
         self.QUIET = quiet
         self.ca_distance = _FLOAT_INIT
-        self.torsion_array = numpy.array((_ANG_INIT, _ANG_INIT, _ANG_INIT, 
+        self.torsion_array = np.array((_ANG_INIT, _ANG_INIT, _ANG_INIT, 
         								  _ANG_INIT, _ANG_INIT))
         self.phiprox = _ANG_INIT
         self.psiprox = _ANG_INIT
@@ -315,7 +315,7 @@ class Disulfide:
             :return pvp: Updated Plotter object.
                 
             '''
-            _bond_conn = numpy.array(
+            _bond_conn = np.array(
             [
                 [0, 1], # n-ca
                 [1, 2], # ca-c
@@ -339,7 +339,7 @@ class Disulfide:
             # oxygen (O) undefined as well. Their previous and next N
             # are also undefined.
 
-            _bond_conn_backbone = numpy.array(
+            _bond_conn_backbone = np.array(
             [
                 [0, 1], # n-ca
                 [1, 2], # ca-c
@@ -353,7 +353,7 @@ class Disulfide:
             ])
             
             # colors for the bonds. Index into ATOM_COLORS array
-            _bond_split_colors = numpy.array(
+            _bond_split_colors = np.array(
                 [
                     ('N', 'C'),
                     ('C', 'C'),
@@ -374,7 +374,7 @@ class Disulfide:
                 ]
             )
 
-            _bond_split_colors_backbone = numpy.array(
+            _bond_split_colors_backbone = np.array(
                 [
                     ('N', 'C'),
                     ('C', 'C'),
@@ -541,11 +541,11 @@ class Disulfide:
 
         Returns
         -------
-        :return: numpy.Array(3,2): Array containing the min, max for X, Y, and Z respectively. 
+        :return: np.Array(3,2): Array containing the min, max for X, Y, and Z respectively. 
         Does not currently take the atom's radius into account.
     
         '''
-        res = numpy.zeros(shape=(3, 2))
+        res = np.zeros(shape=(3, 2))
         xmin, xmax = self.compute_extents('x')
         ymin, ymax = self.compute_extents('y')
         zmin, zmax = self.compute_extents('z')
@@ -629,14 +629,14 @@ class Disulfide:
         self.compute_torsional_energy()
         self.compute_local_coords()
         self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
-        self.torsion_array = numpy.array((self.chi1, self.chi2, self.chi3, 
+        self.torsion_array = np.array((self.chi1, self.chi2, self.chi3, 
                                         self.chi4, self.chi5))
-        self.torsion_length = self.Torsion_length()
+        self.torsion_length = self.Torsion_Length()
         
         self.missing_atoms = True
         self.modelled = True
     
-    def cofmass(self) -> numpy.array:
+    def cofmass(self) -> np.array:
         '''
         Returns the geometric center of mass for the internal coordinates of
         the given Disulfide. Missing atoms are not included.
@@ -687,7 +687,7 @@ class Disulfide:
         """
 
         turt = Turtle3D('tmp')
-        # get the coordinates as numpy.array for Turtle3D use.
+        # get the coordinates as np.array for Turtle3D use.
         cpp = self.c_prev_prox.get_array()
         nnp = self.n_next_prox.get_array()
 
@@ -711,7 +711,7 @@ class Disulfide:
         turt.orient_from_backbone(n, ca, c, cb, ORIENT_SIDECHAIN)
         
         # internal (local) coordinates, stored as Vector objects
-        # to_local returns numpy.array objects
+        # to_local returns np.array objects
         
         self._n_prox = Vector(turt.to_local(n))
         self._ca_prox = Vector(turt.to_local(ca))
@@ -742,7 +742,7 @@ class Disulfide:
         # @TODO find citation for the ss bond energy calculation
 
         def torad(deg):
-            return(numpy.radians(deg))
+            return(np.radians(deg))
 
         chi1 = self.chi1
         chi2 = self.chi2
@@ -854,35 +854,30 @@ class Disulfide:
         :param cutoff: Distance cutoff (Å)
         :return: DisulfideList within the cutoff
         '''
-        
-        res = DisulfideList([], 'neighbors')
-        for ss in others:
-            dist = self.Distance_RMS(ss)
-            if dist <= cutoff:
-                res.append(ss.copy())
-        return res
 
+        res = [ss.copy() for ss in others if self.Distance_RMS(ss) <= cutoff]
+        return DisulfideList(res, 'neighbors')
+
+    
     def Distance_RMS(self, other) -> float:
         '''
-        Calculate the RMS distance between the internal coordinates
-        of self and another Disulfide.
-
+        Calculate the RMS distance between the internal coordinates of self and another Disulfide.
         :param other: Comparison Disulfide
         :return: RMS distance (Å)
         '''
 
+        # Get internal coordinates of both objects
         ic1 = self.internal_coords()
         ic2 = other.internal_coords()
 
-        totsq = 0.0
-        for i in range(12):
-            p1 = ic1[i]
-            p2 = ic2[i]
-            totsq += math.dist(p1, p2)**2
-        
-        totsq /= 12
+        # Compute the sum of squared distances between corresponding internal coordinates
+        totsq = sum(math.dist(p1, p2)**2 for p1, p2 in zip(ic1, ic2))
 
-        return(math.sqrt(totsq))
+        # Compute the mean of the squared distances
+        totsq /= len(ic1)
+
+        # Take the square root of the mean to get the RMS distance
+        return math.sqrt(totsq)
 
     def get_chains(self) -> tuple:
         '''
@@ -999,10 +994,10 @@ class Disulfide:
             nnext_dist = nextdist['N'].get_vector()
 
             # compute phi, psi for prox and distal
-            self.phiprox = numpy.degrees(calc_dihedral(cprev_prox, n1, ca1, c1))
-            self.psiprox = numpy.degrees(calc_dihedral(n1, ca1, c1, nnext_prox))
-            self.phidist = numpy.degrees(calc_dihedral(cprev_dist, n2, ca2, c2))
-            self.psidist = numpy.degrees(calc_dihedral(n2, ca2, c2, nnext_dist))
+            self.phiprox = np.degrees(calc_dihedral(cprev_prox, n1, ca1, c1))
+            self.psiprox = np.degrees(calc_dihedral(n1, ca1, c1, nnext_prox))
+            self.phidist = np.degrees(calc_dihedral(cprev_dist, n2, ca2, c2))
+            self.psidist = np.degrees(calc_dihedral(n2, ca2, c2, nnext_dist))
 
         except Exception:
             mess = f'Missing coords for: {id} {prox-1} or {dist+1} for SS {proximal}-{distal}'
@@ -1015,16 +1010,16 @@ class Disulfide:
                            sg2, cprev_prox, nnext_prox, cprev_dist, nnext_dist)
         
         # calculate and set the disulfide dihedral angles
-        self.chi1 = numpy.degrees(calc_dihedral(n1, ca1, cb1, sg1))
-        self.chi2 = numpy.degrees(calc_dihedral(ca1, cb1, sg1, sg2))
-        self.chi3 = numpy.degrees(calc_dihedral(cb1, sg1, sg2, cb2))
-        self.chi4 = numpy.degrees(calc_dihedral(sg1, sg2, cb2, ca2))
-        self.chi5 = numpy.degrees(calc_dihedral(sg2, cb2, ca2, n2))
+        self.chi1 = np.degrees(calc_dihedral(n1, ca1, cb1, sg1))
+        self.chi2 = np.degrees(calc_dihedral(ca1, cb1, sg1, sg2))
+        self.chi3 = np.degrees(calc_dihedral(cb1, sg1, sg2, cb2))
+        self.chi4 = np.degrees(calc_dihedral(sg1, sg2, cb2, ca2))
+        self.chi5 = np.degrees(calc_dihedral(sg2, cb2, ca2, n2))
 
         self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
-        self.torsion_array = numpy.array((self.chi1, self.chi2, self.chi3, 
+        self.torsion_array = np.array((self.chi1, self.chi2, self.chi3, 
                                         self.chi4, self.chi5))
-        self.torsion_length = self.Torsion_length()
+        self.torsion_length = self.Torsion_Length()
 
         # calculate and set the SS bond torsional energy
         self.compute_torsional_energy()
@@ -1032,7 +1027,7 @@ class Disulfide:
         # compute and set the local coordinates
         self.compute_local_coords()
 
-    def internal_coords(self) -> numpy.array:
+    def internal_coords(self) -> np.array:
         '''
         Returns the internal coordinates for the Disulfide.
         If there are missing atoms the extra atoms for the proximal
@@ -1045,7 +1040,7 @@ class Disulfide:
         # if we don't have the prior and next atoms we initialize those
         # atoms to the origin so as to not effect the center of mass calculations
         if self.missing_atoms:
-            res_array = numpy.array((
+            res_array = np.array((
                 self._n_prox.get_array(),
                 self._ca_prox.get_array(),
                 self._c_prox.get_array(),
@@ -1064,7 +1059,7 @@ class Disulfide:
                 [0,0,0]
             ))
         else:
-            res_array = numpy.array((
+            res_array = np.array((
                 self._n_prox.get_array(),
                 self._ca_prox.get_array(),
                 self._c_prox.get_array(), 
@@ -1084,7 +1079,7 @@ class Disulfide:
             ))
         return res_array
     
-    def internal_coords_res(self, resnumb) -> numpy.array:
+    def internal_coords_res(self, resnumb) -> np.array:
         '''
         Returns the internal coordinates for the internal coordinates of
         the given Disulfide. Missing atoms are not included.
@@ -1093,10 +1088,10 @@ class Disulfide:
         :raises DisulfideConstructionWarning: Warning raised if the residue number is invalid
         :return: Array containing the internal coordinates for the disulfide
         '''
-        res_array = numpy.zeros(shape=(6,3))
+        res_array = np.zeros(shape=(6,3))
 
         if resnumb == self.proximal:
-            res_array = numpy.array((
+            res_array = np.array((
                 self._n_prox.get_array(),
                 self._ca_prox.get_array(),
                 self._c_prox.get_array(), 
@@ -1107,7 +1102,7 @@ class Disulfide:
             return res_array
 
         elif resnumb == self.distal:
-            res_array = numpy.array((
+            res_array = np.array((
                 self._n_dist.get_array(),
                 self._ca_dist.get_array(),
                 self._c_dist.get_array(),
@@ -1473,9 +1468,9 @@ class Disulfide:
         self.chi3 = chi3
         self.chi4 = chi4
         self.chi5 = chi5
-        self.torsion_array = numpy.array([chi1, chi2, chi3, chi4, chi5])
+        self.torsion_array = np.array([chi1, chi2, chi3, chi4, chi5])
         self.compute_torsional_energy()
-        self.Torsion_length()
+        self.Torsion_Length()
 
     def set_name(self, namestr="Disulfide"):
         '''
@@ -1497,7 +1492,7 @@ class Disulfide:
         self.proximal = proximal
         self.distal = distal
 
-    def Torsion_length(self) -> float:
+    def Torsion_Length(self) -> float:
         '''
         Compute the 5D Euclidean length of the Disulfide object
         and update the Disulfide internal state.
@@ -1505,11 +1500,15 @@ class Disulfide:
         :return: Torsion length (Degrees)
         '''
 
-        tors = self.torsion_array
-        tors2 = tors * tors
-        dist = math.sqrt(sum(tors2))
+        # Use numpy array to compute element-wise square
+        tors2 = np.square(self.torsion_array)
 
+        # Compute the sum of squares using numpy's sum function
+        dist = math.sqrt(np.sum(tors2))
+
+        # Update the internal state
         self.torsion_length = dist
+
         return dist
 
     def Torsion_Distance(self, other) -> float:
@@ -1523,12 +1522,18 @@ class Disulfide:
         :return: Euclidean distance (Degrees) between ```self``` and ```other```.
         '''
 
-        _p1 = self.torsion_array + 180.0
-        _p2 = other.torsion_array + 180.0 
-        if (len(_p1) != 5 or len(_p2) != 5):
+        # Check length of torsion arrays
+        if len(self.torsion_array) != 5 or len(other.torsion_array) != 5:
             raise ProteusPyWarning("--> Torsion_Distance() requires vectors of length 5!")
-        d = math.dist(_p1, _p2)
-        return d
+
+        # Convert to numpy arrays and add 180 to each element
+        p1 = np.array(self.torsion_array) + 180.0
+        p2 = np.array(other.torsion_array) + 180.0
+
+        # Compute the 5D Euclidean distance using numpy's linalg.norm function
+        dist = np.linalg.norm(p1 - p2)
+
+        return dist
 
     def Torsion_neighbors(self, others, cutoff):
         '''
@@ -1555,7 +1560,7 @@ class Disulfide:
         >>> from proteusPy.DisulfideList import DisulfideList
         >>> from proteusPy.Disulfide import Disulfide
         >>> PDB_SS = None
-        >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
+        >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
         >>> ss_list = DisulfideList([], 'tmp')
 
         We point to the complete list to search for lowest and highest energies.
@@ -1572,18 +1577,14 @@ class Disulfide:
 
         >>> tot = low_energy_neighbors.length
         >>> print(f'Neighbors: {tot}')
-        Neighbors: 6
+        Neighbors: 2
         >>> low_energy_neighbors.display_overlay()
 
         '''
         
-        res = DisulfideList([], 'neighbors')
-        for ss in others:
-            dist = self.Torsion_Distance(ss)
-            if dist <= cutoff:
-                res.append(ss)
-        return res
-
+        res = [ss for ss in others if self.Torsion_Distance(ss) <= cutoff]
+        return DisulfideList(res, 'neighbors')
+        
 # Class defination ends
 
 
@@ -1746,7 +1747,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
 
     >>> SS4yys = PDB_SS['4yys']
     >>> SS4yys
-    [<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_22B_65B, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56B_98B, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156B_207B, Source: 4yys, Resolution: 1.35 Å>]
+    [<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>]
 
     Make some empty disulfides:
 
@@ -1803,9 +1804,9 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
        Sγ: <Vector -1.14, -3.69, -0.43>
        Cprev <Vector -0.73, -17.44, -2.01>
        Nnext: <Vector 1.92, -19.18, -0.63>
-     Conformation: (Χ1-Χ5):  174.629°, 82.518°, -83.322°, -62.524° -73.827°  Energy: 1.696 kcal/mol
-     Cα Distance: 4.502 Å
-     Torsion length: 231.531 deg>
+     Χ1-Χ5: 174.63°, 82.52°, -83.32°, -62.52° -73.83°, 1.70 kcal/mol
+     Cα Distance: 4.50 Å
+     Torsion length: 231.53 deg>
 
     Get a list of disulfides via slicing and display them oriented against a common
     reference frame (the proximal N, Cα, C').
