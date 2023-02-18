@@ -27,7 +27,7 @@ from tqdm import tqdm
 import proteusPy
 from proteusPy import *
 from proteusPy.atoms import *
-from proteusPy.utility import grid_dimensions, cmap_vector
+from proteusPy.utility import grid_dimensions, get_jet_colormap
 from proteusPy import Disulfide
 from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR, WINSIZE
 from Bio.PDB import PDBParser
@@ -470,7 +470,7 @@ class DisulfideList(UserList):
         pl.add_axes()
 
         mycol = numpy.zeros(shape=(tot_ss, 3))
-        mycol = cmap_vector(tot_ss)
+        mycol = get_jet_colormap(tot_ss)
 
         # scale the overlay bond radii down so that we can see the individual elements better
         # maximum 90% reduction
