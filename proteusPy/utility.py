@@ -241,6 +241,61 @@ def download_file(url, directory):
     else:
         print(f"{file_name} already exists in {directory}.")
 
+# ChatGPT input:
+# write a python function that takes a
+# pandas dataframe containing columns 'pdbid', 'chi1', 'chi2, 'chi3, 'chi4', 'chi5', 'ca_distance', 'torsion_length', 'energy'
+# and then adds additional columns labeled 'chi1_s', 'chi2_s', 'chi3_s', 'chi4_s', 'chi5_s' whose values are either -1 or 1 based
+# on the sign of the 'chi1', 'chi2, 'chi3', 'chi4', 'chi5' columns
+
+import pandas as pd
+
+def add_sign_columns(df):
+    # Create columns for the resulting DF
+    tors_vector_cols = ['ss_id', 'chi1_s', 'chi2_s', 'chi3_s', 'chi4_s', 'chi5_s']
+
+    res_df = pd.DataFrame(columns=tors_vector_cols)
+    
+    # Create new columns with the sign of each chi column
+    chi_columns = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']
+    sign_columns = [col + '_s' for col in chi_columns]
+    df[sign_columns] = df[chi_columns].applymap(lambda x: 1 if x >= 0 else -1)
+    res_df = df[tors_vector_cols].copy()
+    return res_df
+
+'''
+    let's continue and take the resulting data frame and group it by columns 
+    'chi1_s', 'chi2_s', 'chi3_s', 'chi4_s', 'chi5_s' and return that as a new data frame
+'''
+    
+def group_by_sign(df):
+    # Create new columns with the sign of each chi column
+    chi_columns = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']
+    sign_columns = [col + '_s' for col in chi_columns]
+    df[sign_columns] = df[chi_columns].applymap(lambda x: 1 if x >= 0 else -1)
+
+    # Group the DataFrame by the sign columns and return the aggregated data
+    group_columns = sign_columns
+    agg_columns = ['ca_distance', 'torsion_length', 'energy']
+    grouped = df.groupby(group_columns)[agg_columns].agg(['mean', 'std', 'count'])
+    grouped.columns = ['_'.join(col).strip() for col in grouped.columns.values]
+    return grouped.reset_index()
+
+def create_classes(df):
+    # Create new columns with the sign of each chi column
+    chi_columns = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']
+    sign_columns = [col + '_s' for col in chi_columns]
+    df[sign_columns] = df[chi_columns].applymap(lambda x: 1 if x >= 0 else -1)
+
+    # Create a new column with the class ID for each row
+    class_id_column = 'class_id'
+    df[class_id_column] = (df[sign_columns] + 1).apply(lambda x: ''.join(x.astype(str)), axis=1)
+
+    # Group the DataFrame by the class ID and return the grouped data
+    grouped = df.groupby(class_id_column)['ss_id'].unique().reset_index()
+    grouped['count'] = grouped['ss_id'].apply(lambda x: len(x))
+
+    return grouped
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

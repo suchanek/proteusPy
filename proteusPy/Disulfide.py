@@ -756,6 +756,7 @@ class Disulfide:
 
         self.energy = energy
         return energy
+    
 
     def display(self, single=True, style='sb', light=True, shadows=False):
         '''
