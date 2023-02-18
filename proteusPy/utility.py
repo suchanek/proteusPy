@@ -21,10 +21,11 @@ from matplotlib import cm
 
 import proteusPy
 from proteusPy.proteusPyWarning import ProteusPyWarning
-# from proteusPy.DisulfideList import DisulfideList
 
 from Bio.PDB.vectors import Vector
 from Bio.PDB import PDBParser
+
+import pandas as pd
 
 def distance_squared(p1: np.array, p2: np.array) -> np.array:
     '''
@@ -35,8 +36,7 @@ def distance_squared(p1: np.array, p2: np.array) -> np.array:
     :param np.array p2: N-dimensional array 2
     :return: np.array N-dimensional distance squared Å^2
 
-    Example:
-
+    :example:
     >>> from proteusPy.utility import distance_squared
     >>> p1 = np.array([1.0, 0.0, 0.0])
     >>> p2 = np.array([0, 1.0, 0])
@@ -53,13 +53,12 @@ def distance3d(p1: Vector, p2: Vector) -> float:
     :param Vector p2: Point2
     :return float distance: Distance between two points, Å
 
-    Example:
-
-    >>> from proteusPy.utility import distance3d
-    >>> p1 = Vector(1, 0, 0)
-    >>> p2 = Vector(0, 1, 0)
-    >>> distance3d(p1,p2)
-    1.4142135623730951
+    :example:
+        >>> from proteusPy.utility import distance3d
+        >>> p1 = Vector(1, 0, 0)
+        >>> p2 = Vector(0, 1, 0)
+        >>> distance3d(p1,p2)
+        1.4142135623730951
     '''
 
     _p1 = p1.get_array()
@@ -68,45 +67,6 @@ def distance3d(p1: Vector, p2: Vector) -> float:
         raise ProteusPyWarning("distance3d() requires vectors of length 3!")
     d = math.dist(_p1, _p2)
     return d
-
-def cmap_vector(steps):
-    '''
-    Return an RGB array of steps rows using the ```jet``` colormap.
-    
-    :param int steps: number of RGB elements to return
-    :return: np.array [steps][3] array of RGB values.
-
-    Example:
-    >>> from proteusPy.utility import cmap_vector
-    >>> cmap_vector(12)
-    array([[  0.,   0., 127.],
-           [  0.,   0., 232.],
-           [  0.,  56., 255.],
-           [  0., 148., 255.],
-           [ 12., 244., 234.],
-           [ 86., 255., 160.],
-           [160., 255.,  86.],
-           [234., 255.,  12.],
-           [255., 170.,   0.],
-           [255.,  85.,   0.],
-           [232.,   0.,   0.],
-           [127.,   0.,   0.]])
-
-    '''
-
-    rgbcol = np.zeros(shape=(steps, 3))
-    norm = linspace(0.0, 1.0, steps)
-
-    # colormap possible values = viridis, jet, spectral
-    rgb_all = cm.jet(norm, bytes=True) 
-    i = 0
-    
-    for rgb in rgb_all:
-        rgbcol[i][0] = rgb[0]
-        rgbcol[i][1] = rgb[1]
-        rgbcol[i][2] = rgb[2]
-        i += 1
-    return rgbcol
 
 def get_jet_colormap(steps):
     """
@@ -119,20 +79,18 @@ def get_jet_colormap(steps):
 
     :example:
         >>> get_jet_colormap(5)
-        array([[  0,   0, 128],
-               [  0, 128, 255],
-               [128, 255, 128],
-               [255, 255,   0],
-               [255, 128,   0]])
+        array([[  0,   0, 127],
+               [  0, 127, 255],
+               [123, 255, 123],
+               [255, 151,   0],
+               [127,   0,   0]], dtype=uint8)
     """
     norm = np.linspace(0.0, 1.0, steps)
     colormap = cm.get_cmap('jet', steps)
     rgbcol = colormap(norm, bytes=True)[:,:3]
 
     return rgbcol
-
-
-  
+ 
 def grid_dimensions(n):
     '''
     Calculate rows and columns for the given needed to display
@@ -265,8 +223,6 @@ def download_file(url, directory):
     else:
         print(f"{file_name} already exists in {directory}.")
 
-import pandas as pd
-
 def add_sign_columns(df):
     """
     Create new columns with the sign of each dehdral angle (chi1-chi5)
@@ -281,17 +237,17 @@ def add_sign_columns(df):
     the dihedral angle columns in the input DataFrame.
         
     :example:
-    >>> import pandas as pd
-    >>> data = {'ss_id': [1, 2, 3], 'chi1': [-2, 1.0, 1.3], 'chi2': [0.8, -1.5, 0], 
-    ...         'chi3': [-1, 2, 0.1], 'chi4': [0, 0.9, -1.1], 'chi5': [0.2, -0.6, -0.8]}
-    >>> df = pd.DataFrame(data)
-    >>> res_df = add_sign_columns(df)
-    >>> print(res_df)
-       ss_id  chi1_s  chi2_s  chi3_s  chi4_s  chi5_s
-    0      1      -1       1      -1       1       1
-    1      2       1      -1       1       1      -1
-    2      3       1       1       1      -1      -1
-    """
+        >>> import pandas as pd
+        >>> data = {'ss_id': [1, 2, 3], 'chi1': [-2, 1.0, 1.3], 'chi2': [0.8, -1.5, 0], 
+        ...         'chi3': [-1, 2, 0.1], 'chi4': [0, 0.9, -1.1], 'chi5': [0.2, -0.6, -0.8]}
+        >>> df = pd.DataFrame(data)
+        >>> res_df = add_sign_columns(df)
+        >>> print(res_df)
+           ss_id  chi1_s  chi2_s  chi3_s  chi4_s  chi5_s
+        0      1      -1       1      -1       1       1
+        1      2       1      -1       1       1      -1
+        2      3       1       1       1      -1      -1
+        """
     # Create columns for the resulting DF
     tors_vector_cols = ['ss_id', 'chi1_s', 'chi2_s', 'chi3_s', 'chi4_s', 'chi5_s']
     res_df = pd.DataFrame(columns=tors_vector_cols)
@@ -318,23 +274,23 @@ def group_by_sign(df):
     :rtype: pandas.DataFrame
 
     :example:
-    >>> df = pd.DataFrame({'pdbid': ['1ABC', '1DEF', '1GHI', '1HIK'],
-    ...                    'chi1': [120.0, -45.0, 70.0, 90],
-    ...                    'chi2': [90.0, 180.0, -120.0, -90],
-    ...                    'chi3': [-45.0, -80.0, 20.0, 0],
-    ...                    'chi4': [0.0, 100.0, -150.0, -120.0],
-    ...                    'chi5': [-120.0, -10.0, 160.0, -120.0],
-    ...                    'ca_distance': [3.5, 3.8, 2.5, 3.3],
-    ...                    'torsion_length': [3.2, 2.8, 3.0, 4.4],
-    ...                    'energy': [-12.0, -10.0, -15.0, -20.0]})
-    >>> grouped = group_by_sign(df)
-    >>> grouped
-       chi1_s  chi2_s  chi3_s  chi4_s  chi5_s  ca_distance_mean  ca_distance_std  torsion_length_mean  torsion_length_std  energy_mean  energy_std
-    0      -1       1      -1       1      -1               3.8              NaN                  2.8                 NaN        -10.0         NaN
-    1       1      -1       1      -1      -1               3.3              NaN                  4.4                 NaN        -20.0         NaN
-    2       1      -1       1      -1       1               2.5              NaN                  3.0                 NaN        -15.0         NaN
-    3       1       1      -1       1      -1               3.5              NaN                  3.2                 NaN        -12.0         NaN
-    
+        >>> df = pd.DataFrame({'pdbid': ['1ABC', '1DEF', '1GHI', '1HIK'],
+        ...                    'chi1': [120.0, -45.0, 70.0, 90],
+        ...                    'chi2': [90.0, 180.0, -120.0, -90],
+        ...                    'chi3': [-45.0, -80.0, 20.0, 0],
+        ...                    'chi4': [0.0, 100.0, -150.0, -120.0],
+        ...                    'chi5': [-120.0, -10.0, 160.0, -120.0],
+        ...                    'ca_distance': [3.5, 3.8, 2.5, 3.3],
+        ...                    'torsion_length': [3.2, 2.8, 3.0, 4.4],
+        ...                    'energy': [-12.0, -10.0, -15.0, -20.0]})
+        >>> grouped = group_by_sign(df)
+        >>> grouped
+           chi1_s  chi2_s  chi3_s  chi4_s  chi5_s  ca_distance_mean  ca_distance_std  torsion_length_mean  torsion_length_std  energy_mean  energy_std
+        0      -1       1      -1       1      -1               3.8              NaN                  2.8                 NaN        -10.0         NaN
+        1       1      -1       1      -1      -1               3.3              NaN                  4.4                 NaN        -20.0         NaN
+        2       1      -1       1      -1       1               2.5              NaN                  3.0                 NaN        -15.0         NaN
+        3       1       1      -1       1      -1               3.5              NaN                  3.2                 NaN        -12.0         NaN
+        
     '''
     
     
@@ -358,25 +314,25 @@ def Create_classes(df):
     :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'torsion_length', and 'energy'.
     :return: A pandas DataFrame containing columns 'class_id', 'ss_id', and 'count', where 'class_id' is a unique identifier for each grouping of chi signs, 'ss_id' is a list of all 'ss_id' values in that grouping, and 'count' is the number of rows in that grouping.
     :example:
-    >>> import pandas as pd
-    >>> df = pd.DataFrame({
-    ...    'ss_id': [1, 2, 3, 4, 5],
-    ...    'chi1': [1.0, -1.0, 1.0, 1.0, -1.0],
-    ...    'chi2': [-1.0, -1.0, -1.0, 1.0, 1.0],
-    ...    'chi3': [-1.0, 1.0, -1.0, 1.0, -1.0],
-    ...    'chi4': [1.0, -1.0, 1.0, -1.0, 1.0],
-    ...    'chi5': [1.0, -1.0, -1.0, -1.0, -1.0],
-    ...    'ca_distance': [3.1, 3.2, 3.3, 3.4, 3.5],
-    ...    'torsion_length': [120.1, 120.2, 120.3, 120.4, 121.0],
-    ...    'energy': [-2.3, -2.2, -2.1, -2.0, -1.9]
-    ... })
-    >>> Create_classes(df)
-      class_id ss_id  count  incidence  percentage
-    0    00200   [2]      1        0.2        20.0
-    1    02020   [5]      1        0.2        20.0
-    2    20020   [3]      1        0.2        20.0
-    3    20022   [1]      1        0.2        20.0
-    4    22200   [4]      1        0.2        20.0
+        >>> import pandas as pd
+        >>> df = pd.DataFrame({
+        ...    'ss_id': [1, 2, 3, 4, 5],
+        ...    'chi1': [1.0, -1.0, 1.0, 1.0, -1.0],
+        ...    'chi2': [-1.0, -1.0, -1.0, 1.0, 1.0],
+        ...    'chi3': [-1.0, 1.0, -1.0, 1.0, -1.0],
+        ...    'chi4': [1.0, -1.0, 1.0, -1.0, 1.0],
+        ...    'chi5': [1.0, -1.0, -1.0, -1.0, -1.0],
+        ...    'ca_distance': [3.1, 3.2, 3.3, 3.4, 3.5],
+        ...    'torsion_length': [120.1, 120.2, 120.3, 120.4, 121.0],
+        ...    'energy': [-2.3, -2.2, -2.1, -2.0, -1.9]
+        ... })
+        >>> Create_classes(df)
+          class_id ss_id  count  incidence  percentage
+        0    00200   [2]      1        0.2        20.0
+        1    02020   [5]      1        0.2        20.0
+        2    20020   [3]      1        0.2        20.0
+        3    20022   [1]      1        0.2        20.0
+        4    22200   [4]      1        0.2        20.0
 
     """
     # Create new columns with the sign of each chi column
