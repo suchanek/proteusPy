@@ -279,10 +279,10 @@ class DisulfideList(UserList):
 
         for ss in self.data:
             _res = ss.resolution
-            if _res is not None and res != -1.0:
+            if _res is not None and _res != -1.0:
                 res += _res
                 cnt += 1
-        return res / cnt
+        return res / cnt if cnt else -1.0
     
     @property
     def Average_Torsion_Distance(self):
