@@ -153,7 +153,7 @@
 </span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="sd">    :param np.array p2: N-dimensional array 2</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="sd">    :return: np.array N-dimensional distance squared Å^2</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>
-</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="sd">    :example:</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="sd">    Example</span>
 </span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a><span class="sd">    &gt;&gt;&gt; from proteusPy.utility import distance_squared</span>
 </span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a><span class="sd">    &gt;&gt;&gt; p1 = np.array([1.0, 0.0, 0.0])</span>
 </span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="sd">    &gt;&gt;&gt; p2 = np.array([0, 1.0, 0])</span>
@@ -170,12 +170,12 @@
 </span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="sd">    :param Vector p2: Point2</span>
 </span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="sd">    :return float distance: Distance between two points, Å</span>
 </span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="sd">    :example:</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy.utility import distance3d</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="sd">        &gt;&gt;&gt; p1 = Vector(1, 0, 0)</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="sd">        &gt;&gt;&gt; p2 = Vector(0, 1, 0)</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="sd">        &gt;&gt;&gt; distance3d(p1,p2)</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">        1.4142135623730951</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="sd">    Example:</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="sd">    &gt;&gt;&gt; from proteusPy.utility import distance3d</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="sd">    &gt;&gt;&gt; p1 = Vector(1, 0, 0)</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="sd">    &gt;&gt;&gt; p2 = Vector(0, 1, 0)</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="sd">    &gt;&gt;&gt; distance3d(p1,p2)</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">    1.4142135623730951</span>
 </span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="sd">    &#39;&#39;&#39;</span>
 </span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>
 </span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>    <span class="n">_p1</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">get_array</span><span class="p">()</span>
@@ -194,7 +194,7 @@
 </span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="sd">    :return: An array of uniformly spaced RGB values using the &#39;jet&#39; colormap. The shape of the array is (steps, 3).</span>
 </span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="sd">    :rtype: numpy.ndarray</span>
 </span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">    :example:</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">    Example:</span>
 </span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="sd">        &gt;&gt;&gt; get_jet_colormap(5)</span>
 </span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="sd">        array([[  0,   0, 127],</span>
 </span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="sd">               [  0, 127, 255],</span>
@@ -353,18 +353,18 @@
 </span><span id="L-236"><a href="#L-236"><span class="linenos">236</span></a><span class="sd">    &#39;chi2_s&#39;, &#39;chi3_s&#39;, &#39;chi4_s&#39;, &#39;chi5_s&#39; which represent the signs of </span>
 </span><span id="L-237"><a href="#L-237"><span class="linenos">237</span></a><span class="sd">    the dihedral angle columns in the input DataFrame.</span>
 </span><span id="L-238"><a href="#L-238"><span class="linenos">238</span></a><span class="sd">        </span>
-</span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a><span class="sd">    :example:</span>
-</span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a><span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
-</span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a><span class="sd">        &gt;&gt;&gt; data = {&#39;ss_id&#39;: [1, 2, 3], &#39;chi1&#39;: [-2, 1.0, 1.3], &#39;chi2&#39;: [0.8, -1.5, 0], </span>
-</span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a><span class="sd">        ...         &#39;chi3&#39;: [-1, 2, 0.1], &#39;chi4&#39;: [0, 0.9, -1.1], &#39;chi5&#39;: [0.2, -0.6, -0.8]}</span>
-</span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a><span class="sd">        &gt;&gt;&gt; df = pd.DataFrame(data)</span>
-</span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a><span class="sd">        &gt;&gt;&gt; res_df = add_sign_columns(df)</span>
-</span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a><span class="sd">        &gt;&gt;&gt; print(res_df)</span>
-</span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a><span class="sd">           ss_id  chi1_s  chi2_s  chi3_s  chi4_s  chi5_s</span>
-</span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a><span class="sd">        0      1      -1       1      -1       1       1</span>
-</span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a><span class="sd">        1      2       1      -1       1       1      -1</span>
-</span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a><span class="sd">        2      3       1       1       1      -1      -1</span>
-</span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a><span class="sd">    Example:</span>
+</span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a><span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
+</span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a><span class="sd">    &gt;&gt;&gt; data = {&#39;ss_id&#39;: [1, 2, 3], &#39;chi1&#39;: [-2, 1.0, 1.3], &#39;chi2&#39;: [0.8, -1.5, 0], </span>
+</span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a><span class="sd">    ...         &#39;chi3&#39;: [-1, 2, 0.1], &#39;chi4&#39;: [0, 0.9, -1.1], &#39;chi5&#39;: [0.2, -0.6, -0.8]}</span>
+</span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a><span class="sd">    &gt;&gt;&gt; df = pd.DataFrame(data)</span>
+</span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a><span class="sd">    &gt;&gt;&gt; res_df = add_sign_columns(df)</span>
+</span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a><span class="sd">    &gt;&gt;&gt; print(res_df)</span>
+</span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a><span class="sd">        ss_id  chi1_s  chi2_s  chi3_s  chi4_s  chi5_s</span>
+</span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a><span class="sd">    0      1      -1       1      -1       1       1</span>
+</span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a><span class="sd">    1      2       1      -1       1       1      -1</span>
+</span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a><span class="sd">    2      3       1       1       1      -1      -1</span>
+</span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a>    <span class="c1"># Create columns for the resulting DF</span>
 </span><span id="L-252"><a href="#L-252"><span class="linenos">252</span></a>    <span class="n">tors_vector_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ss_id&#39;</span><span class="p">,</span> <span class="s1">&#39;chi1_s&#39;</span><span class="p">,</span> <span class="s1">&#39;chi2_s&#39;</span><span class="p">,</span> <span class="s1">&#39;chi3_s&#39;</span><span class="p">,</span> <span class="s1">&#39;chi4_s&#39;</span><span class="p">,</span> <span class="s1">&#39;chi5_s&#39;</span><span class="p">]</span>
 </span><span id="L-253"><a href="#L-253"><span class="linenos">253</span></a>    <span class="n">res_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">tors_vector_cols</span><span class="p">)</span>
@@ -390,24 +390,24 @@
 </span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a><span class="sd">    :return: The DataFrame grouped by sign, including means and standard deviations.</span>
 </span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a><span class="sd">    :rtype: pandas.DataFrame</span>
 </span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a>
-</span><span id="L-276"><a href="#L-276"><span class="linenos">276</span></a><span class="sd">    :example:</span>
-</span><span id="L-277"><a href="#L-277"><span class="linenos">277</span></a><span class="sd">        &gt;&gt;&gt; df = pd.DataFrame({&#39;pdbid&#39;: [&#39;1ABC&#39;, &#39;1DEF&#39;, &#39;1GHI&#39;, &#39;1HIK&#39;],</span>
-</span><span id="L-278"><a href="#L-278"><span class="linenos">278</span></a><span class="sd">        ...                    &#39;chi1&#39;: [120.0, -45.0, 70.0, 90],</span>
-</span><span id="L-279"><a href="#L-279"><span class="linenos">279</span></a><span class="sd">        ...                    &#39;chi2&#39;: [90.0, 180.0, -120.0, -90],</span>
-</span><span id="L-280"><a href="#L-280"><span class="linenos">280</span></a><span class="sd">        ...                    &#39;chi3&#39;: [-45.0, -80.0, 20.0, 0],</span>
-</span><span id="L-281"><a href="#L-281"><span class="linenos">281</span></a><span class="sd">        ...                    &#39;chi4&#39;: [0.0, 100.0, -150.0, -120.0],</span>
-</span><span id="L-282"><a href="#L-282"><span class="linenos">282</span></a><span class="sd">        ...                    &#39;chi5&#39;: [-120.0, -10.0, 160.0, -120.0],</span>
-</span><span id="L-283"><a href="#L-283"><span class="linenos">283</span></a><span class="sd">        ...                    &#39;ca_distance&#39;: [3.5, 3.8, 2.5, 3.3],</span>
-</span><span id="L-284"><a href="#L-284"><span class="linenos">284</span></a><span class="sd">        ...                    &#39;torsion_length&#39;: [3.2, 2.8, 3.0, 4.4],</span>
-</span><span id="L-285"><a href="#L-285"><span class="linenos">285</span></a><span class="sd">        ...                    &#39;energy&#39;: [-12.0, -10.0, -15.0, -20.0]})</span>
-</span><span id="L-286"><a href="#L-286"><span class="linenos">286</span></a><span class="sd">        &gt;&gt;&gt; grouped = group_by_sign(df)</span>
-</span><span id="L-287"><a href="#L-287"><span class="linenos">287</span></a><span class="sd">        &gt;&gt;&gt; grouped</span>
-</span><span id="L-288"><a href="#L-288"><span class="linenos">288</span></a><span class="sd">           chi1_s  chi2_s  chi3_s  chi4_s  chi5_s  ca_distance_mean  ca_distance_std  torsion_length_mean  torsion_length_std  energy_mean  energy_std</span>
-</span><span id="L-289"><a href="#L-289"><span class="linenos">289</span></a><span class="sd">        0      -1       1      -1       1      -1               3.8              NaN                  2.8                 NaN        -10.0         NaN</span>
-</span><span id="L-290"><a href="#L-290"><span class="linenos">290</span></a><span class="sd">        1       1      -1       1      -1      -1               3.3              NaN                  4.4                 NaN        -20.0         NaN</span>
-</span><span id="L-291"><a href="#L-291"><span class="linenos">291</span></a><span class="sd">        2       1      -1       1      -1       1               2.5              NaN                  3.0                 NaN        -15.0         NaN</span>
-</span><span id="L-292"><a href="#L-292"><span class="linenos">292</span></a><span class="sd">        3       1       1      -1       1      -1               3.5              NaN                  3.2                 NaN        -12.0         NaN</span>
-</span><span id="L-293"><a href="#L-293"><span class="linenos">293</span></a><span class="sd">        </span>
+</span><span id="L-276"><a href="#L-276"><span class="linenos">276</span></a><span class="sd">    Example:</span>
+</span><span id="L-277"><a href="#L-277"><span class="linenos">277</span></a><span class="sd">    &gt;&gt;&gt; df = pd.DataFrame({&#39;pdbid&#39;: [&#39;1ABC&#39;, &#39;1DEF&#39;, &#39;1GHI&#39;, &#39;1HIK&#39;],</span>
+</span><span id="L-278"><a href="#L-278"><span class="linenos">278</span></a><span class="sd">    ...                    &#39;chi1&#39;: [120.0, -45.0, 70.0, 90],</span>
+</span><span id="L-279"><a href="#L-279"><span class="linenos">279</span></a><span class="sd">    ...                    &#39;chi2&#39;: [90.0, 180.0, -120.0, -90],</span>
+</span><span id="L-280"><a href="#L-280"><span class="linenos">280</span></a><span class="sd">    ...                    &#39;chi3&#39;: [-45.0, -80.0, 20.0, 0],</span>
+</span><span id="L-281"><a href="#L-281"><span class="linenos">281</span></a><span class="sd">    ...                    &#39;chi4&#39;: [0.0, 100.0, -150.0, -120.0],</span>
+</span><span id="L-282"><a href="#L-282"><span class="linenos">282</span></a><span class="sd">    ...                    &#39;chi5&#39;: [-120.0, -10.0, 160.0, -120.0],</span>
+</span><span id="L-283"><a href="#L-283"><span class="linenos">283</span></a><span class="sd">    ...                    &#39;ca_distance&#39;: [3.5, 3.8, 2.5, 3.3],</span>
+</span><span id="L-284"><a href="#L-284"><span class="linenos">284</span></a><span class="sd">    ...                    &#39;torsion_length&#39;: [3.2, 2.8, 3.0, 4.4],</span>
+</span><span id="L-285"><a href="#L-285"><span class="linenos">285</span></a><span class="sd">    ...                    &#39;energy&#39;: [-12.0, -10.0, -15.0, -20.0]})</span>
+</span><span id="L-286"><a href="#L-286"><span class="linenos">286</span></a><span class="sd">    &gt;&gt;&gt; grouped = group_by_sign(df)</span>
+</span><span id="L-287"><a href="#L-287"><span class="linenos">287</span></a><span class="sd">    &gt;&gt;&gt; grouped</span>
+</span><span id="L-288"><a href="#L-288"><span class="linenos">288</span></a><span class="sd">        chi1_s  chi2_s  chi3_s  chi4_s  chi5_s  ca_distance_mean  ca_distance_std  torsion_length_mean  torsion_length_std  energy_mean  energy_std</span>
+</span><span id="L-289"><a href="#L-289"><span class="linenos">289</span></a><span class="sd">    0      -1       1      -1       1      -1               3.8              NaN                  2.8                 NaN        -10.0         NaN</span>
+</span><span id="L-290"><a href="#L-290"><span class="linenos">290</span></a><span class="sd">    1       1      -1       1      -1      -1               3.3              NaN                  4.4                 NaN        -20.0         NaN</span>
+</span><span id="L-291"><a href="#L-291"><span class="linenos">291</span></a><span class="sd">    2       1      -1       1      -1       1               2.5              NaN                  3.0                 NaN        -15.0         NaN</span>
+</span><span id="L-292"><a href="#L-292"><span class="linenos">292</span></a><span class="sd">    3       1       1      -1       1      -1               3.5              NaN                  3.2                 NaN        -12.0         NaN</span>
+</span><span id="L-293"><a href="#L-293"><span class="linenos">293</span></a><span class="sd">    </span>
 </span><span id="L-294"><a href="#L-294"><span class="linenos">294</span></a><span class="sd">    &#39;&#39;&#39;</span>
 </span><span id="L-295"><a href="#L-295"><span class="linenos">295</span></a>    
 </span><span id="L-296"><a href="#L-296"><span class="linenos">296</span></a>    
@@ -430,50 +430,51 @@
 </span><span id="L-313"><a href="#L-313"><span class="linenos">313</span></a>
 </span><span id="L-314"><a href="#L-314"><span class="linenos">314</span></a><span class="sd">    :param df: A pandas DataFrame containing columns &#39;ss_id&#39;, &#39;chi1&#39;, &#39;chi2&#39;, &#39;chi3&#39;, &#39;chi4&#39;, &#39;chi5&#39;, &#39;ca_distance&#39;, &#39;torsion_length&#39;, and &#39;energy&#39;.</span>
 </span><span id="L-315"><a href="#L-315"><span class="linenos">315</span></a><span class="sd">    :return: A pandas DataFrame containing columns &#39;class_id&#39;, &#39;ss_id&#39;, and &#39;count&#39;, where &#39;class_id&#39; is a unique identifier for each grouping of chi signs, &#39;ss_id&#39; is a list of all &#39;ss_id&#39; values in that grouping, and &#39;count&#39; is the number of rows in that grouping.</span>
-</span><span id="L-316"><a href="#L-316"><span class="linenos">316</span></a><span class="sd">    :example:</span>
-</span><span id="L-317"><a href="#L-317"><span class="linenos">317</span></a><span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
-</span><span id="L-318"><a href="#L-318"><span class="linenos">318</span></a><span class="sd">        &gt;&gt;&gt; df = pd.DataFrame({</span>
-</span><span id="L-319"><a href="#L-319"><span class="linenos">319</span></a><span class="sd">        ...    &#39;ss_id&#39;: [1, 2, 3, 4, 5],</span>
-</span><span id="L-320"><a href="#L-320"><span class="linenos">320</span></a><span class="sd">        ...    &#39;chi1&#39;: [1.0, -1.0, 1.0, 1.0, -1.0],</span>
-</span><span id="L-321"><a href="#L-321"><span class="linenos">321</span></a><span class="sd">        ...    &#39;chi2&#39;: [-1.0, -1.0, -1.0, 1.0, 1.0],</span>
-</span><span id="L-322"><a href="#L-322"><span class="linenos">322</span></a><span class="sd">        ...    &#39;chi3&#39;: [-1.0, 1.0, -1.0, 1.0, -1.0],</span>
-</span><span id="L-323"><a href="#L-323"><span class="linenos">323</span></a><span class="sd">        ...    &#39;chi4&#39;: [1.0, -1.0, 1.0, -1.0, 1.0],</span>
-</span><span id="L-324"><a href="#L-324"><span class="linenos">324</span></a><span class="sd">        ...    &#39;chi5&#39;: [1.0, -1.0, -1.0, -1.0, -1.0],</span>
-</span><span id="L-325"><a href="#L-325"><span class="linenos">325</span></a><span class="sd">        ...    &#39;ca_distance&#39;: [3.1, 3.2, 3.3, 3.4, 3.5],</span>
-</span><span id="L-326"><a href="#L-326"><span class="linenos">326</span></a><span class="sd">        ...    &#39;torsion_length&#39;: [120.1, 120.2, 120.3, 120.4, 121.0],</span>
-</span><span id="L-327"><a href="#L-327"><span class="linenos">327</span></a><span class="sd">        ...    &#39;energy&#39;: [-2.3, -2.2, -2.1, -2.0, -1.9]</span>
-</span><span id="L-328"><a href="#L-328"><span class="linenos">328</span></a><span class="sd">        ... })</span>
-</span><span id="L-329"><a href="#L-329"><span class="linenos">329</span></a><span class="sd">        &gt;&gt;&gt; Create_classes(df)</span>
-</span><span id="L-330"><a href="#L-330"><span class="linenos">330</span></a><span class="sd">          class_id ss_id  count  incidence  percentage</span>
-</span><span id="L-331"><a href="#L-331"><span class="linenos">331</span></a><span class="sd">        0    00200   [2]      1        0.2        20.0</span>
-</span><span id="L-332"><a href="#L-332"><span class="linenos">332</span></a><span class="sd">        1    02020   [5]      1        0.2        20.0</span>
-</span><span id="L-333"><a href="#L-333"><span class="linenos">333</span></a><span class="sd">        2    20020   [3]      1        0.2        20.0</span>
-</span><span id="L-334"><a href="#L-334"><span class="linenos">334</span></a><span class="sd">        3    20022   [1]      1        0.2        20.0</span>
-</span><span id="L-335"><a href="#L-335"><span class="linenos">335</span></a><span class="sd">        4    22200   [4]      1        0.2        20.0</span>
-</span><span id="L-336"><a href="#L-336"><span class="linenos">336</span></a>
-</span><span id="L-337"><a href="#L-337"><span class="linenos">337</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-338"><a href="#L-338"><span class="linenos">338</span></a>    <span class="c1"># Create new columns with the sign of each chi column</span>
-</span><span id="L-339"><a href="#L-339"><span class="linenos">339</span></a>    <span class="n">chi_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;chi1&#39;</span><span class="p">,</span> <span class="s1">&#39;chi2&#39;</span><span class="p">,</span> <span class="s1">&#39;chi3&#39;</span><span class="p">,</span> <span class="s1">&#39;chi4&#39;</span><span class="p">,</span> <span class="s1">&#39;chi5&#39;</span><span class="p">]</span>
-</span><span id="L-340"><a href="#L-340"><span class="linenos">340</span></a>    <span class="n">sign_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;_s&#39;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">chi_columns</span><span class="p">]</span>
-</span><span id="L-341"><a href="#L-341"><span class="linenos">341</span></a>    <span class="n">df</span><span class="p">[</span><span class="n">sign_columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">chi_columns</span><span class="p">]</span><span class="o">.</span><span class="n">applymap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-</span><span id="L-342"><a href="#L-342"><span class="linenos">342</span></a>    
-</span><span id="L-343"><a href="#L-343"><span class="linenos">343</span></a>    <span class="c1"># Create a new column with the class ID for each row</span>
-</span><span id="L-344"><a href="#L-344"><span class="linenos">344</span></a>    <span class="n">class_id_column</span> <span class="o">=</span> <span class="s1">&#39;class_id&#39;</span>
-</span><span id="L-345"><a href="#L-345"><span class="linenos">345</span></a>    <span class="n">df</span><span class="p">[</span><span class="n">class_id_column</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">sign_columns</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-</span><span id="L-346"><a href="#L-346"><span class="linenos">346</span></a>
-</span><span id="L-347"><a href="#L-347"><span class="linenos">347</span></a>    <span class="c1"># Group the DataFrame by the class ID and return the grouped data</span>
-</span><span id="L-348"><a href="#L-348"><span class="linenos">348</span></a>    <span class="n">grouped</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">class_id_column</span><span class="p">)[</span><span class="s1">&#39;ss_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-</span><span id="L-349"><a href="#L-349"><span class="linenos">349</span></a>    <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;ss_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-</span><span id="L-350"><a href="#L-350"><span class="linenos">350</span></a>    <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;incidence&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;ss_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
-</span><span id="L-351"><a href="#L-351"><span class="linenos">351</span></a>    <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;percentage&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;incidence&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span>
-</span><span id="L-352"><a href="#L-352"><span class="linenos">352</span></a>
-</span><span id="L-353"><a href="#L-353"><span class="linenos">353</span></a>    <span class="k">return</span> <span class="n">grouped</span>
-</span><span id="L-354"><a href="#L-354"><span class="linenos">354</span></a>
-</span><span id="L-355"><a href="#L-355"><span class="linenos">355</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="L-356"><a href="#L-356"><span class="linenos">356</span></a>    <span class="kn">import</span> <span class="nn">doctest</span>
-</span><span id="L-357"><a href="#L-357"><span class="linenos">357</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
-</span><span id="L-358"><a href="#L-358"><span class="linenos">358</span></a>
-</span><span id="L-359"><a href="#L-359"><span class="linenos">359</span></a><span class="c1"># end of file</span>
+</span><span id="L-316"><a href="#L-316"><span class="linenos">316</span></a><span class="sd">    </span>
+</span><span id="L-317"><a href="#L-317"><span class="linenos">317</span></a><span class="sd">    Example:</span>
+</span><span id="L-318"><a href="#L-318"><span class="linenos">318</span></a><span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
+</span><span id="L-319"><a href="#L-319"><span class="linenos">319</span></a><span class="sd">    &gt;&gt;&gt; df = pd.DataFrame({</span>
+</span><span id="L-320"><a href="#L-320"><span class="linenos">320</span></a><span class="sd">    ...    &#39;ss_id&#39;: [1, 2, 3, 4, 5],</span>
+</span><span id="L-321"><a href="#L-321"><span class="linenos">321</span></a><span class="sd">    ...    &#39;chi1&#39;: [1.0, -1.0, 1.0, 1.0, -1.0],</span>
+</span><span id="L-322"><a href="#L-322"><span class="linenos">322</span></a><span class="sd">    ...    &#39;chi2&#39;: [-1.0, -1.0, -1.0, 1.0, 1.0],</span>
+</span><span id="L-323"><a href="#L-323"><span class="linenos">323</span></a><span class="sd">    ...    &#39;chi3&#39;: [-1.0, 1.0, -1.0, 1.0, -1.0],</span>
+</span><span id="L-324"><a href="#L-324"><span class="linenos">324</span></a><span class="sd">    ...    &#39;chi4&#39;: [1.0, -1.0, 1.0, -1.0, 1.0],</span>
+</span><span id="L-325"><a href="#L-325"><span class="linenos">325</span></a><span class="sd">    ...    &#39;chi5&#39;: [1.0, -1.0, -1.0, -1.0, -1.0],</span>
+</span><span id="L-326"><a href="#L-326"><span class="linenos">326</span></a><span class="sd">    ...    &#39;ca_distance&#39;: [3.1, 3.2, 3.3, 3.4, 3.5],</span>
+</span><span id="L-327"><a href="#L-327"><span class="linenos">327</span></a><span class="sd">    ...    &#39;torsion_length&#39;: [120.1, 120.2, 120.3, 120.4, 121.0],</span>
+</span><span id="L-328"><a href="#L-328"><span class="linenos">328</span></a><span class="sd">    ...    &#39;energy&#39;: [-2.3, -2.2, -2.1, -2.0, -1.9]</span>
+</span><span id="L-329"><a href="#L-329"><span class="linenos">329</span></a><span class="sd">    ... })</span>
+</span><span id="L-330"><a href="#L-330"><span class="linenos">330</span></a><span class="sd">    &gt;&gt;&gt; Create_classes(df)</span>
+</span><span id="L-331"><a href="#L-331"><span class="linenos">331</span></a><span class="sd">        class_id ss_id  count  incidence  percentage</span>
+</span><span id="L-332"><a href="#L-332"><span class="linenos">332</span></a><span class="sd">    0    00200   [2]      1        0.2        20.0</span>
+</span><span id="L-333"><a href="#L-333"><span class="linenos">333</span></a><span class="sd">    1    02020   [5]      1        0.2        20.0</span>
+</span><span id="L-334"><a href="#L-334"><span class="linenos">334</span></a><span class="sd">    2    20020   [3]      1        0.2        20.0</span>
+</span><span id="L-335"><a href="#L-335"><span class="linenos">335</span></a><span class="sd">    3    20022   [1]      1        0.2        20.0</span>
+</span><span id="L-336"><a href="#L-336"><span class="linenos">336</span></a><span class="sd">    4    22200   [4]      1        0.2        20.0</span>
+</span><span id="L-337"><a href="#L-337"><span class="linenos">337</span></a>
+</span><span id="L-338"><a href="#L-338"><span class="linenos">338</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-339"><a href="#L-339"><span class="linenos">339</span></a>    <span class="c1"># Create new columns with the sign of each chi column</span>
+</span><span id="L-340"><a href="#L-340"><span class="linenos">340</span></a>    <span class="n">chi_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;chi1&#39;</span><span class="p">,</span> <span class="s1">&#39;chi2&#39;</span><span class="p">,</span> <span class="s1">&#39;chi3&#39;</span><span class="p">,</span> <span class="s1">&#39;chi4&#39;</span><span class="p">,</span> <span class="s1">&#39;chi5&#39;</span><span class="p">]</span>
+</span><span id="L-341"><a href="#L-341"><span class="linenos">341</span></a>    <span class="n">sign_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;_s&#39;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">chi_columns</span><span class="p">]</span>
+</span><span id="L-342"><a href="#L-342"><span class="linenos">342</span></a>    <span class="n">df</span><span class="p">[</span><span class="n">sign_columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">chi_columns</span><span class="p">]</span><span class="o">.</span><span class="n">applymap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="L-343"><a href="#L-343"><span class="linenos">343</span></a>    
+</span><span id="L-344"><a href="#L-344"><span class="linenos">344</span></a>    <span class="c1"># Create a new column with the class ID for each row</span>
+</span><span id="L-345"><a href="#L-345"><span class="linenos">345</span></a>    <span class="n">class_id_column</span> <span class="o">=</span> <span class="s1">&#39;class_id&#39;</span>
+</span><span id="L-346"><a href="#L-346"><span class="linenos">346</span></a>    <span class="n">df</span><span class="p">[</span><span class="n">class_id_column</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">sign_columns</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="L-347"><a href="#L-347"><span class="linenos">347</span></a>
+</span><span id="L-348"><a href="#L-348"><span class="linenos">348</span></a>    <span class="c1"># Group the DataFrame by the class ID and return the grouped data</span>
+</span><span id="L-349"><a href="#L-349"><span class="linenos">349</span></a>    <span class="n">grouped</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">class_id_column</span><span class="p">)[</span><span class="s1">&#39;ss_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+</span><span id="L-350"><a href="#L-350"><span class="linenos">350</span></a>    <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;ss_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</span><span id="L-351"><a href="#L-351"><span class="linenos">351</span></a>    <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;incidence&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;ss_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+</span><span id="L-352"><a href="#L-352"><span class="linenos">352</span></a>    <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;percentage&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;incidence&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span>
+</span><span id="L-353"><a href="#L-353"><span class="linenos">353</span></a>
+</span><span id="L-354"><a href="#L-354"><span class="linenos">354</span></a>    <span class="k">return</span> <span class="n">grouped</span>
+</span><span id="L-355"><a href="#L-355"><span class="linenos">355</span></a>
+</span><span id="L-356"><a href="#L-356"><span class="linenos">356</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="L-357"><a href="#L-357"><span class="linenos">357</span></a>    <span class="kn">import</span> <span class="nn">doctest</span>
+</span><span id="L-358"><a href="#L-358"><span class="linenos">358</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</span><span id="L-359"><a href="#L-359"><span class="linenos">359</span></a>
+</span><span id="L-360"><a href="#L-360"><span class="linenos">360</span></a><span class="c1"># end of file</span>
 </span></pre></div>
 
 
@@ -498,7 +499,7 @@
 </span><span id="distance_squared-37"><a href="#distance_squared-37"><span class="linenos">37</span></a><span class="sd">    :param np.array p2: N-dimensional array 2</span>
 </span><span id="distance_squared-38"><a href="#distance_squared-38"><span class="linenos">38</span></a><span class="sd">    :return: np.array N-dimensional distance squared Å^2</span>
 </span><span id="distance_squared-39"><a href="#distance_squared-39"><span class="linenos">39</span></a>
-</span><span id="distance_squared-40"><a href="#distance_squared-40"><span class="linenos">40</span></a><span class="sd">    :example:</span>
+</span><span id="distance_squared-40"><a href="#distance_squared-40"><span class="linenos">40</span></a><span class="sd">    Example</span>
 </span><span id="distance_squared-41"><a href="#distance_squared-41"><span class="linenos">41</span></a><span class="sd">    &gt;&gt;&gt; from proteusPy.utility import distance_squared</span>
 </span><span id="distance_squared-42"><a href="#distance_squared-42"><span class="linenos">42</span></a><span class="sd">    &gt;&gt;&gt; p1 = np.array([1.0, 0.0, 0.0])</span>
 </span><span id="distance_squared-43"><a href="#distance_squared-43"><span class="linenos">43</span></a><span class="sd">    &gt;&gt;&gt; p2 = np.array([0, 1.0, 0])</span>
@@ -525,7 +526,7 @@ two arrays.</p>
   <p>np.array N-dimensional distance squared Å^2</p>
 </blockquote>
 
-<p>:example:</p>
+<p>Example</p>
 
 <div class="pdoc-code codehilite">
 <pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn"><a href="">proteusPy.utility</a></span> <span class="kn">import</span> <span class="n">distance_squared</span>
@@ -558,12 +559,12 @@ two arrays.</p>
 </span><span id="distance3d-54"><a href="#distance3d-54"><span class="linenos">54</span></a><span class="sd">    :param Vector p2: Point2</span>
 </span><span id="distance3d-55"><a href="#distance3d-55"><span class="linenos">55</span></a><span class="sd">    :return float distance: Distance between two points, Å</span>
 </span><span id="distance3d-56"><a href="#distance3d-56"><span class="linenos">56</span></a>
-</span><span id="distance3d-57"><a href="#distance3d-57"><span class="linenos">57</span></a><span class="sd">    :example:</span>
-</span><span id="distance3d-58"><a href="#distance3d-58"><span class="linenos">58</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy.utility import distance3d</span>
-</span><span id="distance3d-59"><a href="#distance3d-59"><span class="linenos">59</span></a><span class="sd">        &gt;&gt;&gt; p1 = Vector(1, 0, 0)</span>
-</span><span id="distance3d-60"><a href="#distance3d-60"><span class="linenos">60</span></a><span class="sd">        &gt;&gt;&gt; p2 = Vector(0, 1, 0)</span>
-</span><span id="distance3d-61"><a href="#distance3d-61"><span class="linenos">61</span></a><span class="sd">        &gt;&gt;&gt; distance3d(p1,p2)</span>
-</span><span id="distance3d-62"><a href="#distance3d-62"><span class="linenos">62</span></a><span class="sd">        1.4142135623730951</span>
+</span><span id="distance3d-57"><a href="#distance3d-57"><span class="linenos">57</span></a><span class="sd">    Example:</span>
+</span><span id="distance3d-58"><a href="#distance3d-58"><span class="linenos">58</span></a><span class="sd">    &gt;&gt;&gt; from proteusPy.utility import distance3d</span>
+</span><span id="distance3d-59"><a href="#distance3d-59"><span class="linenos">59</span></a><span class="sd">    &gt;&gt;&gt; p1 = Vector(1, 0, 0)</span>
+</span><span id="distance3d-60"><a href="#distance3d-60"><span class="linenos">60</span></a><span class="sd">    &gt;&gt;&gt; p2 = Vector(0, 1, 0)</span>
+</span><span id="distance3d-61"><a href="#distance3d-61"><span class="linenos">61</span></a><span class="sd">    &gt;&gt;&gt; distance3d(p1,p2)</span>
+</span><span id="distance3d-62"><a href="#distance3d-62"><span class="linenos">62</span></a><span class="sd">    1.4142135623730951</span>
 </span><span id="distance3d-63"><a href="#distance3d-63"><span class="linenos">63</span></a><span class="sd">    &#39;&#39;&#39;</span>
 </span><span id="distance3d-64"><a href="#distance3d-64"><span class="linenos">64</span></a>
 </span><span id="distance3d-65"><a href="#distance3d-65"><span class="linenos">65</span></a>    <span class="n">_p1</span> <span class="o">=</span> <span class="n">p1</span><span class="o">.</span><span class="n">get_array</span><span class="p">()</span>
@@ -590,19 +591,16 @@ two arrays.</p>
   <p>Distance between two points, Å</p>
 </blockquote>
 
-<p>:example:</p>
+<p>Example:</p>
 
-<blockquote>
-  <blockquote>
-    <blockquote>
-      <p>from <a href="">proteusPy.utility</a> import distance3d
-      p1 = Vector(1, 0, 0)
-      p2 = Vector(0, 1, 0)
-      distance3d(p1,p2)
-          1.4142135623730951</p>
-    </blockquote>
-  </blockquote>
-</blockquote>
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn"><a href="">proteusPy.utility</a></span> <span class="kn">import</span> <span class="n">distance3d</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p1</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">distance3d</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">)</span>
+<span class="go">1.4142135623730951</span>
+</code></pre>
+</div>
 </div>
 
 
@@ -627,7 +625,7 @@ two arrays.</p>
 </span><span id="get_jet_colormap-78"><a href="#get_jet_colormap-78"><span class="linenos">78</span></a><span class="sd">    :return: An array of uniformly spaced RGB values using the &#39;jet&#39; colormap. The shape of the array is (steps, 3).</span>
 </span><span id="get_jet_colormap-79"><a href="#get_jet_colormap-79"><span class="linenos">79</span></a><span class="sd">    :rtype: numpy.ndarray</span>
 </span><span id="get_jet_colormap-80"><a href="#get_jet_colormap-80"><span class="linenos">80</span></a>
-</span><span id="get_jet_colormap-81"><a href="#get_jet_colormap-81"><span class="linenos">81</span></a><span class="sd">    :example:</span>
+</span><span id="get_jet_colormap-81"><a href="#get_jet_colormap-81"><span class="linenos">81</span></a><span class="sd">    Example:</span>
 </span><span id="get_jet_colormap-82"><a href="#get_jet_colormap-82"><span class="linenos">82</span></a><span class="sd">        &gt;&gt;&gt; get_jet_colormap(5)</span>
 </span><span id="get_jet_colormap-83"><a href="#get_jet_colormap-83"><span class="linenos">83</span></a><span class="sd">        array([[  0,   0, 127],</span>
 </span><span id="get_jet_colormap-84"><a href="#get_jet_colormap-84"><span class="linenos">84</span></a><span class="sd">               [  0, 127, 255],</span>
@@ -657,7 +655,7 @@ two arrays.</p>
   <p>An array of uniformly spaced RGB values using the 'jet' colormap. The shape of the array is (steps, 3).</p>
 </blockquote>
 
-<p>:example:</p>
+<p>Example:</p>
 
 <blockquote>
   <blockquote>
@@ -967,18 +965,18 @@ the first chain and return a dict containing only the first chain disulfides</p>
 </span><span id="add_sign_columns-237"><a href="#add_sign_columns-237"><span class="linenos">237</span></a><span class="sd">    &#39;chi2_s&#39;, &#39;chi3_s&#39;, &#39;chi4_s&#39;, &#39;chi5_s&#39; which represent the signs of </span>
 </span><span id="add_sign_columns-238"><a href="#add_sign_columns-238"><span class="linenos">238</span></a><span class="sd">    the dihedral angle columns in the input DataFrame.</span>
 </span><span id="add_sign_columns-239"><a href="#add_sign_columns-239"><span class="linenos">239</span></a><span class="sd">        </span>
-</span><span id="add_sign_columns-240"><a href="#add_sign_columns-240"><span class="linenos">240</span></a><span class="sd">    :example:</span>
-</span><span id="add_sign_columns-241"><a href="#add_sign_columns-241"><span class="linenos">241</span></a><span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
-</span><span id="add_sign_columns-242"><a href="#add_sign_columns-242"><span class="linenos">242</span></a><span class="sd">        &gt;&gt;&gt; data = {&#39;ss_id&#39;: [1, 2, 3], &#39;chi1&#39;: [-2, 1.0, 1.3], &#39;chi2&#39;: [0.8, -1.5, 0], </span>
-</span><span id="add_sign_columns-243"><a href="#add_sign_columns-243"><span class="linenos">243</span></a><span class="sd">        ...         &#39;chi3&#39;: [-1, 2, 0.1], &#39;chi4&#39;: [0, 0.9, -1.1], &#39;chi5&#39;: [0.2, -0.6, -0.8]}</span>
-</span><span id="add_sign_columns-244"><a href="#add_sign_columns-244"><span class="linenos">244</span></a><span class="sd">        &gt;&gt;&gt; df = pd.DataFrame(data)</span>
-</span><span id="add_sign_columns-245"><a href="#add_sign_columns-245"><span class="linenos">245</span></a><span class="sd">        &gt;&gt;&gt; res_df = add_sign_columns(df)</span>
-</span><span id="add_sign_columns-246"><a href="#add_sign_columns-246"><span class="linenos">246</span></a><span class="sd">        &gt;&gt;&gt; print(res_df)</span>
-</span><span id="add_sign_columns-247"><a href="#add_sign_columns-247"><span class="linenos">247</span></a><span class="sd">           ss_id  chi1_s  chi2_s  chi3_s  chi4_s  chi5_s</span>
-</span><span id="add_sign_columns-248"><a href="#add_sign_columns-248"><span class="linenos">248</span></a><span class="sd">        0      1      -1       1      -1       1       1</span>
-</span><span id="add_sign_columns-249"><a href="#add_sign_columns-249"><span class="linenos">249</span></a><span class="sd">        1      2       1      -1       1       1      -1</span>
-</span><span id="add_sign_columns-250"><a href="#add_sign_columns-250"><span class="linenos">250</span></a><span class="sd">        2      3       1       1       1      -1      -1</span>
-</span><span id="add_sign_columns-251"><a href="#add_sign_columns-251"><span class="linenos">251</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="add_sign_columns-240"><a href="#add_sign_columns-240"><span class="linenos">240</span></a><span class="sd">    Example:</span>
+</span><span id="add_sign_columns-241"><a href="#add_sign_columns-241"><span class="linenos">241</span></a><span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
+</span><span id="add_sign_columns-242"><a href="#add_sign_columns-242"><span class="linenos">242</span></a><span class="sd">    &gt;&gt;&gt; data = {&#39;ss_id&#39;: [1, 2, 3], &#39;chi1&#39;: [-2, 1.0, 1.3], &#39;chi2&#39;: [0.8, -1.5, 0], </span>
+</span><span id="add_sign_columns-243"><a href="#add_sign_columns-243"><span class="linenos">243</span></a><span class="sd">    ...         &#39;chi3&#39;: [-1, 2, 0.1], &#39;chi4&#39;: [0, 0.9, -1.1], &#39;chi5&#39;: [0.2, -0.6, -0.8]}</span>
+</span><span id="add_sign_columns-244"><a href="#add_sign_columns-244"><span class="linenos">244</span></a><span class="sd">    &gt;&gt;&gt; df = pd.DataFrame(data)</span>
+</span><span id="add_sign_columns-245"><a href="#add_sign_columns-245"><span class="linenos">245</span></a><span class="sd">    &gt;&gt;&gt; res_df = add_sign_columns(df)</span>
+</span><span id="add_sign_columns-246"><a href="#add_sign_columns-246"><span class="linenos">246</span></a><span class="sd">    &gt;&gt;&gt; print(res_df)</span>
+</span><span id="add_sign_columns-247"><a href="#add_sign_columns-247"><span class="linenos">247</span></a><span class="sd">        ss_id  chi1_s  chi2_s  chi3_s  chi4_s  chi5_s</span>
+</span><span id="add_sign_columns-248"><a href="#add_sign_columns-248"><span class="linenos">248</span></a><span class="sd">    0      1      -1       1      -1       1       1</span>
+</span><span id="add_sign_columns-249"><a href="#add_sign_columns-249"><span class="linenos">249</span></a><span class="sd">    1      2       1      -1       1       1      -1</span>
+</span><span id="add_sign_columns-250"><a href="#add_sign_columns-250"><span class="linenos">250</span></a><span class="sd">    2      3       1       1       1      -1      -1</span>
+</span><span id="add_sign_columns-251"><a href="#add_sign_columns-251"><span class="linenos">251</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="add_sign_columns-252"><a href="#add_sign_columns-252"><span class="linenos">252</span></a>    <span class="c1"># Create columns for the resulting DF</span>
 </span><span id="add_sign_columns-253"><a href="#add_sign_columns-253"><span class="linenos">253</span></a>    <span class="n">tors_vector_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ss_id&#39;</span><span class="p">,</span> <span class="s1">&#39;chi1_s&#39;</span><span class="p">,</span> <span class="s1">&#39;chi2_s&#39;</span><span class="p">,</span> <span class="s1">&#39;chi3_s&#39;</span><span class="p">,</span> <span class="s1">&#39;chi4_s&#39;</span><span class="p">,</span> <span class="s1">&#39;chi5_s&#39;</span><span class="p">]</span>
 </span><span id="add_sign_columns-254"><a href="#add_sign_columns-254"><span class="linenos">254</span></a>    <span class="n">res_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">tors_vector_cols</span><span class="p">)</span>
@@ -1011,24 +1009,21 @@ the dihedral angle (chi1-chi5) columns.</li>
   the dihedral angle columns in the input DataFrame.</p>
 </blockquote>
 
-<p>:example:</p>
+<p>Example:</p>
 
-<blockquote>
-  <blockquote>
-    <blockquote>
-      <p>import pandas as pd
-      data = {'ss_id': [1, 2, 3], 'chi1': [-2, 1.0, 1.3], 'chi2': [0.8, -1.5, 0], 
-          ...         'chi3': [-1, 2, 0.1], 'chi4': [0, 0.9, -1.1], 'chi5': [0.2, -0.6, -0.8]}
-      df = pd.DataFrame(data)
-      res_df = add_sign_columns(df)
-      print(res_df)
-             ss_id  chi1_s  chi2_s  chi3_s  chi4_s  chi5_s
-          0      1      -1       1      -1       1       1
-          1      2       1      -1       1       1      -1
-          2      3       1       1       1      -1      -1</p>
-    </blockquote>
-  </blockquote>
-</blockquote>
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ss_id&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;chi1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">],</span> <span class="s1">&#39;chi2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.8</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> 
+<span class="gp">... </span>        <span class="s1">&#39;chi3&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span> <span class="s1">&#39;chi4&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.1</span><span class="p">],</span> <span class="s1">&#39;chi5&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.8</span><span class="p">]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res_df</span> <span class="o">=</span> <span class="n">add_sign_columns</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">res_df</span><span class="p">)</span>
+<span class="go">    ss_id  chi1_s  chi2_s  chi3_s  chi4_s  chi5_s</span>
+<span class="go">0      1      -1       1      -1       1       1</span>
+<span class="go">1      2       1      -1       1       1      -1</span>
+<span class="go">2      3       1       1       1      -1      -1</span>
+</code></pre>
+</div>
 </div>
 
 
@@ -1057,24 +1052,24 @@ the dihedral angle (chi1-chi5) columns.</li>
 </span><span id="group_by_sign-274"><a href="#group_by_sign-274"><span class="linenos">274</span></a><span class="sd">    :return: The DataFrame grouped by sign, including means and standard deviations.</span>
 </span><span id="group_by_sign-275"><a href="#group_by_sign-275"><span class="linenos">275</span></a><span class="sd">    :rtype: pandas.DataFrame</span>
 </span><span id="group_by_sign-276"><a href="#group_by_sign-276"><span class="linenos">276</span></a>
-</span><span id="group_by_sign-277"><a href="#group_by_sign-277"><span class="linenos">277</span></a><span class="sd">    :example:</span>
-</span><span id="group_by_sign-278"><a href="#group_by_sign-278"><span class="linenos">278</span></a><span class="sd">        &gt;&gt;&gt; df = pd.DataFrame({&#39;pdbid&#39;: [&#39;1ABC&#39;, &#39;1DEF&#39;, &#39;1GHI&#39;, &#39;1HIK&#39;],</span>
-</span><span id="group_by_sign-279"><a href="#group_by_sign-279"><span class="linenos">279</span></a><span class="sd">        ...                    &#39;chi1&#39;: [120.0, -45.0, 70.0, 90],</span>
-</span><span id="group_by_sign-280"><a href="#group_by_sign-280"><span class="linenos">280</span></a><span class="sd">        ...                    &#39;chi2&#39;: [90.0, 180.0, -120.0, -90],</span>
-</span><span id="group_by_sign-281"><a href="#group_by_sign-281"><span class="linenos">281</span></a><span class="sd">        ...                    &#39;chi3&#39;: [-45.0, -80.0, 20.0, 0],</span>
-</span><span id="group_by_sign-282"><a href="#group_by_sign-282"><span class="linenos">282</span></a><span class="sd">        ...                    &#39;chi4&#39;: [0.0, 100.0, -150.0, -120.0],</span>
-</span><span id="group_by_sign-283"><a href="#group_by_sign-283"><span class="linenos">283</span></a><span class="sd">        ...                    &#39;chi5&#39;: [-120.0, -10.0, 160.0, -120.0],</span>
-</span><span id="group_by_sign-284"><a href="#group_by_sign-284"><span class="linenos">284</span></a><span class="sd">        ...                    &#39;ca_distance&#39;: [3.5, 3.8, 2.5, 3.3],</span>
-</span><span id="group_by_sign-285"><a href="#group_by_sign-285"><span class="linenos">285</span></a><span class="sd">        ...                    &#39;torsion_length&#39;: [3.2, 2.8, 3.0, 4.4],</span>
-</span><span id="group_by_sign-286"><a href="#group_by_sign-286"><span class="linenos">286</span></a><span class="sd">        ...                    &#39;energy&#39;: [-12.0, -10.0, -15.0, -20.0]})</span>
-</span><span id="group_by_sign-287"><a href="#group_by_sign-287"><span class="linenos">287</span></a><span class="sd">        &gt;&gt;&gt; grouped = group_by_sign(df)</span>
-</span><span id="group_by_sign-288"><a href="#group_by_sign-288"><span class="linenos">288</span></a><span class="sd">        &gt;&gt;&gt; grouped</span>
-</span><span id="group_by_sign-289"><a href="#group_by_sign-289"><span class="linenos">289</span></a><span class="sd">           chi1_s  chi2_s  chi3_s  chi4_s  chi5_s  ca_distance_mean  ca_distance_std  torsion_length_mean  torsion_length_std  energy_mean  energy_std</span>
-</span><span id="group_by_sign-290"><a href="#group_by_sign-290"><span class="linenos">290</span></a><span class="sd">        0      -1       1      -1       1      -1               3.8              NaN                  2.8                 NaN        -10.0         NaN</span>
-</span><span id="group_by_sign-291"><a href="#group_by_sign-291"><span class="linenos">291</span></a><span class="sd">        1       1      -1       1      -1      -1               3.3              NaN                  4.4                 NaN        -20.0         NaN</span>
-</span><span id="group_by_sign-292"><a href="#group_by_sign-292"><span class="linenos">292</span></a><span class="sd">        2       1      -1       1      -1       1               2.5              NaN                  3.0                 NaN        -15.0         NaN</span>
-</span><span id="group_by_sign-293"><a href="#group_by_sign-293"><span class="linenos">293</span></a><span class="sd">        3       1       1      -1       1      -1               3.5              NaN                  3.2                 NaN        -12.0         NaN</span>
-</span><span id="group_by_sign-294"><a href="#group_by_sign-294"><span class="linenos">294</span></a><span class="sd">        </span>
+</span><span id="group_by_sign-277"><a href="#group_by_sign-277"><span class="linenos">277</span></a><span class="sd">    Example:</span>
+</span><span id="group_by_sign-278"><a href="#group_by_sign-278"><span class="linenos">278</span></a><span class="sd">    &gt;&gt;&gt; df = pd.DataFrame({&#39;pdbid&#39;: [&#39;1ABC&#39;, &#39;1DEF&#39;, &#39;1GHI&#39;, &#39;1HIK&#39;],</span>
+</span><span id="group_by_sign-279"><a href="#group_by_sign-279"><span class="linenos">279</span></a><span class="sd">    ...                    &#39;chi1&#39;: [120.0, -45.0, 70.0, 90],</span>
+</span><span id="group_by_sign-280"><a href="#group_by_sign-280"><span class="linenos">280</span></a><span class="sd">    ...                    &#39;chi2&#39;: [90.0, 180.0, -120.0, -90],</span>
+</span><span id="group_by_sign-281"><a href="#group_by_sign-281"><span class="linenos">281</span></a><span class="sd">    ...                    &#39;chi3&#39;: [-45.0, -80.0, 20.0, 0],</span>
+</span><span id="group_by_sign-282"><a href="#group_by_sign-282"><span class="linenos">282</span></a><span class="sd">    ...                    &#39;chi4&#39;: [0.0, 100.0, -150.0, -120.0],</span>
+</span><span id="group_by_sign-283"><a href="#group_by_sign-283"><span class="linenos">283</span></a><span class="sd">    ...                    &#39;chi5&#39;: [-120.0, -10.0, 160.0, -120.0],</span>
+</span><span id="group_by_sign-284"><a href="#group_by_sign-284"><span class="linenos">284</span></a><span class="sd">    ...                    &#39;ca_distance&#39;: [3.5, 3.8, 2.5, 3.3],</span>
+</span><span id="group_by_sign-285"><a href="#group_by_sign-285"><span class="linenos">285</span></a><span class="sd">    ...                    &#39;torsion_length&#39;: [3.2, 2.8, 3.0, 4.4],</span>
+</span><span id="group_by_sign-286"><a href="#group_by_sign-286"><span class="linenos">286</span></a><span class="sd">    ...                    &#39;energy&#39;: [-12.0, -10.0, -15.0, -20.0]})</span>
+</span><span id="group_by_sign-287"><a href="#group_by_sign-287"><span class="linenos">287</span></a><span class="sd">    &gt;&gt;&gt; grouped = group_by_sign(df)</span>
+</span><span id="group_by_sign-288"><a href="#group_by_sign-288"><span class="linenos">288</span></a><span class="sd">    &gt;&gt;&gt; grouped</span>
+</span><span id="group_by_sign-289"><a href="#group_by_sign-289"><span class="linenos">289</span></a><span class="sd">        chi1_s  chi2_s  chi3_s  chi4_s  chi5_s  ca_distance_mean  ca_distance_std  torsion_length_mean  torsion_length_std  energy_mean  energy_std</span>
+</span><span id="group_by_sign-290"><a href="#group_by_sign-290"><span class="linenos">290</span></a><span class="sd">    0      -1       1      -1       1      -1               3.8              NaN                  2.8                 NaN        -10.0         NaN</span>
+</span><span id="group_by_sign-291"><a href="#group_by_sign-291"><span class="linenos">291</span></a><span class="sd">    1       1      -1       1      -1      -1               3.3              NaN                  4.4                 NaN        -20.0         NaN</span>
+</span><span id="group_by_sign-292"><a href="#group_by_sign-292"><span class="linenos">292</span></a><span class="sd">    2       1      -1       1      -1       1               2.5              NaN                  3.0                 NaN        -15.0         NaN</span>
+</span><span id="group_by_sign-293"><a href="#group_by_sign-293"><span class="linenos">293</span></a><span class="sd">    3       1       1      -1       1      -1               3.5              NaN                  3.2                 NaN        -12.0         NaN</span>
+</span><span id="group_by_sign-294"><a href="#group_by_sign-294"><span class="linenos">294</span></a><span class="sd">    </span>
 </span><span id="group_by_sign-295"><a href="#group_by_sign-295"><span class="linenos">295</span></a><span class="sd">    &#39;&#39;&#39;</span>
 </span><span id="group_by_sign-296"><a href="#group_by_sign-296"><span class="linenos">296</span></a>    
 </span><span id="group_by_sign-297"><a href="#group_by_sign-297"><span class="linenos">297</span></a>    
@@ -1110,30 +1105,27 @@ the mean and standard deviation of the 'ca_distance', 'torsion_length', and 'ene
   <p>The DataFrame grouped by sign, including means and standard deviations.</p>
 </blockquote>
 
-<p>:example:</p>
+<p>Example:</p>
 
-<blockquote>
-  <blockquote>
-    <blockquote>
-      <p>df = pd.DataFrame({'pdbid': ['1ABC', '1DEF', '1GHI', '1HIK'],
-          ...                    'chi1': [120.0, -45.0, 70.0, 90],
-          ...                    'chi2': [90.0, 180.0, -120.0, -90],
-          ...                    'chi3': [-45.0, -80.0, 20.0, 0],
-          ...                    'chi4': [0.0, 100.0, -150.0, -120.0],
-          ...                    'chi5': [-120.0, -10.0, 160.0, -120.0],
-          ...                    'ca_distance': [3.5, 3.8, 2.5, 3.3],
-          ...                    'torsion_length': [3.2, 2.8, 3.0, 4.4],
-          ...                    'energy': [-12.0, -10.0, -15.0, -20.0]})
-      grouped = group_by_sign(df)
-      grouped
-             chi1_s  chi2_s  chi3_s  chi4_s  chi5_s  ca_distance_mean  ca_distance_std  torsion_length_mean  torsion_length_std  energy_mean  energy_std
-          0      -1       1      -1       1      -1               3.8              NaN                  2.8                 NaN        -10.0         NaN
-          1       1      -1       1      -1      -1               3.3              NaN                  4.4                 NaN        -20.0         NaN
-          2       1      -1       1      -1       1               2.5              NaN                  3.0                 NaN        -15.0         NaN
-          3       1       1      -1       1      -1               3.5              NaN                  3.2                 NaN        -12.0         NaN</p>
-    </blockquote>
-  </blockquote>
-</blockquote>
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;pdbid&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;1ABC&#39;</span><span class="p">,</span> <span class="s1">&#39;1DEF&#39;</span><span class="p">,</span> <span class="s1">&#39;1GHI&#39;</span><span class="p">,</span> <span class="s1">&#39;1HIK&#39;</span><span class="p">],</span>
+<span class="gp">... </span>                   <span class="s1">&#39;chi1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">120.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">45.0</span><span class="p">,</span> <span class="mf">70.0</span><span class="p">,</span> <span class="mi">90</span><span class="p">],</span>
+<span class="gp">... </span>                   <span class="s1">&#39;chi2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">90.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">120.0</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">],</span>
+<span class="gp">... </span>                   <span class="s1">&#39;chi3&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">45.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">80.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="gp">... </span>                   <span class="s1">&#39;chi4&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">150.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">120.0</span><span class="p">],</span>
+<span class="gp">... </span>                   <span class="s1">&#39;chi5&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">120.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">160.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">120.0</span><span class="p">],</span>
+<span class="gp">... </span>                   <span class="s1">&#39;ca_distance&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.5</span><span class="p">,</span> <span class="mf">3.8</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.3</span><span class="p">],</span>
+<span class="gp">... </span>                   <span class="s1">&#39;torsion_length&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.2</span><span class="p">,</span> <span class="mf">2.8</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.4</span><span class="p">],</span>
+<span class="gp">... </span>                   <span class="s1">&#39;energy&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">12.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">15.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">20.0</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grouped</span> <span class="o">=</span> <span class="n">group_by_sign</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grouped</span>
+<span class="go">    chi1_s  chi2_s  chi3_s  chi4_s  chi5_s  ca_distance_mean  ca_distance_std  torsion_length_mean  torsion_length_std  energy_mean  energy_std</span>
+<span class="go">0      -1       1      -1       1      -1               3.8              NaN                  2.8                 NaN        -10.0         NaN</span>
+<span class="go">1       1      -1       1      -1      -1               3.3              NaN                  4.4                 NaN        -20.0         NaN</span>
+<span class="go">2       1      -1       1      -1       1               2.5              NaN                  3.0                 NaN        -15.0         NaN</span>
+<span class="go">3       1       1      -1       1      -1               3.5              NaN                  3.2                 NaN        -12.0         NaN</span>
+</code></pre>
+</div>
 </div>
 
 
@@ -1155,44 +1147,45 @@ the mean and standard deviation of the 'ca_distance', 'torsion_length', and 'ene
 </span><span id="Create_classes-314"><a href="#Create_classes-314"><span class="linenos">314</span></a>
 </span><span id="Create_classes-315"><a href="#Create_classes-315"><span class="linenos">315</span></a><span class="sd">    :param df: A pandas DataFrame containing columns &#39;ss_id&#39;, &#39;chi1&#39;, &#39;chi2&#39;, &#39;chi3&#39;, &#39;chi4&#39;, &#39;chi5&#39;, &#39;ca_distance&#39;, &#39;torsion_length&#39;, and &#39;energy&#39;.</span>
 </span><span id="Create_classes-316"><a href="#Create_classes-316"><span class="linenos">316</span></a><span class="sd">    :return: A pandas DataFrame containing columns &#39;class_id&#39;, &#39;ss_id&#39;, and &#39;count&#39;, where &#39;class_id&#39; is a unique identifier for each grouping of chi signs, &#39;ss_id&#39; is a list of all &#39;ss_id&#39; values in that grouping, and &#39;count&#39; is the number of rows in that grouping.</span>
-</span><span id="Create_classes-317"><a href="#Create_classes-317"><span class="linenos">317</span></a><span class="sd">    :example:</span>
-</span><span id="Create_classes-318"><a href="#Create_classes-318"><span class="linenos">318</span></a><span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
-</span><span id="Create_classes-319"><a href="#Create_classes-319"><span class="linenos">319</span></a><span class="sd">        &gt;&gt;&gt; df = pd.DataFrame({</span>
-</span><span id="Create_classes-320"><a href="#Create_classes-320"><span class="linenos">320</span></a><span class="sd">        ...    &#39;ss_id&#39;: [1, 2, 3, 4, 5],</span>
-</span><span id="Create_classes-321"><a href="#Create_classes-321"><span class="linenos">321</span></a><span class="sd">        ...    &#39;chi1&#39;: [1.0, -1.0, 1.0, 1.0, -1.0],</span>
-</span><span id="Create_classes-322"><a href="#Create_classes-322"><span class="linenos">322</span></a><span class="sd">        ...    &#39;chi2&#39;: [-1.0, -1.0, -1.0, 1.0, 1.0],</span>
-</span><span id="Create_classes-323"><a href="#Create_classes-323"><span class="linenos">323</span></a><span class="sd">        ...    &#39;chi3&#39;: [-1.0, 1.0, -1.0, 1.0, -1.0],</span>
-</span><span id="Create_classes-324"><a href="#Create_classes-324"><span class="linenos">324</span></a><span class="sd">        ...    &#39;chi4&#39;: [1.0, -1.0, 1.0, -1.0, 1.0],</span>
-</span><span id="Create_classes-325"><a href="#Create_classes-325"><span class="linenos">325</span></a><span class="sd">        ...    &#39;chi5&#39;: [1.0, -1.0, -1.0, -1.0, -1.0],</span>
-</span><span id="Create_classes-326"><a href="#Create_classes-326"><span class="linenos">326</span></a><span class="sd">        ...    &#39;ca_distance&#39;: [3.1, 3.2, 3.3, 3.4, 3.5],</span>
-</span><span id="Create_classes-327"><a href="#Create_classes-327"><span class="linenos">327</span></a><span class="sd">        ...    &#39;torsion_length&#39;: [120.1, 120.2, 120.3, 120.4, 121.0],</span>
-</span><span id="Create_classes-328"><a href="#Create_classes-328"><span class="linenos">328</span></a><span class="sd">        ...    &#39;energy&#39;: [-2.3, -2.2, -2.1, -2.0, -1.9]</span>
-</span><span id="Create_classes-329"><a href="#Create_classes-329"><span class="linenos">329</span></a><span class="sd">        ... })</span>
-</span><span id="Create_classes-330"><a href="#Create_classes-330"><span class="linenos">330</span></a><span class="sd">        &gt;&gt;&gt; Create_classes(df)</span>
-</span><span id="Create_classes-331"><a href="#Create_classes-331"><span class="linenos">331</span></a><span class="sd">          class_id ss_id  count  incidence  percentage</span>
-</span><span id="Create_classes-332"><a href="#Create_classes-332"><span class="linenos">332</span></a><span class="sd">        0    00200   [2]      1        0.2        20.0</span>
-</span><span id="Create_classes-333"><a href="#Create_classes-333"><span class="linenos">333</span></a><span class="sd">        1    02020   [5]      1        0.2        20.0</span>
-</span><span id="Create_classes-334"><a href="#Create_classes-334"><span class="linenos">334</span></a><span class="sd">        2    20020   [3]      1        0.2        20.0</span>
-</span><span id="Create_classes-335"><a href="#Create_classes-335"><span class="linenos">335</span></a><span class="sd">        3    20022   [1]      1        0.2        20.0</span>
-</span><span id="Create_classes-336"><a href="#Create_classes-336"><span class="linenos">336</span></a><span class="sd">        4    22200   [4]      1        0.2        20.0</span>
-</span><span id="Create_classes-337"><a href="#Create_classes-337"><span class="linenos">337</span></a>
-</span><span id="Create_classes-338"><a href="#Create_classes-338"><span class="linenos">338</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="Create_classes-339"><a href="#Create_classes-339"><span class="linenos">339</span></a>    <span class="c1"># Create new columns with the sign of each chi column</span>
-</span><span id="Create_classes-340"><a href="#Create_classes-340"><span class="linenos">340</span></a>    <span class="n">chi_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;chi1&#39;</span><span class="p">,</span> <span class="s1">&#39;chi2&#39;</span><span class="p">,</span> <span class="s1">&#39;chi3&#39;</span><span class="p">,</span> <span class="s1">&#39;chi4&#39;</span><span class="p">,</span> <span class="s1">&#39;chi5&#39;</span><span class="p">]</span>
-</span><span id="Create_classes-341"><a href="#Create_classes-341"><span class="linenos">341</span></a>    <span class="n">sign_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;_s&#39;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">chi_columns</span><span class="p">]</span>
-</span><span id="Create_classes-342"><a href="#Create_classes-342"><span class="linenos">342</span></a>    <span class="n">df</span><span class="p">[</span><span class="n">sign_columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">chi_columns</span><span class="p">]</span><span class="o">.</span><span class="n">applymap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-</span><span id="Create_classes-343"><a href="#Create_classes-343"><span class="linenos">343</span></a>    
-</span><span id="Create_classes-344"><a href="#Create_classes-344"><span class="linenos">344</span></a>    <span class="c1"># Create a new column with the class ID for each row</span>
-</span><span id="Create_classes-345"><a href="#Create_classes-345"><span class="linenos">345</span></a>    <span class="n">class_id_column</span> <span class="o">=</span> <span class="s1">&#39;class_id&#39;</span>
-</span><span id="Create_classes-346"><a href="#Create_classes-346"><span class="linenos">346</span></a>    <span class="n">df</span><span class="p">[</span><span class="n">class_id_column</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">sign_columns</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-</span><span id="Create_classes-347"><a href="#Create_classes-347"><span class="linenos">347</span></a>
-</span><span id="Create_classes-348"><a href="#Create_classes-348"><span class="linenos">348</span></a>    <span class="c1"># Group the DataFrame by the class ID and return the grouped data</span>
-</span><span id="Create_classes-349"><a href="#Create_classes-349"><span class="linenos">349</span></a>    <span class="n">grouped</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">class_id_column</span><span class="p">)[</span><span class="s1">&#39;ss_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-</span><span id="Create_classes-350"><a href="#Create_classes-350"><span class="linenos">350</span></a>    <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;ss_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-</span><span id="Create_classes-351"><a href="#Create_classes-351"><span class="linenos">351</span></a>    <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;incidence&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;ss_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
-</span><span id="Create_classes-352"><a href="#Create_classes-352"><span class="linenos">352</span></a>    <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;percentage&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;incidence&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span>
-</span><span id="Create_classes-353"><a href="#Create_classes-353"><span class="linenos">353</span></a>
-</span><span id="Create_classes-354"><a href="#Create_classes-354"><span class="linenos">354</span></a>    <span class="k">return</span> <span class="n">grouped</span>
+</span><span id="Create_classes-317"><a href="#Create_classes-317"><span class="linenos">317</span></a><span class="sd">    </span>
+</span><span id="Create_classes-318"><a href="#Create_classes-318"><span class="linenos">318</span></a><span class="sd">    Example:</span>
+</span><span id="Create_classes-319"><a href="#Create_classes-319"><span class="linenos">319</span></a><span class="sd">    &gt;&gt;&gt; import pandas as pd</span>
+</span><span id="Create_classes-320"><a href="#Create_classes-320"><span class="linenos">320</span></a><span class="sd">    &gt;&gt;&gt; df = pd.DataFrame({</span>
+</span><span id="Create_classes-321"><a href="#Create_classes-321"><span class="linenos">321</span></a><span class="sd">    ...    &#39;ss_id&#39;: [1, 2, 3, 4, 5],</span>
+</span><span id="Create_classes-322"><a href="#Create_classes-322"><span class="linenos">322</span></a><span class="sd">    ...    &#39;chi1&#39;: [1.0, -1.0, 1.0, 1.0, -1.0],</span>
+</span><span id="Create_classes-323"><a href="#Create_classes-323"><span class="linenos">323</span></a><span class="sd">    ...    &#39;chi2&#39;: [-1.0, -1.0, -1.0, 1.0, 1.0],</span>
+</span><span id="Create_classes-324"><a href="#Create_classes-324"><span class="linenos">324</span></a><span class="sd">    ...    &#39;chi3&#39;: [-1.0, 1.0, -1.0, 1.0, -1.0],</span>
+</span><span id="Create_classes-325"><a href="#Create_classes-325"><span class="linenos">325</span></a><span class="sd">    ...    &#39;chi4&#39;: [1.0, -1.0, 1.0, -1.0, 1.0],</span>
+</span><span id="Create_classes-326"><a href="#Create_classes-326"><span class="linenos">326</span></a><span class="sd">    ...    &#39;chi5&#39;: [1.0, -1.0, -1.0, -1.0, -1.0],</span>
+</span><span id="Create_classes-327"><a href="#Create_classes-327"><span class="linenos">327</span></a><span class="sd">    ...    &#39;ca_distance&#39;: [3.1, 3.2, 3.3, 3.4, 3.5],</span>
+</span><span id="Create_classes-328"><a href="#Create_classes-328"><span class="linenos">328</span></a><span class="sd">    ...    &#39;torsion_length&#39;: [120.1, 120.2, 120.3, 120.4, 121.0],</span>
+</span><span id="Create_classes-329"><a href="#Create_classes-329"><span class="linenos">329</span></a><span class="sd">    ...    &#39;energy&#39;: [-2.3, -2.2, -2.1, -2.0, -1.9]</span>
+</span><span id="Create_classes-330"><a href="#Create_classes-330"><span class="linenos">330</span></a><span class="sd">    ... })</span>
+</span><span id="Create_classes-331"><a href="#Create_classes-331"><span class="linenos">331</span></a><span class="sd">    &gt;&gt;&gt; Create_classes(df)</span>
+</span><span id="Create_classes-332"><a href="#Create_classes-332"><span class="linenos">332</span></a><span class="sd">        class_id ss_id  count  incidence  percentage</span>
+</span><span id="Create_classes-333"><a href="#Create_classes-333"><span class="linenos">333</span></a><span class="sd">    0    00200   [2]      1        0.2        20.0</span>
+</span><span id="Create_classes-334"><a href="#Create_classes-334"><span class="linenos">334</span></a><span class="sd">    1    02020   [5]      1        0.2        20.0</span>
+</span><span id="Create_classes-335"><a href="#Create_classes-335"><span class="linenos">335</span></a><span class="sd">    2    20020   [3]      1        0.2        20.0</span>
+</span><span id="Create_classes-336"><a href="#Create_classes-336"><span class="linenos">336</span></a><span class="sd">    3    20022   [1]      1        0.2        20.0</span>
+</span><span id="Create_classes-337"><a href="#Create_classes-337"><span class="linenos">337</span></a><span class="sd">    4    22200   [4]      1        0.2        20.0</span>
+</span><span id="Create_classes-338"><a href="#Create_classes-338"><span class="linenos">338</span></a>
+</span><span id="Create_classes-339"><a href="#Create_classes-339"><span class="linenos">339</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="Create_classes-340"><a href="#Create_classes-340"><span class="linenos">340</span></a>    <span class="c1"># Create new columns with the sign of each chi column</span>
+</span><span id="Create_classes-341"><a href="#Create_classes-341"><span class="linenos">341</span></a>    <span class="n">chi_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;chi1&#39;</span><span class="p">,</span> <span class="s1">&#39;chi2&#39;</span><span class="p">,</span> <span class="s1">&#39;chi3&#39;</span><span class="p">,</span> <span class="s1">&#39;chi4&#39;</span><span class="p">,</span> <span class="s1">&#39;chi5&#39;</span><span class="p">]</span>
+</span><span id="Create_classes-342"><a href="#Create_classes-342"><span class="linenos">342</span></a>    <span class="n">sign_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;_s&#39;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">chi_columns</span><span class="p">]</span>
+</span><span id="Create_classes-343"><a href="#Create_classes-343"><span class="linenos">343</span></a>    <span class="n">df</span><span class="p">[</span><span class="n">sign_columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">chi_columns</span><span class="p">]</span><span class="o">.</span><span class="n">applymap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="Create_classes-344"><a href="#Create_classes-344"><span class="linenos">344</span></a>    
+</span><span id="Create_classes-345"><a href="#Create_classes-345"><span class="linenos">345</span></a>    <span class="c1"># Create a new column with the class ID for each row</span>
+</span><span id="Create_classes-346"><a href="#Create_classes-346"><span class="linenos">346</span></a>    <span class="n">class_id_column</span> <span class="o">=</span> <span class="s1">&#39;class_id&#39;</span>
+</span><span id="Create_classes-347"><a href="#Create_classes-347"><span class="linenos">347</span></a>    <span class="n">df</span><span class="p">[</span><span class="n">class_id_column</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">sign_columns</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="Create_classes-348"><a href="#Create_classes-348"><span class="linenos">348</span></a>
+</span><span id="Create_classes-349"><a href="#Create_classes-349"><span class="linenos">349</span></a>    <span class="c1"># Group the DataFrame by the class ID and return the grouped data</span>
+</span><span id="Create_classes-350"><a href="#Create_classes-350"><span class="linenos">350</span></a>    <span class="n">grouped</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">class_id_column</span><span class="p">)[</span><span class="s1">&#39;ss_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+</span><span id="Create_classes-351"><a href="#Create_classes-351"><span class="linenos">351</span></a>    <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;ss_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</span><span id="Create_classes-352"><a href="#Create_classes-352"><span class="linenos">352</span></a>    <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;incidence&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;ss_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">))</span>
+</span><span id="Create_classes-353"><a href="#Create_classes-353"><span class="linenos">353</span></a>    <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;percentage&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[</span><span class="s1">&#39;incidence&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span>
+</span><span id="Create_classes-354"><a href="#Create_classes-354"><span class="linenos">354</span></a>
+</span><span id="Create_classes-355"><a href="#Create_classes-355"><span class="linenos">355</span></a>    <span class="k">return</span> <span class="n">grouped</span>
 </span></pre></div>
 
 
@@ -1207,33 +1200,33 @@ the mean and standard deviation of the 'ca_distance', 'torsion_length', and 'ene
 <h6 id="returns">Returns</h6>
 
 <blockquote>
-  <p>A pandas DataFrame containing columns 'class_id', 'ss_id', and 'count', where 'class_id' is a unique identifier for each grouping of chi signs, 'ss_id' is a list of all 'ss_id' values in that grouping, and 'count' is the number of rows in that grouping.
-  :example:</p>
-  
-  <blockquote>
-    <blockquote>
-      <p>import pandas as pd
-      df = pd.DataFrame({
-          ...    'ss_id': [1, 2, 3, 4, 5],
-          ...    'chi1': [1.0, -1.0, 1.0, 1.0, -1.0],
-          ...    'chi2': [-1.0, -1.0, -1.0, 1.0, 1.0],
-          ...    'chi3': [-1.0, 1.0, -1.0, 1.0, -1.0],
-          ...    'chi4': [1.0, -1.0, 1.0, -1.0, 1.0],
-          ...    'chi5': [1.0, -1.0, -1.0, -1.0, -1.0],
-          ...    'ca_distance': [3.1, 3.2, 3.3, 3.4, 3.5],
-          ...    'torsion_length': [120.1, 120.2, 120.3, 120.4, 121.0],
-          ...    'energy': [-2.3, -2.2, -2.1, -2.0, -1.9]
-          ... })
-      Create_classes(df)
-            class_id ss_id  count  incidence  percentage
-          0    00200   [2]      1        0.2        20.0
-          1    02020   [5]      1        0.2        20.0
-          2    20020   [3]      1        0.2        20.0
-          3    20022   [1]      1        0.2        20.0
-          4    22200   [4]      1        0.2        20.0</p>
-    </blockquote>
-  </blockquote>
+  <p>A pandas DataFrame containing columns 'class_id', 'ss_id', and 'count', where 'class_id' is a unique identifier for each grouping of chi signs, 'ss_id' is a list of all 'ss_id' values in that grouping, and 'count' is the number of rows in that grouping.</p>
 </blockquote>
+
+<p>Example:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+<span class="gp">... </span>   <span class="s1">&#39;ss_id&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+<span class="gp">... </span>   <span class="s1">&#39;chi1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">],</span>
+<span class="gp">... </span>   <span class="s1">&#39;chi2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+<span class="gp">... </span>   <span class="s1">&#39;chi3&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">],</span>
+<span class="gp">... </span>   <span class="s1">&#39;chi4&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+<span class="gp">... </span>   <span class="s1">&#39;chi5&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">],</span>
+<span class="gp">... </span>   <span class="s1">&#39;ca_distance&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">3.1</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">,</span> <span class="mf">3.3</span><span class="p">,</span> <span class="mf">3.4</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">],</span>
+<span class="gp">... </span>   <span class="s1">&#39;torsion_length&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">120.1</span><span class="p">,</span> <span class="mf">120.2</span><span class="p">,</span> <span class="mf">120.3</span><span class="p">,</span> <span class="mf">120.4</span><span class="p">,</span> <span class="mf">121.0</span><span class="p">],</span>
+<span class="gp">... </span>   <span class="s1">&#39;energy&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">2.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.9</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Create_classes</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="go">    class_id ss_id  count  incidence  percentage</span>
+<span class="go">0    00200   [2]      1        0.2        20.0</span>
+<span class="go">1    02020   [5]      1        0.2        20.0</span>
+<span class="go">2    20020   [3]      1        0.2        20.0</span>
+<span class="go">3    20022   [1]      1        0.2        20.0</span>
+<span class="go">4    22200   [4]      1        0.2        20.0</span>
+</code></pre>
+</div>
 </div>
 
 
