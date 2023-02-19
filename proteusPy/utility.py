@@ -12,6 +12,7 @@ import numpy as np
 
 import copy
 import subprocess
+import pickle
 
 import os
 import requests
@@ -26,6 +27,7 @@ from Bio.PDB.vectors import Vector
 from Bio.PDB import PDBParser
 
 import pandas as pd
+from proteusPy.data import DATA_DIR
 
 def distance_squared(p1: np.array, p2: np.array) -> np.array:
     '''
@@ -225,7 +227,7 @@ def download_file(url, directory):
 
 def add_sign_columns(df):
     """
-    Create new columns with the sign of each dehdral angle (chi1-chi5)
+    Create new columns with the sign of each dihedral angle (chi1-chi5)
     column and return a new DataFrame with the additional columns.
     This is used to build disulfide classes.
 
@@ -293,7 +295,6 @@ def group_by_sign(df):
     
     '''
     
-    
     # Create new columns with the sign of each chi column
     chi_columns = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']
     sign_columns = [col + '_s' for col in chi_columns]
@@ -306,7 +307,6 @@ def group_by_sign(df):
     grouped.columns = ['_'.join(col).strip() for col in grouped.columns.values]
     return grouped.reset_index()
    
-
 def Create_classes(df):
     """
     Group the DataFrame by the sign of the chi columns and create a new class ID column for each unique grouping.
@@ -399,6 +399,11 @@ def About_proteusPy():
     Eric G. Suchanek, PhD. mailto:suchanek@mac.com
     """
     return About_proteusPy.__doc__
+
+def load_class_dict(fname=f'{DATA_DIR}PDB_ss_classes_dict.pkl') -> dict:
+    with open(fname,'rb') as f:
+        res = pickle.load(f)
+        return res
 
 if __name__ == "__main__":
     import doctest
