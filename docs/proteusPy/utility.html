@@ -86,6 +86,9 @@
             <li>
                     <a class="function" href="#Create_classes">Create_classes</a>
             </li>
+            <li>
+                    <a class="function" href="#About_proteusPy">About_proteusPy</a>
+            </li>
     </ul>
 
 
@@ -360,7 +363,7 @@
 </span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a><span class="sd">    &gt;&gt;&gt; df = pd.DataFrame(data)</span>
 </span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a><span class="sd">    &gt;&gt;&gt; res_df = add_sign_columns(df)</span>
 </span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a><span class="sd">    &gt;&gt;&gt; print(res_df)</span>
-</span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a><span class="sd">        ss_id  chi1_s  chi2_s  chi3_s  chi4_s  chi5_s</span>
+</span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a><span class="sd">       ss_id  chi1_s  chi2_s  chi3_s  chi4_s  chi5_s</span>
 </span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a><span class="sd">    0      1      -1       1      -1       1       1</span>
 </span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a><span class="sd">    1      2       1      -1       1       1      -1</span>
 </span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a><span class="sd">    2      3       1       1       1      -1      -1</span>
@@ -402,7 +405,7 @@
 </span><span id="L-285"><a href="#L-285"><span class="linenos">285</span></a><span class="sd">    ...                    &#39;energy&#39;: [-12.0, -10.0, -15.0, -20.0]})</span>
 </span><span id="L-286"><a href="#L-286"><span class="linenos">286</span></a><span class="sd">    &gt;&gt;&gt; grouped = group_by_sign(df)</span>
 </span><span id="L-287"><a href="#L-287"><span class="linenos">287</span></a><span class="sd">    &gt;&gt;&gt; grouped</span>
-</span><span id="L-288"><a href="#L-288"><span class="linenos">288</span></a><span class="sd">        chi1_s  chi2_s  chi3_s  chi4_s  chi5_s  ca_distance_mean  ca_distance_std  torsion_length_mean  torsion_length_std  energy_mean  energy_std</span>
+</span><span id="L-288"><a href="#L-288"><span class="linenos">288</span></a><span class="sd">       chi1_s  chi2_s  chi3_s  chi4_s  chi5_s  ca_distance_mean  ca_distance_std  torsion_length_mean  torsion_length_std  energy_mean  energy_std</span>
 </span><span id="L-289"><a href="#L-289"><span class="linenos">289</span></a><span class="sd">    0      -1       1      -1       1      -1               3.8              NaN                  2.8                 NaN        -10.0         NaN</span>
 </span><span id="L-290"><a href="#L-290"><span class="linenos">290</span></a><span class="sd">    1       1      -1       1      -1      -1               3.3              NaN                  4.4                 NaN        -20.0         NaN</span>
 </span><span id="L-291"><a href="#L-291"><span class="linenos">291</span></a><span class="sd">    2       1      -1       1      -1       1               2.5              NaN                  3.0                 NaN        -15.0         NaN</span>
@@ -445,7 +448,7 @@
 </span><span id="L-328"><a href="#L-328"><span class="linenos">328</span></a><span class="sd">    ...    &#39;energy&#39;: [-2.3, -2.2, -2.1, -2.0, -1.9]</span>
 </span><span id="L-329"><a href="#L-329"><span class="linenos">329</span></a><span class="sd">    ... })</span>
 </span><span id="L-330"><a href="#L-330"><span class="linenos">330</span></a><span class="sd">    &gt;&gt;&gt; Create_classes(df)</span>
-</span><span id="L-331"><a href="#L-331"><span class="linenos">331</span></a><span class="sd">        class_id ss_id  count  incidence  percentage</span>
+</span><span id="L-331"><a href="#L-331"><span class="linenos">331</span></a><span class="sd">      class_id ss_id  count  incidence  percentage</span>
 </span><span id="L-332"><a href="#L-332"><span class="linenos">332</span></a><span class="sd">    0    00200   [2]      1        0.2        20.0</span>
 </span><span id="L-333"><a href="#L-333"><span class="linenos">333</span></a><span class="sd">    1    02020   [5]      1        0.2        20.0</span>
 </span><span id="L-334"><a href="#L-334"><span class="linenos">334</span></a><span class="sd">    2    20020   [3]      1        0.2        20.0</span>
@@ -470,11 +473,58 @@
 </span><span id="L-353"><a href="#L-353"><span class="linenos">353</span></a>
 </span><span id="L-354"><a href="#L-354"><span class="linenos">354</span></a>    <span class="k">return</span> <span class="n">grouped</span>
 </span><span id="L-355"><a href="#L-355"><span class="linenos">355</span></a>
-</span><span id="L-356"><a href="#L-356"><span class="linenos">356</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="L-357"><a href="#L-357"><span class="linenos">357</span></a>    <span class="kn">import</span> <span class="nn">doctest</span>
-</span><span id="L-358"><a href="#L-358"><span class="linenos">358</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
-</span><span id="L-359"><a href="#L-359"><span class="linenos">359</span></a>
-</span><span id="L-360"><a href="#L-360"><span class="linenos">360</span></a><span class="c1"># end of file</span>
+</span><span id="L-356"><a href="#L-356"><span class="linenos">356</span></a><span class="k">def</span> <span class="nf">About_proteusPy</span><span class="p">():</span>
+</span><span id="L-357"><a href="#L-357"><span class="linenos">357</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-358"><a href="#L-358"><span class="linenos">358</span></a><span class="sd">    *proteusPy* is a Python package specializing in the modeling and analysis of </span>
+</span><span id="L-359"><a href="#L-359"><span class="linenos">359</span></a><span class="sd">    proteins of known structure with an emphasis on Disulfide Bonds. This package </span>
+</span><span id="L-360"><a href="#L-360"><span class="linenos">360</span></a><span class="sd">    reprises my molecular modeling program [Proteus](https://doi.org/10.1021/bi00368a023), </span>
+</span><span id="L-361"><a href="#L-361"><span class="linenos">361</span></a><span class="sd">    and relies on the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) </span>
+</span><span id="L-362"><a href="#L-362"><span class="linenos">362</span></a><span class="sd">    class. The turtle implements the functions `Move`, `Roll`, `Yaw`, `Pitch` </span>
+</span><span id="L-363"><a href="#L-363"><span class="linenos">363</span></a><span class="sd">    and `Turn` for movement in a three-dimensional space. The </span>
+</span><span id="L-364"><a href="#L-364"><span class="linenos">364</span></a><span class="sd">    [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class </span>
+</span><span id="L-365"><a href="#L-365"><span class="linenos">365</span></a><span class="sd">    implements methods to analyze the protein structure stabilizing element known as a </span>
+</span><span id="L-366"><a href="#L-366"><span class="linenos">366</span></a><span class="sd">    *Disulfide Bond*. This class and its underlying methods are being used to perform a </span>
+</span><span id="L-367"><a href="#L-367"><span class="linenos">367</span></a><span class="sd">    structural analysis of over 35,800 disulfide-bond containing proteins in the RCSB </span>
+</span><span id="L-368"><a href="#L-368"><span class="linenos">368</span></a><span class="sd">    protein data bank.</span>
+</span><span id="L-369"><a href="#L-369"><span class="linenos">369</span></a>
+</span><span id="L-370"><a href="#L-370"><span class="linenos">370</span></a><span class="sd">    ### Virtual Environment Installation/Creation</span>
+</span><span id="L-371"><a href="#L-371"><span class="linenos">371</span></a>
+</span><span id="L-372"><a href="#L-372"><span class="linenos">372</span></a><span class="sd">    1. Install Anaconda (&lt;http://anaconda.org&gt;)</span>
+</span><span id="L-373"><a href="#L-373"><span class="linenos">373</span></a><span class="sd">       - Create a new environment using python 3.9</span>
+</span><span id="L-374"><a href="#L-374"><span class="linenos">374</span></a><span class="sd">       - Activate the environment</span>
+</span><span id="L-375"><a href="#L-375"><span class="linenos">375</span></a><span class="sd">    2. Build the environment. At this point it&#39;s probably best to clone the repo via github </span>
+</span><span id="L-376"><a href="#L-376"><span class="linenos">376</span></a><span class="sd">       since it contains all of the notebooks and test programs. Ultimately the distribution </span>
+</span><span id="L-377"><a href="#L-377"><span class="linenos">377</span></a><span class="sd">       can be used from pyPi as a normal package.</span>
+</span><span id="L-378"><a href="#L-378"><span class="linenos">378</span></a><span class="sd">       - Using pyPi:</span>
+</span><span id="L-379"><a href="#L-379"><span class="linenos">379</span></a><span class="sd">         - python3 -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ proteusPy</span>
+</span><span id="L-380"><a href="#L-380"><span class="linenos">380</span></a><span class="sd">       - From gitHub:</span>
+</span><span id="L-381"><a href="#L-381"><span class="linenos">381</span></a><span class="sd">         - Install git-lfs</span>
+</span><span id="L-382"><a href="#L-382"><span class="linenos">382</span></a><span class="sd">           - https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage</span>
+</span><span id="L-383"><a href="#L-383"><span class="linenos">383</span></a><span class="sd">           - From a shell prompt: git-lfs track &quot;*.csv&quot; &quot;*.pkl&quot; &quot;*.mp4&quot;</span>
+</span><span id="L-384"><a href="#L-384"><span class="linenos">384</span></a><span class="sd">         - git clone https://github.com/suchanek/proteusPy/proteusPy.git</span>
+</span><span id="L-385"><a href="#L-385"><span class="linenos">385</span></a><span class="sd">         - cd into the repo</span>
+</span><span id="L-386"><a href="#L-386"><span class="linenos">386</span></a><span class="sd">         - pip install .</span>
+</span><span id="L-387"><a href="#L-387"><span class="linenos">387</span></a>
+</span><span id="L-388"><a href="#L-388"><span class="linenos">388</span></a><span class="sd">    #### Publications</span>
+</span><span id="L-389"><a href="#L-389"><span class="linenos">389</span></a><span class="sd">    * https://doi.org/10.1021/bi00368a023</span>
+</span><span id="L-390"><a href="#L-390"><span class="linenos">390</span></a><span class="sd">    * https://doi.org/10.1021/bi00368a024</span>
+</span><span id="L-391"><a href="#L-391"><span class="linenos">391</span></a><span class="sd">    * https://doi.org/10.1016/0092-8674(92)90140-8</span>
+</span><span id="L-392"><a href="#L-392"><span class="linenos">392</span></a><span class="sd">    * http://dx.doi.org/10.2174/092986708783330566</span>
+</span><span id="L-393"><a href="#L-393"><span class="linenos">393</span></a>
+</span><span id="L-394"><a href="#L-394"><span class="linenos">394</span></a><span class="sd">    *NB:* This distribution is actively being developed and will be difficult to implement </span>
+</span><span id="L-395"><a href="#L-395"><span class="linenos">395</span></a><span class="sd">    locally unless the BioPython patch is applied. Also, if you&#39;re running on an M-series Mac </span>
+</span><span id="L-396"><a href="#L-396"><span class="linenos">396</span></a><span class="sd">    then it&#39;s important to install Biopython first, since the generic release won&#39;t build </span>
+</span><span id="L-397"><a href="#L-397"><span class="linenos">397</span></a><span class="sd">    on the M1. 2/18/23 -egs</span>
+</span><span id="L-398"><a href="#L-398"><span class="linenos">398</span></a>
+</span><span id="L-399"><a href="#L-399"><span class="linenos">399</span></a><span class="sd">    Eric G. Suchanek, PhD. mailto:suchanek@mac.com</span>
+</span><span id="L-400"><a href="#L-400"><span class="linenos">400</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-401"><a href="#L-401"><span class="linenos">401</span></a>    <span class="k">return</span> <span class="n">About_proteusPy</span><span class="o">.</span><span class="vm">__doc__</span>
+</span><span id="L-402"><a href="#L-402"><span class="linenos">402</span></a>
+</span><span id="L-403"><a href="#L-403"><span class="linenos">403</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="L-404"><a href="#L-404"><span class="linenos">404</span></a>    <span class="kn">import</span> <span class="nn">doctest</span>
+</span><span id="L-405"><a href="#L-405"><span class="linenos">405</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</span><span id="L-406"><a href="#L-406"><span class="linenos">406</span></a>
+</span><span id="L-407"><a href="#L-407"><span class="linenos">407</span></a><span class="c1"># end of file</span>
 </span></pre></div>
 
 
@@ -972,7 +1022,7 @@ the first chain and return a dict containing only the first chain disulfides</p>
 </span><span id="add_sign_columns-244"><a href="#add_sign_columns-244"><span class="linenos">244</span></a><span class="sd">    &gt;&gt;&gt; df = pd.DataFrame(data)</span>
 </span><span id="add_sign_columns-245"><a href="#add_sign_columns-245"><span class="linenos">245</span></a><span class="sd">    &gt;&gt;&gt; res_df = add_sign_columns(df)</span>
 </span><span id="add_sign_columns-246"><a href="#add_sign_columns-246"><span class="linenos">246</span></a><span class="sd">    &gt;&gt;&gt; print(res_df)</span>
-</span><span id="add_sign_columns-247"><a href="#add_sign_columns-247"><span class="linenos">247</span></a><span class="sd">        ss_id  chi1_s  chi2_s  chi3_s  chi4_s  chi5_s</span>
+</span><span id="add_sign_columns-247"><a href="#add_sign_columns-247"><span class="linenos">247</span></a><span class="sd">       ss_id  chi1_s  chi2_s  chi3_s  chi4_s  chi5_s</span>
 </span><span id="add_sign_columns-248"><a href="#add_sign_columns-248"><span class="linenos">248</span></a><span class="sd">    0      1      -1       1      -1       1       1</span>
 </span><span id="add_sign_columns-249"><a href="#add_sign_columns-249"><span class="linenos">249</span></a><span class="sd">    1      2       1      -1       1       1      -1</span>
 </span><span id="add_sign_columns-250"><a href="#add_sign_columns-250"><span class="linenos">250</span></a><span class="sd">    2      3       1       1       1      -1      -1</span>
@@ -1018,7 +1068,7 @@ the dihedral angle (chi1-chi5) columns.</li>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res_df</span> <span class="o">=</span> <span class="n">add_sign_columns</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">res_df</span><span class="p">)</span>
-<span class="go">    ss_id  chi1_s  chi2_s  chi3_s  chi4_s  chi5_s</span>
+<span class="go">   ss_id  chi1_s  chi2_s  chi3_s  chi4_s  chi5_s</span>
 <span class="go">0      1      -1       1      -1       1       1</span>
 <span class="go">1      2       1      -1       1       1      -1</span>
 <span class="go">2      3       1       1       1      -1      -1</span>
@@ -1064,7 +1114,7 @@ the dihedral angle (chi1-chi5) columns.</li>
 </span><span id="group_by_sign-286"><a href="#group_by_sign-286"><span class="linenos">286</span></a><span class="sd">    ...                    &#39;energy&#39;: [-12.0, -10.0, -15.0, -20.0]})</span>
 </span><span id="group_by_sign-287"><a href="#group_by_sign-287"><span class="linenos">287</span></a><span class="sd">    &gt;&gt;&gt; grouped = group_by_sign(df)</span>
 </span><span id="group_by_sign-288"><a href="#group_by_sign-288"><span class="linenos">288</span></a><span class="sd">    &gt;&gt;&gt; grouped</span>
-</span><span id="group_by_sign-289"><a href="#group_by_sign-289"><span class="linenos">289</span></a><span class="sd">        chi1_s  chi2_s  chi3_s  chi4_s  chi5_s  ca_distance_mean  ca_distance_std  torsion_length_mean  torsion_length_std  energy_mean  energy_std</span>
+</span><span id="group_by_sign-289"><a href="#group_by_sign-289"><span class="linenos">289</span></a><span class="sd">       chi1_s  chi2_s  chi3_s  chi4_s  chi5_s  ca_distance_mean  ca_distance_std  torsion_length_mean  torsion_length_std  energy_mean  energy_std</span>
 </span><span id="group_by_sign-290"><a href="#group_by_sign-290"><span class="linenos">290</span></a><span class="sd">    0      -1       1      -1       1      -1               3.8              NaN                  2.8                 NaN        -10.0         NaN</span>
 </span><span id="group_by_sign-291"><a href="#group_by_sign-291"><span class="linenos">291</span></a><span class="sd">    1       1      -1       1      -1      -1               3.3              NaN                  4.4                 NaN        -20.0         NaN</span>
 </span><span id="group_by_sign-292"><a href="#group_by_sign-292"><span class="linenos">292</span></a><span class="sd">    2       1      -1       1      -1       1               2.5              NaN                  3.0                 NaN        -15.0         NaN</span>
@@ -1119,7 +1169,7 @@ the mean and standard deviation of the 'ca_distance', 'torsion_length', and 'ene
 <span class="gp">... </span>                   <span class="s1">&#39;energy&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">12.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">15.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">20.0</span><span class="p">]})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">grouped</span> <span class="o">=</span> <span class="n">group_by_sign</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">grouped</span>
-<span class="go">    chi1_s  chi2_s  chi3_s  chi4_s  chi5_s  ca_distance_mean  ca_distance_std  torsion_length_mean  torsion_length_std  energy_mean  energy_std</span>
+<span class="go">   chi1_s  chi2_s  chi3_s  chi4_s  chi5_s  ca_distance_mean  ca_distance_std  torsion_length_mean  torsion_length_std  energy_mean  energy_std</span>
 <span class="go">0      -1       1      -1       1      -1               3.8              NaN                  2.8                 NaN        -10.0         NaN</span>
 <span class="go">1       1      -1       1      -1      -1               3.3              NaN                  4.4                 NaN        -20.0         NaN</span>
 <span class="go">2       1      -1       1      -1       1               2.5              NaN                  3.0                 NaN        -15.0         NaN</span>
@@ -1162,7 +1212,7 @@ the mean and standard deviation of the 'ca_distance', 'torsion_length', and 'ene
 </span><span id="Create_classes-329"><a href="#Create_classes-329"><span class="linenos">329</span></a><span class="sd">    ...    &#39;energy&#39;: [-2.3, -2.2, -2.1, -2.0, -1.9]</span>
 </span><span id="Create_classes-330"><a href="#Create_classes-330"><span class="linenos">330</span></a><span class="sd">    ... })</span>
 </span><span id="Create_classes-331"><a href="#Create_classes-331"><span class="linenos">331</span></a><span class="sd">    &gt;&gt;&gt; Create_classes(df)</span>
-</span><span id="Create_classes-332"><a href="#Create_classes-332"><span class="linenos">332</span></a><span class="sd">        class_id ss_id  count  incidence  percentage</span>
+</span><span id="Create_classes-332"><a href="#Create_classes-332"><span class="linenos">332</span></a><span class="sd">      class_id ss_id  count  incidence  percentage</span>
 </span><span id="Create_classes-333"><a href="#Create_classes-333"><span class="linenos">333</span></a><span class="sd">    0    00200   [2]      1        0.2        20.0</span>
 </span><span id="Create_classes-334"><a href="#Create_classes-334"><span class="linenos">334</span></a><span class="sd">    1    02020   [5]      1        0.2        20.0</span>
 </span><span id="Create_classes-335"><a href="#Create_classes-335"><span class="linenos">335</span></a><span class="sd">    2    20020   [3]      1        0.2        20.0</span>
@@ -1219,7 +1269,7 @@ the mean and standard deviation of the 'ca_distance', 'torsion_length', and 'ene
 <span class="gp">... </span>   <span class="s1">&#39;energy&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">2.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.9</span><span class="p">]</span>
 <span class="gp">... </span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Create_classes</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-<span class="go">    class_id ss_id  count  incidence  percentage</span>
+<span class="go">  class_id ss_id  count  incidence  percentage</span>
 <span class="go">0    00200   [2]      1        0.2        20.0</span>
 <span class="go">1    02020   [5]      1        0.2        20.0</span>
 <span class="go">2    20020   [3]      1        0.2        20.0</span>
@@ -1227,6 +1277,127 @@ the mean and standard deviation of the 'ca_distance', 'torsion_length', and 'ene
 <span class="go">4    22200   [4]      1        0.2        20.0</span>
 </code></pre>
 </div>
+</div>
+
+
+                </section>
+                <section id="About_proteusPy">
+                            <input id="About_proteusPy-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">About_proteusPy</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="About_proteusPy-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#About_proteusPy"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="About_proteusPy-357"><a href="#About_proteusPy-357"><span class="linenos">357</span></a><span class="k">def</span> <span class="nf">About_proteusPy</span><span class="p">():</span>
+</span><span id="About_proteusPy-358"><a href="#About_proteusPy-358"><span class="linenos">358</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="About_proteusPy-359"><a href="#About_proteusPy-359"><span class="linenos">359</span></a><span class="sd">    *proteusPy* is a Python package specializing in the modeling and analysis of </span>
+</span><span id="About_proteusPy-360"><a href="#About_proteusPy-360"><span class="linenos">360</span></a><span class="sd">    proteins of known structure with an emphasis on Disulfide Bonds. This package </span>
+</span><span id="About_proteusPy-361"><a href="#About_proteusPy-361"><span class="linenos">361</span></a><span class="sd">    reprises my molecular modeling program [Proteus](https://doi.org/10.1021/bi00368a023), </span>
+</span><span id="About_proteusPy-362"><a href="#About_proteusPy-362"><span class="linenos">362</span></a><span class="sd">    and relies on the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) </span>
+</span><span id="About_proteusPy-363"><a href="#About_proteusPy-363"><span class="linenos">363</span></a><span class="sd">    class. The turtle implements the functions `Move`, `Roll`, `Yaw`, `Pitch` </span>
+</span><span id="About_proteusPy-364"><a href="#About_proteusPy-364"><span class="linenos">364</span></a><span class="sd">    and `Turn` for movement in a three-dimensional space. The </span>
+</span><span id="About_proteusPy-365"><a href="#About_proteusPy-365"><span class="linenos">365</span></a><span class="sd">    [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class </span>
+</span><span id="About_proteusPy-366"><a href="#About_proteusPy-366"><span class="linenos">366</span></a><span class="sd">    implements methods to analyze the protein structure stabilizing element known as a </span>
+</span><span id="About_proteusPy-367"><a href="#About_proteusPy-367"><span class="linenos">367</span></a><span class="sd">    *Disulfide Bond*. This class and its underlying methods are being used to perform a </span>
+</span><span id="About_proteusPy-368"><a href="#About_proteusPy-368"><span class="linenos">368</span></a><span class="sd">    structural analysis of over 35,800 disulfide-bond containing proteins in the RCSB </span>
+</span><span id="About_proteusPy-369"><a href="#About_proteusPy-369"><span class="linenos">369</span></a><span class="sd">    protein data bank.</span>
+</span><span id="About_proteusPy-370"><a href="#About_proteusPy-370"><span class="linenos">370</span></a>
+</span><span id="About_proteusPy-371"><a href="#About_proteusPy-371"><span class="linenos">371</span></a><span class="sd">    ### Virtual Environment Installation/Creation</span>
+</span><span id="About_proteusPy-372"><a href="#About_proteusPy-372"><span class="linenos">372</span></a>
+</span><span id="About_proteusPy-373"><a href="#About_proteusPy-373"><span class="linenos">373</span></a><span class="sd">    1. Install Anaconda (&lt;http://anaconda.org&gt;)</span>
+</span><span id="About_proteusPy-374"><a href="#About_proteusPy-374"><span class="linenos">374</span></a><span class="sd">       - Create a new environment using python 3.9</span>
+</span><span id="About_proteusPy-375"><a href="#About_proteusPy-375"><span class="linenos">375</span></a><span class="sd">       - Activate the environment</span>
+</span><span id="About_proteusPy-376"><a href="#About_proteusPy-376"><span class="linenos">376</span></a><span class="sd">    2. Build the environment. At this point it&#39;s probably best to clone the repo via github </span>
+</span><span id="About_proteusPy-377"><a href="#About_proteusPy-377"><span class="linenos">377</span></a><span class="sd">       since it contains all of the notebooks and test programs. Ultimately the distribution </span>
+</span><span id="About_proteusPy-378"><a href="#About_proteusPy-378"><span class="linenos">378</span></a><span class="sd">       can be used from pyPi as a normal package.</span>
+</span><span id="About_proteusPy-379"><a href="#About_proteusPy-379"><span class="linenos">379</span></a><span class="sd">       - Using pyPi:</span>
+</span><span id="About_proteusPy-380"><a href="#About_proteusPy-380"><span class="linenos">380</span></a><span class="sd">         - python3 -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ proteusPy</span>
+</span><span id="About_proteusPy-381"><a href="#About_proteusPy-381"><span class="linenos">381</span></a><span class="sd">       - From gitHub:</span>
+</span><span id="About_proteusPy-382"><a href="#About_proteusPy-382"><span class="linenos">382</span></a><span class="sd">         - Install git-lfs</span>
+</span><span id="About_proteusPy-383"><a href="#About_proteusPy-383"><span class="linenos">383</span></a><span class="sd">           - https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage</span>
+</span><span id="About_proteusPy-384"><a href="#About_proteusPy-384"><span class="linenos">384</span></a><span class="sd">           - From a shell prompt: git-lfs track &quot;*.csv&quot; &quot;*.pkl&quot; &quot;*.mp4&quot;</span>
+</span><span id="About_proteusPy-385"><a href="#About_proteusPy-385"><span class="linenos">385</span></a><span class="sd">         - git clone https://github.com/suchanek/proteusPy/proteusPy.git</span>
+</span><span id="About_proteusPy-386"><a href="#About_proteusPy-386"><span class="linenos">386</span></a><span class="sd">         - cd into the repo</span>
+</span><span id="About_proteusPy-387"><a href="#About_proteusPy-387"><span class="linenos">387</span></a><span class="sd">         - pip install .</span>
+</span><span id="About_proteusPy-388"><a href="#About_proteusPy-388"><span class="linenos">388</span></a>
+</span><span id="About_proteusPy-389"><a href="#About_proteusPy-389"><span class="linenos">389</span></a><span class="sd">    #### Publications</span>
+</span><span id="About_proteusPy-390"><a href="#About_proteusPy-390"><span class="linenos">390</span></a><span class="sd">    * https://doi.org/10.1021/bi00368a023</span>
+</span><span id="About_proteusPy-391"><a href="#About_proteusPy-391"><span class="linenos">391</span></a><span class="sd">    * https://doi.org/10.1021/bi00368a024</span>
+</span><span id="About_proteusPy-392"><a href="#About_proteusPy-392"><span class="linenos">392</span></a><span class="sd">    * https://doi.org/10.1016/0092-8674(92)90140-8</span>
+</span><span id="About_proteusPy-393"><a href="#About_proteusPy-393"><span class="linenos">393</span></a><span class="sd">    * http://dx.doi.org/10.2174/092986708783330566</span>
+</span><span id="About_proteusPy-394"><a href="#About_proteusPy-394"><span class="linenos">394</span></a>
+</span><span id="About_proteusPy-395"><a href="#About_proteusPy-395"><span class="linenos">395</span></a><span class="sd">    *NB:* This distribution is actively being developed and will be difficult to implement </span>
+</span><span id="About_proteusPy-396"><a href="#About_proteusPy-396"><span class="linenos">396</span></a><span class="sd">    locally unless the BioPython patch is applied. Also, if you&#39;re running on an M-series Mac </span>
+</span><span id="About_proteusPy-397"><a href="#About_proteusPy-397"><span class="linenos">397</span></a><span class="sd">    then it&#39;s important to install Biopython first, since the generic release won&#39;t build </span>
+</span><span id="About_proteusPy-398"><a href="#About_proteusPy-398"><span class="linenos">398</span></a><span class="sd">    on the M1. 2/18/23 -egs</span>
+</span><span id="About_proteusPy-399"><a href="#About_proteusPy-399"><span class="linenos">399</span></a>
+</span><span id="About_proteusPy-400"><a href="#About_proteusPy-400"><span class="linenos">400</span></a><span class="sd">    Eric G. Suchanek, PhD. mailto:suchanek@mac.com</span>
+</span><span id="About_proteusPy-401"><a href="#About_proteusPy-401"><span class="linenos">401</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="About_proteusPy-402"><a href="#About_proteusPy-402"><span class="linenos">402</span></a>    <span class="k">return</span> <span class="n">About_proteusPy</span><span class="o">.</span><span class="vm">__doc__</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p><em>proteusPy</em> is a Python package specializing in the modeling and analysis of 
+proteins of known structure with an emphasis on Disulfide Bonds. This package 
+reprises my molecular modeling program <a href="https://doi.org/10.1021/bi00368a023">Proteus</a>, 
+and relies on the <a href="https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html">Turtle3D</a> 
+class. The turtle implements the functions <code>Move</code>, <code>Roll</code>, <code>Yaw</code>, <code>Pitch</code> 
+and <code>Turn</code> for movement in a three-dimensional space. The 
+<a href="https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html">Disulfide</a> class 
+implements methods to analyze the protein structure stabilizing element known as a 
+<em>Disulfide Bond</em>. This class and its underlying methods are being used to perform a 
+structural analysis of over 35,800 disulfide-bond containing proteins in the RCSB 
+protein data bank.</p>
+
+<h3 id="virtual-environment-installationcreation">Virtual Environment Installation/Creation</h3>
+
+<ol>
+<li>Install Anaconda (<a href="http://anaconda.org">http://anaconda.org</a>)
+<ul>
+<li>Create a new environment using python 3.9</li>
+<li>Activate the environment</li>
+</ul></li>
+<li>Build the environment. At this point it's probably best to clone the repo via github 
+since it contains all of the notebooks and test programs. Ultimately the distribution 
+can be used from pyPi as a normal package.
+<ul>
+<li>Using pyPi:
+<ul>
+<li>python3 -m pip install --index-url <a href="https://test.pypi.org/simple/"><a href="https://test.pypi.org/simple/"><a href="https://test.pypi.org/simple/">https://test.pypi.org/simple/</a></a></a> --extra-index-url <a href="https://pypi.org/simple/"><a href="https://pypi.org/simple/"><a href="https://pypi.org/simple/">https://pypi.org/simple/</a></a></a> proteusPy</li>
+</ul></li>
+<li>From gitHub:
+<ul>
+<li>Install git-lfs
+<ul>
+<li><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage">https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage</a></a></a></a></li>
+<li>From a shell prompt: git-lfs track "<em>.csv" "</em>.pkl" "*.mp4"</li>
+</ul></li>
+<li>git clone <a href="https://github.com/suchanek/proteusPy/proteusPy.git"><a href="https://github.com/suchanek/proteusPy/proteusPy.git"><a href="https://github.com/suchanek/proteusPy/proteusPy.git">https://github.com/suchanek/proteusPy/proteusPy.git</a></a></a></li>
+<li>cd into the repo</li>
+<li>pip install .</li>
+</ul></li>
+</ul></li>
+</ol>
+
+<h4 id="publications">Publications</h4>
+
+<ul>
+<li><a href="https://doi.org/10.1021/bi00368a023">https://doi.org/10.1021/bi00368a023</a></li>
+<li><a href="https://doi.org/10.1021/bi00368a024">https://doi.org/10.1021/bi00368a024</a></li>
+<li><a href="https://doi.org/10.1016/0092-8674(92)90140-8">https://doi.org/10.1016/0092-8674(92)90140-8</a></li>
+<li><a href="http://dx.doi.org/10.2174/092986708783330566">http://dx.doi.org/10.2174/092986708783330566</a></li>
+</ul>
+
+<p><em>NB:</em> This distribution is actively being developed and will be difficult to implement 
+locally unless the BioPython patch is applied. Also, if you're running on an M-series Mac 
+then it's important to install Biopython first, since the generic release won't build 
+on the M1. 2/18/23 -egs</p>
+
+<p>Eric G. Suchanek, PhD. mailto:suchanek@mac.com</p>
 </div>
 
 
