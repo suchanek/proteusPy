@@ -225,133 +225,20 @@ def download_file(url, directory):
     else:
         print(f"{file_name} already exists in {directory}.")
 
-def add_sign_columns(df):
-    """
-    Create new columns with the sign of each dihedral angle (chi1-chi5)
-    column and return a new DataFrame with the additional columns.
-    This is used to build disulfide classes.
+import psutil
 
-    :param df: pandas.DataFrame - The input DataFrame containing 
-    the dihedral angle (chi1-chi5) columns.
-        
-    :return: A new DataFrame containing the columns 'ss_id', 'chi1_s', 
-    'chi2_s', 'chi3_s', 'chi4_s', 'chi5_s' which represent the signs of 
-    the dihedral angle columns in the input DataFrame.
-        
-    Example:
-    >>> import pandas as pd
-    >>> data = {'ss_id': [1, 2, 3], 'chi1': [-2, 1.0, 1.3], 'chi2': [0.8, -1.5, 0], 
-    ...         'chi3': [-1, 2, 0.1], 'chi4': [0, 0.9, -1.1], 'chi5': [0.2, -0.6, -0.8]}
-    >>> df = pd.DataFrame(data)
-    >>> res_df = add_sign_columns(df)
-    >>> print(res_df)
-       ss_id  chi1_s  chi2_s  chi3_s  chi4_s  chi5_s
-    0      1      -1       1      -1       1       1
-    1      2       1      -1       1       1      -1
-    2      3       1       1       1      -1      -1
-    """
-    # Create columns for the resulting DF
-    tors_vector_cols = ['ss_id', 'chi1_s', 'chi2_s', 'chi3_s', 'chi4_s', 'chi5_s']
-    res_df = pd.DataFrame(columns=tors_vector_cols)
-    
-    # Create new columns with the sign of each chi column
-    chi_columns = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']
-    sign_columns = [col + '_s' for col in chi_columns]
-    df[sign_columns] = df[chi_columns].applymap(lambda x: 1 if x >= 0 else -1)
-    res_df = df[tors_vector_cols].copy()
-    return res_df
+def get_memory_usage():
+    process = psutil.Process()
+    mem_info = process.memory_info()
+    return mem_info.rss
 
-
-def group_by_sign(df):
+def print_memory_used():
     '''
-    Group a DataFrame by the sign of each dihedral angle (chi1-chi5) column.
-
-    This function creates new columns in the input DataFrame with the sign of each chi column, 
-    and groups the DataFrame by these new columns. The function returns the aggregated data, including 
-    the mean and standard deviation of the 'ca_distance', 'torsion_length', and 'energy' columns.
-
-    :param df: The input DataFrame to group by sign.
-    :type df: pandas.DataFrame
-    :return: The DataFrame grouped by sign, including means and standard deviations.
-    :rtype: pandas.DataFrame
-
-    Example:
-    >>> df = pd.DataFrame({'pdbid': ['1ABC', '1DEF', '1GHI', '1HIK'],
-    ...                    'chi1': [120.0, -45.0, 70.0, 90],
-    ...                    'chi2': [90.0, 180.0, -120.0, -90],
-    ...                    'chi3': [-45.0, -80.0, 20.0, 0],
-    ...                    'chi4': [0.0, 100.0, -150.0, -120.0],
-    ...                    'chi5': [-120.0, -10.0, 160.0, -120.0],
-    ...                    'ca_distance': [3.5, 3.8, 2.5, 3.3],
-    ...                    'torsion_length': [3.2, 2.8, 3.0, 4.4],
-    ...                    'energy': [-12.0, -10.0, -15.0, -20.0]})
-    >>> grouped = group_by_sign(df)
-    >>> grouped
-       chi1_s  chi2_s  chi3_s  chi4_s  chi5_s  ca_distance_mean  ca_distance_std  torsion_length_mean  torsion_length_std  energy_mean  energy_std
-    0      -1       1      -1       1      -1               3.8              NaN                  2.8                 NaN        -10.0         NaN
-    1       1      -1       1      -1      -1               3.3              NaN                  4.4                 NaN        -20.0         NaN
-    2       1      -1       1      -1       1               2.5              NaN                  3.0                 NaN        -15.0         NaN
-    3       1       1      -1       1      -1               3.5              NaN                  3.2                 NaN        -12.0         NaN
-    
+    Print memory used by the proteusPy process.
     '''
-    
-    # Create new columns with the sign of each chi column
-    chi_columns = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']
-    sign_columns = [col + '_s' for col in chi_columns]
-    df[sign_columns] = df[chi_columns].applymap(lambda x: 1 if x >= 0 else -1)
+    mem = get_memory_usage() / (1024 ** 3) # to GB
 
-    # Group the DataFrame by the sign columns and return the aggregated data
-    group_columns = sign_columns
-    agg_columns = ['ca_distance', 'torsion_length', 'energy']
-    grouped = df.groupby(group_columns)[agg_columns].agg(['mean', 'std'])
-    grouped.columns = ['_'.join(col).strip() for col in grouped.columns.values]
-    return grouped.reset_index()
-   
-def Create_classes(df):
-    """
-    Group the DataFrame by the sign of the chi columns and create a new class ID column for each unique grouping.
-
-    :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'torsion_length', and 'energy'.
-    :return: A pandas DataFrame containing columns 'class_id', 'ss_id', and 'count', where 'class_id' is a unique identifier for each grouping of chi signs, 'ss_id' is a list of all 'ss_id' values in that grouping, and 'count' is the number of rows in that grouping.
-    
-    Example:
-    >>> import pandas as pd
-    >>> df = pd.DataFrame({
-    ...    'ss_id': [1, 2, 3, 4, 5],
-    ...    'chi1': [1.0, -1.0, 1.0, 1.0, -1.0],
-    ...    'chi2': [-1.0, -1.0, -1.0, 1.0, 1.0],
-    ...    'chi3': [-1.0, 1.0, -1.0, 1.0, -1.0],
-    ...    'chi4': [1.0, -1.0, 1.0, -1.0, 1.0],
-    ...    'chi5': [1.0, -1.0, -1.0, -1.0, -1.0],
-    ...    'ca_distance': [3.1, 3.2, 3.3, 3.4, 3.5],
-    ...    'torsion_length': [120.1, 120.2, 120.3, 120.4, 121.0],
-    ...    'energy': [-2.3, -2.2, -2.1, -2.0, -1.9]
-    ... })
-    >>> Create_classes(df)
-      class_id ss_id  count  incidence  percentage
-    0    00200   [2]      1        0.2        20.0
-    1    02020   [5]      1        0.2        20.0
-    2    20020   [3]      1        0.2        20.0
-    3    20022   [1]      1        0.2        20.0
-    4    22200   [4]      1        0.2        20.0
-
-    """
-    # Create new columns with the sign of each chi column
-    chi_columns = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']
-    sign_columns = [col + '_s' for col in chi_columns]
-    df[sign_columns] = df[chi_columns].applymap(lambda x: 1 if x >= 0 else -1)
-    
-    # Create a new column with the class ID for each row
-    class_id_column = 'class_id'
-    df[class_id_column] = (df[sign_columns] + 1).apply(lambda x: ''.join(x.astype(str)), axis=1)
-
-    # Group the DataFrame by the class ID and return the grouped data
-    grouped = df.groupby(class_id_column)['ss_id'].unique().reset_index()
-    grouped['count'] = grouped['ss_id'].apply(lambda x: len(x))
-    grouped['incidence'] = grouped['ss_id'].apply(lambda x: len(x)/len(df))
-    grouped['percentage'] = grouped['incidence'].apply(lambda x: 100 * x)
-
-    return grouped
+    print(f'--> proteusPy {proteusPy.__version__}: Memory Used: {mem:.2f} GB')
 
 def About_proteusPy():
     """
@@ -399,11 +286,6 @@ def About_proteusPy():
     Eric G. Suchanek, PhD. mailto:suchanek@mac.com
     """
     return About_proteusPy.__doc__
-
-def load_class_dict(fname=f'{DATA_DIR}PDB_ss_classes_dict.pkl') -> dict:
-    with open(fname,'rb') as f:
-        res = pickle.load(f)
-        return res
 
 if __name__ == "__main__":
     import doctest

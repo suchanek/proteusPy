@@ -94,6 +94,7 @@ class DisulfideLoader:
         self.ModelDir = datadir
         self.PickleFile = f'{datadir}{picklefile}'
         self.PickleDictFile = f'{datadir}{pickle_dict_file}'
+        self.PickleClassFile = f'{datadir}{SS_CLASS_DICT_FILE}'
         self.TorsionFile = f'{datadir}{torsion_file}'
         self.SSList = DisulfideList([], 'ALL_PDB_SS')
         self.SSDict = {}
@@ -101,6 +102,7 @@ class DisulfideLoader:
         self.TotalDisulfides = 0
         self.IDList = []
         self.QUIET = quiet
+        self.classdict = {}
         
         idlist = []
 
@@ -115,6 +117,15 @@ class DisulfideLoader:
         with open(self.PickleFile, 'rb') as f:
             sslist = pickle.load(f)
             self.SSList = sslist
+
+        if verbose:
+            print(f'done.',)
+
+        if verbose:
+            print(f'--> DisulfideLoader(): Reading disulfide classes from: {self.PickleClassFile}... ', end='')
+        
+        with open(self.PickleClassFile, 'rb') as f:
+            self.classdict = pickle.load(f)
 
         if verbose:
             print(f'done.',)
@@ -391,6 +402,10 @@ class DisulfideLoader:
         else:
             return copy.deepcopy(self.TorsionDF)
     
+    def list_classes(self):
+        for k,v in enumerate(self.classdict):
+            print(f'Class: |{k}|, |{v}|')
+
     @property
     def quiet(self) -> bool:
         '''
@@ -434,8 +449,17 @@ class DisulfideLoader:
         if verbose:
             print(f'done.')
     
-    
-          
+    def sslist_from_classid(self, classid: str) -> DisulfideList:
+        res = DisulfideList([], 'tmp')
+        
+        try:
+            sslist = self.classdict[classid]
+            res = DisulfideList([self[ssid] for ssid in sslist], 'classid')
+            return res
+        except KeyError:
+            print(f'No class: {classid}')
+        return
+  
 # class ends
 
 def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoader:
