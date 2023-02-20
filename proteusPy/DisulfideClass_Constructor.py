@@ -20,8 +20,6 @@ from pyvista import set_plot_theme
 from Bio.PDB import *
 
 # for using from the repo we 
-import proteusPy
-from proteusPy import *
 from proteusPy.data import SS_CLASS_DICT_FILE, SS_CLASS_DEFINITIONS, DATA_DIR
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.Disulfide import *
@@ -76,7 +74,7 @@ class DisulfideClass_Constructor():
             ss_id_dict = dict(zip(df['SS_Classname'], df['ss_id']))
             return ss_id_dict
 
-        PDB_SS = Load_PDB_SS(verbose=self.verbose, subset=False)
+        PDB_SS = proteusPy.DisulfideLoader.Load_PDB_SS(verbose=self.verbose, subset=False)
         if self.verbose:
             PDB_SS.describe()
 
