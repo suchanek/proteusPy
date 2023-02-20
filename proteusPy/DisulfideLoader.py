@@ -4,11 +4,11 @@ the analysis and modeling of protein structures, with an emphasis on disulfide b
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2/14/2023
+Last revision: 2/20/2023
 '''
 
 # Author: Eric G. Suchanek, PhD.
-# Last modification: 2/7/23
+# Last modification: 2/20/23
 
 import sys
 import copy
@@ -31,7 +31,6 @@ from proteusPy.Disulfide import Disulfide
 
 from proteusPy.DisulfideExceptions import *
 from proteusPy.data import *
-from proteusPy.DisulfideClass_Constructor import Create_classes
 
 
 class DisulfideLoader:
@@ -126,17 +125,6 @@ class DisulfideLoader:
         if self.verbose:
             print(f'done.',)
 
-        '''
-        if self.verbose:
-            print(f'--> DisulfideLoader(): Reading disulfide classes from: {self.PickleClassFile}... ', end='')
-        
-        with open(self.PickleClassFile, 'rb') as f:
-            self.classdict = pickle.load(f)
-
-        if self.verbose:
-            print(f'done.',)
-        '''
-
         self.TotalDisulfides = len(self.SSList)
         
         if self.verbose:
@@ -162,7 +150,7 @@ class DisulfideLoader:
         self.build_classes()
 
         if self.verbose:    
-            print(f'Loading complete.')
+            print(f'--> DisulfideLoader(): Loading complete.')
             self.describe()
         return
 
@@ -228,28 +216,6 @@ class DisulfideLoader:
                 cnt += 1
         return res / cnt
     
-    def oAverage_Resolution(self) -> float:
-        '''
-        Compute and return the average structure resolution for the given list.
-
-        :return: Average resolution (A)
-        '''
-        res = 0.0
-        cnt = 1
-        idlist = self.IDList
-        sslist = self.SSList
-
-        for id in idlist:
-            _res = self[id].resolution
-            if _res is not None and res != -1.0:
-                res += _res
-                cnt += 1
-        return res / cnt
-
-    def build_class_df(self, class_df, group_df):
-        ss_id_col = group_df['ss_id']
-        result_df = pd.concat([class_df, ss_id_col], axis=1)
-        return result_df
 
     def build_classes(self):
         '''
@@ -267,7 +233,7 @@ class DisulfideLoader:
         if self.verbose:
             print(f'-> build_classes(): creating SS classes...')
 
-        grouped = Create_classes(tors_df)
+        grouped = create_classes(tors_df)
 
         # grouped.to_csv(f'{DATA_DIR}PDB_ss_classes.csv')
         if self.verbose:
@@ -282,13 +248,10 @@ class DisulfideLoader:
             print(f'-> build_classes(): merging...')
 
         merged = self.concat_dataframes(class_df, grouped)
-
-        # merged = self.build_class_df(class_df, grouped)
         merged.drop(columns=['Idx'], inplace=True)
-        self.classdf = merged.copy()
 
-        classdict = ss_id_dict(merged)
-        self.classdict = classdict
+        self.classdf = merged.copy()
+        self.classdict = ss_id_dict(merged)
 
         if self.verbose:
             print(f'--> build_classes(): initialization complete.')
@@ -314,17 +277,10 @@ class DisulfideLoader:
     def concat_dataframes(self, df1, df2):
         """Concatenates columns from one data frame into the other and returns the new result.
 
-        Parameters
-        ----------
-        df1 : pandas.DataFrame
-            The first data frame.
-        df2 : pandas.DataFrame
-            The second data frame.
+        :param df1 : pandas.DataFrame - The first data frame.
+        :param df2 : pandas.DataFrame - The second data frame.
 
-        Returns
-        -------
-        pandas.DataFrame
-            The concatenated data frame.
+        :return: pandas.DataFrame - The concatenated data frame.
 
         Examples
         --------
@@ -430,7 +386,6 @@ class DisulfideLoader:
         print(f'    ================= proteusPy: {vers} =======================')
        
     def display_overlay(self, pdbid):
-        
         ''' 
         Display all disulfides for a given PDB ID overlaid in stick mode against
         a common coordinate frame. This allows us to see all of the disulfides
@@ -558,7 +513,7 @@ class DisulfideLoader:
         
         try:
             sslist = self.classdict[classid]
-            res = DisulfideList([self[ssid] for ssid in sslist], 'classid')
+            res = DisulfideList([self[ssid] for ssid in sslist], classid)
             return res
         except KeyError:
             print(f'No class: {classid}')
@@ -642,7 +597,7 @@ class DisulfideClass_Constructor():
         if self.verbose:
             print(f'-> DisulfideClass_Constructor(): creating SS classes...')
 
-        grouped = Create_classes(tors_df)
+        grouped = create_classes(tors_df)
         self.class_df = grouped
 
         grouped.to_csv(f'{DATA_DIR}PDB_ss_classes.csv')
@@ -688,9 +643,10 @@ class DisulfideClass_Constructor():
             print(f'--> DisulfideClass_Constructor(): initialization complete.')
         
         return
-        
+
 # class definition ends
-def Create_classes(df):
+
+def create_classes(df):
     """
     Group the DataFrame by the sign of the chi columns and create a new class ID column for each unique grouping.
 
@@ -710,8 +666,8 @@ def Create_classes(df):
     ...    'torsion_length': [120.1, 120.2, 120.3, 120.4, 121.0],
     ...    'energy': [-2.3, -2.2, -2.1, -2.0, -1.9]
     ... })
-    >>> Create_classes(df)
-      class_id ss_id  count  incidence  percentage
+    >>> create_classes(df)
+    class_id ss_id  count  incidence  percentage
     0    00200   [2]      1        0.2        20.0
     1    02020   [5]      1        0.2        20.0
     2    20020   [3]      1        0.2        20.0
