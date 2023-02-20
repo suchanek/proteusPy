@@ -22,7 +22,7 @@ from Bio.PDB import *
 # for using from the repo we 
 import proteusPy
 from proteusPy import *
-from proteusPy.data import SS_CLASS_DICT_FILE, SS_CLASS_DEFINITIONS
+from proteusPy.data import SS_CLASS_DICT_FILE, SS_CLASS_DEFINITIONS, DATA_DIR
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.Disulfide import *
 
@@ -38,6 +38,7 @@ class DisulfideClass_Constructor():
     def __init__(self, verbose=False, bootstrap=False) -> None:
         self.verbose = verbose
         self.classdict = {}
+        self.classdf = None
 
         if bootstrap:
             if self.verbose:
@@ -55,17 +56,6 @@ class DisulfideClass_Constructor():
         ss_id_col = group_df['ss_id']
         result_df = pd.concat([class_df, ss_id_col], axis=1)
         return result_df
-
-    def sslist_from_classid(self, classid: str, loader: DisulfideLoader) -> DisulfideList:
-        res = DisulfideList([], classid)
-        
-        try:
-            sslist = self.classdict[classid]
-            res = DisulfideList([loader[ssid] for ssid in sslist], classid)
-            return res
-
-        except KeyError:
-            print(f'No class: {classid}')
 
     def list_classes(self):
         for k,v in enumerate(self.classdict):
@@ -98,7 +88,7 @@ class DisulfideClass_Constructor():
         grouped = Create_classes(tors_df)
         self.class_df = grouped
 
-        grouped.to_csv(f'{DATA_DIR}PDB_ss_classes.csv')
+        # grouped.to_csv(f'{DATA_DIR}PDB_ss_classes.csv')
         if self.verbose:
             print(f'{grouped.head(32)}')
 
@@ -110,6 +100,7 @@ class DisulfideClass_Constructor():
 
         # !!! df = pd.read_csv(pd.compat.StringIO(csv_string))
         # class_df = pd.read_csv(f'{DATA_DIR}PDB_SS_class_definitions.csv', dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
+        
         class_df = pd.read_csv(StringIO(SS_CLASS_DEFINITIONS), dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
         class_df['FXN'].str.strip()
         class_df['SS_Classname'].str.strip()
@@ -122,10 +113,10 @@ class DisulfideClass_Constructor():
         merged.drop(columns=['Idx'], inplace=True)
 
         classdict = ss_id_dict(merged)
-
         self.classdict = classdict
 
         merged.to_csv(f'{DATA_DIR}PDB_SS_merged.csv')
+        self.classdf = merged.copy()
 
         fname = f'{DATA_DIR}{SS_CLASS_DICT_FILE}'
 

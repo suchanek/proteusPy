@@ -12,6 +12,7 @@ Last revision: 2/14/2023
 
 import sys
 import copy
+from io import StringIO
 
 import pandas as pd
 import pyvista as pv
@@ -30,6 +31,8 @@ from proteusPy.Disulfide import Disulfide
 
 from proteusPy.DisulfideExceptions import *
 from proteusPy.data import *
+from proteusPy.DisulfideClass_Constructor import Create_classes
+
 
 class DisulfideLoader:
     '''
@@ -103,6 +106,8 @@ class DisulfideLoader:
         self.IDList = []
         self.QUIET = quiet
         self.classdict = {}
+        self.classdf = None
+        self.verbose = verbose
         
         idlist = []
 
@@ -111,28 +116,30 @@ class DisulfideLoader:
             self.PickleDictFile = f'{datadir}{SS_SUBSET_DICT_PICKLE_FILE}'
             self.TorsionFile = f'{datadir}{SS_SUBSET_TORSIONS_FILE}'
         
-        if verbose:
+        if self.verbose:
             print(f'--> DisulfideLoader(): Reading disulfides from: {self.PickleFile}... ', end='')
         
         with open(self.PickleFile, 'rb') as f:
             sslist = pickle.load(f)
             self.SSList = sslist
 
-        if verbose:
+        if self.verbose:
             print(f'done.',)
 
-        if verbose:
+        '''
+        if self.verbose:
             print(f'--> DisulfideLoader(): Reading disulfide classes from: {self.PickleClassFile}... ', end='')
         
         with open(self.PickleClassFile, 'rb') as f:
             self.classdict = pickle.load(f)
 
-        if verbose:
+        if self.verbose:
             print(f'done.',)
+        '''
 
         self.TotalDisulfides = len(self.SSList)
         
-        if verbose:
+        if self.verbose:
             print(f'--> DisulfideLoader(): Reading disulfide dict2 from: {self.PickleDictFile}...', end='')
         
         with open(self.PickleDictFile, 'rb') as f:
@@ -142,17 +149,19 @@ class DisulfideLoader:
             self.IDList = idlist.copy()
             totalSS_dict = len(self.IDList)
 
-        if verbose:
+        if self.verbose:
             print(f'done.')
 
-        if verbose:
+        if self.verbose:
             print(f'--> DisulfideLoader(): Reading Torsion DF from: {self.TorsionFile}...', end='')
 
         tmpDF  = pd.read_csv(self.TorsionFile)
         tmpDF.drop(tmpDF.columns[[0]], axis=1, inplace=True)
 
         self.TorsionDF = tmpDF.copy()
-        if verbose:    
+        self.build_classes()
+
+        if self.verbose:    
             print(f'Loading complete.')
             self.describe()
         return
@@ -236,6 +245,53 @@ class DisulfideLoader:
                 res += _res
                 cnt += 1
         return res / cnt
+
+    def build_class_df(self, class_df, group_df):
+        ss_id_col = group_df['ss_id']
+        result_df = pd.concat([class_df, ss_id_col], axis=1)
+        return result_df
+
+    def build_classes(self):
+        '''
+        Builds the internal dictionary mapping the disulfide class names to their respective members.
+        The classnames are defined by the sign of the dihedral angles, per XXX', the list of SS within
+        the database classified, and the resulting dict created.
+        '''
+
+        def ss_id_dict(df):
+            ss_id_dict = dict(zip(df['SS_Classname'], df['ss_id']))
+            return ss_id_dict
+
+        tors_df = self.getTorsions()
+
+        if self.verbose:
+            print(f'-> build_classes(): creating SS classes...')
+
+        grouped = Create_classes(tors_df)
+
+        # grouped.to_csv(f'{DATA_DIR}PDB_ss_classes.csv')
+        if self.verbose:
+            print(f'{grouped.head(32)}')
+        
+        class_df = pd.read_csv(StringIO(SS_CLASS_DEFINITIONS), dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
+        class_df['FXN'].str.strip()
+        class_df['SS_Classname'].str.strip()
+        class_df['class_id'].str.strip()
+
+        if self.verbose:
+            print(f'-> build_classes(): merging...')
+
+        merged = self.build_class_df(class_df, grouped)
+        merged.drop(columns=['Idx'], inplace=True)
+        self.classdf = merged
+
+        classdict = ss_id_dict(merged)
+        self.classdict = classdict
+
+        if self.verbose:
+            print(f'--> build_classes(): initialization complete.')
+        
+        return
 
     def build_ss_from_idlist(self, idlist):
         '''
@@ -426,7 +482,7 @@ class DisulfideLoader:
         '''
         self.QUIET = perm
     
-    def save(self, savepath=DATA_DIR, verbose=False, subset=False):
+    def save(self, savepath=DATA_DIR, subset=False):
         '''
         Save a copy of the fully instantiated Loader to the specified file.
 
@@ -441,12 +497,12 @@ class DisulfideLoader:
 
         _fname = f'{savepath}{fname}'
 
-        if verbose:
+        if self.verbose:
             print(f'-> DisulfideLoader.save(): Writing {_fname}... ', end='')
         
         with open(_fname, 'wb+') as f:
             pickle.dump(self, f)
-        if verbose:
+        if self.verbose:
             print(f'done.')
     
     def sslist_from_classid(self, classid: str) -> DisulfideList:
