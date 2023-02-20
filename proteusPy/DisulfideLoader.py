@@ -147,6 +147,10 @@ class DisulfideLoader:
         tmpDF.drop(tmpDF.columns[[0]], axis=1, inplace=True)
 
         self.TorsionDF = tmpDF.copy()
+
+        if self.verbose:
+            print(f' done.')
+
         self.build_classes()
 
         if self.verbose:    
@@ -216,7 +220,6 @@ class DisulfideLoader:
                 cnt += 1
         return res / cnt
     
-
     def build_classes(self):
         '''
         Builds the internal dictionary mapping the disulfide class names to their respective members.
@@ -236,8 +239,8 @@ class DisulfideLoader:
         grouped = create_classes(tors_df)
 
         # grouped.to_csv(f'{DATA_DIR}PDB_ss_classes.csv')
-        if self.verbose:
-            print(f'{grouped.head(32)}')
+        #if self.verbose:
+        #    print(f'{grouped.head(32)}')
         
         class_df = pd.read_csv(StringIO(SS_CLASS_DEFINITIONS), dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
         class_df['FXN'].str.strip()
@@ -245,7 +248,7 @@ class DisulfideLoader:
         class_df['class_id'].str.strip()
 
         if self.verbose:
-            print(f'-> build_classes(): merging...')
+            print(f'--> build_classes(): merging...')
 
         merged = self.concat_dataframes(class_df, grouped)
         merged.drop(columns=['Idx'], inplace=True)
@@ -254,7 +257,7 @@ class DisulfideLoader:
         self.classdict = ss_id_dict(merged)
 
         if self.verbose:
-            print(f'--> build_classes(): initialization complete.')
+            print(f'-> build_classes(): initialization complete.')
         
         return
 
@@ -501,12 +504,13 @@ class DisulfideLoader:
         _fname = f'{savepath}{fname}'
 
         if self.verbose:
-            print(f'-> DisulfideLoader.save(): Writing {_fname}... ', end='')
+            print(f'-> DisulfideLoader.save(): Writing {_fname}... ')
         
         with open(_fname, 'wb+') as f:
             pickle.dump(self, f)
+        
         if self.verbose:
-            print(f'done.')
+            print(f'-> DisulfideLoader.save(): Done.')
     
     def sslist_from_classid(self, classid: str) -> DisulfideList:
         res = DisulfideList([], 'tmp')
