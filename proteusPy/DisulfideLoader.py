@@ -281,9 +281,11 @@ class DisulfideLoader:
         if self.verbose:
             print(f'-> build_classes(): merging...')
 
-        merged = self.build_class_df(class_df, grouped)
+        merged = self.concat_dataframes(class_df, grouped)
+
+        # merged = self.build_class_df(class_df, grouped)
         merged.drop(columns=['Idx'], inplace=True)
-        self.classdf = merged
+        self.classdf = merged.copy()
 
         classdict = ss_id_dict(merged)
         self.classdict = classdict
@@ -309,6 +311,44 @@ class DisulfideLoader:
                     break
         return res
     
+    def concat_dataframes(self, df1, df2):
+        """Concatenates columns from one data frame into the other and returns the new result.
+
+        Parameters
+        ----------
+        df1 : pandas.DataFrame
+            The first data frame.
+        df2 : pandas.DataFrame
+            The second data frame.
+
+        Returns
+        -------
+        pandas.DataFrame
+            The concatenated data frame.
+
+        Examples
+        --------
+        >>> df1 = pd.DataFrame({
+        ...     'SS_Classname': ['A', 'B', 'C'],
+        ...     'SS_Column1': [1, 2, 3],
+        ...     'SS_Column2': [4, 5, 6]
+        ... })
+        >>> df2 = pd.DataFrame({
+        ...     'SS_Classname': ['A', 'B', 'C'],
+        ...     'SS_Column3': [7, 8, 9],
+        ...     'SS_Column4': [10, 11, 12]
+        ... })
+        >>> concat_dataframes(df1, df2)
+        SS_Classname  SS_Column1  SS_Column2  SS_Column3  SS_Column4
+        0            A           1           4           7          10
+        1            B           2           5           8          11
+        2            C           3           6           9          12
+        """
+        # Merge the data frames based on the 'SS_Classname' column
+        result = pd.merge(df1, df2, on='class_id')
+
+        return result
+
     def copy(self):
         '''
         Return a copy of self
@@ -360,8 +400,16 @@ class DisulfideLoader:
 
         Example:
         >>> from proteusPy.DisulfideLoader import Load_PDB_SS
-        >>> PDB_SS = Load_PDB_SS(verbose=True, subset=False)
+        >>> PDB_SS = Load_PDB_SS(verbose=False, subset=False)
         >>> PDB_SS.describe()
+            =========== RCSB Disulfide Database Summary ==============
+        PDB IDs present:                    35818
+        Disulfides loaded:                  120697
+        Average structure resolution:       2.34 Å
+        Lowest Energy Disulfide:            2q7q_75D_140D
+        Highest Energy Disulfide:           1toz_456A_467A
+        Total RAM Used:                     29.26 GB.
+        ================= proteusPy: 0.55dev =======================
 
         '''
         vers = proteusPy.__version__
@@ -517,6 +565,176 @@ class DisulfideLoader:
         return
   
 # class ends
+class DisulfideClass_Constructor():
+    '''
+    Class manages structural classes for the disulfide bonds contained
+    in the proteusPy disulfide database
+    '''
+
+    def __init__(self, verbose=False, bootstrap=False) -> None:
+        self.verbose = verbose
+        self.classdict = {}
+        self.classdf = None
+
+        if bootstrap:
+            if self.verbose:
+                print(f'--> DisulfideClass_Constructor(): Building SS classes...')
+            self.build_yourself()
+        else:
+            self.classdict = self.load_class_dict()
+
+    def load_class_dict(self, fname=f'{DATA_DIR}{SS_CLASS_DICT_FILE}') -> dict:
+        with open(fname,'rb') as f:
+            #res = pickle.load(f)
+            self.classdict = pickle.load(f)
+    
+    def build_class_df(self, class_df, group_df):
+        ss_id_col = group_df['ss_id']
+        result_df = pd.concat([class_df, ss_id_col], axis=1)
+        return result_df
+
+    def list_classes(self):
+        for k,v in enumerate(self.classdict):
+            print(f'Class: |{k}|, |{v}|')
+
+    #  class_cols = ['Idx','chi1_s','chi2_s','chi3_s','chi4_s','chi5_s','class_id','SS_Classname','FXN',
+    # 'count','incidence','percentage','ca_distance_mean',
+    # 'ca_distance_std','torsion_length_mean','torsion_length_std','energy_mean','energy_std']
+
+    def concat_dataframes(self, df1, df2):
+        """Concatenates columns from one data frame into the other and returns the new result.
+
+        Parameters
+        ----------
+        df1 : pandas.DataFrame
+            The first data frame.
+        df2 : pandas.DataFrame
+            The second data frame.
+
+        Returns
+        -------
+        pandas.DataFrame
+            The concatenated data frame.
+
+        """
+        # Merge the data frames based on the 'SS_Classname' column
+        result = pd.merge(df1, df2, on='class_id')
+
+        return result
+
+    def build_yourself(self):
+        '''
+        Builds the internal dictionary mapping the disulfide class names to their respective members.
+        The classnames are defined by the sign of the dihedral angles, per XXX', the list of SS within
+        the database classified, and the resulting dict created.
+        '''
+
+        def ss_id_dict(df):
+            ss_id_dict = dict(zip(df['SS_Classname'], df['ss_id']))
+            return ss_id_dict
+
+        PDB_SS = Load_PDB_SS(verbose=self.verbose, subset=False)
+        if self.verbose:
+            PDB_SS.describe()
+
+        tors_df = PDB_SS.getTorsions()
+
+        if self.verbose:
+            print(f'-> DisulfideClass_Constructor(): creating SS classes...')
+
+        grouped = Create_classes(tors_df)
+        self.class_df = grouped
+
+        grouped.to_csv(f'{DATA_DIR}PDB_ss_classes.csv')
+        if self.verbose:
+            print(f'{grouped.head(32)}')
+
+        #grouped_summary = grouped.drop(columns=['ss_id'], axis=1)
+        #grouped_summary.to_csv(f'{DATA_DIR}PDB_ss_classes_summary.csv')
+        
+        # this file is hand made. Do not change it. -egs-
+        #class_df = pd.read_csv(f'{DATA_DIR}PDB_ss_classes_master2.csv', dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
+
+        # !!! df = pd.read_csv(pd.compat.StringIO(csv_string))
+        # class_df = pd.read_csv(f'{DATA_DIR}PDB_SS_class_definitions.csv', dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
+        
+        class_df = pd.read_csv(StringIO(SS_CLASS_DEFINITIONS), dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
+        class_df['FXN'].str.strip()
+        class_df['SS_Classname'].str.strip()
+        class_df['class_id'].str.strip()
+
+        if self.verbose:
+            print(f'-> DisulfideClass_Constructor(): merging...')
+
+        merged = self.concat_dataframes(class_df, grouped)
+        #merged = self.build_class_df(class_df, grouped)
+        merged.drop(columns=['Idx'], inplace=True)
+
+        classdict = ss_id_dict(merged)
+        self.classdict = classdict
+
+        merged.to_csv(f'{DATA_DIR}PDB_SS_merged.csv')
+        self.classdf = merged.copy()
+
+        fname = f'{DATA_DIR}{SS_CLASS_DICT_FILE}'
+
+        if self.verbose:
+            print(f'-> DisulfideClass_Constructor(): writing {fname}...')
+
+        with open(fname, "wb+") as f:
+            pickle.dump(classdict, f)
+
+        if self.verbose:
+            print(f'--> DisulfideClass_Constructor(): initialization complete.')
+        
+        return
+        
+# class definition ends
+def Create_classes(df):
+    """
+    Group the DataFrame by the sign of the chi columns and create a new class ID column for each unique grouping.
+
+    :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'torsion_length', and 'energy'.
+    :return: A pandas DataFrame containing columns 'class_id', 'ss_id', and 'count', where 'class_id' is a unique identifier for each grouping of chi signs, 'ss_id' is a list of all 'ss_id' values in that grouping, and 'count' is the number of rows in that grouping.
+    
+    Example:
+    >>> import pandas as pd
+    >>> df = pd.DataFrame({
+    ...    'ss_id': [1, 2, 3, 4, 5],
+    ...    'chi1': [1.0, -1.0, 1.0, 1.0, -1.0],
+    ...    'chi2': [-1.0, -1.0, -1.0, 1.0, 1.0],
+    ...    'chi3': [-1.0, 1.0, -1.0, 1.0, -1.0],
+    ...    'chi4': [1.0, -1.0, 1.0, -1.0, 1.0],
+    ...    'chi5': [1.0, -1.0, -1.0, -1.0, -1.0],
+    ...    'ca_distance': [3.1, 3.2, 3.3, 3.4, 3.5],
+    ...    'torsion_length': [120.1, 120.2, 120.3, 120.4, 121.0],
+    ...    'energy': [-2.3, -2.2, -2.1, -2.0, -1.9]
+    ... })
+    >>> Create_classes(df)
+      class_id ss_id  count  incidence  percentage
+    0    00200   [2]      1        0.2        20.0
+    1    02020   [5]      1        0.2        20.0
+    2    20020   [3]      1        0.2        20.0
+    3    20022   [1]      1        0.2        20.0
+    4    22200   [4]      1        0.2        20.0
+
+    """
+    # Create new columns with the sign of each chi column
+    chi_columns = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']
+    sign_columns = [col + '_s' for col in chi_columns]
+    df[sign_columns] = df[chi_columns].applymap(lambda x: 1 if x >= 0 else -1)
+    
+    # Create a new column with the class ID for each row
+    class_id_column = 'class_id'
+    df[class_id_column] = (df[sign_columns] + 1).apply(lambda x: ''.join(x.astype(str)), axis=1)
+
+    # Group the DataFrame by the class ID and return the grouped data
+    grouped = df.groupby(class_id_column)['ss_id'].unique().reset_index()
+    grouped['count'] = grouped['ss_id'].apply(lambda x: len(x))
+    grouped['incidence'] = grouped['ss_id'].apply(lambda x: len(x)/len(df))
+    grouped['percentage'] = grouped['incidence'].apply(lambda x: 100 * x)
+
+    return grouped
 
 def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoader:
     '''
