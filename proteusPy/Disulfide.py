@@ -10,6 +10,8 @@ Last revision: 2/14/2023
 
 # Cα N, Cα, Cβ, C', Sγ Å °
 
+__pdoc__ = {'__all__': True}
+
 import math
 import numpy as np
 import copy

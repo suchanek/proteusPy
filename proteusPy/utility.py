@@ -7,6 +7,8 @@ Copyright (c)2023 Eric G. Suchanek, PhD, all rights reserved
 
 # Last modification 2/18/23 -egs-
 
+__pdoc__ = {'__all__': True}
+
 import math
 import numpy as np
 

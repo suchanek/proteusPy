@@ -11,6 +11,8 @@ Last revision: 2/20/2023
 # Last modification: 2/20/23
 # Cα N, Cα, Cβ, C', Sγ Å °
 
+__pdoc__ = {'__all__': True}
+
 import sys
 import copy
 from io import StringIO

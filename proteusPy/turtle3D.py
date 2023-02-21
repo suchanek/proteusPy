@@ -9,6 +9,8 @@ Based on the C implementation originally authored by Eric G. Suchanek PhD, 1990.
 
 # Last modification 2/2/23 -egs-
 
+__pdoc__ = {'__all__': True}
+
 import numpy
 import math
 

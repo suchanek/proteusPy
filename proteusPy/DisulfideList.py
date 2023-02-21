@@ -16,6 +16,8 @@ Last revision: 2/14/2023
 # Last modification: 2/8/2023 -egs-
 # Cα N, Cα, Cβ, C', Sγ Å °
 
+__pdoc__ = {'__all__': True}
+
 import numpy
 
 import pandas as pd
