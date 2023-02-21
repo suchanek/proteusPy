@@ -9,6 +9,7 @@ Last revision: 2/20/2023
 
 # Author: Eric G. Suchanek, PhD.
 # Last modification: 2/20/23
+# Cα N, Cα, Cβ, C', Sγ Å °
 
 import sys
 import copy
@@ -44,6 +45,11 @@ class DisulfideLoader:
     
     The class can also render Disulfides overlaid on a common coordinate system to a pyVista window using the 
     [display_overlay()](#DisulfideLoader.display_overlay) method. See below for examples.\n
+
+    Important note: For typical usage one will access the database via the `Load_PDB_SS()` function.
+    The difference is that the latter function loads the compressed database from its single
+    source. the `Load_PDB_SS()` function will load the individual torsions and disulfide .pkl,
+    builds the classlist structures.
     
     *Developer's Notes:*
     The .pkl files needed to instantiate this class and save it into its final .pkl file are
@@ -326,33 +332,6 @@ class DisulfideLoader:
         '''
         return copy.deepcopy(self.SSList)
     
-    def get_by_name(self, name: str) -> Disulfide:
-        '''
-        Return a Disulfide by its name
-
-        :param name: Disulfide name e.g. '4yys_22A_65A'
-        :return: Disulfide
-
-        >>> from proteusPy.Disulfide import Disulfide
-        >>> from proteusPy.DisulfideLoader import Load_PDB_SS
-        >>> from proteusPy.DisulfideList import DisulfideList
-            
-        Instantiate the Loader with the SS database subset.
-
-        >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
-        >>> ss1 = PDB_SS.get_by_name('4yys_22A_65A')
-        >>> ss1
-        <Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>
-        '''
-
-        _sslist = DisulfideList([], 'tmp')
-        _sslist = self.SSList
-
-        res = _sslist.get_by_name(name)
-
-        return res
-    # Cα N, Cα, Cβ, C', Sγ Å °
-
     def describe(self):
         '''
         Provides information about the Disulfide database contained in ```self```.
@@ -512,8 +491,15 @@ class DisulfideLoader:
         if self.verbose:
             print(f'-> DisulfideLoader.save(): Done.')
     
-    def sslist_from_classid(self, classid: str) -> DisulfideList:
-        res = DisulfideList([], 'tmp')
+    def from_class(self, classid: str) -> DisulfideList:
+        '''
+        Return a list of disulfides corresponding to the input class ID
+        string.
+
+        :param classid: Class ID, e.g. '+RHStaple'
+        :return: DisulfideList of class members
+        '''
+        res = DisulfideList([], classid)
         
         try:
             sslist = self.classdict[classid]
