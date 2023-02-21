@@ -6,8 +6,9 @@
 # Last Modification: 11/22/2022
 #
 
-import numpy  # type: ignore
+__pdoc__ = {'__all__': True}
 
+import numpy  # type: ignore
 from Bio.PDB import Vector
 
 from proteusPy.turtle3D import Turtle3D

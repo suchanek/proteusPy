@@ -9,6 +9,8 @@
 # to create the classes merges with the master class spreadsheet, and saves the 
 # resulting dict to {DATA_DIR}PDB_SS_merged.csv
 
+__pdoc__ = {'__all__': True}
+
 import pandas as pd
 import numpy
 
