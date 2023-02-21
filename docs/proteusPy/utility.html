@@ -83,9 +83,6 @@
             <li>
                     <a class="function" href="#print_memory_used">print_memory_used</a>
             </li>
-            <li>
-                    <a class="function" href="#About_proteusPy">About_proteusPy</a>
-            </li>
     </ul>
 
 
@@ -353,64 +350,17 @@
 </span><span id="L-236"><a href="#L-236"><span class="linenos">236</span></a>
 </span><span id="L-237"><a href="#L-237"><span class="linenos">237</span></a><span class="k">def</span> <span class="nf">print_memory_used</span><span class="p">():</span>
 </span><span id="L-238"><a href="#L-238"><span class="linenos">238</span></a>    <span class="sd">&#39;&#39;&#39;</span>
-</span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a><span class="sd">    Print memory used by the proteusPy process.</span>
+</span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a><span class="sd">    Print memory used by the proteusPy process (GB).</span>
 </span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a><span class="sd">    &#39;&#39;&#39;</span>
 </span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a>    <span class="n">mem</span> <span class="o">=</span> <span class="n">get_memory_usage</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">**</span> <span class="mi">3</span><span class="p">)</span> <span class="c1"># to GB</span>
 </span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a>
 </span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;--&gt; proteusPy </span><span class="si">{</span><span class="n">proteusPy</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s1">: Memory Used: </span><span class="si">{</span><span class="n">mem</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> GB&#39;</span><span class="p">)</span>
 </span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a>
-</span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a><span class="k">def</span> <span class="nf">About_proteusPy</span><span class="p">():</span>
-</span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a>    <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a><span class="sd">    *proteusPy* is a Python package specializing in the modeling and analysis of </span>
-</span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a><span class="sd">    proteins of known structure with an emphasis on Disulfide Bonds. This package </span>
-</span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a><span class="sd">    reprises my molecular modeling program [Proteus](https://doi.org/10.1021/bi00368a023), </span>
-</span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a><span class="sd">    and relies on the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) </span>
-</span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a><span class="sd">    class. The turtle implements the functions `Move`, `Roll`, `Yaw`, `Pitch` </span>
-</span><span id="L-252"><a href="#L-252"><span class="linenos">252</span></a><span class="sd">    and `Turn` for movement in a three-dimensional space. The </span>
-</span><span id="L-253"><a href="#L-253"><span class="linenos">253</span></a><span class="sd">    [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class </span>
-</span><span id="L-254"><a href="#L-254"><span class="linenos">254</span></a><span class="sd">    implements methods to analyze the protein structure stabilizing element known as a </span>
-</span><span id="L-255"><a href="#L-255"><span class="linenos">255</span></a><span class="sd">    *Disulfide Bond*. This class and its underlying methods are being used to perform a </span>
-</span><span id="L-256"><a href="#L-256"><span class="linenos">256</span></a><span class="sd">    structural analysis of over 35,800 disulfide-bond containing proteins in the RCSB </span>
-</span><span id="L-257"><a href="#L-257"><span class="linenos">257</span></a><span class="sd">    protein data bank.</span>
-</span><span id="L-258"><a href="#L-258"><span class="linenos">258</span></a>
-</span><span id="L-259"><a href="#L-259"><span class="linenos">259</span></a><span class="sd">    ### Virtual Environment Installation/Creation</span>
-</span><span id="L-260"><a href="#L-260"><span class="linenos">260</span></a>
-</span><span id="L-261"><a href="#L-261"><span class="linenos">261</span></a><span class="sd">    1. Install Anaconda (&lt;http://anaconda.org&gt;)</span>
-</span><span id="L-262"><a href="#L-262"><span class="linenos">262</span></a><span class="sd">       - Create a new environment using python 3.9</span>
-</span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a><span class="sd">       - Activate the environment</span>
-</span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a><span class="sd">    2. Build the environment. At this point it&#39;s probably best to clone the repo via github </span>
-</span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a><span class="sd">       since it contains all of the notebooks and test programs. Ultimately the distribution </span>
-</span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a><span class="sd">       can be used from pyPi as a normal package.</span>
-</span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a><span class="sd">       - Using pyPi:</span>
-</span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a><span class="sd">         - python3 -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ proteusPy</span>
-</span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a><span class="sd">       - From gitHub:</span>
-</span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a><span class="sd">         - Install git-lfs</span>
-</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a><span class="sd">           - https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage</span>
-</span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a><span class="sd">           - From a shell prompt: git-lfs track &quot;*.csv&quot; &quot;*.pkl&quot; &quot;*.mp4&quot;</span>
-</span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a><span class="sd">         - git clone https://github.com/suchanek/proteusPy/proteusPy.git</span>
-</span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a><span class="sd">         - cd into the repo</span>
-</span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a><span class="sd">         - pip install .</span>
-</span><span id="L-276"><a href="#L-276"><span class="linenos">276</span></a>
-</span><span id="L-277"><a href="#L-277"><span class="linenos">277</span></a><span class="sd">    #### Publications</span>
-</span><span id="L-278"><a href="#L-278"><span class="linenos">278</span></a><span class="sd">    * https://doi.org/10.1021/bi00368a023</span>
-</span><span id="L-279"><a href="#L-279"><span class="linenos">279</span></a><span class="sd">    * https://doi.org/10.1021/bi00368a024</span>
-</span><span id="L-280"><a href="#L-280"><span class="linenos">280</span></a><span class="sd">    * https://doi.org/10.1016/0092-8674(92)90140-8</span>
-</span><span id="L-281"><a href="#L-281"><span class="linenos">281</span></a><span class="sd">    * http://dx.doi.org/10.2174/092986708783330566</span>
-</span><span id="L-282"><a href="#L-282"><span class="linenos">282</span></a>
-</span><span id="L-283"><a href="#L-283"><span class="linenos">283</span></a><span class="sd">    *NB:* This distribution is actively being developed and will be difficult to implement </span>
-</span><span id="L-284"><a href="#L-284"><span class="linenos">284</span></a><span class="sd">    locally unless the BioPython patch is applied. Also, if you&#39;re running on an M-series Mac </span>
-</span><span id="L-285"><a href="#L-285"><span class="linenos">285</span></a><span class="sd">    then it&#39;s important to install Biopython first, since the generic release won&#39;t build </span>
-</span><span id="L-286"><a href="#L-286"><span class="linenos">286</span></a><span class="sd">    on the M1. 2/18/23 -egs</span>
-</span><span id="L-287"><a href="#L-287"><span class="linenos">287</span></a>
-</span><span id="L-288"><a href="#L-288"><span class="linenos">288</span></a><span class="sd">    Eric G. Suchanek, PhD. mailto:suchanek@mac.com</span>
-</span><span id="L-289"><a href="#L-289"><span class="linenos">289</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-290"><a href="#L-290"><span class="linenos">290</span></a>    <span class="k">return</span> <span class="n">About_proteusPy</span><span class="o">.</span><span class="vm">__doc__</span>
-</span><span id="L-291"><a href="#L-291"><span class="linenos">291</span></a>
-</span><span id="L-292"><a href="#L-292"><span class="linenos">292</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="L-293"><a href="#L-293"><span class="linenos">293</span></a>    <span class="kn">import</span> <span class="nn">doctest</span>
-</span><span id="L-294"><a href="#L-294"><span class="linenos">294</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
-</span><span id="L-295"><a href="#L-295"><span class="linenos">295</span></a>
-</span><span id="L-296"><a href="#L-296"><span class="linenos">296</span></a><span class="c1"># end of file</span>
+</span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a>    <span class="kn">import</span> <span class="nn">doctest</span>
+</span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a>
+</span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a><span class="c1"># end of file</span>
 </span></pre></div>
 
 
@@ -911,7 +861,7 @@ the first chain and return a dict containing only the first chain disulfides</p>
     <a class="headerlink" href="#print_memory_used"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="print_memory_used-238"><a href="#print_memory_used-238"><span class="linenos">238</span></a><span class="k">def</span> <span class="nf">print_memory_used</span><span class="p">():</span>
 </span><span id="print_memory_used-239"><a href="#print_memory_used-239"><span class="linenos">239</span></a>    <span class="sd">&#39;&#39;&#39;</span>
-</span><span id="print_memory_used-240"><a href="#print_memory_used-240"><span class="linenos">240</span></a><span class="sd">    Print memory used by the proteusPy process.</span>
+</span><span id="print_memory_used-240"><a href="#print_memory_used-240"><span class="linenos">240</span></a><span class="sd">    Print memory used by the proteusPy process (GB).</span>
 </span><span id="print_memory_used-241"><a href="#print_memory_used-241"><span class="linenos">241</span></a><span class="sd">    &#39;&#39;&#39;</span>
 </span><span id="print_memory_used-242"><a href="#print_memory_used-242"><span class="linenos">242</span></a>    <span class="n">mem</span> <span class="o">=</span> <span class="n">get_memory_usage</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">**</span> <span class="mi">3</span><span class="p">)</span> <span class="c1"># to GB</span>
 </span><span id="print_memory_used-243"><a href="#print_memory_used-243"><span class="linenos">243</span></a>
@@ -919,128 +869,7 @@ the first chain and return a dict containing only the first chain disulfides</p>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Print memory used by the proteusPy process.</p>
-</div>
-
-
-                </section>
-                <section id="About_proteusPy">
-                            <input id="About_proteusPy-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">About_proteusPy</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="About_proteusPy-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#About_proteusPy"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="About_proteusPy-246"><a href="#About_proteusPy-246"><span class="linenos">246</span></a><span class="k">def</span> <span class="nf">About_proteusPy</span><span class="p">():</span>
-</span><span id="About_proteusPy-247"><a href="#About_proteusPy-247"><span class="linenos">247</span></a>    <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="About_proteusPy-248"><a href="#About_proteusPy-248"><span class="linenos">248</span></a><span class="sd">    *proteusPy* is a Python package specializing in the modeling and analysis of </span>
-</span><span id="About_proteusPy-249"><a href="#About_proteusPy-249"><span class="linenos">249</span></a><span class="sd">    proteins of known structure with an emphasis on Disulfide Bonds. This package </span>
-</span><span id="About_proteusPy-250"><a href="#About_proteusPy-250"><span class="linenos">250</span></a><span class="sd">    reprises my molecular modeling program [Proteus](https://doi.org/10.1021/bi00368a023), </span>
-</span><span id="About_proteusPy-251"><a href="#About_proteusPy-251"><span class="linenos">251</span></a><span class="sd">    and relies on the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) </span>
-</span><span id="About_proteusPy-252"><a href="#About_proteusPy-252"><span class="linenos">252</span></a><span class="sd">    class. The turtle implements the functions `Move`, `Roll`, `Yaw`, `Pitch` </span>
-</span><span id="About_proteusPy-253"><a href="#About_proteusPy-253"><span class="linenos">253</span></a><span class="sd">    and `Turn` for movement in a three-dimensional space. The </span>
-</span><span id="About_proteusPy-254"><a href="#About_proteusPy-254"><span class="linenos">254</span></a><span class="sd">    [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class </span>
-</span><span id="About_proteusPy-255"><a href="#About_proteusPy-255"><span class="linenos">255</span></a><span class="sd">    implements methods to analyze the protein structure stabilizing element known as a </span>
-</span><span id="About_proteusPy-256"><a href="#About_proteusPy-256"><span class="linenos">256</span></a><span class="sd">    *Disulfide Bond*. This class and its underlying methods are being used to perform a </span>
-</span><span id="About_proteusPy-257"><a href="#About_proteusPy-257"><span class="linenos">257</span></a><span class="sd">    structural analysis of over 35,800 disulfide-bond containing proteins in the RCSB </span>
-</span><span id="About_proteusPy-258"><a href="#About_proteusPy-258"><span class="linenos">258</span></a><span class="sd">    protein data bank.</span>
-</span><span id="About_proteusPy-259"><a href="#About_proteusPy-259"><span class="linenos">259</span></a>
-</span><span id="About_proteusPy-260"><a href="#About_proteusPy-260"><span class="linenos">260</span></a><span class="sd">    ### Virtual Environment Installation/Creation</span>
-</span><span id="About_proteusPy-261"><a href="#About_proteusPy-261"><span class="linenos">261</span></a>
-</span><span id="About_proteusPy-262"><a href="#About_proteusPy-262"><span class="linenos">262</span></a><span class="sd">    1. Install Anaconda (&lt;http://anaconda.org&gt;)</span>
-</span><span id="About_proteusPy-263"><a href="#About_proteusPy-263"><span class="linenos">263</span></a><span class="sd">       - Create a new environment using python 3.9</span>
-</span><span id="About_proteusPy-264"><a href="#About_proteusPy-264"><span class="linenos">264</span></a><span class="sd">       - Activate the environment</span>
-</span><span id="About_proteusPy-265"><a href="#About_proteusPy-265"><span class="linenos">265</span></a><span class="sd">    2. Build the environment. At this point it&#39;s probably best to clone the repo via github </span>
-</span><span id="About_proteusPy-266"><a href="#About_proteusPy-266"><span class="linenos">266</span></a><span class="sd">       since it contains all of the notebooks and test programs. Ultimately the distribution </span>
-</span><span id="About_proteusPy-267"><a href="#About_proteusPy-267"><span class="linenos">267</span></a><span class="sd">       can be used from pyPi as a normal package.</span>
-</span><span id="About_proteusPy-268"><a href="#About_proteusPy-268"><span class="linenos">268</span></a><span class="sd">       - Using pyPi:</span>
-</span><span id="About_proteusPy-269"><a href="#About_proteusPy-269"><span class="linenos">269</span></a><span class="sd">         - python3 -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ proteusPy</span>
-</span><span id="About_proteusPy-270"><a href="#About_proteusPy-270"><span class="linenos">270</span></a><span class="sd">       - From gitHub:</span>
-</span><span id="About_proteusPy-271"><a href="#About_proteusPy-271"><span class="linenos">271</span></a><span class="sd">         - Install git-lfs</span>
-</span><span id="About_proteusPy-272"><a href="#About_proteusPy-272"><span class="linenos">272</span></a><span class="sd">           - https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage</span>
-</span><span id="About_proteusPy-273"><a href="#About_proteusPy-273"><span class="linenos">273</span></a><span class="sd">           - From a shell prompt: git-lfs track &quot;*.csv&quot; &quot;*.pkl&quot; &quot;*.mp4&quot;</span>
-</span><span id="About_proteusPy-274"><a href="#About_proteusPy-274"><span class="linenos">274</span></a><span class="sd">         - git clone https://github.com/suchanek/proteusPy/proteusPy.git</span>
-</span><span id="About_proteusPy-275"><a href="#About_proteusPy-275"><span class="linenos">275</span></a><span class="sd">         - cd into the repo</span>
-</span><span id="About_proteusPy-276"><a href="#About_proteusPy-276"><span class="linenos">276</span></a><span class="sd">         - pip install .</span>
-</span><span id="About_proteusPy-277"><a href="#About_proteusPy-277"><span class="linenos">277</span></a>
-</span><span id="About_proteusPy-278"><a href="#About_proteusPy-278"><span class="linenos">278</span></a><span class="sd">    #### Publications</span>
-</span><span id="About_proteusPy-279"><a href="#About_proteusPy-279"><span class="linenos">279</span></a><span class="sd">    * https://doi.org/10.1021/bi00368a023</span>
-</span><span id="About_proteusPy-280"><a href="#About_proteusPy-280"><span class="linenos">280</span></a><span class="sd">    * https://doi.org/10.1021/bi00368a024</span>
-</span><span id="About_proteusPy-281"><a href="#About_proteusPy-281"><span class="linenos">281</span></a><span class="sd">    * https://doi.org/10.1016/0092-8674(92)90140-8</span>
-</span><span id="About_proteusPy-282"><a href="#About_proteusPy-282"><span class="linenos">282</span></a><span class="sd">    * http://dx.doi.org/10.2174/092986708783330566</span>
-</span><span id="About_proteusPy-283"><a href="#About_proteusPy-283"><span class="linenos">283</span></a>
-</span><span id="About_proteusPy-284"><a href="#About_proteusPy-284"><span class="linenos">284</span></a><span class="sd">    *NB:* This distribution is actively being developed and will be difficult to implement </span>
-</span><span id="About_proteusPy-285"><a href="#About_proteusPy-285"><span class="linenos">285</span></a><span class="sd">    locally unless the BioPython patch is applied. Also, if you&#39;re running on an M-series Mac </span>
-</span><span id="About_proteusPy-286"><a href="#About_proteusPy-286"><span class="linenos">286</span></a><span class="sd">    then it&#39;s important to install Biopython first, since the generic release won&#39;t build </span>
-</span><span id="About_proteusPy-287"><a href="#About_proteusPy-287"><span class="linenos">287</span></a><span class="sd">    on the M1. 2/18/23 -egs</span>
-</span><span id="About_proteusPy-288"><a href="#About_proteusPy-288"><span class="linenos">288</span></a>
-</span><span id="About_proteusPy-289"><a href="#About_proteusPy-289"><span class="linenos">289</span></a><span class="sd">    Eric G. Suchanek, PhD. mailto:suchanek@mac.com</span>
-</span><span id="About_proteusPy-290"><a href="#About_proteusPy-290"><span class="linenos">290</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="About_proteusPy-291"><a href="#About_proteusPy-291"><span class="linenos">291</span></a>    <span class="k">return</span> <span class="n">About_proteusPy</span><span class="o">.</span><span class="vm">__doc__</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p><em>proteusPy</em> is a Python package specializing in the modeling and analysis of 
-proteins of known structure with an emphasis on Disulfide Bonds. This package 
-reprises my molecular modeling program <a href="https://doi.org/10.1021/bi00368a023">Proteus</a>, 
-and relies on the <a href="https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html">Turtle3D</a> 
-class. The turtle implements the functions <code>Move</code>, <code>Roll</code>, <code>Yaw</code>, <code>Pitch</code> 
-and <code>Turn</code> for movement in a three-dimensional space. The 
-<a href="https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html">Disulfide</a> class 
-implements methods to analyze the protein structure stabilizing element known as a 
-<em>Disulfide Bond</em>. This class and its underlying methods are being used to perform a 
-structural analysis of over 35,800 disulfide-bond containing proteins in the RCSB 
-protein data bank.</p>
-
-<h3 id="virtual-environment-installationcreation">Virtual Environment Installation/Creation</h3>
-
-<ol>
-<li>Install Anaconda (<a href="http://anaconda.org">http://anaconda.org</a>)
-<ul>
-<li>Create a new environment using python 3.9</li>
-<li>Activate the environment</li>
-</ul></li>
-<li>Build the environment. At this point it's probably best to clone the repo via github 
-since it contains all of the notebooks and test programs. Ultimately the distribution 
-can be used from pyPi as a normal package.
-<ul>
-<li>Using pyPi:
-<ul>
-<li>python3 -m pip install --index-url <a href="https://test.pypi.org/simple/"><a href="https://test.pypi.org/simple/"><a href="https://test.pypi.org/simple/">https://test.pypi.org/simple/</a></a></a> --extra-index-url <a href="https://pypi.org/simple/"><a href="https://pypi.org/simple/"><a href="https://pypi.org/simple/">https://pypi.org/simple/</a></a></a> proteusPy</li>
-</ul></li>
-<li>From gitHub:
-<ul>
-<li>Install git-lfs
-<ul>
-<li><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage">https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage</a></a></a></a></li>
-<li>From a shell prompt: git-lfs track "<em>.csv" "</em>.pkl" "*.mp4"</li>
-</ul></li>
-<li>git clone <a href="https://github.com/suchanek/proteusPy/proteusPy.git"><a href="https://github.com/suchanek/proteusPy/proteusPy.git"><a href="https://github.com/suchanek/proteusPy/proteusPy.git">https://github.com/suchanek/proteusPy/proteusPy.git</a></a></a></li>
-<li>cd into the repo</li>
-<li>pip install .</li>
-</ul></li>
-</ul></li>
-</ol>
-
-<h4 id="publications">Publications</h4>
-
-<ul>
-<li><a href="https://doi.org/10.1021/bi00368a023">https://doi.org/10.1021/bi00368a023</a></li>
-<li><a href="https://doi.org/10.1021/bi00368a024">https://doi.org/10.1021/bi00368a024</a></li>
-<li><a href="https://doi.org/10.1016/0092-8674(92)90140-8">https://doi.org/10.1016/0092-8674(92)90140-8</a></li>
-<li><a href="http://dx.doi.org/10.2174/092986708783330566">http://dx.doi.org/10.2174/092986708783330566</a></li>
-</ul>
-
-<p><em>NB:</em> This distribution is actively being developed and will be difficult to implement 
-locally unless the BioPython patch is applied. Also, if you're running on an M-series Mac 
-then it's important to install Biopython first, since the generic release won't build 
-on the M1. 2/18/23 -egs</p>
-
-<p>Eric G. Suchanek, PhD. mailto:suchanek@mac.com</p>
+            <div class="docstring"><p>Print memory used by the proteusPy process (GB).</p>
 </div>
 
 

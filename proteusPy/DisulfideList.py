@@ -22,6 +22,7 @@ import numpy
 
 import pandas as pd
 import pyvista as pv
+import plotly.express as px
 
 from collections import UserList
 from tqdm import tqdm
@@ -175,6 +176,12 @@ class DisulfideList(UserList):
         super().__init__(self.validate_ss(item) for item in iterable)
 
     def __getitem__(self, item):
+        '''
+        Retrieve a disulfide from the list. Internal only.
+
+        :param item: Index or slice
+        :return: Sublist
+        '''
         if isinstance(item, slice):
             indices = range(*item.indices(len(self.data)))
             name = self.data[0].pdb_id
@@ -189,13 +196,10 @@ class DisulfideList(UserList):
     # cylinders and atomic sphere meshes. Called by all high level routines
 
     def _render(self, style) -> pv.Plotter:
-        ''' 
-            Display a window showing the list of disulfides in the given style.
-            Argument:
-                self
-                style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd'
-            Returns:
-                Window displaying the Disulfides.
+        '''
+        Display a window showing the list of disulfides in the given style.
+        :param style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd'
+        :return: Window in the relevant style
         '''
         ssList = self.data
         name = self.id
@@ -259,6 +263,26 @@ class DisulfideList(UserList):
             total += ss1.energy
 
         return total/tot
+   
+    @property
+    def Average_Conformation(self):
+        '''
+        Return the Average conformation for the Disulfides in the list.
+
+        :return: Average conformation: [x1, x2, x3, x4, x5]
+        '''
+
+        sslist = self.data
+        tot = len(sslist)
+
+        tors = self.build_torsion_df()
+
+        res = numpy.zeros(5)
+
+        for ss, i in zip(sslist, range(tot)):
+            res += ss.torsion_array
+        
+        return res/tot
    
     def append(self, item):
         '''
@@ -377,7 +401,15 @@ class DisulfideList(UserList):
             else:
                 print(f'Cross chain SS: {ss.repr_compact}:')
         return reslist
-    
+
+    def calculate_torsion_statistics(self):
+        df = self.build_torsion_df()
+        columns = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'energy', 'torsion_length']
+        stats = {}
+        for col in columns:
+            stats[col] = {'mean': df[col].mean(), 'std': df[col].std()}
+        return stats
+
     def display(self, style='sb', light=True):
         '''
         Display the Disulfide list in the specific rendering style.
@@ -405,6 +437,23 @@ class DisulfideList(UserList):
         pl.reset_camera()
         pl.show()
  
+    def display_torsion_statistics(self, stats):
+        title = self.pdb_id
+
+        df = pd.DataFrame(stats)
+        df = df.transpose().reset_index().rename(columns={"index": "Column"})
+        fig = px.bar(df, x="Column", y="mean", error_y="std", title="Statistics")
+        fig.update_layout(
+            title={
+                'text': title,
+                'y':0.95,
+                'x':0.5,
+                'xanchor': 'center',
+                'yanchor': 'top'})
+        fig.update_traces(error_y_thickness=1.5, error_y_color='gray',
+                        texttemplate='%{y:.2f} ± %{error_y.array:.2f}', textposition='outside')
+        fig.show()
+
     @property
     def distance_df(self) -> pd.DataFrame:
         '''
@@ -621,6 +670,11 @@ class DisulfideList(UserList):
         '''
         self.res = value
     
+    def TorsionGraph(self):
+        stats = self.calculate_torsion_statistics()
+        self.display_torsion_statistics(stats)
+
+
     def insert(self, index, item):
         '''
         Insert a Disulfide into the list at the specified index
