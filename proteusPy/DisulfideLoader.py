@@ -286,30 +286,13 @@ class DisulfideLoader:
         return res
     
     def concat_dataframes(self, df1, df2):
-        """Concatenates columns from one data frame into the other and returns the new result.
+        """
+        Concatenates columns from one data frame into the other and returns the new result.
 
         :param df1 : pandas.DataFrame - The first data frame.
         :param df2 : pandas.DataFrame - The second data frame.
 
         :return: pandas.DataFrame - The concatenated data frame.
-
-        Examples
-        --------
-        >>> df1 = pd.DataFrame({
-        ...     'SS_Classname': ['A', 'B', 'C'],
-        ...     'SS_Column1': [1, 2, 3],
-        ...     'SS_Column2': [4, 5, 6]
-        ... })
-        >>> df2 = pd.DataFrame({
-        ...     'SS_Classname': ['A', 'B', 'C'],
-        ...     'SS_Column3': [7, 8, 9],
-        ...     'SS_Column4': [10, 11, 12]
-        ... })
-        >>> concat_dataframes(df1, df2)
-        SS_Classname  SS_Column1  SS_Column2  SS_Column3  SS_Column4
-        0            A           1           4           7          10
-        1            B           2           5           8          11
-        2            C           3           6           9          12
         """
         # Merge the data frames based on the 'SS_Classname' column
         result = pd.merge(df1, df2, on='class_id')
@@ -349,7 +332,6 @@ class DisulfideLoader:
         Lowest Energy Disulfide:            2q7q_75D_140D
         Highest Energy Disulfide:           1toz_456A_467A
         Total RAM Used:                     29.26 GB.
-        ================= proteusPy: 0.55dev =======================
 
         '''
         vers = proteusPy.__version__
@@ -549,7 +531,9 @@ class DisulfideClass_Constructor():
     # 'ca_distance_std','torsion_length_mean','torsion_length_std','energy_mean','energy_std']
 
     def concat_dataframes(self, df1, df2):
-        """Concatenates columns from one data frame into the other and returns the new result.
+        """
+        Concatenates columns from one data frame into the other 
+        and returns the new result.
 
         Parameters
         ----------
@@ -659,7 +643,7 @@ def create_classes(df):
     ...    'energy': [-2.3, -2.2, -2.1, -2.0, -1.9]
     ... })
     >>> create_classes(df)
-    class_id ss_id  count  incidence  percentage
+      class_id ss_id  count  incidence  percentage
     0    00200   [2]      1        0.2        20.0
     1    02020   [5]      1        0.2        20.0
     2    20020   [3]      1        0.2        20.0
@@ -711,7 +695,6 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
     except:
         mess = f'-> load_PDB_SS(): cannot open file {_fname}'
         raise DisulfideIOException(mess)
-
 
 if __name__ == "__main__":
     import doctest
