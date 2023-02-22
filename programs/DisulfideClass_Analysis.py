@@ -82,7 +82,7 @@ The
 # Cα Cβ Sγ
 
 import pandas as pd
-import numpy
+import time
 
 import pyvista as pv
 from pyvista import set_plot_theme
@@ -96,6 +96,8 @@ from proteusPy.data import *
 from proteusPy.Disulfide import *
 from proteusPy.DisulfideList import DisulfideList, load_disulfides_from_id
 from proteusPy.DisulfideLoader import Load_PDB_SS, DisulfideLoader
+
+start = time.time()
 
 # pyvista setup for notebooks
 pv.set_jupyter_backend('trame')
@@ -117,3 +119,11 @@ def analyze_classes(loader: DisulfideLoader):
     return
 
 analyze_classes(PDB_SS)
+
+end = time.time()
+elapsed = end - start
+
+print(f'Disulfide Class Analysis Complete! Elapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)')
+
+# end of file
+
