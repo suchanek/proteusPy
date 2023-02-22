@@ -438,15 +438,16 @@ class DisulfideList(UserList):
         pl.show()
  
     def display_torsion_statistics(self, stats):
-        title = self.pdb_id
+        len = self.length
+        title = f'{self.pdb_id}: {len} members'
 
         df = pd.DataFrame(stats)
         df = df.transpose().reset_index().rename(columns={"index": "Column"})
-        fig = px.bar(df, x="Column", y="mean", error_y="std", title="Statistics")
+        fig = px.bar(df, x="Column", y="mean", error_y="std", title=title)
         fig.update_layout(
             title={
                 'text': title,
-                'y':0.95,
+                'y':0.90,
                 'x':0.5,
                 'xanchor': 'center',
                 'yanchor': 'top'})
