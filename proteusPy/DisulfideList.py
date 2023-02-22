@@ -497,9 +497,10 @@ class DisulfideList(UserList):
                         texttemplate='%{y:.2f} ± %{error_y.array:.2f}', textposition='outside')
         
         # Set x-axis label for fig2
-        fig2.update_xaxes(title_text='Distances')
+        fig2.update_xaxes(title_text='Distance/Energy (A, kcal/mol)')
 
-        fig = make_subplots(rows=1, cols=2, subplot_titles=('Torsions','Distances'))
+        fig = make_subplots(rows=1, cols=2, 
+                            subplot_titles=('Torsions','Distances'))
 
         # add the first bar chart to the first subplot
         for trace in fig1.data:
@@ -512,6 +513,10 @@ class DisulfideList(UserList):
 
         # update the layout of the figure
         fig.update_layout(title=title)
+        fig.update_yaxes(title_text='Degrees', row=1, col=1)
+        fig.update_yaxes(title_standoff = 0)
+
+        fig.update_yaxes(title_text='(A)', row=1, col=2)
 
         
         if display:
