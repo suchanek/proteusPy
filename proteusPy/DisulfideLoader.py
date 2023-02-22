@@ -483,10 +483,19 @@ class DisulfideLoader:
         :param classid: Class ID, e.g. '+RHStaple'
         :return: DisulfideList of class members
         '''
+        from tqdm import tqdm
+        _PBAR_COLS = 105
+
         res = DisulfideList([], classid)
-        
+
         try:
             sslist = self.classdict[classid]
+            if self.verbose:
+                pbar = tqdm(sslist, ncols=_PBAR_COLS)
+                for ssid in pbar:
+                    res.append(self[ssid])
+                return res
+
             res = DisulfideList([self[ssid] for ssid in sslist], classid)
             return res
         except KeyError:
