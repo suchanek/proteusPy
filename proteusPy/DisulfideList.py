@@ -19,10 +19,14 @@ Last revision: 2/14/2023
 __pdoc__ = {'__all__': True}
 
 import numpy
+import numpy as np
 
 import pandas as pd
 import pyvista as pv
 import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
 
 from collections import UserList
 from tqdm import tqdm
@@ -36,6 +40,14 @@ from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR, WINSIZE
 from Bio.PDB import PDBParser
 
 _PBAR_COLS = 105
+
+# Set the figure sizes and axis limits.
+DPI = 220
+WIDTH = 6.0
+HEIGHT = 3.0
+TORMIN = -179.0
+TORMAX = 180.0
+GRIDSIZE = 20
 
 Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', \
            'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
@@ -277,7 +289,7 @@ class DisulfideList(UserList):
 
         tors = self.build_torsion_df()
 
-        res = numpy.zeros(5)
+        res = np.zeros(5)
 
         for ss, i in zip(sslist, range(tot)):
             res += ss.torsion_array
@@ -404,11 +416,22 @@ class DisulfideList(UserList):
 
     def calculate_torsion_statistics(self):
         df = self.build_torsion_df()
-        columns = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'energy', 'torsion_length']
-        stats = {}
-        for col in columns:
-            stats[col] = {'mean': df[col].mean(), 'std': df[col].std()}
-        return stats
+        tor_cols = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'torsion_length']
+        dist_cols = ['ca_distance', 'energy']
+        tor_stats = {}
+        dist_stats = {}
+
+        for col in tor_cols:
+            tor_stats[col] = {'mean': df[col].mean(), 'std': df[col].std()}
+            
+
+        for col in dist_cols:
+            dist_stats[col] = {'mean': df[col].mean(), 'std': df[col].std()}
+
+        tor_stats = pd.DataFrame(tor_stats, columns=tor_cols)
+        dist_stats = pd.DataFrame(dist_stats, columns=dist_cols)
+
+        return tor_stats, dist_stats
 
     def display(self, style='sb', light=True):
         '''
@@ -436,27 +459,121 @@ class DisulfideList(UserList):
         pl.link_views()
         pl.reset_camera()
         pl.show()
- 
-    def display_torsion_statistics(self, stats, display=True, save=False, fname='ss_torsions.png'):
+
+    def display_torsion_statistics(self, tor_stats, dist_stats, display=True, save=False, fname='ss_torsions.png'):
         len = self.length
         title = f'{self.pdb_id}: {len} members'
 
-        df = pd.DataFrame(stats)
-        df = df.transpose().reset_index().rename(columns={"index": "Column"})
-        fig = px.bar(df, x="Column", y="mean", error_y="std", title=title)
-        fig.update_layout(
+        df_tor = pd.DataFrame(tor_stats)
+        df_tor = df_tor.transpose().reset_index().rename(columns={"index": "Dihedral"})
+        
+        df_dist = pd.DataFrame(dist_stats)
+        df_dist = df_dist.transpose().reset_index().rename(columns={"index": "Distance"})
+
+        fig1 = px.bar(df_tor, x="Dihedral", y="mean", error_y="std", title=title)
+        fig1.update_layout(
+            title={
+                'text': title,
+                'y':0.90,
+                'x':0.5,
+                'xanchor': 'center',
+                'yanchor': 'top'},    
+                )
+        fig1.update_traces(error_y_thickness=1.5, error_y_color='gray',
+                        texttemplate='%{y:.2f} ± %{error_y.array:.2f}', textposition='outside')
+        
+        # Set x-axis label for fig1
+        fig1.update_xaxes(title_text='Dihedrals')
+
+        fig2 = px.bar(df_dist, x="Distance", y="mean", error_y="std", title=title)
+        fig2.update_layout(
             title={
                 'text': title,
                 'y':0.90,
                 'x':0.5,
                 'xanchor': 'center',
                 'yanchor': 'top'})
-        fig.update_traces(error_y_thickness=1.5, error_y_color='gray',
+        fig2.update_traces(error_y_thickness=1.5, error_y_color='gray',
                         texttemplate='%{y:.2f} ± %{error_y.array:.2f}', textposition='outside')
+        
+        # Set x-axis label for fig2
+        fig2.update_xaxes(title_text='Distances')
+
+        fig = make_subplots(rows=1, cols=2, subplot_titles=('Torsions','Distances'))
+
+        # add the first bar chart to the first subplot
+        for trace in fig1.data:
+            fig.add_trace(trace, row=1, col=1)
+
+        # add the second bar chart to the second subplot
+        
+        for trace in fig2.data:
+            fig.add_trace(trace, row=1, col=2)
+
+        # update the layout of the figure
+        fig.update_layout(title=title)
+
+        
         if display:
             fig.show()
         if save:
             fig.write_image(fname)
+        
+        return
+
+    def Odisplay_torsion_statistics(self, tor_stats, dist_stats, display=True, save=False, fname='ss_torsions.png'):
+        len = self.length
+        title = f'{self.pdb_id}: {len} members'
+
+        df_tor = pd.DataFrame(tor_stats)
+        df_tor = df_tor.transpose().reset_index().rename(columns={"index": "Dihedral"})
+        
+        df_dist = pd.DataFrame(dist_stats)
+        df_dist = df_dist.transpose().reset_index().rename(columns={"index": "Distance"})
+
+        fig1 = px.bar(df_tor, x="Dihedral", y="mean", error_y="std", title=title)
+        fig1.update_layout(
+            title={
+                'text': title,
+                'y':0.90,
+                'x':0.5,
+                'xanchor': 'center',
+                'yanchor': 'top'},    
+                )
+        fig1.update_xaxes(title_text='Dihedrals')
+        fig1.update_traces(error_y_thickness=1.5, error_y_color='gray',
+                        texttemplate='%{y:.2f} ± %{error_y.array:.2f}', textposition='outside')
+
+        fig2 = px.bar(df_dist, x="Distance", y="mean", error_y="std", title=title)
+        fig2.update_layout(
+            title={
+                'text': title,
+                'y':0.90,
+                'x':0.5,
+                'xanchor': 'center',
+                'yanchor': 'top'})
+        fig2.update_xaxes(title_text='Distances')
+        fig2.update_traces(error_y_thickness=1.5, error_y_color='gray',
+                        texttemplate='%{y:.2f} ± %{error_y.array:.2f}', textposition='outside')
+        fig = make_subplots(rows=1, cols=2)
+
+        # add the first bar chart to the first subplot
+        for trace in fig1.data:
+            fig.add_trace(trace, row=1, col=1)
+
+        # add the second bar chart to the second subplot
+        for trace in fig2.data:
+            fig.add_trace(trace, row=1, col=2)
+
+        # update the layout of the figure
+        fig.update_layout(title=title)
+        
+        if display:
+            fig.show()
+        if save:
+            fig.write_image(fname)
+        
+        return
 
     @property
     def distance_df(self) -> pd.DataFrame:
@@ -524,7 +641,7 @@ class DisulfideList(UserList):
 
         pl.add_axes()
 
-        mycol = numpy.zeros(shape=(tot_ss, 3))
+        mycol = np.zeros(shape=(tot_ss, 3))
         mycol = get_jet_colormap(tot_ss)
 
         # scale the overlay bond radii down so that we can see the individual elements better
@@ -611,7 +728,7 @@ class DisulfideList(UserList):
 
         return res_dict
 
-    def get_torsion_array(self):
+    def Oget_torsion_array(self):
         """
         Returns an rows X 5 array representing the dihedral angles
         in the given disulfide list.
@@ -619,11 +736,30 @@ class DisulfideList(UserList):
         """
         sslist = self.data
         tot = len(sslist)
-        res = numpy.zeros(shape=(tot, 5))
+        res = np.zeros(shape=(tot, 5))
 
         for idx, ss in zip(range(tot), sslist):
             row = ss.torsion_array
             res[idx] = row
+        return res
+
+
+    def get_torsion_array(self):
+        """
+        Returns a 2D NumPy array representing the dihedral angles in the given disulfide list.
+
+        :return: A 2D NumPy array of shape (n, 5), where n is the number of disulfide bonds in the list. Each row
+                of the array represents the dihedral angles of a disulfide bond, in the following order:
+                [X1_i, X2_i, X3_i, X4_i, X5_i], where i is the index of the disulfide bond in the list.
+        """
+        sslist = self.data
+        tot = len(sslist)
+        res = np.zeros(shape=(tot, 5))
+
+        for idx, ss in enumerate(sslist):
+            row = ss.torsion_array
+            res[idx, :] = row
+
         return res
 
     def has_chain(self, chain) -> bool:
@@ -675,8 +811,8 @@ class DisulfideList(UserList):
         self.res = value
     
     def TorsionGraph(self, display=True, save=False, fname='ss_torsions.png'):
-        stats = self.calculate_torsion_statistics()
-        self.display_torsion_statistics(stats, display=display, save=save, fname=fname)
+        tor_stats, dist_stats = self.calculate_torsion_statistics()
+        self.display_torsion_statistics(tor_stats, dist_stats, display=display, save=save, fname=fname)
 
 
     def insert(self, index, item):
