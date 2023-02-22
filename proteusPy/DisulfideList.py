@@ -437,7 +437,7 @@ class DisulfideList(UserList):
         pl.reset_camera()
         pl.show()
  
-    def display_torsion_statistics(self, stats):
+    def display_torsion_statistics(self, stats, display=True, save=False, fname='ss_torsions.png'):
         len = self.length
         title = f'{self.pdb_id}: {len} members'
 
@@ -453,7 +453,10 @@ class DisulfideList(UserList):
                 'yanchor': 'top'})
         fig.update_traces(error_y_thickness=1.5, error_y_color='gray',
                         texttemplate='%{y:.2f} ± %{error_y.array:.2f}', textposition='outside')
-        fig.show()
+        if display:
+            fig.show()
+        if save:
+            fig.write_image(fname)
 
     @property
     def distance_df(self) -> pd.DataFrame:
@@ -671,9 +674,9 @@ class DisulfideList(UserList):
         '''
         self.res = value
     
-    def TorsionGraph(self):
+    def TorsionGraph(self, display=True, save=False, fname='ss_torsions.png'):
         stats = self.calculate_torsion_statistics()
-        self.display_torsion_statistics(stats)
+        self.display_torsion_statistics(stats, display=display, save=save, fname=fname)
 
 
     def insert(self, index, item):

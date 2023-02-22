@@ -1,24 +1,19 @@
-'''
-Disulfide Class definition using the +/- formalism of Hogg et al. (Biochem, 2006, 45, 7429-7433), across
-all 32 possible classes $$2^5$$. Classes are named per Hogg's convention.
-
-The
 +----+----------+----------+----------+----------+----------+------------+----------------+------------+
 | IDX|   chi1_s |   chi2_s |   chi3_s |   chi4_s |   chi5_s |   class_id | SS_Classname   | FXN        |
 +====+==========+==========+==========+==========+==========+============+================+============+
-|  0 |       -1 |       -1 |       -1 |       -1 |       -1 |      00000 | -LHSpiral      | UNK        |
+|  0 |       -1 |       -1 |       -1 |       -1 |       -1 |          0 | -LHSpiral      | UNK        |
 +----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  1 |       -1 |       -1 |       -1 |       -1 |        1 |      00002 | 00002          | UNK        |
+|  1 |       -1 |       -1 |       -1 |       -1 |        1 |          2 | 00002          | UNK        |
 +----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  2 |       -1 |       -1 |       -1 |        1 |       -1 |      00020 | -LHHook        | UNK        |
+|  2 |       -1 |       -1 |       -1 |        1 |       -1 |         20 | -LHHook        | UNK        |
 +----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  3 |       -1 |       -1 |       -1 |        1 |        1 |      00022 | 00022          | UNK        |
+|  3 |       -1 |       -1 |       -1 |        1 |        1 |         22 | 00022          | UNK        |
 +----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  4 |       -1 |       -1 |        1 |       -1 |       -1 |      00200 | -RHStaple      | Allosteric |
+|  4 |       -1 |       -1 |        1 |       -1 |       -1 |        200 | -RHStaple      | Allosteric |
 +----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  5 |       -1 |       -1 |        1 |       -1 |        1 |      00202 | 00202          | UNK        |
+|  5 |       -1 |       -1 |        1 |       -1 |        1 |        202 | 00202          | UNK        |
 +----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  6 |       -1 |       -1 |        1 |        1 |       -1 |       220 | 00220          | UNK        |
+|  6 |       -1 |       -1 |        1 |        1 |       -1 |        220 | 00220          | UNK        |
 +----+----------+----------+----------+----------+----------+------------+----------------+------------+
 |  7 |       -1 |       -1 |        1 |        1 |        1 |        222 | 00222          | UNK        |
 +----+----------+----------+----------+----------+----------+------------+----------------+------------+
@@ -70,50 +65,3 @@ The
 +----+----------+----------+----------+----------+----------+------------+----------------+------------+
 | 31 |        1 |        1 |        1 |        1 |        1 |      22222 | +RHSpiral      | UNK        |
 +----+----------+----------+----------+----------+----------+------------+----------------+------------+
-'''
-
-
-# DisulfideBond Class Exploration
-# Author: Eric G. Suchanek, PhD.
-# (c) 2023 Eric G. Suchanek, PhD., All Rights Reserved
-# License: MIT
-
-# Last Modification: 2/21/2023
-# Cα Cβ Sγ
-
-import pandas as pd
-import numpy
-
-import pyvista as pv
-from pyvista import set_plot_theme
-
-from Bio.PDB import *
-
-# for using from the repo we 
-import proteusPy
-from proteusPy import *
-from proteusPy.data import *
-from proteusPy.Disulfide import *
-from proteusPy.DisulfideList import DisulfideList, load_disulfides_from_id
-from proteusPy.DisulfideLoader import Load_PDB_SS, DisulfideLoader
-
-# pyvista setup for notebooks
-pv.set_jupyter_backend('trame')
-set_plot_theme('dark')
-
-PDB_SS = Load_PDB_SS(verbose=True, subset=False)
-_PBAR_COLS = 105
-
-def analyze_classes(loader: DisulfideLoader):
-    classes = loader.classdict
-    tot_classes = len(classes)
-
-    pbar = enumerate(classes)
-    for idx, cls in pbar:
-        print(f'--> analyze_classes(): {cls} {idx+1}/{tot_classes}')
-        class_ss_list = loader.from_class(cls)
-        fname = f'./classes/ss_class_{idx}.png'
-        class_ss_list.TorsionGraph(display=False, save=True, fname=fname)
-    return
-
-analyze_classes(PDB_SS)
