@@ -460,11 +460,31 @@ class DisulfideList(UserList):
         pl.reset_camera()
         pl.show()
 
-    def display_torsion_statistics(self, tor_stats, dist_stats, display=True, 
-                                   save=False, fname='ss_torsions.png',
-                                   light=True):
-        len = self.length
-        title = f'{self.pdb_id}: {len} members'
+    def Display_torsion_statistics(sslist, tor_stats, dist_stats, 
+                                display=True, 
+                                save=False, 
+                                fname='ss_torsions.png',
+                                light=True): 
+        """Display torsion and distance statistics for a given Disulfide list.
+
+        :param sslist: A DisulfideList object containing the list of Disulfides to analyze.
+        :type sslist: DisulfideList
+        :param tor_stats: A dictionary containing torsion angle statistics for the given Disulfide list.
+        :type tor_stats: dict
+        :param dist_stats: A dictionary containing distance and energy statistics for the given Disulfide list.
+        :type dist_stats: dict
+        :param display: Whether to display the plot in the notebook. Default is True.
+        :type display: bool
+        :param save: Whether to save the plot as an image file. Default is False.
+        :type save: bool
+        :param fname: The name of the image file to save. Default is 'ss_torsions.png'.
+        :type fname: str
+        :param light: Whether to use the 'plotly_light' or 'plotly_dark' template. Default is True.
+        :type light: bool
+        :return: None
+        """
+        length = len(sslist) # should be len(sslist), not sslist.length
+        title = f'{sslist.pdb_id}: {length} members'
         theme = 'plotly_light' if light else 'plotly_dark'
 
         df_tor = pd.DataFrame(tor_stats)
@@ -473,9 +493,10 @@ class DisulfideList(UserList):
         df_dist = pd.DataFrame(dist_stats)
         df_dist = df_dist.transpose().reset_index().rename(columns={"index": "Distance"})
 
-        fig = make_subplots(rows=2, cols=1, 
-                            subplot_titles=('Torsions','Distances + Energy')
-                            )
+        fig = make_subplots(rows=2, cols=1, vertical_spacing=.15,
+                            subplot_titles=('Torsions','Distances + Energy'),
+                            template='plotly' if light else 'plotly_dark')
+                            
         fig.update_layout(
             title={
                 'text': title,
@@ -485,45 +506,42 @@ class DisulfideList(UserList):
                 'yanchor': 'top'
                 },
             width=1024,
-            height=768,
+            height=1024,
             )
         
-        fig1 = px.bar(df_tor, x="Dihedral", y="mean", error_y="std", title=title)
-        
-        fig1.update_traces(error_y_thickness=1.5, error_y_color='red',
-                        texttemplate='%{y:.2f}° ± %{error_y.array:.2f}°', textposition='outside')
-        # Set x-axis label for fig1
-        fig1.update_xaxes(title_text='Dihedrals')
-        fig1.update_xaxes(ticktext=['X1', 'X2', 'X3', 'X2\'', 'X1'])
-
-        fig2 = px.bar(df_dist, x="Distance", y="mean", error_y="std", title=title)
-        
-        fig2.update_traces(error_y_thickness=1.5, error_y_color='gray',
-                        texttemplate='%{y:.2f} ± %{error_y.array:.2f}', textposition='outside')
-        
-        # Set x-axis label for fig2
-        fig2.update_xaxes(title_text='Distance/Energy (Å, kcal/mol)')
-
-        
-        # add the first bar chart to the first subplot
-        fig1.update_yaxes(range=[-180, 180])
-
-        for trace in fig1.data:
-            fig.add_trace(trace, row=1, col=1)
-
-        # add the second bar chart to the second subplot
-        
-        for trace in fig2.data:
-            fig.add_trace(trace, row=2, col=1)
-
-        # update the layout of the figure !!!
-        # fig.update_layout(title=title)
-        # fig.update_layout(width=1024)
-        
-        fig.update_yaxes(title_text='Dihedral Angle', row=1, col=1)
         fig.update_yaxes(title_standoff = 0)
-        fig.update_yaxes(title_text='(Å) & kcal/mol', row=2, col=1)
 
+        # add the first bar chart to the first subplot
+        fig.add_trace(go.Bar(
+            name='Torsion Angles',
+            x=['X1', 'X2', 'X3', 'X2\'', 'X1\''],
+            y=df_tor['mean'].values,
+            error_y=dict(type='data', array=df_tor['std'].values)
+            ), row=1, col=1)
+                
+        fig.update_traces(error_y_thickness=1.5, error_y_color='red', 
+                        texttemplate='%{y:.2f}° ± %{error_y.array:.2f}°', 
+                        hovertemplate='%{y:.2f}° ± %{error_y.array:.2f}°', 
+                        textposition='outside',
+                        row=1, col=1)
+        
+        # Set x-axis label for fig1
+        fig.update_yaxes(title_text='Dihedral Angle', row=1, col=1)
+        fig.update_yaxes(title_text='(Å) & kcal/mol', row=2, col=1)
+    
+        # add the second bar chart to the second subplot
+        fig.add_trace(go.Bar(
+            name='Distances',
+            x=['Ca Distance', 'Energy'],
+            y=df_dist['mean'].values,
+            error_y=dict(type='data', array=df_dist['std'].values)
+            ), row=2, col=1)
+    
+        fig.update_traces(error_y_thickness=1.5, error_y_color='red', 
+                        texttemplate='%{y:.2f} Å ± %{error_y.array:.2f} Å' if 'Distance' in df_dist.columns else '%{y:.2f} kcal/mol ± %{error_y.array:.2f} kcal/mol', 
+                        hovertemplate='%{y:.2f}° ± %{error_y.array:.2f}°', 
+                        textposition='outside',
+                        row=2, col=1)
         if display:
             fig.show()
         if save:
