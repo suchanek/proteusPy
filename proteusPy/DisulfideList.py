@@ -460,19 +460,14 @@ class DisulfideList(UserList):
         pl.reset_camera()
         pl.show()
 
-    def Display_torsion_statistics(sslist, tor_stats, dist_stats, 
-                                display=True, 
-                                save=False, 
-                                fname='ss_torsions.png',
-                                light=True): 
-        """Display torsion and distance statistics for a given Disulfide list.
+    def display_torsion_statistics(self, 
+                            display=True, 
+                            save=False, 
+                            fname='ss_torsions.png',
+                            light=True):
+        """
+        Display torsion and distance statistics for a given Disulfide list.
 
-        :param sslist: A DisulfideList object containing the list of Disulfides to analyze.
-        :type sslist: DisulfideList
-        :param tor_stats: A dictionary containing torsion angle statistics for the given Disulfide list.
-        :type tor_stats: dict
-        :param dist_stats: A dictionary containing distance and energy statistics for the given Disulfide list.
-        :type dist_stats: dict
         :param display: Whether to display the plot in the notebook. Default is True.
         :type display: bool
         :param save: Whether to save the plot as an image file. Default is False.
@@ -483,72 +478,74 @@ class DisulfideList(UserList):
         :type light: bool
         :return: None
         """
-        length = len(sslist) # should be len(sslist), not sslist.length
-        title = f'{sslist.pdb_id}: {length} members'
-        theme = 'plotly_light' if light else 'plotly_dark'
+        title = f'{self.id}: {self.length} members'
 
-        df_tor = pd.DataFrame(tor_stats)
-        df_tor = df_tor.transpose().reset_index().rename(columns={"index": "Dihedral"})
+        df = self.torsion_df
+        df_subset = df.iloc[:, 4:]
+        df_stats = df_subset.describe()
+
+        mean_vals = df_stats.loc['mean'].values
+        std_vals = df_stats.loc['std'].values
         
-        df_dist = pd.DataFrame(dist_stats)
-        df_dist = df_dist.transpose().reset_index().rename(columns={"index": "Distance"})
-
-        fig = make_subplots(rows=2, cols=1, vertical_spacing=.15,
-                            subplot_titles=('Torsions','Distances + Energy'),
-                            template='plotly' if light else 'plotly_dark')
-                            
+        fig = make_subplots(rows=2, cols=2, vertical_spacing=.125,
+                                subplot_titles=('Torsions','Energies', 'Distances', 'Dist2'))
+        fig.update_layout(template='plotly' if light else 'plotly_dark')
+        
         fig.update_layout(
-            title={
-                'text': title,
-                'xanchor': 'center',
-                'y':.95,
-                'x':0.5,
-                'yanchor': 'top'
-                },
-            width=1024,
-            height=1024,
-            )
+                title={
+                    'text': title,
+                    'xanchor': 'center',
+                    # 'y':.9,
+                    'x':0.5,
+                    'yanchor': 'top'
+                    },
+                width=1024,
+                height=1024,
+                )
         
-        fig.update_yaxes(title_standoff = 0)
+        fig.add_trace(go.Bar(x=['X1', 'X2', 'X3', 'X4', 'X5'], y=mean_vals[:5], name="Dihedral Angles Mean", 
+                                error_y=dict(type='data', array=std_vals[:5], visible=True)),
+                                row=1, col=1)
+        # Update the layout of the subplot
 
-        # add the first bar chart to the first subplot
-        fig.add_trace(go.Bar(
-            name='Torsion Angles',
-            x=['X1', 'X2', 'X3', 'X2\'', 'X1\''],
-            y=df_tor['mean'].values,
-            error_y=dict(type='data', array=df_tor['std'].values)
-            ), row=1, col=1)
-                
-        fig.update_traces(error_y_thickness=1.5, error_y_color='red', 
-                        texttemplate='%{y:.2f}° ± %{error_y.array:.2f}°', 
-                        hovertemplate='%{y:.2f}° ± %{error_y.array:.2f}°', 
-                        textposition='outside',
-                        row=1, col=1)
+        #fig.update_xaxes(title_text="Dihedral Angles", row=1, col=1)
+        fig.update_yaxes(title_text="Dihedral Mean Values", row=1, col=1)
+
+        # Add another subplot for the mean values of energy
+        fig.add_trace(go.Bar(x=['Torsion Energy'], y=[mean_vals[6]], name="Energy Mean (kcal/mol)",
+                error_y=dict(type='data', array=[std_vals[6].tolist()], visible=True)),
+                row=1, col=2)
+        # Update the layout of the subplot
+        #fig.update_xaxes(title_text="Energy", row=1, col=2)
+        fig.update_yaxes(title_text="kcal/mol", row=1, col=2)
         
-        # Set x-axis label for fig1
-        fig.update_yaxes(title_text='Dihedral Angle', row=1, col=1)
-        fig.update_yaxes(title_text='(Å) & kcal/mol', row=2, col=1)
-    
-        # add the second bar chart to the second subplot
-        fig.add_trace(go.Bar(
-            name='Distances',
-            x=['Ca Distance', 'Energy'],
-            y=df_dist['mean'].values,
-            error_y=dict(type='data', array=df_dist['std'].values)
-            ), row=2, col=1)
-    
-        fig.update_traces(error_y_thickness=1.5, error_y_color='red', 
-                        texttemplate='%{y:.2f} Å ± %{error_y.array:.2f} Å' if 'Distance' in df_dist.columns else '%{y:.2f} kcal/mol ± %{error_y.array:.2f} kcal/mol', 
-                        hovertemplate='%{y:.2f}° ± %{error_y.array:.2f}°', 
-                        textposition='outside',
+        
+        # Add another subplot for the mean values of ca_distance
+        fig.add_trace(go.Bar(x=['Ca Distance'], y=[mean_vals[7]], name="CA Distance Mean",
+                        error_y=dict(type='data', array=[std_vals[7].tolist()], visible=True)),
                         row=2, col=1)
+        # Update the layout of the subplot
+        #fig.update_xaxes(title_text="Columns", row=2, col=1)
+        fig.update_yaxes(title_text="Distance (A)", row=2, col=1)
+
+
+        # Add a scatter subplot for torsion length column
+        fig.add_trace(go.Bar(x=['Torsion Length'], y=[mean_vals[11]], name="TorsionLength",
+                        error_y=dict(type='data', array=[std_vals[11]], visible=True)),
+                        row=2, col=2)
+        # Update the layout of the subplot
+        #fig.update_xaxes(title_text="Index", row=2, col=2)
+        fig.update_yaxes(title_text="Torsion Length Mean Values", row=2, col=2)
+
+        # Update the layout of the figure
+        fig.update_layout(title_text="Disulfide Family Analysis")
         if display:
             fig.show()
         if save:
             fig.write_image(fname)
-        
         return
-
+        
+    
     @property
     def distance_df(self) -> pd.DataFrame:
         '''
@@ -784,9 +781,9 @@ class DisulfideList(UserList):
         '''
         self.res = value
     
-    def TorsionGraph(self, display=True, save=False, fname='ss_torsions.png'):
-        tor_stats, dist_stats = self.calculate_torsion_statistics()
-        self.display_torsion_statistics(tor_stats, dist_stats, display=display, save=save, fname=fname)
+    def TorsionGraph(self, display=True, save=False, fname='ss_torsions.png', light=True):
+        #tor_stats, dist_stats = self.calculate_torsion_statistics()
+        self.display_torsion_statistics(display=display, save=save, fname=fname, light=light)
 
 
     def insert(self, index, item):
