@@ -534,12 +534,13 @@ class DisulfideList(UserList):
         df = self.torsion_df
         df_subset = df.iloc[:, 4:]
         df_stats = df_subset.describe()
+        
+        # print(df_stats.head())
 
         mean_vals = df_stats.loc['mean'].values
         std_vals = df_stats.loc['std'].values
         
-        fig = make_subplots(rows=2, cols=2, vertical_spacing=.125,
-                            subplot_titles=('Torsions','Energies', 'Distances', 'Dist2'))
+        fig = make_subplots(rows=2, cols=2, vertical_spacing=.125, column_widths=[1, 1])
         fig.update_layout(template='plotly' if light else 'plotly_dark')
         
         fig.update_layout(
@@ -554,40 +555,42 @@ class DisulfideList(UserList):
                 height=1024,
                 )
         
-        fig.add_trace(go.Bar(x=['X1', 'X2', 'X3', 'X4', 'X5'], y=mean_vals[:5], name="Dihedral Angles Mean", 
-                                error_y=dict(type='data', array=std_vals[:5], visible=True)),
+        fig.add_trace(go.Bar(x=['X1', 'X2', 'X3', 'X4', 'X5'], y=mean_vals[:4], name="Torsion Angle,(°) ", 
+                                error_y=dict(type='data', array=std_vals[:4], visible=True)),
                                 row=1, col=1)
         # Update the layout of the subplot
-        #fig.update_xaxes(title_text="Dihedral Angles", row=1, col=1)
-        fig.update_yaxes(title_text="Dihedral Mean Values", row=1, col=1)
+        # Cα N, Cα, Cβ, C', Sγ Å °
 
+        fig.update_yaxes(title_text="Torsion Angle (°)", range=[-200,200], row=1, col=1)
+        
         # Add another subplot for the mean values of energy
-        fig.add_trace(go.Bar(x=['Torsion Energy'], y=[mean_vals[6]], name="Energy Mean (kcal/mol)",
-                error_y=dict(type='data', array=[std_vals[6].tolist()], visible=True)),
+        fig.add_trace(go.Bar(x=['DSE (kcal/mol)'], y=[mean_vals[5]], name="Energy (kcal/mol)",
+                error_y=dict(type='data', array=[std_vals[5].tolist()], width=0.25, visible=True)),
                 row=1, col=2)
+        fig.update_traces(width=0.25, row=1, col=2)
+        
         # Update the layout of the subplot
         #fig.update_xaxes(title_text="Energy", row=1, col=2)
-        fig.update_yaxes(title_text="kcal/mol", row=1, col=2)
+        fig.update_yaxes(title_text="kcal/mol", range=[0, 20], row=1, col=2) # max possible DSE
         
         # Add another subplot for the mean values of ca_distance
-        fig.add_trace(go.Bar(x=['Ca Distance'], y=[mean_vals[7]], name="CA Distance Mean",
-                        error_y=dict(type='data', array=[std_vals[7].tolist()], visible=True)),
+        fig.add_trace(go.Bar(x=['Cα Distance, (Å)'], y=[mean_vals[6]], name="Cα Distance (Å)",
+                        error_y=dict(type='data', array=[std_vals[6].tolist()], width=0.25, visible=True)),
                         row=2, col=1)
         # Update the layout of the subplot
-        #fig.update_xaxes(title_text="Columns", row=2, col=1)
-        fig.update_yaxes(title_text="Distance (A)", row=2, col=1)
+        fig.update_yaxes(title_text="Distance (A)",range=[0, 10], row=2, col=1) #
+        fig.update_traces(width=0.25, row=2, col=1)
 
 
         # Add a scatter subplot for torsion length column
-        fig.add_trace(go.Bar(x=['Torsion Length'], y=[mean_vals[11]], name="TorsionLength",
-                        error_y=dict(type='data', array=[std_vals[11]], visible=True)),
+        fig.add_trace(go.Bar(x=['Torsion Length, (Å)'], y=[mean_vals[11]], name="Torsion Length, (Å)",
+                        error_y=dict(type='data', array=[std_vals[11]], width=0.25, visible=True)),
                         row=2, col=2)
         # Update the layout of the subplot
-        #fig.update_xaxes(title_text="Index", row=2, col=2)
-        fig.update_yaxes(title_text="Torsion Length Mean Values", row=2, col=2)
+        fig.update_yaxes(title_text="Torsion Length", row=2, col=2)
+        fig.update_traces(width=0.25, row=2, col=2)
 
-        # Update the layout of the figure
-
+        # Update the error bars
         fig.update_traces(error_y_thickness=1.5, error_y_color='gray',
                         texttemplate='%{y:.2f} ± %{error_y.array:.2f}', 
                         textposition='outside') #, row=1, col=1)
