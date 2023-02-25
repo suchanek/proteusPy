@@ -104,7 +104,7 @@ pv.set_jupyter_backend('trame')
 set_plot_theme('dark')
 
 PDB_SS = Load_PDB_SS(verbose=True, subset=False)
-_PBAR_COLS = 105
+_PBAR_COLS = 80
 
 def analyze_classes(loader: DisulfideLoader):
     classes = loader.classdict
