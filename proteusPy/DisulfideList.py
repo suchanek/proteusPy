@@ -413,6 +413,15 @@ class DisulfideList(UserList):
 
     def calculate_torsion_statistics(self):
         df = self.build_torsion_df()
+
+        df_subset = df.iloc[:, 4:]
+        df_stats = df_subset.describe()
+        
+        # print(df_stats.head())
+
+        mean_vals = df_stats.loc['mean'].values
+        std_vals = df_stats.loc['std'].values
+
         tor_cols = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'torsion_length']
         dist_cols = ['ca_distance', 'energy']
         tor_stats = {}
@@ -457,59 +466,6 @@ class DisulfideList(UserList):
         pl.reset_camera()
         pl.show()
 
-    def Odisplay_torsion_statistics(self, tor_stats, dist_stats, display=True, save=False, fname='ss_torsions.png'):
-        len = self.length
-        title = f'{self.pdb_id}: {len} members'
-
-        df_tor = pd.DataFrame(tor_stats)
-        df_tor = df_tor.transpose().reset_index().rename(columns={"index": "Dihedral"})
-        
-        df_dist = pd.DataFrame(dist_stats)
-        df_dist = df_dist.transpose().reset_index().rename(columns={"index": "Distance"})
-
-        fig1 = px.bar(df_tor, x="Dihedral", y="mean", error_y="std", title=title)
-        fig1.update_layout(
-            title={
-                'text': title,
-                'y':0.90,
-                'x':0.5,
-                'xanchor': 'center',
-                'yanchor': 'top'},    
-                )
-        fig1.update_xaxes(title_text='Dihedrals')
-        fig1.update_traces(error_y_thickness=1.5, error_y_color='gray',
-                        texttemplate='%{y:.2f} ± %{error_y.array:.2f}', textposition='outside')
-
-        fig2 = px.bar(df_dist, x="Distance", y="mean", error_y="std", title=title)
-        fig2.update_layout(
-            title={
-                'text': title,
-                'y':0.90,
-                'x':0.5,
-                'xanchor': 'center',
-                'yanchor': 'top'})
-        fig2.update_xaxes(title_text='Distances')
-        fig2.update_traces(error_y_thickness=1.5, error_y_color='gray',
-                        texttemplate='%{y:.2f} ± %{error_y.array:.2f}', textposition='outside')
-        fig = make_subplots(rows=1, cols=2)
-
-        # add the first bar chart to the first subplot
-        for trace in fig1.data:
-            fig.add_trace(trace, row=1, col=1)
-
-        # add the second bar chart to the second subplot
-        for trace in fig2.data:
-            fig.add_trace(trace, row=1, col=2)
-
-        # update the layout of the figure
-        fig.update_layout(title=title)
-        
-        if display:
-            fig.show()
-        if save:
-            fig.write_image(fname)
-        
-        return
     
     def display_torsion_statistics(self, 
                             display=True, 
@@ -555,13 +511,14 @@ class DisulfideList(UserList):
                 height=1024,
                 )
         
-        fig.add_trace(go.Bar(x=['X1', 'X2', 'X3', 'X4', 'X5'], y=mean_vals[:4], name="Torsion Angle,(°) ", 
-                                error_y=dict(type='data', array=std_vals[:4], visible=True)),
+        fig.add_trace(go.Bar(x=['X1', 'X2', 'X3', 'X4', 'X5'], y=mean_vals[:5], name="Torsion Angle,(°) ", 
+                                error_y=dict(type='data', array=std_vals[:5], visible=True)),
                                 row=1, col=1)
         # Update the layout of the subplot
         # Cα N, Cα, Cβ, C', Sγ Å °
 
         fig.update_yaxes(title_text="Torsion Angle (°)", range=[-200,200], row=1, col=1)
+        fig.update_yaxes(range=[0,320], row=2, col=2)
         
         # Add another subplot for the mean values of energy
         fig.add_trace(go.Bar(x=['DSE (kcal/mol)'], y=[mean_vals[5]], name="Energy (kcal/mol)",
