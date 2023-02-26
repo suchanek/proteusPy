@@ -46,13 +46,13 @@ _FLOAT_INIT = -999.9
 _ANG_INIT = -180.0
 
 # tqdm progress bar width
-_PBAR_COLS = 110
+from proteusPy.ProteusGlobals import PBAR_COLS
 
 # columns for the torsions file dataframe.
 global Torsion_DF_Cols
 
 Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', \
-           'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
+           'chi5', 'energy', 'ca_distance','cb_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
            'psi_dist', 'torsion_length']
 
 # Class definition for a Disulfide bond. 
@@ -179,6 +179,7 @@ class Disulfide:
         self.PERMISSIVE = permissive
         self.QUIET = quiet
         self.ca_distance = _FLOAT_INIT
+        self.cb_distance = _FLOAT_INIT
         self.torsion_array = np.array((_ANG_INIT, _ANG_INIT, _ANG_INIT, 
         								  _ANG_INIT, _ANG_INIT))
         self.phiprox = _ANG_INIT
@@ -676,6 +677,7 @@ class Disulfide:
         self.compute_torsional_energy()
         self.compute_local_coords()
         self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
+        self.cb_distance = distance3d(self.cb_prox, self.cb_dist)
         self.torsion_array = np.array((self.chi1, self.chi2, self.chi3, 
                                         self.chi4, self.chi5))
         self.torsion_length = self.Torsion_Length()
@@ -831,7 +833,7 @@ class Disulfide:
         src = self.pdb_id
         enrg = self.energy
 
-        title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Tors: {self.torsion_length:.2f}°'
+        title = f'{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Cβ: {self.cb_distance:.2f} Å Tors: {self.torsion_length:.2f}°'
 
         if light:
             pv.set_plot_theme('document')
@@ -1064,6 +1066,7 @@ class Disulfide:
         self.chi5 = np.degrees(calc_dihedral(sg2, cb2, ca2, n2))
 
         self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
+        self.cb_distance = distance3d(self.cb_prox, self.ca_dist)
         self.torsion_array = np.array((self.chi1, self.chi2, self.chi3, 
                                         self.chi4, self.chi5))
         self.torsion_length = self.Torsion_Length()
@@ -1279,6 +1282,13 @@ class Disulfide:
         s1 = f'Cα Distance: {self.ca_distance:.2f} Å'
         return s1
     
+    def repr_ss_cb_dist(self):
+        """
+        Representation for Disulfide Ca distance
+        """
+        s1 = f'Cβ Distance: {self.cb_distance:.2f} Å'
+        return s1
+    
     def repr_ss_torsion_length(self):
         """
         Representation for Disulfide torsion length
@@ -1298,9 +1308,10 @@ class Disulfide:
         s4 = self.repr_ss_conformation()
         s5 = self.repr_chain_ids()
         s6 = self.repr_ss_ca_dist()
+        s8 = self.repr_ss_cb_dist()
         s7 = self.repr_ss_torsion_length()
 
-        res = f'{s1} {s5} {s2} {s3} {s4} {s6} {s7}>'
+        res = f'{s1} {s5} {s2} {s3} {s4} {s6} {s7} {s8}>'
         return res
     
     def repr_compact(self) -> str:
@@ -1379,7 +1390,7 @@ class Disulfide:
         name = self.name
         enrg = self.energy
 
-        title = f'{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Tors: {self.torsion_length:.2f}'
+        title = f'{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Cβ: {self.cb_distance:.2f} Å, Tors: {self.torsion_length:.2f}'
 
         if light:
             pv.set_plot_theme('document')
@@ -1724,7 +1735,7 @@ def Download_Disulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR,
     completed.update(SS_done) # update the completed set with what's downloaded
 
     # Loop over all entries, 
-    pbar = tqdm(entries, ncols=_PBAR_COLS)
+    pbar = tqdm(entries, ncols=PBAR_COLS)
     for entry in pbar:
         pbar.set_postfix({'Entry': entry})
         if entry not in completed:
@@ -1919,9 +1930,9 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     # only do the last numb entries.
     
     if numb > 0:
-        pbar = tqdm(entrylist[:numb], ncols=_PBAR_COLS)
+        pbar = tqdm(entrylist[:numb], ncols=PBAR_COLS)
     else:
-        pbar = tqdm(entrylist, ncols=_PBAR_COLS)
+        pbar = tqdm(entrylist, ncols=PBAR_COLS)
 
     tot = 0
     cnt = 0
@@ -1950,7 +1961,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
                 All_ss_list.append(ss)
                 new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, 
                 		  ss.chi1, ss.chi2, ss.chi3, ss.chi4, ss.chi5, 
-                		  ss.energy, ss.ca_distance, ss.phiprox, 
+                		  ss.energy, ss.ca_distance, ss.cb_distance, ss.phiprox, 
                           ss.psiprox, ss.phidist, ss.psidist, ss.torsion_length]
                           
                 # add the row to the end of the dataframe

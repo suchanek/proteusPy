@@ -6,14 +6,13 @@ This program encapsulates the steps needed to extract disulfides from the PDB fi
 build the DisulfideLoader object, and save it into the proteusPy module data directory.
 
 Author: Eric G. Suchanek, PhD.
-Last revision: 2/12/23 -egs-
+Last revision: 2/26/23 -egs-
 '''
 
 import argparse
-
-from shutil import copytree, ignore_patterns
 import time
 import datetime
+from shutil import copytree, ignore_patterns
 
 from proteusPy.Disulfide import Extract_Disulfides
 from proteusPy.DisulfideLoader import DisulfideLoader
@@ -83,13 +82,13 @@ def do_build(verbose, full, subset):
         if verbose:
             print('--> Building the packed loader for the full dataset...')
         PDB_SS = DisulfideLoader(datadir=DATA_DIR, subset=False)
-        PDB_SS.save(savepath=DATA_DIR, subset=False, verbose=verbose)
+        PDB_SS.save(savepath=DATA_DIR, subset=False)
 
     if subset:
         if verbose:
             print('--> Building the packed loader for the Disulfide subset...')
         PDB_SS = DisulfideLoader(datadir=DATA_DIR, subset=True)
-        PDB_SS.save(savepath=DATA_DIR, subset=True, verbose=verbose)
+        PDB_SS.save(savepath=DATA_DIR, subset=True)
     
     return
 
@@ -98,14 +97,14 @@ def do_stuff(all=False, extract=False, build=True, full=False, update=True, subs
     '''
     Main entrypoint for the proteusPy Disulfide database extraction and creation workflow.
 
-    :param all: _description_, defaults to False
-    :param extract: _description_, defaults to False
-    :param build: _description_, defaults to True
-    :param full: _description_, defaults to False
-    :param update: _description_, defaults to True
-    :param subset: _description_, defaults to True
-    :param verbose: _description_, defaults to True
-    :param cutoff: _description_, defaults to -1.0
+    :param all: Extract the full database, defaults to False
+    :param extract: Perform extaction from raw PDB files, defaults to False
+    :param build: Build the loader(s), defaults to True
+    :param full: Build the full loader, defaults to False
+    :param update: Update the repo, defaults to True
+    :param subset: Extract the subset, defaults to True
+    :param verbose: Be noisy, defaults to True
+    :param cutoff: Distance cutoff (A), defaults to -1.0 for full extract
     '''
     _extract = extract
     _build = build
@@ -128,47 +127,54 @@ def do_stuff(all=False, extract=False, build=True, full=False, update=True, subs
     if _update == True:
         print(f'Copying: {DATA_DIR} to {MODULE_DATA}')
         copytree(DATA_DIR, MODULE_DATA, dirs_exist_ok=True, ignore=ignore_patterns('*_pruned_*'))
-
     return
 
-start = time.time()
+def main():
+    start = time.time()
 
-parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser()
 
-parser.add_argument("-a", "--all", help="do everything. Extract, build and save both datasets", action=argparse.BooleanOptionalAction)
-parser.add_argument("-c", "--cutoff", help="distance cutoff for disulfide distance pruning", type=float, required=False)
-parser.add_argument("-u", "--update", help="update the repo package", action=argparse.BooleanOptionalAction)
-parser.add_argument("-v", "--verbose", help="level of verbosity", action=argparse.BooleanOptionalAction)
-parser.add_argument("-e", "--extract", help="extract disulfides from the PDB structure files", action=argparse.BooleanOptionalAction)
-parser.add_argument("-f", "--full", help="extract all disulfides from the PDB structure files", action=argparse.BooleanOptionalAction)
-parser.add_argument("-b", "--build", help="rebuild the loader", action=argparse.BooleanOptionalAction)
-parser.add_argument("-s", "--subset", help="rebuild the subset only", action=argparse.BooleanOptionalAction)
+    parser.add_argument("-a", "--all", help="do everything. Extract, build and save both datasets", action=argparse.BooleanOptionalAction)
+    parser.add_argument("-c", "--cutoff", help="distance cutoff for disulfide distance pruning", type=float, required=False)
+    parser.add_argument("-u", "--update", help="update the repo package", action=argparse.BooleanOptionalAction)
+    parser.add_argument("-v", "--verbose", help="level of verbosity", action=argparse.BooleanOptionalAction)
+    parser.add_argument("-e", "--extract", help="extract disulfides from the PDB structure files", action=argparse.BooleanOptionalAction)
+    parser.add_argument("-f", "--full", help="extract all disulfides from the PDB structure files", action=argparse.BooleanOptionalAction)
+    parser.add_argument("-b", "--build", help="rebuild the loader", action=argparse.BooleanOptionalAction)
+    parser.add_argument("-s", "--subset", help="rebuild the subset only", action=argparse.BooleanOptionalAction)
 
-parser.set_defaults(all=True)
-parser.set_defaults(update=True)
-parser.set_defaults(verbose=True)
-parser.set_defaults(extract=True)
-parser.set_defaults(subset=True)
-parser.set_defaults(build=True)
-parser.set_defaults(full=False)
-parser.set_defaults(cutoff=-1.0)
+    parser.set_defaults(all=False)
+    parser.set_defaults(update=True)
+    parser.set_defaults(verbose=True)
+    parser.set_defaults(extract=False)
+    parser.set_defaults(subset=True)
+    parser.set_defaults(build=True)
+    parser.set_defaults(full=True)
+    parser.set_defaults(cutoff=-1.0)
 
-args = parser.parse_args()
+    args = parser.parse_args()
 
-all = args.all
-extract = args.extract
-build = args.build
-update = args.update
-full = args.full
-subset = args.subset
-verbose = args.verbose
-cutoff = args.cutoff
+    all = args.all
+    extract = args.extract
+    build = args.build
+    update = args.update
+    full = args.full
+    subset = args.subset
+    verbose = args.verbose
+    cutoff = args.cutoff
 
-do_stuff(all=all, extract=extract, build=build, full=full, update=update, subset=subset, verbose=verbose, cutoff=cutoff)
+    do_stuff(all=all, extract=extract, build=build, full=full, update=update, subset=subset, verbose=verbose, cutoff=cutoff)
 
-end = time.time()
-elapsed = end - start
+    end = time.time()
+    elapsed = end - start
 
-print(f'DisulfideExtractor Complete! Elapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)')
+    print(f'DisulfideExtractor Complete!\nElapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)')
+    return
 
-# end of file
+main()
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+
+# End of file

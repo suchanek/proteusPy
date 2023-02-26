@@ -37,7 +37,7 @@ from proteusPy import Disulfide
 from proteusPy.ProteusGlobals import MODEL_DIR, WINSIZE
 from Bio.PDB import PDBParser
 
-_PBAR_COLS = 105
+from proteusPy.ProteusGlobals import PBAR_COLS
 
 # Set the figure sizes and axis limits.
 DPI = 220
@@ -47,7 +47,7 @@ TORMIN = -179.0
 TORMAX = 180.0
 
 Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', \
-           'chi5', 'energy', 'ca_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
+           'chi5', 'energy', 'ca_distance', 'cb_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
            'psi_dist', 'torsion_length']
 
 Distance_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'energy', 'ca_distance']
@@ -204,7 +204,7 @@ class DisulfideList(UserList):
     # Rendering engine calculates and instantiates all bond 
     # cylinders and atomic sphere meshes. Called by all high level routines
 
-    def _render(self, style) -> pv.Plotter:
+    def _render(self, style, panelsize=256) -> pv.Plotter:
         '''
         Display a window showing the list of disulfides in the given style.
         :param style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd'
@@ -214,7 +214,7 @@ class DisulfideList(UserList):
         name = self.id
         tot_ss = len(ssList) # number off ssbonds
         rows, cols = grid_dimensions(tot_ss)
-        winsize = (512 * cols, 512 * rows)
+        winsize = (panelsize * cols, panelsize * rows)
 
         pl = pv.Plotter(window_size=winsize, shape=(rows, cols))
         i = 0
@@ -357,7 +357,7 @@ class DisulfideList(UserList):
         SS_df = pd.DataFrame(columns=Distance_DF_Cols)
         sslist = self.data
 
-        pbar = tqdm(sslist, ncols=_PBAR_COLS)
+        pbar = tqdm(sslist, ncols=PBAR_COLS)
         for ss in pbar:
             new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.energy, ss.ca_distance]
             # add the row to the end of the dataframe
@@ -380,10 +380,10 @@ class DisulfideList(UserList):
         SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
         sslist = self.data
 
-        pbar = tqdm(sslist, ncols=_PBAR_COLS)
+        pbar = tqdm(sslist, ncols=PBAR_COLS)
         for ss in pbar:
             new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, 
-                    ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance,
+                    ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance, ss.cb_distance,
                     ss.psiprox, ss.psiprox, ss.phidist, ss.psidist, ss.torsion_length]
             # add the row to the end of the dataframe
             SS_df.loc[len(SS_df.index)] = new_row
@@ -423,7 +423,7 @@ class DisulfideList(UserList):
         std_vals = df_stats.loc['std'].values
 
         tor_cols = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'torsion_length']
-        dist_cols = ['ca_distance', 'energy']
+        dist_cols = ['ca_distance', 'cb_distance', 'energy']
         tor_stats = {}
         dist_stats = {}
 
@@ -530,8 +530,8 @@ class DisulfideList(UserList):
         fig.update_yaxes(title_text="kcal/mol", range=[0, 20], row=1, col=2) # max possible DSE
         
         # Add another subplot for the mean values of ca_distance
-        fig.add_trace(go.Bar(x=['Cα Distance, (Å)'], y=[mean_vals[6]], name="Cα Distance (Å)",
-                        error_y=dict(type='data', array=[std_vals[6].tolist()], width=0.25, visible=True)),
+        fig.add_trace(go.Bar(x=['Cα Distance, (Å)', 'Cβ Distance, (Å)'], y=[mean_vals[6], mean_vals[7]], name="Cβ Distance (Å)",
+                        error_y=dict(type='data', array=[std_vals[6].tolist(), std_vals[7].tolist()], width=0.25, visible=True)),
                         row=2, col=1)
         # Update the layout of the subplot
         fig.update_yaxes(title_text="Distance (A)",range=[0, 10], row=2, col=1) #
@@ -539,8 +539,8 @@ class DisulfideList(UserList):
 
 
         # Add a scatter subplot for torsion length column
-        fig.add_trace(go.Bar(x=['Torsion Length, (Å)'], y=[mean_vals[11]], name="Torsion Length, (Å)",
-                        error_y=dict(type='data', array=[std_vals[11]], width=0.25, visible=True)),
+        fig.add_trace(go.Bar(x=['Torsion Length, (Å)'], y=[mean_vals[12]], name="Torsion Length, (Å)",
+                        error_y=dict(type='data', array=[std_vals[12]], width=0.25, visible=True)),
                         row=2, col=2)
         # Update the layout of the subplot
         fig.update_yaxes(title_text="Torsion Length", range=[0,320], row=2, col=2)
@@ -640,7 +640,7 @@ class DisulfideList(UserList):
         brad = brad if tot_ss < 100 else brad * .6
 
         #print(f'Brad: {brad}')
-        pbar = tqdm(range(tot_ss), ncols=_PBAR_COLS)
+        pbar = tqdm(range(tot_ss), ncols=PBAR_COLS)
 
         for i, ss in zip(pbar, ssbonds):
             color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
@@ -852,7 +852,7 @@ class DisulfideList(UserList):
         ssmax = 0
         idx = 0
 
-        pbar = tqdm(sslist, ncols=_PBAR_COLS)
+        pbar = tqdm(sslist, ncols=PBAR_COLS)
         for ss in pbar:
             dist = ss.ca_distance
             
