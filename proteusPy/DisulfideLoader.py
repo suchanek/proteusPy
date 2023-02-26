@@ -114,6 +114,7 @@ class DisulfideLoader:
         self.QUIET = quiet
         self.classdict = {}
         self.classdf = None
+        self.cutoff = -1.0
         self.verbose = verbose
         
         idlist = []
@@ -490,14 +491,16 @@ class DisulfideLoader:
         '''
         self.QUIET = perm
     
-    def save(self, savepath=DATA_DIR, subset=False):
+    def save(self, savepath=DATA_DIR, subset=False, cutoff=-1.0):
         '''
         Save a copy of the fully instantiated Loader to the specified file.
 
         :param savepath: Path to save the file, defaults to DATA_DIR
         :param fname: Filename, defaults to LOADER_FNAME
         :param verbose: Verbosity, defaults to False
+        :param cutoff: Distance cutoff used to build the database, -1 means no cutoff.
         '''
+        self.cutoff = cutoff
         if subset:
             fname = LOADER_SUBSET_FNAME
         else:
