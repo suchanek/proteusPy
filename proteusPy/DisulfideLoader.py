@@ -237,7 +237,7 @@ class DisulfideLoader:
         the database classified, and the resulting dict created.
 
         Disulfide Class definition using the +/- formalism of Hogg et al. (Biochem, 2006, 45, 7429-7433), across
-        all 32 possible classes ($$2^5$$). Classes are named per Hogg's convention.
+        all 32 possible classes. Classes are named per Hogg's convention.
 
         |   class_id | SS_Classname   | FXN        |   count |   incidence |
         |-----------:|:---------------|:-----------|--------:|------------:|
