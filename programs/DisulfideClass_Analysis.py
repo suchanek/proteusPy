@@ -106,7 +106,7 @@ set_plot_theme('dark')
 
 _PBAR_COLS = 80
 
-def analyze_classes(loader: DisulfideLoader) -> DisulfideList:
+def analyze_classes(loader: DisulfideLoader, do_graph=False) -> DisulfideList:
     class_filename = f'{DATA_DIR}SS_consensus_class32.pkl'
     classes = loader.classdict
     tot_classes = len(classes)
@@ -119,8 +119,9 @@ def analyze_classes(loader: DisulfideLoader) -> DisulfideList:
 
         # get the classes
         class_ss_list = loader.from_class(cls)
-        class_ss_list.display_torsion_statistics(display=False, save=True, 
-            fname=fname, light=True, stats=False)
+        if do_graph:
+            class_ss_list.display_torsion_statistics(display=False, save=True, 
+                fname=fname, light=True, stats=False)
 
         # get the average conformation - array of dihedrals
         avg_conformation = np.zeros(5)
@@ -138,7 +139,7 @@ def analyze_classes(loader: DisulfideLoader) -> DisulfideList:
     
     print(f'--> analyze_classes(): Writing consensus structures to: {class_filename}')
     with open(class_filename, "wb+") as f:
-        pickle.dump(res_list)
+        pickle.dump(res_list, f)
     
     return res_list
 
