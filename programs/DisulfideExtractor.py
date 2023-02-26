@@ -82,13 +82,13 @@ def do_build(verbose, full, subset):
         if verbose:
             print('--> Building the packed loader for the full dataset...')
         PDB_SS = DisulfideLoader(datadir=DATA_DIR, subset=False)
-        PDB_SS.save(savepath=DATA_DIR, subset=False)
+        PDB_SS.save(savepath=DATA_DIR, subset=False, cutoff=cutoff)
 
     if subset:
         if verbose:
             print('--> Building the packed loader for the Disulfide subset...')
         PDB_SS = DisulfideLoader(datadir=DATA_DIR, subset=True)
-        PDB_SS.save(savepath=DATA_DIR, subset=True)
+        PDB_SS.save(savepath=DATA_DIR, subset=True, cutoff=cutoff)
     
     return
 
@@ -129,52 +129,46 @@ def do_stuff(all=False, extract=False, build=True, full=False, update=True, subs
         copytree(DATA_DIR, MODULE_DATA, dirs_exist_ok=True, ignore=ignore_patterns('*_pruned_*'))
     return
 
-def main():
-    start = time.time()
+start = time.time()
 
-    parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser()
 
-    parser.add_argument("-a", "--all", help="do everything. Extract, build and save both datasets", action=argparse.BooleanOptionalAction)
-    parser.add_argument("-c", "--cutoff", help="distance cutoff for disulfide distance pruning", type=float, required=False)
-    parser.add_argument("-u", "--update", help="update the repo package", action=argparse.BooleanOptionalAction)
-    parser.add_argument("-v", "--verbose", help="level of verbosity", action=argparse.BooleanOptionalAction)
-    parser.add_argument("-e", "--extract", help="extract disulfides from the PDB structure files", action=argparse.BooleanOptionalAction)
-    parser.add_argument("-f", "--full", help="extract all disulfides from the PDB structure files", action=argparse.BooleanOptionalAction)
-    parser.add_argument("-b", "--build", help="rebuild the loader", action=argparse.BooleanOptionalAction)
-    parser.add_argument("-s", "--subset", help="rebuild the subset only", action=argparse.BooleanOptionalAction)
+parser.add_argument("-a", "--all", help="do everything. Extract, build and save both datasets", action=argparse.BooleanOptionalAction)
+parser.add_argument("-c", "--cutoff", help="distance cutoff for disulfide distance pruning", type=float, required=False)
+parser.add_argument("-u", "--update", help="update the repo package", action=argparse.BooleanOptionalAction)
+parser.add_argument("-v", "--verbose", help="level of verbosity", action=argparse.BooleanOptionalAction)
+parser.add_argument("-e", "--extract", help="extract disulfides from the PDB structure files", action=argparse.BooleanOptionalAction)
+parser.add_argument("-f", "--full", help="extract all disulfides from the PDB structure files", action=argparse.BooleanOptionalAction)
+parser.add_argument("-b", "--build", help="rebuild the loader", action=argparse.BooleanOptionalAction)
+parser.add_argument("-s", "--subset", help="rebuild the subset only", action=argparse.BooleanOptionalAction)
 
-    parser.set_defaults(all=False)
-    parser.set_defaults(update=True)
-    parser.set_defaults(verbose=True)
-    parser.set_defaults(extract=False)
-    parser.set_defaults(subset=True)
-    parser.set_defaults(build=True)
-    parser.set_defaults(full=True)
-    parser.set_defaults(cutoff=-1.0)
+parser.set_defaults(all=False)
+parser.set_defaults(update=True)
+parser.set_defaults(verbose=True)
+parser.set_defaults(extract=False)
+parser.set_defaults(subset=True)
+parser.set_defaults(build=True)
+parser.set_defaults(full=True)
+parser.set_defaults(cutoff=-1.0)
 
-    args = parser.parse_args()
+args = parser.parse_args()
 
-    all = args.all
-    extract = args.extract
-    build = args.build
-    update = args.update
-    full = args.full
-    subset = args.subset
-    verbose = args.verbose
-    cutoff = args.cutoff
+all = args.all
+extract = args.extract
+build = args.build
+update = args.update
+full = args.full
+subset = args.subset
+verbose = args.verbose
+cutoff = args.cutoff
 
-    do_stuff(all=all, extract=extract, build=build, full=full, update=update, subset=subset, verbose=verbose, cutoff=cutoff)
+do_stuff(all=all, extract=extract, build=build, full=full, update=update, subset=subset, verbose=verbose, cutoff=cutoff)
 
-    end = time.time()
-    elapsed = end - start
+end = time.time()
+elapsed = end - start
 
-    print(f'DisulfideExtractor Complete!\nElapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)')
-    return
+print(f'DisulfideExtractor Complete!\nElapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)')
 
-main()
 
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
 
 # End of file
