@@ -1,6 +1,7 @@
 '''
-Disulfide Class definition using the +/- formalism of Hogg et al. (Biochem, 2006, 45, 7429-7433), across
-all 32 possible classes $$2^5$$. Classes are named per Hogg's convention.
+Disulfide class analysis using `proteusPy.Disulfide`. Disulfide families are defined
+using the +/- formalism of Hogg et al. (Biochem, 2006, 45, 7429-7433), across
+all 32 possible classes ($$2^5$$). Classes are named per Hogg's convention.
 
 
 +----+----------+----------+----------+----------+----------+------------+----------------+------------+
@@ -103,27 +104,54 @@ start = time.time()
 pv.set_jupyter_backend('trame')
 set_plot_theme('dark')
 
-PDB_SS = Load_PDB_SS(verbose=True, subset=False)
 _PBAR_COLS = 80
 
-def analyze_classes(loader: DisulfideLoader):
+def analyze_classes(loader: DisulfideLoader) -> DisulfideList:
+    class_filename = f'{DATA_DIR}SS_consensus_class32.pkl'
     classes = loader.classdict
     tot_classes = len(classes)
+    res_list = DisulfideList([], 'SS_Class_Avg_SS')
 
     pbar = enumerate(classes)
     for idx, cls in pbar:
+        fname = f'{DATA_DIR}classes/ss_class_{idx}.png'
         print(f'--> analyze_classes(): {cls} {idx+1}/{tot_classes}')
-        class_ss_list = loader.from_class(cls)
-        fname = f'./classes/ss_class_{idx}.png'
-        class_ss_list.TorsionGraph(display=False, save=True, fname=fname)
-    return
 
-analyze_classes(PDB_SS)
+        # get the classes
+        class_ss_list = loader.from_class(cls)
+        class_ss_list.display_torsion_statistics(display=False, save=True, 
+            fname=fname, light=True, stats=False)
+
+        # get the average conformation - array of dihedrals
+        avg_conformation = np.zeros(5)
+
+        print(f'--> analyze_classes(): Computing avg conformation for: {cls}')
+        avg_conformation = class_ss_list.Average_Conformation
+
+        # build the average disulfide for the class
+        ssname = f'{cls}_avg'
+        exemplar = Disulfide(ssname)
+        exemplar.build_model(avg_conformation[0], avg_conformation[1],
+                             avg_conformation[2],avg_conformation[3],
+                             avg_conformation[4])
+        res_list.append(exemplar)
+    
+    print(f'--> analyze_classes(): Writing consensus structures to: {class_filename}')
+    with open(class_filename, "wb+") as f:
+        pickle.dump(res_list)
+    
+    return res_list
+
+# main program begins
+PDB_SS = Load_PDB_SS(verbose=True, subset=False)
+
+ss_classlist = DisulfideList([], 'PDB_SS_CLASSES')
+ss_classlist = analyze_classes(PDB_SS)
 
 end = time.time()
 elapsed = end - start
 
-print(f'Disulfide Class Analysis Complete! Elapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)')
+print(f'Disulfide Class Analysis Complete! \nElapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)')
 
 # end of file
 
