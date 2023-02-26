@@ -97,6 +97,7 @@ from proteusPy.data import *
 from proteusPy.Disulfide import *
 from proteusPy.DisulfideList import DisulfideList, load_disulfides_from_id
 from proteusPy.DisulfideLoader import Load_PDB_SS, DisulfideLoader
+from proteusPy.ProteusGlobals import PBAR_COLS
 
 start = time.time()
 
@@ -104,9 +105,7 @@ start = time.time()
 pv.set_jupyter_backend('trame')
 set_plot_theme('dark')
 
-_PBAR_COLS = 80
-
-def analyze_classes(loader: DisulfideLoader, do_graph=False) -> DisulfideList:
+def analyze_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -> DisulfideList:
     class_filename = f'{DATA_DIR}SS_consensus_class32.pkl'
     classes = loader.classdict
     tot_classes = len(classes)
@@ -123,23 +122,24 @@ def analyze_classes(loader: DisulfideLoader, do_graph=False) -> DisulfideList:
             class_ss_list.display_torsion_statistics(display=False, save=True, 
                 fname=fname, light=True, stats=False)
 
-        # get the average conformation - array of dihedrals
-        avg_conformation = np.zeros(5)
+        if do_consensus:
+            # get the average conformation - array of dihedrals
+            avg_conformation = np.zeros(5)
 
-        print(f'--> analyze_classes(): Computing avg conformation for: {cls}')
-        avg_conformation = class_ss_list.Average_Conformation
+            print(f'--> analyze_classes(): Computing avg conformation for: {cls}')
+            avg_conformation = class_ss_list.Average_Conformation
 
-        # build the average disulfide for the class
-        ssname = f'{cls}_avg'
-        exemplar = Disulfide(ssname)
-        exemplar.build_model(avg_conformation[0], avg_conformation[1],
-                             avg_conformation[2],avg_conformation[3],
-                             avg_conformation[4])
-        res_list.append(exemplar)
-    
-    print(f'--> analyze_classes(): Writing consensus structures to: {class_filename}')
-    with open(class_filename, "wb+") as f:
-        pickle.dump(res_list, f)
+            # build the average disulfide for the class
+            ssname = f'{cls}_avg'
+            exemplar = Disulfide(ssname)
+            exemplar.build_model(avg_conformation[0], avg_conformation[1],
+                                avg_conformation[2],avg_conformation[3],
+                                avg_conformation[4])
+            res_list.append(exemplar)
+        
+            print(f'--> analyze_classes(): Writing consensus structures to: {class_filename}')
+            with open(class_filename, "wb+") as f:
+                pickle.dump(res_list, f)
     
     return res_list
 
@@ -147,7 +147,7 @@ def analyze_classes(loader: DisulfideLoader, do_graph=False) -> DisulfideList:
 PDB_SS = Load_PDB_SS(verbose=True, subset=False)
 
 ss_classlist = DisulfideList([], 'PDB_SS_CLASSES')
-ss_classlist = analyze_classes(PDB_SS)
+ss_classlist = analyze_classes(PDB_SS, do_graph=True, do_consensus=True)
 
 end = time.time()
 elapsed = end - start

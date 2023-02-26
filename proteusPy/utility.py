@@ -104,15 +104,11 @@ def grid_dimensions(n):
     :return: int rows, columns
     '''
     
-    root = math.sqrt(n)
-    # If the square root is a whole number, return that as the number of rows and columns
-    if root == int(root):
-        return int(root), int(root)
-    # If the square root is not a whole number, round up and return that as the number of columns
-    # and calculate the number of rows as the number of images divided by the number of columns
-    else:
-        columns = math.ceil(root)
-        return int(n / columns), int(columns)
+    res = math.ceil(math.sqrt(n))
+    return res, res
+    
+
+
 
 def Check_chains(pdbid, pdbdir, verbose=True):
     '''

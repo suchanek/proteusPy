@@ -523,14 +523,13 @@ class DisulfideLoader:
         :return: DisulfideList of class members
         '''
         from tqdm import tqdm
-        _PBAR_COLS = 80
-
+        from proteusPy.ProteusGlobals import PBAR_COLS
         res = DisulfideList([], classid)
 
         try:
             sslist = self.classdict[classid]
             if self.verbose:
-                pbar = tqdm(sslist, ncols=_PBAR_COLS)
+                pbar = tqdm(sslist, ncols=PBAR_COLS)
                 for ssid in pbar:
                     res.append(self[ssid])
                 return res
@@ -674,7 +673,7 @@ def create_classes(df):
     """
     Group the DataFrame by the sign of the chi columns and create a new class ID column for each unique grouping.
 
-    :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'torsion_length', and 'energy'.
+    :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'cb_distance', 'torsion_length', and 'energy'.
     :return: A pandas DataFrame containing columns 'class_id', 'ss_id', and 'count', where 'class_id' is a unique identifier for each grouping of chi signs, 'ss_id' is a list of all 'ss_id' values in that grouping, and 'count' is the number of rows in that grouping.
     
     Example:
@@ -687,6 +686,7 @@ def create_classes(df):
     ...    'chi4': [1.0, -1.0, 1.0, -1.0, 1.0],
     ...    'chi5': [1.0, -1.0, -1.0, -1.0, -1.0],
     ...    'ca_distance': [3.1, 3.2, 3.3, 3.4, 3.5],
+    ...    'cb_distance': [3.1, 3.2, 3.3, 3.4, 3.5],
     ...    'torsion_length': [120.1, 120.2, 120.3, 120.4, 121.0],
     ...    'energy': [-2.3, -2.2, -2.1, -2.0, -1.9]
     ... })
