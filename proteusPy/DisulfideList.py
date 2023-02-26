@@ -24,10 +24,10 @@ import pandas as pd
 import pyvista as pv
 import plotly.express as px
 import plotly.graph_objects as go
-
 from plotly.subplots import make_subplots
 from collections import UserList
 from tqdm import tqdm
+from pathlib import Path
 
 import proteusPy
 from proteusPy import *
@@ -429,7 +429,6 @@ class DisulfideList(UserList):
 
         for col in tor_cols:
             tor_stats[col] = {'mean': df[col].mean(), 'std': df[col].std()}
-            
 
         for col in dist_cols:
             dist_stats[col] = {'mean': df[col].mean(), 'std': df[col].std()}
@@ -466,11 +465,9 @@ class DisulfideList(UserList):
         pl.reset_camera()
         pl.show()
 
-    
-    def display_torsion_statistics(self, 
-                            display=True, 
-                            save=False, 
+    def display_torsion_statistics(self, display=True, save=False, 
                             fname='ss_torsions.png',
+                            stats=False,
                             light=True):
         """
         Display torsion and distance statistics for a given Disulfide list.
@@ -481,6 +478,8 @@ class DisulfideList(UserList):
         :type save: bool
         :param fname: The name of the image file to save. Default is 'ss_torsions.png'.
         :type fname: str
+        :param stats: Whether to return the DataFrame representing the statistics for `self`. Default is False.
+        :type stats: bool
         :param light: Whether to use the 'plotly_light' or 'plotly_dark' template. Default is True.
         :type light: bool
         :return: None
@@ -544,23 +543,27 @@ class DisulfideList(UserList):
                         error_y=dict(type='data', array=[std_vals[11]], width=0.25, visible=True)),
                         row=2, col=2)
         # Update the layout of the subplot
-        fig.update_yaxes(title_text="Torsion Length", row=2, col=2)
+        fig.update_yaxes(title_text="Torsion Length", range=[0,320], row=2, col=2)
         fig.update_traces(width=0.25, row=2, col=2)
 
         # Update the error bars
-        fig.update_traces(error_y_thickness=1.5, error_y_color='gray',
+        fig.update_traces(error_y_thickness=2, error_y_color='gray',
                         texttemplate='%{y:.2f} ± %{error_y.array:.2f}', 
                         textposition='outside') #, row=1, col=1)
 
         if display:
             fig.show()
         if save:
-            fig.write_image(fname)
+            fig.write_image(Path(fname))
+        
+        if stats:
+            return df_stats
+        
         return
         
     
     @property
-    def distance_df(self) -> pd.DataFrame:
+    def distance_df(self) -> pd.DataFrame: 
         '''
         Build and return the distance dataframe for the input list.
         This can take considerable time for the entire list.
