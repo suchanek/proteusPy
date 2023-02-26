@@ -230,14 +230,13 @@ class DisulfideLoader:
     
     def build_classes(self):
         '''
-        Build the dictionary mapping disulfides to class names.
+        Build the internal dictionary mapping disulfides to class names.
 
-        Builds the internal dictionary mapping the disulfide class names to their respective members.
-        The classnames are defined by the sign of the dihedral angles, per XXX', the list of SS within
-        the database classified, and the resulting dict created.
-
-        Disulfide Class definition using the +/- formalism of Hogg et al. (Biochem, 2006, 45, 7429-7433), across
-        all 32 possible classes. Classes are named per Hogg's convention.
+        Disulfide classes are defined using the +/- formalism described by 
+        Hogg et al. (Biochem, 2006, 45, 7429-7433), across all 32 (2^5), possible 
+        binary sidechain torsional combinations. Classes are named per Hogg's convention.
+        The ``class_id`` represents the sign of each dihedral angle $\chi_{1} - \chi_{1'}$
+        where *0* repreents *negative* dihedral angle and *2* a *positive* angle.
 
         |   class_id | SS_Classname   | FXN        |   count |   incidence |
         |-----------:|:---------------|:-----------|--------:|------------:|
