@@ -53,7 +53,7 @@ global Torsion_DF_Cols
 
 Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', \
            'chi5', 'energy', 'ca_distance','cb_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
-           'psi_dist', 'torsion_length']
+           'psi_dist', 'torsion_length', 'rho']
 
 # Class definition for a Disulfide bond. 
 def About_proteusPy():
@@ -243,6 +243,7 @@ class Disulfide:
         self.chi3 = _ANG_INIT
         self.chi4 = _ANG_INIT
         self.chi5 = _ANG_INIT
+        self.rho = _ANG_INIT # new dihedral angle: Nprox - Ca_prox - Ca_dist - N_dist
 
         self.torsion_length = _FLOAT_INIT
     
@@ -681,7 +682,7 @@ class Disulfide:
         self.torsion_array = np.array((self.chi1, self.chi2, self.chi3, 
                                         self.chi4, self.chi5))
         self.torsion_length = self.Torsion_Length()
-        
+        self.rho = calc_dihedral(self.n_prox, self.ca_prox, self.ca_dist, self.n_dist)
         self.missing_atoms = True
         self.modelled = True
     
@@ -1064,6 +1065,8 @@ class Disulfide:
         self.chi3 = np.degrees(calc_dihedral(cb1, sg1, sg2, cb2))
         self.chi4 = np.degrees(calc_dihedral(sg1, sg2, cb2, ca2))
         self.chi5 = np.degrees(calc_dihedral(sg2, cb2, ca2, n2))
+        self.rho = np.degrees(calc_dihedral(n1, ca1, ca2, n2))
+
 
         self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
         self.cb_distance = distance3d(self.cb_prox, self.ca_dist)
@@ -1256,7 +1259,7 @@ class Disulfide:
         """
         Representation for Disulfide conformation
         """
-        s4 = f'Χ1-Χ5: {self.chi1:.2f}°, {self.chi2:.2f}°, {self.chi3:.2f}°, {self.chi4:.2f}° {self.chi5:.2f}°, {self.energy:.2f} kcal/mol'
+        s4 = f'Χ1-Χ5: {self.chi1:.2f}°, {self.chi2:.2f}°, {self.chi3:.2f}°, {self.chi4:.2f}° {self.chi5:.2f}°, {self.rho:.2f}°, {self.energy:.2f} kcal/mol'
         stot = f'{s4}'
         return stot
 
@@ -1349,6 +1352,8 @@ class Disulfide:
         '''
         return(f'{self.repr_ss_chain_ids()}')
 
+    def compute_rho(self):
+        self.rho = compute_dihedrals!!!
     def reset(self) -> None:
         '''
         Resets the disulfide object to its initial state. All distances, 
@@ -1962,7 +1967,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
                 new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, 
                 		  ss.chi1, ss.chi2, ss.chi3, ss.chi4, ss.chi5, 
                 		  ss.energy, ss.ca_distance, ss.cb_distance, ss.phiprox, 
-                          ss.psiprox, ss.phidist, ss.psidist, ss.torsion_length]
+                          ss.psiprox, ss.phidist, ss.psidist, ss.torsion_length, ss.rho]
                           
                 # add the row to the end of the dataframe
                 SS_df.loc[len(SS_df.index)] = new_row.copy() # deep copy

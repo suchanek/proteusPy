@@ -46,9 +46,10 @@ HEIGHT = 3.0
 TORMIN = -179.0
 TORMAX = 180.0
 
+
 Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', \
            'chi5', 'energy', 'ca_distance', 'cb_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
-           'psi_dist', 'torsion_length']
+           'psi_dist', 'torsion_length', 'rho']
 
 Distance_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'energy', 'ca_distance']
 
@@ -383,8 +384,8 @@ class DisulfideList(UserList):
         pbar = tqdm(sslist, ncols=PBAR_COLS)
         for ss in pbar:
             new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, 
-                    ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance, ss.cb_distance,
-                    ss.psiprox, ss.psiprox, ss.phidist, ss.psidist, ss.torsion_length]
+                       ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance, ss.cb_distance,
+                       ss.psiprox, ss.psiprox, ss.phidist, ss.psidist, ss.torsion_length, ss.rho]
             # add the row to the end of the dataframe
             SS_df.loc[len(SS_df.index)] = new_row
         
@@ -513,6 +514,11 @@ class DisulfideList(UserList):
         fig.add_trace(go.Bar(x=['X1', 'X2', 'X3', 'X4', 'X5'], y=mean_vals[:5], name="Torsion Angle,(°) ", 
                                 error_y=dict(type='data', array=std_vals[:5], visible=True)),
                                 row=1, col=1)
+
+        fig.add_trace(go.Bar(x=['rho'], y=[mean_vals[13]], name="rho",
+                         error_y=dict(type='data', array=[std_vals[13]], visible=True)),
+                  row=1, col=1)
+
         # Update the layout of the subplot
         # Cα N, Cα, Cβ, C', Sγ Å °
 

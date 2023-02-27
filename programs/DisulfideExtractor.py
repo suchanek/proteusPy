@@ -123,7 +123,7 @@ def do_stuff(all=False, extract=False, build=True, full=False, update=True, subs
         do_extract(_verbose, _full, _subset, cutoff)
 
     if _build == True:
-        print(f'Building...')
+        print(f'Building:')
         do_build(_verbose, _full, _subset, cutoff)
 
     if _update == True:
@@ -150,7 +150,7 @@ parser.set_defaults(verbose=True)
 parser.set_defaults(extract=True)
 parser.set_defaults(subset=True)
 parser.set_defaults(build=True)
-parser.set_defaults(full=True)
+parser.set_defaults(full=False)
 parser.set_defaults(cutoff=8.0)
 
 args = parser.parse_args()
