@@ -137,9 +137,10 @@ def analyze_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -
                                 avg_conformation[4])
             res_list.append(exemplar)
         
-            print(f'--> analyze_classes(): Writing consensus structures to: {class_filename}')
-            with open(class_filename, "wb+") as f:
-                pickle.dump(res_list, f)
+    if do_consensus:
+        print(f'--> analyze_classes(): Writing consensus structures to: {class_filename}')
+        with open(class_filename, "wb+") as f:
+            pickle.dump(res_list, f)
     
     return res_list
 
