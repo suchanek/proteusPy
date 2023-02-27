@@ -69,7 +69,7 @@ def do_extract(verbose, full, subset, cutoff):
                         )
     return
 
-def do_build(verbose, full, subset):
+def do_build(verbose, full, subset, cutoff):
     '''
     Loads and saves a ```proteusPy.DisulfideLoader.DisulfideLoader``` object
     to a .pkl file.
@@ -80,14 +80,16 @@ def do_build(verbose, full, subset):
     '''
     if full:
         if verbose:
-            print('--> Building the packed loader for the full dataset...')
+            print(f'--> Building the packed loader for the full dataset with cutoff: {cutoff}...')
         PDB_SS = DisulfideLoader(datadir=DATA_DIR, subset=False)
+        PDB_SS.cutoff = cutoff
         PDB_SS.save(savepath=DATA_DIR, subset=False, cutoff=cutoff)
 
     if subset:
         if verbose:
-            print('--> Building the packed loader for the Disulfide subset...')
+            print(f'--> Building the packed loader for the Disulfide subset with cutoff: {cutoff}...')
         PDB_SS = DisulfideLoader(datadir=DATA_DIR, subset=True)
+        PDB_SS.cutoff = cutoff
         PDB_SS.save(savepath=DATA_DIR, subset=True, cutoff=cutoff)
     
     return
@@ -122,7 +124,7 @@ def do_stuff(all=False, extract=False, build=True, full=False, update=True, subs
 
     if _build == True:
         print(f'Building...')
-        do_build(_verbose, _full, _subset)
+        do_build(_verbose, _full, _subset, cutoff)
 
     if _update == True:
         print(f'Copying: {DATA_DIR} to {MODULE_DATA}')
@@ -145,11 +147,11 @@ parser.add_argument("-s", "--subset", help="rebuild the subset only", action=arg
 parser.set_defaults(all=False)
 parser.set_defaults(update=True)
 parser.set_defaults(verbose=True)
-parser.set_defaults(extract=False)
+parser.set_defaults(extract=True)
 parser.set_defaults(subset=True)
 parser.set_defaults(build=True)
 parser.set_defaults(full=True)
-parser.set_defaults(cutoff=-1.0)
+parser.set_defaults(cutoff=8.0)
 
 args = parser.parse_args()
 

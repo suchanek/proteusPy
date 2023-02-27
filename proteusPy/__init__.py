@@ -37,6 +37,6 @@ from .DisulfideList import load_disulfides_from_id
 
 from .atoms import *
 from .data import *
-from .utility import distance_squared, distance3d, get_jet_colormap, Check_chains
+from .utility import distance_squared, distance3d, get_jet_colormap, Check_chains, print_memory_used, image_to_ascii_art
 
 # end of file

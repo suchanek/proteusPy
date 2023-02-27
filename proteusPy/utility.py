@@ -106,9 +106,6 @@ def grid_dimensions(n):
     
     res = math.ceil(math.sqrt(n))
     return res, res
-    
-
-
 
 def Check_chains(pdbid, pdbdir, verbose=True):
     '''
@@ -237,6 +234,47 @@ def print_memory_used():
     mem = get_memory_usage() / (1024 ** 3) # to GB
 
     print(f'--> proteusPy {proteusPy.__version__}: Memory Used: {mem:.2f} GB')
+
+def image_to_ascii_art(fname, nwidth):
+    '''
+    Convert an image to ASCII art of given text width.
+
+    Function takes an input filename and width and prints an ASCII art representation to console.
+
+    :param fname: Input filename.
+    :param nwidth: Output width in characters.
+    '''
+    from PIL import Image
+    from sklearn.preprocessing import minmax_scale
+
+    # Open the image file
+    image = Image.open(fname)
+
+    # Resize the image to reduce the number of pixels
+    width, height = image.size
+    aspect_ratio = height/width
+    new_width = nwidth
+    new_height = aspect_ratio * new_width * 0.55  # 0.55 is an adjustment factor
+    image = image.resize((new_width, int(new_height)))
+
+    # Convert the image to grayscale.
+    image = image.convert("L")
+
+    # Define the ASCII character set to use (inverted colormap)
+    char_set = ["@", "#", "8", "&", "o", ":", "*", ".", " "]
+
+    # Normalize the pixel values in the image.
+    pixel_data = list(image.getdata())
+    pixel_data_norm = minmax_scale(pixel_data, feature_range=(0, len(char_set)-1), copy=True)
+    pixel_data_norm = [int(x) for x in pixel_data_norm]
+
+    char_array = [char_set[pixel] for pixel in pixel_data_norm]
+    # Generate the ASCII art string
+    ascii_art = "\n".join(["".join([char_array[i+j] for j in range(new_width)]) for i in range(0, len(char_array), new_width)])
+
+    # Print the ASCII art string.
+    print(ascii_art)
+
 
 if __name__ == "__main__":
     import doctest

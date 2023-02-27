@@ -16,6 +16,8 @@ __pdoc__ = {'__all__': True}
 import sys
 import copy
 from io import StringIO
+import time
+import datetime
 
 import pandas as pd
 import pyvista as pv
@@ -90,7 +92,9 @@ class DisulfideLoader:
 
     def __init__(self, verbose=True, datadir=DATA_DIR, picklefile=SS_PICKLE_FILE, 
                 pickle_dict_file=SS_DICT_PICKLE_FILE,
-                torsion_file=SS_TORSIONS_FILE, quiet=True, subset=False):
+                torsion_file=SS_TORSIONS_FILE, quiet=True, 
+                subset=False,
+                cutoff=-1.0):
         '''
         Initializing the class initiates loading either the entire Disulfide dataset,
         or the 'subset', which consists of the first 1000 PDB structures. The subset
@@ -114,9 +118,10 @@ class DisulfideLoader:
         self.QUIET = quiet
         self.classdict = {}
         self.classdf = None
-        self.cutoff = -1.0
+        self.cutoff = cutoff
         self.verbose = verbose
-        
+        self.timestamp = time.time()
+
         idlist = []
 
         if subset:
@@ -379,15 +384,18 @@ class DisulfideLoader:
         pdbs = len(self.SSDict)
         ram = (sys.getsizeof(self.SSList) + sys.getsizeof(self.SSDict) + sys.getsizeof(self.TorsionDF)) / (1024 * 1024)
         res = self.Average_Resolution
-
+        cutoff = self.cutoff
+        timestr = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.timestamp))
         ssMin, ssMax = self.SSList.minmax_energy()
         
         print(f'    =========== RCSB Disulfide Database Summary ==============')
+        print(f'       =========== Built: {timestr} ==============')
         print(f'PDB IDs present:                    {pdbs}')
         print(f'Disulfides loaded:                  {tot}')
         print(f'Average structure resolution:       {res:.2f} Å')
         print(f'Lowest Energy Disulfide:            {ssMin.name}')
         print(f'Highest Energy Disulfide:           {ssMax.name}')
+        print(f'Ca distance cutoff:                 {cutoff:.2f} Å')
         print(f'Total RAM Used:                     {ram:.2f} GB.')
         print(f'    ================= proteusPy: {vers} =======================')
        
