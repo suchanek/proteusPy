@@ -238,7 +238,7 @@ class DisulfideLoader:
         '''
         Build the internal dictionary mapping disulfides to class names.
 
-        Disulfide classes are defined using the +/- formalism described by 
+        Disulfide classes are defined using the ± formalism described by 
         Hogg et al. (Biochem, 2006, 45, 7429-7433), across all 32 (2^5), possible 
         binary sidechain torsional combinations. Classes are named per Hogg's convention.
         The ``class_id`` represents the sign of each dihedral angle $\chi_{1} - \chi_{1'}$
@@ -262,21 +262,21 @@ class DisulfideLoader:
         |      02202 | 02202          | UNK        |     533 |  0.00441602 |
         |      02220 | -RHSpiral      | UNK        |    6751 |  0.0559335  |
         |      02222 | 02222          | UNK        |    3474 |  0.0287828  |
-        |      20000 | +/-LHSpiral    | UNK        |    3847 |  0.0318732  |
+        |      20000 | ±LHSpiral    | UNK        |    3847 |  0.0318732  |
         |      20002 | +LHSpiral      | UNK        |     875 |  0.00724956 |
-        |      20020 | +/-LHHook      | UNK        |     803 |  0.00665302 |
+        |      20020 | ±LHHook      | UNK        |     803 |  0.00665302 |
         |      20022 | +LHHook        | UNK        |     602 |  0.0049877  |
-        |      20200 | +/-RHStaple    | UNK        |     419 |  0.0034715  |
+        |      20200 | ±RHStaple    | UNK        |     419 |  0.0034715  |
         |      20202 | +RHStaple      | UNK        |     293 |  0.00242757 |
-        |      20220 | +/-RHHook      | Catalytic  |    1435 |  0.0118893  |
+        |      20220 | ±RHHook      | Catalytic  |    1435 |  0.0118893  |
         |      20222 | 20222          | UNK        |     488 |  0.00404318 |
         |      22000 | -/+LHHook      | UNK        |    2455 |  0.0203402  |
         |      22002 | 22002          | UNK        |    1027 |  0.00850891 |
-        |      22020 | +/-LHStaple    | UNK        |    1046 |  0.00866633 |
+        |      22020 | ±LHStaple    | UNK        |    1046 |  0.00866633 |
         |      22022 | +LHStaple      | UNK        |     300 |  0.00248556 |
         |      22200 | -/+RHHook      | UNK        |    6684 |  0.0553783  |
         |      22202 | +RHHook        | UNK        |     593 |  0.00491313 |
-        |      22220 | +/-RHSpiral    | UNK        |    2544 |  0.0210776  |
+        |      22220 | ±RHSpiral    | UNK        |    2544 |  0.0210776  |
         |      22222 | +RHSpiral      | UNK        |    3665 |  0.0303653  |
         '''
 
