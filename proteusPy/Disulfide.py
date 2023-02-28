@@ -8,12 +8,14 @@ Author: Eric G. Suchanek, PhD
 Last revision: 2/14/2023
 '''
 
-# Cα N, Cα, Cβ, C', Sγ Å °
+# Cα N, Cα, Cβ, C', Sγ Å ° ρ
 
 __pdoc__ = {'__all__': True}
 
 import math
 import numpy as np
+np.set_printoptions(suppress=True)
+
 import copy
 
 from math import cos
@@ -682,7 +684,7 @@ class Disulfide:
         self.torsion_array = np.array((self.chi1, self.chi2, self.chi3, 
                                         self.chi4, self.chi5))
         self.torsion_length = self.Torsion_Length()
-        self.rho = calc_dihedral(self.n_prox, self.ca_prox, self.ca_dist, self.n_dist)
+        self.calculate_rho()
         self.missing_atoms = True
         self.modelled = True
     
@@ -1353,7 +1355,9 @@ class Disulfide:
         return(f'{self.repr_ss_chain_ids()}')
 
     def compute_rho(self):
-        self.rho = compute_dihedrals!!!
+        self.rho = calc_dihedral(self.n_prox, self.ca_prox, self.ca_dist, self.n_dist)
+        return self.rho
+
     def reset(self) -> None:
         '''
         Resets the disulfide object to its initial state. All distances, 

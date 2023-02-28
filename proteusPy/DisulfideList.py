@@ -16,7 +16,8 @@ Last revision: 2/24/2023
 # Last modification: 2/8/2023 -egs-
 # Cα N, Cα, Cβ, C', Sγ Å °
 
-__pdoc__ = {'__all__': True}
+__pdoc__ = {}
+__pdoc__['all'] = True
 
 import numpy as np
 
@@ -515,7 +516,7 @@ class DisulfideList(UserList):
                                 error_y=dict(type='data', array=std_vals[:5], visible=True)),
                                 row=1, col=1)
 
-        fig.add_trace(go.Bar(x=['rho'], y=[mean_vals[13]], name="rho",
+        fig.add_trace(go.Bar(x=['rho'], y=[mean_vals[13]], name="ρ, (°)",
                          error_y=dict(type='data', array=[std_vals[13]], visible=True)),
                   row=1, col=1)
 
@@ -526,7 +527,7 @@ class DisulfideList(UserList):
         fig.update_yaxes(range=[0,320], row=2, col=2)
         
         # Add another subplot for the mean values of energy
-        fig.add_trace(go.Bar(x=['DSE (kcal/mol)'], y=[mean_vals[5]], name="Energy (kcal/mol)",
+        fig.add_trace(go.Bar(x=['Strain Energy (kcal/mol)'], y=[mean_vals[5]], name="Energy (kcal/mol)",
                 error_y=dict(type='data', array=[std_vals[5].tolist()], width=0.25, visible=True)),
                 row=1, col=2)
         fig.update_traces(width=0.25, row=1, col=2)

@@ -399,7 +399,7 @@ Last revision: 2/20/2023</p>
 </span><span id="L-238"><a href="#L-238"><span class="linenos">238</span></a>        <span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-239"><a href="#L-239"><span class="linenos">239</span></a><span class="sd">        Build the internal dictionary mapping disulfides to class names.</span>
 </span><span id="L-240"><a href="#L-240"><span class="linenos">240</span></a>
-</span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a><span class="sd">        Disulfide classes are defined using the +/- formalism described by </span>
+</span><span id="L-241"><a href="#L-241"><span class="linenos">241</span></a><span class="sd">        Disulfide classes are defined using the ± formalism described by </span>
 </span><span id="L-242"><a href="#L-242"><span class="linenos">242</span></a><span class="sd">        Hogg et al. (Biochem, 2006, 45, 7429-7433), across all 32 (2^5), possible </span>
 </span><span id="L-243"><a href="#L-243"><span class="linenos">243</span></a><span class="sd">        binary sidechain torsional combinations. Classes are named per Hogg&#39;s convention.</span>
 </span><span id="L-244"><a href="#L-244"><span class="linenos">244</span></a><span class="sd">        The ``class_id`` represents the sign of each dihedral angle $\chi_{1} - \chi_{1&#39;}$</span>
@@ -423,21 +423,21 @@ Last revision: 2/20/2023</p>
 </span><span id="L-262"><a href="#L-262"><span class="linenos">262</span></a><span class="sd">        |      02202 | 02202          | UNK        |     533 |  0.00441602 |</span>
 </span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a><span class="sd">        |      02220 | -RHSpiral      | UNK        |    6751 |  0.0559335  |</span>
 </span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a><span class="sd">        |      02222 | 02222          | UNK        |    3474 |  0.0287828  |</span>
-</span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a><span class="sd">        |      20000 | +/-LHSpiral    | UNK        |    3847 |  0.0318732  |</span>
+</span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a><span class="sd">        |      20000 | ±LHSpiral    | UNK        |    3847 |  0.0318732  |</span>
 </span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a><span class="sd">        |      20002 | +LHSpiral      | UNK        |     875 |  0.00724956 |</span>
-</span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a><span class="sd">        |      20020 | +/-LHHook      | UNK        |     803 |  0.00665302 |</span>
+</span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a><span class="sd">        |      20020 | ±LHHook      | UNK        |     803 |  0.00665302 |</span>
 </span><span id="L-268"><a href="#L-268"><span class="linenos">268</span></a><span class="sd">        |      20022 | +LHHook        | UNK        |     602 |  0.0049877  |</span>
-</span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a><span class="sd">        |      20200 | +/-RHStaple    | UNK        |     419 |  0.0034715  |</span>
+</span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a><span class="sd">        |      20200 | ±RHStaple    | UNK        |     419 |  0.0034715  |</span>
 </span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a><span class="sd">        |      20202 | +RHStaple      | UNK        |     293 |  0.00242757 |</span>
-</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a><span class="sd">        |      20220 | +/-RHHook      | Catalytic  |    1435 |  0.0118893  |</span>
+</span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a><span class="sd">        |      20220 | ±RHHook      | Catalytic  |    1435 |  0.0118893  |</span>
 </span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a><span class="sd">        |      20222 | 20222          | UNK        |     488 |  0.00404318 |</span>
 </span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a><span class="sd">        |      22000 | -/+LHHook      | UNK        |    2455 |  0.0203402  |</span>
 </span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a><span class="sd">        |      22002 | 22002          | UNK        |    1027 |  0.00850891 |</span>
-</span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a><span class="sd">        |      22020 | +/-LHStaple    | UNK        |    1046 |  0.00866633 |</span>
+</span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a><span class="sd">        |      22020 | ±LHStaple    | UNK        |    1046 |  0.00866633 |</span>
 </span><span id="L-276"><a href="#L-276"><span class="linenos">276</span></a><span class="sd">        |      22022 | +LHStaple      | UNK        |     300 |  0.00248556 |</span>
 </span><span id="L-277"><a href="#L-277"><span class="linenos">277</span></a><span class="sd">        |      22200 | -/+RHHook      | UNK        |    6684 |  0.0553783  |</span>
 </span><span id="L-278"><a href="#L-278"><span class="linenos">278</span></a><span class="sd">        |      22202 | +RHHook        | UNK        |     593 |  0.00491313 |</span>
-</span><span id="L-279"><a href="#L-279"><span class="linenos">279</span></a><span class="sd">        |      22220 | +/-RHSpiral    | UNK        |    2544 |  0.0210776  |</span>
+</span><span id="L-279"><a href="#L-279"><span class="linenos">279</span></a><span class="sd">        |      22220 | ±RHSpiral    | UNK        |    2544 |  0.0210776  |</span>
 </span><span id="L-280"><a href="#L-280"><span class="linenos">280</span></a><span class="sd">        |      22222 | +RHSpiral      | UNK        |    3665 |  0.0303653  |</span>
 </span><span id="L-281"><a href="#L-281"><span class="linenos">281</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="L-282"><a href="#L-282"><span class="linenos">282</span></a>
@@ -1136,7 +1136,7 @@ Last revision: 2/20/2023</p>
 </span><span id="DisulfideLoader-239"><a href="#DisulfideLoader-239"><span class="linenos">239</span></a>        <span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader-240"><a href="#DisulfideLoader-240"><span class="linenos">240</span></a><span class="sd">        Build the internal dictionary mapping disulfides to class names.</span>
 </span><span id="DisulfideLoader-241"><a href="#DisulfideLoader-241"><span class="linenos">241</span></a>
-</span><span id="DisulfideLoader-242"><a href="#DisulfideLoader-242"><span class="linenos">242</span></a><span class="sd">        Disulfide classes are defined using the +/- formalism described by </span>
+</span><span id="DisulfideLoader-242"><a href="#DisulfideLoader-242"><span class="linenos">242</span></a><span class="sd">        Disulfide classes are defined using the ± formalism described by </span>
 </span><span id="DisulfideLoader-243"><a href="#DisulfideLoader-243"><span class="linenos">243</span></a><span class="sd">        Hogg et al. (Biochem, 2006, 45, 7429-7433), across all 32 (2^5), possible </span>
 </span><span id="DisulfideLoader-244"><a href="#DisulfideLoader-244"><span class="linenos">244</span></a><span class="sd">        binary sidechain torsional combinations. Classes are named per Hogg&#39;s convention.</span>
 </span><span id="DisulfideLoader-245"><a href="#DisulfideLoader-245"><span class="linenos">245</span></a><span class="sd">        The ``class_id`` represents the sign of each dihedral angle $\chi_{1} - \chi_{1&#39;}$</span>
@@ -1160,21 +1160,21 @@ Last revision: 2/20/2023</p>
 </span><span id="DisulfideLoader-263"><a href="#DisulfideLoader-263"><span class="linenos">263</span></a><span class="sd">        |      02202 | 02202          | UNK        |     533 |  0.00441602 |</span>
 </span><span id="DisulfideLoader-264"><a href="#DisulfideLoader-264"><span class="linenos">264</span></a><span class="sd">        |      02220 | -RHSpiral      | UNK        |    6751 |  0.0559335  |</span>
 </span><span id="DisulfideLoader-265"><a href="#DisulfideLoader-265"><span class="linenos">265</span></a><span class="sd">        |      02222 | 02222          | UNK        |    3474 |  0.0287828  |</span>
-</span><span id="DisulfideLoader-266"><a href="#DisulfideLoader-266"><span class="linenos">266</span></a><span class="sd">        |      20000 | +/-LHSpiral    | UNK        |    3847 |  0.0318732  |</span>
+</span><span id="DisulfideLoader-266"><a href="#DisulfideLoader-266"><span class="linenos">266</span></a><span class="sd">        |      20000 | ±LHSpiral    | UNK        |    3847 |  0.0318732  |</span>
 </span><span id="DisulfideLoader-267"><a href="#DisulfideLoader-267"><span class="linenos">267</span></a><span class="sd">        |      20002 | +LHSpiral      | UNK        |     875 |  0.00724956 |</span>
-</span><span id="DisulfideLoader-268"><a href="#DisulfideLoader-268"><span class="linenos">268</span></a><span class="sd">        |      20020 | +/-LHHook      | UNK        |     803 |  0.00665302 |</span>
+</span><span id="DisulfideLoader-268"><a href="#DisulfideLoader-268"><span class="linenos">268</span></a><span class="sd">        |      20020 | ±LHHook      | UNK        |     803 |  0.00665302 |</span>
 </span><span id="DisulfideLoader-269"><a href="#DisulfideLoader-269"><span class="linenos">269</span></a><span class="sd">        |      20022 | +LHHook        | UNK        |     602 |  0.0049877  |</span>
-</span><span id="DisulfideLoader-270"><a href="#DisulfideLoader-270"><span class="linenos">270</span></a><span class="sd">        |      20200 | +/-RHStaple    | UNK        |     419 |  0.0034715  |</span>
+</span><span id="DisulfideLoader-270"><a href="#DisulfideLoader-270"><span class="linenos">270</span></a><span class="sd">        |      20200 | ±RHStaple    | UNK        |     419 |  0.0034715  |</span>
 </span><span id="DisulfideLoader-271"><a href="#DisulfideLoader-271"><span class="linenos">271</span></a><span class="sd">        |      20202 | +RHStaple      | UNK        |     293 |  0.00242757 |</span>
-</span><span id="DisulfideLoader-272"><a href="#DisulfideLoader-272"><span class="linenos">272</span></a><span class="sd">        |      20220 | +/-RHHook      | Catalytic  |    1435 |  0.0118893  |</span>
+</span><span id="DisulfideLoader-272"><a href="#DisulfideLoader-272"><span class="linenos">272</span></a><span class="sd">        |      20220 | ±RHHook      | Catalytic  |    1435 |  0.0118893  |</span>
 </span><span id="DisulfideLoader-273"><a href="#DisulfideLoader-273"><span class="linenos">273</span></a><span class="sd">        |      20222 | 20222          | UNK        |     488 |  0.00404318 |</span>
 </span><span id="DisulfideLoader-274"><a href="#DisulfideLoader-274"><span class="linenos">274</span></a><span class="sd">        |      22000 | -/+LHHook      | UNK        |    2455 |  0.0203402  |</span>
 </span><span id="DisulfideLoader-275"><a href="#DisulfideLoader-275"><span class="linenos">275</span></a><span class="sd">        |      22002 | 22002          | UNK        |    1027 |  0.00850891 |</span>
-</span><span id="DisulfideLoader-276"><a href="#DisulfideLoader-276"><span class="linenos">276</span></a><span class="sd">        |      22020 | +/-LHStaple    | UNK        |    1046 |  0.00866633 |</span>
+</span><span id="DisulfideLoader-276"><a href="#DisulfideLoader-276"><span class="linenos">276</span></a><span class="sd">        |      22020 | ±LHStaple    | UNK        |    1046 |  0.00866633 |</span>
 </span><span id="DisulfideLoader-277"><a href="#DisulfideLoader-277"><span class="linenos">277</span></a><span class="sd">        |      22022 | +LHStaple      | UNK        |     300 |  0.00248556 |</span>
 </span><span id="DisulfideLoader-278"><a href="#DisulfideLoader-278"><span class="linenos">278</span></a><span class="sd">        |      22200 | -/+RHHook      | UNK        |    6684 |  0.0553783  |</span>
 </span><span id="DisulfideLoader-279"><a href="#DisulfideLoader-279"><span class="linenos">279</span></a><span class="sd">        |      22202 | +RHHook        | UNK        |     593 |  0.00491313 |</span>
-</span><span id="DisulfideLoader-280"><a href="#DisulfideLoader-280"><span class="linenos">280</span></a><span class="sd">        |      22220 | +/-RHSpiral    | UNK        |    2544 |  0.0210776  |</span>
+</span><span id="DisulfideLoader-280"><a href="#DisulfideLoader-280"><span class="linenos">280</span></a><span class="sd">        |      22220 | ±RHSpiral    | UNK        |    2544 |  0.0210776  |</span>
 </span><span id="DisulfideLoader-281"><a href="#DisulfideLoader-281"><span class="linenos">281</span></a><span class="sd">        |      22222 | +RHSpiral      | UNK        |    3665 |  0.0303653  |</span>
 </span><span id="DisulfideLoader-282"><a href="#DisulfideLoader-282"><span class="linenos">282</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader-283"><a href="#DisulfideLoader-283"><span class="linenos">283</span></a>
@@ -1664,7 +1664,7 @@ function.</p>
 </span><span id="DisulfideLoader.build_classes-239"><a href="#DisulfideLoader.build_classes-239"><span class="linenos">239</span></a>        <span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader.build_classes-240"><a href="#DisulfideLoader.build_classes-240"><span class="linenos">240</span></a><span class="sd">        Build the internal dictionary mapping disulfides to class names.</span>
 </span><span id="DisulfideLoader.build_classes-241"><a href="#DisulfideLoader.build_classes-241"><span class="linenos">241</span></a>
-</span><span id="DisulfideLoader.build_classes-242"><a href="#DisulfideLoader.build_classes-242"><span class="linenos">242</span></a><span class="sd">        Disulfide classes are defined using the +/- formalism described by </span>
+</span><span id="DisulfideLoader.build_classes-242"><a href="#DisulfideLoader.build_classes-242"><span class="linenos">242</span></a><span class="sd">        Disulfide classes are defined using the ± formalism described by </span>
 </span><span id="DisulfideLoader.build_classes-243"><a href="#DisulfideLoader.build_classes-243"><span class="linenos">243</span></a><span class="sd">        Hogg et al. (Biochem, 2006, 45, 7429-7433), across all 32 (2^5), possible </span>
 </span><span id="DisulfideLoader.build_classes-244"><a href="#DisulfideLoader.build_classes-244"><span class="linenos">244</span></a><span class="sd">        binary sidechain torsional combinations. Classes are named per Hogg&#39;s convention.</span>
 </span><span id="DisulfideLoader.build_classes-245"><a href="#DisulfideLoader.build_classes-245"><span class="linenos">245</span></a><span class="sd">        The ``class_id`` represents the sign of each dihedral angle $\chi_{1} - \chi_{1&#39;}$</span>
@@ -1688,21 +1688,21 @@ function.</p>
 </span><span id="DisulfideLoader.build_classes-263"><a href="#DisulfideLoader.build_classes-263"><span class="linenos">263</span></a><span class="sd">        |      02202 | 02202          | UNK        |     533 |  0.00441602 |</span>
 </span><span id="DisulfideLoader.build_classes-264"><a href="#DisulfideLoader.build_classes-264"><span class="linenos">264</span></a><span class="sd">        |      02220 | -RHSpiral      | UNK        |    6751 |  0.0559335  |</span>
 </span><span id="DisulfideLoader.build_classes-265"><a href="#DisulfideLoader.build_classes-265"><span class="linenos">265</span></a><span class="sd">        |      02222 | 02222          | UNK        |    3474 |  0.0287828  |</span>
-</span><span id="DisulfideLoader.build_classes-266"><a href="#DisulfideLoader.build_classes-266"><span class="linenos">266</span></a><span class="sd">        |      20000 | +/-LHSpiral    | UNK        |    3847 |  0.0318732  |</span>
+</span><span id="DisulfideLoader.build_classes-266"><a href="#DisulfideLoader.build_classes-266"><span class="linenos">266</span></a><span class="sd">        |      20000 | ±LHSpiral    | UNK        |    3847 |  0.0318732  |</span>
 </span><span id="DisulfideLoader.build_classes-267"><a href="#DisulfideLoader.build_classes-267"><span class="linenos">267</span></a><span class="sd">        |      20002 | +LHSpiral      | UNK        |     875 |  0.00724956 |</span>
-</span><span id="DisulfideLoader.build_classes-268"><a href="#DisulfideLoader.build_classes-268"><span class="linenos">268</span></a><span class="sd">        |      20020 | +/-LHHook      | UNK        |     803 |  0.00665302 |</span>
+</span><span id="DisulfideLoader.build_classes-268"><a href="#DisulfideLoader.build_classes-268"><span class="linenos">268</span></a><span class="sd">        |      20020 | ±LHHook      | UNK        |     803 |  0.00665302 |</span>
 </span><span id="DisulfideLoader.build_classes-269"><a href="#DisulfideLoader.build_classes-269"><span class="linenos">269</span></a><span class="sd">        |      20022 | +LHHook        | UNK        |     602 |  0.0049877  |</span>
-</span><span id="DisulfideLoader.build_classes-270"><a href="#DisulfideLoader.build_classes-270"><span class="linenos">270</span></a><span class="sd">        |      20200 | +/-RHStaple    | UNK        |     419 |  0.0034715  |</span>
+</span><span id="DisulfideLoader.build_classes-270"><a href="#DisulfideLoader.build_classes-270"><span class="linenos">270</span></a><span class="sd">        |      20200 | ±RHStaple    | UNK        |     419 |  0.0034715  |</span>
 </span><span id="DisulfideLoader.build_classes-271"><a href="#DisulfideLoader.build_classes-271"><span class="linenos">271</span></a><span class="sd">        |      20202 | +RHStaple      | UNK        |     293 |  0.00242757 |</span>
-</span><span id="DisulfideLoader.build_classes-272"><a href="#DisulfideLoader.build_classes-272"><span class="linenos">272</span></a><span class="sd">        |      20220 | +/-RHHook      | Catalytic  |    1435 |  0.0118893  |</span>
+</span><span id="DisulfideLoader.build_classes-272"><a href="#DisulfideLoader.build_classes-272"><span class="linenos">272</span></a><span class="sd">        |      20220 | ±RHHook      | Catalytic  |    1435 |  0.0118893  |</span>
 </span><span id="DisulfideLoader.build_classes-273"><a href="#DisulfideLoader.build_classes-273"><span class="linenos">273</span></a><span class="sd">        |      20222 | 20222          | UNK        |     488 |  0.00404318 |</span>
 </span><span id="DisulfideLoader.build_classes-274"><a href="#DisulfideLoader.build_classes-274"><span class="linenos">274</span></a><span class="sd">        |      22000 | -/+LHHook      | UNK        |    2455 |  0.0203402  |</span>
 </span><span id="DisulfideLoader.build_classes-275"><a href="#DisulfideLoader.build_classes-275"><span class="linenos">275</span></a><span class="sd">        |      22002 | 22002          | UNK        |    1027 |  0.00850891 |</span>
-</span><span id="DisulfideLoader.build_classes-276"><a href="#DisulfideLoader.build_classes-276"><span class="linenos">276</span></a><span class="sd">        |      22020 | +/-LHStaple    | UNK        |    1046 |  0.00866633 |</span>
+</span><span id="DisulfideLoader.build_classes-276"><a href="#DisulfideLoader.build_classes-276"><span class="linenos">276</span></a><span class="sd">        |      22020 | ±LHStaple    | UNK        |    1046 |  0.00866633 |</span>
 </span><span id="DisulfideLoader.build_classes-277"><a href="#DisulfideLoader.build_classes-277"><span class="linenos">277</span></a><span class="sd">        |      22022 | +LHStaple      | UNK        |     300 |  0.00248556 |</span>
 </span><span id="DisulfideLoader.build_classes-278"><a href="#DisulfideLoader.build_classes-278"><span class="linenos">278</span></a><span class="sd">        |      22200 | -/+RHHook      | UNK        |    6684 |  0.0553783  |</span>
 </span><span id="DisulfideLoader.build_classes-279"><a href="#DisulfideLoader.build_classes-279"><span class="linenos">279</span></a><span class="sd">        |      22202 | +RHHook        | UNK        |     593 |  0.00491313 |</span>
-</span><span id="DisulfideLoader.build_classes-280"><a href="#DisulfideLoader.build_classes-280"><span class="linenos">280</span></a><span class="sd">        |      22220 | +/-RHSpiral    | UNK        |    2544 |  0.0210776  |</span>
+</span><span id="DisulfideLoader.build_classes-280"><a href="#DisulfideLoader.build_classes-280"><span class="linenos">280</span></a><span class="sd">        |      22220 | ±RHSpiral    | UNK        |    2544 |  0.0210776  |</span>
 </span><span id="DisulfideLoader.build_classes-281"><a href="#DisulfideLoader.build_classes-281"><span class="linenos">281</span></a><span class="sd">        |      22222 | +RHSpiral      | UNK        |    3665 |  0.0303653  |</span>
 </span><span id="DisulfideLoader.build_classes-282"><a href="#DisulfideLoader.build_classes-282"><span class="linenos">282</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader.build_classes-283"><a href="#DisulfideLoader.build_classes-283"><span class="linenos">283</span></a>
@@ -1744,7 +1744,7 @@ function.</p>
 
             <div class="docstring"><p>Build the internal dictionary mapping disulfides to class names.</p>
 
-<p>Disulfide classes are defined using the +/- formalism described by 
+<p>Disulfide classes are defined using the ± formalism described by 
 Hogg et al. (Biochem, 2006, 45, 7429-7433), across all 32 (2^5), possible 
 binary sidechain torsional combinations. Classes are named per Hogg's convention.
 The <code>class_id</code> represents the sign of each dihedral angle $\chi_{1} - \chi_{1'}$
@@ -1875,7 +1875,7 @@ where <em>0</em> repreents <em>negative</em> dihedral angle and <em>2</em> a <em
 </tr>
 <tr>
   <td style="text-align:right;">20000</td>
-  <td style="text-align:left;">+/-LHSpiral</td>
+  <td style="text-align:left;">±LHSpiral</td>
   <td style="text-align:left;">UNK</td>
   <td style="text-align:right;">3847</td>
   <td style="text-align:right;">0.0318732</td>
@@ -1889,7 +1889,7 @@ where <em>0</em> repreents <em>negative</em> dihedral angle and <em>2</em> a <em
 </tr>
 <tr>
   <td style="text-align:right;">20020</td>
-  <td style="text-align:left;">+/-LHHook</td>
+  <td style="text-align:left;">±LHHook</td>
   <td style="text-align:left;">UNK</td>
   <td style="text-align:right;">803</td>
   <td style="text-align:right;">0.00665302</td>
@@ -1903,7 +1903,7 @@ where <em>0</em> repreents <em>negative</em> dihedral angle and <em>2</em> a <em
 </tr>
 <tr>
   <td style="text-align:right;">20200</td>
-  <td style="text-align:left;">+/-RHStaple</td>
+  <td style="text-align:left;">±RHStaple</td>
   <td style="text-align:left;">UNK</td>
   <td style="text-align:right;">419</td>
   <td style="text-align:right;">0.0034715</td>
@@ -1917,7 +1917,7 @@ where <em>0</em> repreents <em>negative</em> dihedral angle and <em>2</em> a <em
 </tr>
 <tr>
   <td style="text-align:right;">20220</td>
-  <td style="text-align:left;">+/-RHHook</td>
+  <td style="text-align:left;">±RHHook</td>
   <td style="text-align:left;">Catalytic</td>
   <td style="text-align:right;">1435</td>
   <td style="text-align:right;">0.0118893</td>
@@ -1945,7 +1945,7 @@ where <em>0</em> repreents <em>negative</em> dihedral angle and <em>2</em> a <em
 </tr>
 <tr>
   <td style="text-align:right;">22020</td>
-  <td style="text-align:left;">+/-LHStaple</td>
+  <td style="text-align:left;">±LHStaple</td>
   <td style="text-align:left;">UNK</td>
   <td style="text-align:right;">1046</td>
   <td style="text-align:right;">0.00866633</td>
@@ -1973,7 +1973,7 @@ where <em>0</em> repreents <em>negative</em> dihedral angle and <em>2</em> a <em
 </tr>
 <tr>
   <td style="text-align:right;">22220</td>
-  <td style="text-align:left;">+/-RHSpiral</td>
+  <td style="text-align:left;">±RHSpiral</td>
   <td style="text-align:left;">UNK</td>
   <td style="text-align:right;">2544</td>
   <td style="text-align:right;">0.0210776</td>
