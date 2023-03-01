@@ -550,7 +550,7 @@ class DisulfideList(UserList):
                         error_y=dict(type='data', array=[std_vals[12]], width=0.25, visible=True)),
                         row=2, col=2)
         # Update the layout of the subplot
-        fig.update_yaxes(title_text="Torsion Length", range=[0,320], row=2, col=2)
+        fig.update_yaxes(title_text="Torsion Length", range=[0,350], row=2, col=2)
         fig.update_traces(width=0.25, row=2, col=2)
 
         # Update the error bars
