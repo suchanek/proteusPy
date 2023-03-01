@@ -57,51 +57,6 @@ Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi
            'chi5', 'energy', 'ca_distance','cb_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
            'psi_dist', 'torsion_length', 'rho']
 
-# Class definition for a Disulfide bond. 
-def About_proteusPy():
-    """
-    This class provides a Python object and methods representing a physical disulfide bond either 
-    extracted from the RCSB protein databank or built using the [proteusPy.Turtle3D](turtle3D.html) 
-    class. The disulfide bond is an important intermolecular stabilizing structural element and is 
-    characterized by:
-
-    * Atomic coordinates for the atoms N, Cα, Cβ, C', Sγ for both residues. These are stored as both 
-    raw atomic coordinates as read from the RCSB file and internal local coordinates.
-    * The dihedral angles Χ1 - Χ5 for the disulfide bond
-    * A name, by default {pdb_id}{prox_resnumb}{prox_chain}_{distal_resnum}{distal_chain}
-    * Proximal residue number
-    * Distal residue number
-    * Approximate bond torsional energy (kcal/mol):
-        $$ E_{kcal/mol} \\approx 2.0 * cos(3.0 * \\chi_{1}) + cos(3.0 * \\chi_{5}) + cos(3.0 * \\chi_{2}) 
-        + cos(3.0 * \\chi_{4}) + 3.5 * cos(2.0 * \\chi_{3}) + 0.6 * cos(3.0 * \\chi_{3}) + 10.1 $$
-        The equation embodies the typical 3-fold rotation barriers associated with single bonds,
-        (Χ1, Χ5, Χ2, Χ4) and a high 2-fold barrier for Χ3, resulting from the partial double bond
-        character of the S-S bond. This property leads to two major disulfide families, characterized
-        by the sign of Χ3. *Left-handed* disulfides have Χ3 < 0° and *right-handed* disulfides have Χ3 > 0°.
-    * Euclidean length of the dihedral angles (degrees) defined as:
-        $$\\sqrt(\\chi_{1}^{2} + \\chi_{2}^{2} + \\chi_{3}^{2} + \\chi_{4}^{2} + \\chi_{5}^{2})$$
-    * Cα - Cα distance (Å)
-    * The previous C' and next N for both the proximal and distal residues. These are needed to calculate 
-    the backbone dihedral angles Φ and Ψ.
-    * Backbone dihedral angles Φ and Ψ, when possible. Not all structures are complete and in those 
-    cases the atoms needed may be undefined. In this case the Φ and Ψ angles are set to -180°.
-
-    The class also provides a rendering capabilities using the excellent [PyVista](https://pyvista.org) 
-    library, and can display disulfides interactively in a variety of display styles:
-    * 'sb' - Split Bonds style - bonds colored by their atom type
-    * 'bs' - Ball and Stick style - split bond coloring with small atoms
-    * 'pd' - Proximal/Distal style - bonds colored *Red* for proximal residue and *Green* for the distal 
-    residue.
-    * 'cpk' - CPK style rendering, colored by atom type:
-        * Carbon   - Grey
-        * Nitrogen - Blue
-        * Sulfur   - Yellow
-        * Oxygen   - Red
-        * Hydrogen - White 
-    
-    Individual displays can be saved to a file, and animations created.
-    """
-
 class Disulfide:
     """
     This class provides a Python object and methods representing a physical disulfide bond 
@@ -684,7 +639,7 @@ class Disulfide:
         self.torsion_array = np.array((self.chi1, self.chi2, self.chi3, 
                                         self.chi4, self.chi5))
         self.torsion_length = self.Torsion_Length()
-        self.calculate_rho()
+        self.compute_rho()
         self.missing_atoms = True
         self.modelled = True
     

@@ -262,21 +262,21 @@ class DisulfideLoader:
         |      02202 | 02202          | UNK        |     533 |  0.00441602 |
         |      02220 | -RHSpiral      | UNK        |    6751 |  0.0559335  |
         |      02222 | 02222          | UNK        |    3474 |  0.0287828  |
-        |      20000 | ±LHSpiral    | UNK        |    3847 |  0.0318732  |
+        |      20000 | ±LHSpiral      | UNK        |    3847 |  0.0318732  |
         |      20002 | +LHSpiral      | UNK        |     875 |  0.00724956 |
-        |      20020 | ±LHHook      | UNK        |     803 |  0.00665302 |
+        |      20020 | ±LHHook        | UNK        |     803 |  0.00665302 |
         |      20022 | +LHHook        | UNK        |     602 |  0.0049877  |
-        |      20200 | ±RHStaple    | UNK        |     419 |  0.0034715  |
+        |      20200 | ±RHStaple      | UNK        |     419 |  0.0034715  |
         |      20202 | +RHStaple      | UNK        |     293 |  0.00242757 |
-        |      20220 | ±RHHook      | Catalytic  |    1435 |  0.0118893  |
+        |      20220 | ±RHHook        | Catalytic  |    1435 |  0.0118893  |
         |      20222 | 20222          | UNK        |     488 |  0.00404318 |
         |      22000 | -/+LHHook      | UNK        |    2455 |  0.0203402  |
         |      22002 | 22002          | UNK        |    1027 |  0.00850891 |
-        |      22020 | ±LHStaple    | UNK        |    1046 |  0.00866633 |
+        |      22020 | ±LHStaple      | UNK        |    1046 |  0.00866633 |
         |      22022 | +LHStaple      | UNK        |     300 |  0.00248556 |
         |      22200 | -/+RHHook      | UNK        |    6684 |  0.0553783  |
         |      22202 | +RHHook        | UNK        |     593 |  0.00491313 |
-        |      22220 | ±RHSpiral    | UNK        |    2544 |  0.0210776  |
+        |      22220 | ±RHSpiral      | UNK        |    2544 |  0.0210776  |
         |      22222 | +RHSpiral      | UNK        |    3665 |  0.0303653  |
         '''
 
@@ -550,7 +550,8 @@ class DisulfideLoader:
         except KeyError:
             print(f'No class: {classid}')
         return
-  
+
+    
 # class ends
 class DisulfideClass_Constructor():
     '''
@@ -709,6 +710,34 @@ def create_classes(df):
     3    20022   [1]      1        0.2        20.0
     4    22200   [4]      1        0.2        20.0
 
+    """
+    # Create new columns with the sign of each chi column
+    chi_columns = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']
+    sign_columns = [col + '_s' for col in chi_columns]
+    df[sign_columns] = df[chi_columns].applymap(lambda x: 1 if x >= 0 else -1)
+    
+    # Create a new column with the class ID for each row
+    class_id_column = 'class_id'
+    df[class_id_column] = (df[sign_columns] + 1).apply(lambda x: ''.join(x.astype(str)), axis=1)
+
+    # Group the DataFrame by the class ID and return the grouped data
+    grouped = df.groupby(class_id_column)['ss_id'].unique().reset_index()
+    grouped['count'] = grouped['ss_id'].apply(lambda x: len(x))
+    grouped['incidence'] = grouped['ss_id'].apply(lambda x: len(x)/len(df))
+    grouped['percentage'] = grouped['incidence'].apply(lambda x: 100 * x)
+
+    return grouped
+
+def create_trinary_classes(df):
+    """
+    Group the DataFrame by the range of the chi columns and create a new class ID column for each unique grouping.
+
+    :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'cb_distance', 'torsion_length', and 'energy'.
+    :return: A pandas DataFrame containing columns 'class_id', 'ss_id', and 'count', where 'class_id' is a unique identifier for each grouping of chi signs, 'ss_id' is a list of all 'ss_id' values in that grouping, and 'count' is the number of rows in that grouping.
+    
+    Example:
+    >>> import pandas as pd
+    
     """
     # Create new columns with the sign of each chi column
     chi_columns = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']
