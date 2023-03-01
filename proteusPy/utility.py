@@ -9,15 +9,14 @@ Copyright (c)2023 Eric G. Suchanek, PhD, all rights reserved
 
 __pdoc__ = {'__all__': True}
 
+import os
 import math
 import numpy as np
+import itertools
 
 import copy
 import subprocess
-import pickle
-
-import os
-import requests
+import pandas as pd
 
 from numpy import linspace
 from matplotlib import cm
@@ -28,12 +27,11 @@ from proteusPy.proteusPyWarning import ProteusPyWarning
 from Bio.PDB.vectors import Vector
 from Bio.PDB import PDBParser
 
-import pandas as pd
 from proteusPy.data import DATA_DIR
 
 def distance_squared(p1: np.array, p2: np.array) -> np.array:
     '''
-    Returns the square of the N-dimensional distance between the
+    Return the square of the N-dimensional distance between the
     two arrays.
 
     :param np.array p1: N-dimensional array 1
@@ -74,7 +72,7 @@ def distance3d(p1: Vector, p2: Vector) -> float:
 
 def get_jet_colormap(steps):
     """
-    Returns an array of uniformly spaced RGB values using the 'jet' colormap.
+    Return an array of uniformly spaced RGB values using the 'jet' colormap.
 
     :param steps: The number of steps in the output array.
 
@@ -274,6 +272,33 @@ def image_to_ascii_art(fname, nwidth):
 
     # Print the ASCII art string.
     print(ascii_art)
+
+def generate_vector_dataframe(base=3):
+    """
+    Generate a pandas DataFrame containing all combinations for a vector of length 5 with a given base.
+
+    :param base: An integer representing the base of the vector elements. Must be 2, 3, or 4.
+    :return: A pandas DataFrame with columns 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', where each row
+             contains all combinations for a vector of length 5 with the specified base. The symbols used
+             to represent the vector elements are '-' and '+' for base 2, '-' '+' and '*' for base 3,
+             and '-' '+' '*' and '@' for base 4.
+    :raises ValueError: If the specified base is not supported (i.e., not 2, 3, or 4).
+    """
+    import pandas as pd
+    import itertools
+
+    if base == 2:
+        states = ['-', '+']
+    elif base == 3:
+        states = ['-', '+', '*']
+    elif base == 4:
+        states = ['-', '+', '*', '@']
+    else:
+        raise ValueError("Unsupported base")
+
+    combinations = list(itertools.product(states, repeat=5))
+    df = pd.DataFrame(combinations, columns=['chi1', 'chi2', 'chi3', 'chi4', 'chi5'])
+    return df
 
 
 if __name__ == "__main__":

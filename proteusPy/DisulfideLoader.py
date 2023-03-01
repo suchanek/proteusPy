@@ -730,23 +730,39 @@ def create_classes(df):
 
 def create_trinary_classes(df):
     """
-    Group the DataFrame by the range of the chi columns and create a new class ID column for each unique grouping.
+    Takes a DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance',
+    'cb_distance', 'torsion_length', 'energy', and 'rho' and adds new columns based on the following rules:
+    1. If the 'chi' column is -60 +/- 15, then the new column is '*'.
+    2. If it's 60 +/- 15, then the new column is '@'.
+    3. If it's 0 +/- 15 OR 180 +/- 15, then the new column is '^'.
 
-    :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'cb_distance', 'torsion_length', and 'energy'.
-    :return: A pandas DataFrame containing columns 'class_id', 'ss_id', and 'count', where 'class_id' is a unique identifier for each grouping of chi signs, 'ss_id' is a list of all 'ss_id' values in that grouping, and 'count' is the number of rows in that grouping.
-    
-    Example:
-    >>> import pandas as pd
-    
+    A new column named `class_id` is also added, which is the concatenation of the `_t` columns.
+
+    :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5',
+               'ca_distance', 'cb_distance', 'torsion_length', 'energy', and 'rho'
+    :return: The input DataFrame with the added columns
     """
-    # Create new columns with the sign of each chi column
-    chi_columns = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']
-    sign_columns = [col + '_s' for col in chi_columns]
-    df[sign_columns] = df[chi_columns].applymap(lambda x: 1 if x >= 0 else -1)
     
-    # Create a new column with the class ID for each row
+    new_cols = []
+    for col_name in ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']:
+        col = df[col_name]
+        new_col = []
+        for val in col:
+            if abs(val + 60) <= 15:
+                new_col.append('*')
+            elif abs(val - 60) <= 15:
+                new_col.append('@')
+            elif abs(val) <= 15 or abs(val - 180) <= 15:
+                new_col.append('^')
+            else:
+                new_col.append('_')
+        new_col_name = col_name + '_t'
+        new_cols.append(new_col_name)
+        df[new_col_name] = new_col
+    
     class_id_column = 'class_id'
-    df[class_id_column] = (df[sign_columns] + 1).apply(lambda x: ''.join(x.astype(str)), axis=1)
+
+    df['class_id'] = df[new_cols].apply(lambda x: ''.join(x), axis=1)
 
     # Group the DataFrame by the class ID and return the grouped data
     grouped = df.groupby(class_id_column)['ss_id'].unique().reset_index()
