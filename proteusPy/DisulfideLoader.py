@@ -37,6 +37,7 @@ from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideExceptions import *
 from proteusPy.data import *
 
+import itertools
 
 class DisulfideLoader:
     '''
@@ -727,6 +728,44 @@ def create_classes(df):
     grouped['percentage'] = grouped['incidence'].apply(lambda x: 100 * x)
 
     return grouped
+
+# BING generated...
+def generate_dataframe(input_df):
+    """Generate a pandas dataframe with columns 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', new columns representing all combinations for a vector of length 5 with a base of 3, and one more column named 'class_id' that is the concatenation of the combination columns.
+
+    :param input_df: A pandas dataframe with columns ['chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy', 'ca_distance', 'cb_distance', 'torsion_length' and 'rho'.
+    :type input_df: pandas.DataFrame
+    :return: A pandas dataframe with the desired columns and rows.
+    :rtype: pandas.DataFrame
+    """
+    # create a list of symbols for each state
+    symbols = ['@', '*', '#']
+    
+    # check if the input dataframe has the required columns
+    required_columns = ['energy','ca_distance','cb_distance','torsion_length','rho']
+    
+    if all(col in input_df.columns for col in required_columns):
+        # create a copy of the input dataframe to avoid modifying it
+        df = input_df.copy()
+        
+        # create new column names for the combinations using chi_comb prefix
+        comb_columns = [f"chi_comb{i+1}" for i in range(5)]
+        
+        # create a list of all possible combinations of symbols for a vector of length 5
+        combinations = list(itertools.product(symbols, repeat=5))
+        
+        # assign each combination to a row in the output dataframe using numpy indexing
+        df[comb_columns] = pd.np.array(combinations)
+        
+        # create one more column named class_id that is the concatenation of the combination columns using string join method
+        df['class_id'] = df[comb_columns].apply(lambda x: ''.join(x), axis=1)
+        
+        # return the dataframe
+        return df
+    
+    else:
+        # raise an exception if the input dataframe does not have the required columns
+        raise ValueError(f"Input dataframe must have these columns: {required_columns}")
 
 def create_trinary_classes(df):
     """

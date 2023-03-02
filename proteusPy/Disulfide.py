@@ -1027,7 +1027,7 @@ class Disulfide:
 
 
         self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
-        self.cb_distance = distance3d(self.cb_prox, self.ca_dist)
+        self.cb_distance = distance3d(self.cb_prox, self.cb_dist)
         self.torsion_array = np.array((self.chi1, self.chi2, self.chi3, 
                                         self.chi4, self.chi5))
         self.torsion_length = self.Torsion_Length()
