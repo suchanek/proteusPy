@@ -1421,6 +1421,55 @@ class Disulfide:
         if verbose:
             print(f'Saved: {fname}')
     
+    def save_meshes_as_stl(self,pl, filename):
+        import pyvista as pv
+    
+        # Combine all meshes into a single dataset
+        combined_mesh = pv.PolyData()
+        for i, actor in enumerate(pl.actors):
+            if isinstance(actor, pv.pyvista_ndarray):
+                mesh = actor.to_mesh()
+                if isinstance(mesh, pv.PolyData):
+                    combined_mesh += mesh
+                    print(f"Added mesh_{i} to combined_mesh")
+                else:
+                    print(f"Skipping non-PolyData mesh_{i} of type {type(mesh)} |{mesh}|")
+            else:
+                print(f"Skipping non-mesh actor_{i} of type {type(actor)}")
+    
+        # Save the combined mesh as an STL file
+        combined_mesh.save(filename + ".stl", binary=True)
+        print(pl)
+    
+
+    def export(self, style='sb', verbose=True, fname='ssbond_plt'):
+        '''
+        Create and save a screenshot of the Disulfide in the given style
+        and filename
+
+        :param single: Display a single vs panel view, defaults to True
+        :param style: Rendering style, one of:
+        * 'sb' - split bonds
+        * 'bs' - ball and stick
+        * 'cpk' - CPK style
+        * 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
+        * 'plain' - boring single color,
+        :param fname: output filename,, defaults to 'ssbond.stl'
+        :param verbose: Verbosit, defaults to False
+        '''
+    
+        if verbose:
+            print(f'-> screenshot(): Rendering screenshot to file {fname}')
+
+        pl = pv.Plotter()
+
+        self._render(pl, style=style, bondcolor=BOND_COLOR, 
+                    bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+        
+        self.save_meshes_as_stl(pl, fname)
+
+        return
+    
     def set_permissive(self, perm: bool) -> None:
         '''
         Sets PERMISSIVE flag for Disulfide parsing
