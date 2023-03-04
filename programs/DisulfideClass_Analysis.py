@@ -163,10 +163,10 @@ def analyze_quart_classes(loader: DisulfideLoader, do_graph=True, do_consensus=T
         ss_list = row['ss_id']
         cls = row['class_id']
         tot = len(ss_list)
-        fname = f'{DATA_DIR}classes/ss_class_trin_{idx}.png'
+        fname = f'{DATA_DIR}classes/ss_class_quart_{idx}.png'
+        pbar.set_postfix({'ID': cls, 'Cnt': tot}) # update the progress bar
 
         class_disulfides = DisulfideList([], cls, quiet=True)
-        pbar.set_postfix({'ID': cls, 'Cnt': tot}) # update the progress bar
 
         for ssid in ss_list:
             class_disulfides.append(loader[ssid])
