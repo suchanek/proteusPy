@@ -144,31 +144,33 @@ def analyze_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -
     
     return res_list
 
-from proteusPy.DisulfideLoader import create_quart_classes
+from proteusPy.DisulfideLoader import create_quat_classes
 from proteusPy.utility import sort_by_column
 
-def analyze_quart_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -> DisulfideList:
-    class_filename = f'{DATA_DIR}SS_consensus_class_quart.pkl'
+def analyze_quat_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -> DisulfideList:
+    class_filename = f'{DATA_DIR}SS_consensus_class_quat.pkl'
 
     tors = loader.getTorsions()
-    trin = create_quart_classes(tors)
+    trin = create_quat_classes(tors)
     tot_classes = trin.shape[0]
     res_list = DisulfideList([], 'SS_Class_Avg_SS')
 
-    pbar = tqdm(range(tot_classes), ncols=100)
+    pbar = tqdm(range(tot_classes), ncols=80)
 
     # loop over all rows
     for idx in pbar:
         row = trin.iloc[idx]
-        ss_list = row['ss_id']
         cls = row['class_id']
+        ss_list = row['ss_id']
         tot = len(ss_list)
-        fname = f'{DATA_DIR}classes/ss_class_quart_{idx}.png'
-        pbar.set_postfix({'ID': cls, 'Cnt': tot}) # update the progress bar
+
+        fname = f'{DATA_DIR}classes/ss_class_quat_{idx}.png'
+        pbar.set_postfix({'CLS': cls, 'Cnt': tot}) # update the progress bar
 
         class_disulfides = DisulfideList([], cls, quiet=True)
 
-        for ssid in ss_list:
+        pbar2 = tqdm(ss_list, ncols=80, leave=False)
+        for ssid in pbar2:
             class_disulfides.append(loader[ssid])
 
         if do_graph:
@@ -179,7 +181,7 @@ def analyze_quart_classes(loader: DisulfideLoader, do_graph=True, do_consensus=T
             # get the average conformation - array of dihedrals
             avg_conformation = np.zeros(5)
 
-            #print(f'--> analyze_quart_classes(): Computing avg conformation for: {cls}')
+            #print(f'--> analyze_quat_classes(): Computing avg conformation for: {cls}')
             avg_conformation = class_disulfides.Average_Conformation
 
             # build the average disulfide for the class
@@ -191,18 +193,17 @@ def analyze_quart_classes(loader: DisulfideLoader, do_graph=True, do_consensus=T
             res_list.append(exemplar)
         
     if do_consensus:
-        print(f'--> analyze_quart_classes(): Writing consensus structures to: {class_filename}')
+        print(f'--> analyze_quat_classes(): Writing consensus structures to: {class_filename}')
         with open(class_filename, "wb+") as f:
             pickle.dump(res_list, f)
     
     return res_list
 
-
 # main program begins
 PDB_SS = Load_PDB_SS(verbose=True, subset=False)
 
-ss_classlist = DisulfideList([], 'PDB_SS_CLASSES')
-ss_classlist = analyze_quart_classes(PDB_SS, do_graph=True, do_consensus=True)
+ss_classlist = DisulfideList([], 'PDB_SS_QUATERNARY_CLASSES')
+ss_classlist = analyze_quat_classes(PDB_SS, do_graph=True, do_consensus=True)
 
 end = time.time()
 elapsed = end - start

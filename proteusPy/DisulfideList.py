@@ -692,8 +692,17 @@ class DisulfideList(UserList):
             self.data.extend(other)
         else:
             self.data.extend(self.validate_ss(item) for item in other)
-
+    
     def get_by_name(self, name) -> Disulfide:
+        '''
+        Returns the Disulfide with the given name from the list.
+        '''
+        for ss in self.data:
+            if ss.name == name:
+                return ss  # or ss.copy() !!!
+        return None
+
+    def Oget_by_name(self, name) -> Disulfide:
         '''
         Returns the Disulfide with the given name from the list.
         '''

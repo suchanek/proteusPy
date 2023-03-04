@@ -11,7 +11,7 @@ Last revision: 2/20/2023
 # Last modification: 2/20/23
 # Cα N, Cα, Cβ, C', Sγ Å °
 
-__pdoc__ = {'__all__': True}
+__pdoc__ = {'__all__': True, '__getitem__': True}
 
 import sys
 import copy
@@ -40,6 +40,8 @@ from proteusPy.data import *
 import itertools
 
 class DisulfideLoader:
+    __pdoc__ = {'__all__': True, '__getitem__': True}
+
     '''
     This class represents the disulfide database itself and is its primary means of accession. 
     The entirety of the RCSB disulfide database is stored within the class via a
@@ -729,17 +731,17 @@ def create_classes(df):
 
     return grouped
 
-
-def create_quart_classes(df):
+def create_quat_classes(df):
     """
     Add new columns to the input DataFrame with a 4-class encoding for input 'chi' values.
 
     Takes a DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance',
     'cb_distance', 'torsion_length', 'energy', and 'rho' and adds new columns based on the following rules:
-    1. If the 'chi' column is -70 +/-20, then the new column is '-'. (g-)
-    2. If it's 70 +/- 20, then the new column is '+'. (g+)
-    3. If it's -160 +/- 20 OR 160 +/- 20, then the new column is '*'. (trans)
-    4. Otherwise the new column is '@' 
+    1. If the 'chi' column is between -90 to -60 then the new column is '-'. (g-)
+    2. If it's between 60 to 90, then the new column is '+'. (g+)
+    3. If it's between -180 to -150 then the new column is '*'. (trans)
+    4. If it's between 150 to 180 then the new column is '@'. (trans)
+    5. Otherwise the new column is '!' 
 
     A new column named `class_id` is also added, which is the concatenation of the `_t` columns. The DataFrame is then
     grouped by the `class_id` column, and a new DataFrame is returned that shows the unique `ss_id` values for each group,
@@ -756,14 +758,14 @@ def create_quart_classes(df):
         col = df[col_name]
         new_col = []
         for val in col:
-            if is_between(val, -90, -60):
+            if is_between(val, -90, -60) or is_between(val, 60, 90):
                 new_col.append('-')
-            elif is_between(val, 60, 90):
-                new_col.append('+')
-            elif is_between(val, -180, -120) or is_between(val, 120, 180):
+            elif is_between(val, -181, -150) or is_between(val, 150, 180):
                 new_col.append('*')
+            elif is_between(val, -150, -120) or is_between(val, 120, 150):
+                new_col.append('+')
             else:
-                new_col.append('@')
+                new_col.append('!')
         new_col_name = col_name + '_t'
         new_cols.append(new_col_name)
         df[new_col_name] = new_col
