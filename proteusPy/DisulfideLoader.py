@@ -729,72 +729,41 @@ def create_classes(df):
 
     return grouped
 
-# BING generated...
-def generate_dataframe(input_df):
-    """Generate a pandas dataframe with columns 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', new columns representing all combinations for a vector of length 5 with a base of 3, and one more column named 'class_id' that is the concatenation of the combination columns.
 
-    :param input_df: A pandas dataframe with columns ['chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'energy', 'ca_distance', 'cb_distance', 'torsion_length' and 'rho'.
-    :type input_df: pandas.DataFrame
-    :return: A pandas dataframe with the desired columns and rows.
-    :rtype: pandas.DataFrame
+def create_quart_classes(df):
     """
-    # create a list of symbols for each state
-    symbols = ['@', '*', '#']
-    
-    # check if the input dataframe has the required columns
-    required_columns = ['energy','ca_distance','cb_distance','torsion_length','rho']
-    
-    if all(col in input_df.columns for col in required_columns):
-        # create a copy of the input dataframe to avoid modifying it
-        df = input_df.copy()
-        
-        # create new column names for the combinations using chi_comb prefix
-        comb_columns = [f"chi_comb{i+1}" for i in range(5)]
-        
-        # create a list of all possible combinations of symbols for a vector of length 5
-        combinations = list(itertools.product(symbols, repeat=5))
-        
-        # assign each combination to a row in the output dataframe using numpy indexing
-        df[comb_columns] = pd.np.array(combinations)
-        
-        # create one more column named class_id that is the concatenation of the combination columns using string join method
-        df['class_id'] = df[comb_columns].apply(lambda x: ''.join(x), axis=1)
-        
-        # return the dataframe
-        return df
-    
-    else:
-        # raise an exception if the input dataframe does not have the required columns
-        raise ValueError(f"Input dataframe must have these columns: {required_columns}")
+    Add new columns to the input DataFrame with a 4-class encoding for input 'chi' values.
 
-def create_trinary_classes(df):
-    """
     Takes a DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance',
     'cb_distance', 'torsion_length', 'energy', and 'rho' and adds new columns based on the following rules:
-    1. If the 'chi' column is -60 +/- 15, then the new column is '*'.
-    2. If it's 60 +/- 15, then the new column is '@'.
-    3. If it's 0 +/- 15 OR 180 +/- 15, then the new column is '^'.
+    1. If the 'chi' column is -70 +/-20, then the new column is '-'. (g-)
+    2. If it's 70 +/- 20, then the new column is '+'. (g+)
+    3. If it's -160 +/- 20 OR 160 +/- 20, then the new column is '*'. (trans)
+    4. Otherwise the new column is '@' 
 
-    A new column named `class_id` is also added, which is the concatenation of the `_t` columns.
+    A new column named `class_id` is also added, which is the concatenation of the `_t` columns. The DataFrame is then
+    grouped by the `class_id` column, and a new DataFrame is returned that shows the unique `ss_id` values for each group,
+    the count of unique `ss_id` values, the incidence of each group as a proportion of the total DataFrame, and the
+    percentage of incidence.
 
     :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5',
                'ca_distance', 'cb_distance', 'torsion_length', 'energy', and 'rho'
     :return: The input DataFrame with the added columns
     """
-    
+    # - + * @ 
     new_cols = []
     for col_name in ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']:
         col = df[col_name]
         new_col = []
         for val in col:
-            if abs(val + 60) <= 15:
+            if is_between(val, -90, -60):
+                new_col.append('-')
+            elif is_between(val, 60, 90):
+                new_col.append('+')
+            elif is_between(val, -180, -120) or is_between(val, 120, 180):
                 new_col.append('*')
-            elif abs(val - 60) <= 15:
-                new_col.append('@')
-            elif abs(val) <= 15 or abs(val - 180) <= 15:
-                new_col.append('^')
             else:
-                new_col.append('_')
+                new_col.append('@')
         new_col_name = col_name + '_t'
         new_cols.append(new_col_name)
         df[new_col_name] = new_col
@@ -838,6 +807,21 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
     except:
         mess = f'-> load_PDB_SS(): cannot open file {_fname}'
         raise DisulfideIOException(mess)
+
+def is_between(x, a, b):
+    """
+    Returns True if x is between a and b (inclusive), False otherwise.
+
+    :param x: The input number to be tested.
+    :type x: int or float
+    :param a: The lower limit of the range to check against.
+    :type a: int or float
+    :param b: The upper limit of the range to check against.
+    :type b: int or float
+    :return: True if x is between a and b (inclusive), False otherwise.
+    :rtype: bool
+    """
+    return a <= x <= b
 
 if __name__ == "__main__":
     import doctest

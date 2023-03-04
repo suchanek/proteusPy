@@ -43,7 +43,7 @@ from proteusPy.ProteusGlobals import PBAR_COLS
 # Set the figure sizes and axis limits.
 DPI = 220
 WIDTH = 6.0
-HEIGHT = 3.0
+HEIGHT = 6.0
 TORMIN = -179.0
 TORMAX = 180.0
 
@@ -52,7 +52,7 @@ Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi
            'chi5', 'energy', 'ca_distance', 'cb_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
            'psi_dist', 'torsion_length', 'rho']
 
-Distance_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'energy', 'ca_distance']
+Distance_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'energy', 'ca_distance', 'cb_distance']
 
 class DisulfideList(UserList):
     '''
@@ -155,7 +155,7 @@ class DisulfideList(UserList):
     >>> subset.display_overlay()
     '''
     
-    def __init__(self, iterable, id: str, res=-1.0):
+    def __init__(self, iterable, id: str, res=-1.0, quiet=True):
         '''
         Initialize the DisulfideList
 
@@ -184,6 +184,7 @@ class DisulfideList(UserList):
         
         self.pdb_id = id
         self.res = res
+        self.quiet = quiet
         super().__init__(self.validate_ss(item) for item in iterable)
 
     def __getitem__(self, item):
@@ -381,8 +382,11 @@ class DisulfideList(UserList):
         
         SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
         sslist = self.data
-
-        pbar = tqdm(sslist, ncols=PBAR_COLS)
+        if self.quiet:
+            pbar = sslist
+        else:
+            pbar = tqdm(sslist, ncols=PBAR_COLS)
+    
         for ss in pbar:
             new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, 
                        ss.chi3, ss.chi4, ss.chi5, ss.energy, ss.ca_distance, ss.cb_distance,
@@ -492,7 +496,7 @@ class DisulfideList(UserList):
         df_subset = df.iloc[:, 4:]
         df_stats = df_subset.describe()
         
-        # print(df_stats.head())
+        #print(df_stats.head())
 
         mean_vals = df_stats.loc['mean'].values
         std_vals = df_stats.loc['std'].values
@@ -721,22 +725,6 @@ class DisulfideList(UserList):
         res_dict.remove('xxx')
 
         return res_dict
-
-    def Oget_torsion_array(self):
-        """
-        Returns an rows X 5 array representing the dihedral angles
-        in the given disulfide list.
-
-        """
-        sslist = self.data
-        tot = len(sslist)
-        res = np.zeros(shape=(tot, 5))
-
-        for idx, ss in zip(range(tot), sslist):
-            row = ss.torsion_array
-            res[idx] = row
-        return res
-
 
     def get_torsion_array(self):
         """

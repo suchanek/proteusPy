@@ -144,11 +144,65 @@ def analyze_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -
     
     return res_list
 
+from proteusPy.DisulfideLoader import create_quart_classes
+from proteusPy.utility import sort_by_column
+
+def analyze_quart_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -> DisulfideList:
+    class_filename = f'{DATA_DIR}SS_consensus_class_quart.pkl'
+
+    tors = loader.getTorsions()
+    trin = create_quart_classes(tors)
+    tot_classes = trin.shape[0]
+    res_list = DisulfideList([], 'SS_Class_Avg_SS')
+
+    pbar = tqdm(range(tot_classes), ncols=100)
+
+    # loop over all rows
+    for idx in pbar:
+        row = trin.iloc[idx]
+        ss_list = row['ss_id']
+        cls = row['class_id']
+        tot = len(ss_list)
+        fname = f'{DATA_DIR}classes/ss_class_trin_{idx}.png'
+
+        class_disulfides = DisulfideList([], cls, quiet=True)
+        pbar.set_postfix({'ID': cls, 'Cnt': tot}) # update the progress bar
+
+        for ssid in ss_list:
+            class_disulfides.append(loader[ssid])
+
+        if do_graph:
+            class_disulfides.display_torsion_statistics(display=False, save=True, 
+                fname=fname, light=True, stats=False)
+
+        if do_consensus:
+            # get the average conformation - array of dihedrals
+            avg_conformation = np.zeros(5)
+
+            #print(f'--> analyze_quart_classes(): Computing avg conformation for: {cls}')
+            avg_conformation = class_disulfides.Average_Conformation
+
+            # build the average disulfide for the class
+            ssname = f'{cls}_avg'
+            exemplar = Disulfide(ssname)
+            exemplar.build_model(avg_conformation[0], avg_conformation[1],
+                                avg_conformation[2],avg_conformation[3],
+                                avg_conformation[4])
+            res_list.append(exemplar)
+        
+    if do_consensus:
+        print(f'--> analyze_quart_classes(): Writing consensus structures to: {class_filename}')
+        with open(class_filename, "wb+") as f:
+            pickle.dump(res_list, f)
+    
+    return res_list
+
+
 # main program begins
 PDB_SS = Load_PDB_SS(verbose=True, subset=False)
 
 ss_classlist = DisulfideList([], 'PDB_SS_CLASSES')
-ss_classlist = analyze_classes(PDB_SS, do_graph=True, do_consensus=True)
+ss_classlist = analyze_quart_classes(PDB_SS, do_graph=True, do_consensus=True)
 
 end = time.time()
 elapsed = end - start

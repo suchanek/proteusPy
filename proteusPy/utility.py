@@ -300,6 +300,17 @@ def generate_vector_dataframe(base=3):
     df = pd.DataFrame(combinations, columns=['chi1', 'chi2', 'chi3', 'chi4', 'chi5'])
     return df
 
+def sort_by_column(df, column):
+    """
+    Sorts a Pandas DataFrame by the values in the 'incidence' column in descending order.
+
+    :param df: The input DataFrame to be sorted.
+    :type df: pandas.DataFrame
+    :return: The sorted DataFrame.
+    :rtype: pandas.DataFrame
+    """
+    sorted_df = df.sort_values(by=[column], ascending=False)
+    return sorted_df
 
 if __name__ == "__main__":
     import doctest
