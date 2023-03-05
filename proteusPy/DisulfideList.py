@@ -382,7 +382,7 @@ class DisulfideList(UserList):
         
         SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
         sslist = self.data
-        if self.quiet:
+        if self.quiet or len(sslist) < 100:
             pbar = sslist
         else:
             pbar = tqdm(sslist, ncols=PBAR_COLS)
