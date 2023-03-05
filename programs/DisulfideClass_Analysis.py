@@ -144,22 +144,22 @@ def analyze_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -
     
     return res_list
 
-from proteusPy.DisulfideLoader import create_quat_classes
+from proteusPy.DisulfideLoader import create_six_classes
 from proteusPy.utility import sort_by_column
 
-def analyze_quat_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -> DisulfideList:
+def analyze_six_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -> DisulfideList:
     class_filename = f'{DATA_DIR}SS_consensus_class_quat.pkl'
 
     tors = loader.getTorsions()
-    trin = create_quat_classes(tors)
-    tot_classes = trin.shape[0]
+    quat = create_six_classes(tors)
+    tot_classes = quat.shape[0]
     res_list = DisulfideList([], 'SS_Class_Avg_SS')
 
     pbar = tqdm(range(tot_classes), ncols=80)
 
     # loop over all rows
     for idx in pbar:
-        row = trin.iloc[idx]
+        row = quat.iloc[idx]
         cls = row['class_id']
         ss_list = row['ss_id']
         tot = len(ss_list)
@@ -203,7 +203,7 @@ def analyze_quat_classes(loader: DisulfideLoader, do_graph=True, do_consensus=Tr
 PDB_SS = Load_PDB_SS(verbose=True, subset=False)
 
 ss_classlist = DisulfideList([], 'PDB_SS_QUATERNARY_CLASSES')
-ss_classlist = analyze_quat_classes(PDB_SS, do_graph=True, do_consensus=True)
+ss_classlist = analyze_six_classes(PDB_SS, do_graph=True, do_consensus=True)
 
 end = time.time()
 elapsed = end - start
