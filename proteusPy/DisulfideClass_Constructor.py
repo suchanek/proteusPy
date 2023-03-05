@@ -141,7 +141,7 @@ class DisulfideClass_Constructor():
         result_df = pd.concat([class_df, ss_id_col], axis=1)
         return result_df
 
-    def list_classes(self):
+    def list_binary_classes(self):
         for k,v in enumerate(self.classdict):
             print(f'Class: |{k}|, |{v}|')
 

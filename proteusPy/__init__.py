@@ -39,5 +39,7 @@ from .atoms import *
 from .data import *
 from .utility import distance_squared, distance3d, get_jet_colormap, Check_chains, print_memory_used
 from .utility import image_to_ascii_art, generate_vector_dataframe
+from .DisulfideClasses import create_classes, create_quat_classes, create_six_class_df
+from .DisulfideClasses import get_half_quadrant, get_quadrant, get_sixth_quadrant
 
 # end of file
