@@ -3,6 +3,7 @@ setup.cfg
 setup.py
 proteusPy/Disulfide.py
 proteusPy/DisulfideClass_Constructor.py
+proteusPy/DisulfideClasses.py
 proteusPy/DisulfideExceptions.py
 proteusPy/DisulfideList.py
 proteusPy/DisulfideLoader.py
@@ -37,8 +38,12 @@ proteusPy/data/PDB_subset_ss.pkl
 proteusPy/data/PDB_subset_ss_dict.pkl
 proteusPy/data/PDB_subset_torsions.csv
 proteusPy/data/SS_consensus_class32.pkl
+proteusPy/data/SS_consensus_class_quart.pkl
+proteusPy/data/SS_consensus_class_quat.pkl
 proteusPy/data/__init__.py
 proteusPy/data/average_ss_byclass.csv
+proteusPy/data/quat.csv
+proteusPy/data/six.csv
 proteusPy/data/ss_completed.txt
 proteusPy/data/ss_ids.txt
 proteusPy/data/ss_query.json

@@ -37,6 +37,7 @@ from proteusPy.Disulfide import Disulfide
 
 from proteusPy.DisulfideExceptions import *
 from proteusPy.data import *
+from proteusPy.DisulfideClasses import create_six_class_df, create_classes
 
 import itertools
 
@@ -120,9 +121,11 @@ class DisulfideLoader:
         self.QUIET = quiet
         self.classdict = {}
         self.classdf = None
+        self.sixclass_df = None
         self.cutoff = cutoff
         self.verbose = verbose
         self.timestamp = time.time()
+        self.version = 'V0.0'
 
         idlist = []
 
@@ -317,7 +320,7 @@ class DisulfideLoader:
             print(f'-> build_classes(): initialization complete.')
         
         return
-
+    
     def build_ss_from_idlist(self, idlist):
         '''
         Given a list of PDBid, return a DisulfideList of Disulfides
@@ -333,6 +336,44 @@ class DisulfideLoader:
                     res.append(ss)
                     break
         return res
+    
+    def create_six_class_df(self):
+        """
+        Create a new DataFrame from the input with a 6-class encoding for input 'chi' values.
+        
+        The function takes a pandas DataFrame containing the following columns:
+        'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'cb_distance',
+        'torsion_length', 'energy', and 'rho', and adds a class ID column based on the following rules:
+        
+        1. A new column named `class_id` is added, which is the concatenation of the individual class IDs per Chi.
+        2. The DataFrame is grouped by the `class_id` column, and a new DataFrame is returned that shows the unique `ss_id` values for each group,
+        the count of unique `ss_id` values, the incidence of each group as a proportion of the total DataFrame, and the
+        percentage of incidence.
+
+        :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5',
+                'ca_distance', 'cb_distance', 'torsion_length', 'energy', and 'rho'
+        :return: The grouped DataFrame with the added class column.
+        """
+        from proteusPy.DisulfideClasses import get_sixth_quadrant
+
+        _df = pd.DataFrame()
+        df = self.getTorsions
+        # create the chi_t columns for each chi column
+        for col_name in ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']:
+            _df[col_name + '_t'] = df[col_name].apply(get_sixth_quadrant)
+        
+        # create the class_id column
+        df['class_id'] = _df[['chi1_t', 'chi2_t', 'chi3_t', 'chi4_t', 'chi5_t']].apply(lambda x: ''.join(x), axis=1)
+
+        # group the DataFrame by class_id and return the grouped data
+        grouped = df.groupby('class_id').agg({'ss_id': 'unique'})
+        grouped['count'] = grouped['ss_id'].apply(lambda x: len(x))
+        grouped['incidence'] = grouped['count'] / len(df)
+        grouped['percentage'] = grouped['incidence'] * 100
+        grouped.reset_index(inplace=True)
+
+        self.sixclass_df = grouped
+
     
     def concat_dataframes(self, df1, df2):
         """
@@ -383,7 +424,7 @@ class DisulfideLoader:
         Total RAM Used:                     29.26 GB.
 
         '''
-        vers = proteusPy.__version__
+        vers = self.version
         tot = self.TotalDisulfides
         pdbs = len(self.SSDict)
         ram = (sys.getsizeof(self.SSList) + sys.getsizeof(self.SSDict) + sys.getsizeof(self.TorsionDF)) / (1024 * 1024)
@@ -618,35 +659,30 @@ class DisulfideClass_Constructor():
 
     def build_yourself(self):
         '''
-        Builds the internal dictionary mapping the disulfide class names to their respective members.
+        Builds the internal structures needed for the loader, including binary and six-fold classes.
         The classnames are defined by the sign of the dihedral angles, per XXX', the list of SS within
         the database classified, and the resulting dict created.
         '''
 
-        from proteusPy.DisulfideClasses import create_classes
+        from proteusPy.DisulfideClasses import create_classes, create_six_class_df
 
         def ss_id_dict(df):
             ss_id_dict = dict(zip(df['SS_Classname'], df['ss_id']))
             return ss_id_dict
 
         PDB_SS = Load_PDB_SS(verbose=self.verbose, subset=False)
+        self.version = proteusPy.__version__
+
         if self.verbose:
             PDB_SS.describe()
 
         tors_df = PDB_SS.getTorsions()
 
         if self.verbose:
-            print(f'-> DisulfideClass_Constructor(): creating SS classes...')
-
-        grouped = create_classes(tors_df)
-        self.class_df = grouped
-
-        grouped.to_csv(f'{DATA_DIR}PDB_ss_classes.csv')
-        if self.verbose:
-            print(f'{grouped.head(32)}')
-
-        #grouped_summary = grouped.drop(columns=['ss_id'], axis=1)
-        #grouped_summary.to_csv(f'{DATA_DIR}PDB_ss_classes_summary.csv')
+            print(f'-> DisulfideClass_Constructor(): creating binary SS classes...')
+        grouped = create_classes(tors_df)        
+        
+        # grouped.to_csv(f'{DATA_DIR}PDB_ss_classes.csv')
         
         # this file is hand made. Do not change it. -egs-
         #class_df = pd.read_csv(f'{DATA_DIR}PDB_ss_classes_master2.csv', dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
@@ -663,7 +699,6 @@ class DisulfideClass_Constructor():
             print(f'-> DisulfideClass_Constructor(): merging...')
 
         merged = self.concat_dataframes(class_df, grouped)
-        #merged = self.build_class_df(class_df, grouped)
         merged.drop(columns=['Idx'], inplace=True)
 
         classdict = ss_id_dict(merged)
@@ -680,6 +715,16 @@ class DisulfideClass_Constructor():
         with open(fname, "wb+") as f:
             pickle.dump(classdict, f)
 
+        if self.verbose:
+            print(f'-> DisulfideClass_Constructor(): creating sixfold SS classes...')
+        
+        grouped_sixclass = create_six_class_df(tors_df)
+        grouped_sixclass.to_csv(f'{DATA_DIR}PDB_ss_classes.csv')
+        self.sixclass_df = grouped_sixclass
+
+        if self.verbose:
+            print(f'--> DisulfideClass_Constructor(): ')
+        
         if self.verbose:
             print(f'--> DisulfideClass_Constructor(): initialization complete.')
         
