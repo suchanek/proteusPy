@@ -22,6 +22,7 @@ import datetime
 import pandas as pd
 import pyvista as pv
 import pickle
+import numpy as np
 
 import proteusPy
 from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR
@@ -731,7 +732,177 @@ def create_classes(df):
 
     return grouped
 
+def angle_within_range(angle, min_angle, max_angle):
+    """
+    Check whether the given angle is within the specified range.
+
+    Parameters:
+        angle (float): The angle to check, in degrees.
+        min_angle (float): The minimum angle in the range, in degrees.
+        max_angle (float): The maximum angle in the range, in degrees.
+
+    Returns:
+        bool: True if the angle is within the range, False otherwise.
+    """
+    import math
+    # Convert angles to radians
+    angle_rad = math.radians(angle)
+    min_angle_rad = math.radians(min_angle)
+    max_angle_rad = math.radians(max_angle)
+
+    # Check whether the angle is within the range
+    if min_angle_rad <= angle_rad <= max_angle_rad:
+        return True
+    else:
+        return False
+
+def get_quadrant(angle_deg):
+    """
+    Return the quadrant in which an angle in degrees lies.
+
+    Parameters:
+        angle_deg (float): The angle in degrees.
+
+    Returns:
+        int: The quadrant number (1, 2, 3, or 4) that the angle belongs to.
+    """
+    if angle_deg >= 0 and angle_deg < 90:
+        return str(1)
+    elif angle_deg >= 90 and angle_deg < 180:
+        return str(2)
+    elif angle_deg >= -180 and angle_deg < -90:
+        return str(3)
+    elif angle_deg >= -90 and angle_deg < 0:
+        return str(4)
+    else:
+        raise ValueError("Invalid angle value: angle must be in the range [-180, 180).")
+
+def get_half_quadrant(angle_deg):
+    """
+    Returns the half-quadrant in which an angle in degrees lies.
+
+    Parameters:
+        angle_deg (float): The angle in degrees.
+
+    Returns:
+        int: The half-quadrant number (1-8) that the angle belongs to.
+    """
+    if angle_deg >= 0 and angle_deg < 45:
+        return str(1)
+    elif angle_deg >= 45 and angle_deg < 90:
+        return str(2)
+    elif angle_deg >= 90 and angle_deg < 135:
+        return str(3)
+    elif angle_deg >= 135 and angle_deg < 180:
+        return str(4)
+    elif angle_deg >= -45 and angle_deg < 0:
+        return str(5)
+    elif angle_deg >= -90 and angle_deg < -45:
+        return str(6)
+    elif angle_deg >= -135 and angle_deg < -90:
+        return str(7)
+    elif angle_deg >= -180 and angle_deg < -135:
+        return str(8)
+    else:
+        raise ValueError("Invalid angle value: angle must be in the range [-180, 180).")
+
+def get_sixth_quadrant(angle: float) -> int:
+    """
+    Return which sixth-quadrant the angle lies in, yielding a result from 1 to 6.
+
+    The function divides the range -180 to +180 into six equal sections of 60 degrees each,
+    with the zero angle at the midpoint of the first section.
+    
+    :param angle: The angle to be categorized (in degrees).
+    :type angle: float
+    :return: An integer representing which half-quadrant the angle falls in, from 1 to 6. 
+        If the angle is exactly 0, returns 1.
+    :rtype: int
+    """
+    angle = np.mod(angle, 360)
+    if angle == 0:
+        return 1
+    else:
+        half_quadrant = int((angle + 150) // 60) % 6
+        return str(half_quadrant + 1)
+
+def create_six_classes(df):
+    """
+    Add new columns to the input DataFrame with a 6-class encoding for input 'chi' values.
+    
+    The function takes a pandas DataFrame containing the following columns:
+    'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'cb_distance',
+    'torsion_length', 'energy', and 'rho', and adds new columns based on the following rules:
+    
+    1. A new column 'chi_t' is added for each 'chi' column, which is set to the sixth-quadrant in which the dihedral angle is located.
+    2. A new column named `class_id` is added, which is the concatenation of the '_t' columns.
+    3. The DataFrame is grouped by the `class_id` column, and a new DataFrame is returned that shows the unique `ss_id` values for each group,
+    the count of unique `ss_id` values, the incidence of each group as a proportion of the total DataFrame, and the
+    percentage of incidence.
+
+    :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5',
+               'ca_distance', 'cb_distance', 'torsion_length', 'energy', and 'rho'
+    :return: The grouped DataFrame with the added columns
+    """
+    
+    # create the chi_t columns for each chi column
+    for col_name in ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']:
+        df[col_name + '_t'] = df[col_name].apply(get_sixth_quadrant)
+    
+    # create the class_id column
+    df['class_id'] = df[['chi1_t', 'chi2_t', 'chi3_t', 'chi4_t', 'chi5_t']].apply(lambda x: ''.join(x), axis=1)
+
+    # group the DataFrame by class_id and return the grouped data
+    grouped = df.groupby('class_id').agg({'ss_id': 'unique'})
+    grouped['count'] = grouped['ss_id'].apply(lambda x: len(x))
+    grouped['incidence'] = grouped['count'] / len(df)
+    grouped['percentage'] = grouped['incidence'] * 100
+    grouped.reset_index(inplace=True)
+
+    return grouped
+
 def create_quat_classes(df):
+    """
+    Add new columns to the input DataFrame with a 4-class encoding for input 'chi' values.
+
+    Takes a DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance',
+    'cb_distance', 'torsion_length', 'energy', and 'rho' and adds new columns based on the following rules:
+    1. The 'chi_t' column is set to the quadrant in which the dihedral angle is located.
+    
+
+    A new column named `class_id` is also added, which is the concatenation of the `_t` columns. The DataFrame is then
+    grouped by the `class_id` column, and a new DataFrame is returned that shows the unique `ss_id` values for each group,
+    the count of unique `ss_id` values, the incidence of each group as a proportion of the total DataFrame, and the
+    percentage of incidence.
+
+    :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5',
+               'ca_distance', 'cb_distance', 'torsion_length', 'energy', and 'rho'
+    :return: The input DataFrame with the added columns
+    """
+
+    new_cols = []
+    for col_name in ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']:
+        col = df[col_name]
+        new_col = []
+        for val in col:
+            new_col.append(get_sixth_quadrant(val))
+        new_col_name = col_name + '_t'
+        new_cols.append(new_col_name)
+        df[new_col_name] = new_col
+    
+    class_id_column = 'class_id'
+
+    df['class_id'] = df[new_cols].apply(lambda x: ''.join(x), axis=1)
+
+    # Group the DataFrame by the class ID and return the grouped data
+    grouped = df.groupby(class_id_column)['ss_id'].unique().reset_index()
+    grouped['count'] = grouped['ss_id'].apply(lambda x: len(x))
+    grouped['incidence'] = grouped['ss_id'].apply(lambda x: len(x)/len(df))
+    grouped['percentage'] = grouped['incidence'].apply(lambda x: 100 * x)
+
+    return grouped
+
+def Ocreate_quat_classes(df):
     """
     Add new columns to the input DataFrame with a 4-class encoding for input 'chi' values.
 
