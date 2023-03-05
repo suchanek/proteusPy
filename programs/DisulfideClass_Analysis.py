@@ -144,7 +144,7 @@ def analyze_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -
     
     return res_list
 
-from proteusPy.DisulfideLoader import create_six_class_df
+from proteusPy.DisulfideClasses import create_six_class_df
 from proteusPy.utility import sort_by_column
 
 def analyze_six_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -> DisulfideList:

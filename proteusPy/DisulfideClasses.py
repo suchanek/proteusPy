@@ -112,7 +112,7 @@ def get_half_quadrant(angle_deg):
     Returns:
         int: The half-quadrant number (1-8) that the angle belongs to.
     """
-    
+
     if angle_deg >= 0 and angle_deg < 45:
         return str(1)
     elif angle_deg >= 45 and angle_deg < 90:
@@ -248,6 +248,7 @@ def Ocreate_quat_classes(df):
                'ca_distance', 'cb_distance', 'torsion_length', 'energy', and 'rho'
     :return: The input DataFrame with the added columns
     """
+    
     # - + * @ 
     new_cols = []
     for col_name in ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']:

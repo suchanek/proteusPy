@@ -73,7 +73,7 @@
                                 <a class="function" href="#DisulfideClass_Constructor.build_class_df">build_class_df</a>
                         </li>
                         <li>
-                                <a class="function" href="#DisulfideClass_Constructor.list_classes">list_classes</a>
+                                <a class="function" href="#DisulfideClass_Constructor.list_binary_classes">list_binary_classes</a>
                         </li>
                         <li>
                                 <a class="function" href="#DisulfideClass_Constructor.build_yourself">build_yourself</a>
@@ -337,7 +337,7 @@ all 32 possible classes ($$2^5$$). Classes are named per Hogg's convention.</p>
 </span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>        <span class="n">result_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">class_df</span><span class="p">,</span> <span class="n">ss_id_col</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>        <span class="k">return</span> <span class="n">result_df</span>
 </span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>
-</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>    <span class="k">def</span> <span class="nf">list_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>    <span class="k">def</span> <span class="nf">list_binary_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classdict</span><span class="p">):</span>
 </span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Class: |</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">|, |</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">|&#39;</span><span class="p">)</span>
 </span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>
@@ -585,7 +585,7 @@ all 32 possible classes ($$2^5$$). Classes are named per Hogg's convention.</p>
 </span><span id="DisulfideClass_Constructor-142"><a href="#DisulfideClass_Constructor-142"><span class="linenos">142</span></a>        <span class="n">result_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">class_df</span><span class="p">,</span> <span class="n">ss_id_col</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </span><span id="DisulfideClass_Constructor-143"><a href="#DisulfideClass_Constructor-143"><span class="linenos">143</span></a>        <span class="k">return</span> <span class="n">result_df</span>
 </span><span id="DisulfideClass_Constructor-144"><a href="#DisulfideClass_Constructor-144"><span class="linenos">144</span></a>
-</span><span id="DisulfideClass_Constructor-145"><a href="#DisulfideClass_Constructor-145"><span class="linenos">145</span></a>    <span class="k">def</span> <span class="nf">list_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DisulfideClass_Constructor-145"><a href="#DisulfideClass_Constructor-145"><span class="linenos">145</span></a>    <span class="k">def</span> <span class="nf">list_binary_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideClass_Constructor-146"><a href="#DisulfideClass_Constructor-146"><span class="linenos">146</span></a>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classdict</span><span class="p">):</span>
 </span><span id="DisulfideClass_Constructor-147"><a href="#DisulfideClass_Constructor-147"><span class="linenos">147</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Class: |</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">|, |</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">|&#39;</span><span class="p">)</span>
 </span><span id="DisulfideClass_Constructor-148"><a href="#DisulfideClass_Constructor-148"><span class="linenos">148</span></a>
@@ -735,20 +735,20 @@ in the proteusPy disulfide database</p>
     
 
                             </div>
-                            <div id="DisulfideClass_Constructor.list_classes" class="classattr">
-                                        <input id="DisulfideClass_Constructor.list_classes-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                            <div id="DisulfideClass_Constructor.list_binary_classes" class="classattr">
+                                        <input id="DisulfideClass_Constructor.list_binary_classes-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">list_classes</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
+        <span class="name">list_binary_classes</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
 
-                <label class="view-source-button" for="DisulfideClass_Constructor.list_classes-view-source"><span>View Source</span></label>
+                <label class="view-source-button" for="DisulfideClass_Constructor.list_binary_classes-view-source"><span>View Source</span></label>
 
     </div>
-    <a class="headerlink" href="#DisulfideClass_Constructor.list_classes"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideClass_Constructor.list_classes-145"><a href="#DisulfideClass_Constructor.list_classes-145"><span class="linenos">145</span></a>    <span class="k">def</span> <span class="nf">list_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideClass_Constructor.list_classes-146"><a href="#DisulfideClass_Constructor.list_classes-146"><span class="linenos">146</span></a>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classdict</span><span class="p">):</span>
-</span><span id="DisulfideClass_Constructor.list_classes-147"><a href="#DisulfideClass_Constructor.list_classes-147"><span class="linenos">147</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Class: |</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">|, |</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">|&#39;</span><span class="p">)</span>
+    <a class="headerlink" href="#DisulfideClass_Constructor.list_binary_classes"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideClass_Constructor.list_binary_classes-145"><a href="#DisulfideClass_Constructor.list_binary_classes-145"><span class="linenos">145</span></a>    <span class="k">def</span> <span class="nf">list_binary_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DisulfideClass_Constructor.list_binary_classes-146"><a href="#DisulfideClass_Constructor.list_binary_classes-146"><span class="linenos">146</span></a>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classdict</span><span class="p">):</span>
+</span><span id="DisulfideClass_Constructor.list_binary_classes-147"><a href="#DisulfideClass_Constructor.list_binary_classes-147"><span class="linenos">147</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Class: |</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">|, |</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">|&#39;</span><span class="p">)</span>
 </span></pre></div>
 
 
