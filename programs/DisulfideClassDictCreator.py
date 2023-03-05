@@ -51,7 +51,7 @@ def sslist_from_classid(classid: str, loader: DisulfideLoader, classdict: dict) 
     except KeyError:
         print(f'No class: {classid}')
 
-def list_classes(ssdict):
+def list_binary_classes(ssdict):
     for k,v in enumerate(ssdict):
         print(f'Class: |{k}|, |{v}|')
 

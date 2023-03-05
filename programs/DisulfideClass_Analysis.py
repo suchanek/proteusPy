@@ -144,14 +144,14 @@ def analyze_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -
     
     return res_list
 
-from proteusPy.DisulfideLoader import create_six_classes
+from proteusPy.DisulfideLoader import create_six_class_df
 from proteusPy.utility import sort_by_column
 
 def analyze_six_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -> DisulfideList:
     class_filename = f'{DATA_DIR}SS_consensus_class_quat.pkl'
 
     tors = loader.getTorsions()
-    quat = create_six_classes(tors)
+    quat = create_six_class_df(tors)
     tot_classes = quat.shape[0]
     res_list = DisulfideList([], 'SS_Class_Avg_SS')
 
@@ -188,8 +188,8 @@ def analyze_six_classes(loader: DisulfideLoader, do_graph=True, do_consensus=Tru
             ssname = f'{cls}_avg'
             exemplar = Disulfide(ssname)
             exemplar.build_model(avg_conformation[0], avg_conformation[1],
-                                avg_conformation[2],avg_conformation[3],
-                                avg_conformation[4])
+                                 avg_conformation[2], avg_conformation[3],
+                                 avg_conformation[4])
             res_list.append(exemplar)
         
     if do_consensus:
