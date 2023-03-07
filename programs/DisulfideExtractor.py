@@ -119,7 +119,7 @@ def do_stuff(all=False, extract=False, build=True, full=False, update=True, subs
         _extract = _build = _update = _subset = _full = True
 
     if _extract == True:
-        print(f'Extracting...')
+        print(f'Extracting with cutoff: {cutoff}')
         do_extract(_verbose, _full, _subset, cutoff)
 
     if _build == True:

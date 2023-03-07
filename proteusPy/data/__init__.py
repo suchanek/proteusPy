@@ -70,4 +70,5 @@ Idx,chi1_s,chi2_s,chi3_s,chi4_s,chi5_s,class_id,SS_Classname,FXN
 31,1,1,1,1,1,22222,+RHSpiral,UNK
 '''
 
+CLASSOBJ_FNAME = 'PDB_CLASS_OBJ.pkl'
 # end of file
