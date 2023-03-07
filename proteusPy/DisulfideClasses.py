@@ -11,7 +11,7 @@ import copy
 from io import StringIO
 import time
 import datetime
-from pickle import pickle
+import pickle
 
 import pandas as pd
 import numpy as np
@@ -19,8 +19,6 @@ import proteusPy
 
 from proteusPy.data import DATA_DIR, SS_CLASS_DICT_FILE, CLASSOBJ_FNAME
 from proteusPy.data import SS_CLASS_DEFINITIONS
-
-from proteusPy.DisulfideLoader import Load_PDB_SS
 
 class DisulfideClass_Constructor():
     '''
@@ -95,7 +93,7 @@ class DisulfideClass_Constructor():
             ss_id_dict = dict(zip(df['SS_Classname'], df['ss_id']))
             return ss_id_dict
 
-        PDB_SS = Load_PDB_SS(verbose=self.verbose, subset=False)
+        PDB_SS = proteusPy.DisulfideLoader.Load_PDB_SS(verbose=self.verbose, subset=False)
         self.version = proteusPy.__version__
 
         if self.verbose:
