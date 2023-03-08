@@ -1,11 +1,14 @@
-# functions to create Disulfide Bond structural classes based on
-# dihedral angle rules.
-#
-# Author: Eric G. Suchanek, PhD.
-# (c) 2023 Eric G. Suchanek, PhD., All Rights Reserved
-# License: MIT
-# Last Modification: 2/18/23
-# Cα N, Cα, Cβ, C', Sγ Å °
+'''
+Functions to create Disulfide Bond structural classes based on
+dihedral angle rules.
+
+Author: Eric G. Suchanek, PhD. \n
+
+(c) 2023 Eric G. Suchanek, PhD., All Rights Reserved
+License: MIT
+Last Modification: 2/18/23
+
+'''
 
 import copy
 from io import StringIO
@@ -20,165 +23,6 @@ import proteusPy
 from proteusPy.data import DATA_DIR, SS_CLASS_DICT_FILE, CLASSOBJ_FNAME
 from proteusPy.data import SS_CLASS_DEFINITIONS
 
-class DisulfideClass_Constructor():
-    '''
-    Class manages structural classes for the disulfide bonds contained
-    in the proteusPy disulfide database.
-    '''
-
-    def __init__(self, verbose=True, bootstrap=False) -> None:
-        self.verbose = verbose
-        self.classdict = {}
-        self.classdf = None
-        self.sixclass_df = None
-
-        if bootstrap:
-            if self.verbose:
-                print(f'--> DisulfideClass_Constructor(): Building SS classes...')
-            self.build_yourself()
-        else:
-            self.classdict = self.load_class_dict()
-
-    def load_class_dict(self, fname=f'{DATA_DIR}{SS_CLASS_DICT_FILE}') -> dict:
-        with open(fname,'rb') as f:
-            #res = pickle.load(f)
-            self.classdict = pickle.load(f)
-    
-    def build_class_df(self, class_df, group_df):
-        ss_id_col = group_df['ss_id']
-        result_df = pd.concat([class_df, ss_id_col], axis=1)
-        return result_df
-
-    def list_binary_classes(self):
-        for k,v in enumerate(self.classdict):
-            print(f'Class: |{k}|, |{v}|')
-
-    #  class_cols = ['Idx','chi1_s','chi2_s','chi3_s','chi4_s','chi5_s','class_id','SS_Classname','FXN',
-    # 'count','incidence','percentage','ca_distance_mean',
-    # 'ca_distance_std','torsion_length_mean','torsion_length_std','energy_mean','energy_std']
-
-    def concat_dataframes(self, df1, df2):
-        """
-        Concatenates columns from one data frame into the other 
-        and returns the new result.
-
-        Parameters
-        ----------
-        df1 : pandas.DataFrame
-            The first data frame.
-        df2 : pandas.DataFrame
-            The second data frame.
-
-        Returns
-        -------
-        pandas.DataFrame
-            The concatenated data frame.
-
-        """
-        # Merge the data frames based on the 'SS_Classname' column
-        result = pd.merge(df1, df2, on='class_id')
-
-        return result
-
-    def build_yourself(self):
-        '''
-        Builds the internal structures needed for the loader, including binary and six-fold classes.
-        The classnames are defined by the sign of the dihedral angles, per XXX', the list of SS within
-        the database classified, and the resulting dict created.
-        '''
-
-        from proteusPy.DisulfideClasses import create_classes, create_six_class_df
-
-        def ss_id_dict(df):
-            ss_id_dict = dict(zip(df['SS_Classname'], df['ss_id']))
-            return ss_id_dict
-
-        PDB_SS = proteusPy.DisulfideLoader.Load_PDB_SS(verbose=self.verbose, subset=False)
-        self.version = proteusPy.__version__
-
-        if self.verbose:
-            PDB_SS.describe()
-
-        tors_df = PDB_SS.getTorsions()
-
-        if self.verbose:
-            print(f'-> DisulfideClass_Constructor(): creating binary SS classes...')
-        grouped = create_classes(tors_df)        
-        
-        # grouped.to_csv(f'{DATA_DIR}PDB_ss_classes.csv')
-        
-        # this file is hand made. Do not change it. -egs-
-        #class_df = pd.read_csv(f'{DATA_DIR}PDB_ss_classes_master2.csv', dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
-
-        # !!! df = pd.read_csv(pd.compat.StringIO(csv_string))
-        # class_df = pd.read_csv(f'{DATA_DIR}PDB_SS_class_definitions.csv', dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
-        
-        class_df = pd.read_csv(StringIO(SS_CLASS_DEFINITIONS), dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
-        class_df['FXN'].str.strip()
-        class_df['SS_Classname'].str.strip()
-        class_df['class_id'].str.strip()
-
-        if self.verbose:
-            print(f'-> DisulfideClass_Constructor(): merging...')
-
-        merged = self.concat_dataframes(class_df, grouped)
-        merged.drop(columns=['Idx'], inplace=True)
-
-        classdict = ss_id_dict(merged)
-        self.classdict = classdict
-
-        merged.to_csv(f'{DATA_DIR}PDB_SS_merged.csv')
-        self.classdf = merged.copy()
-
-        fname = f'{DATA_DIR}{SS_CLASS_DICT_FILE}'
-
-        if self.verbose:
-            print(f'-> DisulfideClass_Constructor(): writing {fname}...')
-
-        with open(fname, "wb+") as f:
-            pickle.dump(classdict, f)
-
-        if self.verbose:
-            print(f'-> DisulfideClass_Constructor(): creating sixfold SS classes...')
-        
-        grouped_sixclass = create_six_class_df(tors_df)
-        grouped_sixclass.to_csv(f'{DATA_DIR}PDB_ss_six_classes.csv')
-        self.sixclass_df = grouped_sixclass
-
-        if self.verbose:
-            print(f'--> DisulfideClass_Constructor(): ')
-        
-        if self.verbose:
-            print(f'--> DisulfideClass_Constructor(): initialization complete.')
-        
-        return
-    
-    def save(self, savepath=DATA_DIR):
-        '''
-        Save a copy of the fully instantiated Loader to the specified file.
-
-        :param savepath: Path to save the file, defaults to DATA_DIR
-        :param fname: Filename, defaults to LOADER_FNAME
-        :param verbose: Verbosity, defaults to False
-        :param cutoff: Distance cutoff used to build the database, -1 means no cutoff.
-        '''
-        self.version = proteusPy.__version__
-
-        fname = CLASSOBJ_FNAME
-
-        _fname = f'{savepath}{fname}'
-
-        if self.verbose:
-            print(f'-> DisulfideLoader.save(): Writing {_fname}... ')
-        
-        with open(_fname, 'wb+') as f:
-            pickle.dump(self, f)
-        
-        if self.verbose:
-            print(f'-> DisulfideLoader.save(): Done.')
-    
-
-# class definition ends
 
 def create_classes(df):
     """
@@ -272,6 +116,34 @@ def get_quadrant(angle_deg):
     else:
         raise ValueError("Invalid angle value: angle must be in the range [-180, 180).")
 
+def get_sixth_quadrant(angle_deg):
+    """
+    Returns the sextant in which an angle in degrees lies if the area is described by dividing a unit circle into 6 equal segments.
+
+    Parameters:
+        angle_deg (float): The angle in degrees.
+
+    Returns:
+        int: The sextant (1-6) that the angle belongs to.
+    """
+    # Normalize the angle to the range [0, 360)
+    angle_deg = angle_deg % 360
+
+    if angle_deg >= 0 and angle_deg < 60:
+        return str(1)
+    elif angle_deg >= 60 and angle_deg < 120:
+        return str(2)
+    elif angle_deg >= 120 and angle_deg < 180:
+        return str(3)
+    elif angle_deg >= 180 and angle_deg < 240:
+        return str(4)
+    elif angle_deg >= 240 and angle_deg < 300:
+        return str(5)
+    elif angle_deg >= 300 and angle_deg < 360:
+        return str(6)
+    else:
+        raise ValueError("Invalid angle value: angle must be in the range [-360, 360).")
+
 def get_half_quadrant(angle_deg):
     """
     Returns the half-quadrant in which an angle in degrees lies.
@@ -301,26 +173,6 @@ def get_half_quadrant(angle_deg):
         return str(8)
     else:
         raise ValueError("Invalid angle value: angle must be in the range [-180, 180).")
-
-def get_sixth_quadrant(angle: float) -> int:
-    """
-    Return which sixth-quadrant the angle lies in, yielding a result from 1 to 6.
-
-    The function divides the range -180 to +180 into six equal sections of 60 degrees each,
-    with the zero angle at the midpoint of the first section.
-    
-    :param angle: The angle to be categorized (in degrees).
-    :type angle: float
-    :return: An integer representing which half-quadrant the angle falls in, from 1 to 6. 
-        If the angle is exactly 0, returns 1.
-    :rtype: int
-    """
-    angle = np.mod(angle, 360)
-    if angle == 0:
-        return 1
-    else:
-        half_quadrant = int((angle + 150) // 60) % 6
-        return str(half_quadrant + 1)
 
 def create_six_class_df(df) -> pd.DataFrame:
     """
@@ -448,6 +300,34 @@ def Ocreate_quat_classes(df):
     grouped['percentage'] = grouped['incidence'].apply(lambda x: 100 * x)
 
     return grouped
+
+def get_section(angle_deg, basis):
+    """
+    Returns the section in which an angle in degrees lies if the section is described by dividing a unit circle into `basis` equal segments.
+
+    Parameters:
+        angle_deg (float): The angle in degrees.
+        basis (int): The number of equal angular divisions into which the unit circle is divided.
+
+    Returns:
+        int: The section number (1-basis) that the angle belongs to.
+    """
+    # Normalize the angle to the range [-180, 180)
+    angle_deg = angle_deg % 360
+    if angle_deg < -180:
+        angle_deg += 360
+    elif angle_deg >= 180:
+        angle_deg -= 360
+
+    # Calculate the size of each segment
+    segment_size = 360 / basis
+
+    # Calculate the section number
+    section = int(angle_deg // segment_size) + 1
+    if section <= 0:
+        section += basis
+
+    return str(section)
 
 def is_between(x, a, b):
     """

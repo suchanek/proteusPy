@@ -116,6 +116,165 @@ merge_cols = ['chi1_s','chi2_s','chi3_s','chi4_s','chi5_s','class_id','SS_Classn
 class DisulfideClass_Constructor():
     '''
     Class manages structural classes for the disulfide bonds contained
+    in the proteusPy disulfide database.
+    '''
+
+    def __init__(self, verbose=True, bootstrap=False) -> None:
+        self.verbose = verbose
+        self.classdict = {}
+        self.classdf = None
+        self.sixclass_df = None
+
+        if bootstrap:
+            if self.verbose:
+                print(f'--> DisulfideClass_Constructor(): Building SS classes...')
+            self.build_yourself()
+        else:
+            self.classdict = self.load_class_dict()
+
+    def load_class_dict(self, fname=f'{DATA_DIR}{SS_CLASS_DICT_FILE}') -> dict:
+        with open(fname,'rb') as f:
+            #res = pickle.load(f)
+            self.classdict = pickle.load(f)
+    
+    def build_class_df(self, class_df, group_df):
+        ss_id_col = group_df['ss_id']
+        result_df = pd.concat([class_df, ss_id_col], axis=1)
+        return result_df
+
+    def list_binary_classes(self):
+        for k,v in enumerate(self.classdict):
+            print(f'Class: |{k}|, |{v}|')
+
+    #  class_cols = ['Idx','chi1_s','chi2_s','chi3_s','chi4_s','chi5_s','class_id','SS_Classname','FXN',
+    # 'count','incidence','percentage','ca_distance_mean',
+    # 'ca_distance_std','torsion_length_mean','torsion_length_std','energy_mean','energy_std']
+
+    def concat_dataframes(self, df1, df2):
+        """
+        Concatenates columns from one data frame into the other 
+        and returns the new result.
+
+        Parameters
+        ----------
+        df1 : pandas.DataFrame
+            The first data frame.
+        df2 : pandas.DataFrame
+            The second data frame.
+
+        Returns
+        -------
+        pandas.DataFrame
+            The concatenated data frame.
+
+        """
+        # Merge the data frames based on the 'SS_Classname' column
+        result = pd.merge(df1, df2, on='class_id')
+
+        return result
+
+    def build_yourself(self):
+        '''
+        Builds the internal structures needed for the loader, including binary and six-fold classes.
+        The classnames are defined by the sign of the dihedral angles, per XXX', the list of SS within
+        the database classified, and the resulting dict created.
+        '''
+
+        from proteusPy.DisulfideClasses import create_classes, create_six_class_df
+
+        def ss_id_dict(df):
+            ss_id_dict = dict(zip(df['SS_Classname'], df['ss_id']))
+            return ss_id_dict
+
+        PDB_SS = proteusPy.DisulfideLoader.Load_PDB_SS(verbose=self.verbose, subset=False)
+        self.version = proteusPy.__version__
+
+        if self.verbose:
+            PDB_SS.describe()
+
+        tors_df = PDB_SS.getTorsions()
+
+        if self.verbose:
+            print(f'-> DisulfideClass_Constructor(): creating binary SS classes...')
+        grouped = create_classes(tors_df)        
+        
+        # grouped.to_csv(f'{DATA_DIR}PDB_ss_classes.csv')
+        
+        # this file is hand made. Do not change it. -egs-
+        #class_df = pd.read_csv(f'{DATA_DIR}PDB_ss_classes_master2.csv', dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
+
+        # !!! df = pd.read_csv(pd.compat.StringIO(csv_string))
+        # class_df = pd.read_csv(f'{DATA_DIR}PDB_SS_class_definitions.csv', dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
+        
+        class_df = pd.read_csv(StringIO(SS_CLASS_DEFINITIONS), dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
+        class_df['FXN'].str.strip()
+        class_df['SS_Classname'].str.strip()
+        class_df['class_id'].str.strip()
+
+        if self.verbose:
+            print(f'-> DisulfideClass_Constructor(): merging...')
+
+        merged = self.concat_dataframes(class_df, grouped)
+        merged.drop(columns=['Idx'], inplace=True)
+
+        classdict = ss_id_dict(merged)
+        self.classdict = classdict
+
+        merged.to_csv(f'{DATA_DIR}PDB_SS_merged.csv')
+        self.classdf = merged.copy()
+
+        fname = f'{DATA_DIR}{SS_CLASS_DICT_FILE}'
+
+        if self.verbose:
+            print(f'-> DisulfideClass_Constructor(): writing {fname}...')
+
+        with open(fname, "wb+") as f:
+            pickle.dump(classdict, f)
+
+        if self.verbose:
+            print(f'-> DisulfideClass_Constructor(): creating sixfold SS classes...')
+        
+        grouped_sixclass = create_six_class_df(tors_df)
+        grouped_sixclass.to_csv(f'{DATA_DIR}PDB_ss_six_classes.csv')
+        self.sixclass_df = grouped_sixclass
+
+        if self.verbose:
+            print(f'--> DisulfideClass_Constructor(): ')
+        
+        if self.verbose:
+            print(f'--> DisulfideClass_Constructor(): initialization complete.')
+        
+        return
+    
+    def save(self, savepath=DATA_DIR):
+        '''
+        Save a copy of the fully instantiated Loader to the specified file.
+
+        :param savepath: Path to save the file, defaults to DATA_DIR
+        :param fname: Filename, defaults to LOADER_FNAME
+        :param verbose: Verbosity, defaults to False
+        :param cutoff: Distance cutoff used to build the database, -1 means no cutoff.
+        '''
+        self.version = proteusPy.__version__
+
+        fname = CLASSOBJ_FNAME
+
+        _fname = f'{savepath}{fname}'
+
+        if self.verbose:
+            print(f'-> DisulfideLoader.save(): Writing {_fname}... ')
+        
+        with open(_fname, 'wb+') as f:
+            pickle.dump(self, f)
+        
+        if self.verbose:
+            print(f'-> DisulfideLoader.save(): Done.')
+    
+
+# class definition ends
+class oDisulfideClass_Constructor():
+    '''
+    Class manages structural classes for the disulfide bonds contained
     in the proteusPy disulfide database
     '''
 
