@@ -151,7 +151,7 @@ def analyze_six_classes(loader: DisulfideLoader, do_graph=True,
                         do_consensus=True, cutoff=0.1) -> DisulfideList:
     _PBAR_COLS = 85
 
-    class_filename = f'{DATA_DIR}SS_consensus_class_quat.pkl'
+    class_filename = f'{DATA_DIR}SS_consensus_class_sext.pkl'
 
     tors = loader.getTorsions()
     six = create_six_class_df(tors)
@@ -218,4 +218,3 @@ elapsed = end - start
 print(f'Disulfide Class Analysis Complete! \nElapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)')
 
 # end of file
-
