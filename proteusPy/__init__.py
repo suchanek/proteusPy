@@ -43,5 +43,6 @@ from .utility import distance_squared, distance3d, get_jet_colormap, Check_chain
 from .utility import image_to_ascii_art, generate_vector_dataframe
 from .DisulfideClasses import create_classes, create_quat_classes, create_six_class_df
 from .DisulfideClasses import get_half_quadrant, get_quadrant, get_sixth_quadrant
+from .DisulfideClass_Constructor import DisulfideClass_Constructor, plot_class_chart
 
 # end of file

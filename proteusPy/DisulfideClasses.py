@@ -22,7 +22,8 @@ import proteusPy
 
 from proteusPy.data import DATA_DIR, SS_CLASS_DICT_FILE, CLASSOBJ_FNAME
 from proteusPy.data import SS_CLASS_DEFINITIONS
-
+from proteusPy.angle_annotation import AngleAnnotation
+from proteusPy.ProteusGlobals import DPI
 
 def create_classes(df):
     """
@@ -232,7 +233,7 @@ def create_quat_classes(df):
         col = df[col_name]
         new_col = []
         for val in col:
-            new_col.append(get_sixth_quadrant(val))
+            new_col.append(get_quadrant(val))
         new_col_name = col_name + '_t'
         new_cols.append(new_col_name)
         df[new_col_name] = new_col
@@ -249,57 +250,18 @@ def create_quat_classes(df):
 
     return grouped
 
-def Ocreate_quat_classes(df):
-    """
-    Add new columns to the input DataFrame with a 4-class encoding for input 'chi' values.
+def get_ss_id(df: pd.DataFrame, cls: str) -> str:
+    '''
+    Returns the 'ss_id' value in the given DataFrame that corresponds to the
+    input 'cls' string.
+    '''
+    filtered_df = df[df['class_id'] == cls]
+    if len(filtered_df) == 0:
+        raise ValueError(f"No rows found for class_id '{cls}'")
+    elif len(filtered_df) > 1:
+        raise ValueError(f"Multiple rows found for class_id '{cls}'")
+    return filtered_df.iloc[0]['ss_id']
 
-    Takes a DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance',
-    'cb_distance', 'torsion_length', 'energy', and 'rho' and adds new columns based on the following rules:
-    1. If the 'chi' column is between -90 to -60 then the new column is '-'. (g-)
-    2. If it's between 60 to 90, then the new column is '+'. (g+)
-    3. If it's between -180 to -150 then the new column is '*'. (trans)
-    4. If it's between 150 to 180 then the new column is '@'. (trans)
-    5. Otherwise the new column is '!' 
-
-    A new column named `class_id` is also added, which is the concatenation of the `_t` columns. The DataFrame is then
-    grouped by the `class_id` column, and a new DataFrame is returned that shows the unique `ss_id` values for each group,
-    the count of unique `ss_id` values, the incidence of each group as a proportion of the total DataFrame, and the
-    percentage of incidence.
-
-    :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5',
-               'ca_distance', 'cb_distance', 'torsion_length', 'energy', and 'rho'
-    :return: The input DataFrame with the added columns
-    """
-    
-    # - + * @ 
-    new_cols = []
-    for col_name in ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']:
-        col = df[col_name]
-        new_col = []
-        for val in col:
-            if is_between(val, -90, -60) or is_between(val, 60, 90):
-                new_col.append('-')
-            elif is_between(val, -181, -150) or is_between(val, 150, 180):
-                new_col.append('*')
-            elif is_between(val, -150, -120) or is_between(val, 120, 150):
-                new_col.append('+')
-            else:
-                new_col.append('!')
-        new_col_name = col_name + '_t'
-        new_cols.append(new_col_name)
-        df[new_col_name] = new_col
-    
-    class_id_column = 'class_id'
-
-    df['class_id'] = df[new_cols].apply(lambda x: ''.join(x), axis=1)
-
-    # Group the DataFrame by the class ID and return the grouped data
-    grouped = df.groupby(class_id_column)['ss_id'].unique().reset_index()
-    grouped['count'] = grouped['ss_id'].apply(lambda x: len(x))
-    grouped['incidence'] = grouped['ss_id'].apply(lambda x: len(x)/len(df))
-    grouped['percentage'] = grouped['incidence'].apply(lambda x: 100 * x)
-
-    return grouped
 
 def get_section(angle_deg, basis):
     """
@@ -344,6 +306,95 @@ def is_between(x, a, b):
     """
     return a <= x <= b
 
+def plot_class_chart(classes: int) -> None:
+    """
+    Create a Matplotlib pie chart with `classes` segments of equal size.
+
+    :param classes: The number of segments to create in the pie chart.
+    :type classes: int
+    
+    :return: None
+
+    :Example:
+    
+    Create a pie chart with 4 equal segments.
+    
+    >>> plot_class_chart(4)
+    """
+
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from proteusPy.angle_annotation import AngleAnnotation
+    # Helper function to draw angle easily.
+    def plot_angle(ax, pos, angle, length=0.95, acol="C4", **kwargs):
+        """
+        Helper function to draw an angle.
+
+        :param ax: The Matplotlib axis to draw on.
+        :type ax: matplotlib.axis.Axis
+
+        :param pos: The starting position of the angle.
+        :type pos: tuple[float, float]
+
+        :param angle: The angle in degrees to draw.
+        :type angle: float
+
+        :param length: The length of the angle in the plot.
+        :type length: float
+
+        :param acol: The color of the angle.
+        :type acol: str
+
+        :return: An AngleAnnotation object representing the angle.
+        """
+        vec2 = np.array([np.cos(np.deg2rad(angle)), np.sin(np.deg2rad(angle))])
+        xy = np.c_[[length, 0], [0, 0], vec2*length].T + np.array(pos)
+        ax.plot(*xy.T, color=acol)
+        return AngleAnnotation(pos, xy[0], xy[2], ax=ax, **kwargs)
+
+    fig, ax1= plt.subplots(sharex=True)
+
+    # Set up the figure
+    fig.suptitle("SS Torsion Classes")
+    fig.set_dpi(DPI)
+    fig.set_size_inches(4, 4)
+    fig.canvas.draw()  # Need to draw the figure to define renderer
+
+    # Showcase different text positions.
+    ax1.margins(y=0.4)
+    ax1.set_title("textposition")
+    _text = f"${360/classes}°$"
+
+    kw = dict(size=144, unit="pixels", text=_text)
+    #am1 = AngleAnnotation(center, p1[1], p2[1], ax=ax, size=75, text=r"$\alpha$")
+
+    am7 = plot_angle(ax1, (0, 0), 360/classes, 
+                    textposition="outside", **kw)
+
+    # Create a list of segment values
+    values = [1 for _ in range(classes)]
+
+    # Create the pie chart
+    wedges, _ = ax1.pie(
+        values, startangle=0, counterclock=True, wedgeprops=dict(width=0.65))
+
+    # Set the chart title and size
+    ax1.set_title(f'{classes}-Class Angular Layout')
+
+    # Set the segment colors
+    color_palette = plt.cm.get_cmap('tab20', classes)
+    ax1.set_prop_cycle('color', [color_palette(i) for i in range(classes)])
+
+    # Create the legend
+    legend_labels = [f'{i+1}' for i in range(classes)]
+    legend = ax1.legend(wedges, legend_labels, title='Class', loc='center right', bbox_to_anchor=(1.2, 0.5))
+
+    # Set the legend fontsize
+    plt.setp(legend.get_title(), fontsize='medium')
+    plt.setp(legend.get_texts(), fontsize='small')
+
+    # Show the chart
+ 
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

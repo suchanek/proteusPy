@@ -37,7 +37,7 @@ from proteusPy.Disulfide import Disulfide
 
 from proteusPy.DisulfideExceptions import *
 from proteusPy.data import *
-from proteusPy.DisulfideClasses import create_six_class_df, create_classes
+from proteusPy.DisulfideClasses import create_classes
 
 import itertools
 
