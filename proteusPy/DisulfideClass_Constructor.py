@@ -3,7 +3,7 @@ DisulfideBond Class Analysis Dictionary creation
 Author: Eric G. Suchanek, PhD.
 (c) 2023 Eric G. Suchanek, PhD., All Rights Reserved
 License: MIT
-Last Modification: 2/18/23
+Last Modification: 3/8/23
 
 # this workflow reads in the torsion database, groups it by torsions 
 # to create the classes merges with the master class spreadsheet, and saves the 
@@ -81,12 +81,6 @@ all 32 possible classes ($$2^5$$). Classes are named per Hogg's convention.
 | 31 |        1 |        1 |        1 |        1 |        1 |      22222 | +RHSpiral      | UNK        |
 +----+----------+----------+----------+----------+----------+------------+----------------+------------+
 '''
-
-# DisulfideBond Class Analysis Dictionary creation
-# Author: Eric G. Suchanek, PhD.
-# (c) 2023 Eric G. Suchanek, PhD., All Rights Reserved
-# License: MIT
-# Last Modification: 2/18/23
 # Cα Cβ Sγ
 
 # this workflow reads in the torsion database, groups it by torsions 
@@ -127,7 +121,7 @@ class DisulfideClass_Constructor():
 
         if bootstrap:
             if self.verbose:
-                print(f'--> DisulfideClass_Constructor(): Building SS classes...')
+                print(f'-> DisulfideClass_Constructor(): Building SS classes...')
             self.build_yourself()
         else:
             self.classdict = self.load_class_dict()
@@ -181,12 +175,13 @@ class DisulfideClass_Constructor():
         '''
 
         from proteusPy.DisulfideClasses import create_classes, create_six_class_df
+        from proteusPy.DisulfideLoader import Load_PDB_SS
 
         def ss_id_dict(df):
             ss_id_dict = dict(zip(df['SS_Classname'], df['ss_id']))
             return ss_id_dict
 
-        PDB_SS = proteusPy.DisulfideLoader.Load_PDB_SS(verbose=self.verbose, subset=False)
+        PDB_SS = Load_PDB_SS(verbose=self.verbose, subset=False)
         self.version = proteusPy.__version__
 
         if self.verbose:
@@ -239,10 +234,7 @@ class DisulfideClass_Constructor():
         self.sixclass_df = grouped_sixclass
 
         if self.verbose:
-            print(f'--> DisulfideClass_Constructor(): ')
-        
-        if self.verbose:
-            print(f'--> DisulfideClass_Constructor(): initialization complete.')
+            print(f'-> DisulfideClass_Constructor(): initialization complete.')
         
         return
     
@@ -269,111 +261,6 @@ class DisulfideClass_Constructor():
         
         if self.verbose:
             print(f'-> DisulfideLoader.save(): Done.')
-    
-
-# class definition ends
-class oDisulfideClass_Constructor():
-    '''
-    Class manages structural classes for the disulfide bonds contained
-    in the proteusPy disulfide database
-    '''
-
-    def __init__(self, verbose=False, bootstrap=False) -> None:
-        self.verbose = verbose
-        self.classdict = {}
-        self.classdf = None
-
-        if bootstrap:
-            if self.verbose:
-                print(f'--> DisulfideClass_Constructor(): Building SS classes...')
-            self.build_yourself()
-        else:
-            self.classdict = self.load_class_dict()
-
-    def load_class_dict(self, fname=f'{DATA_DIR}{SS_CLASS_DICT_FILE}') -> dict:
-        with open(fname,'rb') as f:
-            #res = pickle.load(f)
-            self.classdict = pickle.load(f)
-    
-    def build_class_df(self, class_df, group_df):
-        ss_id_col = group_df['ss_id']
-        result_df = pd.concat([class_df, ss_id_col], axis=1)
-        return result_df
-
-    def list_binary_classes(self):
-        for k,v in enumerate(self.classdict):
-            print(f'Class: |{k}|, |{v}|')
-
-    #  class_cols = ['Idx','chi1_s','chi2_s','chi3_s','chi4_s','chi5_s','class_id','SS_Classname','FXN',
-    # 'count','incidence','percentage','ca_distance_mean',
-    # 'ca_distance_std','torsion_length_mean','torsion_length_std','energy_mean','energy_std']
-
-    def build_yourself(self):
-        '''
-        Builds the internal dictionary mapping the disulfide class names to their respective members.
-        The classnames are defined by the sign of the dihedral angles, per XXX', the list of SS within
-        the database classified, and the resulting dict created.
-        '''
-
-        def ss_id_dict(df):
-            ss_id_dict = dict(zip(df['SS_Classname'], df['ss_id']))
-            return ss_id_dict
-
-        PDB_SS = proteusPy.DisulfideLoader.Load_PDB_SS(verbose=self.verbose, subset=False)
-        if self.verbose:
-            PDB_SS.describe()
-
-        tors_df = PDB_SS.getTorsions()
-
-        if self.verbose:
-            print(f'-> DisulfideClass_Constructor(): creating SS classes...')
-
-        grouped = Create_classes(tors_df)
-        self.class_df = grouped
-
-        # grouped.to_csv(f'{DATA_DIR}PDB_ss_classes.csv')
-        if self.verbose:
-            print(f'{grouped.head(32)}')
-
-        #grouped_summary = grouped.drop(columns=['ss_id'], axis=1)
-        #grouped_summary.to_csv(f'{DATA_DIR}PDB_ss_classes_summary.csv')
-        
-        # this file is hand made. Do not change it. -egs-
-        #class_df = pd.read_csv(f'{DATA_DIR}PDB_ss_classes_master2.csv', dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
-
-        # !!! df = pd.read_csv(pd.compat.StringIO(csv_string))
-        # class_df = pd.read_csv(f'{DATA_DIR}PDB_SS_class_definitions.csv', dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
-        
-        class_df = pd.read_csv(StringIO(SS_CLASS_DEFINITIONS), dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
-        class_df['FXN'].str.strip()
-        class_df['SS_Classname'].str.strip()
-        class_df['class_id'].str.strip()
-
-        if self.verbose:
-            print(f'-> DisulfideClass_Constructor(): merging...')
-
-        merged = self.build_class_df(class_df, grouped)
-        merged.drop(columns=['Idx'], inplace=True)
-
-        classdict = ss_id_dict(merged)
-        self.classdict = classdict
-
-        merged.to_csv(f'{DATA_DIR}PDB_SS_merged.csv')
-        self.classdf = merged.copy()
-
-        fname = f'{DATA_DIR}{SS_CLASS_DICT_FILE}'
-
-        if self.verbose:
-            print(f'-> DisulfideClass_Constructor(): writing {fname}...')
-
-        with open(fname, "wb+") as f:
-            pickle.dump(classdict, f)
-
-        if self.verbose:
-            print(f'--> DisulfideClass_Constructor(): initialization complete.')
-        
-        return
-
         
 # class definition ends
 def plot_class_chart(classes: int) -> None:

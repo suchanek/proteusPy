@@ -206,7 +206,7 @@ class AngleAnnotation(Arc):
             bbox = self.text.get_window_extent()
             X = R(angle, r, bbox.width, bbox.height)
             trans = self.ax.figure.dpi_scale_trans.inverted()
-            offs = trans.transform(((X-s/2), 0))[0] * 72
+            offs = trans.transform(((X-s/2), 0))[0] * 72 # !!!
             self.text.set_position([offs*np.cos(angle), offs*np.sin(angle)])
 
 
