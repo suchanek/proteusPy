@@ -107,6 +107,8 @@ from proteusPy.Disulfide import *
 merge_cols = ['chi1_s','chi2_s','chi3_s','chi4_s','chi5_s','class_id','SS_Classname','FXN','count','incidence','percentage','ca_distance_mean',
 'ca_distance_std','torsion_length_mean','torsion_length_std','energy_mean','energy_std', 'ss_id']
 
+SS_CONSENSUS_FILE = 'SS_consensus_class_sext.pkl'
+
 class DisulfideClass_Constructor():
     '''
     Class manages structural classes for the disulfide bonds contained
@@ -172,6 +174,11 @@ class DisulfideClass_Constructor():
             #res = pickle.load(f)
             self.classdict = pickle.load(f)
     
+    def load_consensus_file(self, fname=f'{DATA_DIR}{SS_CONSENSUS_FILE}'):
+        with open(fname,'rb') as f:
+            res = pickle.load(f)
+            return res
+            
     def build_class_df(self, class_df, group_df):
         ss_id_col = group_df['ss_id']
         result_df = pd.concat([class_df, ss_id_col], axis=1)

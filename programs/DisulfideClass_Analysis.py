@@ -105,9 +105,9 @@ start = time.time()
 pv.set_jupyter_backend('trame')
 set_plot_theme('dark')
 
-def analyze_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -> DisulfideList:
+def analyze_binary_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -> DisulfideList:
     class_filename = f'{DATA_DIR}SS_consensus_class32.pkl'
-    classes = loader.classdict
+    classes = loader.tclass.classdict
     tot_classes = len(classes)
     res_list = DisulfideList([], 'SS_Class_Avg_SS')
 
@@ -144,19 +144,25 @@ def analyze_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -
     
     return res_list
 
-from proteusPy.DisulfideClasses import create_six_class_df
-from proteusPy.utility import sort_by_column
+def analyze_six_classes(loader, do_graph=True, do_consensus=True, cutoff=0.1):
+    """
+    Analyze the six classes of disulfide bonds.
 
-def analyze_six_classes(loader: DisulfideLoader, do_graph=True, 
-                        do_consensus=True, cutoff=0.1) -> DisulfideList:
+    :param loader: The disulfide loader object.
+    :param do_graph: Whether or not to display torsion statistics graphs. Default is True.
+    :param do_consensus: Whether or not to compute average conformations for each class. Default is True.
+    :param cutoff: The cutoff percentage for each class. If the percentage of disulfides for a class is below
+                   this value, the class will be skipped. Default is 0.1.
+
+    :return: A list of disulfide bonds, where each disulfide bond represents the average conformation for a class.
+    """
     _PBAR_COLS = 85
 
     class_filename = f'{DATA_DIR}SS_consensus_class_sext.pkl'
 
-    tors = loader.getTorsions()
-    six = create_six_class_df(tors)
+    six = loader.tclass.sixclass_df
     tot_classes = six.shape[0]
-    res_list = DisulfideList([], 'SS_Class_Avg_SS')
+    res_list = DisulfideList([], 'SS_6class_Avg_SS')
     total_ss = len(loader.SSList)
 
     pbar = tqdm(range(tot_classes), ncols=_PBAR_COLS)
@@ -205,12 +211,46 @@ def analyze_six_classes(loader: DisulfideLoader, do_graph=True,
     
     return res_list
 
+def extract_class(loader, clsid):
+    """
+    Analyze the six classes of disulfide bonds.
+
+    :param loader: The disulfide loader object.
+    :param do_graph: Whether or not to display torsion statistics graphs. Default is True.
+    :param do_consensus: Whether or not to compute average conformations for each class. Default is True.
+    :param cutoff: The cutoff percentage for each class. If the percentage of disulfides for a class is below
+                   this value, the class will be skipped. Default is 0.1.
+
+    :return: A list of disulfide bonds, where each disulfide bond represents the average conformation for a class.
+    """
+    _PBAR_COLS = 85
+
+    six = loader.tclass.sixclass_df
+    tot_classes = six.shape[0]
+    class_disulfides = DisulfideList([], _cls, quiet=True)
+
+    pbar = tqdm(range(tot_classes), ncols=_PBAR_COLS)
+
+    # loop over all rows
+    for idx in pbar:
+        row = six.iloc[idx]
+        _cls = row['class_id']
+        if _cls == clsid:
+            ss_list = row['ss_id']
+            tot = len(ss_list)
+            pbar.set_postfix({'CLS': _cls, 'Cnt': tot}) # update the progress bar
+            pbar2 = tqdm(ss_list, ncols=_PBAR_COLS, leave=False)
+            for ssid in pbar2:
+                class_disulfides.append(loader[ssid])
+    
+    return class_disulfides
+
 # main program begins
 PDB_SS = Load_PDB_SS(verbose=True, subset=False)
 
 ss_classlist = DisulfideList([], 'PDB_SS_SIX_CLASSES')
 ss_classlist = analyze_six_classes(PDB_SS, do_graph=True, 
-                                   do_consensus=True, cutoff=0.5)
+                                   do_consensus=True, cutoff=0.1)
 
 end = time.time()
 elapsed = end - start
