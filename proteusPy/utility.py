@@ -231,7 +231,7 @@ def print_memory_used():
     '''
     mem = get_memory_usage() / (1024 ** 3) # to GB
 
-    print(f'--> proteusPy {proteusPy.__version__}: Memory Used: {mem:.2f} GB')
+    print(f'proteusPy {proteusPy.__version__}: Memory Used: {mem:.2f} GB')
 
 def image_to_ascii_art(fname, nwidth):
     '''

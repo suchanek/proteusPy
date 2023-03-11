@@ -260,13 +260,39 @@ class DisulfideLoader:
     
     def copy(self):
         '''
-        Return a copy of self
+        Return a copy of self.
 
         :return: Copy of self
-        :rtype: proteusPy.DisulfideLoader
         '''
         return copy.deepcopy(self)
 
+    def extract_class(self, clsid):
+        """
+        Return the list of disulfides corresponding to the input `clsid`.
+    
+        :param clsid: The class name to extract.
+        :return: The list of disulfide bonds from the class.
+        """
+        from tqdm import tqdm
+    
+        six = self.tclass.sixclass_df
+        tot_classes = six.shape[0]
+        class_disulfides = DisulfideList([], clsid, quiet=True)
+        _pbar = tqdm(six.iterrows(), total=tot_classes, ncols=80, leave=False)
+        for idx, row in _pbar:
+            _cls = row['class_id']
+            if _cls == clsid:
+                ss_list = row['ss_id']
+                pbar = tqdm(ss_list, ncols=80, leave=False)
+                for ssid in pbar:
+                    class_disulfides.append(self[ssid])
+                pbar.set_postfix({'Done': ''})
+                break
+
+            _pbar.set_postfix({'Cnt': idx})
+            
+        return class_disulfides
+    
     def getlist(self) -> DisulfideList:
         '''
         Return the list of Disulfides contained in the class.
