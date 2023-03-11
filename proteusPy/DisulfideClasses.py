@@ -250,6 +250,19 @@ def create_quat_classes(df):
 
     return grouped
 
+def filter_by_percentage(df, cutoff):
+       """
+       Filter a pandas DataFrame by incidence
+   
+       :param df: A Pandas DataFrame with an 'incidence' column to filter by
+       :param cutoff: A numeric value specifying the minimum incidence required for a row to be included in the output
+       :type df: pandas.DataFrame
+       :type cutoff: float
+       :return: A new Pandas DataFrame containing only rows where the incidence is greater than or equal to the cutoff
+       :rtype: pandas.DataFrame
+       """
+       return df[df['percentage'] >= cutoff]
+
 def get_ss_id(df: pd.DataFrame, cls: str) -> str:
     '''
     Returns the 'ss_id' value in the given DataFrame that corresponds to the
