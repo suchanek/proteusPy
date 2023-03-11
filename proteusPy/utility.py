@@ -312,6 +312,81 @@ def sort_by_column(df, column):
     sorted_df = df.sort_values(by=[column], ascending=False)
     return sorted_df
 
+def plot_class_chart(classes: int) -> None:
+    """
+    Create a Matplotlib pie chart with `classes` segments of equal size.
+
+    Parameters:
+        classes (int): The number of segments to create in the pie chart.
+
+    Returns:
+        None
+
+    Example:
+    >>> plot_class_chart(4)
+
+    This will create a pie chart with 4 equal segments.
+    """
+    import matplotlib.pyplot as plt
+    import numpy as np
+    
+    from proteusPy.angle_annotation import AngleAnnotation
+
+    # Helper function to draw angle easily.
+    def plot_angle(ax, pos, angle, length=0.95, acol="C0", **kwargs):
+        vec2 = np.array([np.cos(np.deg2rad(angle)), np.sin(np.deg2rad(angle))])
+        xy = np.c_[[length, 0], [0, 0], vec2*length].T + np.array(pos)
+        ax.plot(*xy.T, color=acol)
+        return AngleAnnotation(pos, xy[0], xy[2], ax=ax, **kwargs)
+
+    #fig = plt.figure(figsize=(WIDTH, HEIGHT), dpi=DPI)
+    fig, ax1= plt.subplots(sharex=True)
+
+    #ax1, ax2 = fig.subplots(1, 2, sharey=True, sharex=True)
+
+    fig.suptitle("SS Torsion Classes")
+    fig.set_dpi(220)
+    fig.set_size_inches(6, 6)
+
+    fig.canvas.draw()  # Need to draw the figure to define renderer
+
+    # Showcase different text positions.
+    ax1.margins(y=0.4)
+    ax1.set_title("textposition")
+    _text = f"${360/classes}°$"
+    kw = dict(size=75, unit="points", text=_text)
+
+    #am6 = plot_angle(ax1, (2.0, 0), 60, textposition="inside", **kw)
+    am7 = plot_angle(ax1, (0, 0), 360/classes, textposition="outside", **kw)
+
+    # Create a list of segment values
+    # !!!
+    values = [1 for _ in range(classes)]
+
+    # Create the pie chart
+    #fig, ax = plt.subplots()
+    wedges, _ = ax1.pie(
+        values, startangle=0, counterclock=False, wedgeprops=dict(width=0.65))
+
+    # Set the chart title and size
+    ax1.set_title(f'{classes}-Class Angular Layout')
+
+    # Set the segment colors
+    color_palette = plt.cm.get_cmap('tab20', classes)
+    ax1.set_prop_cycle('color', [color_palette(i) for i in range(classes)])
+
+    # Create the legend
+    legend_labels = [f'Class {i+1}' for i in range(classes)]
+    legend = ax1.legend(wedges, legend_labels, title='Classes', loc='center left', bbox_to_anchor=(1.2, 0.5))
+
+    # Set the legend fontsize
+    plt.setp(legend.get_title(), fontsize='large')
+    plt.setp(legend.get_texts(), fontsize='medium')
+
+    # Show the chart
+    fig.show()
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

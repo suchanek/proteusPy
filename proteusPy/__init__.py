@@ -32,8 +32,8 @@ from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN
 from .residue import build_residue, get_backbone_from_chain, to_alpha, to_carbonyl, to_nitrogen, to_oxygen
 
 from .Disulfide import Download_Disulfides, Extract_Disulfides
-from .DisulfideLoader import DisulfideLoader, Load_PDB_SS
 from .DisulfideList import load_disulfides_from_id
+from .DisulfideLoader import DisulfideLoader, Load_PDB_SS
 
 from .atoms import *
 from .data import *
@@ -41,7 +41,7 @@ from .angle_annotation import *
 
 from .utility import distance_squared, distance3d, get_jet_colormap, Check_chains, print_memory_used
 from .utility import image_to_ascii_art, generate_vector_dataframe
-from .DisulfideClasses import create_classes, create_quat_classes, create_six_class_df
+from .DisulfideClasses import create_classes, create_quat_classes
 from .DisulfideClasses import get_half_quadrant, get_quadrant, get_sixth_quadrant, filter_by_percentage
 from .DisulfideClass_Constructor import DisulfideClass_Constructor
 

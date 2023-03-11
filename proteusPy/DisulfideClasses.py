@@ -175,40 +175,6 @@ def get_half_quadrant(angle_deg):
     else:
         raise ValueError("Invalid angle value: angle must be in the range [-180, 180).")
 
-def create_six_class_df(df) -> pd.DataFrame:
-    """
-    Create a new DataFrame from the input with a 6-class encoding for input 'chi' values.
-    
-    The function takes a pandas DataFrame containing the following columns:
-    'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'cb_distance',
-    'torsion_length', 'energy', and 'rho', and adds a class ID column based on the following rules:
-    
-    1. A new column named `class_id` is added, which is the concatenation of the individual class IDs per Chi.
-    2. The DataFrame is grouped by the `class_id` column, and a new DataFrame is returned that shows the unique `ss_id` values for each group,
-    the count of unique `ss_id` values, the incidence of each group as a proportion of the total DataFrame, and the
-    percentage of incidence.
-
-    :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5',
-               'ca_distance', 'cb_distance', 'torsion_length', 'energy', and 'rho'
-    :return: The grouped DataFrame with the added class column.
-    """
-    
-    _df = pd.DataFrame()
-    # create the chi_t columns for each chi column
-    for col_name in ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']:
-        _df[col_name + '_t'] = df[col_name].apply(get_sixth_quadrant)
-    
-    # create the class_id column
-    df['class_id'] = _df[['chi1_t', 'chi2_t', 'chi3_t', 'chi4_t', 'chi5_t']].apply(lambda x: ''.join(x), axis=1)
-
-    # group the DataFrame by class_id and return the grouped data
-    grouped = df.groupby('class_id').agg({'ss_id': 'unique'})
-    grouped['count'] = grouped['ss_id'].apply(lambda x: len(x))
-    grouped['incidence'] = grouped['count'] / len(df)
-    grouped['percentage'] = grouped['incidence'] * 100
-    grouped.reset_index(inplace=True)
-
-    return grouped
 
 def create_quat_classes(df):
     """

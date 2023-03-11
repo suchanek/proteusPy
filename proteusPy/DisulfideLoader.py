@@ -38,6 +38,7 @@ from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideExceptions import *
 from proteusPy.data import *
 from proteusPy.DisulfideClasses import create_classes
+from proteusPy.DisulfideClass_Constructor import DisulfideClass_Constructor
 
 import itertools
 
@@ -90,7 +91,6 @@ class DisulfideLoader:
     
     Finally, we can access disulfides by regular slicing:
     >>> SSlist = PDB_SS[:4]
-    >>> SSlist.display(style='sb') 
     '''
 
     def __init__(self, verbose=True, datadir=DATA_DIR, picklefile=SS_PICKLE_FILE, 
@@ -119,13 +119,16 @@ class DisulfideLoader:
         self.TotalDisulfides = 0
         self.IDList = []
         self.QUIET = quiet
+        
         self.classdict = {}
         self.classdf = None
         self.sixclass_df = None
-        self.cutoff = cutoff
+        
+        self.tclass = None        # disulfideClass_constructor to manage classes
+        self.cutoff = cutoff      # distance cutoff used to bulid the database
         self.verbose = verbose
         self.timestamp = time.time()
-        self.version = 'V0.0'
+        self.version = proteusPy.__version__
 
         idlist = []
 
@@ -135,7 +138,7 @@ class DisulfideLoader:
             self.TorsionFile = f'{datadir}{SS_SUBSET_TORSIONS_FILE}'
         
         if self.verbose:
-            print(f'--> DisulfideLoader(): Reading disulfides from: {self.PickleFile}... ', end='')
+            print(f'-> DisulfideLoader(): Reading disulfides from: {self.PickleFile}... ', end='')
         
         with open(self.PickleFile, 'rb') as f:
             sslist = pickle.load(f)
@@ -147,7 +150,7 @@ class DisulfideLoader:
         self.TotalDisulfides = len(self.SSList)
         
         if self.verbose:
-            print(f'--> DisulfideLoader(): Reading disulfide dict2 from: {self.PickleDictFile}...', end='')
+            print(f'-> DisulfideLoader(): Reading disulfide dict2 from: {self.PickleDictFile}...', end='')
         
         with open(self.PickleDictFile, 'rb') as f:
             self.SSDict = pickle.load(f)
@@ -160,7 +163,7 @@ class DisulfideLoader:
             print(f'done.')
 
         if self.verbose:
-            print(f'--> DisulfideLoader(): Reading Torsion DF from: {self.TorsionFile}...', end='')
+            print(f'-> DisulfideLoader(): Reading Torsion DF from: {self.TorsionFile}...', end='')
 
         tmpDF  = pd.read_csv(self.TorsionFile)
         tmpDF.drop(tmpDF.columns[[0]], axis=1, inplace=True)
@@ -170,10 +173,10 @@ class DisulfideLoader:
         if self.verbose:
             print(f' done.')
 
-        self.build_classes()
+        self.tclass = DisulfideClass_Constructor(self, self.verbose)
 
         if self.verbose:    
-            print(f'--> DisulfideLoader(): Loading complete.')
+            print(f'-> DisulfideLoader(): Loading complete.')
             self.describe()
         return
 
@@ -239,88 +242,6 @@ class DisulfideLoader:
                 cnt += 1
         return res / cnt
     
-    def build_classes(self):
-        '''
-        Build the internal dictionary mapping disulfides to class names.
-
-        Disulfide classes are defined using the ± formalism described by 
-        Hogg et al. (Biochem, 2006, 45, 7429-7433), across all 32 (2^5), possible 
-        binary sidechain torsional combinations. Classes are named per Hogg's convention.
-        The ``class_id`` represents the sign of each dihedral angle $\chi_{1} - \chi_{1'}$
-        where *0* repreents *negative* dihedral angle and *2* a *positive* angle.
-
-        |   class_id | SS_Classname   | FXN        |   count |   incidence |
-        |-----------:|:---------------|:-----------|--------:|------------:|
-        |      00000 | -LHSpiral      | UNK        |   31513 |  0.261092   |
-        |      00002 | 00002          | UNK        |    5805 |  0.0480956  |
-        |      00020 | -LHHook        | UNK        |    3413 |  0.0282774  |
-        |      00022 | 00022          | UNK        |    1940 |  0.0160733  |
-        |      00200 | -RHStaple      | Allosteric |   12735 |  0.105512   |
-        |      00202 | 00202          | UNK        |     993 |  0.00822721 |
-        |      00220 | 00220          | UNK        |    5674 |  0.0470103  |
-        |      00222 | 00222          | UNK        |    5092 |  0.0421883  |
-        |      02000 | 02000          | UNK        |    4749 |  0.0393465  |
-        |      02002 | 02002          | UNK        |    3774 |  0.0312684  |
-        |      02020 | -LHStaple      | UNK        |    1494 |  0.0123781  |
-        |      02022 | 02022          | UNK        |     591 |  0.00489656 |
-        |      02200 | -RHHook        | UNK        |    5090 |  0.0421717  |
-        |      02202 | 02202          | UNK        |     533 |  0.00441602 |
-        |      02220 | -RHSpiral      | UNK        |    6751 |  0.0559335  |
-        |      02222 | 02222          | UNK        |    3474 |  0.0287828  |
-        |      20000 | ±LHSpiral      | UNK        |    3847 |  0.0318732  |
-        |      20002 | +LHSpiral      | UNK        |     875 |  0.00724956 |
-        |      20020 | ±LHHook        | UNK        |     803 |  0.00665302 |
-        |      20022 | +LHHook        | UNK        |     602 |  0.0049877  |
-        |      20200 | ±RHStaple      | UNK        |     419 |  0.0034715  |
-        |      20202 | +RHStaple      | UNK        |     293 |  0.00242757 |
-        |      20220 | ±RHHook        | Catalytic  |    1435 |  0.0118893  |
-        |      20222 | 20222          | UNK        |     488 |  0.00404318 |
-        |      22000 | -/+LHHook      | UNK        |    2455 |  0.0203402  |
-        |      22002 | 22002          | UNK        |    1027 |  0.00850891 |
-        |      22020 | ±LHStaple      | UNK        |    1046 |  0.00866633 |
-        |      22022 | +LHStaple      | UNK        |     300 |  0.00248556 |
-        |      22200 | -/+RHHook      | UNK        |    6684 |  0.0553783  |
-        |      22202 | +RHHook        | UNK        |     593 |  0.00491313 |
-        |      22220 | ±RHSpiral      | UNK        |    2544 |  0.0210776  |
-        |      22222 | +RHSpiral      | UNK        |    3665 |  0.0303653  |
-        '''
-
-        from proteusPy.DisulfideClasses import create_classes
-
-        def ss_id_dict(df):
-            ss_id_dict = dict(zip(df['SS_Classname'], df['ss_id']))
-            return ss_id_dict
-
-        tors_df = self.getTorsions()
-
-        if self.verbose:
-            print(f'-> build_classes(): creating SS classes...')
-
-        grouped = create_classes(tors_df)
-
-        # grouped.to_csv(f'{DATA_DIR}PDB_ss_classes.csv')
-        #if self.verbose:
-        #    print(f'{grouped.head(32)}')
-        
-        class_df = pd.read_csv(StringIO(SS_CLASS_DEFINITIONS), dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
-        class_df['FXN'].str.strip()
-        class_df['SS_Classname'].str.strip()
-        class_df['class_id'].str.strip()
-
-        if self.verbose:
-            print(f'--> build_classes(): merging...')
-
-        merged = self.concat_dataframes(class_df, grouped)
-        merged.drop(columns=['Idx'], inplace=True)
-
-        self.classdf = merged.copy()
-        self.classdict = ss_id_dict(merged)
-
-        if self.verbose:
-            print(f'-> build_classes(): initialization complete.')
-        
-        return
-    
     def build_ss_from_idlist(self, idlist):
         '''
         Given a list of PDBid, return a DisulfideList of Disulfides
@@ -337,58 +258,6 @@ class DisulfideLoader:
                     break
         return res
     
-    def create_six_class_df(self):
-        """
-        Create a new DataFrame from the input with a 6-class encoding for input 'chi' values.
-        
-        The function takes a pandas DataFrame containing the following columns:
-        'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'cb_distance',
-        'torsion_length', 'energy', and 'rho', and adds a class ID column based on the following rules:
-        
-        1. A new column named `class_id` is added, which is the concatenation of the individual class IDs per Chi.
-        2. The DataFrame is grouped by the `class_id` column, and a new DataFrame is returned that shows the unique `ss_id` values for each group,
-        the count of unique `ss_id` values, the incidence of each group as a proportion of the total DataFrame, and the
-        percentage of incidence.
-
-        :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5',
-                'ca_distance', 'cb_distance', 'torsion_length', 'energy', and 'rho'
-        :return: The grouped DataFrame with the added class column.
-        """
-        from proteusPy.DisulfideClasses import get_sixth_quadrant
-
-        _df = pd.DataFrame()
-        df = self.getTorsions
-        # create the chi_t columns for each chi column
-        for col_name in ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']:
-            _df[col_name + '_t'] = df[col_name].apply(get_sixth_quadrant)
-        
-        # create the class_id column
-        df['class_id'] = _df[['chi1_t', 'chi2_t', 'chi3_t', 'chi4_t', 'chi5_t']].apply(lambda x: ''.join(x), axis=1)
-
-        # group the DataFrame by class_id and return the grouped data
-        grouped = df.groupby('class_id').agg({'ss_id': 'unique'})
-        grouped['count'] = grouped['ss_id'].apply(lambda x: len(x))
-        grouped['incidence'] = grouped['count'] / len(df)
-        grouped['percentage'] = grouped['incidence'] * 100
-        grouped.reset_index(inplace=True)
-
-        self.sixclass_df = grouped
-
-    
-    def concat_dataframes(self, df1, df2):
-        """
-        Concatenates columns from one data frame into the other and returns the new result.
-
-        :param df1 : pandas.DataFrame - The first data frame.
-        :param df2 : pandas.DataFrame - The second data frame.
-
-        :return: pandas.DataFrame - The concatenated data frame.
-        """
-        # Merge the data frames based on the 'SS_Classname' column
-        result = pd.merge(df1, df2, on='class_id')
-
-        return result
-
     def copy(self):
         '''
         Return a copy of self
@@ -571,31 +440,6 @@ class DisulfideLoader:
         
         if self.verbose:
             print(f'-> DisulfideLoader.save(): Done.')
-    
-    def from_class(self, classid: str) -> DisulfideList:
-        '''
-        Return a list of disulfides corresponding to the input class ID
-        string.
-
-        :param classid: Class ID, e.g. '+RHStaple'
-        :return: DisulfideList of class members
-        '''
-        from tqdm import tqdm
-        from proteusPy.ProteusGlobals import PBAR_COLS
-        res = DisulfideList([], classid)
-
-        try:
-            sslist = self.classdict[classid]
-            if self.verbose:
-                pbar = tqdm(sslist, ncols=PBAR_COLS)
-                for ssid in pbar:
-                    res.append(self[ssid])
-                return res
-            else:
-                return DisulfideList([self[ssid] for ssid in sslist], classid)
-        except KeyError:
-            print(f'No class: {classid}')
-        return
 
     
 # class ends
