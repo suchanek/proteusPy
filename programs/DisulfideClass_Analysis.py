@@ -211,46 +211,42 @@ def analyze_six_classes(loader, do_graph=True, do_consensus=True, cutoff=0.1):
     
     return res_list
 
-def extract_class(loader, clsid):
+def plot_classes_vs_cutoff(cutoff, steps):
     """
-    Analyze the six classes of disulfide bonds.
-
-    :param loader: The disulfide loader object.
-    :param do_graph: Whether or not to display torsion statistics graphs. Default is True.
-    :param do_consensus: Whether or not to compute average conformations for each class. Default is True.
-    :param cutoff: The cutoff percentage for each class. If the percentage of disulfides for a class is below
-                   this value, the class will be skipped. Default is 0.1.
-
-    :return: A list of disulfide bonds, where each disulfide bond represents the average conformation for a class.
-    """
-    _PBAR_COLS = 85
-
-    six = loader.tclass.sixclass_df
-    tot_classes = six.shape[0]
-    class_disulfides = DisulfideList([], _cls, quiet=True)
-
-    pbar = tqdm(range(tot_classes), ncols=_PBAR_COLS)
-
-    # loop over all rows
-    for idx in pbar:
-        row = six.iloc[idx]
-        _cls = row['class_id']
-        if _cls == clsid:
-            ss_list = row['ss_id']
-            tot = len(ss_list)
-            pbar.set_postfix({'CLS': _cls, 'Cnt': tot}) # update the progress bar
-            pbar2 = tqdm(ss_list, ncols=_PBAR_COLS, leave=False)
-            for ssid in pbar2:
-                class_disulfides.append(loader[ssid])
+    Plot the total percentage and number of members for each class against the cutoff value.
     
-    return class_disulfides
+    :param cutoff: Percent cutoff value for filtering the classes.
+    :return: None
+    """
+    _cutoff = np.linspace(0, cutoff, steps)
+    tot_list = []
+    members_list = []
+
+    for c in _cutoff:
+        class_df = PDB_SS.tclass.filter_sixclass_by_percentage(c)
+        tot = class_df['percentage'].sum()
+        tot_list.append(tot)
+        members_list.append(class_df.shape[0])
+        print(f'Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long.')
+
+    fig, ax1 = plt.subplots()
+
+    ax2 = ax1.twinx()
+    ax1.plot(_cutoff, tot_list, label='Total percentage', color='blue')
+    ax2.plot(_cutoff, members_list, label='Number of members', color='red')
+
+    ax1.set_xlabel('Cutoff')
+    ax1.set_ylabel('Total percentage', color='blue')
+    ax2.set_ylabel('Number of members', color='red')
+
+    plt.show()
 
 # main program begins
 PDB_SS = Load_PDB_SS(verbose=True, subset=False)
 
 ss_classlist = DisulfideList([], 'PDB_SS_SIX_CLASSES')
 ss_classlist = analyze_six_classes(PDB_SS, do_graph=True, 
-                                   do_consensus=True, cutoff=0.1)
+                                   do_consensus=True, cutoff=0.2)
 
 end = time.time()
 elapsed = end - start
