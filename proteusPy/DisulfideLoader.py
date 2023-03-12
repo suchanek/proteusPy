@@ -17,7 +17,7 @@ import sys
 import copy
 from io import StringIO
 import time
-import datetime
+import matplotlib.pyplot as plt
 
 import pandas as pd
 import pyvista as pv
@@ -32,15 +32,11 @@ from proteusPy.data import SS_PICKLE_FILE, SS_TORSIONS_FILE, SS_DICT_PICKLE_FILE
 from proteusPy.data import LOADER_FNAME, LOADER_SUBSET_FNAME
 
 from proteusPy.DisulfideList import DisulfideList
-from proteusPy.Disulfide import Torsion_DF_Cols
 from proteusPy.Disulfide import Disulfide
 
 from proteusPy.DisulfideExceptions import *
 from proteusPy.data import *
-from proteusPy.DisulfideClasses import create_classes
 from proteusPy.DisulfideClass_Constructor import DisulfideClass_Constructor
-
-import itertools
 
 class DisulfideLoader:
     '''
@@ -439,6 +435,36 @@ class DisulfideLoader:
         '''
         self.QUIET = perm
     
+    def plot_classes_vs_cutoff(self, cutoff, steps):
+        """
+        Plot the total percentage and number of members for each class against the cutoff value.
+        
+        :param cutoff: Percent cutoff value for filtering the classes.
+        :return: None
+        """
+        _cutoff = np.linspace(0, cutoff, steps)
+        tot_list = []
+        members_list = []
+
+        for c in _cutoff:
+            class_df = self.tclass.filter_sixclass_by_percentage(c)
+            tot = class_df['percentage'].sum()
+            tot_list.append(tot)
+            members_list.append(class_df.shape[0])
+            print(f'Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long.')
+
+        fig, ax1 = plt.subplots()
+
+        ax2 = ax1.twinx()
+        ax1.plot(_cutoff, tot_list, label='Total percentage', color='blue')
+        ax2.plot(_cutoff, members_list, label='Number of members', color='red')
+
+        ax1.set_xlabel('Cutoff')
+        ax1.set_ylabel('Total percentage', color='blue')
+        ax2.set_ylabel('Number of members', color='red')
+
+        plt.show()
+
     def save(self, savepath=DATA_DIR, subset=False, cutoff=-1.0):
         '''
         Save a copy of the fully instantiated Loader to the specified file.

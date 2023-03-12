@@ -5,81 +5,12 @@ Author: Eric G. Suchanek, PhD.
 License: MIT
 Last Modification: 3/8/23
 
-# this workflow reads in the torsion database, groups it by torsions 
-# to create the classes merges with the master class spreadsheet, and saves the 
-# resulting dict to {DATA_DIR}PDB_SS_merged.csv
+This workflow reads in the torsion database, groups it by torsions 
+to create the classes merges with the master class spreadsheet, and saves the 
+resulting dict to {DATA_DIR}PDB_SS_merged.csv
 
 Disulfide Class definition using the +/- formalism of Hogg et al. (Biochem, 2006, 45, 7429-7433), across
 all 32 possible classes ($$2^5$$). Classes are named per Hogg's convention.
-
-
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| IDX|   chi1_s |   chi2_s |   chi3_s |   chi4_s |   chi5_s |   class_id | SS_Classname   | FXN        |
-+====+==========+==========+==========+==========+==========+============+================+============+
-|  0 |       -1 |       -1 |       -1 |       -1 |       -1 |      00000 | -LHSpiral      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  1 |       -1 |       -1 |       -1 |       -1 |        1 |      00002 | 00002          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  2 |       -1 |       -1 |       -1 |        1 |       -1 |      00020 | -LHHook        | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  3 |       -1 |       -1 |       -1 |        1 |        1 |      00022 | 00022          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  4 |       -1 |       -1 |        1 |       -1 |       -1 |      00200 | -RHStaple      | Allosteric |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  5 |       -1 |       -1 |        1 |       -1 |        1 |      00202 | 00202          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  6 |       -1 |       -1 |        1 |        1 |       -1 |      00220 | 00220          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  7 |       -1 |       -1 |        1 |        1 |        1 |      00222 | 00222          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  8 |       -1 |        1 |       -1 |       -1 |       -1 |      02000 | 02000          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  9 |       -1 |        1 |       -1 |       -1 |        1 |      02002 | 02002          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 10 |       -1 |        1 |       -1 |        1 |       -1 |      02020 | -LHStaple      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 11 |       -1 |        1 |       -1 |        1 |        1 |      02022 | 02022          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 12 |       -1 |        1 |        1 |       -1 |       -1 |      02200 | -RHHook        | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 13 |       -1 |        1 |        1 |       -1 |        1 |      02202 | 02202          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 14 |       -1 |        1 |        1 |        1 |       -1 |      02220 | -RHSpiral      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 15 |       -1 |        1 |        1 |        1 |        1 |      02222 | 02222          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 16 |        1 |       -1 |       -1 |       -1 |       -1 |      20000 | +/-LHSpiral    | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 17 |        1 |       -1 |       -1 |       -1 |        1 |      20002 | +LHSpiral      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 18 |        1 |       -1 |       -1 |        1 |       -1 |      20020 | +/-LHHook      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 19 |        1 |       -1 |       -1 |        1 |        1 |      20022 | +LHHook        | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 20 |        1 |       -1 |        1 |       -1 |       -1 |      20200 | +/-RHStaple    | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 21 |        1 |       -1 |        1 |       -1 |        1 |      20202 | +RHStaple      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 22 |        1 |       -1 |        1 |        1 |       -1 |      20220 | +/-RHHook      | Catalytic  |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 23 |        1 |       -1 |        1 |        1 |        1 |      20222 | 20222          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 24 |        1 |        1 |       -1 |       -1 |       -1 |      22000 | -/+LHHook      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 25 |        1 |        1 |       -1 |       -1 |        1 |      22002 | 22002          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 26 |        1 |        1 |       -1 |        1 |       -1 |      22020 | +/-LHStaple    | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 27 |        1 |        1 |       -1 |        1 |        1 |      22022 | +LHStaple      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 28 |        1 |        1 |        1 |       -1 |       -1 |      22200 | -/+RHHook      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 29 |        1 |        1 |        1 |       -1 |        1 |      22202 | +RHHook        | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 30 |        1 |        1 |        1 |        1 |       -1 |      22220 | +/-RHSpiral    | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 31 |        1 |        1 |        1 |        1 |        1 |      22222 | +RHSpiral      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
 '''
 # Cα Cβ Sγ
 
@@ -240,6 +171,30 @@ class DisulfideClass_Constructor():
 
         return result
 
+    def binary_to_six_class(self, class_str):
+        """
+        Convert a binary input string to a list of possible six-class strings.
+
+        Returns a list of all possible combinations of ordinal sections of a unit circle 
+        divided into 6 equal segments, originating at 0 degrees, rotating counterclockwise, 
+        based on the sign of each angle in the input string.
+        
+        :param angle_str (str): A string of length 5, where each character represents the sign 
+        of an angle in the range of -180-180 degrees.
+
+        :return list: A list of strings of length 5, representing all possible six-class strings.
+        """
+        import itertools
+        
+        angle_maps = {
+            "0": ["4", "5", "6"],
+            "2": ["1", "2", "3"]
+        }
+        class_lists = [angle_maps[char] for char in class_str]
+        class_combinations = itertools.product(*class_lists)
+        class_strings = ["".join(combination) for combination in class_combinations]
+        return class_strings
+
     def build_yourself(self, loader):
         '''
         Build disulfide structural classes based on dihedral angle rules.
@@ -366,8 +321,6 @@ class DisulfideClass_Constructor():
    
        :param df: A Pandas DataFrame with an 'percentage' column to filter by
        :param cutoff: A numeric value specifying the minimum percentage required for a row to be included in the output
-       :type df: pandas.DataFrame
-       :type cutoff: float
        :return: A new Pandas DataFrame containing only rows where the percentage is greater than or equal to the cutoff
        :rtype: pandas.DataFrame
        """
@@ -375,15 +328,15 @@ class DisulfideClass_Constructor():
 
        return df[df['percentage'] >= cutoff].copy()
 
+    
     def get_sixth_quadrant(self, angle_deg):
         """
         Return the sextant in which an angle in degrees lies if the area is described by dividing a unit circle into 6 equal segments.
 
-        Parameters:
-            angle_deg (float): The angle in degrees.
+        :param angle_deg (float): The angle in degrees.
 
         Returns:
-            int: The sextant (1-6) that the angle belongs to.
+        :return int: The sextant (1-6) that the angle belongs to.
         """
         # Normalize the angle to the range [0, 360)
         angle_deg = angle_deg % 360
@@ -468,6 +421,23 @@ class DisulfideClass_Constructor():
         if self.verbose:
             print(f'-> DisulfideLoader.save(): Done.')
     
+    def six_class_to_binary(self, cls_str):
+        """
+        Transforms a string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees 
+        into a string of 5 characters, where each character is either '1' if the corresponding input character represents a 
+        negative angle or '2' if it represents a positive angle.
+        
+        :param cls_str (str): A string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees.
+        :return str: A string of length 5, where each character is either '1' or '2', representing the sign of the corresponding input angle. 
+        """
+        output_str = ""
+        for char in cls_str:
+            if char in ['1', '2', '3']:
+                output_str += '2'
+            elif char in ['4', '5', '6']:
+                output_str += '0'
+        return output_str
+
     def plot_class_chart(self, classes: int) -> None:
         """
         Create a Matplotlib pie chart with `classes` segments of equal size.

@@ -12,6 +12,8 @@ __pdoc__ = {'__all__': True}
 import os
 import math
 import numpy as np
+import matplotlib.pyplot as plt
+
 import itertools
 
 import copy
