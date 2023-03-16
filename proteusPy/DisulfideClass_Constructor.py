@@ -326,7 +326,7 @@ class DisulfideClass_Constructor():
        return df[df['percentage'] >= cutoff].copy()
 
     
-    def get_sixth_quadrant(self, angle_deg):
+    def Oget_sixth_quadrant(self, angle_deg):
         """
         Return the sextant in which an angle in degrees lies if the area is described by dividing a unit circle into 6 equal segments.
 
@@ -350,6 +350,33 @@ class DisulfideClass_Constructor():
             return str(5)
         elif angle_deg >= 300 and angle_deg < 360:
             return str(6)
+        else:
+            raise ValueError("Invalid angle value: angle must be in the range [-360, 360).")
+
+    def get_sixth_quadrant(self, angle_deg):
+        """
+        Return the sextant in which an angle in degrees lies if the area is described by dividing a unit circle into 6 equal segments.
+
+        :param angle_deg (float): The angle in degrees.
+
+        Returns:
+        :return int: The sextant (1-6) that the angle belongs to.
+        """
+        # Normalize the angle to the range [0, 360)
+        angle_deg = angle_deg % 360
+
+        if angle_deg >= 0 and angle_deg < 60:
+            return str(6)
+        elif angle_deg >= 60 and angle_deg < 120:
+            return str(5)
+        elif angle_deg >= 120 and angle_deg < 180:
+            return str(4)
+        elif angle_deg >= 180 and angle_deg < 240:
+            return str(3)
+        elif angle_deg >= 240 and angle_deg < 300:
+            return str(2)
+        elif angle_deg >= 300 and angle_deg < 360:
+            return str(1)
         else:
             raise ValueError("Invalid angle value: angle must be in the range [-360, 360).")
 
