@@ -444,7 +444,7 @@ class DisulfideList(UserList):
 
         return tor_stats, dist_stats
 
-    def display(self, style='sb', light=True):
+    def display(self, style='sb', light=True, panelsize=512):
         '''
         Display the Disulfide list in the specific rendering style.
 
@@ -464,7 +464,7 @@ class DisulfideList(UserList):
             pv.set_plot_theme('dark')
 
         pl = pv.Plotter()
-        pl = self._render(style)
+        pl = self._render(style, panelsize)
         pl.add_camera_orientation_widget()
         pl.enable_anti_aliasing('msaa')
         pl.link_views()

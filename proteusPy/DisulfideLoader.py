@@ -38,6 +38,18 @@ from proteusPy.DisulfideExceptions import *
 from proteusPy.data import *
 from proteusPy.DisulfideClass_Constructor import DisulfideClass_Constructor
 
+try:
+    # Check if running in Jupyter
+    shell = get_ipython().__class__.__name__
+    if shell == 'ZMQInteractiveShell':
+        from tqdm.notebook import tqdm
+    else:
+        from tqdm import tqdm
+except NameError:
+    from tqdm import tqdm
+
+# Now use tqdm as normal, depending on your environment
+
 class DisulfideLoader:
     '''
     This class represents the disulfide database itself and is its primary means of accession. 
@@ -269,17 +281,17 @@ class DisulfideLoader:
         :param clsid: The class name to extract.
         :return: The list of disulfide bonds from the class.
         """
+        
         from tqdm import tqdm
-    
         six = self.tclass.sixclass_df
         tot_classes = six.shape[0]
         class_disulfides = DisulfideList([], clsid, quiet=True)
-        _pbar = tqdm(six.iterrows(), total=tot_classes, ncols=80, leave=False)
+        _pbar = tqdm(six.iterrows(), total=tot_classes, leave=True)
         for idx, row in _pbar:
             _cls = row['class_id']
             if _cls == clsid:
                 ss_list = row['ss_id']
-                pbar = tqdm(ss_list, ncols=80, leave=False)
+                pbar = tqdm(ss_list, leave=True)
                 for ssid in pbar:
                     class_disulfides.append(self[ssid])
                 pbar.set_postfix({'Done': ''})

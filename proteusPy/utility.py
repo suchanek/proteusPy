@@ -94,8 +94,28 @@ def get_jet_colormap(steps):
     rgbcol = colormap(norm, bytes=True)[:,:3]
 
     return rgbcol
+
+def grid_dimensions(n: int) -> tuple:
+    '''
+    Computes the number of rows and columns needed to display a list of length `n`.
+    
+    Args:
+        n (int): Length of input list
+    
+    Returns:
+        tuple: Number of rows and columns required to display input list
+    '''
+    if n == 1:
+        return 1, 1
+    elif n == 2:
+        return 1, 2
+    else:
+        root = math.sqrt(n)
+        cols = math.ceil(root)
+        rows = cols - 1 if cols * (cols - 1) >= n else cols
+        return rows, cols
  
-def grid_dimensions(n):
+def Ogrid_dimensions(n):
     '''
     Calculate rows and columns for the given needed to display
     a given number of disulfides in a square aspect.

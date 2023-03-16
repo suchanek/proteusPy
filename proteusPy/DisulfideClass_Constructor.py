@@ -1,16 +1,12 @@
 '''
 DisulfideBond Class Analysis Dictionary creation
 Author: Eric G. Suchanek, PhD.
-(c) 2023 Eric G. Suchanek, PhD., All Rights Reserved
-License: MIT
-Last Modification: 3/8/23
+(c) 2023 Eric G. Suchanek, PhD., All Rights Reserved \n
+License: MIT \n
+Last Modification: 3/14/23
 
-This workflow reads in the torsion database, groups it by torsions 
-to create the classes merges with the master class spreadsheet, and saves the 
-resulting dict to {DATA_DIR}PDB_SS_merged.csv
-
-Disulfide Class definition using the +/- formalism of Hogg et al. (Biochem, 2006, 45, 7429-7433), across
-all 32 possible classes ($$2^5$$). Classes are named per Hogg's convention.
+Disulfide Class creation and manipulation using the +/- formalism of Hogg et al. (Biochem, 2006, 45, 7429-7433), 
+across all 32 possible classes. Classes are named per Hogg's convention.
 '''
 # Cα Cβ Sγ
 
@@ -217,6 +213,7 @@ class DisulfideClass_Constructor():
 
         if self.verbose:
             print(f'-> DisulfideClass_Constructor(): creating binary SS classes...')
+        
         grouped = self.create_binary_classes(tors_df)        
         
         # grouped.to_csv(f'{DATA_DIR}PDB_ss_classes.csv')
@@ -258,10 +255,10 @@ class DisulfideClass_Constructor():
         """
         Group the DataFrame by the sign of the chi columns and create a new class ID column for each unique grouping.
 
-        :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'cb_distance', 'torsion_length', and 'energy'.
-        :return: A pandas DataFrame containing columns 'class_id', 'ss_id', and 'count', where 'class_id' is a unique identifier for each grouping of chi signs, 'ss_id' is a list of all 'ss_id' values in that grouping, and 'count' is the number of rows in that grouping.
-        
-
+        :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 
+        'cb_distance', 'torsion_length', and 'energy'.
+        :return: A pandas DataFrame containing columns 'class_id', 'ss_id', and 'count', where 'class_id' is a unique identifier for each grouping of chi signs, 'ss_id' is a list of all 'ss_id' values in that grouping, and 'count' 
+        is the number of rows in that grouping.
         """
         # Create new columns with the sign of each chi column
         chi_columns = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']
