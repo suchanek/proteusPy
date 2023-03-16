@@ -246,7 +246,7 @@ PDB_SS = Load_PDB_SS(verbose=True, subset=False)
 
 ss_classlist = DisulfideList([], 'PDB_SS_SIX_CLASSES')
 ss_classlist = analyze_six_classes(PDB_SS, do_graph=True, 
-                                   do_consensus=True, cutoff=0.2)
+                                   do_consensus=True, cutoff=0.0)
 
 end = time.time()
 elapsed = end - start
