@@ -99,6 +99,11 @@ from proteusPy.DisulfideList import DisulfideList, load_disulfides_from_id
 from proteusPy.DisulfideLoader import Load_PDB_SS, DisulfideLoader
 from proteusPy.ProteusGlobals import PBAR_COLS
 
+import os
+_abspath = os.path.dirname(os.path.abspath(__file__))
+
+SAVE_DIR = f'/Users/egs/repos/proteusPy/data/'
+
 start = time.time()
 
 # pyvista setup for notebooks
@@ -106,14 +111,14 @@ pv.set_jupyter_backend('trame')
 set_plot_theme('dark')
 
 def analyze_binary_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -> DisulfideList:
-    class_filename = f'{DATA_DIR}SS_consensus_class32.pkl'
+    class_filename = f'{SAVE_DIR}SS_consensus_class32.pkl'
     classes = loader.tclass.classdict
     tot_classes = len(classes)
     res_list = DisulfideList([], 'SS_Class_Avg_SS')
 
     pbar = enumerate(classes)
     for idx, cls in pbar:
-        fname = f'{DATA_DIR}classes/ss_class_{idx}.png'
+        fname = f'{SAVE_DIR}ss_class_{idx}.png'
         print(f'--> analyze_classes(): {cls} {idx+1}/{tot_classes}')
 
         # get the classes
@@ -158,7 +163,7 @@ def analyze_six_classes(loader, do_graph=True, do_consensus=True, cutoff=0.1):
     """
     _PBAR_COLS = 85
 
-    class_filename = f'{DATA_DIR}SS_consensus_class_sext.pkl'
+    class_filename = f'{SAVE_DIR}SS_consensus_class_sext.pkl'
 
     six = loader.tclass.sixclass_df
     tot_classes = six.shape[0]
@@ -176,7 +181,7 @@ def analyze_six_classes(loader, do_graph=True, do_consensus=True, cutoff=0.1):
         if 100 * tot / total_ss <  cutoff:
             continue
 
-        fname = f'{DATA_DIR}classes/ss_class_sext_{cls}.png'
+        fname = f'{SAVE_DIR}classes/ss_class_sext_{cls}.png'
         pbar.set_postfix({'CLS': cls, 'Cnt': tot}) # update the progress bar
 
         class_disulfides = DisulfideList([], cls, quiet=True)

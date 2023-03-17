@@ -233,7 +233,7 @@ class DisulfideClass_Constructor():
             print(f'-> DisulfideClass_Constructor(): merging...')
 
         merged = self.concat_dataframes(class_df, grouped)
-        merged.drop(columns=['Idx'], inplace=True)
+        merged.drop(columns=['Idx', 'chi1_s', 'chi2_s', 'chi3_s', 'chi4_s', 'chi5_s'], inplace=True)
 
         classdict = ss_id_dict(merged)
         self.classdict = classdict

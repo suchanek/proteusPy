@@ -5,7 +5,7 @@ It represents the core of the current implementation of *proteusPy*.
 
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 Author: Eric G. Suchanek, PhD
-Last revision: 2/14/2023
+Last revision: 3/16/2023
 '''
 
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
@@ -111,8 +111,7 @@ class Disulfide:
         * Oxygen   - Red
         * Hydrogen - White 
     
-    Individual displays can be saved to a file, and animations created.
-
+    Individual renderings can be saved to a file, and animations created.
     """
     def __init__(self, name: str="SSBOND", proximal: int=-1,
                 distal: int=-1, proximal_chain: str='A',
@@ -139,7 +138,7 @@ class Disulfide:
         self.ca_distance = _FLOAT_INIT
         self.cb_distance = _FLOAT_INIT
         self.torsion_array = np.array((_ANG_INIT, _ANG_INIT, _ANG_INIT, 
-        								  _ANG_INIT, _ANG_INIT))
+        							   _ANG_INIT, _ANG_INIT))
         self.phiprox = _ANG_INIT
         self.psiprox = _ANG_INIT
         self.phidist = _ANG_INIT
@@ -324,21 +323,21 @@ class Disulfide:
             '''
             _bond_conn = np.array(
             [
-                [0, 1], # n-ca
-                [1, 2], # ca-c
-                [2, 3], # c-o
-                [1, 4], # ca-cb
-                [4, 5], # cb-sg
-                [6, 7], # n-ca
-                [7, 8], # ca-c
-                [8, 9], # c-o
-                [7, 10], # ca-cb
+                [0, 1],   # n-ca
+                [1, 2],   # ca-c
+                [2, 3],   # c-o
+                [1, 4],   # ca-cb
+                [4, 5],   # cb-sg
+                [6, 7],   # n-ca
+                [7, 8],   # ca-c
+                [8, 9],   # c-o
+                [7, 10],  # ca-cb
                 [10, 11], # cb-sg
                 [5, 11],  # sg -sg
                 [12, 0],  # cprev_prox-n
                 [2, 13],  # c-nnext_prox
-                [14,6],   # cprev_dist-n_dist
-                [8,15]    # c-nnext_dist
+                [14, 6],  # cprev_dist-n_dist
+                [8, 15]   # c-nnext_dist
             ])
 
             # modeled disulfides only have backbone atoms since
@@ -1940,7 +1939,21 @@ class Disulfide:
         
         res = [ss for ss in others if self.Torsion_Distance(ss) <= cutoff]
         return DisulfideList(res, 'neighbors')
+
+    def torsion_to_sixclass(self):
+        '''
+        Return the sextant class string for ``self``.
+
+        :raises DisulfideIOException: _description_
+        :return: Sextant string
+        '''
+        from proteusPy.DisulfideClasses import get_sixth_quadrant
         
+        tors = self.torsion_array
+        res = [get_sixth_quadrant(x) for x in tors]
+        return ''.join([str(r) for r in res])
+
+            
 # Class defination ends
 
 

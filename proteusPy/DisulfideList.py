@@ -385,7 +385,7 @@ class DisulfideList(UserList):
         if self.quiet or len(sslist) < 100:
             pbar = sslist
         else:
-            pbar = tqdm(sslist, ncols=PBAR_COLS)
+            pbar = tqdm(sslist, ncols=PBAR_COLS, leave=False)
     
         for ss in pbar:
             new_row = [ss.pdb_id, ss.name, ss.proximal, ss.distal, ss.chi1, ss.chi2, 
