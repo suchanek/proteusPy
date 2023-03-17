@@ -128,10 +128,6 @@ class DisulfideLoader:
         self.IDList = []
         self.QUIET = quiet
         
-        self.classdict = {}
-        self.classdf = None
-        self.sixclass_df = None
-        
         self.tclass = None        # disulfideClass_constructor to manage classes
         self.cutoff = cutoff      # distance cutoff used to bulid the database
         self.verbose = verbose

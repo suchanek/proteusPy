@@ -41,8 +41,8 @@ from .angle_annotation import *
 
 from .utility import distance_squared, distance3d, get_jet_colormap, Check_chains, print_memory_used
 from .utility import image_to_ascii_art, generate_vector_dataframe
-from .DisulfideClasses import create_classes, create_quat_classes
-from .DisulfideClasses import get_half_quadrant, get_quadrant, get_sixth_quadrant, filter_by_percentage
+from .DisulfideClasses import create_classes, create_quat_classes, plot_count_vs_classid, plot_count_vs_class_df
+from .DisulfideClasses import get_half_quadrant, get_quadrant, get_sixth_quadrant, filter_by_percentage, torsion_to_sixclass
 from .DisulfideClass_Constructor import DisulfideClass_Constructor
 
 # end of file

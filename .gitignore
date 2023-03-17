@@ -4,4 +4,8 @@ __pycache__
 .DS_Store
 proteusPy/.DS_Store
 proteusPy/pdb/.DS_Store
+data/*.png
+data/Nclasses/*
+data/classes/*
+data/Oclasses/*
 *.mp4

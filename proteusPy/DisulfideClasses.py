@@ -117,6 +117,19 @@ def get_quadrant(angle_deg):
     else:
         raise ValueError("Invalid angle value: angle must be in the range [-180, 180).")
 
+def torsion_to_sixclass(tors):
+    '''
+    Return the sextant class string for the input array of torsions.
+
+    :param tors: Array of five torsions
+    :return: Sextant string
+    '''
+
+    from proteusPy.DisulfideClasses import get_sixth_quadrant
+    
+    res = [get_sixth_quadrant(x) for x in tors]
+    return ''.join([str(r) for r in res])
+
 def get_sixth_quadrant(angle_deg):
     """
     Returns the sextant in which an angle in degrees lies if the area is described by dividing a unit circle into 6 equal segments.
@@ -131,17 +144,17 @@ def get_sixth_quadrant(angle_deg):
     angle_deg = angle_deg % 360
 
     if angle_deg >= 0 and angle_deg < 60:
-        return str(1)
-    elif angle_deg >= 60 and angle_deg < 120:
-        return str(2)
-    elif angle_deg >= 120 and angle_deg < 180:
-        return str(3)
-    elif angle_deg >= 180 and angle_deg < 240:
-        return str(4)
-    elif angle_deg >= 240 and angle_deg < 300:
-        return str(5)
-    elif angle_deg >= 300 and angle_deg < 360:
         return str(6)
+    elif angle_deg >= 60 and angle_deg < 120:
+        return str(5)
+    elif angle_deg >= 120 and angle_deg < 180:
+        return str(4)
+    elif angle_deg >= 180 and angle_deg < 240:
+        return str(3)
+    elif angle_deg >= 240 and angle_deg < 300:
+        return str(2)
+    elif angle_deg >= 300 and angle_deg < 360:
+        return str(1)
     else:
         raise ValueError("Invalid angle value: angle must be in the range [-360, 360).")
 
@@ -373,7 +386,47 @@ def plot_class_chart(classes: int) -> None:
     plt.setp(legend.get_texts(), fontsize='small')
 
     # Show the chart
- 
+
+def plot_count_vs_class_df(df, title='title', theme='plotly_dark'):
+    """
+    Plots a line graph of count vs class ID using Plotly.
+
+    :param df: A pandas DataFrame containing the data to be plotted.
+    :param title: A string representing the title of the plot (default is 'title').
+    :param theme: A string representing the name of the theme to use. Can be either 'notebook' or 'plotly_dark'. Default is 'plotly_dark'.
+    :return: None
+    """
+    fig = px.line(df, x='cls', y='count', 
+                  title=f'{title}', 
+                  labels={'cls': 'Class ID', 'count': 'Count'})
+    fig.update_layout(showlegend=True, title_x=0.5, title_font=dict(size=20), 
+                      xaxis_showgrid=False, yaxis_showgrid=False, 
+                      template=theme)
+    fig.show()
+
+def plot_count_vs_classid(df, title='title', theme='notebook'):
+    """
+    Plots a line graph of count vs class ID using Plotly.
+
+    :param df: A pandas DataFrame containing the data to be plotted.
+    :param title: A string representing the title of the plot (default is 'title').
+    :param theme: A string representing the theme of the plot. Can be set to 'notebook' or 'plotly_dark' (default is 'notebook').
+    :return: None
+    """
+    import plotly_express as px
+    fig = px.line(df, x='class_id', y='count', 
+                  title=f'{title}')
+    
+    fig.update_layout(xaxis_title='Class ID', yaxis_title='Count', showlegend=True, 
+                    title_x=0.5)
+    
+    if theme == 'notebook':
+        fig.update_layout(template='plotly_white')
+    elif theme == 'plotly_dark':
+        fig.update_layout(template='plotly_dark')
+        
+    fig.show()
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
