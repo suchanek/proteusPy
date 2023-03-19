@@ -387,7 +387,7 @@ def plot_class_chart(classes: int) -> None:
 
     # Show the chart
 
-def plot_count_vs_class_df(df, title='title', theme='plotly_dark'):
+def plot_count_vs_class_df(df, title='title', theme='Notebook'):
     """
     Plots a line graph of count vs class ID using Plotly.
 
@@ -396,6 +396,8 @@ def plot_count_vs_class_df(df, title='title', theme='plotly_dark'):
     :param theme: A string representing the name of the theme to use. Can be either 'notebook' or 'plotly_dark'. Default is 'plotly_dark'.
     :return: None
     """
+    import plotly_express as px
+
     fig = px.line(df, x='cls', y='count', 
                   title=f'{title}', 
                   labels={'cls': 'Class ID', 'count': 'Count'})
