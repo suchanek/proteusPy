@@ -33,7 +33,6 @@ proteusPy/data/PDB_all_ss_dict.pkl
 proteusPy/data/PDB_all_ss_torsions.csv
 proteusPy/data/PDB_ss_classes_dict.pkl
 proteusPy/data/PDB_ss_six_classes.csv
-proteusPy/data/PDB_subset_ss.pkl
 proteusPy/data/PDB_subset_ss_dict.pkl
 proteusPy/data/PDB_subset_torsions.csv
 proteusPy/data/SS_consensus_class_sext.pkl
