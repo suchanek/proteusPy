@@ -20,10 +20,13 @@ import pandas as pd
 import numpy as np
 import proteusPy
 
+from proteusPy.DisulfideLoader import DisulfideLoader
+
 from proteusPy.data import DATA_DIR, SS_CLASS_DICT_FILE, CLASSOBJ_FNAME
 from proteusPy.data import SS_CLASS_DEFINITIONS
 from proteusPy.angle_annotation import AngleAnnotation
 from proteusPy.ProteusGlobals import DPI
+
 
 def create_classes(df):
     """
@@ -387,7 +390,7 @@ def plot_class_chart(classes: int) -> None:
 
     # Show the chart
 
-def plot_count_vs_class_df(df, title='title', theme='Notebook'):
+def plot_count_vs_class_df(df, title='title', theme='plotly_dark'):
     """
     Plots a line graph of count vs class ID using Plotly.
 
@@ -398,15 +401,21 @@ def plot_count_vs_class_df(df, title='title', theme='Notebook'):
     """
     import plotly_express as px
 
-    fig = px.line(df, x='cls', y='count', 
-                  title=f'{title}', 
-                  labels={'cls': 'Class ID', 'count': 'Count'})
+    fig = px.line(df, x='class_id', y='count', 
+                title=f'{title}', 
+                labels={'class_id': 'Class ID', 'count': 'Count'})
+    
+    if theme == 'light':
+        fig.update_layout(template='plotly_white')
+    else:
+        fig.update_layout(template='plotly_dark')
+
     fig.update_layout(showlegend=True, title_x=0.5, title_font=dict(size=20), 
-                      xaxis_showgrid=False, yaxis_showgrid=False, 
-                      template=theme)
+                    xaxis_showgrid=False, yaxis_showgrid=False)
     fig.show()
 
-def plot_count_vs_classid(df, cls=None, title='title', theme='notebook'):
+
+def plot_count_vs_classid(df, cls=None, title='title', theme='light'):
     """
     Plots a line graph of count vs class ID using Plotly.
 
@@ -427,12 +436,45 @@ def plot_count_vs_classid(df, cls=None, title='title', theme='notebook'):
     fig.update_layout(xaxis_title='Class ID', yaxis_title='Count', showlegend=True, 
                     title_x=0.5)
     
-    if theme == 'notebook':
+    if theme == 'light':
         fig.update_layout(template='plotly_white')
-    elif theme == 'plotly_dark':
+    else:
         fig.update_layout(template='plotly_dark')
         
     fig.show()
+
+
+def plot_binary_to_sixclass_incidence(loader: DisulfideLoader, light=True):
+    '''
+    Plot the incidence of all sextant Disulfide classes for a given binary class.
+
+    :param loader: `proteusPy.DisulfideLoader` object
+    '''
+    def enumerate_sixclass_fromlist(sslist):
+        x = []
+        y = []
+
+        for sixcls in sslist:
+            if sixcls is not None:
+                _y = loader.tclass.sslist_from_classid(sixcls)
+                # it's possible to have 0 SS in a class
+                if _y is not None:
+                    # only append if we have both.
+                    x.append(sixcls)
+                    y.append(len(_y))
+
+        sslist_df = pd.DataFrame(columns=['class_id', 'count'])
+        sslist_df['class_id'] = x
+        sslist_df['count'] = y
+        return(sslist_df)
+
+    clslist = loader.tclass.classdf['class_id']
+    for cls in clslist:
+        sixcls = loader.tclass.binary_to_six_class(cls)
+        df = enumerate_sixclass_fromlist(sixcls)
+        plot_count_vs_class_df(df, cls, theme='light')
+    return
+
 
 if __name__ == "__main__":
     import doctest
