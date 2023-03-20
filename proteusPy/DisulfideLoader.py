@@ -529,6 +529,14 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
             print(f'done.')
         return res
     except:
-        mess = f'-> load_PDB_SS(): cannot open file {_fname}'
-        raise DisulfideIOException(mess)
+        # no fully built loader available. See if we can
+        # build it
+        print(f'\n-> Load_PDB_SS() attempting to rebuild the loader.')
+        pdb = DisulfideLoader(verbose=True)
+        if pdb is None:
+            mess = f'-> load_PDB_SS(): cannot open file {_fname}'
+            raise DisulfideIOException(mess)
+        else:
+            pdb.save()
+        print(f'-> Load_PDB_SS(): rebuild complete.')
 
