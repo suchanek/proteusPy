@@ -9,3 +9,4 @@ data/Nclasses/*
 data/classes/*
 data/Oclasses/*
 *.mp4
+programs/chatbot.py

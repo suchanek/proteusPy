@@ -406,7 +406,7 @@ def plot_count_vs_class_df(df, title='title', theme='Notebook'):
                       template=theme)
     fig.show()
 
-def plot_count_vs_classid(df, title='title', theme='notebook'):
+def plot_count_vs_classid(df, cls=None, title='title', theme='notebook'):
     """
     Plots a line graph of count vs class ID using Plotly.
 
@@ -416,9 +416,14 @@ def plot_count_vs_classid(df, title='title', theme='notebook'):
     :return: None
     """
     import plotly_express as px
-    fig = px.line(df, x='class_id', y='count', 
-                  title=f'{title}')
-    
+    if cls is None:
+        fig = px.line(df, x='class_id', y='count', 
+                    title=f'{title}')
+    else:
+        subset = df[df['class_id'] == cls]
+        print(subset.head())
+        fig = px.line(subset, x='class_id', y='count', title=f'{title}')
+        
     fig.update_layout(xaxis_title='Class ID', yaxis_title='Count', showlegend=True, 
                     title_x=0.5)
     

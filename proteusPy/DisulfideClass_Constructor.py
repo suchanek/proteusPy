@@ -193,64 +193,56 @@ class DisulfideClass_Constructor():
 
     def build_yourself(self, loader):
         '''
-        Build disulfide structural classes based on dihedral angle rules.
-
-        Builds the internal structures needed for the binary and six-fold, including 
-        binary and six-fold classes. The classnames are defined by the sign of the dihedral 
-        angles, per Hogg'. The six-fold classes represent the ordinal quadrant for the given
-        disulfide dihedral angle. See
+        Builds the internal structures needed for the binary and six-fold disulfide structural classes
+        based on dihedral angle rules. See Hogg'.
+    
+        Parameters
+        ----------
+        loader: proteusPy.utilities.MolecularLoader
+            A MolecularLoader object containing data from the target dataset.
+        
+        Returns
+        -------
+        None
         '''
-
-        from proteusPy.DisulfideLoader import Load_PDB_SS
-
-        def ss_id_dict(df):
-            ss_id_dict = dict(zip(df['SS_Classname'], df['ss_id']))
-            return ss_id_dict
-
+        
         self.version = proteusPy.__version__
-
+        
         tors_df = loader.getTorsions()
-
+        
         if self.verbose:
             print(f'-> DisulfideClass_Constructor(): creating binary SS classes...')
         
         grouped = self.create_binary_classes(tors_df)        
         
-        # grouped.to_csv(f'{DATA_DIR}PDB_ss_classes.csv')
-        
-        # this file is hand made. Do not change it. -egs-
-        #class_df = pd.read_csv(f'{DATA_DIR}PDB_ss_classes_master2.csv', dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
-
-        # !!! df = pd.read_csv(pd.compat.StringIO(csv_string))
-        # class_df = pd.read_csv(f'{DATA_DIR}PDB_SS_class_definitions.csv', dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
-        
         class_df = pd.read_csv(StringIO(SS_CLASS_DEFINITIONS), dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
         class_df['FXN'].str.strip()
         class_df['SS_Classname'].str.strip()
         class_df['class_id'].str.strip()
-
+        
         if self.verbose:
             print(f'-> DisulfideClass_Constructor(): merging...')
-
+        
         merged = self.concat_dataframes(class_df, grouped)
         merged.drop(columns=['Idx', 'chi1_s', 'chi2_s', 'chi3_s', 'chi4_s', 'chi5_s'], inplace=True)
-
-        classdict = ss_id_dict(merged)
+        
+        classdict = dict(zip(merged['SS_Classname'], merged['ss_id']))
         self.classdict = classdict
         self.classdf = merged.copy()
-
+        
         if self.verbose:
             print(f'-> DisulfideClass_Constructor(): creating sixfold SS classes...')
         
         grouped_sixclass = self.create_six_classes(tors_df)
         
         self.sixclass_df = grouped_sixclass.copy()
-
+        
         if self.verbose:
             print(f'-> DisulfideClass_Constructor(): initialization complete.')
         
         return
-
+    
+    
     def create_binary_classes(self, df) -> pd.DataFrame:
         """
         Group the DataFrame by the sign of the chi columns and create a new class ID column for each unique grouping.
