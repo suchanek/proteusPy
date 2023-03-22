@@ -473,6 +473,40 @@ class DisulfideLoader:
 
         plt.show()
 
+    def plot_binary_to_sixclass_incidence(self, light=True, save=False, savedir='.'):
+        '''
+        Plot the incidence of all sextant Disulfide classes for a given binary class.
+
+        :param loader: `proteusPy.DisulfideLoader` object
+        '''
+        
+        from proteusPy.DisulfideClasses import plot_count_vs_class_df
+
+        def enumerate_sixclass_fromlist(sslist):
+            x = []
+            y = []
+
+            for sixcls in sslist:
+                if sixcls is not None:
+                    _y = self.tclass.sslist_from_classid(sixcls)
+                    # it's possible to have 0 SS in a class
+                    if _y is not None:
+                        # only append if we have both.
+                        x.append(sixcls)
+                        y.append(len(_y))
+
+            sslist_df = pd.DataFrame(columns=['class_id', 'count'])
+            sslist_df['class_id'] = x
+            sslist_df['count'] = y
+            return(sslist_df)
+
+        clslist = self.tclass.classdf['class_id']
+        for cls in clslist:
+            sixcls = self.tclass.binary_to_six_class(cls)
+            df = enumerate_sixclass_fromlist(sixcls)
+            plot_count_vs_class_df(df, cls, theme='light',save=save, savedir=savedir)
+        return
+
     def save(self, savepath=DATA_DIR, subset=False, cutoff=-1.0):
         '''
         Save a copy of the fully instantiated Loader to the specified file.
@@ -500,8 +534,7 @@ class DisulfideLoader:
         
         if self.verbose:
             print(f'-> DisulfideLoader.save(): Done.')
-
-    
+   
 # class ends
 
 def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoader:
@@ -531,12 +564,13 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
     except:
         # no fully built loader available. See if we can
         # build it
-        print(f'\n-> Load_PDB_SS() attempting to rebuild the loader.')
+        print(f'\n\n!!! Load_PDB_SS() attempting to rebuild the loader.')
         pdb = DisulfideLoader(verbose=True)
         if pdb is None:
-            mess = f'-> load_PDB_SS(): cannot open file {_fname}'
+            mess = f'!!! FATAL: load_PDB_SS(): cannot open primary SS file!'
             raise DisulfideIOException(mess)
         else:
             pdb.save()
         print(f'-> Load_PDB_SS(): rebuild complete.')
 
+# End of file
