@@ -504,7 +504,7 @@ class DisulfideLoader:
         for cls in clslist:
             sixcls = self.tclass.binary_to_six_class(cls)
             df = enumerate_sixclass_fromlist(sixcls)
-            plot_count_vs_class_df(df, cls, theme='light',save=save, savedir=savedir)
+            plot_count_vs_class_df(df, cls, theme='light', save=save, savedir=savedir)
         return
 
     def save(self, savepath=DATA_DIR, subset=False, cutoff=-1.0):

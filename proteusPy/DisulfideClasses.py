@@ -415,7 +415,7 @@ def plot_count_vs_class_df(df, title='title',
     fig.update_layout(showlegend=True, title_x=0.5, title_font=dict(size=20), 
                     xaxis_showgrid=False, yaxis_showgrid=False)
     if save:
-        fname = f'{savedir}{title}.png'
+        fname = f'{savedir}/{title}.png'
         fig.write_image(fname, 'png')
     else:          
         fig.show()
