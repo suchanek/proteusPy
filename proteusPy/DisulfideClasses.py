@@ -27,7 +27,6 @@ from proteusPy.data import SS_CLASS_DEFINITIONS
 from proteusPy.angle_annotation import AngleAnnotation
 from proteusPy.ProteusGlobals import DPI
 
-
 def create_classes(df):
     """
     Group the DataFrame by the sign of the chi columns and create a new class ID column for each unique grouping.
@@ -135,7 +134,7 @@ def torsion_to_sixclass(tors):
 
 def get_sixth_quadrant(angle_deg):
     """
-    Returns the sextant in which an angle in degrees lies if the area is described by dividing a unit circle into 6 equal segments.
+    Return the sextant in which an angle in degrees lies if the area is described by dividing a unit circle into 6 equal segments.
 
     Parameters:
         angle_deg (float): The angle in degrees.
@@ -320,6 +319,7 @@ def plot_class_chart(classes: int) -> None:
     import matplotlib.pyplot as plt
     import numpy as np
     from proteusPy.angle_annotation import AngleAnnotation
+
     # Helper function to draw angle easily.
     def plot_angle(ax, pos, angle, length=0.95, acol="C4", **kwargs):
         """
@@ -427,16 +427,15 @@ def plot_count_vs_classid(df, cls=None, title='title', theme='light'):
 
     :param df: A pandas DataFrame containing the data to be plotted.
     :param title: A string representing the title of the plot (default is 'title').
-    :param theme: A string representing the theme of the plot. Can be set to 'notebook' or 'plotly_dark' (default is 'notebook').
+    :param theme: A string representing the theme of the plot. Anything other than `light` is in `plotly_dark`.
     :return: None
     """
+
     import plotly_express as px
     if cls is None:
-        fig = px.line(df, x='class_id', y='count', 
-                    title=f'{title}')
+        fig = px.line(df, x='class_id', y='count', title=f'{title}')
     else:
         subset = df[df['class_id'] == cls]
-        print(subset.head())
         fig = px.line(subset, x='class_id', y='count', title=f'{title}')
         
     fig.update_layout(xaxis_title='Class ID', yaxis_title='Count', showlegend=True, 

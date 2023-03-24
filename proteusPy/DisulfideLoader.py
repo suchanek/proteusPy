@@ -11,7 +11,6 @@ Last revision: 3/5/2023
 # Last modification: 2/20/23
 # Cα N, Cα, Cβ, C', Sγ Å °
 
-__pdoc__ = {'__all__': True, '__getitem__': True}
 
 import sys
 import copy
