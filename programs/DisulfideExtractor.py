@@ -1,9 +1,15 @@
 '''
-DisulfideExtractor.py
+`DisulfideExtractor.py`
 
-Purpose:
+# Purpose:
 This program encapsulates the steps needed to extract disulfides from the PDB file repository,
 build the DisulfideLoader object, and save it into the proteusPy module data directory.
+
+# Processes:
+* Extract: Extract SS bonds from the PDB raw files, with a cutoff of `cutoff` A.
+* Build: Load the data from the extraction and save it as a compressed .pkl file.
+* Update: Copy the `.pkl` files to the repo.
+* Subset: Only extract and process the first 1000 Disulfides found in the PDB directory.
 
 Author: Eric G. Suchanek, PhD.
 Last revision: 2/26/23 -egs-
@@ -12,7 +18,7 @@ Last revision: 2/26/23 -egs-
 import argparse
 import time
 import datetime
-from shutil import copytree, ignore_patterns
+from shutil import copytree, ignore_patterns, copy
 
 from proteusPy.Disulfide import Extract_Disulfides
 from proteusPy.DisulfideLoader import DisulfideLoader
@@ -20,6 +26,7 @@ from proteusPy.DisulfideLoader import DisulfideLoader
 from proteusPy.data import DATA_DIR
 from proteusPy.data import SS_PROBLEM_SUBSET_ID_FILE, SS_SUBSET_DICT_PICKLE_FILE
 from proteusPy.data import SS_SUBSET_PICKLE_FILE, SS_SUBSET_TORSIONS_FILE
+from proteusPy.data import LOADER_FNAME, LOADER_SUBSET_FNAME
 
 # the locations below represent the actual location on the dev drive.
 # location for PDB repository
@@ -40,6 +47,7 @@ def do_extract(verbose, full, subset, cutoff):
     if subset:
         if verbose:
             print('--> Extracting the SS subset...')
+        
         Extract_Disulfides(
                         numb=1000, 
                         pdbdir=PDB_DIR, 
@@ -59,14 +67,15 @@ def do_extract(verbose, full, subset, cutoff):
     if full:
         if verbose:
             print('--> Extracting the SS full dataset. This will take ~1.5 hours.')
+        
         Extract_Disulfides(
-                        numb=-1, 
-                        verbose=False, 
-                        quiet=True, 
-                        pdbdir=PDB_DIR, 
-                        datadir=DATA_DIR, 
-                        dist_cutoff=cutoff
-                        )
+            numb=-1, 
+            verbose=False, 
+            quiet=True, 
+            pdbdir=PDB_DIR, 
+            datadir=DATA_DIR, 
+            dist_cutoff=cutoff
+        )
     return
 
 def do_build(verbose, full, subset, cutoff):
@@ -128,7 +137,9 @@ def do_stuff(all=False, extract=False, build=True, full=False, update=True, subs
 
     if _update == True:
         print(f'Copying: {DATA_DIR} to {MODULE_DATA}')
-        copytree(DATA_DIR, MODULE_DATA, dirs_exist_ok=True, ignore=ignore_patterns('*_pruned_*'))
+        copy(f'{DATA_DIR}{LOADER_FNAME}', {MODULE_DATA})
+        copy(f'{DATA_DIR}{LOADER_SUBSET_FNAME}', {MODULE_DATA})
+        # copytree(DATA_DIR, MODULE_DATA, dirs_exist_ok=True, ignore=ignore_patterns('*_pruned_*'))
     return
 
 start = time.time()
