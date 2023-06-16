@@ -61,10 +61,6 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
-# We now define the Biopython version number in Bio/__init__.py
-# Here we can't use "import Bio" then "Bio.__version__" as that would
-# tell us the version of Biopython already installed (if any).
-
 __version__ = "Undefined"
 for line in open("proteusPy/__init__.py"):
     if line.startswith("__version__"):
