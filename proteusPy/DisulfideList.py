@@ -699,7 +699,7 @@ class DisulfideList(UserList):
         '''
         for ss in self.data:
             if ss.name == name:
-                return ss  # or ss.copy() !!!
+                return ss.copy()  # or ss.copy() !!!
         return None
 
     def Oget_by_name(self, name) -> Disulfide:
