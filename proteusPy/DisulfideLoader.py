@@ -305,6 +305,14 @@ class DisulfideLoader:
         '''
         return copy.deepcopy(self.SSList)
     
+    def get_by_name(self, name) -> Disulfide:
+        '''
+        Returns the Disulfide with the given name from the list.
+        '''
+        for ss in self.SSList.data:
+            if ss.name == name:
+                return ss  # or ss.copy() !!!
+        return None
     def describe(self):
         '''
         Provides information about the Disulfide database contained in ```self```.
