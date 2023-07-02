@@ -4,13 +4,12 @@ the analysis and modeling of protein structures, with an emphasis on disulfide b
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
 Author: Eric G. Suchanek, PhD
-Last revision: 3/5/2023
+Last revision: 7/2/2023
 '''
 
 # Author: Eric G. Suchanek, PhD.
 # Last modification: 2/20/23
 # Cα N, Cα, Cβ, C', Sγ Å °
-
 
 import sys
 import copy
@@ -24,7 +23,7 @@ import pickle
 import numpy as np
 
 import proteusPy
-from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR
+from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR,  REPO_DATA_DIR
 from proteusPy.atoms import *
 
 from proteusPy.data import SS_PICKLE_FILE, SS_TORSIONS_FILE, SS_DICT_PICKLE_FILE, DATA_DIR
@@ -48,22 +47,6 @@ except NameError:
     from tqdm import tqdm
 
 # Now use tqdm as normal, depending on your environment
-
-import requests
-
-def download_google_drive_file(url, destination_path):
-    response = requests.get(url)
-    if response.status_code == 200:
-        with open(destination_path, "wb") as file:
-            file.write(response.content)
-        return True
-    else:
-        return False
-
-# Example usage
-# url = "https://drive.google.com/your-file-url"  # Replace with the actual file URL
-# destination = "/path/to/save/file.pkl"  # Replace with the desired destination path
-# download_google_drive_file(url, destination)
 
 class DisulfideLoader:
     '''
@@ -116,7 +99,7 @@ class DisulfideLoader:
     >>> SSlist = PDB_SS[:4]
     '''
 
-    def __init__(self, verbose=True, datadir=DATA_DIR, picklefile=SS_PICKLE_FILE, 
+    def __init__(self, verbose=True, datadir=REPO_DATA_DIR, picklefile=SS_PICKLE_FILE, 
                 pickle_dict_file=SS_DICT_PICKLE_FILE,
                 torsion_file=SS_TORSIONS_FILE, quiet=True, 
                 subset=False,
@@ -567,7 +550,6 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
     used to load the built database.*
 
     :param loadpath: Path from which to load, defaults to DATA_DIR
-    :param fname: Filename, defaults to LOADER_FNAME
     :param verbose: Verbosity, defaults to False
     :param subset: If True, load the subset DB, otherwise load the full database
     '''
