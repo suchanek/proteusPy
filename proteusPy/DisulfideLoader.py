@@ -49,6 +49,22 @@ except NameError:
 
 # Now use tqdm as normal, depending on your environment
 
+import requests
+
+def download_google_drive_file(url, destination_path):
+    response = requests.get(url)
+    if response.status_code == 200:
+        with open(destination_path, "wb") as file:
+            file.write(response.content)
+        return True
+    else:
+        return False
+
+# Example usage
+# url = "https://drive.google.com/your-file-url"  # Replace with the actual file URL
+# destination = "/path/to/save/file.pkl"  # Replace with the desired destination path
+# download_google_drive_file(url, destination)
+
 class DisulfideLoader:
     '''
     This class represents the disulfide database itself and is its primary means of accession. 
@@ -142,26 +158,25 @@ class DisulfideLoader:
         
         if self.verbose:
             print(f'-> DisulfideLoader(): Reading disulfides from: {self.PickleFile}... ', end='')
-        
+    
         with open(self.PickleFile, 'rb') as f:
             sslist = pickle.load(f)
             self.SSList = sslist
+            self.TotalDisulfides = len(self.SSList)
 
         if self.verbose:
             print(f'done.',)
 
-        self.TotalDisulfides = len(self.SSList)
-        
         if self.verbose:
-            print(f'-> DisulfideLoader(): Reading disulfide dict2 from: {self.PickleDictFile}...', end='')
-        
+            print(f'-> DisulfideLoader(): Reading disulfide dict from: {self.PickleDictFile}...', end='')
+    
         with open(self.PickleDictFile, 'rb') as f:
             self.SSDict = pickle.load(f)
             for key in self.SSDict:
                 idlist.append(key)
             self.IDList = idlist.copy()
             totalSS_dict = len(self.IDList)
-
+    
         if self.verbose:
             print(f'done.')
 
@@ -172,6 +187,7 @@ class DisulfideLoader:
         tmpDF.drop(tmpDF.columns[[0]], axis=1, inplace=True)
 
         self.TorsionDF = tmpDF.copy()
+        self.TotalDisulfides = len(self.SSList)
 
         if self.verbose:
             print(f' done.')
@@ -555,6 +571,14 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
     :param verbose: Verbosity, defaults to False
     :param subset: If True, load the subset DB, otherwise load the full database
     '''
+    # normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy 
+    # distribution. In that case we need to download the files for all disulfides and the subset
+    # from the Google Drive storage.
+    
+    import gdown
+    url_all = "https://drive.google.com/uc?id=1igF-sppLPaNsBaUS7nkb13vtOGZZmsFp"
+    url_subset = "https://drive.google.com/uc?id=1puy9pxrClFks0KN9q5PPV_ONKvL-hg33/view?usp=drive_link"
+
     if subset:
         _fname = f'{loadpath}{LOADER_SUBSET_FNAME}'
     else:
@@ -568,16 +592,64 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
         if verbose:
             print(f'done.')
         return res
+    
+    except IOError:
+        _good1 = False # all data
+        _good2 = False # subset data
+        _fname_sub = f'{loadpath}{LOADER_SUBSET_FNAME}'
+        _fname_all = f'{loadpath}{LOADER_FNAME}'
+        if verbose:
+            print(f'-> DisulfideLoader(): Reading disulfides from Google Drive... ')
+        
+        #PDB_SS_ALL_LOADER.pkl
+        if verbose:
+            destination = _fname_all
+            print(f'-> DisulfideLoader(): Downloading the RCSB Disulfide Database from Google Drive to {destination}... ', end='')
+        
+        if gdown.download(url_all, _fname_all) is not None:
+            _good1 = True
+            if verbose:
+                print(f' done.')
+        else:
+            print('Error downloading RCSB database!')
+
+        #PDB_ss_subset.pkl
+        destination = _fname_sub
+        if verbose:
+            print(f'-> DisulfideLoader(): Downloading disulfide subset database from Google Drive to {destination}... ', end='')
+        
+        if gdown.download(url_subset, _fname_sub) is not None:
+            _good2 = True
+            if verbose:
+                print(f' done.')
+        else:
+            print('Error downloading RCSB subset database!')
+
+    if subset:
+        _fname = f'{loadpath}{LOADER_SUBSET_FNAME}'
+    else:
+        _fname = f'{loadpath}{LOADER_FNAME}'
+
+    if verbose:
+        print(f'-> load_PDB_SS(): Attempting to read {_fname}... ', end='')
+    try:
+        with open(_fname, 'rb') as f:
+            res = pickle.load(f)
+        if verbose:
+            print(f'done.')
+        return res
     except:
         # no fully built loader available. See if we can
         # build it
-        print(f'\n\n!!! Load_PDB_SS() attempting to rebuild the loader.')
-        pdb = DisulfideLoader(verbose=True)
+        print(f'\n\n!!! Unable to download database! Load_PDB_SS() is attempting to rebuild the loader.')
+        pdb = DisulfideLoader(verbose=True, subset=subset)
         if pdb is None:
-            mess = f'!!! FATAL: load_PDB_SS(): cannot open primary SS file!'
+            mess = f'!!! FATAL: load_PDB_SS(): cannot rebuild primary SS file!'
             raise DisulfideIOException(mess)
         else:
             pdb.save()
         print(f'-> Load_PDB_SS(): rebuild complete.')
+    
+    return pdb
 
 # End of file
