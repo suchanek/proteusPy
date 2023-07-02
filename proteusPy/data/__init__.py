@@ -1,5 +1,5 @@
 '''
-Global declarations for
+Global declarations for the proteusPy package
 '''
 
 # init for proteusPy data module
@@ -10,7 +10,6 @@ import os
 
 # absolute location for the disulfide .pkl files
 _abspath = os.path.dirname(os.path.abspath(__file__))
-
 
 DATA_DIR = f'{_abspath}/'
 SS_PICKLE_FILE = 'PDB_all_ss.pkl'
