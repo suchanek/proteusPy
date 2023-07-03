@@ -9,14 +9,21 @@
    of the notebooks and test programs. Ultimately the distribution can be used from pyPi as a normal
    package.
    - Using pyPi:
-     - python3 -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ proteusPy
-   - From gitHub:
+     - python3 -m pip install proteusPy
+   - From the gitHub repository:
      - Install git-lfs
        - https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage
-       - From a shell prompt: git-lfs track "*.csv" "*.pkl" "*.mp4"
-     - git clone https://github.com/suchanek/proteusPy/proteusPy.git
+       - From a shell prompt: 
+         ```
+          $ git-lfs track "*.csv" "*.pkl" "*.mp4"
+          $ git clone https://github.com/suchanek/proteusPy/proteusPy.git
+         ```
      - cd into the repo
-     - pip install .
+     - ```
+        $ conda env create --name proteusPy --file=proteusPy.yml
+        $ pip install .
+       ```
+     - 
   
 
 #### Publications

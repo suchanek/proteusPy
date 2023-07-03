@@ -22,3 +22,6 @@ proteusPy.egg-info/not-zip-safe
 proteusPy.egg-info/requires.txt
 proteusPy.egg-info/top_level.txt
 proteusPy/data/__init__.py
+proteusPy/data/ss_completed.txt
+proteusPy/data/ss_ids.txt
+proteusPy/data/ss_query.json

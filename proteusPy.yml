@@ -1,4 +1,4 @@
-name: prot2
+name: prtst
 channels:
   - conda-forge
 dependencies:
@@ -356,6 +356,7 @@ dependencies:
       - pip==23.1.2
       - pkginfo==1.9.6
       - ply==3.11
+      - proteusPy
       - py3dmol==2.0.1.post1
       - pydantic==1.10.9
       - pygtrie==2.5.0
@@ -393,4 +394,4 @@ dependencies:
       - uri-template==1.2.0
       - webcolors==1.12
       - wxpython==4.2.0
-prefix: /Users/egs/miniforge3/envs/prot2
+prefix: /Users/egs/miniforge3/envs/prtst

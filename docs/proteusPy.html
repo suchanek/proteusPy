@@ -97,18 +97,24 @@ package.
 <ul>
 <li>Using pyPi:
 <ul>
-<li>python3 -m pip install --index-url <a href="https://test.pypi.org/simple/"><a href="https://test.pypi.org/simple/"><a href="https://test.pypi.org/simple/">https://test.pypi.org/simple/</a></a></a> --extra-index-url <a href="https://pypi.org/simple/"><a href="https://pypi.org/simple/"><a href="https://pypi.org/simple/">https://pypi.org/simple/</a></a></a> proteusPy</li>
+<li>python3 -m pip install proteusPy</li>
 </ul></li>
-<li>From gitHub:
+<li>From the gitHub repository:
 <ul>
 <li>Install git-lfs
 <ul>
 <li><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage">https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage</a></a></a></a></li>
-<li>From a shell prompt: git-lfs track "<em>.csv" "</em>.pkl" "*.mp4"</li>
+<li>From a shell prompt: 
+<pre><code> $ git-lfs track "*.csv" "*.pkl" "*.mp4"
+ $ git clone https://github.com/suchanek/proteusPy/proteusPy.git
+</code></pre></li>
 </ul></li>
-<li>git clone <a href="https://github.com/suchanek/proteusPy/proteusPy.git"><a href="https://github.com/suchanek/proteusPy/proteusPy.git"><a href="https://github.com/suchanek/proteusPy/proteusPy.git">https://github.com/suchanek/proteusPy/proteusPy.git</a></a></a></li>
 <li>cd into the repo</li>
-<li>pip install .</li>
+<li><code>
+ $ conda env create --name proteusPy --file=proteusPy.yml
+ $ pip install .
+</code></li>
+- 
 </ul></li>
 </ul></li>
 </ol>

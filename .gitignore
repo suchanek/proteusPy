@@ -2,6 +2,7 @@
 __pycache__
 
 .DS_Store
+build/*
 proteusPy/.DS_Store
 proteusPy/pdb/.DS_Store
 data/*.png
@@ -11,3 +12,5 @@ data/Oclasses/*
 *.mp4
 programs/chatbot.py
 proteusPy/.DS_Store
+proteusPy/data/PDB_SS_ALL_LOADER.pkl
+proteusPy/data/PDB_SS_SUBSET_LOADER.pkl
