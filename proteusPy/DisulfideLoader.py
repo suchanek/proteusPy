@@ -559,15 +559,22 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
     
     import gdown
     url_all = "https://drive.google.com/uc?id=1igF-sppLPaNsBaUS7nkb13vtOGZZmsFp"
-    url_subset = "https://drive.google.com/uc?id=1puy9pxrClFks0KN9q5PPV_ONKvL-hg33/view?usp=drive_link"
-
+    url_subset = "https://drive.google.com/uc?id=1puy9pxrClFks0KN9q5PPV_ONKvL-hg33"
+    
+    _good1 = False # all data
+    _good2 = False # subset data
+    
+    _fname_sub = f'{loadpath}{LOADER_SUBSET_FNAME}'
+    _fname_all = f'{loadpath}{LOADER_FNAME}'
+    
     if subset:
-        _fname = f'{loadpath}{LOADER_SUBSET_FNAME}'
+        _fname = _fname_sub
     else:
-        _fname = f'{loadpath}{LOADER_FNAME}'
-
+        _fname = _fname_all
+    
     if verbose:
         print(f'-> load_PDB_SS(): Reading {_fname}... ', end='')
+
     try:
         with open(_fname, 'rb') as f:
             res = pickle.load(f)
@@ -576,10 +583,6 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
         return res
     
     except IOError:
-        _good1 = False # all data
-        _good2 = False # subset data
-        _fname_sub = f'{loadpath}{LOADER_SUBSET_FNAME}'
-        _fname_all = f'{loadpath}{LOADER_FNAME}'
         if verbose:
             print(f'-> DisulfideLoader(): Reading disulfides from Google Drive... ')
         
@@ -608,9 +611,9 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
             print('Error downloading RCSB subset database!')
 
     if subset:
-        _fname = f'{loadpath}{LOADER_SUBSET_FNAME}'
+        _fname = _fname_sub
     else:
-        _fname = f'{loadpath}{LOADER_FNAME}'
+        _fname = _fname_all
 
     if verbose:
         print(f'-> load_PDB_SS(): Attempting to read {_fname}... ', end='')
@@ -624,6 +627,8 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
         # no fully built loader available. See if we can
         # build it
         print(f'\n\n!!! Unable to download database! Load_PDB_SS() is attempting to rebuild the loader.')
+        return
+        '''
         pdb = DisulfideLoader(verbose=True, subset=subset)
         if pdb is None:
             mess = f'!!! FATAL: load_PDB_SS(): cannot rebuild primary SS file!'
@@ -631,7 +636,8 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
         else:
             pdb.save()
         print(f'-> Load_PDB_SS(): rebuild complete.')
-    
+        '''
+
     return pdb
 
 # End of file
