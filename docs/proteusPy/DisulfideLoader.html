@@ -721,7 +721,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-584"><a href="#L-584"><span class="linenos">584</span></a>    
 </span><span id="L-585"><a href="#L-585"><span class="linenos">585</span></a>    <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
 </span><span id="L-586"><a href="#L-586"><span class="linenos">586</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-587"><a href="#L-587"><span class="linenos">587</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; DisulfideLoader(): Reading disulfides from Google Drive... &#39;</span><span class="p">)</span>
+</span><span id="L-587"><a href="#L-587"><span class="linenos">587</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">-&gt; DisulfideLoader(): Reading disulfides from Google Drive... &#39;</span><span class="p">)</span>
 </span><span id="L-588"><a href="#L-588"><span class="linenos">588</span></a>        
 </span><span id="L-589"><a href="#L-589"><span class="linenos">589</span></a>        <span class="c1">#PDB_SS_ALL_LOADER.pkl</span>
 </span><span id="L-590"><a href="#L-590"><span class="linenos">590</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
@@ -733,7 +733,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-596"><a href="#L-596"><span class="linenos">596</span></a>            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
 </span><span id="L-597"><a href="#L-597"><span class="linenos">597</span></a>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; done.&#39;</span><span class="p">)</span>
 </span><span id="L-598"><a href="#L-598"><span class="linenos">598</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="L-599"><a href="#L-599"><span class="linenos">599</span></a>            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error downloading RCSB database!&#39;</span><span class="p">)</span>
+</span><span id="L-599"><a href="#L-599"><span class="linenos">599</span></a>            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Error downloading RCSB database!&#39;</span><span class="p">)</span>
 </span><span id="L-600"><a href="#L-600"><span class="linenos">600</span></a>
 </span><span id="L-601"><a href="#L-601"><span class="linenos">601</span></a>        <span class="c1">#PDB_ss_subset.pkl</span>
 </span><span id="L-602"><a href="#L-602"><span class="linenos">602</span></a>        <span class="n">destination</span> <span class="o">=</span> <span class="n">_fname_sub</span>
@@ -745,7 +745,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-608"><a href="#L-608"><span class="linenos">608</span></a>            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
 </span><span id="L-609"><a href="#L-609"><span class="linenos">609</span></a>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; done.&#39;</span><span class="p">)</span>
 </span><span id="L-610"><a href="#L-610"><span class="linenos">610</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="L-611"><a href="#L-611"><span class="linenos">611</span></a>            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error downloading RCSB subset database!&#39;</span><span class="p">)</span>
+</span><span id="L-611"><a href="#L-611"><span class="linenos">611</span></a>            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Error downloading RCSB subset database!&#39;</span><span class="p">)</span>
 </span><span id="L-612"><a href="#L-612"><span class="linenos">612</span></a>
 </span><span id="L-613"><a href="#L-613"><span class="linenos">613</span></a>    <span class="k">if</span> <span class="n">subset</span><span class="p">:</span>
 </span><span id="L-614"><a href="#L-614"><span class="linenos">614</span></a>        <span class="n">_fname</span> <span class="o">=</span> <span class="n">_fname_sub</span>
@@ -775,7 +775,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-638"><a href="#L-638"><span class="linenos">638</span></a><span class="sd">        print(f&#39;-&gt; Load_PDB_SS(): rebuild complete.&#39;)</span>
 </span><span id="L-639"><a href="#L-639"><span class="linenos">639</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="L-640"><a href="#L-640"><span class="linenos">640</span></a>
-</span><span id="L-641"><a href="#L-641"><span class="linenos">641</span></a>    <span class="k">return</span> <span class="n">pdb</span>
+</span><span id="L-641"><a href="#L-641"><span class="linenos">641</span></a>    <span class="k">return</span>
 </span><span id="L-642"><a href="#L-642"><span class="linenos">642</span></a>
 </span><span id="L-643"><a href="#L-643"><span class="linenos">643</span></a><span class="c1"># End of file</span>
 </span></pre></div>
@@ -2213,7 +2213,7 @@ a common reference (the proximal disulfides).</p>
 </span><span id="Load_PDB_SS-585"><a href="#Load_PDB_SS-585"><span class="linenos">585</span></a>    
 </span><span id="Load_PDB_SS-586"><a href="#Load_PDB_SS-586"><span class="linenos">586</span></a>    <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
 </span><span id="Load_PDB_SS-587"><a href="#Load_PDB_SS-587"><span class="linenos">587</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-588"><a href="#Load_PDB_SS-588"><span class="linenos">588</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; DisulfideLoader(): Reading disulfides from Google Drive... &#39;</span><span class="p">)</span>
+</span><span id="Load_PDB_SS-588"><a href="#Load_PDB_SS-588"><span class="linenos">588</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">-&gt; DisulfideLoader(): Reading disulfides from Google Drive... &#39;</span><span class="p">)</span>
 </span><span id="Load_PDB_SS-589"><a href="#Load_PDB_SS-589"><span class="linenos">589</span></a>        
 </span><span id="Load_PDB_SS-590"><a href="#Load_PDB_SS-590"><span class="linenos">590</span></a>        <span class="c1">#PDB_SS_ALL_LOADER.pkl</span>
 </span><span id="Load_PDB_SS-591"><a href="#Load_PDB_SS-591"><span class="linenos">591</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
@@ -2225,7 +2225,7 @@ a common reference (the proximal disulfides).</p>
 </span><span id="Load_PDB_SS-597"><a href="#Load_PDB_SS-597"><span class="linenos">597</span></a>            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
 </span><span id="Load_PDB_SS-598"><a href="#Load_PDB_SS-598"><span class="linenos">598</span></a>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; done.&#39;</span><span class="p">)</span>
 </span><span id="Load_PDB_SS-599"><a href="#Load_PDB_SS-599"><span class="linenos">599</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-600"><a href="#Load_PDB_SS-600"><span class="linenos">600</span></a>            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error downloading RCSB database!&#39;</span><span class="p">)</span>
+</span><span id="Load_PDB_SS-600"><a href="#Load_PDB_SS-600"><span class="linenos">600</span></a>            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Error downloading RCSB database!&#39;</span><span class="p">)</span>
 </span><span id="Load_PDB_SS-601"><a href="#Load_PDB_SS-601"><span class="linenos">601</span></a>
 </span><span id="Load_PDB_SS-602"><a href="#Load_PDB_SS-602"><span class="linenos">602</span></a>        <span class="c1">#PDB_ss_subset.pkl</span>
 </span><span id="Load_PDB_SS-603"><a href="#Load_PDB_SS-603"><span class="linenos">603</span></a>        <span class="n">destination</span> <span class="o">=</span> <span class="n">_fname_sub</span>
@@ -2237,7 +2237,7 @@ a common reference (the proximal disulfides).</p>
 </span><span id="Load_PDB_SS-609"><a href="#Load_PDB_SS-609"><span class="linenos">609</span></a>            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
 </span><span id="Load_PDB_SS-610"><a href="#Load_PDB_SS-610"><span class="linenos">610</span></a>                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; done.&#39;</span><span class="p">)</span>
 </span><span id="Load_PDB_SS-611"><a href="#Load_PDB_SS-611"><span class="linenos">611</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-612"><a href="#Load_PDB_SS-612"><span class="linenos">612</span></a>            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error downloading RCSB subset database!&#39;</span><span class="p">)</span>
+</span><span id="Load_PDB_SS-612"><a href="#Load_PDB_SS-612"><span class="linenos">612</span></a>            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Error downloading RCSB subset database!&#39;</span><span class="p">)</span>
 </span><span id="Load_PDB_SS-613"><a href="#Load_PDB_SS-613"><span class="linenos">613</span></a>
 </span><span id="Load_PDB_SS-614"><a href="#Load_PDB_SS-614"><span class="linenos">614</span></a>    <span class="k">if</span> <span class="n">subset</span><span class="p">:</span>
 </span><span id="Load_PDB_SS-615"><a href="#Load_PDB_SS-615"><span class="linenos">615</span></a>        <span class="n">_fname</span> <span class="o">=</span> <span class="n">_fname_sub</span>
@@ -2267,7 +2267,7 @@ a common reference (the proximal disulfides).</p>
 </span><span id="Load_PDB_SS-639"><a href="#Load_PDB_SS-639"><span class="linenos">639</span></a><span class="sd">        print(f&#39;-&gt; Load_PDB_SS(): rebuild complete.&#39;)</span>
 </span><span id="Load_PDB_SS-640"><a href="#Load_PDB_SS-640"><span class="linenos">640</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="Load_PDB_SS-641"><a href="#Load_PDB_SS-641"><span class="linenos">641</span></a>
-</span><span id="Load_PDB_SS-642"><a href="#Load_PDB_SS-642"><span class="linenos">642</span></a>    <span class="k">return</span> <span class="n">pdb</span>
+</span><span id="Load_PDB_SS-642"><a href="#Load_PDB_SS-642"><span class="linenos">642</span></a>    <span class="k">return</span>
 </span></pre></div>
 
 
