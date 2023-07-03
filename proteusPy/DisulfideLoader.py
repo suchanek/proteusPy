@@ -27,7 +27,7 @@ from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR,  REPO_DATA_DIR
 from proteusPy.atoms import *
 
 from proteusPy.data import SS_PICKLE_FILE, SS_TORSIONS_FILE, SS_DICT_PICKLE_FILE, DATA_DIR
-from proteusPy.data import LOADER_FNAME, LOADER_SUBSET_FNAME
+from proteusPy.data import LOADER_FNAME, LOADER_SUBSET_FNAME, LOADER_ALL_URL, LOADER_SUBSET_URL
 
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.Disulfide import Disulfide
@@ -558,8 +558,9 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
     # from the Google Drive storage.
     
     import gdown
-    url_all = "https://drive.google.com/uc?id=1igF-sppLPaNsBaUS7nkb13vtOGZZmsFp"
-    url_subset = "https://drive.google.com/uc?id=1puy9pxrClFks0KN9q5PPV_ONKvL-hg33"
+
+    url_all = LOADER_ALL_URL
+    url_subset = LOADER_SUBSET_URL
     
     _good1 = False # all data
     _good2 = False # subset data
