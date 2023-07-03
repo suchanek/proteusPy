@@ -30,6 +30,3 @@ PBAR_COLS = 105
 # nominal macbook Pro screen resolution
 DPI = 220
 
-
-
-
