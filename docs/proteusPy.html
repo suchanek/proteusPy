@@ -92,8 +92,8 @@ proteusPy    </h1>
 <li>Activate the environment</li>
 </ul></li>
 <li>Build the environment. At this point it's probably best to clone the repo via github since it contains all
-of the notebooks and test programs. Ultimately the distribution can be used from pyPi as a normal
-package.
+ of the notebooks and test programs. The source code distribution can be used from pyPi as a normal
+ package, within your own environment.
 <ul>
 <li>Using pyPi:
 <ul>
@@ -114,10 +114,17 @@ package.
  $ conda env create --name proteusPy --file=proteusPy.yml
  $ pip install .
 </code></li>
-- 
+<li>Profit! OK, just kidding. I hope you enjoy using proteusPy and would love to hear any success/insights gleaned from any subsequent work. 
+<h3 id="general-usage">General Usage</h3></li>
 </ul></li>
 </ul></li>
 </ol>
+
+<p>Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. The <code>notebooks</code> directory contains all of my Jupyter notebooks and is a good place to start. The <code>DisulfideAnalysis.ipynb</code> notebook contains the first analysis paper. The <code>programs</code> subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files, (<code>DisulfideDownloader.py</code>), extracting the disulfides and creating the database loaders (<code>DisulfideExtractor.py</code>) and cluster analysis, (````DisulfideClass_Analysis.py).</p>
+
+<h3 id="the-future">The Future</h3>
+
+<p>I am interested in continuing to explore the initial disulfide structural classes gleaned from Hogg et al further using the sextant class approach. This offers much higher class resolution and reveals subgroups within the broad class. I'd also like to explore the catalytic and allosteric classes in more detail to look for common structural elements.</p>
 
 <h4 id="publications">Publications</h4>
 
@@ -128,7 +135,7 @@ package.
 <li><a href="http://dx.doi.org/10.2174/092986708783330566">http://dx.doi.org/10.2174/092986708783330566</a></li>
 </ul>
 
-<p><em>NB:</em> This distribution is actively being developed and will be difficult to implement locally unless the BioPython patch is applied. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1. 1/26/23 -egs</p>
+<p><em>NB:</em> This distribution is actively being developed and will be difficult to implement locally unless the BioPython patch is applied. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1. 7/3/23 -egs</p>
 
 <p>Eric G. Suchanek, PhD. mailto:suchanek@mac.com</p>
 </div>
@@ -145,7 +152,7 @@ package.
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">.. include:: ../README.md</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.681&quot;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.69&quot;</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="kn">import</span> <span class="nn">sys</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="kn">import</span> <span class="nn">os</span>

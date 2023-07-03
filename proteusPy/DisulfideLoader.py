@@ -584,7 +584,7 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
     
     except IOError:
         if verbose:
-            print(f'-> DisulfideLoader(): Reading disulfides from Google Drive... ')
+            print(f'\n-> DisulfideLoader(): Reading disulfides from Google Drive... ')
         
         #PDB_SS_ALL_LOADER.pkl
         if verbose:
@@ -596,7 +596,7 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
             if verbose:
                 print(f' done.')
         else:
-            print('Error downloading RCSB database!')
+            print('\nError downloading RCSB database!')
 
         #PDB_ss_subset.pkl
         destination = _fname_sub
@@ -608,7 +608,7 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
             if verbose:
                 print(f' done.')
         else:
-            print('Error downloading RCSB subset database!')
+            print('\nError downloading RCSB subset database!')
 
     if subset:
         _fname = _fname_sub
@@ -638,6 +638,6 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
         print(f'-> Load_PDB_SS(): rebuild complete.')
         '''
 
-    return pdb
+    return
 
 # End of file
