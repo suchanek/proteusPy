@@ -18,7 +18,7 @@ jsonpath-ng==1.5.3
 jsonpointer==2.3
 kaleido==0.2.1
 keyring==23.13.1
-markdown-it-py==2.1.0
+markdown-it-py==2.2.0
 marshmallow==3.19.0
 mdurl==0.1.2
 more-itertools==9.0.0
