@@ -31,7 +31,7 @@ Once the package is installed one can use the existing notebooks for analysis of
 The first time one loads the database via ``Load_PDB_SS()`` the system will attempt to download the full and subset database from my Google Drive. If this fails the system will attempt to rebuild the database from the repo's ``data`` subdirectory (not the package's). If you've downloaded from github this will work correctly. If you've installed from pyPi via ``pip`` it will fail.
 
 ### The Future
-I am interested in continuing to explore the initial disulfide structural classes gleaned from Hogg et al further using the sextant class approach. This offers much higher class resolution and reveals subgroups within the broad class. I'd also like to explore the catalytic and allosteric classes in more detail to look for common structural elements.
+I am continuing to explore the initial disulfide structural classes gleaned from Hogg *et al.* further using the sextant class approach. This offers much higher class resolution and reveals subgroups within the broad class. I'd also like to explore the catalytic and allosteric classes in more detail to look for common structural elements.
 
 ### Publications
 * https://doi.org/10.1021/bi00368a023
@@ -40,7 +40,7 @@ I am interested in continuing to explore the initial disulfide structural classe
 * http://dx.doi.org/10.2174/092986708783330566
 
 
-*NB:* This distribution is slowly being developed and will be difficult to implement locally unless the BioPython patch is applied. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1. 7/3/23 -egs
+*NB:* This distribution is being developed slowly. proteusPy relies on my fork of the ``Bio`` Python package to download and build the database. As a result, one can't download and create the database locally unless the BioPython patch is applied. This has no impact on analysis with the existing databases. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1. 7/3/23 -egs
 
 Eric G. Suchanek, PhD., <mailto:suchanek@mac.com>
 
