@@ -715,7 +715,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-578"><a href="#L-578"><span class="linenos">578</span></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_fname</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 </span><span id="L-579"><a href="#L-579"><span class="linenos">579</span></a>            <span class="n">res</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 </span><span id="L-580"><a href="#L-580"><span class="linenos">580</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-581"><a href="#L-581"><span class="linenos">581</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;done.&#39;</span><span class="p">)</span>
+</span><span id="L-581"><a href="#L-581"><span class="linenos">581</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; load_PDB_SS(): Done reading </span><span class="si">{</span><span class="n">_fname</span><span class="si">}</span><span class="s1">... &#39;</span><span class="p">)</span>
 </span><span id="L-582"><a href="#L-582"><span class="linenos">582</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-583"><a href="#L-583"><span class="linenos">583</span></a>    
 </span><span id="L-584"><a href="#L-584"><span class="linenos">584</span></a>    <span class="c1"># we don&#39;t have it locally, so download both from google drive</span>
@@ -748,35 +748,17 @@ Last revision: 7/2/2023</p>
 </span><span id="L-611"><a href="#L-611"><span class="linenos">611</span></a><span class="sd">        else:</span>
 </span><span id="L-612"><a href="#L-612"><span class="linenos">612</span></a><span class="sd">            print(&#39;Error downloading RCSB subset database!&#39;)</span>
 </span><span id="L-613"><a href="#L-613"><span class="linenos">613</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-614"><a href="#L-614"><span class="linenos">614</span></a>    <span class="k">if</span> <span class="n">subset</span><span class="p">:</span>
-</span><span id="L-615"><a href="#L-615"><span class="linenos">615</span></a>        <span class="n">_fname</span> <span class="o">=</span> <span class="n">_fname_sub</span>
-</span><span id="L-616"><a href="#L-616"><span class="linenos">616</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-617"><a href="#L-617"><span class="linenos">617</span></a>        <span class="n">_fname</span> <span class="o">=</span> <span class="n">_fname_all</span>
-</span><span id="L-618"><a href="#L-618"><span class="linenos">618</span></a>
-</span><span id="L-619"><a href="#L-619"><span class="linenos">619</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-620"><a href="#L-620"><span class="linenos">620</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; load_PDB_SS(): Attempting to read </span><span class="si">{</span><span class="n">_fname</span><span class="si">}</span><span class="s1">... &#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-</span><span id="L-621"><a href="#L-621"><span class="linenos">621</span></a>    <span class="k">try</span><span class="p">:</span>
-</span><span id="L-622"><a href="#L-622"><span class="linenos">622</span></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_fname</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="L-623"><a href="#L-623"><span class="linenos">623</span></a>            <span class="n">res</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-</span><span id="L-624"><a href="#L-624"><span class="linenos">624</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-625"><a href="#L-625"><span class="linenos">625</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;done.&#39;</span><span class="p">)</span>
-</span><span id="L-626"><a href="#L-626"><span class="linenos">626</span></a>        <span class="k">return</span> <span class="n">res</span>
-</span><span id="L-627"><a href="#L-627"><span class="linenos">627</span></a>    <span class="k">except</span><span class="p">:</span>
-</span><span id="L-628"><a href="#L-628"><span class="linenos">628</span></a>        <span class="c1"># no fully built loader available. See if we can</span>
-</span><span id="L-629"><a href="#L-629"><span class="linenos">629</span></a>        <span class="c1"># build it</span>
-</span><span id="L-630"><a href="#L-630"><span class="linenos">630</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">!!! Unable to download database! Load_PDB_SS() is attempting to rebuild the loader.&#39;</span><span class="p">)</span>
-</span><span id="L-631"><a href="#L-631"><span class="linenos">631</span></a>    
-</span><span id="L-632"><a href="#L-632"><span class="linenos">632</span></a>        <span class="n">pdb</span> <span class="o">=</span> <span class="n">DisulfideLoader</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">)</span>
-</span><span id="L-633"><a href="#L-633"><span class="linenos">633</span></a>        <span class="k">if</span> <span class="n">pdb</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-634"><a href="#L-634"><span class="linenos">634</span></a>            <span class="n">mess</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;!!! FATAL: load_PDB_SS(): cannot rebuild primary SS file!&#39;</span>
-</span><span id="L-635"><a href="#L-635"><span class="linenos">635</span></a>            <span class="k">raise</span> <span class="n">DisulfideIOException</span><span class="p">(</span><span class="n">mess</span><span class="p">)</span>
-</span><span id="L-636"><a href="#L-636"><span class="linenos">636</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="L-637"><a href="#L-637"><span class="linenos">637</span></a>            <span class="n">pdb</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">savepath</span><span class="o">=</span><span class="n">loadpath</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">)</span>
-</span><span id="L-638"><a href="#L-638"><span class="linenos">638</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; Load_PDB_SS(): rebuild complete.&#39;</span><span class="p">)</span>
-</span><span id="L-639"><a href="#L-639"><span class="linenos">639</span></a>    
-</span><span id="L-640"><a href="#L-640"><span class="linenos">640</span></a>    <span class="k">return</span>
-</span><span id="L-641"><a href="#L-641"><span class="linenos">641</span></a>
-</span><span id="L-642"><a href="#L-642"><span class="linenos">642</span></a><span class="c1"># End of file</span>
+</span><span id="L-614"><a href="#L-614"><span class="linenos">614</span></a>    
+</span><span id="L-615"><a href="#L-615"><span class="linenos">615</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="L-616"><a href="#L-616"><span class="linenos">616</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; load_PDB_SS(): Attempting to read local </span><span class="si">{</span><span class="n">_fname</span><span class="si">}</span><span class="s1">... &#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+</span><span id="L-617"><a href="#L-617"><span class="linenos">617</span></a>    <span class="c1">#try:</span>
+</span><span id="L-618"><a href="#L-618"><span class="linenos">618</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_fname</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="L-619"><a href="#L-619"><span class="linenos">619</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span><span id="L-620"><a href="#L-620"><span class="linenos">620</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="L-621"><a href="#L-621"><span class="linenos">621</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;done.&#39;</span><span class="p">)</span>
+</span><span id="L-622"><a href="#L-622"><span class="linenos">622</span></a>    <span class="k">return</span> <span class="n">res</span>
+</span><span id="L-623"><a href="#L-623"><span class="linenos">623</span></a>
+</span><span id="L-624"><a href="#L-624"><span class="linenos">624</span></a><span class="c1"># End of file</span>
 </span></pre></div>
 
 
@@ -2206,7 +2188,7 @@ a common reference (the proximal disulfides).</p>
 </span><span id="Load_PDB_SS-579"><a href="#Load_PDB_SS-579"><span class="linenos">579</span></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_fname</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 </span><span id="Load_PDB_SS-580"><a href="#Load_PDB_SS-580"><span class="linenos">580</span></a>            <span class="n">res</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 </span><span id="Load_PDB_SS-581"><a href="#Load_PDB_SS-581"><span class="linenos">581</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-582"><a href="#Load_PDB_SS-582"><span class="linenos">582</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;done.&#39;</span><span class="p">)</span>
+</span><span id="Load_PDB_SS-582"><a href="#Load_PDB_SS-582"><span class="linenos">582</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; load_PDB_SS(): Done reading </span><span class="si">{</span><span class="n">_fname</span><span class="si">}</span><span class="s1">... &#39;</span><span class="p">)</span>
 </span><span id="Load_PDB_SS-583"><a href="#Load_PDB_SS-583"><span class="linenos">583</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="Load_PDB_SS-584"><a href="#Load_PDB_SS-584"><span class="linenos">584</span></a>    
 </span><span id="Load_PDB_SS-585"><a href="#Load_PDB_SS-585"><span class="linenos">585</span></a>    <span class="c1"># we don&#39;t have it locally, so download both from google drive</span>
@@ -2239,33 +2221,15 @@ a common reference (the proximal disulfides).</p>
 </span><span id="Load_PDB_SS-612"><a href="#Load_PDB_SS-612"><span class="linenos">612</span></a><span class="sd">        else:</span>
 </span><span id="Load_PDB_SS-613"><a href="#Load_PDB_SS-613"><span class="linenos">613</span></a><span class="sd">            print(&#39;Error downloading RCSB subset database!&#39;)</span>
 </span><span id="Load_PDB_SS-614"><a href="#Load_PDB_SS-614"><span class="linenos">614</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="Load_PDB_SS-615"><a href="#Load_PDB_SS-615"><span class="linenos">615</span></a>    <span class="k">if</span> <span class="n">subset</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-616"><a href="#Load_PDB_SS-616"><span class="linenos">616</span></a>        <span class="n">_fname</span> <span class="o">=</span> <span class="n">_fname_sub</span>
-</span><span id="Load_PDB_SS-617"><a href="#Load_PDB_SS-617"><span class="linenos">617</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-618"><a href="#Load_PDB_SS-618"><span class="linenos">618</span></a>        <span class="n">_fname</span> <span class="o">=</span> <span class="n">_fname_all</span>
-</span><span id="Load_PDB_SS-619"><a href="#Load_PDB_SS-619"><span class="linenos">619</span></a>
-</span><span id="Load_PDB_SS-620"><a href="#Load_PDB_SS-620"><span class="linenos">620</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-621"><a href="#Load_PDB_SS-621"><span class="linenos">621</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; load_PDB_SS(): Attempting to read </span><span class="si">{</span><span class="n">_fname</span><span class="si">}</span><span class="s1">... &#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-622"><a href="#Load_PDB_SS-622"><span class="linenos">622</span></a>    <span class="k">try</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-623"><a href="#Load_PDB_SS-623"><span class="linenos">623</span></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_fname</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-624"><a href="#Load_PDB_SS-624"><span class="linenos">624</span></a>            <span class="n">res</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-625"><a href="#Load_PDB_SS-625"><span class="linenos">625</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-626"><a href="#Load_PDB_SS-626"><span class="linenos">626</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;done.&#39;</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-627"><a href="#Load_PDB_SS-627"><span class="linenos">627</span></a>        <span class="k">return</span> <span class="n">res</span>
-</span><span id="Load_PDB_SS-628"><a href="#Load_PDB_SS-628"><span class="linenos">628</span></a>    <span class="k">except</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-629"><a href="#Load_PDB_SS-629"><span class="linenos">629</span></a>        <span class="c1"># no fully built loader available. See if we can</span>
-</span><span id="Load_PDB_SS-630"><a href="#Load_PDB_SS-630"><span class="linenos">630</span></a>        <span class="c1"># build it</span>
-</span><span id="Load_PDB_SS-631"><a href="#Load_PDB_SS-631"><span class="linenos">631</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">!!! Unable to download database! Load_PDB_SS() is attempting to rebuild the loader.&#39;</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-632"><a href="#Load_PDB_SS-632"><span class="linenos">632</span></a>    
-</span><span id="Load_PDB_SS-633"><a href="#Load_PDB_SS-633"><span class="linenos">633</span></a>        <span class="n">pdb</span> <span class="o">=</span> <span class="n">DisulfideLoader</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-634"><a href="#Load_PDB_SS-634"><span class="linenos">634</span></a>        <span class="k">if</span> <span class="n">pdb</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-635"><a href="#Load_PDB_SS-635"><span class="linenos">635</span></a>            <span class="n">mess</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;!!! FATAL: load_PDB_SS(): cannot rebuild primary SS file!&#39;</span>
-</span><span id="Load_PDB_SS-636"><a href="#Load_PDB_SS-636"><span class="linenos">636</span></a>            <span class="k">raise</span> <span class="n">DisulfideIOException</span><span class="p">(</span><span class="n">mess</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-637"><a href="#Load_PDB_SS-637"><span class="linenos">637</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-638"><a href="#Load_PDB_SS-638"><span class="linenos">638</span></a>            <span class="n">pdb</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">savepath</span><span class="o">=</span><span class="n">loadpath</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-639"><a href="#Load_PDB_SS-639"><span class="linenos">639</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; Load_PDB_SS(): rebuild complete.&#39;</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-640"><a href="#Load_PDB_SS-640"><span class="linenos">640</span></a>    
-</span><span id="Load_PDB_SS-641"><a href="#Load_PDB_SS-641"><span class="linenos">641</span></a>    <span class="k">return</span>
+</span><span id="Load_PDB_SS-615"><a href="#Load_PDB_SS-615"><span class="linenos">615</span></a>    
+</span><span id="Load_PDB_SS-616"><a href="#Load_PDB_SS-616"><span class="linenos">616</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-617"><a href="#Load_PDB_SS-617"><span class="linenos">617</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; load_PDB_SS(): Attempting to read local </span><span class="si">{</span><span class="n">_fname</span><span class="si">}</span><span class="s1">... &#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+</span><span id="Load_PDB_SS-618"><a href="#Load_PDB_SS-618"><span class="linenos">618</span></a>    <span class="c1">#try:</span>
+</span><span id="Load_PDB_SS-619"><a href="#Load_PDB_SS-619"><span class="linenos">619</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_fname</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-620"><a href="#Load_PDB_SS-620"><span class="linenos">620</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span><span id="Load_PDB_SS-621"><a href="#Load_PDB_SS-621"><span class="linenos">621</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-622"><a href="#Load_PDB_SS-622"><span class="linenos">622</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;done.&#39;</span><span class="p">)</span>
+</span><span id="Load_PDB_SS-623"><a href="#Load_PDB_SS-623"><span class="linenos">623</span></a>    <span class="k">return</span> <span class="n">res</span>
 </span></pre></div>
 
 
