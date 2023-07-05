@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 13.0.0"/>
+    <meta name="generator" content="pdoc 14.0.0"/>
     <title>proteusPy.residue API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
@@ -51,8 +51,8 @@
 
 
 
-        <h2>API Documentation</h2>
-            <ul class="memberlist">
+            <h2>API Documentation</h2>
+                <ul class="memberlist">
             <li>
                     <a class="function" href="#build_residue">build_residue</a>
             </li>
@@ -111,7 +111,7 @@
 </span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="kn">from</span> <span class="nn">proteusPy.turtle3D</span> <span class="kn">import</span> <span class="n">Turtle3D</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>
 </span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="k">def</span> <span class="nf">build_residue</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">):</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>    <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="sd">    build residue requires the turtle to be in orientation #2</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="sd">    (at Ca, headed to C, with N on left), and returns coordinates</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="sd">    for n, ca, cb, and c.</span>
@@ -137,7 +137,7 @@
 </span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>    <span class="k">return</span> <span class="n">n</span><span class="p">,</span> <span class="n">ca</span><span class="p">,</span> <span class="n">cb</span><span class="p">,</span> <span class="n">c</span>
 </span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>
 </span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="k">def</span> <span class="nf">get_backbone_from_chain</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">resnumb</span><span class="p">):</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>    <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="sd">    Retrieve the backbone atom positions (N, Ca, C, O) for the given chain and residue number.</span>
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="sd">    Arguments: </span>
@@ -159,7 +159,7 @@
 </span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>
 </span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>
 </span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="k">def</span> <span class="nf">to_alpha</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">,</span> <span class="n">phi</span><span class="p">):</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="sd">    Moves the Turtle3D from backbone nitrogen to alpha carbon.  Turtle </span>
 </span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a><span class="sd">    begins at nitrogen, headed towards alpha carbon, </span>
 </span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="sd">    with carbonyl carbon of previous residue on left side and ends in </span>
@@ -176,7 +176,7 @@
 </span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>    <span class="k">return</span><span class="p">(</span><span class="n">Vector</span><span class="p">(</span><span class="n">turtle</span><span class="o">.</span><span class="n">getPosition</span><span class="p">()))</span>
 </span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>
 </span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="k">def</span> <span class="nf">to_carbonyl</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="sd">    Moves turtle from alpha carbon to carbonyl carbon. Turtle begins in </span>
 </span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="sd">    orientation #2 (at alpha carbon, headed towards carbonyl carbon, with </span>
 </span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="sd">    nitrogen on left) and ends at carbonyl carbon, headed towards nitrogen of </span>
@@ -193,7 +193,7 @@
 </span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a>    <span class="k">return</span><span class="p">(</span><span class="n">Vector</span><span class="p">(</span><span class="n">turtle</span><span class="o">.</span><span class="n">getPosition</span><span class="p">()))</span>
 </span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a>
 </span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="k">def</span> <span class="nf">to_nitrogen</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">,</span> <span class="n">omega</span><span class="p">):</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">    Turtle begins at carbonyl carbon, headed towards nitrogen of </span>
 </span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="sd">    second residue, with alpha carbon of first residue on left side. </span>
 </span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="sd">    Turtle ends at nitrogen of second residue, headed towards alpha carbon </span>
@@ -211,7 +211,7 @@
 </span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>    <span class="k">return</span><span class="p">(</span><span class="n">Vector</span><span class="p">(</span><span class="n">turtle</span><span class="o">.</span><span class="n">getPosition</span><span class="p">()))</span>
 </span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>
 </span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="k">def</span> <span class="nf">add_oxygen</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">):</span>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>    <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="sd">    Returns the position of the carbonyl oxygen assuming the Turtle3D</span>
 </span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="sd">    begins at carbonyl carbon, headed towards nitrogen of </span>
 </span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="sd">    second residue, with alpha carbon of first residue on left side. </span>
@@ -225,7 +225,7 @@
 </span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>    <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="n">turtle</span><span class="o">.</span><span class="n">to_global</span><span class="p">(</span><span class="n">loc</span><span class="p">))</span>
 </span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>
 </span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a><span class="k">def</span> <span class="nf">to_oxygen</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">):</span>
-</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>    <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a><span class="sd">    Returns the position of the carbonyl oxygen assuming the Turtle3D</span>
 </span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a><span class="sd">    begins at carbonyl carbon, headed towards nitrogen of </span>
 </span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a><span class="sd">    second residue, with alpha carbon of first residue on left side. </span>
@@ -258,7 +258,7 @@
     </div>
     <a class="headerlink" href="#build_residue"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="build_residue-17"><a href="#build_residue-17"><span class="linenos">17</span></a><span class="k">def</span> <span class="nf">build_residue</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">):</span>
-</span><span id="build_residue-18"><a href="#build_residue-18"><span class="linenos">18</span></a>    <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="build_residue-18"><a href="#build_residue-18"><span class="linenos">18</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="build_residue-19"><a href="#build_residue-19"><span class="linenos">19</span></a><span class="sd">    build residue requires the turtle to be in orientation #2</span>
 </span><span id="build_residue-20"><a href="#build_residue-20"><span class="linenos">20</span></a><span class="sd">    (at Ca, headed to C, with N on left), and returns coordinates</span>
 </span><span id="build_residue-21"><a href="#build_residue-21"><span class="linenos">21</span></a><span class="sd">    for n, ca, cb, and c.</span>
@@ -307,7 +307,7 @@ Returns: <Vector> n, ca, cb, c</p>
     </div>
     <a class="headerlink" href="#get_backbone_from_chain"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="get_backbone_from_chain-43"><a href="#get_backbone_from_chain-43"><span class="linenos">43</span></a><span class="k">def</span> <span class="nf">get_backbone_from_chain</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">resnumb</span><span class="p">):</span>
-</span><span id="get_backbone_from_chain-44"><a href="#get_backbone_from_chain-44"><span class="linenos">44</span></a>    <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="get_backbone_from_chain-44"><a href="#get_backbone_from_chain-44"><span class="linenos">44</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="get_backbone_from_chain-45"><a href="#get_backbone_from_chain-45"><span class="linenos">45</span></a><span class="sd">    Retrieve the backbone atom positions (N, Ca, C, O) for the given chain and residue number.</span>
 </span><span id="get_backbone_from_chain-46"><a href="#get_backbone_from_chain-46"><span class="linenos">46</span></a>
 </span><span id="get_backbone_from_chain-47"><a href="#get_backbone_from_chain-47"><span class="linenos">47</span></a><span class="sd">    Arguments: </span>
@@ -351,7 +351,7 @@ Returns: <Vector> n, ca, c, o atomic coordinates</p>
     </div>
     <a class="headerlink" href="#to_alpha"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="to_alpha-65"><a href="#to_alpha-65"><span class="linenos">65</span></a><span class="k">def</span> <span class="nf">to_alpha</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">,</span> <span class="n">phi</span><span class="p">):</span>
-</span><span id="to_alpha-66"><a href="#to_alpha-66"><span class="linenos">66</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="to_alpha-66"><a href="#to_alpha-66"><span class="linenos">66</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="to_alpha-67"><a href="#to_alpha-67"><span class="linenos">67</span></a><span class="sd">    Moves the Turtle3D from backbone nitrogen to alpha carbon.  Turtle </span>
 </span><span id="to_alpha-68"><a href="#to_alpha-68"><span class="linenos">68</span></a><span class="sd">    begins at nitrogen, headed towards alpha carbon, </span>
 </span><span id="to_alpha-69"><a href="#to_alpha-69"><span class="linenos">69</span></a><span class="sd">    with carbonyl carbon of previous residue on left side and ends in </span>
@@ -394,7 +394,7 @@ Returns: Position of the modeled Ca. <Vector></p>
     </div>
     <a class="headerlink" href="#to_carbonyl"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="to_carbonyl-82"><a href="#to_carbonyl-82"><span class="linenos">82</span></a><span class="k">def</span> <span class="nf">to_carbonyl</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
-</span><span id="to_carbonyl-83"><a href="#to_carbonyl-83"><span class="linenos">83</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="to_carbonyl-83"><a href="#to_carbonyl-83"><span class="linenos">83</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="to_carbonyl-84"><a href="#to_carbonyl-84"><span class="linenos">84</span></a><span class="sd">    Moves turtle from alpha carbon to carbonyl carbon. Turtle begins in </span>
 </span><span id="to_carbonyl-85"><a href="#to_carbonyl-85"><span class="linenos">85</span></a><span class="sd">    orientation #2 (at alpha carbon, headed towards carbonyl carbon, with </span>
 </span><span id="to_carbonyl-86"><a href="#to_carbonyl-86"><span class="linenos">86</span></a><span class="sd">    nitrogen on left) and ends at carbonyl carbon, headed towards nitrogen of </span>
@@ -436,7 +436,7 @@ Returns: Position of the modeled C atom. <Vector></p>
     </div>
     <a class="headerlink" href="#to_nitrogen"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="to_nitrogen-99"><a href="#to_nitrogen-99"><span class="linenos"> 99</span></a><span class="k">def</span> <span class="nf">to_nitrogen</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">,</span> <span class="n">omega</span><span class="p">):</span>
-</span><span id="to_nitrogen-100"><a href="#to_nitrogen-100"><span class="linenos">100</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="to_nitrogen-100"><a href="#to_nitrogen-100"><span class="linenos">100</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="to_nitrogen-101"><a href="#to_nitrogen-101"><span class="linenos">101</span></a><span class="sd">    Turtle begins at carbonyl carbon, headed towards nitrogen of </span>
 </span><span id="to_nitrogen-102"><a href="#to_nitrogen-102"><span class="linenos">102</span></a><span class="sd">    second residue, with alpha carbon of first residue on left side. </span>
 </span><span id="to_nitrogen-103"><a href="#to_nitrogen-103"><span class="linenos">103</span></a><span class="sd">    Turtle ends at nitrogen of second residue, headed towards alpha carbon </span>
@@ -480,7 +480,7 @@ Returns: Position of the modeled C atom. <Vector></p>
     </div>
     <a class="headerlink" href="#add_oxygen"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="add_oxygen-117"><a href="#add_oxygen-117"><span class="linenos">117</span></a><span class="k">def</span> <span class="nf">add_oxygen</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">):</span>
-</span><span id="add_oxygen-118"><a href="#add_oxygen-118"><span class="linenos">118</span></a>    <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="add_oxygen-118"><a href="#add_oxygen-118"><span class="linenos">118</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="add_oxygen-119"><a href="#add_oxygen-119"><span class="linenos">119</span></a><span class="sd">    Returns the position of the carbonyl oxygen assuming the Turtle3D</span>
 </span><span id="add_oxygen-120"><a href="#add_oxygen-120"><span class="linenos">120</span></a><span class="sd">    begins at carbonyl carbon, headed towards nitrogen of </span>
 </span><span id="add_oxygen-121"><a href="#add_oxygen-121"><span class="linenos">121</span></a><span class="sd">    second residue, with alpha carbon of first residue on left side. </span>
@@ -518,7 +518,7 @@ second residue, with alpha carbon of first residue on left side. </p>
     </div>
     <a class="headerlink" href="#to_oxygen"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="to_oxygen-131"><a href="#to_oxygen-131"><span class="linenos">131</span></a><span class="k">def</span> <span class="nf">to_oxygen</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">):</span>
-</span><span id="to_oxygen-132"><a href="#to_oxygen-132"><span class="linenos">132</span></a>    <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="to_oxygen-132"><a href="#to_oxygen-132"><span class="linenos">132</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="to_oxygen-133"><a href="#to_oxygen-133"><span class="linenos">133</span></a><span class="sd">    Returns the position of the carbonyl oxygen assuming the Turtle3D</span>
 </span><span id="to_oxygen-134"><a href="#to_oxygen-134"><span class="linenos">134</span></a><span class="sd">    begins at carbonyl carbon, headed towards nitrogen of </span>
 </span><span id="to_oxygen-135"><a href="#to_oxygen-135"><span class="linenos">135</span></a><span class="sd">    second residue, with alpha carbon of first residue on left side. </span>

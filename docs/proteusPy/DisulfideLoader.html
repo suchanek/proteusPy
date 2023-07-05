@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 13.0.0"/>
+    <meta name="generator" content="pdoc 14.0.0"/>
     <title>proteusPy.DisulfideLoader API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
@@ -51,13 +51,61 @@
 
 
 
-        <h2>API Documentation</h2>
-            <ul class="memberlist">
+            <h2>API Documentation</h2>
+                <ul class="memberlist">
             <li>
                     <a class="class" href="#DisulfideLoader">DisulfideLoader</a>
                             <ul class="memberlist">
                         <li>
                                 <a class="function" href="#DisulfideLoader.__init__">DisulfideLoader</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideLoader.ModelDir">ModelDir</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideLoader.PickleFile">PickleFile</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideLoader.PickleDictFile">PickleDictFile</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideLoader.PickleClassFile">PickleClassFile</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideLoader.TorsionFile">TorsionFile</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideLoader.SSList">SSList</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideLoader.SSDict">SSDict</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideLoader.TorsionDF">TorsionDF</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideLoader.TotalDisulfides">TotalDisulfides</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideLoader.IDList">IDList</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideLoader.QUIET">QUIET</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideLoader.tclass">tclass</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideLoader.cutoff">cutoff</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideLoader.verbose">verbose</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideLoader.timestamp">timestamp</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideLoader.version">version</a>
                         </li>
                         <li>
                                 <a class="variable" href="#DisulfideLoader.Average_Resolution">Average_Resolution</a>
@@ -103,6 +151,9 @@
                         </li>
                 </ul>
 
+            </li>
+            <li>
+                    <a class="function" href="#Download_PDB_SS">Download_PDB_SS</a>
             </li>
             <li>
                     <a class="function" href="#Load_PDB_SS">Load_PDB_SS</a>
@@ -186,7 +237,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="c1"># Now use tqdm as normal, depending on your environment</span>
 </span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a><span class="k">class</span> <span class="nc">DisulfideLoader</span><span class="p">:</span>
-</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>    <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="sd">    This class represents the disulfide database itself and is its primary means of accession. </span>
 </span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="sd">    The entirety of the RCSB disulfide database is stored within the class via a</span>
 </span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="sd">    proteusPy.DisulfideList.DisulfideList, a ```Pandas``` .csv file, and a ```dict``` of</span>
@@ -241,7 +292,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>                <span class="n">torsion_file</span><span class="o">=</span><span class="n">SS_TORSIONS_FILE</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
 </span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>                <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>                <span class="n">cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">):</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="sd">        Initializing the class initiates loading either the entire Disulfide dataset,</span>
 </span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="sd">        or the &#39;subset&#39;, which consists of the first 1000 PDB structures. The subset</span>
 </span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a><span class="sd">        is useful for testing and debugging since it doesn&#39;t require nearly as much</span>
@@ -333,7 +384,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-196"><a href="#L-196"><span class="linenos">196</span></a>        
 </span><span id="L-197"><a href="#L-197"><span class="linenos">197</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
 </span><span id="L-198"><a href="#L-198"><span class="linenos">198</span></a>            <span class="k">if</span> <span class="p">(</span><span class="n">item</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">item</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TotalDisulfides</span><span class="p">):</span>
-</span><span id="L-199"><a href="#L-199"><span class="linenos">199</span></a>                <span class="n">mess</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;DisulfideLoader(): Index </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s1"> out of range 0-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">TotalDisulfides</span> <span class="o">-</span> <span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span>
+</span><span id="L-199"><a href="#L-199"><span class="linenos">199</span></a>                <span class="n">mess</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;DisulfideLoader(): Index </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s1"> out of range 0-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">TotalDisulfides</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span>
 </span><span id="L-200"><a href="#L-200"><span class="linenos">200</span></a>                <span class="k">raise</span> <span class="n">DisulfideException</span><span class="p">(</span><span class="n">mess</span><span class="p">)</span>
 </span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a>            <span class="k">else</span><span class="p">:</span>
 </span><span id="L-202"><a href="#L-202"><span class="linenos">202</span></a>                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">SSList</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
@@ -365,7 +416,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-228"><a href="#L-228"><span class="linenos">228</span></a>    
 </span><span id="L-229"><a href="#L-229"><span class="linenos">229</span></a>    <span class="nd">@property</span>
 </span><span id="L-230"><a href="#L-230"><span class="linenos">230</span></a>    <span class="k">def</span> <span class="nf">Average_Resolution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-231"><a href="#L-231"><span class="linenos">231</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-232"><a href="#L-232"><span class="linenos">232</span></a><span class="sd">        Compute and return the average structure resolution for the given list.</span>
 </span><span id="L-233"><a href="#L-233"><span class="linenos">233</span></a>
 </span><span id="L-234"><a href="#L-234"><span class="linenos">234</span></a><span class="sd">        :return: Average resolution (A)</span>
@@ -382,7 +433,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-245"><a href="#L-245"><span class="linenos">245</span></a>        <span class="k">return</span> <span class="n">res</span> <span class="o">/</span> <span class="n">cnt</span>
 </span><span id="L-246"><a href="#L-246"><span class="linenos">246</span></a>    
 </span><span id="L-247"><a href="#L-247"><span class="linenos">247</span></a>    <span class="k">def</span> <span class="nf">build_ss_from_idlist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idlist</span><span class="p">):</span>
-</span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-248"><a href="#L-248"><span class="linenos">248</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-249"><a href="#L-249"><span class="linenos">249</span></a><span class="sd">        Given a list of PDBid, return a DisulfideList of Disulfides</span>
 </span><span id="L-250"><a href="#L-250"><span class="linenos">250</span></a>
 </span><span id="L-251"><a href="#L-251"><span class="linenos">251</span></a><span class="sd">        :param idlist: List of PDBIDs, e.g. [&#39;4yys&#39;, &#39;2q7q&#39;]</span>
@@ -398,7 +449,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-261"><a href="#L-261"><span class="linenos">261</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-262"><a href="#L-262"><span class="linenos">262</span></a>    
 </span><span id="L-263"><a href="#L-263"><span class="linenos">263</span></a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-264"><a href="#L-264"><span class="linenos">264</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-265"><a href="#L-265"><span class="linenos">265</span></a><span class="sd">        Return a copy of self.</span>
 </span><span id="L-266"><a href="#L-266"><span class="linenos">266</span></a>
 </span><span id="L-267"><a href="#L-267"><span class="linenos">267</span></a><span class="sd">        :return: Copy of self</span>
@@ -406,7 +457,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-269"><a href="#L-269"><span class="linenos">269</span></a>        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </span><span id="L-270"><a href="#L-270"><span class="linenos">270</span></a>
 </span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a>    <span class="k">def</span> <span class="nf">extract_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clsid</span><span class="p">):</span>
-</span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a><span class="sd">        Return the list of disulfides corresponding to the input `clsid`.</span>
 </span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a><span class="sd">    </span>
 </span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a><span class="sd">        :param clsid: The class name to extract.</span>
@@ -433,7 +484,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-296"><a href="#L-296"><span class="linenos">296</span></a>        <span class="k">return</span> <span class="n">class_disulfides</span>
 </span><span id="L-297"><a href="#L-297"><span class="linenos">297</span></a>    
 </span><span id="L-298"><a href="#L-298"><span class="linenos">298</span></a>    <span class="k">def</span> <span class="nf">getlist</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DisulfideList</span><span class="p">:</span>
-</span><span id="L-299"><a href="#L-299"><span class="linenos">299</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-299"><a href="#L-299"><span class="linenos">299</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-300"><a href="#L-300"><span class="linenos">300</span></a><span class="sd">        Return the list of Disulfides contained in the class.</span>
 </span><span id="L-301"><a href="#L-301"><span class="linenos">301</span></a>
 </span><span id="L-302"><a href="#L-302"><span class="linenos">302</span></a><span class="sd">        :return: DisulfideList</span>
@@ -442,7 +493,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-305"><a href="#L-305"><span class="linenos">305</span></a>        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SSList</span><span class="p">)</span>
 </span><span id="L-306"><a href="#L-306"><span class="linenos">306</span></a>    
 </span><span id="L-307"><a href="#L-307"><span class="linenos">307</span></a>    <span class="k">def</span> <span class="nf">get_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Disulfide</span><span class="p">:</span>
-</span><span id="L-308"><a href="#L-308"><span class="linenos">308</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-308"><a href="#L-308"><span class="linenos">308</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-309"><a href="#L-309"><span class="linenos">309</span></a><span class="sd">        Returns the Disulfide with the given name from the list.</span>
 </span><span id="L-310"><a href="#L-310"><span class="linenos">310</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="L-311"><a href="#L-311"><span class="linenos">311</span></a>        <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SSList</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
@@ -450,7 +501,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-313"><a href="#L-313"><span class="linenos">313</span></a>                <span class="k">return</span> <span class="n">ss</span>  <span class="c1"># or ss.copy() !!!</span>
 </span><span id="L-314"><a href="#L-314"><span class="linenos">314</span></a>        <span class="k">return</span> <span class="kc">None</span>
 </span><span id="L-315"><a href="#L-315"><span class="linenos">315</span></a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-316"><a href="#L-316"><span class="linenos">316</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-316"><a href="#L-316"><span class="linenos">316</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-317"><a href="#L-317"><span class="linenos">317</span></a><span class="sd">        Provides information about the Disulfide database contained in ```self```.</span>
 </span><span id="L-318"><a href="#L-318"><span class="linenos">318</span></a>
 </span><span id="L-319"><a href="#L-319"><span class="linenos">319</span></a><span class="sd">        Example:</span>
@@ -487,7 +538,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-350"><a href="#L-350"><span class="linenos">350</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    ================= proteusPy: </span><span class="si">{</span><span class="n">vers</span><span class="si">}</span><span class="s1"> =======================&#39;</span><span class="p">)</span>
 </span><span id="L-351"><a href="#L-351"><span class="linenos">351</span></a>       
 </span><span id="L-352"><a href="#L-352"><span class="linenos">352</span></a>    <span class="k">def</span> <span class="nf">display_overlay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdbid</span><span class="p">):</span>
-</span><span id="L-353"><a href="#L-353"><span class="linenos">353</span></a>        <span class="sd">&#39;&#39;&#39; </span>
+</span><span id="L-353"><a href="#L-353"><span class="linenos">353</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39; </span>
 </span><span id="L-354"><a href="#L-354"><span class="linenos">354</span></a><span class="sd">        Display all disulfides for a given PDB ID overlaid in stick mode against</span>
 </span><span id="L-355"><a href="#L-355"><span class="linenos">355</span></a><span class="sd">        a common coordinate frame. This allows us to see all of the disulfides</span>
 </span><span id="L-356"><a href="#L-356"><span class="linenos">356</span></a><span class="sd">        at one time in a single view. Colors vary smoothy between bonds.</span>
@@ -521,7 +572,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-384"><a href="#L-384"><span class="linenos">384</span></a>    
 </span><span id="L-385"><a href="#L-385"><span class="linenos">385</span></a>    
 </span><span id="L-386"><a href="#L-386"><span class="linenos">386</span></a>    <span class="k">def</span> <span class="nf">getTorsions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdbID</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-</span><span id="L-387"><a href="#L-387"><span class="linenos">387</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-387"><a href="#L-387"><span class="linenos">387</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-388"><a href="#L-388"><span class="linenos">388</span></a><span class="sd">        Return the torsions, distances and energies defined by Disulfide.Torsion_DF_cols</span>
 </span><span id="L-389"><a href="#L-389"><span class="linenos">389</span></a>
 </span><span id="L-390"><a href="#L-390"><span class="linenos">390</span></a><span class="sd">        :param pdbID: pdbID, defaults to None, meaning return entire dataset.</span>
@@ -568,7 +619,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-431"><a href="#L-431"><span class="linenos">431</span></a>
 </span><span id="L-432"><a href="#L-432"><span class="linenos">432</span></a>    <span class="nd">@property</span>
 </span><span id="L-433"><a href="#L-433"><span class="linenos">433</span></a>    <span class="k">def</span> <span class="nf">quiet</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-434"><a href="#L-434"><span class="linenos">434</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-434"><a href="#L-434"><span class="linenos">434</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-435"><a href="#L-435"><span class="linenos">435</span></a><span class="sd">        The loader quiet state</span>
 </span><span id="L-436"><a href="#L-436"><span class="linenos">436</span></a>
 </span><span id="L-437"><a href="#L-437"><span class="linenos">437</span></a><span class="sd">        :return: quiet parameter</span>
@@ -578,7 +629,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-441"><a href="#L-441"><span class="linenos">441</span></a>
 </span><span id="L-442"><a href="#L-442"><span class="linenos">442</span></a>    <span class="nd">@quiet</span><span class="o">.</span><span class="n">setter</span>
 </span><span id="L-443"><a href="#L-443"><span class="linenos">443</span></a>    <span class="k">def</span> <span class="nf">quiet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">perm</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-444"><a href="#L-444"><span class="linenos">444</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-444"><a href="#L-444"><span class="linenos">444</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-445"><a href="#L-445"><span class="linenos">445</span></a><span class="sd">        Sets the quiet attribute for the loader. This silences many of the BIO.PDB warnings.</span>
 </span><span id="L-446"><a href="#L-446"><span class="linenos">446</span></a>
 </span><span id="L-447"><a href="#L-447"><span class="linenos">447</span></a><span class="sd">        :param perm: True or False</span>
@@ -587,7 +638,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-450"><a href="#L-450"><span class="linenos">450</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">QUIET</span> <span class="o">=</span> <span class="n">perm</span>
 </span><span id="L-451"><a href="#L-451"><span class="linenos">451</span></a>    
 </span><span id="L-452"><a href="#L-452"><span class="linenos">452</span></a>    <span class="k">def</span> <span class="nf">plot_classes_vs_cutoff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">steps</span><span class="p">):</span>
-</span><span id="L-453"><a href="#L-453"><span class="linenos">453</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-453"><a href="#L-453"><span class="linenos">453</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-454"><a href="#L-454"><span class="linenos">454</span></a><span class="sd">        Plot the total percentage and number of members for each class against the cutoff value.</span>
 </span><span id="L-455"><a href="#L-455"><span class="linenos">455</span></a><span class="sd">        </span>
 </span><span id="L-456"><a href="#L-456"><span class="linenos">456</span></a><span class="sd">        :param cutoff: Percent cutoff value for filtering the classes.</span>
@@ -617,7 +668,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-480"><a href="#L-480"><span class="linenos">480</span></a>        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </span><span id="L-481"><a href="#L-481"><span class="linenos">481</span></a>
 </span><span id="L-482"><a href="#L-482"><span class="linenos">482</span></a>    <span class="k">def</span> <span class="nf">plot_binary_to_sixclass_incidence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">savedir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
-</span><span id="L-483"><a href="#L-483"><span class="linenos">483</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-483"><a href="#L-483"><span class="linenos">483</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-484"><a href="#L-484"><span class="linenos">484</span></a><span class="sd">        Plot the incidence of all sextant Disulfide classes for a given binary class.</span>
 </span><span id="L-485"><a href="#L-485"><span class="linenos">485</span></a>
 </span><span id="L-486"><a href="#L-486"><span class="linenos">486</span></a><span class="sd">        :param loader: `proteusPy.DisulfideLoader` object</span>
@@ -651,7 +702,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-514"><a href="#L-514"><span class="linenos">514</span></a>        <span class="k">return</span>
 </span><span id="L-515"><a href="#L-515"><span class="linenos">515</span></a>
 </span><span id="L-516"><a href="#L-516"><span class="linenos">516</span></a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">savepath</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">):</span>
-</span><span id="L-517"><a href="#L-517"><span class="linenos">517</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-517"><a href="#L-517"><span class="linenos">517</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-518"><a href="#L-518"><span class="linenos">518</span></a><span class="sd">        Save a copy of the fully instantiated Loader to the specified file.</span>
 </span><span id="L-519"><a href="#L-519"><span class="linenos">519</span></a>
 </span><span id="L-520"><a href="#L-520"><span class="linenos">520</span></a><span class="sd">        :param savepath: Path to save the file, defaults to DATA_DIR</span>
@@ -680,85 +731,93 @@ Last revision: 7/2/2023</p>
 </span><span id="L-543"><a href="#L-543"><span class="linenos">543</span></a>   
 </span><span id="L-544"><a href="#L-544"><span class="linenos">544</span></a><span class="c1"># class ends</span>
 </span><span id="L-545"><a href="#L-545"><span class="linenos">545</span></a>
-</span><span id="L-546"><a href="#L-546"><span class="linenos">546</span></a><span class="k">def</span> <span class="nf">Load_PDB_SS</span><span class="p">(</span><span class="n">loadpath</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DisulfideLoader</span><span class="p">:</span>
-</span><span id="L-547"><a href="#L-547"><span class="linenos">547</span></a>    <span class="sd">&#39;&#39;&#39;</span>
-</span><span id="L-548"><a href="#L-548"><span class="linenos">548</span></a><span class="sd">    Load the fully instantiated Disulfide database from the specified file. Use the</span>
-</span><span id="L-549"><a href="#L-549"><span class="linenos">549</span></a><span class="sd">    defaults unless you are building the database by hand. *This is the function</span>
-</span><span id="L-550"><a href="#L-550"><span class="linenos">550</span></a><span class="sd">    used to load the built database.*</span>
-</span><span id="L-551"><a href="#L-551"><span class="linenos">551</span></a>
-</span><span id="L-552"><a href="#L-552"><span class="linenos">552</span></a><span class="sd">    :param loadpath: Path from which to load, defaults to DATA_DIR</span>
-</span><span id="L-553"><a href="#L-553"><span class="linenos">553</span></a><span class="sd">    :param verbose: Verbosity, defaults to False</span>
-</span><span id="L-554"><a href="#L-554"><span class="linenos">554</span></a><span class="sd">    :param subset: If True, load the subset DB, otherwise load the full database</span>
-</span><span id="L-555"><a href="#L-555"><span class="linenos">555</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-556"><a href="#L-556"><span class="linenos">556</span></a>    <span class="c1"># normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy </span>
-</span><span id="L-557"><a href="#L-557"><span class="linenos">557</span></a>    <span class="c1"># distribution. In that case we need to download the files for all disulfides and the subset</span>
-</span><span id="L-558"><a href="#L-558"><span class="linenos">558</span></a>    <span class="c1"># from the Google Drive storage.</span>
-</span><span id="L-559"><a href="#L-559"><span class="linenos">559</span></a>    
-</span><span id="L-560"><a href="#L-560"><span class="linenos">560</span></a>    <span class="kn">import</span> <span class="nn">gdown</span>
+</span><span id="L-546"><a href="#L-546"><span class="linenos">546</span></a><span class="k">def</span> <span class="nf">Download_PDB_SS</span><span class="p">(</span><span class="n">loadpath</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+</span><span id="L-547"><a href="#L-547"><span class="linenos">547</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-548"><a href="#L-548"><span class="linenos">548</span></a><span class="sd">    Download the databases from Google Drive.</span>
+</span><span id="L-549"><a href="#L-549"><span class="linenos">549</span></a>
+</span><span id="L-550"><a href="#L-550"><span class="linenos">550</span></a><span class="sd">    :param loadpath: Path from which to load, defaults to DATA_DIR</span>
+</span><span id="L-551"><a href="#L-551"><span class="linenos">551</span></a><span class="sd">    :param verbose: Verbosity, defaults to False</span>
+</span><span id="L-552"><a href="#L-552"><span class="linenos">552</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-553"><a href="#L-553"><span class="linenos">553</span></a>    <span class="c1"># normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy </span>
+</span><span id="L-554"><a href="#L-554"><span class="linenos">554</span></a>    <span class="c1"># distribution. In that case we need to download the files for all disulfides and the subset</span>
+</span><span id="L-555"><a href="#L-555"><span class="linenos">555</span></a>    <span class="c1"># from the Google Drive storage.</span>
+</span><span id="L-556"><a href="#L-556"><span class="linenos">556</span></a>    
+</span><span id="L-557"><a href="#L-557"><span class="linenos">557</span></a>    <span class="kn">import</span> <span class="nn">gdown</span>
+</span><span id="L-558"><a href="#L-558"><span class="linenos">558</span></a>    
+</span><span id="L-559"><a href="#L-559"><span class="linenos">559</span></a>    <span class="n">_good1</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># all data</span>
+</span><span id="L-560"><a href="#L-560"><span class="linenos">560</span></a>    <span class="n">_good2</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># subset data</span>
 </span><span id="L-561"><a href="#L-561"><span class="linenos">561</span></a>    
-</span><span id="L-562"><a href="#L-562"><span class="linenos">562</span></a>    <span class="n">_good1</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># all data</span>
-</span><span id="L-563"><a href="#L-563"><span class="linenos">563</span></a>    <span class="n">_good2</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># subset data</span>
+</span><span id="L-562"><a href="#L-562"><span class="linenos">562</span></a>    <span class="n">_fname_sub</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">loadpath</span><span class="si">}{</span><span class="n">LOADER_SUBSET_FNAME</span><span class="si">}</span><span class="s1">&#39;</span>
+</span><span id="L-563"><a href="#L-563"><span class="linenos">563</span></a>    <span class="n">_fname_all</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">loadpath</span><span class="si">}{</span><span class="n">LOADER_FNAME</span><span class="si">}</span><span class="s1">&#39;</span>
 </span><span id="L-564"><a href="#L-564"><span class="linenos">564</span></a>    
-</span><span id="L-565"><a href="#L-565"><span class="linenos">565</span></a>    <span class="n">_fname_sub</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">loadpath</span><span class="si">}{</span><span class="n">LOADER_SUBSET_FNAME</span><span class="si">}</span><span class="s1">&#39;</span>
-</span><span id="L-566"><a href="#L-566"><span class="linenos">566</span></a>    <span class="n">_fname_all</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">loadpath</span><span class="si">}{</span><span class="n">LOADER_FNAME</span><span class="si">}</span><span class="s1">&#39;</span>
-</span><span id="L-567"><a href="#L-567"><span class="linenos">567</span></a>    
-</span><span id="L-568"><a href="#L-568"><span class="linenos">568</span></a>    <span class="k">if</span> <span class="n">subset</span><span class="p">:</span>
-</span><span id="L-569"><a href="#L-569"><span class="linenos">569</span></a>        <span class="n">_fname</span> <span class="o">=</span> <span class="n">_fname_sub</span>
-</span><span id="L-570"><a href="#L-570"><span class="linenos">570</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-571"><a href="#L-571"><span class="linenos">571</span></a>        <span class="n">_fname</span> <span class="o">=</span> <span class="n">_fname_all</span>
-</span><span id="L-572"><a href="#L-572"><span class="linenos">572</span></a>    
-</span><span id="L-573"><a href="#L-573"><span class="linenos">573</span></a>    <span class="c1"># first attempt to read the local copy of the loader</span>
-</span><span id="L-574"><a href="#L-574"><span class="linenos">574</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-575"><a href="#L-575"><span class="linenos">575</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; load_PDB_SS(): Reading </span><span class="si">{</span><span class="n">_fname</span><span class="si">}</span><span class="s1">... &#39;</span><span class="p">)</span>
+</span><span id="L-565"><a href="#L-565"><span class="linenos">565</span></a>    
+</span><span id="L-566"><a href="#L-566"><span class="linenos">566</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="L-567"><a href="#L-567"><span class="linenos">567</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; Download_PDB_SS(): Reading disulfides from Google Drive... &#39;</span><span class="p">)</span>
+</span><span id="L-568"><a href="#L-568"><span class="linenos">568</span></a>    
+</span><span id="L-569"><a href="#L-569"><span class="linenos">569</span></a>    <span class="k">if</span> <span class="n">gdown</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">LOADER_SUBSET_URL</span><span class="p">,</span> <span class="n">_fname_sub</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-570"><a href="#L-570"><span class="linenos">570</span></a>        <span class="n">_good2</span> <span class="o">=</span> <span class="mi">2</span>
+</span><span id="L-571"><a href="#L-571"><span class="linenos">571</span></a>
+</span><span id="L-572"><a href="#L-572"><span class="linenos">572</span></a>    <span class="k">if</span> <span class="n">gdown</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">LOADER_ALL_URL</span><span class="p">,</span> <span class="n">_fname_all</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-573"><a href="#L-573"><span class="linenos">573</span></a>        <span class="n">_good1</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span id="L-574"><a href="#L-574"><span class="linenos">574</span></a>
+</span><span id="L-575"><a href="#L-575"><span class="linenos">575</span></a>    <span class="k">return</span> <span class="n">_good1</span> <span class="o">+</span> <span class="n">_good2</span>
 </span><span id="L-576"><a href="#L-576"><span class="linenos">576</span></a>
-</span><span id="L-577"><a href="#L-577"><span class="linenos">577</span></a>    <span class="k">try</span><span class="p">:</span>
-</span><span id="L-578"><a href="#L-578"><span class="linenos">578</span></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_fname</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="L-579"><a href="#L-579"><span class="linenos">579</span></a>            <span class="n">res</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-</span><span id="L-580"><a href="#L-580"><span class="linenos">580</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-581"><a href="#L-581"><span class="linenos">581</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; load_PDB_SS(): Done reading </span><span class="si">{</span><span class="n">_fname</span><span class="si">}</span><span class="s1">... &#39;</span><span class="p">)</span>
-</span><span id="L-582"><a href="#L-582"><span class="linenos">582</span></a>        <span class="k">return</span> <span class="n">res</span>
-</span><span id="L-583"><a href="#L-583"><span class="linenos">583</span></a>    
-</span><span id="L-584"><a href="#L-584"><span class="linenos">584</span></a>    <span class="c1"># we don&#39;t have it locally, so download both from google drive</span>
-</span><span id="L-585"><a href="#L-585"><span class="linenos">585</span></a>    <span class="k">except</span><span class="p">:</span>
-</span><span id="L-586"><a href="#L-586"><span class="linenos">586</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-587"><a href="#L-587"><span class="linenos">587</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; DisulfideLoader(): Reading disulfides from Google Drive... &#39;</span><span class="p">)</span>
-</span><span id="L-588"><a href="#L-588"><span class="linenos">588</span></a>        
-</span><span id="L-589"><a href="#L-589"><span class="linenos">589</span></a>            <span class="n">gdown</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">LOADER_SUBSET_URL</span><span class="p">,</span> <span class="n">_fname_sub</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</span><span id="L-590"><a href="#L-590"><span class="linenos">590</span></a>            <span class="n">gdown</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">LOADER_ALL_URL</span><span class="p">,</span> <span class="n">_fname_all</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</span><span id="L-591"><a href="#L-591"><span class="linenos">591</span></a>    <span class="sd">&#39;&#39;&#39;</span>
-</span><span id="L-592"><a href="#L-592"><span class="linenos">592</span></a><span class="sd">        #PDB_SS_ALL_LOADER.pkl</span>
-</span><span id="L-593"><a href="#L-593"><span class="linenos">593</span></a><span class="sd">        if verbose:</span>
-</span><span id="L-594"><a href="#L-594"><span class="linenos">594</span></a><span class="sd">            print(f&#39;-&gt; DisulfideLoader(): Downloading the RCSB Disulfide Database from Google Drive to {_fname}... &#39;)</span>
-</span><span id="L-595"><a href="#L-595"><span class="linenos">595</span></a><span class="sd">        </span>
-</span><span id="L-596"><a href="#L-596"><span class="linenos">596</span></a><span class="sd">        if gdown.download(LOADER_ALL_URL, _fname_all) is not None:</span>
-</span><span id="L-597"><a href="#L-597"><span class="linenos">597</span></a><span class="sd">            _good1 = True</span>
-</span><span id="L-598"><a href="#L-598"><span class="linenos">598</span></a><span class="sd">            if verbose:</span>
-</span><span id="L-599"><a href="#L-599"><span class="linenos">599</span></a><span class="sd">                print(f&#39; done.&#39;)</span>
-</span><span id="L-600"><a href="#L-600"><span class="linenos">600</span></a><span class="sd">        else:</span>
-</span><span id="L-601"><a href="#L-601"><span class="linenos">601</span></a><span class="sd">            print(&#39;\nError downloading RCSB database!&#39;)</span>
-</span><span id="L-602"><a href="#L-602"><span class="linenos">602</span></a>
-</span><span id="L-603"><a href="#L-603"><span class="linenos">603</span></a><span class="sd">        #PDB_ss_subset.pkl</span>
-</span><span id="L-604"><a href="#L-604"><span class="linenos">604</span></a><span class="sd">        if verbose:</span>
-</span><span id="L-605"><a href="#L-605"><span class="linenos">605</span></a><span class="sd">            print(f&#39;-&gt; DisulfideLoader(): Downloading disulfide subset database from Google Drive to {_fname}... &#39;, end=&#39;&#39;)</span>
-</span><span id="L-606"><a href="#L-606"><span class="linenos">606</span></a><span class="sd">        </span>
-</span><span id="L-607"><a href="#L-607"><span class="linenos">607</span></a><span class="sd">        if gdown.download(LOADER_SUBSET_URL, _fname_sub) is not None:</span>
-</span><span id="L-608"><a href="#L-608"><span class="linenos">608</span></a><span class="sd">            _good2 = True</span>
-</span><span id="L-609"><a href="#L-609"><span class="linenos">609</span></a><span class="sd">            if verbose:</span>
-</span><span id="L-610"><a href="#L-610"><span class="linenos">610</span></a><span class="sd">                print(f&#39; done.&#39;)</span>
-</span><span id="L-611"><a href="#L-611"><span class="linenos">611</span></a><span class="sd">        else:</span>
-</span><span id="L-612"><a href="#L-612"><span class="linenos">612</span></a><span class="sd">            print(&#39;Error downloading RCSB subset database!&#39;)</span>
-</span><span id="L-613"><a href="#L-613"><span class="linenos">613</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-614"><a href="#L-614"><span class="linenos">614</span></a>    
-</span><span id="L-615"><a href="#L-615"><span class="linenos">615</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-616"><a href="#L-616"><span class="linenos">616</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; load_PDB_SS(): Attempting to read local </span><span class="si">{</span><span class="n">_fname</span><span class="si">}</span><span class="s1">... &#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-</span><span id="L-617"><a href="#L-617"><span class="linenos">617</span></a>    <span class="c1">#try:</span>
-</span><span id="L-618"><a href="#L-618"><span class="linenos">618</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_fname</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="L-619"><a href="#L-619"><span class="linenos">619</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-</span><span id="L-620"><a href="#L-620"><span class="linenos">620</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-621"><a href="#L-621"><span class="linenos">621</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;done.&#39;</span><span class="p">)</span>
-</span><span id="L-622"><a href="#L-622"><span class="linenos">622</span></a>    <span class="k">return</span> <span class="n">res</span>
-</span><span id="L-623"><a href="#L-623"><span class="linenos">623</span></a>
-</span><span id="L-624"><a href="#L-624"><span class="linenos">624</span></a><span class="c1"># End of file</span>
+</span><span id="L-577"><a href="#L-577"><span class="linenos">577</span></a>
+</span><span id="L-578"><a href="#L-578"><span class="linenos">578</span></a><span class="k">def</span> <span class="nf">Load_PDB_SS</span><span class="p">(</span><span class="n">loadpath</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DisulfideLoader</span><span class="p">:</span>
+</span><span id="L-579"><a href="#L-579"><span class="linenos">579</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-580"><a href="#L-580"><span class="linenos">580</span></a><span class="sd">    Load the fully instantiated Disulfide database from the specified file. Use the</span>
+</span><span id="L-581"><a href="#L-581"><span class="linenos">581</span></a><span class="sd">    defaults unless you are building the database by hand. *This is the function</span>
+</span><span id="L-582"><a href="#L-582"><span class="linenos">582</span></a><span class="sd">    used to load the built database.*</span>
+</span><span id="L-583"><a href="#L-583"><span class="linenos">583</span></a>
+</span><span id="L-584"><a href="#L-584"><span class="linenos">584</span></a><span class="sd">    :param loadpath: Path from which to load, defaults to DATA_DIR</span>
+</span><span id="L-585"><a href="#L-585"><span class="linenos">585</span></a><span class="sd">    :param verbose: Verbosity, defaults to False</span>
+</span><span id="L-586"><a href="#L-586"><span class="linenos">586</span></a><span class="sd">    :param subset: If True, load the subset DB, otherwise load the full database</span>
+</span><span id="L-587"><a href="#L-587"><span class="linenos">587</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-588"><a href="#L-588"><span class="linenos">588</span></a>    <span class="c1"># normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy </span>
+</span><span id="L-589"><a href="#L-589"><span class="linenos">589</span></a>    <span class="c1"># distribution. In that case we need to download the files for all disulfides and the subset</span>
+</span><span id="L-590"><a href="#L-590"><span class="linenos">590</span></a>    <span class="c1"># from the Google Drive storage.</span>
+</span><span id="L-591"><a href="#L-591"><span class="linenos">591</span></a>    
+</span><span id="L-592"><a href="#L-592"><span class="linenos">592</span></a>    <span class="kn">import</span> <span class="nn">gdown</span>
+</span><span id="L-593"><a href="#L-593"><span class="linenos">593</span></a>    
+</span><span id="L-594"><a href="#L-594"><span class="linenos">594</span></a>    <span class="n">_good1</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># all data</span>
+</span><span id="L-595"><a href="#L-595"><span class="linenos">595</span></a>    <span class="n">_good2</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># subset data</span>
+</span><span id="L-596"><a href="#L-596"><span class="linenos">596</span></a>    
+</span><span id="L-597"><a href="#L-597"><span class="linenos">597</span></a>    <span class="n">_fname_sub</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">loadpath</span><span class="si">}{</span><span class="n">LOADER_SUBSET_FNAME</span><span class="si">}</span><span class="s1">&#39;</span>
+</span><span id="L-598"><a href="#L-598"><span class="linenos">598</span></a>    <span class="n">_fname_all</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">loadpath</span><span class="si">}{</span><span class="n">LOADER_FNAME</span><span class="si">}</span><span class="s1">&#39;</span>
+</span><span id="L-599"><a href="#L-599"><span class="linenos">599</span></a>    
+</span><span id="L-600"><a href="#L-600"><span class="linenos">600</span></a>    <span class="k">if</span> <span class="n">subset</span><span class="p">:</span>
+</span><span id="L-601"><a href="#L-601"><span class="linenos">601</span></a>        <span class="n">_fname</span> <span class="o">=</span> <span class="n">_fname_sub</span>
+</span><span id="L-602"><a href="#L-602"><span class="linenos">602</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-603"><a href="#L-603"><span class="linenos">603</span></a>        <span class="n">_fname</span> <span class="o">=</span> <span class="n">_fname_all</span>
+</span><span id="L-604"><a href="#L-604"><span class="linenos">604</span></a>    
+</span><span id="L-605"><a href="#L-605"><span class="linenos">605</span></a>    <span class="c1"># first attempt to read the local copy of the loader</span>
+</span><span id="L-606"><a href="#L-606"><span class="linenos">606</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="L-607"><a href="#L-607"><span class="linenos">607</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; load_PDB_SS(): Reading </span><span class="si">{</span><span class="n">_fname</span><span class="si">}</span><span class="s1">... &#39;</span><span class="p">)</span>
+</span><span id="L-608"><a href="#L-608"><span class="linenos">608</span></a>
+</span><span id="L-609"><a href="#L-609"><span class="linenos">609</span></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="L-610"><a href="#L-610"><span class="linenos">610</span></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_fname</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="L-611"><a href="#L-611"><span class="linenos">611</span></a>            <span class="n">res</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span><span id="L-612"><a href="#L-612"><span class="linenos">612</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="L-613"><a href="#L-613"><span class="linenos">613</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; load_PDB_SS(): Done reading </span><span class="si">{</span><span class="n">_fname</span><span class="si">}</span><span class="s1">... &#39;</span><span class="p">)</span>
+</span><span id="L-614"><a href="#L-614"><span class="linenos">614</span></a>        <span class="k">return</span> <span class="n">res</span>
+</span><span id="L-615"><a href="#L-615"><span class="linenos">615</span></a>    
+</span><span id="L-616"><a href="#L-616"><span class="linenos">616</span></a>    <span class="c1"># we don&#39;t have it locally, so download both from google drive</span>
+</span><span id="L-617"><a href="#L-617"><span class="linenos">617</span></a>    <span class="k">except</span><span class="p">:</span>
+</span><span id="L-618"><a href="#L-618"><span class="linenos">618</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">Download_PDB_SS</span><span class="p">(</span><span class="n">loadpath</span><span class="o">=</span><span class="n">loadpath</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+</span><span id="L-619"><a href="#L-619"><span class="linenos">619</span></a>        <span class="k">if</span> <span class="n">res</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+</span><span id="L-620"><a href="#L-620"><span class="linenos">620</span></a>            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;!! Unable to download databases, exiting&#39;</span><span class="p">)</span>
+</span><span id="L-621"><a href="#L-621"><span class="linenos">621</span></a>            <span class="k">return</span>
+</span><span id="L-622"><a href="#L-622"><span class="linenos">622</span></a>    
+</span><span id="L-623"><a href="#L-623"><span class="linenos">623</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="L-624"><a href="#L-624"><span class="linenos">624</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; load_PDB_SS(): Attempting to read local </span><span class="si">{</span><span class="n">_fname</span><span class="si">}</span><span class="s1">... &#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+</span><span id="L-625"><a href="#L-625"><span class="linenos">625</span></a>    <span class="c1">#try:</span>
+</span><span id="L-626"><a href="#L-626"><span class="linenos">626</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_fname</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="L-627"><a href="#L-627"><span class="linenos">627</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span><span id="L-628"><a href="#L-628"><span class="linenos">628</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="L-629"><a href="#L-629"><span class="linenos">629</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;done.&#39;</span><span class="p">)</span>
+</span><span id="L-630"><a href="#L-630"><span class="linenos">630</span></a>    <span class="k">return</span> <span class="n">res</span>
+</span><span id="L-631"><a href="#L-631"><span class="linenos">631</span></a>
+</span><span id="L-632"><a href="#L-632"><span class="linenos">632</span></a><span class="c1"># End of file</span>
 </span></pre></div>
 
 
@@ -775,7 +834,7 @@ Last revision: 7/2/2023</p>
     </div>
     <a class="headerlink" href="#DisulfideLoader"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideLoader-52"><a href="#DisulfideLoader-52"><span class="linenos"> 52</span></a><span class="k">class</span> <span class="nc">DisulfideLoader</span><span class="p">:</span>
-</span><span id="DisulfideLoader-53"><a href="#DisulfideLoader-53"><span class="linenos"> 53</span></a>    <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader-53"><a href="#DisulfideLoader-53"><span class="linenos"> 53</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader-54"><a href="#DisulfideLoader-54"><span class="linenos"> 54</span></a><span class="sd">    This class represents the disulfide database itself and is its primary means of accession. </span>
 </span><span id="DisulfideLoader-55"><a href="#DisulfideLoader-55"><span class="linenos"> 55</span></a><span class="sd">    The entirety of the RCSB disulfide database is stored within the class via a</span>
 </span><span id="DisulfideLoader-56"><a href="#DisulfideLoader-56"><span class="linenos"> 56</span></a><span class="sd">    proteusPy.DisulfideList.DisulfideList, a ```Pandas``` .csv file, and a ```dict``` of</span>
@@ -830,7 +889,7 @@ Last revision: 7/2/2023</p>
 </span><span id="DisulfideLoader-105"><a href="#DisulfideLoader-105"><span class="linenos">105</span></a>                <span class="n">torsion_file</span><span class="o">=</span><span class="n">SS_TORSIONS_FILE</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
 </span><span id="DisulfideLoader-106"><a href="#DisulfideLoader-106"><span class="linenos">106</span></a>                <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="DisulfideLoader-107"><a href="#DisulfideLoader-107"><span class="linenos">107</span></a>                <span class="n">cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">):</span>
-</span><span id="DisulfideLoader-108"><a href="#DisulfideLoader-108"><span class="linenos">108</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader-108"><a href="#DisulfideLoader-108"><span class="linenos">108</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader-109"><a href="#DisulfideLoader-109"><span class="linenos">109</span></a><span class="sd">        Initializing the class initiates loading either the entire Disulfide dataset,</span>
 </span><span id="DisulfideLoader-110"><a href="#DisulfideLoader-110"><span class="linenos">110</span></a><span class="sd">        or the &#39;subset&#39;, which consists of the first 1000 PDB structures. The subset</span>
 </span><span id="DisulfideLoader-111"><a href="#DisulfideLoader-111"><span class="linenos">111</span></a><span class="sd">        is useful for testing and debugging since it doesn&#39;t require nearly as much</span>
@@ -922,7 +981,7 @@ Last revision: 7/2/2023</p>
 </span><span id="DisulfideLoader-197"><a href="#DisulfideLoader-197"><span class="linenos">197</span></a>        
 </span><span id="DisulfideLoader-198"><a href="#DisulfideLoader-198"><span class="linenos">198</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
 </span><span id="DisulfideLoader-199"><a href="#DisulfideLoader-199"><span class="linenos">199</span></a>            <span class="k">if</span> <span class="p">(</span><span class="n">item</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">item</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TotalDisulfides</span><span class="p">):</span>
-</span><span id="DisulfideLoader-200"><a href="#DisulfideLoader-200"><span class="linenos">200</span></a>                <span class="n">mess</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;DisulfideLoader(): Index </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s1"> out of range 0-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">TotalDisulfides</span> <span class="o">-</span> <span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span>
+</span><span id="DisulfideLoader-200"><a href="#DisulfideLoader-200"><span class="linenos">200</span></a>                <span class="n">mess</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;DisulfideLoader(): Index </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s1"> out of range 0-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">TotalDisulfides</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span>
 </span><span id="DisulfideLoader-201"><a href="#DisulfideLoader-201"><span class="linenos">201</span></a>                <span class="k">raise</span> <span class="n">DisulfideException</span><span class="p">(</span><span class="n">mess</span><span class="p">)</span>
 </span><span id="DisulfideLoader-202"><a href="#DisulfideLoader-202"><span class="linenos">202</span></a>            <span class="k">else</span><span class="p">:</span>
 </span><span id="DisulfideLoader-203"><a href="#DisulfideLoader-203"><span class="linenos">203</span></a>                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">SSList</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
@@ -954,7 +1013,7 @@ Last revision: 7/2/2023</p>
 </span><span id="DisulfideLoader-229"><a href="#DisulfideLoader-229"><span class="linenos">229</span></a>    
 </span><span id="DisulfideLoader-230"><a href="#DisulfideLoader-230"><span class="linenos">230</span></a>    <span class="nd">@property</span>
 </span><span id="DisulfideLoader-231"><a href="#DisulfideLoader-231"><span class="linenos">231</span></a>    <span class="k">def</span> <span class="nf">Average_Resolution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span id="DisulfideLoader-232"><a href="#DisulfideLoader-232"><span class="linenos">232</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader-232"><a href="#DisulfideLoader-232"><span class="linenos">232</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader-233"><a href="#DisulfideLoader-233"><span class="linenos">233</span></a><span class="sd">        Compute and return the average structure resolution for the given list.</span>
 </span><span id="DisulfideLoader-234"><a href="#DisulfideLoader-234"><span class="linenos">234</span></a>
 </span><span id="DisulfideLoader-235"><a href="#DisulfideLoader-235"><span class="linenos">235</span></a><span class="sd">        :return: Average resolution (A)</span>
@@ -971,7 +1030,7 @@ Last revision: 7/2/2023</p>
 </span><span id="DisulfideLoader-246"><a href="#DisulfideLoader-246"><span class="linenos">246</span></a>        <span class="k">return</span> <span class="n">res</span> <span class="o">/</span> <span class="n">cnt</span>
 </span><span id="DisulfideLoader-247"><a href="#DisulfideLoader-247"><span class="linenos">247</span></a>    
 </span><span id="DisulfideLoader-248"><a href="#DisulfideLoader-248"><span class="linenos">248</span></a>    <span class="k">def</span> <span class="nf">build_ss_from_idlist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idlist</span><span class="p">):</span>
-</span><span id="DisulfideLoader-249"><a href="#DisulfideLoader-249"><span class="linenos">249</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader-249"><a href="#DisulfideLoader-249"><span class="linenos">249</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader-250"><a href="#DisulfideLoader-250"><span class="linenos">250</span></a><span class="sd">        Given a list of PDBid, return a DisulfideList of Disulfides</span>
 </span><span id="DisulfideLoader-251"><a href="#DisulfideLoader-251"><span class="linenos">251</span></a>
 </span><span id="DisulfideLoader-252"><a href="#DisulfideLoader-252"><span class="linenos">252</span></a><span class="sd">        :param idlist: List of PDBIDs, e.g. [&#39;4yys&#39;, &#39;2q7q&#39;]</span>
@@ -987,7 +1046,7 @@ Last revision: 7/2/2023</p>
 </span><span id="DisulfideLoader-262"><a href="#DisulfideLoader-262"><span class="linenos">262</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="DisulfideLoader-263"><a href="#DisulfideLoader-263"><span class="linenos">263</span></a>    
 </span><span id="DisulfideLoader-264"><a href="#DisulfideLoader-264"><span class="linenos">264</span></a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideLoader-265"><a href="#DisulfideLoader-265"><span class="linenos">265</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader-265"><a href="#DisulfideLoader-265"><span class="linenos">265</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader-266"><a href="#DisulfideLoader-266"><span class="linenos">266</span></a><span class="sd">        Return a copy of self.</span>
 </span><span id="DisulfideLoader-267"><a href="#DisulfideLoader-267"><span class="linenos">267</span></a>
 </span><span id="DisulfideLoader-268"><a href="#DisulfideLoader-268"><span class="linenos">268</span></a><span class="sd">        :return: Copy of self</span>
@@ -995,7 +1054,7 @@ Last revision: 7/2/2023</p>
 </span><span id="DisulfideLoader-270"><a href="#DisulfideLoader-270"><span class="linenos">270</span></a>        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </span><span id="DisulfideLoader-271"><a href="#DisulfideLoader-271"><span class="linenos">271</span></a>
 </span><span id="DisulfideLoader-272"><a href="#DisulfideLoader-272"><span class="linenos">272</span></a>    <span class="k">def</span> <span class="nf">extract_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clsid</span><span class="p">):</span>
-</span><span id="DisulfideLoader-273"><a href="#DisulfideLoader-273"><span class="linenos">273</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DisulfideLoader-273"><a href="#DisulfideLoader-273"><span class="linenos">273</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideLoader-274"><a href="#DisulfideLoader-274"><span class="linenos">274</span></a><span class="sd">        Return the list of disulfides corresponding to the input `clsid`.</span>
 </span><span id="DisulfideLoader-275"><a href="#DisulfideLoader-275"><span class="linenos">275</span></a><span class="sd">    </span>
 </span><span id="DisulfideLoader-276"><a href="#DisulfideLoader-276"><span class="linenos">276</span></a><span class="sd">        :param clsid: The class name to extract.</span>
@@ -1022,7 +1081,7 @@ Last revision: 7/2/2023</p>
 </span><span id="DisulfideLoader-297"><a href="#DisulfideLoader-297"><span class="linenos">297</span></a>        <span class="k">return</span> <span class="n">class_disulfides</span>
 </span><span id="DisulfideLoader-298"><a href="#DisulfideLoader-298"><span class="linenos">298</span></a>    
 </span><span id="DisulfideLoader-299"><a href="#DisulfideLoader-299"><span class="linenos">299</span></a>    <span class="k">def</span> <span class="nf">getlist</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DisulfideList</span><span class="p">:</span>
-</span><span id="DisulfideLoader-300"><a href="#DisulfideLoader-300"><span class="linenos">300</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader-300"><a href="#DisulfideLoader-300"><span class="linenos">300</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader-301"><a href="#DisulfideLoader-301"><span class="linenos">301</span></a><span class="sd">        Return the list of Disulfides contained in the class.</span>
 </span><span id="DisulfideLoader-302"><a href="#DisulfideLoader-302"><span class="linenos">302</span></a>
 </span><span id="DisulfideLoader-303"><a href="#DisulfideLoader-303"><span class="linenos">303</span></a><span class="sd">        :return: DisulfideList</span>
@@ -1031,7 +1090,7 @@ Last revision: 7/2/2023</p>
 </span><span id="DisulfideLoader-306"><a href="#DisulfideLoader-306"><span class="linenos">306</span></a>        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SSList</span><span class="p">)</span>
 </span><span id="DisulfideLoader-307"><a href="#DisulfideLoader-307"><span class="linenos">307</span></a>    
 </span><span id="DisulfideLoader-308"><a href="#DisulfideLoader-308"><span class="linenos">308</span></a>    <span class="k">def</span> <span class="nf">get_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Disulfide</span><span class="p">:</span>
-</span><span id="DisulfideLoader-309"><a href="#DisulfideLoader-309"><span class="linenos">309</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader-309"><a href="#DisulfideLoader-309"><span class="linenos">309</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader-310"><a href="#DisulfideLoader-310"><span class="linenos">310</span></a><span class="sd">        Returns the Disulfide with the given name from the list.</span>
 </span><span id="DisulfideLoader-311"><a href="#DisulfideLoader-311"><span class="linenos">311</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader-312"><a href="#DisulfideLoader-312"><span class="linenos">312</span></a>        <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SSList</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
@@ -1039,7 +1098,7 @@ Last revision: 7/2/2023</p>
 </span><span id="DisulfideLoader-314"><a href="#DisulfideLoader-314"><span class="linenos">314</span></a>                <span class="k">return</span> <span class="n">ss</span>  <span class="c1"># or ss.copy() !!!</span>
 </span><span id="DisulfideLoader-315"><a href="#DisulfideLoader-315"><span class="linenos">315</span></a>        <span class="k">return</span> <span class="kc">None</span>
 </span><span id="DisulfideLoader-316"><a href="#DisulfideLoader-316"><span class="linenos">316</span></a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideLoader-317"><a href="#DisulfideLoader-317"><span class="linenos">317</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader-317"><a href="#DisulfideLoader-317"><span class="linenos">317</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader-318"><a href="#DisulfideLoader-318"><span class="linenos">318</span></a><span class="sd">        Provides information about the Disulfide database contained in ```self```.</span>
 </span><span id="DisulfideLoader-319"><a href="#DisulfideLoader-319"><span class="linenos">319</span></a>
 </span><span id="DisulfideLoader-320"><a href="#DisulfideLoader-320"><span class="linenos">320</span></a><span class="sd">        Example:</span>
@@ -1076,7 +1135,7 @@ Last revision: 7/2/2023</p>
 </span><span id="DisulfideLoader-351"><a href="#DisulfideLoader-351"><span class="linenos">351</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    ================= proteusPy: </span><span class="si">{</span><span class="n">vers</span><span class="si">}</span><span class="s1"> =======================&#39;</span><span class="p">)</span>
 </span><span id="DisulfideLoader-352"><a href="#DisulfideLoader-352"><span class="linenos">352</span></a>       
 </span><span id="DisulfideLoader-353"><a href="#DisulfideLoader-353"><span class="linenos">353</span></a>    <span class="k">def</span> <span class="nf">display_overlay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdbid</span><span class="p">):</span>
-</span><span id="DisulfideLoader-354"><a href="#DisulfideLoader-354"><span class="linenos">354</span></a>        <span class="sd">&#39;&#39;&#39; </span>
+</span><span id="DisulfideLoader-354"><a href="#DisulfideLoader-354"><span class="linenos">354</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39; </span>
 </span><span id="DisulfideLoader-355"><a href="#DisulfideLoader-355"><span class="linenos">355</span></a><span class="sd">        Display all disulfides for a given PDB ID overlaid in stick mode against</span>
 </span><span id="DisulfideLoader-356"><a href="#DisulfideLoader-356"><span class="linenos">356</span></a><span class="sd">        a common coordinate frame. This allows us to see all of the disulfides</span>
 </span><span id="DisulfideLoader-357"><a href="#DisulfideLoader-357"><span class="linenos">357</span></a><span class="sd">        at one time in a single view. Colors vary smoothy between bonds.</span>
@@ -1110,7 +1169,7 @@ Last revision: 7/2/2023</p>
 </span><span id="DisulfideLoader-385"><a href="#DisulfideLoader-385"><span class="linenos">385</span></a>    
 </span><span id="DisulfideLoader-386"><a href="#DisulfideLoader-386"><span class="linenos">386</span></a>    
 </span><span id="DisulfideLoader-387"><a href="#DisulfideLoader-387"><span class="linenos">387</span></a>    <span class="k">def</span> <span class="nf">getTorsions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdbID</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-</span><span id="DisulfideLoader-388"><a href="#DisulfideLoader-388"><span class="linenos">388</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader-388"><a href="#DisulfideLoader-388"><span class="linenos">388</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader-389"><a href="#DisulfideLoader-389"><span class="linenos">389</span></a><span class="sd">        Return the torsions, distances and energies defined by Disulfide.Torsion_DF_cols</span>
 </span><span id="DisulfideLoader-390"><a href="#DisulfideLoader-390"><span class="linenos">390</span></a>
 </span><span id="DisulfideLoader-391"><a href="#DisulfideLoader-391"><span class="linenos">391</span></a><span class="sd">        :param pdbID: pdbID, defaults to None, meaning return entire dataset.</span>
@@ -1157,7 +1216,7 @@ Last revision: 7/2/2023</p>
 </span><span id="DisulfideLoader-432"><a href="#DisulfideLoader-432"><span class="linenos">432</span></a>
 </span><span id="DisulfideLoader-433"><a href="#DisulfideLoader-433"><span class="linenos">433</span></a>    <span class="nd">@property</span>
 </span><span id="DisulfideLoader-434"><a href="#DisulfideLoader-434"><span class="linenos">434</span></a>    <span class="k">def</span> <span class="nf">quiet</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="DisulfideLoader-435"><a href="#DisulfideLoader-435"><span class="linenos">435</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader-435"><a href="#DisulfideLoader-435"><span class="linenos">435</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader-436"><a href="#DisulfideLoader-436"><span class="linenos">436</span></a><span class="sd">        The loader quiet state</span>
 </span><span id="DisulfideLoader-437"><a href="#DisulfideLoader-437"><span class="linenos">437</span></a>
 </span><span id="DisulfideLoader-438"><a href="#DisulfideLoader-438"><span class="linenos">438</span></a><span class="sd">        :return: quiet parameter</span>
@@ -1167,7 +1226,7 @@ Last revision: 7/2/2023</p>
 </span><span id="DisulfideLoader-442"><a href="#DisulfideLoader-442"><span class="linenos">442</span></a>
 </span><span id="DisulfideLoader-443"><a href="#DisulfideLoader-443"><span class="linenos">443</span></a>    <span class="nd">@quiet</span><span class="o">.</span><span class="n">setter</span>
 </span><span id="DisulfideLoader-444"><a href="#DisulfideLoader-444"><span class="linenos">444</span></a>    <span class="k">def</span> <span class="nf">quiet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">perm</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="DisulfideLoader-445"><a href="#DisulfideLoader-445"><span class="linenos">445</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader-445"><a href="#DisulfideLoader-445"><span class="linenos">445</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader-446"><a href="#DisulfideLoader-446"><span class="linenos">446</span></a><span class="sd">        Sets the quiet attribute for the loader. This silences many of the BIO.PDB warnings.</span>
 </span><span id="DisulfideLoader-447"><a href="#DisulfideLoader-447"><span class="linenos">447</span></a>
 </span><span id="DisulfideLoader-448"><a href="#DisulfideLoader-448"><span class="linenos">448</span></a><span class="sd">        :param perm: True or False</span>
@@ -1176,7 +1235,7 @@ Last revision: 7/2/2023</p>
 </span><span id="DisulfideLoader-451"><a href="#DisulfideLoader-451"><span class="linenos">451</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">QUIET</span> <span class="o">=</span> <span class="n">perm</span>
 </span><span id="DisulfideLoader-452"><a href="#DisulfideLoader-452"><span class="linenos">452</span></a>    
 </span><span id="DisulfideLoader-453"><a href="#DisulfideLoader-453"><span class="linenos">453</span></a>    <span class="k">def</span> <span class="nf">plot_classes_vs_cutoff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">steps</span><span class="p">):</span>
-</span><span id="DisulfideLoader-454"><a href="#DisulfideLoader-454"><span class="linenos">454</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DisulfideLoader-454"><a href="#DisulfideLoader-454"><span class="linenos">454</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideLoader-455"><a href="#DisulfideLoader-455"><span class="linenos">455</span></a><span class="sd">        Plot the total percentage and number of members for each class against the cutoff value.</span>
 </span><span id="DisulfideLoader-456"><a href="#DisulfideLoader-456"><span class="linenos">456</span></a><span class="sd">        </span>
 </span><span id="DisulfideLoader-457"><a href="#DisulfideLoader-457"><span class="linenos">457</span></a><span class="sd">        :param cutoff: Percent cutoff value for filtering the classes.</span>
@@ -1206,7 +1265,7 @@ Last revision: 7/2/2023</p>
 </span><span id="DisulfideLoader-481"><a href="#DisulfideLoader-481"><span class="linenos">481</span></a>        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </span><span id="DisulfideLoader-482"><a href="#DisulfideLoader-482"><span class="linenos">482</span></a>
 </span><span id="DisulfideLoader-483"><a href="#DisulfideLoader-483"><span class="linenos">483</span></a>    <span class="k">def</span> <span class="nf">plot_binary_to_sixclass_incidence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">savedir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
-</span><span id="DisulfideLoader-484"><a href="#DisulfideLoader-484"><span class="linenos">484</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader-484"><a href="#DisulfideLoader-484"><span class="linenos">484</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader-485"><a href="#DisulfideLoader-485"><span class="linenos">485</span></a><span class="sd">        Plot the incidence of all sextant Disulfide classes for a given binary class.</span>
 </span><span id="DisulfideLoader-486"><a href="#DisulfideLoader-486"><span class="linenos">486</span></a>
 </span><span id="DisulfideLoader-487"><a href="#DisulfideLoader-487"><span class="linenos">487</span></a><span class="sd">        :param loader: `proteusPy.DisulfideLoader` object</span>
@@ -1240,7 +1299,7 @@ Last revision: 7/2/2023</p>
 </span><span id="DisulfideLoader-515"><a href="#DisulfideLoader-515"><span class="linenos">515</span></a>        <span class="k">return</span>
 </span><span id="DisulfideLoader-516"><a href="#DisulfideLoader-516"><span class="linenos">516</span></a>
 </span><span id="DisulfideLoader-517"><a href="#DisulfideLoader-517"><span class="linenos">517</span></a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">savepath</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">):</span>
-</span><span id="DisulfideLoader-518"><a href="#DisulfideLoader-518"><span class="linenos">518</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader-518"><a href="#DisulfideLoader-518"><span class="linenos">518</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader-519"><a href="#DisulfideLoader-519"><span class="linenos">519</span></a><span class="sd">        Save a copy of the fully instantiated Loader to the specified file.</span>
 </span><span id="DisulfideLoader-520"><a href="#DisulfideLoader-520"><span class="linenos">520</span></a>
 </span><span id="DisulfideLoader-521"><a href="#DisulfideLoader-521"><span class="linenos">521</span></a><span class="sd">        :param savepath: Path to save the file, defaults to DATA_DIR</span>
@@ -1357,7 +1416,7 @@ will load them and initialize itself. </p>
 </span><span id="DisulfideLoader.__init__-105"><a href="#DisulfideLoader.__init__-105"><span class="linenos">105</span></a>                <span class="n">torsion_file</span><span class="o">=</span><span class="n">SS_TORSIONS_FILE</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
 </span><span id="DisulfideLoader.__init__-106"><a href="#DisulfideLoader.__init__-106"><span class="linenos">106</span></a>                <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="DisulfideLoader.__init__-107"><a href="#DisulfideLoader.__init__-107"><span class="linenos">107</span></a>                <span class="n">cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">):</span>
-</span><span id="DisulfideLoader.__init__-108"><a href="#DisulfideLoader.__init__-108"><span class="linenos">108</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader.__init__-108"><a href="#DisulfideLoader.__init__-108"><span class="linenos">108</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader.__init__-109"><a href="#DisulfideLoader.__init__-109"><span class="linenos">109</span></a><span class="sd">        Initializing the class initiates loading either the entire Disulfide dataset,</span>
 </span><span id="DisulfideLoader.__init__-110"><a href="#DisulfideLoader.__init__-110"><span class="linenos">110</span></a><span class="sd">        or the &#39;subset&#39;, which consists of the first 1000 PDB structures. The subset</span>
 </span><span id="DisulfideLoader.__init__-111"><a href="#DisulfideLoader.__init__-111"><span class="linenos">111</span></a><span class="sd">        is useful for testing and debugging since it doesn&#39;t require nearly as much</span>
@@ -1448,6 +1507,182 @@ function.</p>
 
 
                             </div>
+                            <div id="DisulfideLoader.ModelDir" class="classattr">
+                                <div class="attr variable">
+            <span class="name">ModelDir</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideLoader.ModelDir"></a>
+    
+    
+
+                            </div>
+                            <div id="DisulfideLoader.PickleFile" class="classattr">
+                                <div class="attr variable">
+            <span class="name">PickleFile</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideLoader.PickleFile"></a>
+    
+    
+
+                            </div>
+                            <div id="DisulfideLoader.PickleDictFile" class="classattr">
+                                <div class="attr variable">
+            <span class="name">PickleDictFile</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideLoader.PickleDictFile"></a>
+    
+    
+
+                            </div>
+                            <div id="DisulfideLoader.PickleClassFile" class="classattr">
+                                <div class="attr variable">
+            <span class="name">PickleClassFile</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideLoader.PickleClassFile"></a>
+    
+    
+
+                            </div>
+                            <div id="DisulfideLoader.TorsionFile" class="classattr">
+                                <div class="attr variable">
+            <span class="name">TorsionFile</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideLoader.TorsionFile"></a>
+    
+    
+
+                            </div>
+                            <div id="DisulfideLoader.SSList" class="classattr">
+                                <div class="attr variable">
+            <span class="name">SSList</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideLoader.SSList"></a>
+    
+    
+
+                            </div>
+                            <div id="DisulfideLoader.SSDict" class="classattr">
+                                <div class="attr variable">
+            <span class="name">SSDict</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideLoader.SSDict"></a>
+    
+    
+
+                            </div>
+                            <div id="DisulfideLoader.TorsionDF" class="classattr">
+                                <div class="attr variable">
+            <span class="name">TorsionDF</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideLoader.TorsionDF"></a>
+    
+    
+
+                            </div>
+                            <div id="DisulfideLoader.TotalDisulfides" class="classattr">
+                                <div class="attr variable">
+            <span class="name">TotalDisulfides</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideLoader.TotalDisulfides"></a>
+    
+    
+
+                            </div>
+                            <div id="DisulfideLoader.IDList" class="classattr">
+                                <div class="attr variable">
+            <span class="name">IDList</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideLoader.IDList"></a>
+    
+    
+
+                            </div>
+                            <div id="DisulfideLoader.QUIET" class="classattr">
+                                <div class="attr variable">
+            <span class="name">QUIET</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideLoader.QUIET"></a>
+    
+    
+
+                            </div>
+                            <div id="DisulfideLoader.tclass" class="classattr">
+                                <div class="attr variable">
+            <span class="name">tclass</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideLoader.tclass"></a>
+    
+    
+
+                            </div>
+                            <div id="DisulfideLoader.cutoff" class="classattr">
+                                <div class="attr variable">
+            <span class="name">cutoff</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideLoader.cutoff"></a>
+    
+    
+
+                            </div>
+                            <div id="DisulfideLoader.verbose" class="classattr">
+                                <div class="attr variable">
+            <span class="name">verbose</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideLoader.verbose"></a>
+    
+    
+
+                            </div>
+                            <div id="DisulfideLoader.timestamp" class="classattr">
+                                <div class="attr variable">
+            <span class="name">timestamp</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideLoader.timestamp"></a>
+    
+    
+
+                            </div>
+                            <div id="DisulfideLoader.version" class="classattr">
+                                <div class="attr variable">
+            <span class="name">version</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideLoader.version"></a>
+    
+    
+
+                            </div>
                             <div id="DisulfideLoader.Average_Resolution" class="classattr">
                                 <div class="attr variable">
             <span class="name">Average_Resolution</span><span class="annotation">: float</span>
@@ -1479,7 +1714,7 @@ function.</p>
     </div>
     <a class="headerlink" href="#DisulfideLoader.build_ss_from_idlist"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideLoader.build_ss_from_idlist-248"><a href="#DisulfideLoader.build_ss_from_idlist-248"><span class="linenos">248</span></a>    <span class="k">def</span> <span class="nf">build_ss_from_idlist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idlist</span><span class="p">):</span>
-</span><span id="DisulfideLoader.build_ss_from_idlist-249"><a href="#DisulfideLoader.build_ss_from_idlist-249"><span class="linenos">249</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader.build_ss_from_idlist-249"><a href="#DisulfideLoader.build_ss_from_idlist-249"><span class="linenos">249</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader.build_ss_from_idlist-250"><a href="#DisulfideLoader.build_ss_from_idlist-250"><span class="linenos">250</span></a><span class="sd">        Given a list of PDBid, return a DisulfideList of Disulfides</span>
 </span><span id="DisulfideLoader.build_ss_from_idlist-251"><a href="#DisulfideLoader.build_ss_from_idlist-251"><span class="linenos">251</span></a>
 </span><span id="DisulfideLoader.build_ss_from_idlist-252"><a href="#DisulfideLoader.build_ss_from_idlist-252"><span class="linenos">252</span></a><span class="sd">        :param idlist: List of PDBIDs, e.g. [&#39;4yys&#39;, &#39;2q7q&#39;]</span>
@@ -1525,7 +1760,7 @@ function.</p>
     </div>
     <a class="headerlink" href="#DisulfideLoader.copy"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideLoader.copy-264"><a href="#DisulfideLoader.copy-264"><span class="linenos">264</span></a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideLoader.copy-265"><a href="#DisulfideLoader.copy-265"><span class="linenos">265</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader.copy-265"><a href="#DisulfideLoader.copy-265"><span class="linenos">265</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader.copy-266"><a href="#DisulfideLoader.copy-266"><span class="linenos">266</span></a><span class="sd">        Return a copy of self.</span>
 </span><span id="DisulfideLoader.copy-267"><a href="#DisulfideLoader.copy-267"><span class="linenos">267</span></a>
 </span><span id="DisulfideLoader.copy-268"><a href="#DisulfideLoader.copy-268"><span class="linenos">268</span></a><span class="sd">        :return: Copy of self</span>
@@ -1557,7 +1792,7 @@ function.</p>
     </div>
     <a class="headerlink" href="#DisulfideLoader.extract_class"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideLoader.extract_class-272"><a href="#DisulfideLoader.extract_class-272"><span class="linenos">272</span></a>    <span class="k">def</span> <span class="nf">extract_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clsid</span><span class="p">):</span>
-</span><span id="DisulfideLoader.extract_class-273"><a href="#DisulfideLoader.extract_class-273"><span class="linenos">273</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DisulfideLoader.extract_class-273"><a href="#DisulfideLoader.extract_class-273"><span class="linenos">273</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideLoader.extract_class-274"><a href="#DisulfideLoader.extract_class-274"><span class="linenos">274</span></a><span class="sd">        Return the list of disulfides corresponding to the input `clsid`.</span>
 </span><span id="DisulfideLoader.extract_class-275"><a href="#DisulfideLoader.extract_class-275"><span class="linenos">275</span></a><span class="sd">    </span>
 </span><span id="DisulfideLoader.extract_class-276"><a href="#DisulfideLoader.extract_class-276"><span class="linenos">276</span></a><span class="sd">        :param clsid: The class name to extract.</span>
@@ -1614,7 +1849,7 @@ function.</p>
     </div>
     <a class="headerlink" href="#DisulfideLoader.getlist"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideLoader.getlist-299"><a href="#DisulfideLoader.getlist-299"><span class="linenos">299</span></a>    <span class="k">def</span> <span class="nf">getlist</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DisulfideList</span><span class="p">:</span>
-</span><span id="DisulfideLoader.getlist-300"><a href="#DisulfideLoader.getlist-300"><span class="linenos">300</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader.getlist-300"><a href="#DisulfideLoader.getlist-300"><span class="linenos">300</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader.getlist-301"><a href="#DisulfideLoader.getlist-301"><span class="linenos">301</span></a><span class="sd">        Return the list of Disulfides contained in the class.</span>
 </span><span id="DisulfideLoader.getlist-302"><a href="#DisulfideLoader.getlist-302"><span class="linenos">302</span></a>
 </span><span id="DisulfideLoader.getlist-303"><a href="#DisulfideLoader.getlist-303"><span class="linenos">303</span></a><span class="sd">        :return: DisulfideList</span>
@@ -1647,7 +1882,7 @@ function.</p>
     </div>
     <a class="headerlink" href="#DisulfideLoader.get_by_name"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideLoader.get_by_name-308"><a href="#DisulfideLoader.get_by_name-308"><span class="linenos">308</span></a>    <span class="k">def</span> <span class="nf">get_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Disulfide</span><span class="p">:</span>
-</span><span id="DisulfideLoader.get_by_name-309"><a href="#DisulfideLoader.get_by_name-309"><span class="linenos">309</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader.get_by_name-309"><a href="#DisulfideLoader.get_by_name-309"><span class="linenos">309</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader.get_by_name-310"><a href="#DisulfideLoader.get_by_name-310"><span class="linenos">310</span></a><span class="sd">        Returns the Disulfide with the given name from the list.</span>
 </span><span id="DisulfideLoader.get_by_name-311"><a href="#DisulfideLoader.get_by_name-311"><span class="linenos">311</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader.get_by_name-312"><a href="#DisulfideLoader.get_by_name-312"><span class="linenos">312</span></a>        <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">SSList</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
@@ -1674,7 +1909,7 @@ function.</p>
     </div>
     <a class="headerlink" href="#DisulfideLoader.describe"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideLoader.describe-316"><a href="#DisulfideLoader.describe-316"><span class="linenos">316</span></a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideLoader.describe-317"><a href="#DisulfideLoader.describe-317"><span class="linenos">317</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader.describe-317"><a href="#DisulfideLoader.describe-317"><span class="linenos">317</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader.describe-318"><a href="#DisulfideLoader.describe-318"><span class="linenos">318</span></a><span class="sd">        Provides information about the Disulfide database contained in ```self```.</span>
 </span><span id="DisulfideLoader.describe-319"><a href="#DisulfideLoader.describe-319"><span class="linenos">319</span></a>
 </span><span id="DisulfideLoader.describe-320"><a href="#DisulfideLoader.describe-320"><span class="linenos">320</span></a><span class="sd">        Example:</span>
@@ -1745,7 +1980,7 @@ function.</p>
     </div>
     <a class="headerlink" href="#DisulfideLoader.display_overlay"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideLoader.display_overlay-353"><a href="#DisulfideLoader.display_overlay-353"><span class="linenos">353</span></a>    <span class="k">def</span> <span class="nf">display_overlay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdbid</span><span class="p">):</span>
-</span><span id="DisulfideLoader.display_overlay-354"><a href="#DisulfideLoader.display_overlay-354"><span class="linenos">354</span></a>        <span class="sd">&#39;&#39;&#39; </span>
+</span><span id="DisulfideLoader.display_overlay-354"><a href="#DisulfideLoader.display_overlay-354"><span class="linenos">354</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39; </span>
 </span><span id="DisulfideLoader.display_overlay-355"><a href="#DisulfideLoader.display_overlay-355"><span class="linenos">355</span></a><span class="sd">        Display all disulfides for a given PDB ID overlaid in stick mode against</span>
 </span><span id="DisulfideLoader.display_overlay-356"><a href="#DisulfideLoader.display_overlay-356"><span class="linenos">356</span></a><span class="sd">        a common coordinate frame. This allows us to see all of the disulfides</span>
 </span><span id="DisulfideLoader.display_overlay-357"><a href="#DisulfideLoader.display_overlay-357"><span class="linenos">357</span></a><span class="sd">        at one time in a single view. Colors vary smoothy between bonds.</span>
@@ -1842,7 +2077,7 @@ a common reference (the proximal disulfides).</p>
     </div>
     <a class="headerlink" href="#DisulfideLoader.getTorsions"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideLoader.getTorsions-387"><a href="#DisulfideLoader.getTorsions-387"><span class="linenos">387</span></a>    <span class="k">def</span> <span class="nf">getTorsions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdbID</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-</span><span id="DisulfideLoader.getTorsions-388"><a href="#DisulfideLoader.getTorsions-388"><span class="linenos">388</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader.getTorsions-388"><a href="#DisulfideLoader.getTorsions-388"><span class="linenos">388</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader.getTorsions-389"><a href="#DisulfideLoader.getTorsions-389"><span class="linenos">389</span></a><span class="sd">        Return the torsions, distances and energies defined by Disulfide.Torsion_DF_cols</span>
 </span><span id="DisulfideLoader.getTorsions-390"><a href="#DisulfideLoader.getTorsions-390"><span class="linenos">390</span></a>
 </span><span id="DisulfideLoader.getTorsions-391"><a href="#DisulfideLoader.getTorsions-391"><span class="linenos">391</span></a><span class="sd">        :param pdbID: pdbID, defaults to None, meaning return entire dataset.</span>
@@ -1957,13 +2192,13 @@ a common reference (the proximal disulfides).</p>
     </div>
     <a class="headerlink" href="#DisulfideLoader.quiet"></a>
     
-            <div class="docstring"><p>Sets the quiet attribute for the loader. This silences many of the BIO.PDB warnings.</p>
+            <div class="docstring"><p>The loader quiet state</p>
 
-<h6 id="parameters">Parameters</h6>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li><strong>perm</strong>:  True or False</li>
-</ul>
+<blockquote>
+  <p>quiet parameter</p>
+</blockquote>
 </div>
 
 
@@ -1980,7 +2215,7 @@ a common reference (the proximal disulfides).</p>
     </div>
     <a class="headerlink" href="#DisulfideLoader.plot_classes_vs_cutoff"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideLoader.plot_classes_vs_cutoff-453"><a href="#DisulfideLoader.plot_classes_vs_cutoff-453"><span class="linenos">453</span></a>    <span class="k">def</span> <span class="nf">plot_classes_vs_cutoff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">steps</span><span class="p">):</span>
-</span><span id="DisulfideLoader.plot_classes_vs_cutoff-454"><a href="#DisulfideLoader.plot_classes_vs_cutoff-454"><span class="linenos">454</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DisulfideLoader.plot_classes_vs_cutoff-454"><a href="#DisulfideLoader.plot_classes_vs_cutoff-454"><span class="linenos">454</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideLoader.plot_classes_vs_cutoff-455"><a href="#DisulfideLoader.plot_classes_vs_cutoff-455"><span class="linenos">455</span></a><span class="sd">        Plot the total percentage and number of members for each class against the cutoff value.</span>
 </span><span id="DisulfideLoader.plot_classes_vs_cutoff-456"><a href="#DisulfideLoader.plot_classes_vs_cutoff-456"><span class="linenos">456</span></a><span class="sd">        </span>
 </span><span id="DisulfideLoader.plot_classes_vs_cutoff-457"><a href="#DisulfideLoader.plot_classes_vs_cutoff-457"><span class="linenos">457</span></a><span class="sd">        :param cutoff: Percent cutoff value for filtering the classes.</span>
@@ -2040,7 +2275,7 @@ a common reference (the proximal disulfides).</p>
     </div>
     <a class="headerlink" href="#DisulfideLoader.plot_binary_to_sixclass_incidence"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideLoader.plot_binary_to_sixclass_incidence-483"><a href="#DisulfideLoader.plot_binary_to_sixclass_incidence-483"><span class="linenos">483</span></a>    <span class="k">def</span> <span class="nf">plot_binary_to_sixclass_incidence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">savedir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
-</span><span id="DisulfideLoader.plot_binary_to_sixclass_incidence-484"><a href="#DisulfideLoader.plot_binary_to_sixclass_incidence-484"><span class="linenos">484</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader.plot_binary_to_sixclass_incidence-484"><a href="#DisulfideLoader.plot_binary_to_sixclass_incidence-484"><span class="linenos">484</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader.plot_binary_to_sixclass_incidence-485"><a href="#DisulfideLoader.plot_binary_to_sixclass_incidence-485"><span class="linenos">485</span></a><span class="sd">        Plot the incidence of all sextant Disulfide classes for a given binary class.</span>
 </span><span id="DisulfideLoader.plot_binary_to_sixclass_incidence-486"><a href="#DisulfideLoader.plot_binary_to_sixclass_incidence-486"><span class="linenos">486</span></a>
 </span><span id="DisulfideLoader.plot_binary_to_sixclass_incidence-487"><a href="#DisulfideLoader.plot_binary_to_sixclass_incidence-487"><span class="linenos">487</span></a><span class="sd">        :param loader: `proteusPy.DisulfideLoader` object</span>
@@ -2098,7 +2333,7 @@ a common reference (the proximal disulfides).</p>
     </div>
     <a class="headerlink" href="#DisulfideLoader.save"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideLoader.save-517"><a href="#DisulfideLoader.save-517"><span class="linenos">517</span></a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">savepath</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">):</span>
-</span><span id="DisulfideLoader.save-518"><a href="#DisulfideLoader.save-518"><span class="linenos">518</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideLoader.save-518"><a href="#DisulfideLoader.save-518"><span class="linenos">518</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideLoader.save-519"><a href="#DisulfideLoader.save-519"><span class="linenos">519</span></a><span class="sd">        Save a copy of the fully instantiated Loader to the specified file.</span>
 </span><span id="DisulfideLoader.save-520"><a href="#DisulfideLoader.save-520"><span class="linenos">520</span></a>
 </span><span id="DisulfideLoader.save-521"><a href="#DisulfideLoader.save-521"><span class="linenos">521</span></a><span class="sd">        :param savepath: Path to save the file, defaults to DATA_DIR</span>
@@ -2142,6 +2377,62 @@ a common reference (the proximal disulfides).</p>
 
                             </div>
                 </section>
+                <section id="Download_PDB_SS">
+                            <input id="Download_PDB_SS-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">Download_PDB_SS</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">loadpath</span><span class="o">=</span><span class="s1">&#39;/Users/egs/repos/proteusPy/proteusPy/data/&#39;</span>,</span><span class="param">	<span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>,</span><span class="param">	<span class="n">subset</span><span class="o">=</span><span class="kc">False</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="Download_PDB_SS-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Download_PDB_SS"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Download_PDB_SS-547"><a href="#Download_PDB_SS-547"><span class="linenos">547</span></a><span class="k">def</span> <span class="nf">Download_PDB_SS</span><span class="p">(</span><span class="n">loadpath</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+</span><span id="Download_PDB_SS-548"><a href="#Download_PDB_SS-548"><span class="linenos">548</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="Download_PDB_SS-549"><a href="#Download_PDB_SS-549"><span class="linenos">549</span></a><span class="sd">    Download the databases from Google Drive.</span>
+</span><span id="Download_PDB_SS-550"><a href="#Download_PDB_SS-550"><span class="linenos">550</span></a>
+</span><span id="Download_PDB_SS-551"><a href="#Download_PDB_SS-551"><span class="linenos">551</span></a><span class="sd">    :param loadpath: Path from which to load, defaults to DATA_DIR</span>
+</span><span id="Download_PDB_SS-552"><a href="#Download_PDB_SS-552"><span class="linenos">552</span></a><span class="sd">    :param verbose: Verbosity, defaults to False</span>
+</span><span id="Download_PDB_SS-553"><a href="#Download_PDB_SS-553"><span class="linenos">553</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="Download_PDB_SS-554"><a href="#Download_PDB_SS-554"><span class="linenos">554</span></a>    <span class="c1"># normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy </span>
+</span><span id="Download_PDB_SS-555"><a href="#Download_PDB_SS-555"><span class="linenos">555</span></a>    <span class="c1"># distribution. In that case we need to download the files for all disulfides and the subset</span>
+</span><span id="Download_PDB_SS-556"><a href="#Download_PDB_SS-556"><span class="linenos">556</span></a>    <span class="c1"># from the Google Drive storage.</span>
+</span><span id="Download_PDB_SS-557"><a href="#Download_PDB_SS-557"><span class="linenos">557</span></a>    
+</span><span id="Download_PDB_SS-558"><a href="#Download_PDB_SS-558"><span class="linenos">558</span></a>    <span class="kn">import</span> <span class="nn">gdown</span>
+</span><span id="Download_PDB_SS-559"><a href="#Download_PDB_SS-559"><span class="linenos">559</span></a>    
+</span><span id="Download_PDB_SS-560"><a href="#Download_PDB_SS-560"><span class="linenos">560</span></a>    <span class="n">_good1</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># all data</span>
+</span><span id="Download_PDB_SS-561"><a href="#Download_PDB_SS-561"><span class="linenos">561</span></a>    <span class="n">_good2</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># subset data</span>
+</span><span id="Download_PDB_SS-562"><a href="#Download_PDB_SS-562"><span class="linenos">562</span></a>    
+</span><span id="Download_PDB_SS-563"><a href="#Download_PDB_SS-563"><span class="linenos">563</span></a>    <span class="n">_fname_sub</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">loadpath</span><span class="si">}{</span><span class="n">LOADER_SUBSET_FNAME</span><span class="si">}</span><span class="s1">&#39;</span>
+</span><span id="Download_PDB_SS-564"><a href="#Download_PDB_SS-564"><span class="linenos">564</span></a>    <span class="n">_fname_all</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">loadpath</span><span class="si">}{</span><span class="n">LOADER_FNAME</span><span class="si">}</span><span class="s1">&#39;</span>
+</span><span id="Download_PDB_SS-565"><a href="#Download_PDB_SS-565"><span class="linenos">565</span></a>    
+</span><span id="Download_PDB_SS-566"><a href="#Download_PDB_SS-566"><span class="linenos">566</span></a>    
+</span><span id="Download_PDB_SS-567"><a href="#Download_PDB_SS-567"><span class="linenos">567</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="Download_PDB_SS-568"><a href="#Download_PDB_SS-568"><span class="linenos">568</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; Download_PDB_SS(): Reading disulfides from Google Drive... &#39;</span><span class="p">)</span>
+</span><span id="Download_PDB_SS-569"><a href="#Download_PDB_SS-569"><span class="linenos">569</span></a>    
+</span><span id="Download_PDB_SS-570"><a href="#Download_PDB_SS-570"><span class="linenos">570</span></a>    <span class="k">if</span> <span class="n">gdown</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">LOADER_SUBSET_URL</span><span class="p">,</span> <span class="n">_fname_sub</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="Download_PDB_SS-571"><a href="#Download_PDB_SS-571"><span class="linenos">571</span></a>        <span class="n">_good2</span> <span class="o">=</span> <span class="mi">2</span>
+</span><span id="Download_PDB_SS-572"><a href="#Download_PDB_SS-572"><span class="linenos">572</span></a>
+</span><span id="Download_PDB_SS-573"><a href="#Download_PDB_SS-573"><span class="linenos">573</span></a>    <span class="k">if</span> <span class="n">gdown</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">LOADER_ALL_URL</span><span class="p">,</span> <span class="n">_fname_all</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="Download_PDB_SS-574"><a href="#Download_PDB_SS-574"><span class="linenos">574</span></a>        <span class="n">_good1</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span id="Download_PDB_SS-575"><a href="#Download_PDB_SS-575"><span class="linenos">575</span></a>
+</span><span id="Download_PDB_SS-576"><a href="#Download_PDB_SS-576"><span class="linenos">576</span></a>    <span class="k">return</span> <span class="n">_good1</span> <span class="o">+</span> <span class="n">_good2</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Download the databases from Google Drive.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>loadpath</strong>:  Path from which to load, defaults to DATA_DIR</li>
+<li><strong>verbose</strong>:  Verbosity, defaults to False</li>
+</ul>
+</div>
+
+
+                </section>
                 <section id="Load_PDB_SS">
                             <input id="Load_PDB_SS-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
@@ -2153,83 +2444,59 @@ a common reference (the proximal disulfides).</p>
 
     </div>
     <a class="headerlink" href="#Load_PDB_SS"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Load_PDB_SS-547"><a href="#Load_PDB_SS-547"><span class="linenos">547</span></a><span class="k">def</span> <span class="nf">Load_PDB_SS</span><span class="p">(</span><span class="n">loadpath</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DisulfideLoader</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-548"><a href="#Load_PDB_SS-548"><span class="linenos">548</span></a>    <span class="sd">&#39;&#39;&#39;</span>
-</span><span id="Load_PDB_SS-549"><a href="#Load_PDB_SS-549"><span class="linenos">549</span></a><span class="sd">    Load the fully instantiated Disulfide database from the specified file. Use the</span>
-</span><span id="Load_PDB_SS-550"><a href="#Load_PDB_SS-550"><span class="linenos">550</span></a><span class="sd">    defaults unless you are building the database by hand. *This is the function</span>
-</span><span id="Load_PDB_SS-551"><a href="#Load_PDB_SS-551"><span class="linenos">551</span></a><span class="sd">    used to load the built database.*</span>
-</span><span id="Load_PDB_SS-552"><a href="#Load_PDB_SS-552"><span class="linenos">552</span></a>
-</span><span id="Load_PDB_SS-553"><a href="#Load_PDB_SS-553"><span class="linenos">553</span></a><span class="sd">    :param loadpath: Path from which to load, defaults to DATA_DIR</span>
-</span><span id="Load_PDB_SS-554"><a href="#Load_PDB_SS-554"><span class="linenos">554</span></a><span class="sd">    :param verbose: Verbosity, defaults to False</span>
-</span><span id="Load_PDB_SS-555"><a href="#Load_PDB_SS-555"><span class="linenos">555</span></a><span class="sd">    :param subset: If True, load the subset DB, otherwise load the full database</span>
-</span><span id="Load_PDB_SS-556"><a href="#Load_PDB_SS-556"><span class="linenos">556</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="Load_PDB_SS-557"><a href="#Load_PDB_SS-557"><span class="linenos">557</span></a>    <span class="c1"># normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy </span>
-</span><span id="Load_PDB_SS-558"><a href="#Load_PDB_SS-558"><span class="linenos">558</span></a>    <span class="c1"># distribution. In that case we need to download the files for all disulfides and the subset</span>
-</span><span id="Load_PDB_SS-559"><a href="#Load_PDB_SS-559"><span class="linenos">559</span></a>    <span class="c1"># from the Google Drive storage.</span>
-</span><span id="Load_PDB_SS-560"><a href="#Load_PDB_SS-560"><span class="linenos">560</span></a>    
-</span><span id="Load_PDB_SS-561"><a href="#Load_PDB_SS-561"><span class="linenos">561</span></a>    <span class="kn">import</span> <span class="nn">gdown</span>
-</span><span id="Load_PDB_SS-562"><a href="#Load_PDB_SS-562"><span class="linenos">562</span></a>    
-</span><span id="Load_PDB_SS-563"><a href="#Load_PDB_SS-563"><span class="linenos">563</span></a>    <span class="n">_good1</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># all data</span>
-</span><span id="Load_PDB_SS-564"><a href="#Load_PDB_SS-564"><span class="linenos">564</span></a>    <span class="n">_good2</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># subset data</span>
-</span><span id="Load_PDB_SS-565"><a href="#Load_PDB_SS-565"><span class="linenos">565</span></a>    
-</span><span id="Load_PDB_SS-566"><a href="#Load_PDB_SS-566"><span class="linenos">566</span></a>    <span class="n">_fname_sub</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">loadpath</span><span class="si">}{</span><span class="n">LOADER_SUBSET_FNAME</span><span class="si">}</span><span class="s1">&#39;</span>
-</span><span id="Load_PDB_SS-567"><a href="#Load_PDB_SS-567"><span class="linenos">567</span></a>    <span class="n">_fname_all</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">loadpath</span><span class="si">}{</span><span class="n">LOADER_FNAME</span><span class="si">}</span><span class="s1">&#39;</span>
-</span><span id="Load_PDB_SS-568"><a href="#Load_PDB_SS-568"><span class="linenos">568</span></a>    
-</span><span id="Load_PDB_SS-569"><a href="#Load_PDB_SS-569"><span class="linenos">569</span></a>    <span class="k">if</span> <span class="n">subset</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-570"><a href="#Load_PDB_SS-570"><span class="linenos">570</span></a>        <span class="n">_fname</span> <span class="o">=</span> <span class="n">_fname_sub</span>
-</span><span id="Load_PDB_SS-571"><a href="#Load_PDB_SS-571"><span class="linenos">571</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-572"><a href="#Load_PDB_SS-572"><span class="linenos">572</span></a>        <span class="n">_fname</span> <span class="o">=</span> <span class="n">_fname_all</span>
-</span><span id="Load_PDB_SS-573"><a href="#Load_PDB_SS-573"><span class="linenos">573</span></a>    
-</span><span id="Load_PDB_SS-574"><a href="#Load_PDB_SS-574"><span class="linenos">574</span></a>    <span class="c1"># first attempt to read the local copy of the loader</span>
-</span><span id="Load_PDB_SS-575"><a href="#Load_PDB_SS-575"><span class="linenos">575</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-576"><a href="#Load_PDB_SS-576"><span class="linenos">576</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; load_PDB_SS(): Reading </span><span class="si">{</span><span class="n">_fname</span><span class="si">}</span><span class="s1">... &#39;</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-577"><a href="#Load_PDB_SS-577"><span class="linenos">577</span></a>
-</span><span id="Load_PDB_SS-578"><a href="#Load_PDB_SS-578"><span class="linenos">578</span></a>    <span class="k">try</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-579"><a href="#Load_PDB_SS-579"><span class="linenos">579</span></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_fname</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-580"><a href="#Load_PDB_SS-580"><span class="linenos">580</span></a>            <span class="n">res</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-581"><a href="#Load_PDB_SS-581"><span class="linenos">581</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-582"><a href="#Load_PDB_SS-582"><span class="linenos">582</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; load_PDB_SS(): Done reading </span><span class="si">{</span><span class="n">_fname</span><span class="si">}</span><span class="s1">... &#39;</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-583"><a href="#Load_PDB_SS-583"><span class="linenos">583</span></a>        <span class="k">return</span> <span class="n">res</span>
-</span><span id="Load_PDB_SS-584"><a href="#Load_PDB_SS-584"><span class="linenos">584</span></a>    
-</span><span id="Load_PDB_SS-585"><a href="#Load_PDB_SS-585"><span class="linenos">585</span></a>    <span class="c1"># we don&#39;t have it locally, so download both from google drive</span>
-</span><span id="Load_PDB_SS-586"><a href="#Load_PDB_SS-586"><span class="linenos">586</span></a>    <span class="k">except</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-587"><a href="#Load_PDB_SS-587"><span class="linenos">587</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-588"><a href="#Load_PDB_SS-588"><span class="linenos">588</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; DisulfideLoader(): Reading disulfides from Google Drive... &#39;</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-589"><a href="#Load_PDB_SS-589"><span class="linenos">589</span></a>        
-</span><span id="Load_PDB_SS-590"><a href="#Load_PDB_SS-590"><span class="linenos">590</span></a>            <span class="n">gdown</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">LOADER_SUBSET_URL</span><span class="p">,</span> <span class="n">_fname_sub</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-591"><a href="#Load_PDB_SS-591"><span class="linenos">591</span></a>            <span class="n">gdown</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">LOADER_ALL_URL</span><span class="p">,</span> <span class="n">_fname_all</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-592"><a href="#Load_PDB_SS-592"><span class="linenos">592</span></a>    <span class="sd">&#39;&#39;&#39;</span>
-</span><span id="Load_PDB_SS-593"><a href="#Load_PDB_SS-593"><span class="linenos">593</span></a><span class="sd">        #PDB_SS_ALL_LOADER.pkl</span>
-</span><span id="Load_PDB_SS-594"><a href="#Load_PDB_SS-594"><span class="linenos">594</span></a><span class="sd">        if verbose:</span>
-</span><span id="Load_PDB_SS-595"><a href="#Load_PDB_SS-595"><span class="linenos">595</span></a><span class="sd">            print(f&#39;-&gt; DisulfideLoader(): Downloading the RCSB Disulfide Database from Google Drive to {_fname}... &#39;)</span>
-</span><span id="Load_PDB_SS-596"><a href="#Load_PDB_SS-596"><span class="linenos">596</span></a><span class="sd">        </span>
-</span><span id="Load_PDB_SS-597"><a href="#Load_PDB_SS-597"><span class="linenos">597</span></a><span class="sd">        if gdown.download(LOADER_ALL_URL, _fname_all) is not None:</span>
-</span><span id="Load_PDB_SS-598"><a href="#Load_PDB_SS-598"><span class="linenos">598</span></a><span class="sd">            _good1 = True</span>
-</span><span id="Load_PDB_SS-599"><a href="#Load_PDB_SS-599"><span class="linenos">599</span></a><span class="sd">            if verbose:</span>
-</span><span id="Load_PDB_SS-600"><a href="#Load_PDB_SS-600"><span class="linenos">600</span></a><span class="sd">                print(f&#39; done.&#39;)</span>
-</span><span id="Load_PDB_SS-601"><a href="#Load_PDB_SS-601"><span class="linenos">601</span></a><span class="sd">        else:</span>
-</span><span id="Load_PDB_SS-602"><a href="#Load_PDB_SS-602"><span class="linenos">602</span></a><span class="sd">            print(&#39;\nError downloading RCSB database!&#39;)</span>
-</span><span id="Load_PDB_SS-603"><a href="#Load_PDB_SS-603"><span class="linenos">603</span></a>
-</span><span id="Load_PDB_SS-604"><a href="#Load_PDB_SS-604"><span class="linenos">604</span></a><span class="sd">        #PDB_ss_subset.pkl</span>
-</span><span id="Load_PDB_SS-605"><a href="#Load_PDB_SS-605"><span class="linenos">605</span></a><span class="sd">        if verbose:</span>
-</span><span id="Load_PDB_SS-606"><a href="#Load_PDB_SS-606"><span class="linenos">606</span></a><span class="sd">            print(f&#39;-&gt; DisulfideLoader(): Downloading disulfide subset database from Google Drive to {_fname}... &#39;, end=&#39;&#39;)</span>
-</span><span id="Load_PDB_SS-607"><a href="#Load_PDB_SS-607"><span class="linenos">607</span></a><span class="sd">        </span>
-</span><span id="Load_PDB_SS-608"><a href="#Load_PDB_SS-608"><span class="linenos">608</span></a><span class="sd">        if gdown.download(LOADER_SUBSET_URL, _fname_sub) is not None:</span>
-</span><span id="Load_PDB_SS-609"><a href="#Load_PDB_SS-609"><span class="linenos">609</span></a><span class="sd">            _good2 = True</span>
-</span><span id="Load_PDB_SS-610"><a href="#Load_PDB_SS-610"><span class="linenos">610</span></a><span class="sd">            if verbose:</span>
-</span><span id="Load_PDB_SS-611"><a href="#Load_PDB_SS-611"><span class="linenos">611</span></a><span class="sd">                print(f&#39; done.&#39;)</span>
-</span><span id="Load_PDB_SS-612"><a href="#Load_PDB_SS-612"><span class="linenos">612</span></a><span class="sd">        else:</span>
-</span><span id="Load_PDB_SS-613"><a href="#Load_PDB_SS-613"><span class="linenos">613</span></a><span class="sd">            print(&#39;Error downloading RCSB subset database!&#39;)</span>
-</span><span id="Load_PDB_SS-614"><a href="#Load_PDB_SS-614"><span class="linenos">614</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="Load_PDB_SS-615"><a href="#Load_PDB_SS-615"><span class="linenos">615</span></a>    
-</span><span id="Load_PDB_SS-616"><a href="#Load_PDB_SS-616"><span class="linenos">616</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-617"><a href="#Load_PDB_SS-617"><span class="linenos">617</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; load_PDB_SS(): Attempting to read local </span><span class="si">{</span><span class="n">_fname</span><span class="si">}</span><span class="s1">... &#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-618"><a href="#Load_PDB_SS-618"><span class="linenos">618</span></a>    <span class="c1">#try:</span>
-</span><span id="Load_PDB_SS-619"><a href="#Load_PDB_SS-619"><span class="linenos">619</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_fname</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-620"><a href="#Load_PDB_SS-620"><span class="linenos">620</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-621"><a href="#Load_PDB_SS-621"><span class="linenos">621</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-622"><a href="#Load_PDB_SS-622"><span class="linenos">622</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;done.&#39;</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-623"><a href="#Load_PDB_SS-623"><span class="linenos">623</span></a>    <span class="k">return</span> <span class="n">res</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Load_PDB_SS-579"><a href="#Load_PDB_SS-579"><span class="linenos">579</span></a><span class="k">def</span> <span class="nf">Load_PDB_SS</span><span class="p">(</span><span class="n">loadpath</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DisulfideLoader</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-580"><a href="#Load_PDB_SS-580"><span class="linenos">580</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="Load_PDB_SS-581"><a href="#Load_PDB_SS-581"><span class="linenos">581</span></a><span class="sd">    Load the fully instantiated Disulfide database from the specified file. Use the</span>
+</span><span id="Load_PDB_SS-582"><a href="#Load_PDB_SS-582"><span class="linenos">582</span></a><span class="sd">    defaults unless you are building the database by hand. *This is the function</span>
+</span><span id="Load_PDB_SS-583"><a href="#Load_PDB_SS-583"><span class="linenos">583</span></a><span class="sd">    used to load the built database.*</span>
+</span><span id="Load_PDB_SS-584"><a href="#Load_PDB_SS-584"><span class="linenos">584</span></a>
+</span><span id="Load_PDB_SS-585"><a href="#Load_PDB_SS-585"><span class="linenos">585</span></a><span class="sd">    :param loadpath: Path from which to load, defaults to DATA_DIR</span>
+</span><span id="Load_PDB_SS-586"><a href="#Load_PDB_SS-586"><span class="linenos">586</span></a><span class="sd">    :param verbose: Verbosity, defaults to False</span>
+</span><span id="Load_PDB_SS-587"><a href="#Load_PDB_SS-587"><span class="linenos">587</span></a><span class="sd">    :param subset: If True, load the subset DB, otherwise load the full database</span>
+</span><span id="Load_PDB_SS-588"><a href="#Load_PDB_SS-588"><span class="linenos">588</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="Load_PDB_SS-589"><a href="#Load_PDB_SS-589"><span class="linenos">589</span></a>    <span class="c1"># normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy </span>
+</span><span id="Load_PDB_SS-590"><a href="#Load_PDB_SS-590"><span class="linenos">590</span></a>    <span class="c1"># distribution. In that case we need to download the files for all disulfides and the subset</span>
+</span><span id="Load_PDB_SS-591"><a href="#Load_PDB_SS-591"><span class="linenos">591</span></a>    <span class="c1"># from the Google Drive storage.</span>
+</span><span id="Load_PDB_SS-592"><a href="#Load_PDB_SS-592"><span class="linenos">592</span></a>    
+</span><span id="Load_PDB_SS-593"><a href="#Load_PDB_SS-593"><span class="linenos">593</span></a>    <span class="kn">import</span> <span class="nn">gdown</span>
+</span><span id="Load_PDB_SS-594"><a href="#Load_PDB_SS-594"><span class="linenos">594</span></a>    
+</span><span id="Load_PDB_SS-595"><a href="#Load_PDB_SS-595"><span class="linenos">595</span></a>    <span class="n">_good1</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># all data</span>
+</span><span id="Load_PDB_SS-596"><a href="#Load_PDB_SS-596"><span class="linenos">596</span></a>    <span class="n">_good2</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># subset data</span>
+</span><span id="Load_PDB_SS-597"><a href="#Load_PDB_SS-597"><span class="linenos">597</span></a>    
+</span><span id="Load_PDB_SS-598"><a href="#Load_PDB_SS-598"><span class="linenos">598</span></a>    <span class="n">_fname_sub</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">loadpath</span><span class="si">}{</span><span class="n">LOADER_SUBSET_FNAME</span><span class="si">}</span><span class="s1">&#39;</span>
+</span><span id="Load_PDB_SS-599"><a href="#Load_PDB_SS-599"><span class="linenos">599</span></a>    <span class="n">_fname_all</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">loadpath</span><span class="si">}{</span><span class="n">LOADER_FNAME</span><span class="si">}</span><span class="s1">&#39;</span>
+</span><span id="Load_PDB_SS-600"><a href="#Load_PDB_SS-600"><span class="linenos">600</span></a>    
+</span><span id="Load_PDB_SS-601"><a href="#Load_PDB_SS-601"><span class="linenos">601</span></a>    <span class="k">if</span> <span class="n">subset</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-602"><a href="#Load_PDB_SS-602"><span class="linenos">602</span></a>        <span class="n">_fname</span> <span class="o">=</span> <span class="n">_fname_sub</span>
+</span><span id="Load_PDB_SS-603"><a href="#Load_PDB_SS-603"><span class="linenos">603</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-604"><a href="#Load_PDB_SS-604"><span class="linenos">604</span></a>        <span class="n">_fname</span> <span class="o">=</span> <span class="n">_fname_all</span>
+</span><span id="Load_PDB_SS-605"><a href="#Load_PDB_SS-605"><span class="linenos">605</span></a>    
+</span><span id="Load_PDB_SS-606"><a href="#Load_PDB_SS-606"><span class="linenos">606</span></a>    <span class="c1"># first attempt to read the local copy of the loader</span>
+</span><span id="Load_PDB_SS-607"><a href="#Load_PDB_SS-607"><span class="linenos">607</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-608"><a href="#Load_PDB_SS-608"><span class="linenos">608</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; load_PDB_SS(): Reading </span><span class="si">{</span><span class="n">_fname</span><span class="si">}</span><span class="s1">... &#39;</span><span class="p">)</span>
+</span><span id="Load_PDB_SS-609"><a href="#Load_PDB_SS-609"><span class="linenos">609</span></a>
+</span><span id="Load_PDB_SS-610"><a href="#Load_PDB_SS-610"><span class="linenos">610</span></a>    <span class="k">try</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-611"><a href="#Load_PDB_SS-611"><span class="linenos">611</span></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_fname</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-612"><a href="#Load_PDB_SS-612"><span class="linenos">612</span></a>            <span class="n">res</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span><span id="Load_PDB_SS-613"><a href="#Load_PDB_SS-613"><span class="linenos">613</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-614"><a href="#Load_PDB_SS-614"><span class="linenos">614</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; load_PDB_SS(): Done reading </span><span class="si">{</span><span class="n">_fname</span><span class="si">}</span><span class="s1">... &#39;</span><span class="p">)</span>
+</span><span id="Load_PDB_SS-615"><a href="#Load_PDB_SS-615"><span class="linenos">615</span></a>        <span class="k">return</span> <span class="n">res</span>
+</span><span id="Load_PDB_SS-616"><a href="#Load_PDB_SS-616"><span class="linenos">616</span></a>    
+</span><span id="Load_PDB_SS-617"><a href="#Load_PDB_SS-617"><span class="linenos">617</span></a>    <span class="c1"># we don&#39;t have it locally, so download both from google drive</span>
+</span><span id="Load_PDB_SS-618"><a href="#Load_PDB_SS-618"><span class="linenos">618</span></a>    <span class="k">except</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-619"><a href="#Load_PDB_SS-619"><span class="linenos">619</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">Download_PDB_SS</span><span class="p">(</span><span class="n">loadpath</span><span class="o">=</span><span class="n">loadpath</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+</span><span id="Load_PDB_SS-620"><a href="#Load_PDB_SS-620"><span class="linenos">620</span></a>        <span class="k">if</span> <span class="n">res</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-621"><a href="#Load_PDB_SS-621"><span class="linenos">621</span></a>            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;!! Unable to download databases, exiting&#39;</span><span class="p">)</span>
+</span><span id="Load_PDB_SS-622"><a href="#Load_PDB_SS-622"><span class="linenos">622</span></a>            <span class="k">return</span>
+</span><span id="Load_PDB_SS-623"><a href="#Load_PDB_SS-623"><span class="linenos">623</span></a>    
+</span><span id="Load_PDB_SS-624"><a href="#Load_PDB_SS-624"><span class="linenos">624</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-625"><a href="#Load_PDB_SS-625"><span class="linenos">625</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; load_PDB_SS(): Attempting to read local </span><span class="si">{</span><span class="n">_fname</span><span class="si">}</span><span class="s1">... &#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+</span><span id="Load_PDB_SS-626"><a href="#Load_PDB_SS-626"><span class="linenos">626</span></a>    <span class="c1">#try:</span>
+</span><span id="Load_PDB_SS-627"><a href="#Load_PDB_SS-627"><span class="linenos">627</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_fname</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-628"><a href="#Load_PDB_SS-628"><span class="linenos">628</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span><span id="Load_PDB_SS-629"><a href="#Load_PDB_SS-629"><span class="linenos">629</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-630"><a href="#Load_PDB_SS-630"><span class="linenos">630</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;done.&#39;</span><span class="p">)</span>
+</span><span id="Load_PDB_SS-631"><a href="#Load_PDB_SS-631"><span class="linenos">631</span></a>    <span class="k">return</span> <span class="n">res</span>
 </span></pre></div>
 
 

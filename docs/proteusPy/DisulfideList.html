@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 13.0.0"/>
+    <meta name="generator" content="pdoc 14.0.0"/>
     <title>proteusPy.DisulfideList API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
@@ -51,13 +51,43 @@
 
 
 
-        <h2>API Documentation</h2>
-            <ul class="memberlist">
+            <h2>API Documentation</h2>
+                <ul class="memberlist">
+            <li>
+                    <a class="variable" href="#DPI">DPI</a>
+            </li>
+            <li>
+                    <a class="variable" href="#WIDTH">WIDTH</a>
+            </li>
+            <li>
+                    <a class="variable" href="#HEIGHT">HEIGHT</a>
+            </li>
+            <li>
+                    <a class="variable" href="#TORMIN">TORMIN</a>
+            </li>
+            <li>
+                    <a class="variable" href="#TORMAX">TORMAX</a>
+            </li>
+            <li>
+                    <a class="variable" href="#Torsion_DF_Cols">Torsion_DF_Cols</a>
+            </li>
+            <li>
+                    <a class="variable" href="#Distance_DF_Cols">Distance_DF_Cols</a>
+            </li>
             <li>
                     <a class="class" href="#DisulfideList">DisulfideList</a>
                             <ul class="memberlist">
                         <li>
                                 <a class="function" href="#DisulfideList.__init__">DisulfideList</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideList.pdb_id">pdb_id</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideList.res">res</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideList.quiet">quiet</a>
                         </li>
                         <li>
                                 <a class="variable" href="#DisulfideList.Average_Distance">Average_Distance</a>
@@ -132,6 +162,9 @@
                                 <a class="function" href="#DisulfideList.insert">insert</a>
                         </li>
                         <li>
+                                <a class="variable" href="#DisulfideList.length">length</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#DisulfideList.min">min</a>
                         </li>
                         <li>
@@ -154,6 +187,12 @@
                         </li>
                         <li>
                                 <a class="function" href="#DisulfideList.screenshot">screenshot</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideList.torsion_df">torsion_df</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#DisulfideList.torsion_array">torsion_array</a>
                         </li>
                         <li>
                                 <a class="function" href="#DisulfideList.validate_ss">validate_ss</a>
@@ -252,7 +291,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-55"><a href="#L-55"><span class="linenos">  55</span></a><span class="n">Distance_DF_Cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">,</span> <span class="s1">&#39;ss_id&#39;</span><span class="p">,</span> <span class="s1">&#39;proximal&#39;</span><span class="p">,</span> <span class="s1">&#39;distal&#39;</span><span class="p">,</span> <span class="s1">&#39;energy&#39;</span><span class="p">,</span> <span class="s1">&#39;ca_distance&#39;</span><span class="p">,</span> <span class="s1">&#39;cb_distance&#39;</span><span class="p">]</span>
 </span><span id="L-56"><a href="#L-56"><span class="linenos">  56</span></a>
 </span><span id="L-57"><a href="#L-57"><span class="linenos">  57</span></a><span class="k">class</span> <span class="nc">DisulfideList</span><span class="p">(</span><span class="n">UserList</span><span class="p">):</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos">  58</span></a>    <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos">  58</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-59"><a href="#L-59"><span class="linenos">  59</span></a><span class="sd">    The class provides a sortable list for Disulfide objects.</span>
 </span><span id="L-60"><a href="#L-60"><span class="linenos">  60</span></a><span class="sd">    Indexing and slicing are supported, as well as typical list operations like </span>
 </span><span id="L-61"><a href="#L-61"><span class="linenos">  61</span></a><span class="sd">    ``.insert()``, ``.append()`` and ``.extend().`` The DisulfideList object must be initialized </span>
@@ -353,7 +392,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-156"><a href="#L-156"><span class="linenos"> 156</span></a><span class="sd">    &#39;&#39;&#39;</span>
 </span><span id="L-157"><a href="#L-157"><span class="linenos"> 157</span></a>    
 </span><span id="L-158"><a href="#L-158"><span class="linenos"> 158</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterable</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">res</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="L-159"><a href="#L-159"><span class="linenos"> 159</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-159"><a href="#L-159"><span class="linenos"> 159</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-160"><a href="#L-160"><span class="linenos"> 160</span></a><span class="sd">        Initialize the DisulfideList</span>
 </span><span id="L-161"><a href="#L-161"><span class="linenos"> 161</span></a>
 </span><span id="L-162"><a href="#L-162"><span class="linenos"> 162</span></a><span class="sd">        :param iterable: an iterable e.g. []</span>
@@ -385,7 +424,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-188"><a href="#L-188"><span class="linenos"> 188</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validate_ss</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">)</span>
 </span><span id="L-189"><a href="#L-189"><span class="linenos"> 189</span></a>
 </span><span id="L-190"><a href="#L-190"><span class="linenos"> 190</span></a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
-</span><span id="L-191"><a href="#L-191"><span class="linenos"> 191</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-191"><a href="#L-191"><span class="linenos"> 191</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-192"><a href="#L-192"><span class="linenos"> 192</span></a><span class="sd">        Retrieve a disulfide from the list. Internal only.</span>
 </span><span id="L-193"><a href="#L-193"><span class="linenos"> 193</span></a>
 </span><span id="L-194"><a href="#L-194"><span class="linenos"> 194</span></a><span class="sd">        :param item: Index or slice</span>
@@ -405,7 +444,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-208"><a href="#L-208"><span class="linenos"> 208</span></a>    <span class="c1"># cylinders and atomic sphere meshes. Called by all high level routines</span>
 </span><span id="L-209"><a href="#L-209"><span class="linenos"> 209</span></a>
 </span><span id="L-210"><a href="#L-210"><span class="linenos"> 210</span></a>    <span class="k">def</span> <span class="nf">_render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">panelsize</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pv</span><span class="o">.</span><span class="n">Plotter</span><span class="p">:</span>
-</span><span id="L-211"><a href="#L-211"><span class="linenos"> 211</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-211"><a href="#L-211"><span class="linenos"> 211</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-212"><a href="#L-212"><span class="linenos"> 212</span></a><span class="sd">        Display a window showing the list of disulfides in the given style.</span>
 </span><span id="L-213"><a href="#L-213"><span class="linenos"> 213</span></a><span class="sd">        :param style: one of &#39;cpk&#39;, &#39;bs&#39;, &#39;sb&#39;, &#39;plain&#39;, &#39;cov&#39;, &#39;pd&#39;</span>
 </span><span id="L-214"><a href="#L-214"><span class="linenos"> 214</span></a><span class="sd">        :return: Window in the relevant style</span>
@@ -436,7 +475,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-239"><a href="#L-239"><span class="linenos"> 239</span></a>    
 </span><span id="L-240"><a href="#L-240"><span class="linenos"> 240</span></a>    <span class="nd">@property</span>
 </span><span id="L-241"><a href="#L-241"><span class="linenos"> 241</span></a>    <span class="k">def</span> <span class="nf">Average_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-242"><a href="#L-242"><span class="linenos"> 242</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-242"><a href="#L-242"><span class="linenos"> 242</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-243"><a href="#L-243"><span class="linenos"> 243</span></a><span class="sd">        Return the Average distance (Å) between the atoms in the list.</span>
 </span><span id="L-244"><a href="#L-244"><span class="linenos"> 244</span></a>
 </span><span id="L-245"><a href="#L-245"><span class="linenos"> 245</span></a><span class="sd">        :return: Average distance (Å) between all atoms in the list</span>
@@ -458,7 +497,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-261"><a href="#L-261"><span class="linenos"> 261</span></a>    
 </span><span id="L-262"><a href="#L-262"><span class="linenos"> 262</span></a>    <span class="nd">@property</span>
 </span><span id="L-263"><a href="#L-263"><span class="linenos"> 263</span></a>    <span class="k">def</span> <span class="nf">Average_Energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-264"><a href="#L-264"><span class="linenos"> 264</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-264"><a href="#L-264"><span class="linenos"> 264</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-265"><a href="#L-265"><span class="linenos"> 265</span></a><span class="sd">        Return the Average energy (kcal/mol) for the Disulfides in the list.</span>
 </span><span id="L-266"><a href="#L-266"><span class="linenos"> 266</span></a>
 </span><span id="L-267"><a href="#L-267"><span class="linenos"> 267</span></a><span class="sd">        :return: Average energy (kcal/mol) between all atoms in the list</span>
@@ -475,7 +514,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-278"><a href="#L-278"><span class="linenos"> 278</span></a>   
 </span><span id="L-279"><a href="#L-279"><span class="linenos"> 279</span></a>    <span class="nd">@property</span>
 </span><span id="L-280"><a href="#L-280"><span class="linenos"> 280</span></a>    <span class="k">def</span> <span class="nf">Average_Conformation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-281"><a href="#L-281"><span class="linenos"> 281</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-281"><a href="#L-281"><span class="linenos"> 281</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-282"><a href="#L-282"><span class="linenos"> 282</span></a><span class="sd">        Return the Average conformation for the Disulfides in the list.</span>
 </span><span id="L-283"><a href="#L-283"><span class="linenos"> 283</span></a>
 </span><span id="L-284"><a href="#L-284"><span class="linenos"> 284</span></a><span class="sd">        :return: Average conformation: [x1, x2, x3, x4, x5]</span>
@@ -494,7 +533,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-297"><a href="#L-297"><span class="linenos"> 297</span></a>        <span class="k">return</span> <span class="n">res</span><span class="o">/</span><span class="n">tot</span>
 </span><span id="L-298"><a href="#L-298"><span class="linenos"> 298</span></a>   
 </span><span id="L-299"><a href="#L-299"><span class="linenos"> 299</span></a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
-</span><span id="L-300"><a href="#L-300"><span class="linenos"> 300</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-300"><a href="#L-300"><span class="linenos"> 300</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-301"><a href="#L-301"><span class="linenos"> 301</span></a><span class="sd">        Append the list with item</span>
 </span><span id="L-302"><a href="#L-302"><span class="linenos"> 302</span></a>
 </span><span id="L-303"><a href="#L-303"><span class="linenos"> 303</span></a><span class="sd">        :param item: Disulfide to add</span>
@@ -504,7 +543,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-307"><a href="#L-307"><span class="linenos"> 307</span></a>
 </span><span id="L-308"><a href="#L-308"><span class="linenos"> 308</span></a>    <span class="nd">@property</span>
 </span><span id="L-309"><a href="#L-309"><span class="linenos"> 309</span></a>    <span class="k">def</span> <span class="nf">Average_Resolution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span id="L-310"><a href="#L-310"><span class="linenos"> 310</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-310"><a href="#L-310"><span class="linenos"> 310</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-311"><a href="#L-311"><span class="linenos"> 311</span></a><span class="sd">        Compute and return the average structure resolution for the given list.</span>
 </span><span id="L-312"><a href="#L-312"><span class="linenos"> 312</span></a>
 </span><span id="L-313"><a href="#L-313"><span class="linenos"> 313</span></a><span class="sd">        :return: Average resolution (A)</span>
@@ -521,7 +560,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-324"><a href="#L-324"><span class="linenos"> 324</span></a>    
 </span><span id="L-325"><a href="#L-325"><span class="linenos"> 325</span></a>    <span class="nd">@property</span>
 </span><span id="L-326"><a href="#L-326"><span class="linenos"> 326</span></a>    <span class="k">def</span> <span class="nf">Average_Torsion_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-327"><a href="#L-327"><span class="linenos"> 327</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-327"><a href="#L-327"><span class="linenos"> 327</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-328"><a href="#L-328"><span class="linenos"> 328</span></a><span class="sd">        Return the average distance in torsion space (degrees), between all pairs in the</span>
 </span><span id="L-329"><a href="#L-329"><span class="linenos"> 329</span></a><span class="sd">        DisulfideList</span>
 </span><span id="L-330"><a href="#L-330"><span class="linenos"> 330</span></a>
@@ -543,7 +582,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-346"><a href="#L-346"><span class="linenos"> 346</span></a>    
 </span><span id="L-347"><a href="#L-347"><span class="linenos"> 347</span></a>    
 </span><span id="L-348"><a href="#L-348"><span class="linenos"> 348</span></a>    <span class="k">def</span> <span class="nf">build_distance_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-</span><span id="L-349"><a href="#L-349"><span class="linenos"> 349</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-349"><a href="#L-349"><span class="linenos"> 349</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-350"><a href="#L-350"><span class="linenos"> 350</span></a><span class="sd">        Create a dataframe containing the input DisulfideList Cα-Cα distance, energy. </span>
 </span><span id="L-351"><a href="#L-351"><span class="linenos"> 351</span></a><span class="sd">        This can take several minutes for the entire database.</span>
 </span><span id="L-352"><a href="#L-352"><span class="linenos"> 352</span></a>
@@ -566,7 +605,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-369"><a href="#L-369"><span class="linenos"> 369</span></a>        <span class="k">return</span> <span class="n">SS_df</span>
 </span><span id="L-370"><a href="#L-370"><span class="linenos"> 370</span></a>
 </span><span id="L-371"><a href="#L-371"><span class="linenos"> 371</span></a>    <span class="k">def</span> <span class="nf">build_torsion_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-</span><span id="L-372"><a href="#L-372"><span class="linenos"> 372</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-372"><a href="#L-372"><span class="linenos"> 372</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-373"><a href="#L-373"><span class="linenos"> 373</span></a><span class="sd">        Create a dataframe containing the input DisulfideList torsional parameters,</span>
 </span><span id="L-374"><a href="#L-374"><span class="linenos"> 374</span></a><span class="sd">        Cα-Cα distance, energy, and phi-psi angles. This can take several minutes for the</span>
 </span><span id="L-375"><a href="#L-375"><span class="linenos"> 375</span></a><span class="sd">        entire database.</span>
@@ -594,7 +633,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-397"><a href="#L-397"><span class="linenos"> 397</span></a>        <span class="k">return</span> <span class="n">SS_df</span>
 </span><span id="L-398"><a href="#L-398"><span class="linenos"> 398</span></a>
 </span><span id="L-399"><a href="#L-399"><span class="linenos"> 399</span></a>    <span class="k">def</span> <span class="nf">by_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chain</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="L-400"><a href="#L-400"><span class="linenos"> 400</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-400"><a href="#L-400"><span class="linenos"> 400</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-401"><a href="#L-401"><span class="linenos"> 401</span></a><span class="sd">        Return a DisulfideList from the input chain identifier.</span>
 </span><span id="L-402"><a href="#L-402"><span class="linenos"> 402</span></a>
 </span><span id="L-403"><a href="#L-403"><span class="linenos"> 403</span></a><span class="sd">        :param chain: chain identifier, &#39;A&#39;, &#39;B, etc</span>
@@ -642,7 +681,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-445"><a href="#L-445"><span class="linenos"> 445</span></a>        <span class="k">return</span> <span class="n">tor_stats</span><span class="p">,</span> <span class="n">dist_stats</span>
 </span><span id="L-446"><a href="#L-446"><span class="linenos"> 446</span></a>
 </span><span id="L-447"><a href="#L-447"><span class="linenos"> 447</span></a>    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;sb&#39;</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">panelsize</span><span class="o">=</span><span class="mi">512</span><span class="p">):</span>
-</span><span id="L-448"><a href="#L-448"><span class="linenos"> 448</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-448"><a href="#L-448"><span class="linenos"> 448</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-449"><a href="#L-449"><span class="linenos"> 449</span></a><span class="sd">        Display the Disulfide list in the specific rendering style.</span>
 </span><span id="L-450"><a href="#L-450"><span class="linenos"> 450</span></a>
 </span><span id="L-451"><a href="#L-451"><span class="linenos"> 451</span></a><span class="sd">        :param single: Display the bond in a single panel in the specific style. </span>
@@ -672,7 +711,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-475"><a href="#L-475"><span class="linenos"> 475</span></a>                            <span class="n">fname</span><span class="o">=</span><span class="s1">&#39;ss_torsions.png&#39;</span><span class="p">,</span>
 </span><span id="L-476"><a href="#L-476"><span class="linenos"> 476</span></a>                            <span class="n">stats</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="L-477"><a href="#L-477"><span class="linenos"> 477</span></a>                            <span class="n">light</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="L-478"><a href="#L-478"><span class="linenos"> 478</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-478"><a href="#L-478"><span class="linenos"> 478</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-479"><a href="#L-479"><span class="linenos"> 479</span></a><span class="sd">        Display torsion and distance statistics for a given Disulfide list.</span>
 </span><span id="L-480"><a href="#L-480"><span class="linenos"> 480</span></a>
 </span><span id="L-481"><a href="#L-481"><span class="linenos"> 481</span></a><span class="sd">        :param display: Whether to display the plot in the notebook. Default is True.</span>
@@ -772,7 +811,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-575"><a href="#L-575"><span class="linenos"> 575</span></a>    
 </span><span id="L-576"><a href="#L-576"><span class="linenos"> 576</span></a>    <span class="nd">@property</span>
 </span><span id="L-577"><a href="#L-577"><span class="linenos"> 577</span></a>    <span class="k">def</span> <span class="nf">distance_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span> 
-</span><span id="L-578"><a href="#L-578"><span class="linenos"> 578</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-578"><a href="#L-578"><span class="linenos"> 578</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-579"><a href="#L-579"><span class="linenos"> 579</span></a><span class="sd">        Build and return the distance dataframe for the input list.</span>
 </span><span id="L-580"><a href="#L-580"><span class="linenos"> 580</span></a><span class="sd">        This can take considerable time for the entire list.</span>
 </span><span id="L-581"><a href="#L-581"><span class="linenos"> 581</span></a>
@@ -790,7 +829,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-593"><a href="#L-593"><span class="linenos"> 593</span></a>    
 </span><span id="L-594"><a href="#L-594"><span class="linenos"> 594</span></a>    <span class="k">def</span> <span class="nf">display_overlay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">screenshot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">movie</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
 </span><span id="L-595"><a href="#L-595"><span class="linenos"> 595</span></a>                        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s1">&#39;ss_overlay.png&#39;</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="L-596"><a href="#L-596"><span class="linenos"> 596</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-596"><a href="#L-596"><span class="linenos"> 596</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-597"><a href="#L-597"><span class="linenos"> 597</span></a><span class="sd">        Display all disulfides in the list overlaid in stick mode against</span>
 </span><span id="L-598"><a href="#L-598"><span class="linenos"> 598</span></a><span class="sd">        a common coordinate frames. This allows us to see all of the disulfides</span>
 </span><span id="L-599"><a href="#L-599"><span class="linenos"> 599</span></a><span class="sd">        at one time in a single view. Colors vary smoothy between bonds.</span>
@@ -878,7 +917,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-681"><a href="#L-681"><span class="linenos"> 681</span></a>        <span class="k">return</span>
 </span><span id="L-682"><a href="#L-682"><span class="linenos"> 682</span></a>
 </span><span id="L-683"><a href="#L-683"><span class="linenos"> 683</span></a>    <span class="k">def</span> <span class="nf">extend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-</span><span id="L-684"><a href="#L-684"><span class="linenos"> 684</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-684"><a href="#L-684"><span class="linenos"> 684</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-685"><a href="#L-685"><span class="linenos"> 685</span></a><span class="sd">        Extend the Disulfide list with other.</span>
 </span><span id="L-686"><a href="#L-686"><span class="linenos"> 686</span></a>
 </span><span id="L-687"><a href="#L-687"><span class="linenos"> 687</span></a><span class="sd">        :param other: extension</span>
@@ -891,7 +930,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-694"><a href="#L-694"><span class="linenos"> 694</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validate_ss</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">other</span><span class="p">)</span>
 </span><span id="L-695"><a href="#L-695"><span class="linenos"> 695</span></a>    
 </span><span id="L-696"><a href="#L-696"><span class="linenos"> 696</span></a>    <span class="k">def</span> <span class="nf">get_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Disulfide</span><span class="p">:</span>
-</span><span id="L-697"><a href="#L-697"><span class="linenos"> 697</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-697"><a href="#L-697"><span class="linenos"> 697</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-698"><a href="#L-698"><span class="linenos"> 698</span></a><span class="sd">        Returns the Disulfide with the given name from the list.</span>
 </span><span id="L-699"><a href="#L-699"><span class="linenos"> 699</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="L-700"><a href="#L-700"><span class="linenos"> 700</span></a>        <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
@@ -900,7 +939,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-703"><a href="#L-703"><span class="linenos"> 703</span></a>        <span class="k">return</span> <span class="kc">None</span>
 </span><span id="L-704"><a href="#L-704"><span class="linenos"> 704</span></a>
 </span><span id="L-705"><a href="#L-705"><span class="linenos"> 705</span></a>    <span class="k">def</span> <span class="nf">Oget_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Disulfide</span><span class="p">:</span>
-</span><span id="L-706"><a href="#L-706"><span class="linenos"> 706</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-706"><a href="#L-706"><span class="linenos"> 706</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-707"><a href="#L-707"><span class="linenos"> 707</span></a><span class="sd">        Returns the Disulfide with the given name from the list.</span>
 </span><span id="L-708"><a href="#L-708"><span class="linenos"> 708</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="L-709"><a href="#L-709"><span class="linenos"> 709</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
@@ -914,7 +953,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-717"><a href="#L-717"><span class="linenos"> 717</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-718"><a href="#L-718"><span class="linenos"> 718</span></a>    
 </span><span id="L-719"><a href="#L-719"><span class="linenos"> 719</span></a>    <span class="k">def</span> <span class="nf">get_chains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-720"><a href="#L-720"><span class="linenos"> 720</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-720"><a href="#L-720"><span class="linenos"> 720</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-721"><a href="#L-721"><span class="linenos"> 721</span></a><span class="sd">        Return the chain IDs for chains within the given Disulfide.</span>
 </span><span id="L-722"><a href="#L-722"><span class="linenos"> 722</span></a><span class="sd">        :return: Chain IDs for given Disulfide</span>
 </span><span id="L-723"><a href="#L-723"><span class="linenos"> 723</span></a><span class="sd">        &#39;&#39;&#39;</span>
@@ -933,7 +972,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-736"><a href="#L-736"><span class="linenos"> 736</span></a>        <span class="k">return</span> <span class="n">res_dict</span>
 </span><span id="L-737"><a href="#L-737"><span class="linenos"> 737</span></a>
 </span><span id="L-738"><a href="#L-738"><span class="linenos"> 738</span></a>    <span class="k">def</span> <span class="nf">get_torsion_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-739"><a href="#L-739"><span class="linenos"> 739</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-739"><a href="#L-739"><span class="linenos"> 739</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-740"><a href="#L-740"><span class="linenos"> 740</span></a><span class="sd">        Returns a 2D NumPy array representing the dihedral angles in the given disulfide list.</span>
 </span><span id="L-741"><a href="#L-741"><span class="linenos"> 741</span></a>
 </span><span id="L-742"><a href="#L-742"><span class="linenos"> 742</span></a><span class="sd">        :return: A 2D NumPy array of shape (n, 5), where n is the number of disulfide bonds in the list. Each row</span>
@@ -951,7 +990,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-754"><a href="#L-754"><span class="linenos"> 754</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-755"><a href="#L-755"><span class="linenos"> 755</span></a>
 </span><span id="L-756"><a href="#L-756"><span class="linenos"> 756</span></a>    <span class="k">def</span> <span class="nf">has_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chain</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-757"><a href="#L-757"><span class="linenos"> 757</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-757"><a href="#L-757"><span class="linenos"> 757</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-758"><a href="#L-758"><span class="linenos"> 758</span></a><span class="sd">        Returns True if given chain contained in Disulfide, False otherwise.</span>
 </span><span id="L-759"><a href="#L-759"><span class="linenos"> 759</span></a><span class="sd">        :return: Returns True if given chain contained in Disulfide, False otherwise.</span>
 </span><span id="L-760"><a href="#L-760"><span class="linenos"> 760</span></a><span class="sd">        &#39;&#39;&#39;</span>
@@ -965,14 +1004,14 @@ Last revision: 2/24/2023</p>
 </span><span id="L-768"><a href="#L-768"><span class="linenos"> 768</span></a>
 </span><span id="L-769"><a href="#L-769"><span class="linenos"> 769</span></a>    <span class="nd">@property</span>
 </span><span id="L-770"><a href="#L-770"><span class="linenos"> 770</span></a>    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-771"><a href="#L-771"><span class="linenos"> 771</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-771"><a href="#L-771"><span class="linenos"> 771</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-772"><a href="#L-772"><span class="linenos"> 772</span></a><span class="sd">        PDB ID of the list</span>
 </span><span id="L-773"><a href="#L-773"><span class="linenos"> 773</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="L-774"><a href="#L-774"><span class="linenos"> 774</span></a>        <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb_id</span><span class="p">)</span>
 </span><span id="L-775"><a href="#L-775"><span class="linenos"> 775</span></a>    
 </span><span id="L-776"><a href="#L-776"><span class="linenos"> 776</span></a>    <span class="nd">@id</span><span class="o">.</span><span class="n">setter</span>
 </span><span id="L-777"><a href="#L-777"><span class="linenos"> 777</span></a>    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="L-778"><a href="#L-778"><span class="linenos"> 778</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-778"><a href="#L-778"><span class="linenos"> 778</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-779"><a href="#L-779"><span class="linenos"> 779</span></a><span class="sd">        Set the DisulfideList ID</span>
 </span><span id="L-780"><a href="#L-780"><span class="linenos"> 780</span></a>
 </span><span id="L-781"><a href="#L-781"><span class="linenos"> 781</span></a><span class="sd">        Parameters</span>
@@ -984,14 +1023,14 @@ Last revision: 2/24/2023</p>
 </span><span id="L-787"><a href="#L-787"><span class="linenos"> 787</span></a>    
 </span><span id="L-788"><a href="#L-788"><span class="linenos"> 788</span></a>    <span class="nd">@property</span>
 </span><span id="L-789"><a href="#L-789"><span class="linenos"> 789</span></a>    <span class="k">def</span> <span class="nf">resolution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-790"><a href="#L-790"><span class="linenos"> 790</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-790"><a href="#L-790"><span class="linenos"> 790</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-791"><a href="#L-791"><span class="linenos"> 791</span></a><span class="sd">        Resolution of the parent sturcture (A)</span>
 </span><span id="L-792"><a href="#L-792"><span class="linenos"> 792</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="L-793"><a href="#L-793"><span class="linenos"> 793</span></a>        <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">)</span>
 </span><span id="L-794"><a href="#L-794"><span class="linenos"> 794</span></a>    
 </span><span id="L-795"><a href="#L-795"><span class="linenos"> 795</span></a>    <span class="nd">@resolution</span><span class="o">.</span><span class="n">setter</span>
 </span><span id="L-796"><a href="#L-796"><span class="linenos"> 796</span></a>    <span class="k">def</span> <span class="nf">resolution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="L-797"><a href="#L-797"><span class="linenos"> 797</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-797"><a href="#L-797"><span class="linenos"> 797</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-798"><a href="#L-798"><span class="linenos"> 798</span></a><span class="sd">        Set the resolution of the list</span>
 </span><span id="L-799"><a href="#L-799"><span class="linenos"> 799</span></a>
 </span><span id="L-800"><a href="#L-800"><span class="linenos"> 800</span></a><span class="sd">        :param value: Resolution (A)</span>
@@ -1004,7 +1043,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-807"><a href="#L-807"><span class="linenos"> 807</span></a>
 </span><span id="L-808"><a href="#L-808"><span class="linenos"> 808</span></a>
 </span><span id="L-809"><a href="#L-809"><span class="linenos"> 809</span></a>    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
-</span><span id="L-810"><a href="#L-810"><span class="linenos"> 810</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-810"><a href="#L-810"><span class="linenos"> 810</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-811"><a href="#L-811"><span class="linenos"> 811</span></a><span class="sd">        Insert a Disulfide into the list at the specified index</span>
 </span><span id="L-812"><a href="#L-812"><span class="linenos"> 812</span></a>
 </span><span id="L-813"><a href="#L-813"><span class="linenos"> 813</span></a><span class="sd">        :param index: insertion point</span>
@@ -1020,7 +1059,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-823"><a href="#L-823"><span class="linenos"> 823</span></a>    
 </span><span id="L-824"><a href="#L-824"><span class="linenos"> 824</span></a>    
 </span><span id="L-825"><a href="#L-825"><span class="linenos"> 825</span></a>    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-826"><a href="#L-826"><span class="linenos"> 826</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-826"><a href="#L-826"><span class="linenos"> 826</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-827"><a href="#L-827"><span class="linenos"> 827</span></a><span class="sd">        Return Disulfide from the list with the minimum energy</span>
 </span><span id="L-828"><a href="#L-828"><span class="linenos"> 828</span></a>
 </span><span id="L-829"><a href="#L-829"><span class="linenos"> 829</span></a><span class="sd">        :return: Disulfide with the minimum energy.</span>
@@ -1029,7 +1068,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-832"><a href="#L-832"><span class="linenos"> 832</span></a>        <span class="k">return</span> <span class="n">sslist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </span><span id="L-833"><a href="#L-833"><span class="linenos"> 833</span></a>    
 </span><span id="L-834"><a href="#L-834"><span class="linenos"> 834</span></a>    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-835"><a href="#L-835"><span class="linenos"> 835</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-835"><a href="#L-835"><span class="linenos"> 835</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-836"><a href="#L-836"><span class="linenos"> 836</span></a><span class="sd">        Return Disulfide from the list with the maximum energy</span>
 </span><span id="L-837"><a href="#L-837"><span class="linenos"> 837</span></a><span class="sd">        </span>
 </span><span id="L-838"><a href="#L-838"><span class="linenos"> 838</span></a><span class="sd">        :return: Disulfide with the maximum energy.</span>
@@ -1038,7 +1077,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-841"><a href="#L-841"><span class="linenos"> 841</span></a>        <span class="k">return</span> <span class="n">sslist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 </span><span id="L-842"><a href="#L-842"><span class="linenos"> 842</span></a>    
 </span><span id="L-843"><a href="#L-843"><span class="linenos"> 843</span></a>    <span class="k">def</span> <span class="nf">minmax_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-844"><a href="#L-844"><span class="linenos"> 844</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-844"><a href="#L-844"><span class="linenos"> 844</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-845"><a href="#L-845"><span class="linenos"> 845</span></a><span class="sd">        Return the Disulfides with the minimum and </span>
 </span><span id="L-846"><a href="#L-846"><span class="linenos"> 846</span></a><span class="sd">        maximum Cα distances in the list.</span>
 </span><span id="L-847"><a href="#L-847"><span class="linenos"> 847</span></a>
@@ -1069,7 +1108,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-872"><a href="#L-872"><span class="linenos"> 872</span></a>        <span class="k">return</span> <span class="n">sslist</span><span class="p">[</span><span class="n">ssmin</span><span class="p">],</span> <span class="n">sslist</span><span class="p">[</span><span class="n">ssmax</span><span class="p">]</span>
 </span><span id="L-873"><a href="#L-873"><span class="linenos"> 873</span></a>
 </span><span id="L-874"><a href="#L-874"><span class="linenos"> 874</span></a>    <span class="k">def</span> <span class="nf">minmax_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-875"><a href="#L-875"><span class="linenos"> 875</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-875"><a href="#L-875"><span class="linenos"> 875</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-876"><a href="#L-876"><span class="linenos"> 876</span></a><span class="sd">        Return the Disulfides with the minimum and maximum energies</span>
 </span><span id="L-877"><a href="#L-877"><span class="linenos"> 877</span></a><span class="sd">        from the DisulfideList.</span>
 </span><span id="L-878"><a href="#L-878"><span class="linenos"> 878</span></a>
@@ -1080,7 +1119,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-883"><a href="#L-883"><span class="linenos"> 883</span></a>
 </span><span id="L-884"><a href="#L-884"><span class="linenos"> 884</span></a>    <span class="k">def</span> <span class="nf">nearest_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chi1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">chi2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">chi3</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> 
 </span><span id="L-885"><a href="#L-885"><span class="linenos"> 885</span></a>                        <span class="n">chi4</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">chi5</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-</span><span id="L-886"><a href="#L-886"><span class="linenos"> 886</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-886"><a href="#L-886"><span class="linenos"> 886</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-887"><a href="#L-887"><span class="linenos"> 887</span></a><span class="sd">        Given a torsional array of chi1-chi5, return list of Disulfides</span>
 </span><span id="L-888"><a href="#L-888"><span class="linenos"> 888</span></a><span class="sd">        within cutoff. </span>
 </span><span id="L-889"><a href="#L-889"><span class="linenos"> 889</span></a>
@@ -1103,7 +1142,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-906"><a href="#L-906"><span class="linenos"> 906</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-907"><a href="#L-907"><span class="linenos"> 907</span></a>        
 </span><span id="L-908"><a href="#L-908"><span class="linenos"> 908</span></a>    <span class="k">def</span> <span class="nf">nearest_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-</span><span id="L-909"><a href="#L-909"><span class="linenos"> 909</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-909"><a href="#L-909"><span class="linenos"> 909</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-910"><a href="#L-910"><span class="linenos"> 910</span></a><span class="sd">        Given an input Disulfide and overall torsional cutoff, return </span>
 </span><span id="L-911"><a href="#L-911"><span class="linenos"> 911</span></a><span class="sd">        the list of Disulfides within the cutoff </span>
 </span><span id="L-912"><a href="#L-912"><span class="linenos"> 912</span></a>
@@ -1132,7 +1171,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-935"><a href="#L-935"><span class="linenos"> 935</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="L-936"><a href="#L-936"><span class="linenos"> 936</span></a>
 </span><span id="L-937"><a href="#L-937"><span class="linenos"> 937</span></a>    <span class="k">def</span> <span class="nf">pprint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-938"><a href="#L-938"><span class="linenos"> 938</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-938"><a href="#L-938"><span class="linenos"> 938</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-939"><a href="#L-939"><span class="linenos"> 939</span></a><span class="sd">        Pretty print self.</span>
 </span><span id="L-940"><a href="#L-940"><span class="linenos"> 940</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="L-941"><a href="#L-941"><span class="linenos"> 941</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
@@ -1140,7 +1179,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-943"><a href="#L-943"><span class="linenos"> 943</span></a>            <span class="n">ss</span><span class="o">.</span><span class="n">pprint</span><span class="p">()</span>
 </span><span id="L-944"><a href="#L-944"><span class="linenos"> 944</span></a>    
 </span><span id="L-945"><a href="#L-945"><span class="linenos"> 945</span></a>    <span class="k">def</span> <span class="nf">pprint_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-946"><a href="#L-946"><span class="linenos"> 946</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-946"><a href="#L-946"><span class="linenos"> 946</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-947"><a href="#L-947"><span class="linenos"> 947</span></a><span class="sd">        Pretty print full disulfide descriptions in self.</span>
 </span><span id="L-948"><a href="#L-948"><span class="linenos"> 948</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="L-949"><a href="#L-949"><span class="linenos"> 949</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
@@ -1148,7 +1187,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-951"><a href="#L-951"><span class="linenos"> 951</span></a>            <span class="n">ss</span><span class="o">.</span><span class="n">pprint_all</span><span class="p">()</span>
 </span><span id="L-952"><a href="#L-952"><span class="linenos"> 952</span></a>    
 </span><span id="L-953"><a href="#L-953"><span class="linenos"> 953</span></a>    <span class="k">def</span> <span class="nf">screenshot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;bs&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s1">&#39;sslist.png&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="L-954"><a href="#L-954"><span class="linenos"> 954</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-954"><a href="#L-954"><span class="linenos"> 954</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-955"><a href="#L-955"><span class="linenos"> 955</span></a><span class="sd">        Save the interactive window displaying the list of </span>
 </span><span id="L-956"><a href="#L-956"><span class="linenos"> 956</span></a><span class="sd">        disulfides in the given style. Position the disulfide then</span>
 </span><span id="L-957"><a href="#L-957"><span class="linenos"> 957</span></a><span class="sd">        close the window to save.</span>
@@ -1208,7 +1247,7 @@ Last revision: 2/24/2023</p>
 </span><span id="L-1011"><a href="#L-1011"><span class="linenos">1011</span></a>                        <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="L-1012"><a href="#L-1012"><span class="linenos">1012</span></a>                        <span class="n">dbg</span> <span class="o">=</span> <span class="kc">False</span>
 </span><span id="L-1013"><a href="#L-1013"><span class="linenos">1013</span></a>                        <span class="p">):</span>
-</span><span id="L-1014"><a href="#L-1014"><span class="linenos">1014</span></a>    <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-1014"><a href="#L-1014"><span class="linenos">1014</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-1015"><a href="#L-1015"><span class="linenos">1015</span></a><span class="sd">    Loads the Disulfides by PDB ID and returns a ```DisulfideList``` of Disulfide objects.</span>
 </span><span id="L-1016"><a href="#L-1016"><span class="linenos">1016</span></a><span class="sd">    Assumes the file is downloaded in the pdb_dir path.</span>
 </span><span id="L-1017"><a href="#L-1017"><span class="linenos">1017</span></a><span class="sd">    </span>
@@ -1340,6 +1379,91 @@ Last revision: 2/24/2023</p>
 
 
             </section>
+                <section id="DPI">
+                    <div class="attr variable">
+            <span class="name">DPI</span>        =
+<span class="default_value">220</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DPI"></a>
+    
+    
+
+                </section>
+                <section id="WIDTH">
+                    <div class="attr variable">
+            <span class="name">WIDTH</span>        =
+<span class="default_value">6.0</span>
+
+        
+    </div>
+    <a class="headerlink" href="#WIDTH"></a>
+    
+    
+
+                </section>
+                <section id="HEIGHT">
+                    <div class="attr variable">
+            <span class="name">HEIGHT</span>        =
+<span class="default_value">6.0</span>
+
+        
+    </div>
+    <a class="headerlink" href="#HEIGHT"></a>
+    
+    
+
+                </section>
+                <section id="TORMIN">
+                    <div class="attr variable">
+            <span class="name">TORMIN</span>        =
+<span class="default_value">-179.0</span>
+
+        
+    </div>
+    <a class="headerlink" href="#TORMIN"></a>
+    
+    
+
+                </section>
+                <section id="TORMAX">
+                    <div class="attr variable">
+            <span class="name">TORMAX</span>        =
+<span class="default_value">180.0</span>
+
+        
+    </div>
+    <a class="headerlink" href="#TORMAX"></a>
+    
+    
+
+                </section>
+                <section id="Torsion_DF_Cols">
+                    <div class="attr variable">
+            <span class="name">Torsion_DF_Cols</span>        =
+<input id="Torsion_DF_Cols-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+            <label class="view-value-button pdoc-button" for="Torsion_DF_Cols-view-value"></label><span class="default_value">[&#39;source&#39;, &#39;ss_id&#39;, &#39;proximal&#39;, &#39;distal&#39;, &#39;chi1&#39;, &#39;chi2&#39;, &#39;chi3&#39;, &#39;chi4&#39;, &#39;chi5&#39;, &#39;energy&#39;, &#39;ca_distance&#39;, &#39;cb_distance&#39;, &#39;phi_prox&#39;, &#39;psi_prox&#39;, &#39;phi_dist&#39;, &#39;psi_dist&#39;, &#39;torsion_length&#39;, &#39;rho&#39;]</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Torsion_DF_Cols"></a>
+    
+    
+
+                </section>
+                <section id="Distance_DF_Cols">
+                    <div class="attr variable">
+            <span class="name">Distance_DF_Cols</span>        =
+<span class="default_value">[&#39;source&#39;, &#39;ss_id&#39;, &#39;proximal&#39;, &#39;distal&#39;, &#39;energy&#39;, &#39;ca_distance&#39;, &#39;cb_distance&#39;]</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Distance_DF_Cols"></a>
+    
+    
+
+                </section>
                 <section id="DisulfideList">
                             <input id="DisulfideList-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr class">
@@ -1352,7 +1476,7 @@ Last revision: 2/24/2023</p>
     </div>
     <a class="headerlink" href="#DisulfideList"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList-58"><a href="#DisulfideList-58"><span class="linenos">  58</span></a><span class="k">class</span> <span class="nc">DisulfideList</span><span class="p">(</span><span class="n">UserList</span><span class="p">):</span>
-</span><span id="DisulfideList-59"><a href="#DisulfideList-59"><span class="linenos">  59</span></a>    <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-59"><a href="#DisulfideList-59"><span class="linenos">  59</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-60"><a href="#DisulfideList-60"><span class="linenos">  60</span></a><span class="sd">    The class provides a sortable list for Disulfide objects.</span>
 </span><span id="DisulfideList-61"><a href="#DisulfideList-61"><span class="linenos">  61</span></a><span class="sd">    Indexing and slicing are supported, as well as typical list operations like </span>
 </span><span id="DisulfideList-62"><a href="#DisulfideList-62"><span class="linenos">  62</span></a><span class="sd">    ``.insert()``, ``.append()`` and ``.extend().`` The DisulfideList object must be initialized </span>
@@ -1453,7 +1577,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-157"><a href="#DisulfideList-157"><span class="linenos"> 157</span></a><span class="sd">    &#39;&#39;&#39;</span>
 </span><span id="DisulfideList-158"><a href="#DisulfideList-158"><span class="linenos"> 158</span></a>    
 </span><span id="DisulfideList-159"><a href="#DisulfideList-159"><span class="linenos"> 159</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterable</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">res</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="DisulfideList-160"><a href="#DisulfideList-160"><span class="linenos"> 160</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-160"><a href="#DisulfideList-160"><span class="linenos"> 160</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-161"><a href="#DisulfideList-161"><span class="linenos"> 161</span></a><span class="sd">        Initialize the DisulfideList</span>
 </span><span id="DisulfideList-162"><a href="#DisulfideList-162"><span class="linenos"> 162</span></a>
 </span><span id="DisulfideList-163"><a href="#DisulfideList-163"><span class="linenos"> 163</span></a><span class="sd">        :param iterable: an iterable e.g. []</span>
@@ -1485,7 +1609,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-189"><a href="#DisulfideList-189"><span class="linenos"> 189</span></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validate_ss</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">)</span>
 </span><span id="DisulfideList-190"><a href="#DisulfideList-190"><span class="linenos"> 190</span></a>
 </span><span id="DisulfideList-191"><a href="#DisulfideList-191"><span class="linenos"> 191</span></a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
-</span><span id="DisulfideList-192"><a href="#DisulfideList-192"><span class="linenos"> 192</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-192"><a href="#DisulfideList-192"><span class="linenos"> 192</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-193"><a href="#DisulfideList-193"><span class="linenos"> 193</span></a><span class="sd">        Retrieve a disulfide from the list. Internal only.</span>
 </span><span id="DisulfideList-194"><a href="#DisulfideList-194"><span class="linenos"> 194</span></a>
 </span><span id="DisulfideList-195"><a href="#DisulfideList-195"><span class="linenos"> 195</span></a><span class="sd">        :param item: Index or slice</span>
@@ -1505,7 +1629,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-209"><a href="#DisulfideList-209"><span class="linenos"> 209</span></a>    <span class="c1"># cylinders and atomic sphere meshes. Called by all high level routines</span>
 </span><span id="DisulfideList-210"><a href="#DisulfideList-210"><span class="linenos"> 210</span></a>
 </span><span id="DisulfideList-211"><a href="#DisulfideList-211"><span class="linenos"> 211</span></a>    <span class="k">def</span> <span class="nf">_render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">panelsize</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pv</span><span class="o">.</span><span class="n">Plotter</span><span class="p">:</span>
-</span><span id="DisulfideList-212"><a href="#DisulfideList-212"><span class="linenos"> 212</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-212"><a href="#DisulfideList-212"><span class="linenos"> 212</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-213"><a href="#DisulfideList-213"><span class="linenos"> 213</span></a><span class="sd">        Display a window showing the list of disulfides in the given style.</span>
 </span><span id="DisulfideList-214"><a href="#DisulfideList-214"><span class="linenos"> 214</span></a><span class="sd">        :param style: one of &#39;cpk&#39;, &#39;bs&#39;, &#39;sb&#39;, &#39;plain&#39;, &#39;cov&#39;, &#39;pd&#39;</span>
 </span><span id="DisulfideList-215"><a href="#DisulfideList-215"><span class="linenos"> 215</span></a><span class="sd">        :return: Window in the relevant style</span>
@@ -1536,7 +1660,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-240"><a href="#DisulfideList-240"><span class="linenos"> 240</span></a>    
 </span><span id="DisulfideList-241"><a href="#DisulfideList-241"><span class="linenos"> 241</span></a>    <span class="nd">@property</span>
 </span><span id="DisulfideList-242"><a href="#DisulfideList-242"><span class="linenos"> 242</span></a>    <span class="k">def</span> <span class="nf">Average_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList-243"><a href="#DisulfideList-243"><span class="linenos"> 243</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-243"><a href="#DisulfideList-243"><span class="linenos"> 243</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-244"><a href="#DisulfideList-244"><span class="linenos"> 244</span></a><span class="sd">        Return the Average distance (Å) between the atoms in the list.</span>
 </span><span id="DisulfideList-245"><a href="#DisulfideList-245"><span class="linenos"> 245</span></a>
 </span><span id="DisulfideList-246"><a href="#DisulfideList-246"><span class="linenos"> 246</span></a><span class="sd">        :return: Average distance (Å) between all atoms in the list</span>
@@ -1558,7 +1682,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-262"><a href="#DisulfideList-262"><span class="linenos"> 262</span></a>    
 </span><span id="DisulfideList-263"><a href="#DisulfideList-263"><span class="linenos"> 263</span></a>    <span class="nd">@property</span>
 </span><span id="DisulfideList-264"><a href="#DisulfideList-264"><span class="linenos"> 264</span></a>    <span class="k">def</span> <span class="nf">Average_Energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList-265"><a href="#DisulfideList-265"><span class="linenos"> 265</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-265"><a href="#DisulfideList-265"><span class="linenos"> 265</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-266"><a href="#DisulfideList-266"><span class="linenos"> 266</span></a><span class="sd">        Return the Average energy (kcal/mol) for the Disulfides in the list.</span>
 </span><span id="DisulfideList-267"><a href="#DisulfideList-267"><span class="linenos"> 267</span></a>
 </span><span id="DisulfideList-268"><a href="#DisulfideList-268"><span class="linenos"> 268</span></a><span class="sd">        :return: Average energy (kcal/mol) between all atoms in the list</span>
@@ -1575,7 +1699,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-279"><a href="#DisulfideList-279"><span class="linenos"> 279</span></a>   
 </span><span id="DisulfideList-280"><a href="#DisulfideList-280"><span class="linenos"> 280</span></a>    <span class="nd">@property</span>
 </span><span id="DisulfideList-281"><a href="#DisulfideList-281"><span class="linenos"> 281</span></a>    <span class="k">def</span> <span class="nf">Average_Conformation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList-282"><a href="#DisulfideList-282"><span class="linenos"> 282</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-282"><a href="#DisulfideList-282"><span class="linenos"> 282</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-283"><a href="#DisulfideList-283"><span class="linenos"> 283</span></a><span class="sd">        Return the Average conformation for the Disulfides in the list.</span>
 </span><span id="DisulfideList-284"><a href="#DisulfideList-284"><span class="linenos"> 284</span></a>
 </span><span id="DisulfideList-285"><a href="#DisulfideList-285"><span class="linenos"> 285</span></a><span class="sd">        :return: Average conformation: [x1, x2, x3, x4, x5]</span>
@@ -1594,7 +1718,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-298"><a href="#DisulfideList-298"><span class="linenos"> 298</span></a>        <span class="k">return</span> <span class="n">res</span><span class="o">/</span><span class="n">tot</span>
 </span><span id="DisulfideList-299"><a href="#DisulfideList-299"><span class="linenos"> 299</span></a>   
 </span><span id="DisulfideList-300"><a href="#DisulfideList-300"><span class="linenos"> 300</span></a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
-</span><span id="DisulfideList-301"><a href="#DisulfideList-301"><span class="linenos"> 301</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-301"><a href="#DisulfideList-301"><span class="linenos"> 301</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-302"><a href="#DisulfideList-302"><span class="linenos"> 302</span></a><span class="sd">        Append the list with item</span>
 </span><span id="DisulfideList-303"><a href="#DisulfideList-303"><span class="linenos"> 303</span></a>
 </span><span id="DisulfideList-304"><a href="#DisulfideList-304"><span class="linenos"> 304</span></a><span class="sd">        :param item: Disulfide to add</span>
@@ -1604,7 +1728,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-308"><a href="#DisulfideList-308"><span class="linenos"> 308</span></a>
 </span><span id="DisulfideList-309"><a href="#DisulfideList-309"><span class="linenos"> 309</span></a>    <span class="nd">@property</span>
 </span><span id="DisulfideList-310"><a href="#DisulfideList-310"><span class="linenos"> 310</span></a>    <span class="k">def</span> <span class="nf">Average_Resolution</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span id="DisulfideList-311"><a href="#DisulfideList-311"><span class="linenos"> 311</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-311"><a href="#DisulfideList-311"><span class="linenos"> 311</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-312"><a href="#DisulfideList-312"><span class="linenos"> 312</span></a><span class="sd">        Compute and return the average structure resolution for the given list.</span>
 </span><span id="DisulfideList-313"><a href="#DisulfideList-313"><span class="linenos"> 313</span></a>
 </span><span id="DisulfideList-314"><a href="#DisulfideList-314"><span class="linenos"> 314</span></a><span class="sd">        :return: Average resolution (A)</span>
@@ -1621,7 +1745,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-325"><a href="#DisulfideList-325"><span class="linenos"> 325</span></a>    
 </span><span id="DisulfideList-326"><a href="#DisulfideList-326"><span class="linenos"> 326</span></a>    <span class="nd">@property</span>
 </span><span id="DisulfideList-327"><a href="#DisulfideList-327"><span class="linenos"> 327</span></a>    <span class="k">def</span> <span class="nf">Average_Torsion_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList-328"><a href="#DisulfideList-328"><span class="linenos"> 328</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-328"><a href="#DisulfideList-328"><span class="linenos"> 328</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-329"><a href="#DisulfideList-329"><span class="linenos"> 329</span></a><span class="sd">        Return the average distance in torsion space (degrees), between all pairs in the</span>
 </span><span id="DisulfideList-330"><a href="#DisulfideList-330"><span class="linenos"> 330</span></a><span class="sd">        DisulfideList</span>
 </span><span id="DisulfideList-331"><a href="#DisulfideList-331"><span class="linenos"> 331</span></a>
@@ -1643,7 +1767,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-347"><a href="#DisulfideList-347"><span class="linenos"> 347</span></a>    
 </span><span id="DisulfideList-348"><a href="#DisulfideList-348"><span class="linenos"> 348</span></a>    
 </span><span id="DisulfideList-349"><a href="#DisulfideList-349"><span class="linenos"> 349</span></a>    <span class="k">def</span> <span class="nf">build_distance_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-</span><span id="DisulfideList-350"><a href="#DisulfideList-350"><span class="linenos"> 350</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DisulfideList-350"><a href="#DisulfideList-350"><span class="linenos"> 350</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideList-351"><a href="#DisulfideList-351"><span class="linenos"> 351</span></a><span class="sd">        Create a dataframe containing the input DisulfideList Cα-Cα distance, energy. </span>
 </span><span id="DisulfideList-352"><a href="#DisulfideList-352"><span class="linenos"> 352</span></a><span class="sd">        This can take several minutes for the entire database.</span>
 </span><span id="DisulfideList-353"><a href="#DisulfideList-353"><span class="linenos"> 353</span></a>
@@ -1666,7 +1790,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-370"><a href="#DisulfideList-370"><span class="linenos"> 370</span></a>        <span class="k">return</span> <span class="n">SS_df</span>
 </span><span id="DisulfideList-371"><a href="#DisulfideList-371"><span class="linenos"> 371</span></a>
 </span><span id="DisulfideList-372"><a href="#DisulfideList-372"><span class="linenos"> 372</span></a>    <span class="k">def</span> <span class="nf">build_torsion_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-</span><span id="DisulfideList-373"><a href="#DisulfideList-373"><span class="linenos"> 373</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-373"><a href="#DisulfideList-373"><span class="linenos"> 373</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-374"><a href="#DisulfideList-374"><span class="linenos"> 374</span></a><span class="sd">        Create a dataframe containing the input DisulfideList torsional parameters,</span>
 </span><span id="DisulfideList-375"><a href="#DisulfideList-375"><span class="linenos"> 375</span></a><span class="sd">        Cα-Cα distance, energy, and phi-psi angles. This can take several minutes for the</span>
 </span><span id="DisulfideList-376"><a href="#DisulfideList-376"><span class="linenos"> 376</span></a><span class="sd">        entire database.</span>
@@ -1694,7 +1818,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-398"><a href="#DisulfideList-398"><span class="linenos"> 398</span></a>        <span class="k">return</span> <span class="n">SS_df</span>
 </span><span id="DisulfideList-399"><a href="#DisulfideList-399"><span class="linenos"> 399</span></a>
 </span><span id="DisulfideList-400"><a href="#DisulfideList-400"><span class="linenos"> 400</span></a>    <span class="k">def</span> <span class="nf">by_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chain</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="DisulfideList-401"><a href="#DisulfideList-401"><span class="linenos"> 401</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-401"><a href="#DisulfideList-401"><span class="linenos"> 401</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-402"><a href="#DisulfideList-402"><span class="linenos"> 402</span></a><span class="sd">        Return a DisulfideList from the input chain identifier.</span>
 </span><span id="DisulfideList-403"><a href="#DisulfideList-403"><span class="linenos"> 403</span></a>
 </span><span id="DisulfideList-404"><a href="#DisulfideList-404"><span class="linenos"> 404</span></a><span class="sd">        :param chain: chain identifier, &#39;A&#39;, &#39;B, etc</span>
@@ -1742,7 +1866,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-446"><a href="#DisulfideList-446"><span class="linenos"> 446</span></a>        <span class="k">return</span> <span class="n">tor_stats</span><span class="p">,</span> <span class="n">dist_stats</span>
 </span><span id="DisulfideList-447"><a href="#DisulfideList-447"><span class="linenos"> 447</span></a>
 </span><span id="DisulfideList-448"><a href="#DisulfideList-448"><span class="linenos"> 448</span></a>    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;sb&#39;</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">panelsize</span><span class="o">=</span><span class="mi">512</span><span class="p">):</span>
-</span><span id="DisulfideList-449"><a href="#DisulfideList-449"><span class="linenos"> 449</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-449"><a href="#DisulfideList-449"><span class="linenos"> 449</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-450"><a href="#DisulfideList-450"><span class="linenos"> 450</span></a><span class="sd">        Display the Disulfide list in the specific rendering style.</span>
 </span><span id="DisulfideList-451"><a href="#DisulfideList-451"><span class="linenos"> 451</span></a>
 </span><span id="DisulfideList-452"><a href="#DisulfideList-452"><span class="linenos"> 452</span></a><span class="sd">        :param single: Display the bond in a single panel in the specific style. </span>
@@ -1772,7 +1896,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-476"><a href="#DisulfideList-476"><span class="linenos"> 476</span></a>                            <span class="n">fname</span><span class="o">=</span><span class="s1">&#39;ss_torsions.png&#39;</span><span class="p">,</span>
 </span><span id="DisulfideList-477"><a href="#DisulfideList-477"><span class="linenos"> 477</span></a>                            <span class="n">stats</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="DisulfideList-478"><a href="#DisulfideList-478"><span class="linenos"> 478</span></a>                            <span class="n">light</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="DisulfideList-479"><a href="#DisulfideList-479"><span class="linenos"> 479</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DisulfideList-479"><a href="#DisulfideList-479"><span class="linenos"> 479</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideList-480"><a href="#DisulfideList-480"><span class="linenos"> 480</span></a><span class="sd">        Display torsion and distance statistics for a given Disulfide list.</span>
 </span><span id="DisulfideList-481"><a href="#DisulfideList-481"><span class="linenos"> 481</span></a>
 </span><span id="DisulfideList-482"><a href="#DisulfideList-482"><span class="linenos"> 482</span></a><span class="sd">        :param display: Whether to display the plot in the notebook. Default is True.</span>
@@ -1872,7 +1996,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-576"><a href="#DisulfideList-576"><span class="linenos"> 576</span></a>    
 </span><span id="DisulfideList-577"><a href="#DisulfideList-577"><span class="linenos"> 577</span></a>    <span class="nd">@property</span>
 </span><span id="DisulfideList-578"><a href="#DisulfideList-578"><span class="linenos"> 578</span></a>    <span class="k">def</span> <span class="nf">distance_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span> 
-</span><span id="DisulfideList-579"><a href="#DisulfideList-579"><span class="linenos"> 579</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-579"><a href="#DisulfideList-579"><span class="linenos"> 579</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-580"><a href="#DisulfideList-580"><span class="linenos"> 580</span></a><span class="sd">        Build and return the distance dataframe for the input list.</span>
 </span><span id="DisulfideList-581"><a href="#DisulfideList-581"><span class="linenos"> 581</span></a><span class="sd">        This can take considerable time for the entire list.</span>
 </span><span id="DisulfideList-582"><a href="#DisulfideList-582"><span class="linenos"> 582</span></a>
@@ -1890,7 +2014,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-594"><a href="#DisulfideList-594"><span class="linenos"> 594</span></a>    
 </span><span id="DisulfideList-595"><a href="#DisulfideList-595"><span class="linenos"> 595</span></a>    <span class="k">def</span> <span class="nf">display_overlay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">screenshot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">movie</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
 </span><span id="DisulfideList-596"><a href="#DisulfideList-596"><span class="linenos"> 596</span></a>                        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s1">&#39;ss_overlay.png&#39;</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="DisulfideList-597"><a href="#DisulfideList-597"><span class="linenos"> 597</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-597"><a href="#DisulfideList-597"><span class="linenos"> 597</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-598"><a href="#DisulfideList-598"><span class="linenos"> 598</span></a><span class="sd">        Display all disulfides in the list overlaid in stick mode against</span>
 </span><span id="DisulfideList-599"><a href="#DisulfideList-599"><span class="linenos"> 599</span></a><span class="sd">        a common coordinate frames. This allows us to see all of the disulfides</span>
 </span><span id="DisulfideList-600"><a href="#DisulfideList-600"><span class="linenos"> 600</span></a><span class="sd">        at one time in a single view. Colors vary smoothy between bonds.</span>
@@ -1978,7 +2102,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-682"><a href="#DisulfideList-682"><span class="linenos"> 682</span></a>        <span class="k">return</span>
 </span><span id="DisulfideList-683"><a href="#DisulfideList-683"><span class="linenos"> 683</span></a>
 </span><span id="DisulfideList-684"><a href="#DisulfideList-684"><span class="linenos"> 684</span></a>    <span class="k">def</span> <span class="nf">extend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-</span><span id="DisulfideList-685"><a href="#DisulfideList-685"><span class="linenos"> 685</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-685"><a href="#DisulfideList-685"><span class="linenos"> 685</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-686"><a href="#DisulfideList-686"><span class="linenos"> 686</span></a><span class="sd">        Extend the Disulfide list with other.</span>
 </span><span id="DisulfideList-687"><a href="#DisulfideList-687"><span class="linenos"> 687</span></a>
 </span><span id="DisulfideList-688"><a href="#DisulfideList-688"><span class="linenos"> 688</span></a><span class="sd">        :param other: extension</span>
@@ -1991,7 +2115,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-695"><a href="#DisulfideList-695"><span class="linenos"> 695</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">validate_ss</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">other</span><span class="p">)</span>
 </span><span id="DisulfideList-696"><a href="#DisulfideList-696"><span class="linenos"> 696</span></a>    
 </span><span id="DisulfideList-697"><a href="#DisulfideList-697"><span class="linenos"> 697</span></a>    <span class="k">def</span> <span class="nf">get_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Disulfide</span><span class="p">:</span>
-</span><span id="DisulfideList-698"><a href="#DisulfideList-698"><span class="linenos"> 698</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-698"><a href="#DisulfideList-698"><span class="linenos"> 698</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-699"><a href="#DisulfideList-699"><span class="linenos"> 699</span></a><span class="sd">        Returns the Disulfide with the given name from the list.</span>
 </span><span id="DisulfideList-700"><a href="#DisulfideList-700"><span class="linenos"> 700</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideList-701"><a href="#DisulfideList-701"><span class="linenos"> 701</span></a>        <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
@@ -2000,7 +2124,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-704"><a href="#DisulfideList-704"><span class="linenos"> 704</span></a>        <span class="k">return</span> <span class="kc">None</span>
 </span><span id="DisulfideList-705"><a href="#DisulfideList-705"><span class="linenos"> 705</span></a>
 </span><span id="DisulfideList-706"><a href="#DisulfideList-706"><span class="linenos"> 706</span></a>    <span class="k">def</span> <span class="nf">Oget_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Disulfide</span><span class="p">:</span>
-</span><span id="DisulfideList-707"><a href="#DisulfideList-707"><span class="linenos"> 707</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-707"><a href="#DisulfideList-707"><span class="linenos"> 707</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-708"><a href="#DisulfideList-708"><span class="linenos"> 708</span></a><span class="sd">        Returns the Disulfide with the given name from the list.</span>
 </span><span id="DisulfideList-709"><a href="#DisulfideList-709"><span class="linenos"> 709</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideList-710"><a href="#DisulfideList-710"><span class="linenos"> 710</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
@@ -2014,7 +2138,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-718"><a href="#DisulfideList-718"><span class="linenos"> 718</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="DisulfideList-719"><a href="#DisulfideList-719"><span class="linenos"> 719</span></a>    
 </span><span id="DisulfideList-720"><a href="#DisulfideList-720"><span class="linenos"> 720</span></a>    <span class="k">def</span> <span class="nf">get_chains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList-721"><a href="#DisulfideList-721"><span class="linenos"> 721</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-721"><a href="#DisulfideList-721"><span class="linenos"> 721</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-722"><a href="#DisulfideList-722"><span class="linenos"> 722</span></a><span class="sd">        Return the chain IDs for chains within the given Disulfide.</span>
 </span><span id="DisulfideList-723"><a href="#DisulfideList-723"><span class="linenos"> 723</span></a><span class="sd">        :return: Chain IDs for given Disulfide</span>
 </span><span id="DisulfideList-724"><a href="#DisulfideList-724"><span class="linenos"> 724</span></a><span class="sd">        &#39;&#39;&#39;</span>
@@ -2033,7 +2157,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-737"><a href="#DisulfideList-737"><span class="linenos"> 737</span></a>        <span class="k">return</span> <span class="n">res_dict</span>
 </span><span id="DisulfideList-738"><a href="#DisulfideList-738"><span class="linenos"> 738</span></a>
 </span><span id="DisulfideList-739"><a href="#DisulfideList-739"><span class="linenos"> 739</span></a>    <span class="k">def</span> <span class="nf">get_torsion_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList-740"><a href="#DisulfideList-740"><span class="linenos"> 740</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DisulfideList-740"><a href="#DisulfideList-740"><span class="linenos"> 740</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideList-741"><a href="#DisulfideList-741"><span class="linenos"> 741</span></a><span class="sd">        Returns a 2D NumPy array representing the dihedral angles in the given disulfide list.</span>
 </span><span id="DisulfideList-742"><a href="#DisulfideList-742"><span class="linenos"> 742</span></a>
 </span><span id="DisulfideList-743"><a href="#DisulfideList-743"><span class="linenos"> 743</span></a><span class="sd">        :return: A 2D NumPy array of shape (n, 5), where n is the number of disulfide bonds in the list. Each row</span>
@@ -2051,7 +2175,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-755"><a href="#DisulfideList-755"><span class="linenos"> 755</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="DisulfideList-756"><a href="#DisulfideList-756"><span class="linenos"> 756</span></a>
 </span><span id="DisulfideList-757"><a href="#DisulfideList-757"><span class="linenos"> 757</span></a>    <span class="k">def</span> <span class="nf">has_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chain</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="DisulfideList-758"><a href="#DisulfideList-758"><span class="linenos"> 758</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-758"><a href="#DisulfideList-758"><span class="linenos"> 758</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-759"><a href="#DisulfideList-759"><span class="linenos"> 759</span></a><span class="sd">        Returns True if given chain contained in Disulfide, False otherwise.</span>
 </span><span id="DisulfideList-760"><a href="#DisulfideList-760"><span class="linenos"> 760</span></a><span class="sd">        :return: Returns True if given chain contained in Disulfide, False otherwise.</span>
 </span><span id="DisulfideList-761"><a href="#DisulfideList-761"><span class="linenos"> 761</span></a><span class="sd">        &#39;&#39;&#39;</span>
@@ -2065,14 +2189,14 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-769"><a href="#DisulfideList-769"><span class="linenos"> 769</span></a>
 </span><span id="DisulfideList-770"><a href="#DisulfideList-770"><span class="linenos"> 770</span></a>    <span class="nd">@property</span>
 </span><span id="DisulfideList-771"><a href="#DisulfideList-771"><span class="linenos"> 771</span></a>    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList-772"><a href="#DisulfideList-772"><span class="linenos"> 772</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-772"><a href="#DisulfideList-772"><span class="linenos"> 772</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-773"><a href="#DisulfideList-773"><span class="linenos"> 773</span></a><span class="sd">        PDB ID of the list</span>
 </span><span id="DisulfideList-774"><a href="#DisulfideList-774"><span class="linenos"> 774</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideList-775"><a href="#DisulfideList-775"><span class="linenos"> 775</span></a>        <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pdb_id</span><span class="p">)</span>
 </span><span id="DisulfideList-776"><a href="#DisulfideList-776"><span class="linenos"> 776</span></a>    
 </span><span id="DisulfideList-777"><a href="#DisulfideList-777"><span class="linenos"> 777</span></a>    <span class="nd">@id</span><span class="o">.</span><span class="n">setter</span>
 </span><span id="DisulfideList-778"><a href="#DisulfideList-778"><span class="linenos"> 778</span></a>    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="DisulfideList-779"><a href="#DisulfideList-779"><span class="linenos"> 779</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-779"><a href="#DisulfideList-779"><span class="linenos"> 779</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-780"><a href="#DisulfideList-780"><span class="linenos"> 780</span></a><span class="sd">        Set the DisulfideList ID</span>
 </span><span id="DisulfideList-781"><a href="#DisulfideList-781"><span class="linenos"> 781</span></a>
 </span><span id="DisulfideList-782"><a href="#DisulfideList-782"><span class="linenos"> 782</span></a><span class="sd">        Parameters</span>
@@ -2084,14 +2208,14 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-788"><a href="#DisulfideList-788"><span class="linenos"> 788</span></a>    
 </span><span id="DisulfideList-789"><a href="#DisulfideList-789"><span class="linenos"> 789</span></a>    <span class="nd">@property</span>
 </span><span id="DisulfideList-790"><a href="#DisulfideList-790"><span class="linenos"> 790</span></a>    <span class="k">def</span> <span class="nf">resolution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList-791"><a href="#DisulfideList-791"><span class="linenos"> 791</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-791"><a href="#DisulfideList-791"><span class="linenos"> 791</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-792"><a href="#DisulfideList-792"><span class="linenos"> 792</span></a><span class="sd">        Resolution of the parent sturcture (A)</span>
 </span><span id="DisulfideList-793"><a href="#DisulfideList-793"><span class="linenos"> 793</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideList-794"><a href="#DisulfideList-794"><span class="linenos"> 794</span></a>        <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">)</span>
 </span><span id="DisulfideList-795"><a href="#DisulfideList-795"><span class="linenos"> 795</span></a>    
 </span><span id="DisulfideList-796"><a href="#DisulfideList-796"><span class="linenos"> 796</span></a>    <span class="nd">@resolution</span><span class="o">.</span><span class="n">setter</span>
 </span><span id="DisulfideList-797"><a href="#DisulfideList-797"><span class="linenos"> 797</span></a>    <span class="k">def</span> <span class="nf">resolution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-</span><span id="DisulfideList-798"><a href="#DisulfideList-798"><span class="linenos"> 798</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-798"><a href="#DisulfideList-798"><span class="linenos"> 798</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-799"><a href="#DisulfideList-799"><span class="linenos"> 799</span></a><span class="sd">        Set the resolution of the list</span>
 </span><span id="DisulfideList-800"><a href="#DisulfideList-800"><span class="linenos"> 800</span></a>
 </span><span id="DisulfideList-801"><a href="#DisulfideList-801"><span class="linenos"> 801</span></a><span class="sd">        :param value: Resolution (A)</span>
@@ -2104,7 +2228,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-808"><a href="#DisulfideList-808"><span class="linenos"> 808</span></a>
 </span><span id="DisulfideList-809"><a href="#DisulfideList-809"><span class="linenos"> 809</span></a>
 </span><span id="DisulfideList-810"><a href="#DisulfideList-810"><span class="linenos"> 810</span></a>    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
-</span><span id="DisulfideList-811"><a href="#DisulfideList-811"><span class="linenos"> 811</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-811"><a href="#DisulfideList-811"><span class="linenos"> 811</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-812"><a href="#DisulfideList-812"><span class="linenos"> 812</span></a><span class="sd">        Insert a Disulfide into the list at the specified index</span>
 </span><span id="DisulfideList-813"><a href="#DisulfideList-813"><span class="linenos"> 813</span></a>
 </span><span id="DisulfideList-814"><a href="#DisulfideList-814"><span class="linenos"> 814</span></a><span class="sd">        :param index: insertion point</span>
@@ -2120,7 +2244,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-824"><a href="#DisulfideList-824"><span class="linenos"> 824</span></a>    
 </span><span id="DisulfideList-825"><a href="#DisulfideList-825"><span class="linenos"> 825</span></a>    
 </span><span id="DisulfideList-826"><a href="#DisulfideList-826"><span class="linenos"> 826</span></a>    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList-827"><a href="#DisulfideList-827"><span class="linenos"> 827</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-827"><a href="#DisulfideList-827"><span class="linenos"> 827</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-828"><a href="#DisulfideList-828"><span class="linenos"> 828</span></a><span class="sd">        Return Disulfide from the list with the minimum energy</span>
 </span><span id="DisulfideList-829"><a href="#DisulfideList-829"><span class="linenos"> 829</span></a>
 </span><span id="DisulfideList-830"><a href="#DisulfideList-830"><span class="linenos"> 830</span></a><span class="sd">        :return: Disulfide with the minimum energy.</span>
@@ -2129,7 +2253,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-833"><a href="#DisulfideList-833"><span class="linenos"> 833</span></a>        <span class="k">return</span> <span class="n">sslist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </span><span id="DisulfideList-834"><a href="#DisulfideList-834"><span class="linenos"> 834</span></a>    
 </span><span id="DisulfideList-835"><a href="#DisulfideList-835"><span class="linenos"> 835</span></a>    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList-836"><a href="#DisulfideList-836"><span class="linenos"> 836</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-836"><a href="#DisulfideList-836"><span class="linenos"> 836</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-837"><a href="#DisulfideList-837"><span class="linenos"> 837</span></a><span class="sd">        Return Disulfide from the list with the maximum energy</span>
 </span><span id="DisulfideList-838"><a href="#DisulfideList-838"><span class="linenos"> 838</span></a><span class="sd">        </span>
 </span><span id="DisulfideList-839"><a href="#DisulfideList-839"><span class="linenos"> 839</span></a><span class="sd">        :return: Disulfide with the maximum energy.</span>
@@ -2138,7 +2262,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-842"><a href="#DisulfideList-842"><span class="linenos"> 842</span></a>        <span class="k">return</span> <span class="n">sslist</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 </span><span id="DisulfideList-843"><a href="#DisulfideList-843"><span class="linenos"> 843</span></a>    
 </span><span id="DisulfideList-844"><a href="#DisulfideList-844"><span class="linenos"> 844</span></a>    <span class="k">def</span> <span class="nf">minmax_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList-845"><a href="#DisulfideList-845"><span class="linenos"> 845</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-845"><a href="#DisulfideList-845"><span class="linenos"> 845</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-846"><a href="#DisulfideList-846"><span class="linenos"> 846</span></a><span class="sd">        Return the Disulfides with the minimum and </span>
 </span><span id="DisulfideList-847"><a href="#DisulfideList-847"><span class="linenos"> 847</span></a><span class="sd">        maximum Cα distances in the list.</span>
 </span><span id="DisulfideList-848"><a href="#DisulfideList-848"><span class="linenos"> 848</span></a>
@@ -2169,7 +2293,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-873"><a href="#DisulfideList-873"><span class="linenos"> 873</span></a>        <span class="k">return</span> <span class="n">sslist</span><span class="p">[</span><span class="n">ssmin</span><span class="p">],</span> <span class="n">sslist</span><span class="p">[</span><span class="n">ssmax</span><span class="p">]</span>
 </span><span id="DisulfideList-874"><a href="#DisulfideList-874"><span class="linenos"> 874</span></a>
 </span><span id="DisulfideList-875"><a href="#DisulfideList-875"><span class="linenos"> 875</span></a>    <span class="k">def</span> <span class="nf">minmax_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList-876"><a href="#DisulfideList-876"><span class="linenos"> 876</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-876"><a href="#DisulfideList-876"><span class="linenos"> 876</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-877"><a href="#DisulfideList-877"><span class="linenos"> 877</span></a><span class="sd">        Return the Disulfides with the minimum and maximum energies</span>
 </span><span id="DisulfideList-878"><a href="#DisulfideList-878"><span class="linenos"> 878</span></a><span class="sd">        from the DisulfideList.</span>
 </span><span id="DisulfideList-879"><a href="#DisulfideList-879"><span class="linenos"> 879</span></a>
@@ -2180,7 +2304,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-884"><a href="#DisulfideList-884"><span class="linenos"> 884</span></a>
 </span><span id="DisulfideList-885"><a href="#DisulfideList-885"><span class="linenos"> 885</span></a>    <span class="k">def</span> <span class="nf">nearest_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chi1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">chi2</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">chi3</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> 
 </span><span id="DisulfideList-886"><a href="#DisulfideList-886"><span class="linenos"> 886</span></a>                        <span class="n">chi4</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">chi5</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-</span><span id="DisulfideList-887"><a href="#DisulfideList-887"><span class="linenos"> 887</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-887"><a href="#DisulfideList-887"><span class="linenos"> 887</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-888"><a href="#DisulfideList-888"><span class="linenos"> 888</span></a><span class="sd">        Given a torsional array of chi1-chi5, return list of Disulfides</span>
 </span><span id="DisulfideList-889"><a href="#DisulfideList-889"><span class="linenos"> 889</span></a><span class="sd">        within cutoff. </span>
 </span><span id="DisulfideList-890"><a href="#DisulfideList-890"><span class="linenos"> 890</span></a>
@@ -2203,7 +2327,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-907"><a href="#DisulfideList-907"><span class="linenos"> 907</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="DisulfideList-908"><a href="#DisulfideList-908"><span class="linenos"> 908</span></a>        
 </span><span id="DisulfideList-909"><a href="#DisulfideList-909"><span class="linenos"> 909</span></a>    <span class="k">def</span> <span class="nf">nearest_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-</span><span id="DisulfideList-910"><a href="#DisulfideList-910"><span class="linenos"> 910</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-910"><a href="#DisulfideList-910"><span class="linenos"> 910</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-911"><a href="#DisulfideList-911"><span class="linenos"> 911</span></a><span class="sd">        Given an input Disulfide and overall torsional cutoff, return </span>
 </span><span id="DisulfideList-912"><a href="#DisulfideList-912"><span class="linenos"> 912</span></a><span class="sd">        the list of Disulfides within the cutoff </span>
 </span><span id="DisulfideList-913"><a href="#DisulfideList-913"><span class="linenos"> 913</span></a>
@@ -2232,7 +2356,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-936"><a href="#DisulfideList-936"><span class="linenos"> 936</span></a>        <span class="k">return</span> <span class="n">res</span>
 </span><span id="DisulfideList-937"><a href="#DisulfideList-937"><span class="linenos"> 937</span></a>
 </span><span id="DisulfideList-938"><a href="#DisulfideList-938"><span class="linenos"> 938</span></a>    <span class="k">def</span> <span class="nf">pprint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList-939"><a href="#DisulfideList-939"><span class="linenos"> 939</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-939"><a href="#DisulfideList-939"><span class="linenos"> 939</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-940"><a href="#DisulfideList-940"><span class="linenos"> 940</span></a><span class="sd">        Pretty print self.</span>
 </span><span id="DisulfideList-941"><a href="#DisulfideList-941"><span class="linenos"> 941</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideList-942"><a href="#DisulfideList-942"><span class="linenos"> 942</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
@@ -2240,7 +2364,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-944"><a href="#DisulfideList-944"><span class="linenos"> 944</span></a>            <span class="n">ss</span><span class="o">.</span><span class="n">pprint</span><span class="p">()</span>
 </span><span id="DisulfideList-945"><a href="#DisulfideList-945"><span class="linenos"> 945</span></a>    
 </span><span id="DisulfideList-946"><a href="#DisulfideList-946"><span class="linenos"> 946</span></a>    <span class="k">def</span> <span class="nf">pprint_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList-947"><a href="#DisulfideList-947"><span class="linenos"> 947</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-947"><a href="#DisulfideList-947"><span class="linenos"> 947</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-948"><a href="#DisulfideList-948"><span class="linenos"> 948</span></a><span class="sd">        Pretty print full disulfide descriptions in self.</span>
 </span><span id="DisulfideList-949"><a href="#DisulfideList-949"><span class="linenos"> 949</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideList-950"><a href="#DisulfideList-950"><span class="linenos"> 950</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
@@ -2248,7 +2372,7 @@ Last revision: 2/24/2023</p>
 </span><span id="DisulfideList-952"><a href="#DisulfideList-952"><span class="linenos"> 952</span></a>            <span class="n">ss</span><span class="o">.</span><span class="n">pprint_all</span><span class="p">()</span>
 </span><span id="DisulfideList-953"><a href="#DisulfideList-953"><span class="linenos"> 953</span></a>    
 </span><span id="DisulfideList-954"><a href="#DisulfideList-954"><span class="linenos"> 954</span></a>    <span class="k">def</span> <span class="nf">screenshot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;bs&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s1">&#39;sslist.png&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="DisulfideList-955"><a href="#DisulfideList-955"><span class="linenos"> 955</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList-955"><a href="#DisulfideList-955"><span class="linenos"> 955</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList-956"><a href="#DisulfideList-956"><span class="linenos"> 956</span></a><span class="sd">        Save the interactive window displaying the list of </span>
 </span><span id="DisulfideList-957"><a href="#DisulfideList-957"><span class="linenos"> 957</span></a><span class="sd">        disulfides in the given style. Position the disulfide then</span>
 </span><span id="DisulfideList-958"><a href="#DisulfideList-958"><span class="linenos"> 958</span></a><span class="sd">        close the window to save.</span>
@@ -2453,7 +2577,7 @@ are optional.</p>
     </div>
     <a class="headerlink" href="#DisulfideList.__init__"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.__init__-159"><a href="#DisulfideList.__init__-159"><span class="linenos">159</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterable</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">res</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="DisulfideList.__init__-160"><a href="#DisulfideList.__init__-160"><span class="linenos">160</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.__init__-160"><a href="#DisulfideList.__init__-160"><span class="linenos">160</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.__init__-161"><a href="#DisulfideList.__init__-161"><span class="linenos">161</span></a><span class="sd">        Initialize the DisulfideList</span>
 </span><span id="DisulfideList.__init__-162"><a href="#DisulfideList.__init__-162"><span class="linenos">162</span></a>
 </span><span id="DisulfideList.__init__-163"><a href="#DisulfideList.__init__-163"><span class="linenos">163</span></a><span class="sd">        :param iterable: an iterable e.g. []</span>
@@ -2527,6 +2651,39 @@ are optional.</p>
 
 
                             </div>
+                            <div id="DisulfideList.pdb_id" class="classattr">
+                                <div class="attr variable">
+            <span class="name">pdb_id</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideList.pdb_id"></a>
+    
+    
+
+                            </div>
+                            <div id="DisulfideList.res" class="classattr">
+                                <div class="attr variable">
+            <span class="name">res</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideList.res"></a>
+    
+    
+
+                            </div>
+                            <div id="DisulfideList.quiet" class="classattr">
+                                <div class="attr variable">
+            <span class="name">quiet</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideList.quiet"></a>
+    
+    
+
+                            </div>
                             <div id="DisulfideList.Average_Distance" class="classattr">
                                 <div class="attr variable">
             <span class="name">Average_Distance</span>
@@ -2596,7 +2753,7 @@ are optional.</p>
     </div>
     <a class="headerlink" href="#DisulfideList.append"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.append-300"><a href="#DisulfideList.append-300"><span class="linenos">300</span></a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
-</span><span id="DisulfideList.append-301"><a href="#DisulfideList.append-301"><span class="linenos">301</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.append-301"><a href="#DisulfideList.append-301"><span class="linenos">301</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.append-302"><a href="#DisulfideList.append-302"><span class="linenos">302</span></a><span class="sd">        Append the list with item</span>
 </span><span id="DisulfideList.append-303"><a href="#DisulfideList.append-303"><span class="linenos">303</span></a>
 </span><span id="DisulfideList.append-304"><a href="#DisulfideList.append-304"><span class="linenos">304</span></a><span class="sd">        :param item: Disulfide to add</span>
@@ -2668,7 +2825,7 @@ DisulfideList</p>
     </div>
     <a class="headerlink" href="#DisulfideList.build_distance_df"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.build_distance_df-349"><a href="#DisulfideList.build_distance_df-349"><span class="linenos">349</span></a>    <span class="k">def</span> <span class="nf">build_distance_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-</span><span id="DisulfideList.build_distance_df-350"><a href="#DisulfideList.build_distance_df-350"><span class="linenos">350</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DisulfideList.build_distance_df-350"><a href="#DisulfideList.build_distance_df-350"><span class="linenos">350</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideList.build_distance_df-351"><a href="#DisulfideList.build_distance_df-351"><span class="linenos">351</span></a><span class="sd">        Create a dataframe containing the input DisulfideList Cα-Cα distance, energy. </span>
 </span><span id="DisulfideList.build_distance_df-352"><a href="#DisulfideList.build_distance_df-352"><span class="linenos">352</span></a><span class="sd">        This can take several minutes for the entire database.</span>
 </span><span id="DisulfideList.build_distance_df-353"><a href="#DisulfideList.build_distance_df-353"><span class="linenos">353</span></a>
@@ -2716,7 +2873,7 @@ This can take several minutes for the entire database.</p>
     </div>
     <a class="headerlink" href="#DisulfideList.build_torsion_df"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.build_torsion_df-372"><a href="#DisulfideList.build_torsion_df-372"><span class="linenos">372</span></a>    <span class="k">def</span> <span class="nf">build_torsion_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-</span><span id="DisulfideList.build_torsion_df-373"><a href="#DisulfideList.build_torsion_df-373"><span class="linenos">373</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.build_torsion_df-373"><a href="#DisulfideList.build_torsion_df-373"><span class="linenos">373</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.build_torsion_df-374"><a href="#DisulfideList.build_torsion_df-374"><span class="linenos">374</span></a><span class="sd">        Create a dataframe containing the input DisulfideList torsional parameters,</span>
 </span><span id="DisulfideList.build_torsion_df-375"><a href="#DisulfideList.build_torsion_df-375"><span class="linenos">375</span></a><span class="sd">        Cα-Cα distance, energy, and phi-psi angles. This can take several minutes for the</span>
 </span><span id="DisulfideList.build_torsion_df-376"><a href="#DisulfideList.build_torsion_df-376"><span class="linenos">376</span></a><span class="sd">        entire database.</span>
@@ -2776,7 +2933,7 @@ entire database.</p>
     </div>
     <a class="headerlink" href="#DisulfideList.by_chain"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.by_chain-400"><a href="#DisulfideList.by_chain-400"><span class="linenos">400</span></a>    <span class="k">def</span> <span class="nf">by_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chain</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="DisulfideList.by_chain-401"><a href="#DisulfideList.by_chain-401"><span class="linenos">401</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.by_chain-401"><a href="#DisulfideList.by_chain-401"><span class="linenos">401</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.by_chain-402"><a href="#DisulfideList.by_chain-402"><span class="linenos">402</span></a><span class="sd">        Return a DisulfideList from the input chain identifier.</span>
 </span><span id="DisulfideList.by_chain-403"><a href="#DisulfideList.by_chain-403"><span class="linenos">403</span></a>
 </span><span id="DisulfideList.by_chain-404"><a href="#DisulfideList.by_chain-404"><span class="linenos">404</span></a><span class="sd">        :param chain: chain identifier, &#39;A&#39;, &#39;B, etc</span>
@@ -2870,7 +3027,7 @@ entire database.</p>
     </div>
     <a class="headerlink" href="#DisulfideList.display"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.display-448"><a href="#DisulfideList.display-448"><span class="linenos">448</span></a>    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;sb&#39;</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">panelsize</span><span class="o">=</span><span class="mi">512</span><span class="p">):</span>
-</span><span id="DisulfideList.display-449"><a href="#DisulfideList.display-449"><span class="linenos">449</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.display-449"><a href="#DisulfideList.display-449"><span class="linenos">449</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.display-450"><a href="#DisulfideList.display-450"><span class="linenos">450</span></a><span class="sd">        Display the Disulfide list in the specific rendering style.</span>
 </span><span id="DisulfideList.display-451"><a href="#DisulfideList.display-451"><span class="linenos">451</span></a>
 </span><span id="DisulfideList.display-452"><a href="#DisulfideList.display-452"><span class="linenos">452</span></a><span class="sd">        :param single: Display the bond in a single panel in the specific style. </span>
@@ -2934,7 +3091,7 @@ entire database.</p>
 </span><span id="DisulfideList.display_torsion_statistics-476"><a href="#DisulfideList.display_torsion_statistics-476"><span class="linenos">476</span></a>                            <span class="n">fname</span><span class="o">=</span><span class="s1">&#39;ss_torsions.png&#39;</span><span class="p">,</span>
 </span><span id="DisulfideList.display_torsion_statistics-477"><a href="#DisulfideList.display_torsion_statistics-477"><span class="linenos">477</span></a>                            <span class="n">stats</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="DisulfideList.display_torsion_statistics-478"><a href="#DisulfideList.display_torsion_statistics-478"><span class="linenos">478</span></a>                            <span class="n">light</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="DisulfideList.display_torsion_statistics-479"><a href="#DisulfideList.display_torsion_statistics-479"><span class="linenos">479</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DisulfideList.display_torsion_statistics-479"><a href="#DisulfideList.display_torsion_statistics-479"><span class="linenos">479</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideList.display_torsion_statistics-480"><a href="#DisulfideList.display_torsion_statistics-480"><span class="linenos">480</span></a><span class="sd">        Display torsion and distance statistics for a given Disulfide list.</span>
 </span><span id="DisulfideList.display_torsion_statistics-481"><a href="#DisulfideList.display_torsion_statistics-481"><span class="linenos">481</span></a>
 </span><span id="DisulfideList.display_torsion_statistics-482"><a href="#DisulfideList.display_torsion_statistics-482"><span class="linenos">482</span></a><span class="sd">        :param display: Whether to display the plot in the notebook. Default is True.</span>
@@ -3101,7 +3258,7 @@ This can take considerable time for the entire list.</p>
     <a class="headerlink" href="#DisulfideList.display_overlay"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.display_overlay-595"><a href="#DisulfideList.display_overlay-595"><span class="linenos">595</span></a>    <span class="k">def</span> <span class="nf">display_overlay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">screenshot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">movie</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
 </span><span id="DisulfideList.display_overlay-596"><a href="#DisulfideList.display_overlay-596"><span class="linenos">596</span></a>                        <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s1">&#39;ss_overlay.png&#39;</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="DisulfideList.display_overlay-597"><a href="#DisulfideList.display_overlay-597"><span class="linenos">597</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.display_overlay-597"><a href="#DisulfideList.display_overlay-597"><span class="linenos">597</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.display_overlay-598"><a href="#DisulfideList.display_overlay-598"><span class="linenos">598</span></a><span class="sd">        Display all disulfides in the list overlaid in stick mode against</span>
 </span><span id="DisulfideList.display_overlay-599"><a href="#DisulfideList.display_overlay-599"><span class="linenos">599</span></a><span class="sd">        a common coordinate frames. This allows us to see all of the disulfides</span>
 </span><span id="DisulfideList.display_overlay-600"><a href="#DisulfideList.display_overlay-600"><span class="linenos">600</span></a><span class="sd">        at one time in a single view. Colors vary smoothy between bonds.</span>
@@ -3219,7 +3376,7 @@ at one time in a single view. Colors vary smoothy between bonds.</p>
     </div>
     <a class="headerlink" href="#DisulfideList.extend"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.extend-684"><a href="#DisulfideList.extend-684"><span class="linenos">684</span></a>    <span class="k">def</span> <span class="nf">extend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-</span><span id="DisulfideList.extend-685"><a href="#DisulfideList.extend-685"><span class="linenos">685</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.extend-685"><a href="#DisulfideList.extend-685"><span class="linenos">685</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.extend-686"><a href="#DisulfideList.extend-686"><span class="linenos">686</span></a><span class="sd">        Extend the Disulfide list with other.</span>
 </span><span id="DisulfideList.extend-687"><a href="#DisulfideList.extend-687"><span class="linenos">687</span></a>
 </span><span id="DisulfideList.extend-688"><a href="#DisulfideList.extend-688"><span class="linenos">688</span></a><span class="sd">        :param other: extension</span>
@@ -3256,7 +3413,7 @@ at one time in a single view. Colors vary smoothy between bonds.</p>
     </div>
     <a class="headerlink" href="#DisulfideList.get_by_name"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.get_by_name-697"><a href="#DisulfideList.get_by_name-697"><span class="linenos">697</span></a>    <span class="k">def</span> <span class="nf">get_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Disulfide</span><span class="p">:</span>
-</span><span id="DisulfideList.get_by_name-698"><a href="#DisulfideList.get_by_name-698"><span class="linenos">698</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.get_by_name-698"><a href="#DisulfideList.get_by_name-698"><span class="linenos">698</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.get_by_name-699"><a href="#DisulfideList.get_by_name-699"><span class="linenos">699</span></a><span class="sd">        Returns the Disulfide with the given name from the list.</span>
 </span><span id="DisulfideList.get_by_name-700"><a href="#DisulfideList.get_by_name-700"><span class="linenos">700</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideList.get_by_name-701"><a href="#DisulfideList.get_by_name-701"><span class="linenos">701</span></a>        <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
@@ -3283,7 +3440,7 @@ at one time in a single view. Colors vary smoothy between bonds.</p>
     </div>
     <a class="headerlink" href="#DisulfideList.Oget_by_name"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.Oget_by_name-706"><a href="#DisulfideList.Oget_by_name-706"><span class="linenos">706</span></a>    <span class="k">def</span> <span class="nf">Oget_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Disulfide</span><span class="p">:</span>
-</span><span id="DisulfideList.Oget_by_name-707"><a href="#DisulfideList.Oget_by_name-707"><span class="linenos">707</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.Oget_by_name-707"><a href="#DisulfideList.Oget_by_name-707"><span class="linenos">707</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.Oget_by_name-708"><a href="#DisulfideList.Oget_by_name-708"><span class="linenos">708</span></a><span class="sd">        Returns the Disulfide with the given name from the list.</span>
 </span><span id="DisulfideList.Oget_by_name-709"><a href="#DisulfideList.Oget_by_name-709"><span class="linenos">709</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideList.Oget_by_name-710"><a href="#DisulfideList.Oget_by_name-710"><span class="linenos">710</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
@@ -3315,7 +3472,7 @@ at one time in a single view. Colors vary smoothy between bonds.</p>
     </div>
     <a class="headerlink" href="#DisulfideList.get_chains"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.get_chains-720"><a href="#DisulfideList.get_chains-720"><span class="linenos">720</span></a>    <span class="k">def</span> <span class="nf">get_chains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList.get_chains-721"><a href="#DisulfideList.get_chains-721"><span class="linenos">721</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.get_chains-721"><a href="#DisulfideList.get_chains-721"><span class="linenos">721</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.get_chains-722"><a href="#DisulfideList.get_chains-722"><span class="linenos">722</span></a><span class="sd">        Return the chain IDs for chains within the given Disulfide.</span>
 </span><span id="DisulfideList.get_chains-723"><a href="#DisulfideList.get_chains-723"><span class="linenos">723</span></a><span class="sd">        :return: Chain IDs for given Disulfide</span>
 </span><span id="DisulfideList.get_chains-724"><a href="#DisulfideList.get_chains-724"><span class="linenos">724</span></a><span class="sd">        &#39;&#39;&#39;</span>
@@ -3358,7 +3515,7 @@ at one time in a single view. Colors vary smoothy between bonds.</p>
     </div>
     <a class="headerlink" href="#DisulfideList.get_torsion_array"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.get_torsion_array-739"><a href="#DisulfideList.get_torsion_array-739"><span class="linenos">739</span></a>    <span class="k">def</span> <span class="nf">get_torsion_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList.get_torsion_array-740"><a href="#DisulfideList.get_torsion_array-740"><span class="linenos">740</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="DisulfideList.get_torsion_array-740"><a href="#DisulfideList.get_torsion_array-740"><span class="linenos">740</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideList.get_torsion_array-741"><a href="#DisulfideList.get_torsion_array-741"><span class="linenos">741</span></a><span class="sd">        Returns a 2D NumPy array representing the dihedral angles in the given disulfide list.</span>
 </span><span id="DisulfideList.get_torsion_array-742"><a href="#DisulfideList.get_torsion_array-742"><span class="linenos">742</span></a>
 </span><span id="DisulfideList.get_torsion_array-743"><a href="#DisulfideList.get_torsion_array-743"><span class="linenos">743</span></a><span class="sd">        :return: A 2D NumPy array of shape (n, 5), where n is the number of disulfide bonds in the list. Each row</span>
@@ -3402,7 +3559,7 @@ at one time in a single view. Colors vary smoothy between bonds.</p>
     </div>
     <a class="headerlink" href="#DisulfideList.has_chain"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.has_chain-757"><a href="#DisulfideList.has_chain-757"><span class="linenos">757</span></a>    <span class="k">def</span> <span class="nf">has_chain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chain</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="DisulfideList.has_chain-758"><a href="#DisulfideList.has_chain-758"><span class="linenos">758</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.has_chain-758"><a href="#DisulfideList.has_chain-758"><span class="linenos">758</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.has_chain-759"><a href="#DisulfideList.has_chain-759"><span class="linenos">759</span></a><span class="sd">        Returns True if given chain contained in Disulfide, False otherwise.</span>
 </span><span id="DisulfideList.has_chain-760"><a href="#DisulfideList.has_chain-760"><span class="linenos">760</span></a><span class="sd">        :return: Returns True if given chain contained in Disulfide, False otherwise.</span>
 </span><span id="DisulfideList.has_chain-761"><a href="#DisulfideList.has_chain-761"><span class="linenos">761</span></a><span class="sd">        &#39;&#39;&#39;</span>
@@ -3435,12 +3592,7 @@ at one time in a single view. Colors vary smoothy between bonds.</p>
     </div>
     <a class="headerlink" href="#DisulfideList.id"></a>
     
-            <div class="docstring"><p>Set the DisulfideList ID</p>
-
-<h2 id="parameters">Parameters</h2>
-
-<p>value : str
-    List ID</p>
+            <div class="docstring"><p>PDB ID of the list</p>
 </div>
 
 
@@ -3453,13 +3605,7 @@ at one time in a single view. Colors vary smoothy between bonds.</p>
     </div>
     <a class="headerlink" href="#DisulfideList.resolution"></a>
     
-            <div class="docstring"><p>Set the resolution of the list</p>
-
-<h6 id="parameters">Parameters</h6>
-
-<ul>
-<li><strong>value</strong>:  Resolution (A)</li>
-</ul>
+            <div class="docstring"><p>Resolution of the parent sturcture (A)</p>
 </div>
 
 
@@ -3496,7 +3642,7 @@ at one time in a single view. Colors vary smoothy between bonds.</p>
     </div>
     <a class="headerlink" href="#DisulfideList.insert"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.insert-810"><a href="#DisulfideList.insert-810"><span class="linenos">810</span></a>    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
-</span><span id="DisulfideList.insert-811"><a href="#DisulfideList.insert-811"><span class="linenos">811</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.insert-811"><a href="#DisulfideList.insert-811"><span class="linenos">811</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.insert-812"><a href="#DisulfideList.insert-812"><span class="linenos">812</span></a><span class="sd">        Insert a Disulfide into the list at the specified index</span>
 </span><span id="DisulfideList.insert-813"><a href="#DisulfideList.insert-813"><span class="linenos">813</span></a>
 </span><span id="DisulfideList.insert-814"><a href="#DisulfideList.insert-814"><span class="linenos">814</span></a><span class="sd">        :param index: insertion point</span>
@@ -3520,6 +3666,17 @@ at one time in a single view. Colors vary smoothy between bonds.</p>
 
 
                             </div>
+                            <div id="DisulfideList.length" class="classattr">
+                                <div class="attr variable">
+            <span class="name">length</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideList.length"></a>
+    
+    
+
+                            </div>
                             <div id="DisulfideList.min" class="classattr">
                                         <input id="DisulfideList.min-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
@@ -3532,7 +3689,7 @@ at one time in a single view. Colors vary smoothy between bonds.</p>
     </div>
     <a class="headerlink" href="#DisulfideList.min"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.min-826"><a href="#DisulfideList.min-826"><span class="linenos">826</span></a>    <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList.min-827"><a href="#DisulfideList.min-827"><span class="linenos">827</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.min-827"><a href="#DisulfideList.min-827"><span class="linenos">827</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.min-828"><a href="#DisulfideList.min-828"><span class="linenos">828</span></a><span class="sd">        Return Disulfide from the list with the minimum energy</span>
 </span><span id="DisulfideList.min-829"><a href="#DisulfideList.min-829"><span class="linenos">829</span></a>
 </span><span id="DisulfideList.min-830"><a href="#DisulfideList.min-830"><span class="linenos">830</span></a><span class="sd">        :return: Disulfide with the minimum energy.</span>
@@ -3565,7 +3722,7 @@ at one time in a single view. Colors vary smoothy between bonds.</p>
     </div>
     <a class="headerlink" href="#DisulfideList.max"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.max-835"><a href="#DisulfideList.max-835"><span class="linenos">835</span></a>    <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList.max-836"><a href="#DisulfideList.max-836"><span class="linenos">836</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.max-836"><a href="#DisulfideList.max-836"><span class="linenos">836</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.max-837"><a href="#DisulfideList.max-837"><span class="linenos">837</span></a><span class="sd">        Return Disulfide from the list with the maximum energy</span>
 </span><span id="DisulfideList.max-838"><a href="#DisulfideList.max-838"><span class="linenos">838</span></a><span class="sd">        </span>
 </span><span id="DisulfideList.max-839"><a href="#DisulfideList.max-839"><span class="linenos">839</span></a><span class="sd">        :return: Disulfide with the maximum energy.</span>
@@ -3598,7 +3755,7 @@ at one time in a single view. Colors vary smoothy between bonds.</p>
     </div>
     <a class="headerlink" href="#DisulfideList.minmax_distance"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.minmax_distance-844"><a href="#DisulfideList.minmax_distance-844"><span class="linenos">844</span></a>    <span class="k">def</span> <span class="nf">minmax_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList.minmax_distance-845"><a href="#DisulfideList.minmax_distance-845"><span class="linenos">845</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.minmax_distance-845"><a href="#DisulfideList.minmax_distance-845"><span class="linenos">845</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.minmax_distance-846"><a href="#DisulfideList.minmax_distance-846"><span class="linenos">846</span></a><span class="sd">        Return the Disulfides with the minimum and </span>
 </span><span id="DisulfideList.minmax_distance-847"><a href="#DisulfideList.minmax_distance-847"><span class="linenos">847</span></a><span class="sd">        maximum Cα distances in the list.</span>
 </span><span id="DisulfideList.minmax_distance-848"><a href="#DisulfideList.minmax_distance-848"><span class="linenos">848</span></a>
@@ -3654,7 +3811,7 @@ maximum Cα distances in the list.</p>
     </div>
     <a class="headerlink" href="#DisulfideList.minmax_energy"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.minmax_energy-875"><a href="#DisulfideList.minmax_energy-875"><span class="linenos">875</span></a>    <span class="k">def</span> <span class="nf">minmax_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList.minmax_energy-876"><a href="#DisulfideList.minmax_energy-876"><span class="linenos">876</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.minmax_energy-876"><a href="#DisulfideList.minmax_energy-876"><span class="linenos">876</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.minmax_energy-877"><a href="#DisulfideList.minmax_energy-877"><span class="linenos">877</span></a><span class="sd">        Return the Disulfides with the minimum and maximum energies</span>
 </span><span id="DisulfideList.minmax_energy-878"><a href="#DisulfideList.minmax_energy-878"><span class="linenos">878</span></a><span class="sd">        from the DisulfideList.</span>
 </span><span id="DisulfideList.minmax_energy-879"><a href="#DisulfideList.minmax_energy-879"><span class="linenos">879</span></a>
@@ -3689,7 +3846,7 @@ from the DisulfideList.</p>
     </div>
     <a class="headerlink" href="#DisulfideList.nearest_neighbors"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.nearest_neighbors-909"><a href="#DisulfideList.nearest_neighbors-909"><span class="linenos">909</span></a>    <span class="k">def</span> <span class="nf">nearest_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
-</span><span id="DisulfideList.nearest_neighbors-910"><a href="#DisulfideList.nearest_neighbors-910"><span class="linenos">910</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.nearest_neighbors-910"><a href="#DisulfideList.nearest_neighbors-910"><span class="linenos">910</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.nearest_neighbors-911"><a href="#DisulfideList.nearest_neighbors-911"><span class="linenos">911</span></a><span class="sd">        Given an input Disulfide and overall torsional cutoff, return </span>
 </span><span id="DisulfideList.nearest_neighbors-912"><a href="#DisulfideList.nearest_neighbors-912"><span class="linenos">912</span></a><span class="sd">        the list of Disulfides within the cutoff </span>
 </span><span id="DisulfideList.nearest_neighbors-913"><a href="#DisulfideList.nearest_neighbors-913"><span class="linenos">913</span></a>
@@ -3754,7 +3911,7 @@ the list of Disulfides within the cutoff </p>
     </div>
     <a class="headerlink" href="#DisulfideList.pprint"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.pprint-938"><a href="#DisulfideList.pprint-938"><span class="linenos">938</span></a>    <span class="k">def</span> <span class="nf">pprint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList.pprint-939"><a href="#DisulfideList.pprint-939"><span class="linenos">939</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.pprint-939"><a href="#DisulfideList.pprint-939"><span class="linenos">939</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.pprint-940"><a href="#DisulfideList.pprint-940"><span class="linenos">940</span></a><span class="sd">        Pretty print self.</span>
 </span><span id="DisulfideList.pprint-941"><a href="#DisulfideList.pprint-941"><span class="linenos">941</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideList.pprint-942"><a href="#DisulfideList.pprint-942"><span class="linenos">942</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
@@ -3780,7 +3937,7 @@ the list of Disulfides within the cutoff </p>
     </div>
     <a class="headerlink" href="#DisulfideList.pprint_all"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.pprint_all-946"><a href="#DisulfideList.pprint_all-946"><span class="linenos">946</span></a>    <span class="k">def</span> <span class="nf">pprint_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="DisulfideList.pprint_all-947"><a href="#DisulfideList.pprint_all-947"><span class="linenos">947</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.pprint_all-947"><a href="#DisulfideList.pprint_all-947"><span class="linenos">947</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.pprint_all-948"><a href="#DisulfideList.pprint_all-948"><span class="linenos">948</span></a><span class="sd">        Pretty print full disulfide descriptions in self.</span>
 </span><span id="DisulfideList.pprint_all-949"><a href="#DisulfideList.pprint_all-949"><span class="linenos">949</span></a><span class="sd">        &#39;&#39;&#39;</span>
 </span><span id="DisulfideList.pprint_all-950"><a href="#DisulfideList.pprint_all-950"><span class="linenos">950</span></a>        <span class="n">sslist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
@@ -3806,7 +3963,7 @@ the list of Disulfides within the cutoff </p>
     </div>
     <a class="headerlink" href="#DisulfideList.screenshot"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.screenshot-954"><a href="#DisulfideList.screenshot-954"><span class="linenos">954</span></a>    <span class="k">def</span> <span class="nf">screenshot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;bs&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s1">&#39;sslist.png&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="DisulfideList.screenshot-955"><a href="#DisulfideList.screenshot-955"><span class="linenos">955</span></a>        <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="DisulfideList.screenshot-955"><a href="#DisulfideList.screenshot-955"><span class="linenos">955</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideList.screenshot-956"><a href="#DisulfideList.screenshot-956"><span class="linenos">956</span></a><span class="sd">        Save the interactive window displaying the list of </span>
 </span><span id="DisulfideList.screenshot-957"><a href="#DisulfideList.screenshot-957"><span class="linenos">957</span></a><span class="sd">        disulfides in the given style. Position the disulfide then</span>
 </span><span id="DisulfideList.screenshot-958"><a href="#DisulfideList.screenshot-958"><span class="linenos">958</span></a><span class="sd">        close the window to save.</span>
@@ -3862,6 +4019,28 @@ close the window to save.</p>
 
 
                             </div>
+                            <div id="DisulfideList.torsion_df" class="classattr">
+                                <div class="attr variable">
+            <span class="name">torsion_df</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideList.torsion_df"></a>
+    
+    
+
+                            </div>
+                            <div id="DisulfideList.torsion_array" class="classattr">
+                                <div class="attr variable">
+            <span class="name">torsion_array</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DisulfideList.torsion_array"></a>
+    
+    
+
+                            </div>
                             <div id="DisulfideList.validate_ss" class="classattr">
                                         <input id="DisulfideList.validate_ss-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
@@ -3885,7 +4064,8 @@ close the window to save.</p>
                                 <h5>Inherited Members</h5>
                                 <dl>
                                     <div><dt>collections.UserList</dt>
-                                <dd id="DisulfideList.pop" class="function">pop</dd>
+                                <dd id="DisulfideList.data" class="variable">data</dd>
+                <dd id="DisulfideList.pop" class="function">pop</dd>
                 <dd id="DisulfideList.remove" class="function">remove</dd>
                 <dd id="DisulfideList.clear" class="function">clear</dd>
                 <dd id="DisulfideList.copy" class="function">copy</dd>
@@ -3916,7 +4096,7 @@ close the window to save.</p>
 </span><span id="load_disulfides_from_id-1012"><a href="#load_disulfides_from_id-1012"><span class="linenos">1012</span></a>                        <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="load_disulfides_from_id-1013"><a href="#load_disulfides_from_id-1013"><span class="linenos">1013</span></a>                        <span class="n">dbg</span> <span class="o">=</span> <span class="kc">False</span>
 </span><span id="load_disulfides_from_id-1014"><a href="#load_disulfides_from_id-1014"><span class="linenos">1014</span></a>                        <span class="p">):</span>
-</span><span id="load_disulfides_from_id-1015"><a href="#load_disulfides_from_id-1015"><span class="linenos">1015</span></a>    <span class="sd">&#39;&#39;&#39;</span>
+</span><span id="load_disulfides_from_id-1015"><a href="#load_disulfides_from_id-1015"><span class="linenos">1015</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="load_disulfides_from_id-1016"><a href="#load_disulfides_from_id-1016"><span class="linenos">1016</span></a><span class="sd">    Loads the Disulfides by PDB ID and returns a ```DisulfideList``` of Disulfide objects.</span>
 </span><span id="load_disulfides_from_id-1017"><a href="#load_disulfides_from_id-1017"><span class="linenos">1017</span></a><span class="sd">    Assumes the file is downloaded in the pdb_dir path.</span>
 </span><span id="load_disulfides_from_id-1018"><a href="#load_disulfides_from_id-1018"><span class="linenos">1018</span></a><span class="sd">    </span>

@@ -543,6 +543,38 @@ class DisulfideLoader:
    
 # class ends
 
+def Download_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False):
+    '''
+    Download the databases from Google Drive.
+
+    :param loadpath: Path from which to load, defaults to DATA_DIR
+    :param verbose: Verbosity, defaults to False
+    '''
+    # normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy 
+    # distribution. In that case we need to download the files for all disulfides and the subset
+    # from the Google Drive storage.
+    
+    import gdown
+    
+    _good1 = 0 # all data
+    _good2 = 0 # subset data
+    
+    _fname_sub = f'{loadpath}{LOADER_SUBSET_FNAME}'
+    _fname_all = f'{loadpath}{LOADER_FNAME}'
+    
+    
+    if verbose:
+        print(f'-> Download_PDB_SS(): Reading disulfides from Google Drive... ')
+    
+    if gdown.download(LOADER_SUBSET_URL, _fname_sub, quiet=False) is not None:
+        _good2 = 2
+
+    if gdown.download(LOADER_ALL_URL, _fname_all, quiet=False) is not None:
+        _good1 = 1
+
+    return _good1 + _good2
+
+
 def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoader:
     '''
     Load the fully instantiated Disulfide database from the specified file. Use the
@@ -583,34 +615,10 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
     
     # we don't have it locally, so download both from google drive
     except:
-        if verbose:
-            print(f'-> DisulfideLoader(): Reading disulfides from Google Drive... ')
-        
-            gdown.download(LOADER_SUBSET_URL, _fname_sub, quiet=False)
-            gdown.download(LOADER_ALL_URL, _fname_all, quiet=False)
-    '''
-        #PDB_SS_ALL_LOADER.pkl
-        if verbose:
-            print(f'-> DisulfideLoader(): Downloading the RCSB Disulfide Database from Google Drive to {_fname}... ')
-        
-        if gdown.download(LOADER_ALL_URL, _fname_all) is not None:
-            _good1 = True
-            if verbose:
-                print(f' done.')
-        else:
-            print('\nError downloading RCSB database!')
-
-        #PDB_ss_subset.pkl
-        if verbose:
-            print(f'-> DisulfideLoader(): Downloading disulfide subset database from Google Drive to {_fname}... ', end='')
-        
-        if gdown.download(LOADER_SUBSET_URL, _fname_sub) is not None:
-            _good2 = True
-            if verbose:
-                print(f' done.')
-        else:
-            print('Error downloading RCSB subset database!')
-    '''
+        res = Download_PDB_SS(loadpath=loadpath, verbose=verbose)
+        if res != 3:
+            print('!! Unable to download databases, exiting')
+            return
     
     if verbose:
         print(f'-> load_PDB_SS(): Attempting to read local {_fname}... ', end='')
