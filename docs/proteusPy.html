@@ -92,8 +92,8 @@ proteusPy    </h1>
 <li>Activate the environment</li>
 </ul></li>
 <li>Build the environment. At this point it's probably best to clone the repo via github since it contains all
- of the notebooks test programs and raw Disulfide databases. The source code distribution can be used from pyPi as a normal
- package, within your own environment.
+of the notebooks test programs and raw Disulfide databases. The source code distribution can be used from pyPi as a normal
+package, within your own environment.
 <ul>
 <li>Using pyPi:
 <ul>
@@ -107,15 +107,15 @@ proteusPy    </h1>
 <li>From a shell prompt: 
 <pre><code> $ git-lfs track "*.csv" "*.pkl" "*.mp4"
  $ git clone https://github.com/suchanek/proteusPy/proteusPy.git
+ $ cd proteusPy
+ $ conda env create --name proteusPy --file=proteusPy.yml
+ $ conda activate proteusPy
+ $ pip install .
 </code></pre></li>
 </ul></li>
-<li>cd into the repo
-<pre><code>  $ conda env create --name proteusPy --file=proteusPy.yml
-  $ pip install .
-</code></pre></li>
+</ul></li>
+</ul></li>
 <li>Profit! OK, just kidding. I hope you enjoy using proteusPy and would love to hear any success/insights gleaned from any subsequent work. </li>
-</ul></li>
-</ul></li>
 </ol>
 
 <h3 id="general-usage">General Usage</h3>
@@ -139,7 +139,7 @@ proteusPy    </h1>
 
 <p><em>NB:</em> This distribution is being developed slowly. proteusPy relies on my fork of the <code>Bio</code> Python package to download and build the database. As a result, one can't download and create the database locally unless the BioPython patch is applied. This has no impact on analysis with the existing databases. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1. 7/3/23 -egs</p>
 
-<p>Eric G. Suchanek, PhD., <a href="&#109;&#x61;&#105;l&#116;&#111;&#58;&#x73;&#117;c&#104;&#97;&#110;&#101;k&#64;&#x6d;&#97;&#x63;&#46;&#x63;&#x6f;&#109;">&#x73;&#117;c&#104;&#97;&#110;&#101;k&#64;&#x6d;&#97;&#x63;&#46;&#x63;&#x6f;&#109;</a></p>
+<p>Eric G. Suchanek, PhD., <a href="&#109;&#97;&#x69;&#108;&#x74;o&#58;s&#x75;&#99;&#104;&#97;&#110;&#x65;k&#x40;&#x6d;a&#99;&#46;&#99;&#111;&#109;">s&#x75;&#99;&#104;&#97;&#110;&#x65;k&#x40;&#x6d;a&#99;&#46;&#99;&#111;&#109;</a></p>
 </div>
 
                         <input id="mod-proteusPy-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
