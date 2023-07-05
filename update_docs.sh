@@ -1,4 +1,4 @@
-#!/bin/bash ~/.bash_profile
+#!/bin/bash
 conda activate proteus
 pdoc proteusPy —math -o docs —logo "./logo.png"
-python setup.py sdist bdist-wheel
+python setup.py sdist
