@@ -376,7 +376,7 @@ dependencies:
       - pdfminer==20191125
       - pkginfo==1.9.6
       - ply==3.11
-      - proteuspy==0.68
+      - proteuspy
       - py3dmol==2.0.1.post1
       - pydantic==1.10.9
       - pygtrie==2.5.0
