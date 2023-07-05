@@ -578,7 +578,7 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
         with open(_fname, 'rb') as f:
             res = pickle.load(f)
         if verbose:
-            print(f'done.')
+            print(f'-> load_PDB_SS(): Done reading {_fname}... ')
         return res
     
     # we don't have it locally, so download both from google drive
@@ -611,32 +611,14 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
         else:
             print('Error downloading RCSB subset database!')
     '''
-    if subset:
-        _fname = _fname_sub
-    else:
-        _fname = _fname_all
-
+    
     if verbose:
-        print(f'-> load_PDB_SS(): Attempting to read {_fname}... ', end='')
-    try:
-        with open(_fname, 'rb') as f:
-            res = pickle.load(f)
-        if verbose:
-            print(f'done.')
-        return res
-    except:
-        # no fully built loader available. See if we can
-        # build it
-        print(f'\n\n!!! Unable to download database! Load_PDB_SS() is attempting to rebuild the loader.')
-    
-        pdb = DisulfideLoader(verbose=True, subset=subset)
-        if pdb is None:
-            mess = f'!!! FATAL: load_PDB_SS(): cannot rebuild primary SS file!'
-            raise DisulfideIOException(mess)
-        else:
-            pdb.save(savepath=loadpath, subset=subset)
-        print(f'-> Load_PDB_SS(): rebuild complete.')
-    
-    return
+        print(f'-> load_PDB_SS(): Attempting to read local {_fname}... ', end='')
+    #try:
+    with open(_fname, 'rb') as f:
+        res = pickle.load(f)
+    if verbose:
+        print(f'done.')
+    return res
 
 # End of file

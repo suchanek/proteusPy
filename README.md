@@ -21,6 +21,7 @@
      - cd into the repo
       ```
         $ conda env create --name proteusPy --file=proteusPy.yml
+        $ conda activate proteusPy
         $ pip install .
       ```
   3. Profit! OK, just kidding. I hope you enjoy using proteusPy and would love to hear any success/insights gleaned from any subsequent work. 
