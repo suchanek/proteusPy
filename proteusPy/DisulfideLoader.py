@@ -566,11 +566,16 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False):
     if verbose:
         print(f'-> Download_PDB_SS(): Reading disulfides from Google Drive... ')
     
-    if gdown.download(LOADER_SUBSET_URL, _fname_sub, quiet=False) is not None:
-        _good2 = 2
-
-    if gdown.download(LOADER_ALL_URL, _fname_all, quiet=False) is not None:
-        _good1 = 1
+    if subset:
+        if gdown.download(LOADER_SUBSET_URL, _fname_sub, quiet=False) is not None:
+            os.sync()
+            if os.path.exists(_fname_sub):
+                _good2 = 2
+    else:
+        if gdown.download(LOADER_ALL_URL, _fname_all, quiet=False) is not None:
+            os.sync()
+            if os.path.exists(_fname_all):
+                _good1 = 1
 
     return _good1 + _good2
 
@@ -602,31 +607,22 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
     else:
         _fname = _fname_all
     
+    if not os.path.exists(_fname_sub):
+        res2 = Download_PDB_SS(loadpath=loadpath, verbose=verbose, subset=True)
+    
+    if not os.path.exists(_fname_all):
+        res2 = Download_PDB_SS(loadpath=loadpath, verbose=verbose, subset=False)
+
     # first attempt to read the local copy of the loader
     if verbose:
         print(f'-> load_PDB_SS(): Reading {_fname}... ')
 
-    try:
-        with open(_fname, 'rb') as f:
-            res = pickle.load(f)
-        if verbose:
-            print(f'-> load_PDB_SS(): Done reading {_fname}... ')
-        return res
-    
-    # we don't have it locally, so download both from google drive
-    except:
-        res = Download_PDB_SS(loadpath=loadpath, verbose=verbose)
-        if res != 3:
-            print('!! Unable to download databases, exiting')
-            return
-    
-    if verbose:
-        print(f'-> load_PDB_SS(): Attempting to read local {_fname}... ', end='')
-    #try:
+
     with open(_fname, 'rb') as f:
         res = pickle.load(f)
     if verbose:
-        print(f'done.')
+        print(f'-> load_PDB_SS(): Done reading {_fname}... ')
     return res
+
 
 # End of file
