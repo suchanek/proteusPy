@@ -14,7 +14,7 @@ affiliations:
  - name: Monterey Institute for Research in Astronomy, Marina, USA
    index: 1
 date: 4 July, 2023
-bibliography: proteusPy.bib
+bibliography: proteusPyJOSS.bib
 ---
 
 # Summary
