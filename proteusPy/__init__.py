@@ -24,7 +24,7 @@ import Bio
 from Bio.PDB.vectors import calc_dihedral, calc_angle
 from Bio.PDB import Select, Vector
 
-from .proteusPyWarning import ProteusPyWarning
+from .ProteusPyWarning import ProteusPyWarning
 from .ProteusGlobals import PDB_DIR, MODEL_DIR
 
 from .DisulfideExceptions import DisulfideIOException, DisulfideConstructionWarning, DisulfideConstructionException
