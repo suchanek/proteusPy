@@ -24,7 +24,7 @@ from numpy import linspace
 from matplotlib import cm
 
 import proteusPy
-from proteusPy.proteusPyWarning import ProteusPyWarning
+from proteusPy.ProteusPyWarning import ProteusPyWarning
 
 from Bio.PDB.vectors import Vector
 from Bio.PDB import PDBParser
