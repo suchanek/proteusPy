@@ -3,3 +3,4 @@ numpy
 matplotlib
 pyvista
 pip
+tqdm
