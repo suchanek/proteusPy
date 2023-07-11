@@ -77,7 +77,7 @@ setup(name='proteusPy',
       license='MIT',
       packages=['proteusPy'],
       keywords='proteus suchanek disulfide',
-      install_requires=['pandas', 'numpy', 'matplotlib', 'pyvista', 'pip'],
+      install_requires=['pandas', 'numpy', 'matplotlib', 'pyvista', 'pip', 'tqdm'],
       source='https://github.com/suchanek/proteusPy/',
       project_urls={
         "Documentation": "https://suchanek.github.io/proteusPy/",
