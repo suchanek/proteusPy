@@ -55,10 +55,10 @@
                 <li><a href="proteusPy/DisulfideLoader.html">DisulfideLoader</a></li>
                 <li><a href="proteusPy/ProteusGlobals.html">ProteusGlobals</a></li>
                 <li><a href="proteusPy/ProteusPyWarning.html">ProteusPyWarning</a></li>
+                <li><a href="proteusPy/Residue.html">Residue</a></li>
                 <li><a href="proteusPy/angle_annotation.html">angle_annotation</a></li>
                 <li><a href="proteusPy/atoms.html">atoms</a></li>
                 <li><a href="proteusPy/data.html">data</a></li>
-                <li><a href="proteusPy/residue.html">residue</a></li>
                 <li><a href="proteusPy/turtle3D.html">turtle3D</a></li>
                 <li><a href="proteusPy/utility.html">utility</a></li>
         </ul>
@@ -138,7 +138,7 @@ package, within your own environment.
 
 <p><em>NB:</em> This distribution is being developed slowly. proteusPy relies on my fork of the <code>Bio</code> Python package to download and build the database. As a result, one can't download and create the database locally unless the BioPython patch is applied. The changed python file is in the repo's data directory - <code>parse_pdb_header.py</code>. Database analysis is unaffected without the patch. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1. 7/4/23 -egs-</p>
 
-<p>Eric G. Suchanek, PhD., <a href="&#x6d;&#x61;&#105;l&#116;&#x6f;&#58;&#115;u&#99;&#104;&#x61;&#x6e;&#x65;&#107;&#64;&#109;&#x61;&#99;&#46;&#x63;&#111;&#x6d;">&#115;u&#99;&#104;&#x61;&#x6e;&#x65;&#107;&#64;&#109;&#x61;&#99;&#46;&#x63;&#111;&#x6d;</a></p>
+<p>Eric G. Suchanek, PhD., <a href="&#x6d;&#x61;&#105;&#108;&#x74;&#111;&#x3a;&#115;&#117;&#99;&#104;&#97;&#110;&#101;&#107;&#64;&#109;&#97;&#99;&#46;&#99;o&#x6d;">&#115;&#117;&#99;&#104;&#97;&#110;&#101;&#107;&#64;&#109;&#97;&#99;&#46;&#99;o&#x6d;</a></p>
 </div>
 
                         <input id="mod-proteusPy-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -153,7 +153,7 @@ package, within your own environment.
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">.. include:: ../README.md</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.72&quot;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.73&quot;</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="kn">import</span> <span class="nn">sys</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="kn">import</span> <span class="nn">os</span>
@@ -178,7 +178,7 @@ package, within your own environment.
 </span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>
 </span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="kn">from</span> <span class="nn">.turtle3D</span> <span class="kn">import</span> <span class="n">Turtle3D</span>
 </span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a><span class="kn">from</span> <span class="nn">.turtle3D</span> <span class="kn">import</span> <span class="n">ORIENT_BACKBONE</span><span class="p">,</span> <span class="n">ORIENT_SIDECHAIN</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a><span class="kn">from</span> <span class="nn">.residue</span> <span class="kn">import</span> <span class="n">build_residue</span><span class="p">,</span> <span class="n">get_backbone_from_chain</span><span class="p">,</span> <span class="n">to_alpha</span><span class="p">,</span> <span class="n">to_carbonyl</span><span class="p">,</span> <span class="n">to_nitrogen</span><span class="p">,</span> <span class="n">to_oxygen</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a><span class="kn">from</span> <span class="nn">.Residue</span> <span class="kn">import</span> <span class="n">build_residue</span><span class="p">,</span> <span class="n">get_backbone_from_chain</span><span class="p">,</span> <span class="n">to_alpha</span><span class="p">,</span> <span class="n">to_carbonyl</span><span class="p">,</span> <span class="n">to_nitrogen</span><span class="p">,</span> <span class="n">to_oxygen</span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>
 </span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="kn">from</span> <span class="nn">.Disulfide</span> <span class="kn">import</span> <span class="n">Download_Disulfides</span><span class="p">,</span> <span class="n">Extract_Disulfides</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="kn">from</span> <span class="nn">.DisulfideList</span> <span class="kn">import</span> <span class="n">load_disulfides_from_id</span>

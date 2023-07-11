@@ -6,7 +6,7 @@
 .. include:: ../README.md
 """
 
-__version__ = "0.72"
+__version__ = "0.73"
 
 import sys
 import os
@@ -31,7 +31,7 @@ from .DisulfideExceptions import DisulfideIOException, DisulfideConstructionWarn
 
 from .turtle3D import Turtle3D
 from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN
-from .residue import build_residue, get_backbone_from_chain, to_alpha, to_carbonyl, to_nitrogen, to_oxygen
+from .Residue import build_residue, get_backbone_from_chain, to_alpha, to_carbonyl, to_nitrogen, to_oxygen
 
 from .Disulfide import Download_Disulfides, Extract_Disulfides
 from .DisulfideList import load_disulfides_from_id

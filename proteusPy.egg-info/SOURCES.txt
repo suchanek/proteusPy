@@ -10,6 +10,7 @@ proteusPy/DisulfideList.py
 proteusPy/DisulfideLoader.py
 proteusPy/ProteusGlobals.py
 proteusPy/ProteusPyWarning.py
+proteusPy/Residue.py
 proteusPy/__init__.py
 proteusPy/angle_annotation.py
 proteusPy/atoms.py
