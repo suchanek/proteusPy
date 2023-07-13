@@ -109,6 +109,7 @@ package, within your own environment.
  $ conda activate proteusPy
  $ pip install .
  $ jupyter nbextension enable --py --sys-prefix widgetsnbextension
+ $ python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy)"
 
 </code></pre></li>
 </ul></li>
@@ -138,7 +139,7 @@ package, within your own environment.
 
 <p><em>NB:</em> This distribution is being developed slowly. proteusPy relies on my fork of the <code>Bio</code> Python package to download and build the database. As a result, one can't download and create the database locally unless the BioPython patch is applied. The changed python file is in the repo's data directory - <code>parse_pdb_header.py</code>. Database analysis is unaffected without the patch. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1. 7/4/23 -egs-</p>
 
-<p>Eric G. Suchanek, PhD., <a href="&#x6d;&#x61;&#105;&#108;&#x74;&#111;&#x3a;&#115;&#117;&#99;&#104;&#97;&#110;&#101;&#107;&#64;&#109;&#97;&#99;&#46;&#99;o&#x6d;">&#115;&#117;&#99;&#104;&#97;&#110;&#101;&#107;&#64;&#109;&#97;&#99;&#46;&#99;o&#x6d;</a></p>
+<p>Eric G. Suchanek, PhD., <a href="&#x6d;&#97;&#x69;&#x6c;&#116;&#111;&#58;&#115;&#117;&#x63;&#x68;&#x61;&#x6e;&#x65;&#107;&#x40;&#x6d;&#x61;&#99;&#46;com">&#115;&#117;&#x63;&#x68;&#x61;&#x6e;&#x65;&#107;&#x40;&#x6d;&#x61;&#99;&#46;com</a></p>
 </div>
 
                         <input id="mod-proteusPy-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -153,7 +154,7 @@ package, within your own environment.
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">.. include:: ../README.md</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.73&quot;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.75&quot;</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="kn">import</span> <span class="nn">sys</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="kn">import</span> <span class="nn">os</span>
