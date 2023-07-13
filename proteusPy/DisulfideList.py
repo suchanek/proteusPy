@@ -905,15 +905,12 @@ class DisulfideList(UserList):
 
         return res
         
-    def nearest_neighbors(self, ss, cutoff: float):
+    def nearest_neighbors_ss(self, ss, cutoff: float):
         '''
         Given an input Disulfide and overall torsional cutoff, return 
         the list of Disulfides within the cutoff 
 
-        :param chi1: Chi1 (degrees)
-        :param chi2: Chi2 (degrees)
-        :param chi3: Chi3 (degrees)
-        :param chi4: Chi4 (degrees)
+        :param ss: Disulfide to compare to
         :param chi5: Chi5 (degrees)
         :param cutoff: Distance cutoff, degrees
         :return: DisulfideList of neighbors

@@ -10,14 +10,14 @@ installation just type the command::
 However, you would normally install the latest proteusPy release from
 the PyPI archive with::
 
-    python -m pip install --index-url https://test.pypi.org/simple/ proteusPy
+    python -m pip install proteusPy
 
 For more in-depth instructions, see the installation section of the
 proteusPy documentation, linked to from:
 
 http://suchanek.github.io/proteusPy/
 
-This code is in alpha pre-release.
+This code is in beta.
 """
 import sys
 import os
@@ -42,7 +42,7 @@ if "bdist_wheel" in sys.argv:
         )
 
 # Make sure we have the right Python version.
-MIN_PY_VER = (3, 8)
+MIN_PY_VER = (3, 9)
 if sys.version_info[:2] < MIN_PY_VER:
     sys.stderr.write(
         ("ERROR: proteusPy requires Python %i.%i or later. " % MIN_PY_VER)
@@ -77,7 +77,7 @@ setup(name='proteusPy',
       license='MIT',
       packages=['proteusPy'],
       keywords='proteus suchanek disulfide',
-      install_requires=['pandas', 'numpy', 'matplotlib', 'pyvista', 'pip', 'tqdm', 'gdown'],
+      install_requires=[],
       source='https://github.com/suchanek/proteusPy/',
       project_urls={
         "Documentation": "https://suchanek.github.io/proteusPy/",
@@ -85,12 +85,11 @@ setup(name='proteusPy',
         "Tracker": "https://github.com/suchanek/proteusPy/issues",
       },
       classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'License :: OSI Approved :: MIT License',
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Topic :: Scientific/Engineering',
