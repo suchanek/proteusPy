@@ -21,6 +21,7 @@
           $ conda activate proteusPy
           $ pip install .
           $ jupyter nbextension enable --py --sys-prefix widgetsnbextension
+          $ python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy)"
 
          ```
 3. *Profit!* OK, just kidding. I hope you enjoy using proteusPy and would love to hear any success/insights gleaned from it. The Disulfide database is unique as far as I know, and is ripe for mining. 
