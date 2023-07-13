@@ -22,7 +22,6 @@ proteusPy.egg-info/PKG-INFO
 proteusPy.egg-info/SOURCES.txt
 proteusPy.egg-info/dependency_links.txt
 proteusPy.egg-info/not-zip-safe
-proteusPy.egg-info/requires.txt
 proteusPy.egg-info/top_level.txt
 proteusPy/data/__init__.py
 proteusPy/data/ss_completed.txt
