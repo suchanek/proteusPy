@@ -1,0 +1,39 @@
+name: prt_hist
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - biopython
+  - ca-certificates
+  - gdown
+  - openssl
+  - pyvista
+  - jupyter
+  - pandas
+  - matplotlib
+  - certifi
+  - seaborn
+  - plotly_express
+  - tqdm
+  - ipygany
+  - qtpy
+  - pyvistaqt
+  - pythreejs
+  - panel
+  - jupyterlab
+  - ipyparallel
+  - wget
+  - pycryptodome
+  - nodejs
+  - pdoc
+  - pillow
+  - pytube
+  - openai
+  - rdkit
+  - yarn
+  - grpcio
+  - conda
+  - pip
+  - scikit-learn
+  - trame
+prefix: /Users/egs/miniforge3/envs/prt_hist
