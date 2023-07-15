@@ -62,7 +62,7 @@ class Disulfide:
     This class provides a Python object and methods representing a physical disulfide bond 
     either extracted from the RCSB protein databank or built using the 
     [proteusPy.Turtle3D](turtle3D.html) class. The disulfide bond is an important
-    intermolecular stabilizing structural element and is characterized by:
+    intramolecular stabilizing structural element and is characterized by:
 
     * Atomic coordinates for the atoms N, Cα, Cβ, C', Sγ for both residues. 
     These are stored as both raw atomic coordinates as read from the RCSB file 
@@ -74,11 +74,11 @@ class Disulfide:
     * Approximate bond torsional energy (kcal/mol):
     
     $$ 
-    E_{kcal/mol} \\approx 2.0 * cos(3.0 * \\chi_{1}) + cos(3.0 * \\chi_{5}) + cos(3.0 * \\chi_{2}) + 
+    E_{kcal/mol} \approx 2.0 * cos(3.0 * \chi_{1}) + cos(3.0 * \chi_{5}) + cos(3.0 * \chi_{2}) + 
     $$
 
     $$
-    cos(3.0 * \\chi_{4}) + 3.5 * cos(2.0 * \\chi_{3}) + 0.6 * cos(3.0 * \\chi_{3}) + 10.1 
+    cos(3.0 * \chi_{4}) + 3.5 * cos(2.0 * \chi_{3}) + 0.6 * cos(3.0 * \chi_{3}) + 10.1 
     $$
     
     The equation embodies the typical 3-fold rotation barriers associated with single bonds,
@@ -89,7 +89,7 @@ class Disulfide:
     *spiral* and *staple*. These are under characgterization.
 
     * Euclidean length of the dihedral angles (degrees) defined as:
-    $$\\sqrt(\\chi_{1}^{2} + \\chi_{2}^{2} + \\chi_{3}^{2} + \\chi_{4}^{2} + \\chi_{5}^{2})$$
+    $$\sqrt(\chi_{1}^{2} + \chi_{2}^{2} + \chi_{3}^{2} + \chi_{4}^{2} + \chi_{5}^{2})$$
     * Cα - Cα distance (Å)
     * Cβ - Cβ distance (Å)
     * The previous C' and next N for both the proximal and distal residues. These are needed
