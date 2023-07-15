@@ -17,48 +17,94 @@ date: 4 July, 2023
 bibliography: proteusPyJOSS.bib
 ---
 
+<div style="text-align:center">
+    <img src="logo.png" alt="proteusPy logo">
+    Eric G. Suchanek, PhD
+</div>
+
+
 # Summary
-*proteusPy* is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide Bonds. This package reprises my molecular modeling program *proteus*, [@Pabo_1986], and utilizes a new implementation of the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class for disufulfide modeling. The turtle implements the functions ``Move``, ``Roll``, ``Yaw``, ``Pitch`` and ``Turn`` for movement in a three-dimensional space. The [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class implements methods to analyze the protein structure stabilizing element known as a *Disulfide Bond*. This class and its underlying methods are being used to perform a structural analysis of over 35,800 disulfide-bond containing proteins in the RCSB protein data bank.
+**proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide Bonds. This package reprises my molecular modeling program *proteus*, [@Pabo_1986], and utilizes a new implementation of the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class for disulfide and protein modeling. The turtle implements the functions ``Move``, ``Roll``, ``Yaw``, ``Pitch`` and ``Turn`` for movement in a three-dimensional space. The [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class implements methods to analyze the protein structure stabilizing element known as a *Disulfide Bond*. This class and its underlying methods are being used to perform a structural analysis of over 35,800 disulfide-bond containing proteins in the RCSB protein data bank.
 
-# Virtual Environment Creation
-1. *Install Anaconda (<http://anaconda.org>)*
-2. *Build the environment.* 
-   At this point it's probably best to clone the repo via github since it contains all
-   of the notebooks test programs and raw Disulfide databases. The source code distribution can be used from pyPi as a normal
-   package, within your own environment.
-   - Using pyPi:
-     - python3 -m pip install proteusPy
-   - From the gitHub repository:
-     - Install git-lfs
-       - https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage
-       - From a shell prompt: 
-         ```
-          $ git-lfs track "*.csv" "*.pkl" "*.mp4"
-          $ git clone https://github.com/suchanek/proteusPy/proteusPy.git
-          $ cd proteusPy
-          $ conda env create --name proteusPy --file=proteusPy.yml
-          $ conda activate proteusPy
-          $ pip install .
-          $ jupyter nbextension enable --py --sys-prefix widgetsnbextension
+# Motivation
+My primary motivation for implementing ``proteusPy`` was to revisit the [RCSB Protein Databank](https://www.rcsb.org) and do a structural analysis of the disulfide bonds contained therein. This necessitated the creation an object-oriented database capable of introspection, analysis and display. The API is available online at: https://suchanek.github.io/proteusPy/proteusPy.html and provides more details and numerous examples.
+# Requirements
+1. PC running MacOS, Linux, Windows
+2. 16 GB RAM
+3. 2 GB disk space
 
-         ```
+# Installation
+1. **Install Anaconda:** <http://anaconda.org>
+2. **Build the environment.** 
+   It's simplest to clone the repo via github since it contains all of the notebooks, test programs and raw Disulfide databases. 
+
+  - Install git-lfs
+    - https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage
+  - From a shell prompt: 
+     ```
+     $ git-lfs track "*.csv" "*.pkl" "*.mp4"
+     $ git clone https://github.com/suchanek/proteusPy/proteusPy.git
+     $ cd proteusPy
+     $ conda env create --name proteusPy --file=proteusPy.yml
+     $ conda activate proteusPy
+     $ pip install .
+     $ jupyter nbextension enable --py --sys-prefix widgetsnbextension
+     $ python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy)"
+    ```
+
 
 # General Usage
 Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. The ``notebooks`` directory contains all of my Jupyter notebooks and is a good place to start. The ``DisulfideAnalysis.ipynb`` notebook contains the first analysis paper. The ``programs`` subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files, (``DisulfideDownloader.py``), extracting the disulfides and creating the database loaders (``DisulfideExtractor.py``) and cluster analysis (``DisulfideClass_Analysis.py``).
 
 The first time one loads the database via ``Load_PDB_SS()`` the system will attempt to download the full and subset database from my Google Drive. If this fails the system will attempt to rebuild the database from the repo's ``data`` subdirectory (not the package's). If you've downloaded from github this will work correctly. If you've installed from pyPi via ``pip`` it will fail.
 
-# The Class Details
-The primary driver for implementing ``proteusPy`` was to revisit the [RCSB Protein Databank](https://www.rcsb.org) and do a structural analysis of the disulfide bonds contained therein. This necessitated the creation an object-oriented database capable of introspection analysis, and display. I'll describe the primary classes below. The API is available online at: https://suchanek.github.io/proteusPy/proteusPy.html.
+# Class Details
+The primary classes developed for ``proteusPy`` are described briefly below. Please see the [API](https://suchanek.github.io/proteusPy/proteusPy.html) for details.
 
-##[Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html)
+## [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html)
+This class provides a Python object and methods representing a physical disulfide bond either extracted from the RCSB protein databank or a virtual one built using the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class. The disulfide bond is an important intramolecular stabilizing structural element and is characterized by:
 
+* Atomic coordinates for the atoms N, C$_{\alpha}$, C$_{\beta}$, C', S$_{γ}$ for both residues. These are stored as both raw atomic coordinates as read from the RCSB file and internal local coordinates.
+* The dihedral angles $\chi_{1} - \chi_{5}$ for the disulfide bond
+* A name, by default: ``{pdb_id}{prox_resnumb}{prox_chain}_{distal_resnum}{distal_chain}``
+* Proximal residue number
+* Distal residue number
+* Approximate bond torsional energy (kcal/mol):
+  $$ 
+    E_{kcal/mol} \approx 2.0 * cos(3.0 * \chi_{1}) + cos(3.0 * \chi_{5}) + cos(3.0 * \chi_{2}) + 
+  $$
+  $$
+    cos(3.0 * \chi_{4}) + 3.5 * cos(2.0 * \chi_{3}) + 0.6 * cos(3.0 * \chi_{3}) + 10.1 
+  $$
+* Euclidean length of the dihedral angles (degrees) defined as:
+$$\sqrt(\chi_{1}^{2} + \chi_{2}^{2} + \chi_{3}^{2} + \chi_{4}^{2} + \chi_{5}^{2})$$
+* C$_{α}$ - C$_{\alpha}$ distance ($\AA$)
+* C$_{β}$- C$_{\beta}$ distance ($\AA$)
+* The previous C' and next N coordinates for both the proximal and distal residues. These are needed to calculate the backbone dihedral angles Φ and Ψ.
+* Backbone dihedral angles Φ and Ψ, when possible. Not all structures are complete and in those cases the atoms needed may be undefined. In this case the Φ and Ψ angles are set to -180°.
 
-##[DisulfideLoader](https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html)
+The class also provides 3D rendering capabilities using the excellent [PyVista](https://pyvista.org) library, and can display disulfides interactively in a variety of display styles:
+* 'sb' - Split Bonds style - bonds colored by their atom type
+* 'bs' - Ball and Stick style - split bond coloring with small atoms
+* 'pd' - Proximal/Distal style - bonds colored *Red* for proximal residue and *Green* for
+the distal residue.
+* 'cpk' - CPK style rendering, colored by atom type:
+   * Carbon   - Grey
+   * Nitrogen - Blue
+   * Sulfur   - Yellow
+   * Oxygen   - Red
+   * Hydrogen - White 
+
+Individual renderings can be saved to a file, and animations created.
+
+![CPK](logo_cpk.png)
+![SB](logo_bs.png)
+
+## [DisulfideLoader](https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html)
 
 This class represents the disulfide database itself and is its primary means of accession.  Instantiation takes 2 parameters: ``subset`` and ``verbose``. Given the size of the database, one can use the ``subset`` parameter to load the first 1000 disulfides into memory. This facilitates quicker development and testing new functions. I recommend using at least a 16 GB machine to work with the full dataset.
 
-The entirety of the RCSB disulfide database is stored within the class via a [proteusPy.DisulfideList]("https://suchanek.github.io/proteusPy/proteusPy/DisulfideList.html"), a ```Pandas``` .csv file, and a ```dict``` of indices mapping the PDB IDs into their respective list of disulfides. The datastructures allow simple, direct and flexible access to the disulfide structures contained within. This makes it possible to access the disulfides by array index, PDB structure ID or disulfide name.
+The entirety of the RCSB disulfide database is stored within the class via a [proteusPy.DisulfideList]("https://suchanek.github.io/proteusPy/proteusPy/DisulfideList.html"), a ```Pandas``` .csv file, and a ```dict``` of indices mapping the RCSB IDs into their respective list of disulfides. The datastructures allow simple, direct and flexible access to the disulfide structures contained within. This makes it possible to access the disulfides by array index, RCSB structure ID or disulfide name.
 
 Example:
 
@@ -93,19 +139,14 @@ The class can also render Disulfides overlaid on a common coordinate system to a
 
 **NB:** For typical usage one accesses the database via the `Load_PDB_SS()` function. This function loads the compressed database from its single source. Initializing a `DisulfideLoader()` object will load the individual torsions and disulfide .pkl files, builds the classlist structures, and writes the completely built object to a single ``.pkl`` file. This requires the raw .pkl files created by download process. These files are contained in the repository ``data`` directory.
 
+### [turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html)
+
 *Developer's Notes:*
 The .pkl files needed to instantiate this class and save it into its final .pkl file are
-defined in the [proteusPy.data]("https://suchanek.github.io/proteusPy/proteusPy/data.html") class and should not be changed. Upon initialization the class
-will load them and initialize itself. 
+defined in the [proteusPy.data]("https://suchanek.github.io/proteusPy/proteusPy/data.html") class and should not be changed. Upon initialization the class will load them and initialize itself. 
 
 
-
-  * [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html)
-  * 
-  
-
-to manage both the representation of the 
-
+# Workflow
 This resulted in the following overall workflow:
 * Identify disulfide containing proteins in the [RCSB](https://www.rcsb.org). I generated a query using their web-based query tool. The resulting file consisted of 35819 proteins containing over 200,000 disulfide bonds.
 * Download the structure files to disk. This resulted in the program ``DisulfideDownloader.py``. 
@@ -113,14 +154,14 @@ This resulted in the following overall workflow:
   * Check for structural feasibility
   * 
 # The Future
-I am continuing to explore the initial disulfide structural classes gleaned from Hogg *et al.* further using the sextant class approach. This offers much higher class resolution and reveals subgroups within the broad class. I'd also like to explore the catalytic and allosteric classes in more detail to look for common structural elements.
+I am continuing to explore the disulfide structural classes gleaned from Hogg *et al.* further using the sextant class approach. This offers much higher class resolution and reveals subgroups within the broad class. I'd also like to explore the catalytic and allosteric classes in more detail to look for common structural elements.
 
 # Citations
 * [Pabo_1986]
 * [proteusPy]
 
 
-*NB:* This distribution is being developed slowly. proteusPy relies on my fork of the ``Bio`` Python package to download and build the database. As a result, one can't download and create the database locally unless the BioPython patch is applied. The changed python file is in the repo's data directory - ``parse_pdb_header.py``. Database analysis is unaffected without the patch. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1. 7/4/23 -egs-
+*NB:* ``proteusPy`` relies on my [fork](https://github.com/suchanek/biopython) of the [Biopython](https://biopython.org) Python package to download and build the database, (https://github.com/suchanek/biopython). As a result, one can't download and create the database locally unless the BioPython patch is applied. The changed python file is in the repo's data directory - ``parse_pdb_header.py``. Database analysis is unaffected without the patch. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1. 7/4/23 -egs-
 
-Eric G. Suchanek, PhD., <mailto:suchanek@mac.com>
+Eric G. Suchanek, PhD., suchanek@mac.com
 
