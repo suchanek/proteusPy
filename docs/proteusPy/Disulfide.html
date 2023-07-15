@@ -318,7 +318,7 @@ Last revision: 3/16/2023</p>
 </span><span id="L-62"><a href="#L-62"><span class="linenos">  62</span></a><span class="sd">    This class provides a Python object and methods representing a physical disulfide bond </span>
 </span><span id="L-63"><a href="#L-63"><span class="linenos">  63</span></a><span class="sd">    either extracted from the RCSB protein databank or built using the </span>
 </span><span id="L-64"><a href="#L-64"><span class="linenos">  64</span></a><span class="sd">    [proteusPy.Turtle3D](turtle3D.html) class. The disulfide bond is an important</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos">  65</span></a><span class="sd">    intermolecular stabilizing structural element and is characterized by:</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos">  65</span></a><span class="sd">    intramolecular stabilizing structural element and is characterized by:</span>
 </span><span id="L-66"><a href="#L-66"><span class="linenos">  66</span></a>
 </span><span id="L-67"><a href="#L-67"><span class="linenos">  67</span></a><span class="sd">    * Atomic coordinates for the atoms N, Cα, Cβ, C&#39;, Sγ for both residues. </span>
 </span><span id="L-68"><a href="#L-68"><span class="linenos">  68</span></a><span class="sd">    These are stored as both raw atomic coordinates as read from the RCSB file </span>
@@ -330,11 +330,11 @@ Last revision: 3/16/2023</p>
 </span><span id="L-74"><a href="#L-74"><span class="linenos">  74</span></a><span class="sd">    * Approximate bond torsional energy (kcal/mol):</span>
 </span><span id="L-75"><a href="#L-75"><span class="linenos">  75</span></a><span class="sd">    </span>
 </span><span id="L-76"><a href="#L-76"><span class="linenos">  76</span></a><span class="sd">    $$ </span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos">  77</span></a><span class="sd">    E_{kcal/mol} \\approx 2.0 * cos(3.0 * \\chi_{1}) + cos(3.0 * \\chi_{5}) + cos(3.0 * \\chi_{2}) + </span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos">  77</span></a><span class="sd">    E_{kcal/mol} \approx 2.0 * cos(3.0 * \chi_{1}) + cos(3.0 * \chi_{5}) + cos(3.0 * \chi_{2}) + </span>
 </span><span id="L-78"><a href="#L-78"><span class="linenos">  78</span></a><span class="sd">    $$</span>
 </span><span id="L-79"><a href="#L-79"><span class="linenos">  79</span></a>
 </span><span id="L-80"><a href="#L-80"><span class="linenos">  80</span></a><span class="sd">    $$</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos">  81</span></a><span class="sd">    cos(3.0 * \\chi_{4}) + 3.5 * cos(2.0 * \\chi_{3}) + 0.6 * cos(3.0 * \\chi_{3}) + 10.1 </span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos">  81</span></a><span class="sd">    cos(3.0 * \chi_{4}) + 3.5 * cos(2.0 * \chi_{3}) + 0.6 * cos(3.0 * \chi_{3}) + 10.1 </span>
 </span><span id="L-82"><a href="#L-82"><span class="linenos">  82</span></a><span class="sd">    $$</span>
 </span><span id="L-83"><a href="#L-83"><span class="linenos">  83</span></a><span class="sd">    </span>
 </span><span id="L-84"><a href="#L-84"><span class="linenos">  84</span></a><span class="sd">    The equation embodies the typical 3-fold rotation barriers associated with single bonds,</span>
@@ -345,7 +345,7 @@ Last revision: 3/16/2023</p>
 </span><span id="L-89"><a href="#L-89"><span class="linenos">  89</span></a><span class="sd">    *spiral* and *staple*. These are under characgterization.</span>
 </span><span id="L-90"><a href="#L-90"><span class="linenos">  90</span></a>
 </span><span id="L-91"><a href="#L-91"><span class="linenos">  91</span></a><span class="sd">    * Euclidean length of the dihedral angles (degrees) defined as:</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos">  92</span></a><span class="sd">    $$\\sqrt(\\chi_{1}^{2} + \\chi_{2}^{2} + \\chi_{3}^{2} + \\chi_{4}^{2} + \\chi_{5}^{2})$$</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos">  92</span></a><span class="sd">    $$\sqrt(\chi_{1}^{2} + \chi_{2}^{2} + \chi_{3}^{2} + \chi_{4}^{2} + \chi_{5}^{2})$$</span>
 </span><span id="L-93"><a href="#L-93"><span class="linenos">  93</span></a><span class="sd">    * Cα - Cα distance (Å)</span>
 </span><span id="L-94"><a href="#L-94"><span class="linenos">  94</span></a><span class="sd">    * Cβ - Cβ distance (Å)</span>
 </span><span id="L-95"><a href="#L-95"><span class="linenos">  95</span></a><span class="sd">    * The previous C&#39; and next N for both the proximal and distal residues. These are needed</span>
@@ -2819,7 +2819,7 @@ Last revision: 3/16/2023</p>
 </span><span id="Disulfide-63"><a href="#Disulfide-63"><span class="linenos">  63</span></a><span class="sd">    This class provides a Python object and methods representing a physical disulfide bond </span>
 </span><span id="Disulfide-64"><a href="#Disulfide-64"><span class="linenos">  64</span></a><span class="sd">    either extracted from the RCSB protein databank or built using the </span>
 </span><span id="Disulfide-65"><a href="#Disulfide-65"><span class="linenos">  65</span></a><span class="sd">    [proteusPy.Turtle3D](turtle3D.html) class. The disulfide bond is an important</span>
-</span><span id="Disulfide-66"><a href="#Disulfide-66"><span class="linenos">  66</span></a><span class="sd">    intermolecular stabilizing structural element and is characterized by:</span>
+</span><span id="Disulfide-66"><a href="#Disulfide-66"><span class="linenos">  66</span></a><span class="sd">    intramolecular stabilizing structural element and is characterized by:</span>
 </span><span id="Disulfide-67"><a href="#Disulfide-67"><span class="linenos">  67</span></a>
 </span><span id="Disulfide-68"><a href="#Disulfide-68"><span class="linenos">  68</span></a><span class="sd">    * Atomic coordinates for the atoms N, Cα, Cβ, C&#39;, Sγ for both residues. </span>
 </span><span id="Disulfide-69"><a href="#Disulfide-69"><span class="linenos">  69</span></a><span class="sd">    These are stored as both raw atomic coordinates as read from the RCSB file </span>
@@ -2831,11 +2831,11 @@ Last revision: 3/16/2023</p>
 </span><span id="Disulfide-75"><a href="#Disulfide-75"><span class="linenos">  75</span></a><span class="sd">    * Approximate bond torsional energy (kcal/mol):</span>
 </span><span id="Disulfide-76"><a href="#Disulfide-76"><span class="linenos">  76</span></a><span class="sd">    </span>
 </span><span id="Disulfide-77"><a href="#Disulfide-77"><span class="linenos">  77</span></a><span class="sd">    $$ </span>
-</span><span id="Disulfide-78"><a href="#Disulfide-78"><span class="linenos">  78</span></a><span class="sd">    E_{kcal/mol} \\approx 2.0 * cos(3.0 * \\chi_{1}) + cos(3.0 * \\chi_{5}) + cos(3.0 * \\chi_{2}) + </span>
+</span><span id="Disulfide-78"><a href="#Disulfide-78"><span class="linenos">  78</span></a><span class="sd">    E_{kcal/mol} \approx 2.0 * cos(3.0 * \chi_{1}) + cos(3.0 * \chi_{5}) + cos(3.0 * \chi_{2}) + </span>
 </span><span id="Disulfide-79"><a href="#Disulfide-79"><span class="linenos">  79</span></a><span class="sd">    $$</span>
 </span><span id="Disulfide-80"><a href="#Disulfide-80"><span class="linenos">  80</span></a>
 </span><span id="Disulfide-81"><a href="#Disulfide-81"><span class="linenos">  81</span></a><span class="sd">    $$</span>
-</span><span id="Disulfide-82"><a href="#Disulfide-82"><span class="linenos">  82</span></a><span class="sd">    cos(3.0 * \\chi_{4}) + 3.5 * cos(2.0 * \\chi_{3}) + 0.6 * cos(3.0 * \\chi_{3}) + 10.1 </span>
+</span><span id="Disulfide-82"><a href="#Disulfide-82"><span class="linenos">  82</span></a><span class="sd">    cos(3.0 * \chi_{4}) + 3.5 * cos(2.0 * \chi_{3}) + 0.6 * cos(3.0 * \chi_{3}) + 10.1 </span>
 </span><span id="Disulfide-83"><a href="#Disulfide-83"><span class="linenos">  83</span></a><span class="sd">    $$</span>
 </span><span id="Disulfide-84"><a href="#Disulfide-84"><span class="linenos">  84</span></a><span class="sd">    </span>
 </span><span id="Disulfide-85"><a href="#Disulfide-85"><span class="linenos">  85</span></a><span class="sd">    The equation embodies the typical 3-fold rotation barriers associated with single bonds,</span>
@@ -2846,7 +2846,7 @@ Last revision: 3/16/2023</p>
 </span><span id="Disulfide-90"><a href="#Disulfide-90"><span class="linenos">  90</span></a><span class="sd">    *spiral* and *staple*. These are under characgterization.</span>
 </span><span id="Disulfide-91"><a href="#Disulfide-91"><span class="linenos">  91</span></a>
 </span><span id="Disulfide-92"><a href="#Disulfide-92"><span class="linenos">  92</span></a><span class="sd">    * Euclidean length of the dihedral angles (degrees) defined as:</span>
-</span><span id="Disulfide-93"><a href="#Disulfide-93"><span class="linenos">  93</span></a><span class="sd">    $$\\sqrt(\\chi_{1}^{2} + \\chi_{2}^{2} + \\chi_{3}^{2} + \\chi_{4}^{2} + \\chi_{5}^{2})$$</span>
+</span><span id="Disulfide-93"><a href="#Disulfide-93"><span class="linenos">  93</span></a><span class="sd">    $$\sqrt(\chi_{1}^{2} + \chi_{2}^{2} + \chi_{3}^{2} + \chi_{4}^{2} + \chi_{5}^{2})$$</span>
 </span><span id="Disulfide-94"><a href="#Disulfide-94"><span class="linenos">  94</span></a><span class="sd">    * Cα - Cα distance (Å)</span>
 </span><span id="Disulfide-95"><a href="#Disulfide-95"><span class="linenos">  95</span></a><span class="sd">    * Cβ - Cβ distance (Å)</span>
 </span><span id="Disulfide-96"><a href="#Disulfide-96"><span class="linenos">  96</span></a><span class="sd">    * The previous C&#39; and next N for both the proximal and distal residues. These are needed</span>
@@ -4715,7 +4715,7 @@ Last revision: 3/16/2023</p>
             <div class="docstring"><p>This class provides a Python object and methods representing a physical disulfide bond 
 either extracted from the RCSB protein databank or built using the 
 <a href="turtle3D.html">proteusPy.Turtle3D</a> class. The disulfide bond is an important
-intermolecular stabilizing structural element and is characterized by:</p>
+intramolecular stabilizing structural element and is characterized by:</p>
 
 <ul>
 <li>Atomic coordinates for the atoms N, Cα, Cβ, C', Sγ for both residues. 
@@ -4729,7 +4729,7 @@ and internal local coordinates.</li>
 </ul>
 
 <p>$$ 
-E_{kcal/mol} \approx 2.0 * cos(3.0 * \chi_{1}) + cos(3.0 * \chi_{5}) + cos(3.0 * \chi_{2}) + 
+E_{kcal/mol} pprox 2.0 * cos(3.0 * \chi_{1}) + cos(3.0 * \chi_{5}) + cos(3.0 * \chi_{2}) + 
 $$</p>
 
 <p>$$
