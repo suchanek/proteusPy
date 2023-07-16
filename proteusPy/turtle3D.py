@@ -1,13 +1,13 @@
 '''
-Implementation of a 3D Turtle in Python.
+Implementation of a 3D 'Turtle' in Python.
 
-A part of the program proteusPy, https://github.com/suchanek/proteusPy, 
+Part of the program proteusPy, https://github.com/suchanek/proteusPy, 
 a Python packages for the manipulation and analysis of macromolecules. 
 Based on the C implementation originally authored by Eric G. Suchanek PhD, 1990.
 
 '''
 
-# Last modification 2/2/23 -egs-
+# Last modification 7/15/23 -egs-
 
 __pdoc__ = {'__all__': True}
 
