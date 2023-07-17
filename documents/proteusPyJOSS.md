@@ -66,9 +66,9 @@ My primary motivation for implementing ``proteusPy`` was to revisit the [RCSB Pr
 
 
 # General Usage
-Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. The ``notebooks`` directory contains all of my Jupyter notebooks and is a good place to start. The ``DisulfideAnalysis.ipynb`` notebook contains the first analysis paper. The ``programs`` subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files, (``DisulfideDownloader.py``), extracting the disulfides and creating the database loaders (``DisulfideExtractor.py``) and cluster analysis (``DisulfideClass_Analysis.py``).
+Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. The [notebooks]() directory contains all of my Jupyter notebooks and is a good place to start. The [DisulfideAnalysis.ipynb](https://github.com/suchanek/proteusPy/blob/master/notebooks/DisulfideAnalysis.ipynb) notebook contains the first analysis paper. The [programs](https://github.com/suchanek/proteusPy/tree/master/programs) subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files, [DisulfideDownloader.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py), extracting the disulfides and creating the database loaders [DisulfideExtractor.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py) and cluster analysis [DisulfideClass_Analysis.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py).
 
-The first time one loads the database via ``Load_PDB_SS()`` the system will attempt to download the full and subset database from my Google Drive. If this fails the system will attempt to rebuild the database from the repo's ``data`` subdirectory (not the package's). If you've downloaded from github this will work correctly. If you've installed from pyPi via ``pip`` it will fail.
+The first time one loads the database via [Load_PDB_SS()](https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html#Load_PDB_SS) the system will attempt to download the full and subset database from my Google Drive. If this fails the system will attempt to rebuild the database from the repo's ``data`` subdirectory (not the package's). If you've downloaded from github this will work correctly. If you've installed from pyPi via ``pip`` it will fail.
 
 # Class Details
 The primary classes developed for ``proteusPy`` are described briefly below. Please see the [API](https://suchanek.github.io/proteusPy/proteusPy.html) for details.
@@ -76,7 +76,7 @@ The primary classes developed for ``proteusPy`` are described briefly below. Ple
 ## [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html)
 This class provides a Python object and methods representing a physical disulfide bond either extracted from the RCSB protein databank or a virtual one built using the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class. The disulfide bond is an important intramolecular stabilizing structural element and is characterized by:
 
-* Atomic coordinates for the atoms N, C$_{\alpha}$, C$_{\beta}$, C', S$_{γ}$ for both residues. These are stored as both raw atomic coordinates as read from the RCSB file and internal local coordinates.
+* Atomic coordinates for the atoms N, $C_{\alpha}$, $C_{\beta}$, $C'$, $S_{γ}$ for both residues. These are stored as both raw atomic coordinates as read from the RCSB file and internal local coordinates.
 * The dihedral angles $\chi_{1} - \chi_{5}$ for the disulfide bond
 * A name, by default: ``{pdb_id}{prox_resnumb}{prox_chain}_{distal_resnum}{distal_chain}``
 * Proximal residue number
@@ -90,8 +90,8 @@ This class provides a Python object and methods representing a physical disulfid
   $$
 * Euclidean length of the dihedral angles (degrees) defined as:
 $$\sqrt(\chi_{1}^{2} + \chi_{2}^{2} + \chi_{3}^{2} + \chi_{4}^{2} + \chi_{5}^{2})$$
-* C$_{α}$ - C$_{\alpha}$ distance ($\AA$)
-* C$_{β}$- C$_{\beta}$ distance ($\AA$)
+* $C_{\alpha} - C_{\alpha}$ distance ($\AA$)
+* $C_{\beta} - C_{\beta}$ distance ($\AA$)
 * The previous C' and next N coordinates for both the proximal and distal residues. These are needed to calculate the backbone dihedral angles $\phi$, $\psi$.
 * Backbone dihedral angles $\phi$ and $\psi$, when possible. Not all structures are complete and in those cases the atoms needed may be undefined. In this case the $\phi$ and $\psi$ angles are set to -180°.
 
@@ -119,7 +119,7 @@ Individual renderings can be saved to a file and animations can be created. The 
 
 This class represents the disulfide database itself and is its primary means of accession.  Instantiation takes 2 parameters: ``subset`` and ``verbose``. Given the size of the database, one can use the ``subset`` parameter to load the first 1000 disulfides into memory. This facilitates quicker development and testing new functions. I recommend using at least a 16 GB machine to work with the full dataset.
 
-The entirety of the RCSB disulfide database is stored within the class via a [proteusPy.DisulfideList]("https://suchanek.github.io/proteusPy/proteusPy/DisulfideList.html"), a ```Pandas``` .csv file, and a ```dict``` of indices mapping the RCSB IDs into their respective list of disulfides. The datastructures allow simple, direct and flexible access to the disulfide structures contained within. This makes it possible to access the disulfides by array index, RCSB structure ID or disulfide name.
+The entirety of the RCSB disulfide database is stored within the class via a [DisulfideList]("https://suchanek.github.io/proteusPy/proteusPy/DisulfideList.html"), a ```Pandas``` .csv file, and a ```dict``` of indices mapping the RCSB IDs into their respective list of disulfides. The datastructures allow simple, direct and flexible access to the disulfide structures contained within. This makes it possible to access the disulfides by array index, RCSB structure ID or disulfide name.
 
 Example:
 
@@ -176,13 +176,13 @@ By implementing the functions ``Move``, ``Roll``, ``Yaw``, ``Pitch`` and ``Turn`
 # Database Creation
 The following steps were performed to create the RCSB database:
 1. Identify disulfide containing proteins in the [RCSB](https://www.rcsb.org). I generated a query using the web-based query tool for all proteins containing one or more disulfide bond. The resulting file consisted of 35819 IDs.
-2. Download the structure files to disk. This resulted in the program ``DisulfideDownloader.py``. The download took approximately twelve hours.
-3. Extract the disulfides from the downloaded structures. The program ``DisulfideExtractor.py`` was used to extract disulfides from the individual structure files. This seemingly simple task was complicated by a few factors including:
-   1. Duplicate disulfides contained within a multi-chain protein file
-   2. Physically impossible disulfides, where the C$_\alpha$-C$_\alpha$ distance is > 8$\AA$.
-   3. Structures with disordered atoms.
+2. Download the structure files to disk. This resulted in the program [DisulfideDownloader.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py). The download took approximately twelve hours.
+3. Extract the disulfides from the downloaded structures. The program [DisulfideExtractor.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py) was used to extract disulfides from the individual structure files. This seemingly simple task was complicated by several factors including:
+   1. Duplicate disulfides contained within a multi-chain protein file.
+   2. Physically impossible disulfides, where the $C_\alpha - C_\alpha$ distance is > 8$\AA$.
+   3. Structures with disordered CYS atoms.
 
-In the end I elected to only use a single example of a given disulfide from a multi-chain entry, and removed any disulfides with a C$_\alpha$-C$_\alpha$ distance is > 8$\AA$. This resulted in the current database consisting of 35,808 structures and 120,494 disulfide bonds. To my knowledge this is the only database of disulfide bonds in existence.
+In the end I elected to only use a single example of a given disulfide from a multi-chain entry, and removed any disulfides with a C$_\alpha$-C$_\alpha$ distance is > 8$\AA$. This resulted in the current database consisting of 35,808 structures and 120,494 disulfide bonds. To my knowledge this is the only searchable database of disulfide bonds in existence.
 
 
 # The Future
