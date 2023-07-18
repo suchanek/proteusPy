@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE article PUBLIC "-//NLM//DTD JATS (Z39.96) Journal Publishing DTD v1.2 20190208//EN"
+                  "JATS-publishing1.dtd">
+<article xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink" dtd-version="1.2" article-type="other">
+<front>
+<journal-meta>
+<journal-id></journal-id>
+<journal-title-group>
+<journal-title>Journal of Open Source Software</journal-title>
+<abbrev-journal-title>JOSS</abbrev-journal-title>
+</journal-title-group>
+<issn publication-format="electronic">2475-9066</issn>
+<publisher>
+<publisher-name>Open Journals</publisher-name>
+</publisher>
+</journal-meta>
+<article-meta>
+<article-id pub-id-type="publisher-id">0</article-id>
+<article-id pub-id-type="doi">N/A</article-id>
+<title-group>
+<article-title>proteusPy: A Python Package for Disulfide Bond
+Analysis</article-title>
+</title-group>
+<contrib-group>
+<contrib contrib-type="author" equal-contrib="yes">
+<contrib-id contrib-id-type="orcid">https://orcid.org/0009-0009-0891-1507</contrib-id>
+<name>
+<surname>Eric G Suchanek</surname>
+<given-names>PhD</given-names>
+</name>
+<xref ref-type="aff" rid="aff-1"/>
+</contrib>
+<aff id="aff-1">
+<institution-wrap>
+<institution>Monterey Institute for Research in Astronomy, Marina,
+USA</institution>
+</institution-wrap>
+</aff>
+</contrib-group>
+<volume>¿VOL?</volume>
+<issue>¿ISSUE?</issue>
+<fpage>¿PAGE?</fpage>
+<permissions>
+<copyright-statement>Authors of papers retain copyright and release the
+work under a Creative Commons Attribution 4.0 International License (CC
+BY 4.0)</copyright-statement>
+<copyright-year>2022</copyright-year>
+<copyright-holder>The article authors</copyright-holder>
+<license license-type="open-access" xlink:href="https://creativecommons.org/licenses/by/4.0/">
+<license-p>Authors of papers retain copyright and release the work under
+a Creative Commons Attribution 4.0 International License (CC BY
+4.0)</license-p>
+</license>
+</permissions>
+<kwd-group kwd-group-type="author">
+<kwd>Python</kwd>
+<kwd>disulfide bonds</kwd>
+<kwd>protein structure</kwd>
+<kwd>RCSB protein databank</kwd>
+</kwd-group>
+</article-meta>
+</front>
+<body>
+<sec id="summary">
+  <title>Summary</title>
+  <p><bold>proteusPy</bold> is a Python package specializing in the
+  modeling and analysis of proteins of known structure with an emphasis
+  on Disulfide Bonds. This package reprises my molecular modeling
+  program <italic>proteus</italic>, <monospace>@Pabo_1986</monospace>,
+  and utilizes a new implementation of the
+  <ext-link ext-link-type="uri" xlink:href="https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html">Turtle3D</ext-link>
+  class for disulfide and protein modeling. The
+  <ext-link ext-link-type="uri" xlink:href="https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html">Disulfide</ext-link>
+  class implements methods to analyze the protein structure stabilizing
+  element known as a <italic>Disulfide Bond</italic>.</p>
+  <p>The work has resulted in a freely-accessible database of over
+  120,000 disulfide bonds contained within 35,818 proteins in the RCSB
+  protein databank.</p>
+  <table-wrap>
+    <table>
+      <tbody>
+        <tr>
+          <td>PDB IDs present:</td>
+          <td>35818</td>
+        </tr>
+        <tr>
+          <td>Disulfides loaded:</td>
+          <td>120494</td>
+        </tr>
+        <tr>
+          <td>Average structure resolution:</td>
+          <td>2.34 Å</td>
+        </tr>
+        <tr>
+          <td>Lowest Energy Disulfide:</td>
+          <td>2q7q_75D_140D</td>
+        </tr>
+        <tr>
+          <td>Highest Energy Disulfide:</td>
+          <td>1toz_456A_467A</td>
+        </tr>
+        <tr>
+          <td>Ca distance cutoff:</td>
+          <td>8.00 Å</td>
+        </tr>
+        <tr>
+          <td>Total RAM Used:</td>
+          <td>31.05 GB.</td>
+        </tr>
+      </tbody>
+    </table>
+  </table-wrap>
+</sec>
+<sec id="motivation">
+  <title>Motivation</title>
+  <p>My primary motivation for implementing
+  <monospace>proteusPy</monospace> was to revisit the
+  <ext-link ext-link-type="uri" xlink:href="https://www.rcsb.org">RCSB
+  Protein Databank</ext-link> and do a structural analysis of the
+  disulfide bonds contained therein. This necessitated the creation an
+  object-oriented database capable of introspection, analysis and
+  display. The API is available online at:
+  https://suchanek.github.io/proteusPy/proteusPy.html and provides more
+  details and numerous examples. # Requirements 1. PC running MacOS,
+  Linux, Windows 2. 16 GB RAM 3. 2 GB disk space</p>
+</sec>
+<sec id="installation">
+  <title>Installation</title>
+  <p><bold>Install Anaconda:</bold>
+  <ext-link ext-link-type="uri" xlink:href="http://anaconda.org">http://anaconda.org</ext-link>
+  ## <bold>Build the environment.</bold> It’s simplest to clone the repo
+  via github since it contains all of the notebooks, test programs and
+  raw Disulfide databases.</p>
+  <list list-type="bullet">
+    <list-item>
+      <p>Install git-lfs</p>
+      <list list-type="bullet">
+        <list-item>
+          <p>https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage</p>
+        </list-item>
+      </list>
+    </list-item>
+    <list-item>
+      <p>From a shell prompt:</p>
+      <p>$ git-lfs track “<italic>.csv” ”</italic>.pkl” “*.mp4” $ git
+      clone https://github.com/suchanek/proteusPy/proteusPy.git $ cd
+      proteusPy $ conda env create –name proteusPy –file=proteusPy.yml $
+      conda activate proteusPy $ pip install . $ jupyter nbextension
+      enable –py –sys-prefix widgetsnbextension $ python -m ipykernel
+      install –user –name proteusPy –display-name “Python
+      (proteusPy)”</p>
+    </list-item>
+  </list>
+</sec>
+<sec id="general-usage">
+  <title>General Usage</title>
+  <p>Once the package is installed one can use the existing notebooks
+  for analysis of the RCSB Disulfide database. The
+  <ext-link ext-link-type="uri" xlink:href="">notebooks</ext-link>
+  directory contains all of my Jupyter notebooks and is a good place to
+  start. The
+  <ext-link ext-link-type="uri" xlink:href="https://github.com/suchanek/proteusPy/blob/master/notebooks/DisulfideAnalysis.ipynb">DisulfideAnalysis.ipynb</ext-link>
+  notebook contains the first analysis paper. The
+  <ext-link ext-link-type="uri" xlink:href="https://github.com/suchanek/proteusPy/tree/master/programs">programs</ext-link>
+  subdirectory contains the primary programs for downloading the RCSB
+  disulfide-containing structure files,
+  <ext-link ext-link-type="uri" xlink:href="https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py">DisulfideDownloader.py</ext-link>,
+  extracting the disulfides and creating the database loaders
+  <ext-link ext-link-type="uri" xlink:href="https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py">DisulfideExtractor.py</ext-link>
+  and cluster analysis
+  <ext-link ext-link-type="uri" xlink:href="https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py">DisulfideClass_Analysis.py</ext-link>.</p>
+  <p>The first time one loads the database via
+  <ext-link ext-link-type="uri" xlink:href="https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html#Load_PDB_SS">Load_PDB_SS()</ext-link>
+  the system will attempt to download the full and subset database from
+  my Google Drive. If this fails the system will attempt to rebuild the
+  database from the repo’s <monospace>data</monospace> subdirectory (not
+  the package’s). If you’ve downloaded from github this will work
+  correctly. If you’ve installed from pyPi via
+  <monospace>pip</monospace> it will fail.</p>
+</sec>
+<sec id="class-details">
+  <title>Class Details</title>
+  <p>The primary classes developed for <monospace>proteusPy</monospace>
+  are described briefly below. Please see the
+  <ext-link ext-link-type="uri" xlink:href="https://suchanek.github.io/proteusPy/proteusPy.html">API</ext-link>
+  for details.</p>
+  <sec id="disulfide">
+    <title><ext-link ext-link-type="uri" xlink:href="https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html">Disulfide</ext-link></title>
+    <p>This class provides a Python object and methods representing a
+    physical disulfide bond either extracted from the RCSB protein
+    databank or a virtual one built using the
+    <ext-link ext-link-type="uri" xlink:href="https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html">Turtle3D</ext-link>
+    class. The disulfide bond is an important intramolecular stabilizing
+    structural element and is characterized by:</p>
+    <list list-type="bullet">
+      <list-item>
+        <p>Atomic coordinates for the atoms
+        <inline-formula><alternatives>
+        <tex-math><![CDATA[N, C_{\alpha}]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>N</mml:mi><mml:mo>,</mml:mo><mml:msub><mml:mi>C</mml:mi><mml:mi>α</mml:mi></mml:msub></mml:mrow></mml:math></alternatives></inline-formula>,
+        <inline-formula><alternatives>
+        <tex-math><![CDATA[C_{\beta}]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mi>C</mml:mi><mml:mi>β</mml:mi></mml:msub></mml:math></alternatives></inline-formula>,
+        <inline-formula><alternatives>
+        <tex-math><![CDATA[C']]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>C</mml:mi><mml:mi>′</mml:mi></mml:mrow></mml:math></alternatives></inline-formula>,
+        <inline-formula><alternatives>
+        <tex-math><![CDATA[S_\gamma]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mi>S</mml:mi><mml:mi>γ</mml:mi></mml:msub></mml:math></alternatives></inline-formula>
+        for both residues. These are stored as both raw atomic
+        coordinates as read from the RCSB file and internal local
+        coordinates.</p>
+      </list-item>
+      <list-item>
+        <p>The dihedral angles <inline-formula><alternatives>
+        <tex-math><![CDATA[\chi_{1} - \chi_{5}]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msub><mml:mi>χ</mml:mi><mml:mn>1</mml:mn></mml:msub><mml:mo>−</mml:mo><mml:msub><mml:mi>χ</mml:mi><mml:mn>5</mml:mn></mml:msub></mml:mrow></mml:math></alternatives></inline-formula>
+        for the disulfide bond</p>
+      </list-item>
+      <list-item>
+        <p>A name, by default:
+        <monospace>{pdb_id}{prox_resnumb}{prox_chain}_{distal_resnum}{distal_chain}</monospace></p>
+      </list-item>
+      <list-item>
+        <p>Proximal residue number</p>
+      </list-item>
+      <list-item>
+        <p>Distal residue number</p>
+      </list-item>
+      <list-item>
+        <p>Approximate bond torsional energy (kcal/mol):
+        <disp-formula><alternatives>
+        <tex-math><![CDATA[ 
+          E_{kcal/mol} \approx 2.0 * cos(3.0 * \chi_{1}) + cos(3.0 * \chi_{5}) + cos(3.0 * \chi_{2}) + 
+        ]]></tex-math>
+        <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msub><mml:mi>E</mml:mi><mml:mrow><mml:mi>k</mml:mi><mml:mi>c</mml:mi><mml:mi>a</mml:mi><mml:mi>l</mml:mi><mml:mi>/</mml:mi><mml:mi>m</mml:mi><mml:mi>o</mml:mi><mml:mi>l</mml:mi></mml:mrow></mml:msub><mml:mo>≈</mml:mo><mml:mn>2.0</mml:mn><mml:mo>*</mml:mo><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>s</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mn>3.0</mml:mn><mml:mo>*</mml:mo><mml:msub><mml:mi>χ</mml:mi><mml:mn>1</mml:mn></mml:msub><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>+</mml:mo><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>s</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mn>3.0</mml:mn><mml:mo>*</mml:mo><mml:msub><mml:mi>χ</mml:mi><mml:mn>5</mml:mn></mml:msub><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>+</mml:mo><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>s</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mn>3.0</mml:mn><mml:mo>*</mml:mo><mml:msub><mml:mi>χ</mml:mi><mml:mn>2</mml:mn></mml:msub><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>+</mml:mo></mml:mrow></mml:math></alternatives></disp-formula>
+        <disp-formula><alternatives>
+        <tex-math><![CDATA[
+          cos(3.0 * \chi_{4}) + 3.5 * cos(2.0 * \chi_{3}) + 0.6 * cos(3.0 * \chi_{3}) + 10.1 
+        ]]></tex-math>
+        <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>s</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mn>3.0</mml:mn><mml:mo>*</mml:mo><mml:msub><mml:mi>χ</mml:mi><mml:mn>4</mml:mn></mml:msub><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>+</mml:mo><mml:mn>3.5</mml:mn><mml:mo>*</mml:mo><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>s</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mn>2.0</mml:mn><mml:mo>*</mml:mo><mml:msub><mml:mi>χ</mml:mi><mml:mn>3</mml:mn></mml:msub><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>+</mml:mo><mml:mn>0.6</mml:mn><mml:mo>*</mml:mo><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>s</mml:mi><mml:mrow><mml:mo stretchy="true" form="prefix">(</mml:mo><mml:mn>3.0</mml:mn><mml:mo>*</mml:mo><mml:msub><mml:mi>χ</mml:mi><mml:mn>3</mml:mn></mml:msub><mml:mo stretchy="true" form="postfix">)</mml:mo></mml:mrow><mml:mo>+</mml:mo><mml:mn>10.1</mml:mn></mml:mrow></mml:math></alternatives></disp-formula></p>
+      </list-item>
+      <list-item>
+        <p>Euclidean length of the dihedral angles (degrees) defined as:
+        <disp-formula><alternatives>
+        <tex-math><![CDATA[\sqrt(\chi_{1}^{2} + \chi_{2}^{2} + \chi_{3}^{2} + \chi_{4}^{2} + \chi_{5}^{2})]]></tex-math>
+        <mml:math display="block" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msqrt><mml:mi>(</mml:mi></mml:msqrt><mml:msubsup><mml:mi>χ</mml:mi><mml:mn>1</mml:mn><mml:mn>2</mml:mn></mml:msubsup><mml:mo>+</mml:mo><mml:msubsup><mml:mi>χ</mml:mi><mml:mn>2</mml:mn><mml:mn>2</mml:mn></mml:msubsup><mml:mo>+</mml:mo><mml:msubsup><mml:mi>χ</mml:mi><mml:mn>3</mml:mn><mml:mn>2</mml:mn></mml:msubsup><mml:mo>+</mml:mo><mml:msubsup><mml:mi>χ</mml:mi><mml:mn>4</mml:mn><mml:mn>2</mml:mn></mml:msubsup><mml:mo>+</mml:mo><mml:msubsup><mml:mi>χ</mml:mi><mml:mn>5</mml:mn><mml:mn>2</mml:mn></mml:msubsup><mml:mo stretchy="false" form="postfix">)</mml:mo></mml:mrow></mml:math></alternatives></disp-formula></p>
+      </list-item>
+      <list-item>
+        <p><inline-formula><alternatives>
+        <tex-math><![CDATA[C_{\alpha} - C_{\alpha}]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msub><mml:mi>C</mml:mi><mml:mi>α</mml:mi></mml:msub><mml:mo>−</mml:mo><mml:msub><mml:mi>C</mml:mi><mml:mi>α</mml:mi></mml:msub></mml:mrow></mml:math></alternatives></inline-formula>
+        distance
+        (<inline-formula><tex-math><![CDATA[\text{\normalfont\AA}]]></tex-math></inline-formula>)</p>
+      </list-item>
+      <list-item>
+        <p><inline-formula><alternatives>
+        <tex-math><![CDATA[C_{\beta} - C_{\beta}]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msub><mml:mi>C</mml:mi><mml:mi>β</mml:mi></mml:msub><mml:mo>−</mml:mo><mml:msub><mml:mi>C</mml:mi><mml:mi>β</mml:mi></mml:msub></mml:mrow></mml:math></alternatives></inline-formula>
+        distance
+        (<inline-formula><tex-math><![CDATA[\text{\normalfont\AA}]]></tex-math></inline-formula>)</p>
+      </list-item>
+      <list-item>
+        <p>The previous C’ and next N coordinates for both the proximal
+        and distal residues. These are needed to calculate the backbone
+        dihedral angles <inline-formula><alternatives>
+        <tex-math><![CDATA[\phi]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>ϕ</mml:mi></mml:math></alternatives></inline-formula>,
+        <inline-formula><alternatives>
+        <tex-math><![CDATA[\psi]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>ψ</mml:mi></mml:math></alternatives></inline-formula>.</p>
+      </list-item>
+      <list-item>
+        <p>Backbone dihedral angles <inline-formula><alternatives>
+        <tex-math><![CDATA[\phi]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>ϕ</mml:mi></mml:math></alternatives></inline-formula>
+        and <inline-formula><alternatives>
+        <tex-math><![CDATA[\psi]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>ψ</mml:mi></mml:math></alternatives></inline-formula>,
+        when possible. Not all structures are complete and in those
+        cases the atoms needed may be undefined. In this case the
+        <inline-formula><alternatives>
+        <tex-math><![CDATA[\phi]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>ϕ</mml:mi></mml:math></alternatives></inline-formula>
+        and <inline-formula><alternatives>
+        <tex-math><![CDATA[\psi]]></tex-math>
+        <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>ψ</mml:mi></mml:math></alternatives></inline-formula>
+        angles are set to -180°.</p>
+      </list-item>
+    </list>
+    <p>The class also provides 3D rendering capabilities using the
+    excellent
+    <ext-link ext-link-type="uri" xlink:href="https://pyvista.org">PyVista</ext-link>
+    library, and can display disulfides interactively in a variety of
+    display styles: * ‘sb’ - Split Bonds style - bonds colored by their
+    atom type * ‘bs’ - Ball and Stick style - split bond coloring with
+    small atoms * ‘pd’ - Proximal/Distal style - bonds colored
+    <italic>Red</italic> for proximal residue and <italic>Green</italic>
+    for the distal residue. * ‘cpk’ - CPK style rendering, colored by
+    atom type: * Carbon - Grey * Nitrogen - Blue * Sulfur - Yellow *
+    Oxygen - Red * Hydrogen - White</p>
+    <p>Individual renderings can be saved to a file and animations can
+    be created. The <italic>cpk</italic> and <italic>bs</italic> styles
+    are illustrated below:</p>
+    <p><inline-graphic mimetype="image" mime-subtype="png" xlink:href="media/logo_cpk.png">
+      <alt-text>cpk</alt-text>
+    </inline-graphic>
+    <inline-graphic mimetype="image" mime-subtype="png" xlink:href="media/logo_bs.png">
+      <alt-text>bs</alt-text>
+    </inline-graphic></p>
+  </sec>
+  <sec id="disulfideloader">
+    <title><ext-link ext-link-type="uri" xlink:href="https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html">DisulfideLoader</ext-link></title>
+    <p>This class represents the disulfide database itself and is its
+    primary means of accession. Instantiation takes 2 parameters:
+    <monospace>subset</monospace> and <monospace>verbose</monospace>.
+    Given the size of the database, one can use the
+    <monospace>subset</monospace> parameter to load the first 1000
+    disulfides into memory. This facilitates quicker development and
+    testing new functions. I recommend using at least a 16 GB machine to
+    work with the full dataset.</p>
+    <p>The entirety of the RCSB disulfide database is stored within the
+    class via a
+    <ext-link ext-link-type="uri" xlink:href="%22https://suchanek.github.io/proteusPy/proteusPy/DisulfideList.html%22">DisulfideList</ext-link>,
+    a <monospace>Pandas</monospace> .csv file, and a
+    <monospace>dict</monospace> of indices mapping the RCSB IDs into
+    their respective list of disulfides. The datastructures allow
+    simple, direct and flexible access to the disulfide structures
+    contained within. This makes it possible to access the disulfides by
+    array index, RCSB structure ID or disulfide name.</p>
+    <p>Example:</p>
+    <preformat>&gt;&gt;&gt; import proteusPy
+&gt;&gt;&gt; from proteusPy.Disulfide import Disulfide
+&gt;&gt;&gt; from proteusPy.DisulfideLoader import DisulfideLoader
+&gt;&gt;&gt; from proteusPy.DisulfideList import DisulfideList
+&gt;&gt;&gt; SS1 = DisulfideList([],'tmp1')
+&gt;&gt;&gt; SS2 = DisulfideList([],'tmp2')
+
+&gt;&gt;&gt; PDB_SS = DisulfideLoader(verbose=False, subset=True)
+
+Accessing by index value:
+&gt;&gt;&gt; SS1 = PDB_SS[0]
+&gt;&gt;&gt; SS1
+&lt;Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å&gt;
+
+Accessing by PDB_ID returns a list of Disulfides:
+&gt;&gt;&gt; SS2 = PDB_SS['4yys']
+&gt;&gt;&gt; SS2
+[&lt;Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å&gt;, &lt;Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å&gt;, &lt;Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å&gt;]
+
+Accessing individual disulfides by their name:
+&gt;&gt;&gt; SS3 = PDB_SS['4yys_56A_98A']
+&gt;&gt;&gt; SS3
+&lt;Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å&gt;
+
+Finally, we can access disulfides by regular slicing:
+&gt;&gt;&gt; SSlist = PDB_SS[:4]</preformat>
+    <p>The class can also render Disulfides overlaid on a common
+    coordinate system to a pyVista window using the
+    <ext-link ext-link-type="uri" xlink:href="https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html#DisulfideLoader.display_overlay">DisulfideLoader.display_overlay()</ext-link>
+    method.</p>
+    <p><bold>NB:</bold> For typical usage one accesses the database via
+    the <monospace>Load_PDB_SS()</monospace> function. This function
+    loads the compressed database from its single source. Initializing a
+    <monospace>DisulfideLoader()</monospace> object will load the
+    individual torsions and disulfide .pkl files, builds the classlist
+    structures, and writes the completely built object to a single
+    <monospace>.pkl</monospace> file. This requires the raw .pkl files
+    created by download process. These files are contained in the
+    repository <monospace>data</monospace> directory.</p>
+    <sec id="turtle3d">
+      <title><ext-link ext-link-type="uri" xlink:href="https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html">turtle3D</ext-link></title>
+      <p>The <monospace>turtle3D</monospace> is an object that maintains
+      a <italic>local coordinate system</italic> in three dimensional
+      space. This coordinate system consists of: * a Position vector * a
+      Heading vector * a Left vector * an Up vector</p>
+      <p>These vectors fully define the object’s position and
+      orientation in a <italic>local</italic> coordinate frame. The
+      <ext-link ext-link-type="uri" xlink:href="%22https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.to_local%22">to_local</ext-link>
+      and
+      <ext-link ext-link-type="uri" xlink:href="%22https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.to_global%22">to_global</ext-link>
+      methods convert between these two. These methods make it possible
+      to readily compare different disulfides by: 1. Orienting the
+      turtle at the disulfide’s proximal residue in a standard
+      orientation. 2. Converting the global coordinates of the disulfide
+      as read from the RCSB into local coordinates. 3. Saving all of the
+      local coordinates with the raw coordinates 4. Performing RMS
+      distance and angle calculations</p>
+      <p>The turtle has several molecule-specific functions including
+      <ext-link ext-link-type="uri" xlink:href="%22https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.orient_at_residue%22">orient_at_residue</ext-link>
+      and
+      <ext-link ext-link-type="uri" xlink:href="%22https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.orient_from_backbone%22">orient_from_backbone</ext-link>.</p>
+      <p>By implementing the functions <monospace>Move</monospace>,
+      <monospace>Roll</monospace>, <monospace>Yaw</monospace>,
+      <monospace>Pitch</monospace> and <monospace>Turn</monospace> the
+      turtle is capable of movement in a three-dimensional space. See
+      (<xref alt="Pabo &amp; Suchanek, 1986" rid="ref-Pabo_1986" ref-type="bibr">Pabo
+      &amp; Suchanek, 1986</xref>) for more details.</p>
+    </sec>
+  </sec>
+</sec>
+<sec id="database-creation">
+  <title>Database Creation</title>
+  <p>The following steps were performed to create the RCSB database: 1.
+  Identify disulfide containing proteins in the
+  <ext-link ext-link-type="uri" xlink:href="https://www.rcsb.org">RCSB</ext-link>.
+  I generated a query using the web-based query tool for all proteins
+  containing one or more disulfide bond. The resulting file consisted of
+  35819 IDs. 2. Download the structure files to disk. This resulted in
+  the program
+  <ext-link ext-link-type="uri" xlink:href="https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py">DisulfideDownloader.py</ext-link>.
+  The download took approximately twelve hours. 3. Extract the
+  disulfides from the downloaded structures. The program
+  <ext-link ext-link-type="uri" xlink:href="https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py">DisulfideExtractor.py</ext-link>
+  was used to extract disulfides from the individual structure files.
+  This seemingly simple task was complicated by several factors
+  including: 1. Duplicate disulfides contained within a multi-chain
+  protein file. 2. Physically impossible disulfides, where the
+  <inline-formula><alternatives>
+  <tex-math><![CDATA[C_\alpha - C_\alpha]]></tex-math>
+  <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mrow><mml:msub><mml:mi>C</mml:mi><mml:mi>α</mml:mi></mml:msub><mml:mo>−</mml:mo><mml:msub><mml:mi>C</mml:mi><mml:mi>α</mml:mi></mml:msub></mml:mrow></mml:math></alternatives></inline-formula>
+  distance is &gt;
+  8<inline-formula><tex-math><![CDATA[\text{\normalfont\AA}]]></tex-math></inline-formula>.
+  3. Structures with disordered CYS atoms.</p>
+  <p>In the end I elected to only use a single example of a given
+  disulfide from a multi-chain entry, and removed any disulfides with a
+  C<inline-formula><alternatives>
+  <tex-math><![CDATA[_\alpha]]></tex-math>
+  <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mi></mml:mi><mml:mi>α</mml:mi></mml:msub></mml:math></alternatives></inline-formula>-C<inline-formula><alternatives>
+  <tex-math><![CDATA[_\alpha]]></tex-math>
+  <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mi></mml:mi><mml:mi>α</mml:mi></mml:msub></mml:math></alternatives></inline-formula>
+  distance is &gt;
+  8<inline-formula><tex-math><![CDATA[\text{\normalfont\AA}]]></tex-math></inline-formula>.
+  This resulted in the current database consisting of 35,808 structures
+  and 120,494 disulfide bonds. To my knowledge this is the only
+  searchable database of disulfide bonds in existence.</p>
+</sec>
+<sec id="the-future">
+  <title>The Future</title>
+  <p>I am continuing to explore binary and disulfide structural classes
+  using the sextant class approach. This offers much higher class
+  resolution and reveals subgroups within the broad class. Than the
+  binary approach described by Hogg et al. I’d also like to explore the
+  catalytic and allosteric classes in more detail to look for common
+  structural elements.</p>
+  <p>I also intend to deploy a Disulfide Database browser for
+  exploration and analysis. This is ongoing.</p>
+</sec>
+<sec id="citations">
+  <title>Citations</title>
+  <list list-type="bullet">
+    <list-item>
+      <p><monospace>@Pabo_1986</monospace></p>
+    </list-item>
+    <list-item>
+      <p><monospace>@Schmidt_2006</monospace></p>
+    </list-item>
+    <list-item>
+      <p><monospace>@proteusPy</monospace></p>
+    </list-item>
+  </list>
+  <sec id="misc">
+    <title>Misc</title>
+    <p><italic>Developer’s Notes:</italic> The .pkl files needed to
+    instantiate this class and save it into its final .pkl file are
+    defined in the
+    <ext-link ext-link-type="uri" xlink:href="%22https://suchanek.github.io/proteusPy/proteusPy/data.html%22">proteusPy.data</ext-link>
+    class and should not be changed. Upon initialization the class will
+    load them and initialize itself.</p>
+    <p><italic>NB:</italic> <monospace>proteusPy</monospace> relies on
+    my
+    <ext-link ext-link-type="uri" xlink:href="https://github.com/suchanek/biopython">fork</ext-link>
+    of the
+    <ext-link ext-link-type="uri" xlink:href="https://biopython.org">Biopython</ext-link>
+    Python package to download and build the database,
+    (https://github.com/suchanek/biopython). As a result, one can’t
+    download and create the database locally unless the BioPython patch
+    is applied. The changed python file is in the repo’s data directory
+    - <monospace>parse_pdb_header.py</monospace>. Database analysis is
+    unaffected without the patch. Also, if you’re running on an M-series
+    Mac then it’s important to install Biopython first, since the
+    generic release won’t build on the M1. 7/4/23 -egs-</p>
+  </sec>
+</sec>
+<sec id="bibliography">
+  <title>Bibliography</title>
+</sec>
+</body>
+<back>
+<ref-list>
+  <ref id="ref-Pabo_1986">
+    <element-citation publication-type="article-journal">
+      <person-group person-group-type="author">
+        <name><surname>Pabo</surname><given-names>C. O.</given-names></name>
+        <name><surname>Suchanek</surname><given-names>E. G.</given-names></name>
+      </person-group>
+      <article-title>Computer-aided model-building strategies for protein design</article-title>
+      <source>Biochemistry</source>
+      <publisher-name>American Chemical Society (ACS)</publisher-name>
+      <year iso-8601-date="1986-10">1986</year><month>10</month>
+      <volume>25</volume>
+      <issue>20</issue>
+      <uri>https://doi.org/10.1021%2Fbi00368a023</uri>
+      <pub-id pub-id-type="doi">10.1021/bi00368a023</pub-id>
+      <fpage>5987</fpage>
+      <lpage>5991</lpage>
+    </element-citation>
+  </ref>
+</ref-list>
+</back>
+</article>
