@@ -5,6 +5,7 @@ tags:
   - disulfide bonds
   - protein structure
   - RCSB protein databank
+author: "Eric G. Suchanek, PhD."
 authors:
   - name: Eric G Suchanek
     orcid: 0009-0009-0891-1507
@@ -13,15 +14,13 @@ authors:
 affiliations:
  - name: Monterey Institute for Research in Astronomy, Marina, USA
    index: 1
-date: 4 July, 2023
-bibliography: proteusPyJOSS.bib
+date: 17 July, 2023
+header-includes:
+  - \usepackage[margin=1.0in]{geometry}
+  - \let\oldAA\AA
+  - \renewcommand{\AA}{\text{\normalfont\oldAA}}
+bibliography: joss.bib
 ---
-
-<div style="text-align:center">
-    <img src="logo.png" alt="proteusPy logo"> <br>
-    Eric G. Suchanek, PhD
-</div>
-
 
 # Summary
 **proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide Bonds. This package reprises my molecular modeling program *proteus*, [@Pabo_1986], and utilizes a new implementation of the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class for disulfide and protein modeling.  The [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class implements methods to analyze the protein structure stabilizing element known as a *Disulfide Bond*. 
@@ -46,24 +45,24 @@ My primary motivation for implementing ``proteusPy`` was to revisit the [RCSB Pr
 3. 2 GB disk space
 
 # Installation
-1. **Install Anaconda:** <http://anaconda.org>
-2. **Build the environment.** 
+**Install Anaconda:** <http://anaconda.org>
+## **Build the environment.** 
    It's simplest to clone the repo via github since it contains all of the notebooks, test programs and raw Disulfide databases. 
 
   - Install git-lfs
     - https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage
-  - From a shell prompt: 
-     ```
-     $ git-lfs track "*.csv" "*.pkl" "*.mp4"
-     $ git clone https://github.com/suchanek/proteusPy/proteusPy.git
-     $ cd proteusPy
-     $ conda env create --name proteusPy --file=proteusPy.yml
-     $ conda activate proteusPy
-     $ pip install .
-     $ jupyter nbextension enable --py --sys-prefix widgetsnbextension
-     $ python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy)"
-    ```
+  - From a shell prompt:
 
+   ```
+    $ git-lfs track "*.csv" "*.pkl" "*.mp4" <br>
+    $ git clone https://github.com/suchanek/proteusPy/proteusPy.git <br>
+    $ cd proteusPy <br>
+    $ conda env create --name proteusPy --file=proteusPy.yml <br>
+    $ conda activate proteusPy <br>
+    $ pip install . <br>
+    $ jupyter nbextension enable --py --sys-prefix widgetsnbextension <br>
+    $ python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy)"
+  ```
 
 # General Usage
 Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. The [notebooks]() directory contains all of my Jupyter notebooks and is a good place to start. The [DisulfideAnalysis.ipynb](https://github.com/suchanek/proteusPy/blob/master/notebooks/DisulfideAnalysis.ipynb) notebook contains the first analysis paper. The [programs](https://github.com/suchanek/proteusPy/tree/master/programs) subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files, [DisulfideDownloader.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py), extracting the disulfides and creating the database loaders [DisulfideExtractor.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py) and cluster analysis [DisulfideClass_Analysis.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py).
@@ -76,7 +75,7 @@ The primary classes developed for ``proteusPy`` are described briefly below. Ple
 ## [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html)
 This class provides a Python object and methods representing a physical disulfide bond either extracted from the RCSB protein databank or a virtual one built using the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class. The disulfide bond is an important intramolecular stabilizing structural element and is characterized by:
 
-* Atomic coordinates for the atoms N, $C_{\alpha}$, $C_{\beta}$, $C'$, $S_{γ}$ for both residues. These are stored as both raw atomic coordinates as read from the RCSB file and internal local coordinates.
+* Atomic coordinates for the atoms $N, C_{\alpha}$, $C_{\beta}$, $C'$, $S_\gamma$ for both residues. These are stored as both raw atomic coordinates as read from the RCSB file and internal local coordinates.
 * The dihedral angles $\chi_{1} - \chi_{5}$ for the disulfide bond
 * A name, by default: ``{pdb_id}{prox_resnumb}{prox_chain}_{distal_resnum}{distal_chain}``
 * Proximal residue number
@@ -108,12 +107,11 @@ the distal residue.
    * Hydrogen - White 
 
 Individual renderings can be saved to a file and animations can be created. The *cpk* and *bs* styles are illustrated below:
+<center>
 
-<div style="text-align:center">
-    <img src="logo_cpk.png" alt="proteusPy logo"> 
-    <img src="logo_bs.png" alt="proteusPy logo"> 
-</div>
-
+![cpk](logo_cpk.png)
+![bs](logo_bs.png)
+</center>
 
 ## [DisulfideLoader](https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html)
 
@@ -170,7 +168,7 @@ These vectors fully define the object's position and orientation in a *local* co
 
 The turtle has several molecule-specific functions including [orient_at_residue]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.orient_at_residue") and [orient_from_backbone]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.orient_from_backbone").
 
-By implementing the functions ``Move``, ``Roll``, ``Yaw``, ``Pitch`` and ``Turn`` the turtle is capable of movement in a three-dimensional space. See [Pabo_1986] for more details.
+By implementing the functions ``Move``, ``Roll``, ``Yaw``, ``Pitch`` and ``Turn`` the turtle is capable of movement in a three-dimensional space. See [@Pabo_1986] for more details.
 
 
 # Database Creation
@@ -186,23 +184,17 @@ In the end I elected to only use a single example of a given disulfide from a mu
 
 
 # The Future
-I am continuing to explore the disulfide structural classes gleaned from Hogg *et al.* further using the sextant class approach. This offers much higher class resolution and reveals subgroups within the broad class. I'd also like to explore the catalytic and allosteric classes in more detail to look for common structural elements.
+* I am continuing to explore disulfide structural classes using the sextant class approach. This offers much higher class resolution than the binary approach described by [@Schmidt_2006] and reveals subgroups within the broad class . I'd also like to explore the catalytic and allosteric classes in more detail to look for common structural elements.
 
-# Citations
-* [Pabo_1986]
-* [proteusPy]
-
-
-
-Eric G. Suchanek, PhD., suchanek@mac.com
-
-<hr>
+* I also intend to deploy a Disulfide Database browser for exploration and analysis. This is ongoing.
 
 ## Misc
 *Developer's Notes:*
 The .pkl files needed to instantiate this class and save it into its final .pkl file are
 defined in the [proteusPy.data]("https://suchanek.github.io/proteusPy/proteusPy/data.html") class and should not be changed. Upon initialization the class will load them and initialize itself. 
 
-*NB:* ``proteusPy`` relies on my [fork](https://github.com/suchanek/biopython) of the [Biopython](https://biopython.org) Python package to download and build the database, (https://github.com/suchanek/biopython). As a result, one can't download and create the database locally unless the BioPython patch is applied. The changed python file is in the repo's data directory - ``parse_pdb_header.py``. Database analysis is unaffected without the patch. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1. 7/4/23 -egs-
+*NB:* [@proteusPy] relies on my [fork](https://github.com/suchanek/biopython) of the [Biopython](https://biopython.org) Python package to download and build the database, (https://github.com/suchanek/biopython). As a result, one can't download and create the database locally unless the BioPython patch is applied. The changed python file is in the repo's data directory - ``parse_pdb_header.py``. Database analysis is unaffected without the patch. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1.
 
+
+# Bibliography
 
