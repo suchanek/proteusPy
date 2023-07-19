@@ -24,7 +24,7 @@ bibliography: joss.bib
 
 # Summary
 
-**proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide Bonds. This package reprises my molecular modeling program *proteus*, [@Pabo_1986], and utilizes a new implementation of the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class for disulfide and protein modeling.  The [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class implements methods to analyze the protein structure stabilizing element known as a *Disulfide Bond*.
+**proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide Bonds. This package reprises my molecular modeling program *proteus*, [@Pabo_1986], and utilizes a new implementation of the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class for disulfide and protein modeling.  The [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class implements methods to analyze the protein structure stabilizing element known as a **Disulfide Bond**.
 
 The work has resulted in a freely-accessible database of over 120,000 disulfide bonds contained within 35,818 proteins in the RCSB protein databank.
 
@@ -40,7 +40,7 @@ The work has resulted in a freely-accessible database of over 120,000 disulfide 
 
 # Motivation
 
-My primary motivation for implementing ``proteusPy`` was to revisit the [RCSB Protein Databank](https://www.rcsb.org) and do a structural analysis of the disulfide bonds contained therein. This necessitated the creation an object-oriented database capable of introspection, analysis and display. The API is available online at: https://suchanek.github.io/proteusPy/proteusPy.html and provides more details and numerous examples.
+My primary motivation for implementing ``proteusPy`` was to revisit the [RCSB Protein Databank](https://www.rcsb.org) and do a structural analysis of the disulfide bonds contained therein. This necessitated the creation an object-oriented database capable of introspection, analysis and display. The API [@API] is available online at: https://suchanek.github.io/proteusPy/proteusPy.html and provides more details and numerous examples.
 # Requirements
 1. PC running MacOS, Linux, Windows
 2. 16 GB RAM
@@ -102,16 +102,17 @@ $$\sqrt(\chi_{1}^{2} + \chi_{2}^{2} + \chi_{3}^{2} + \chi_{4}^{2} + \chi_{5}^{2}
 * Backbone dihedral angles $\phi$ and $\psi$, when possible. Not all structures are complete and in those cases the atoms needed may be undefined. In this case the $\phi$ and $\psi$ angles are set to -180°.
 
 The class also provides 3D rendering capabilities using the excellent [PyVista](https://pyvista.org) library, and can display disulfides interactively in a variety of display styles:
-* 'sb' - Split Bonds style - bonds colored by their atom type
-* 'bs' - Ball and Stick style - split bond coloring with small atoms
-* 'pd' - Proximal/Distal style - bonds colored *Red* for proximal residue and *Green* for
-the distal residue.
-* 'cpk' - CPK style rendering, colored by atom type:
-   * Carbon   - Grey
-   * Nitrogen - Blue
-   * Sulfur   - Yellow
-   * Oxygen   - Red
-   * Hydrogen - White
+
+- 'sb' - Split Bonds style - bonds colored by their atom type
+- 'bs' - Ball and Stick style - split bond coloring with small atoms
+- 'pd' - Proximal/Distal style - bonds colored *Red* for proximal residue and *Green* for the distal residue.
+- 'cpk' - CPK style rendering, colored by atom type:
+
+  - Carbon   - Grey
+  - Nitrogen - Blue
+  - Sulfur   - Yellow
+  - Oxygen   - Red
+  - Hydrogen - White
 
 Individual renderings can be saved to a file and animations can be created. The *cpk* and *bs* styles are illustrated below:
 <center>
@@ -188,10 +189,28 @@ The following steps were performed to create the RCSB database:
 3. Extract the disulfides from the downloaded structures. The program [DisulfideExtractor.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py) was used to extract disulfides from the individual structure files. This seemingly simple task was complicated by several factors including:
 
    1. Duplicate disulfides contained within a multi-chain protein file.
-   2. Physically impossible disulfides, where the $C_\alpha - C_\alpha$ distance is > 8 $\AA$.
+   2. Physically impossible disulfides, where the $C_\alpha - C_\alpha$ distance is > 8 $\AA$ .
    3. Structures with disordered CYS atoms.
 
-In the end I elected to only use a single example of a given disulfide from a multi-chain entry, and removed any disulfides with a $C_\alpha - C_\alpha$ distance is > 8 $ \AA$. This resulted in the current database consisting of 35,808 structures and 120,494 disulfide bonds. To my knowledge this is the only searchable database of disulfide bonds in existence.
+In the end I elected to only use a single example of a given disulfide from a multi-chain entry, and removed any disulfides with a $C_\alpha - C_\alpha$ distance is > 8 $\AA $. This resulted in the current database consisting of 35,808 structures and 120,494 disulfide bonds. To my knowledge this is the only searchable database of disulfide bonds in existence.
+
+# Use Cases
+
+I illustrate a few use cases for the package below. See the notebooks for more examples.
+
+1. Find the lowest and highest energy disulfides present in the database.
+
+```python
+# default parameters will read from the package itself.
+PDB_SS = Load_PDB_SS(verbose=False, subset=False)
+# display the best and worst SS
+ssMin, ssMax = PDB_SS.SSList.minmax_energy()
+minmaxlist = DisulfideList([ssMin, ssMax], 'mm')
+minmaxlist.display(style='bs', light=True)
+```
+
+[minmax](duo.png)
+
 
 # The Future
 
