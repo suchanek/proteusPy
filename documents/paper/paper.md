@@ -26,17 +26,7 @@ bibliography: joss.bib
 
 **proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide Bonds. This package reprises my molecular modeling program *proteus*, [@Pabo_1986], and utilizes a new implementation of the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class for disulfide and protein modeling.  The [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class implements methods to analyze the protein structure stabilizing element known as a **Disulfide Bond**.
 
-The work has resulted in a freely-accessible database of over 120,000 disulfide bonds contained within 35,818 proteins in the RCSB protein databank.
-
-|                    |                  |
-| ------------------ | ---------------- |
-| PDB IDs present:   | 35818            |
-| Disulfides loaded: | 120494           |
-| Average structure resolution: | 2.34 Å |
-| Lowest Energy Disulfide: | 2q7q_75D_140D |
-| Highest Energy Disulfide: | 1toz_456A_467A |
-| Ca distance cutoff: | 8.00 Å |
-| Total RAM Used: | 31.05 GB. |
+The work has resulted in a freely-accessible database of over 120,494 disulfide bonds contained within 35,818 proteins in the RCSB protein databank.
 
 # Motivation
 
@@ -48,25 +38,23 @@ My primary motivation for implementing ``proteusPy`` was to revisit the [RCSB Pr
 
 # Installation
 
-**Install Anaconda:** <http://anaconda.org>
-# **Build the environment.**
-
    It's simplest to clone the repo via github since it contains all of the notebooks, test programs and raw Disulfide databases.
 
+  - Install Anaconda: <http://anaconda.org>
   - Install git-lfs
     - https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage
   - From a shell prompt:
 
-   ```
-    $ git-lfs track "*.csv" "*.pkl" "*.mp4" <br>
-    $ git clone https://github.com/suchanek/proteusPy/proteusPy.git <br>
-    $ cd proteusPy <br>
-    $ conda env create --name proteusPy --file=proteusPy.yml <br>
-    $ conda activate proteusPy <br>
-    $ pip install . <br>
-    $ jupyter nbextension enable --py --sys-prefix widgetsnbextension <br>
-    $ python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy)"
-  ```
+    ```bash
+      $ git-lfs track "*.csv" "*.pkl" "*.mp4"
+      $ git clone https://github.com/suchanek/proteusPy/proteusPy.git
+      $ cd proteusPy
+      $ conda env create --name proteusPy --file=proteusPy.yml
+      $ conda activate proteusPy
+      $ pip install .
+      $ jupyter nbextension enable --py --sys-prefix widgetsnbextension
+      $ python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy)"
+    ```
 
 # General Usage
 
@@ -128,33 +116,38 @@ This class represents the disulfide database itself and is its primary means of 
 The entirety of the RCSB disulfide database is stored within the class via a [DisulfideList]("https://suchanek.github.io/proteusPy/proteusPy/DisulfideList.html"), a ```Pandas``` .csv file, and a ```dict``` of indices mapping the RCSB IDs into their respective list of disulfides. The datastructures allow simple, direct and flexible access to the disulfide structures contained within. This makes it possible to access the disulfides by array index, RCSB structure ID or disulfide name.
 
 Example:
+```python
+  import proteusPy
+  from proteusPy.Disulfide import Disulfide
+  from proteusPy.DisulfideLoader import DisulfideLoader
+  from proteusPy.DisulfideList import DisulfideList
+  SS1 = DisulfideList([],'tmp1')
+  SS2 = DisulfideList([],'tmp2')
 
-    >>> import proteusPy
-    >>> from proteusPy.Disulfide import Disulfide
-    >>> from proteusPy.DisulfideLoader import DisulfideLoader
-    >>> from proteusPy.DisulfideList import DisulfideList
-    >>> SS1 = DisulfideList([],'tmp1')
-    >>> SS2 = DisulfideList([],'tmp2')
-    
-    >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
+  PDB_SS = DisulfideLoader(verbose=False, subset=True)
 
-    Accessing by index value:
-    >>> SS1 = PDB_SS[0]
-    >>> SS1
-    <Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>
-    
-    Accessing by PDB_ID returns a list of Disulfides:
-    >>> SS2 = PDB_SS['4yys']
-    >>> SS2
-    [<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>]
-    
-    Accessing individual disulfides by their name:
-    >>> SS3 = PDB_SS['4yys_56A_98A']
-    >>> SS3
-    <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>
-    
-    Finally, we can access disulfides by regular slicing:
-    >>> SSlist = PDB_SS[:4]
+# Accessing by index value:
+SS1 = PDB_SS[0]
+SS1
+<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>
+
+# Accessing by PDB_ID returns a list of Disulfides:
+SS2 = PDB_SS['4yys']
+SS2
+[<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>, 
+<Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, 
+<Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>]
+
+# Accessing individual disulfides by their name:
+SS3 = PDB_SS['4yys_56A_98A']
+SS3
+<Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>
+
+# Finally, we can access disulfides by regular slicing:
+SSlist = SS2[:2]
+[<Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, 
+<Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>]
+```
 
 The class can also render Disulfides overlaid on a common coordinate system to a pyVista window using the [DisulfideLoader.display_overlay()](https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html#DisulfideLoader.display_overlay) method.
 
@@ -200,18 +193,23 @@ I illustrate a few use cases for the package below. See the notebooks for more e
 
 1. Find the lowest and highest energy disulfides present in the database.
 
-```python
-# default parameters will read from the package itself.
-PDB_SS = Load_PDB_SS(verbose=False, subset=False)
-# display the best and worst SS
-ssMin, ssMax = PDB_SS.SSList.minmax_energy()
-minmaxlist = DisulfideList([ssMin, ssMax], 'mm')
-minmaxlist.display(style='bs', light=True)
-```
+  ```python
+  # default parameters will read from the package itself.
+  PDB_SS = Load_PDB_SS(verbose=False, subset=False)
+  # display the best and worst SS
+  ssMin, ssMax = PDB_SS.SSList.minmax_energy()
+  minmaxlist = DisulfideList([ssMin, ssMax], 'mm')
+  minmaxlist.display(style='bs', light=True)
+  ```
 
-[minmax](duo.png)
+![minmax](minmax.png)
 
+2. Find disulfides within 5 $\AA$ RMS of the lowest energy structure.
 
+  ```python
+  
+  ```
+  
 # The Future
 
 - I continue to explore disulfide structural classes using the sextant class approach. This offers much higher class resolution than the binary approach described by [@Schmidt_2006] and reveals subgroups within the broad class. I'd also like to explore the catalytic and allosteric classes in more detail to look for common structural elements.
