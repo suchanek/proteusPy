@@ -9,7 +9,7 @@ dependencies:
   - openssl
   - pyvista
   - jupyter
-  - pandas
+  - pandas<2.0.0
   - matplotlib
   - notebook
   - certifi

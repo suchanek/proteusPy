@@ -2,8 +2,8 @@
 title: 'proteusPy: A Python Package for Disulfide Bond Analysis'
 tags:
   - Python
-  - disulfide bonds
-  - protein structure
+  - Disulfide Bonds
+  - Protein Structure
   - RCSB protein databank
 author: "Eric G. Suchanek, PhD."
 authors:
@@ -14,7 +14,7 @@ authors:
 affiliations:
  - name: Monterey Institute for Research in Astronomy, Marina, USA
    index: 1
-date: 17 July, 2023
+date: 19 July, 2023
 header-includes:
   - \usepackage[margin=1.0in]{geometry}
   - \let\oldAA\AA
@@ -121,32 +121,33 @@ Example:
   from proteusPy.Disulfide import Disulfide
   from proteusPy.DisulfideLoader import DisulfideLoader
   from proteusPy.DisulfideList import DisulfideList
+
   SS1 = DisulfideList([],'tmp1')
   SS2 = DisulfideList([],'tmp2')
 
   PDB_SS = DisulfideLoader(verbose=False, subset=True)
 
-# Accessing by index value:
-SS1 = PDB_SS[0]
-SS1
-<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>
+  # Accessing by index value:
+  SS1 = PDB_SS[0]
+  SS1
+  <Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>
 
-# Accessing by PDB_ID returns a list of Disulfides:
-SS2 = PDB_SS['4yys']
-SS2
-[<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>, 
-<Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, 
-<Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>]
+  # Accessing by PDB_ID returns a list of Disulfides:
+  SS2 = PDB_SS['4yys']
+  SS2
+  [<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>, 
+  <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, 
+  <Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>]
 
-# Accessing individual disulfides by their name:
-SS3 = PDB_SS['4yys_56A_98A']
-SS3
-<Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>
+  # Accessing individual disulfides by their name:
+  SS3 = PDB_SS['4yys_56A_98A']
+  SS3
+  <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>
 
-# Finally, we can access disulfides by regular slicing:
-SSlist = SS2[:2]
-[<Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, 
-<Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>]
+  # Finally, we can access disulfides by regular slicing:
+  SSlist = SS2[:2]
+  [<Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, 
+  <Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>]
 ```
 
 The class can also render Disulfides overlaid on a common coordinate system to a pyVista window using the [DisulfideLoader.display_overlay()](https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html#DisulfideLoader.display_overlay) method.
@@ -157,12 +158,12 @@ The class can also render Disulfides overlaid on a common coordinate system to a
 
 The ``turtle3D`` is an object that maintains a *local coordinate system* in three dimensional space. This coordinate system consists of:
 
-- A Position vector
-- A Heading vector
-- A Left vector
-- An Up vector
+- A Position Vector
+- A Heading Vector
+- A Left Vector
+- An Up Vector
 
-These vectors fully define the object's position and orientation in a *local* coordinate frame. The [to_local]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.to_local") and [to_global]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.to_global") methods convert between these two. These methods make it possible to readily compare different disulfides by:
+These vectors fully define the object's position and orientation in a *local* coordinate frame. The Turtle developed in `proteusPy` is based on the excellent book by Abelson: [@Abelson_DiSessa_1986]. The [to_local]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.to_local") and [to_global]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.to_global") methods convert between these two. These methods make it possible to readily compare different disulfides by:
 
 1. Orienting the turtle at the disulfide's proximal residue in a standard orientation.
 2. Converting the global coordinates of the disulfide as read from the RCSB into local coordinates.
@@ -187,29 +188,73 @@ The following steps were performed to create the RCSB database:
 
 In the end I elected to only use a single example of a given disulfide from a multi-chain entry, and removed any disulfides with a $C_\alpha - C_\alpha$ distance is > 8 $\AA $. This resulted in the current database consisting of 35,808 structures and 120,494 disulfide bonds. To my knowledge this is the only searchable database of disulfide bonds in existence.
 
-# Use Cases
+# Examples
 
 I illustrate a few use cases for the package below. See the notebooks for more examples.
 
-1. Find the lowest and highest energy disulfides present in the database.
+## Find the lowest and highest energy disulfides present in the database.
 
   ```python
   # default parameters will read from the package itself.
+
   PDB_SS = Load_PDB_SS(verbose=False, subset=False)
+
   # display the best and worst SS
+
   ssMin, ssMax = PDB_SS.SSList.minmax_energy()
   minmaxlist = DisulfideList([ssMin, ssMax], 'mm')
   minmaxlist.display(style='bs', light=True)
   ```
 
-![minmax](minmax.png)
+<center> 
 
-2. Find disulfides within 5 $\AA$ RMS of the lowest energy structure.
+![minmax](minmax.png){width=75%} 
+</center>
+
+## Find disulfides within 10 $\AA$ RMS in torsional space of the lowest energy structure.
+
+In this example we load the disulfide database, find the disulfides with
+the lowest and highest energies, and then find the nearest conformational neighbors.
+Finally, we display the neighbors overlaid against a common reference frame.
+
 
   ```python
+  import proteusPy
+  from proteusPy.DisulfideLoader import DisulfideLoader
+  from proteusPy.DisulfideList import DisulfideList
+  from proteusPy.Disulfide import Disulfide
+  
+  PDB_SS = None
+  PDB_SS = Load_PDB_SS(verbose=False, subset=True)
+  ss_list = DisulfideList([], 'tmp')
+
+  # We point to the complete list to search for lowest and highest energies.
+
+  sslist = PDB_SS.SSList
+  ssmin_enrg, ssmax_enrg = PDB_SS.SSList.minmax_energy()
+
+  # Make an empty list and find the nearest neighbors within 10 degrees avg RMS in
+  # sidechain dihedral angle space.
+
+  low_energy_neighbors = DisulfideList([],'Neighbors')
+  low_energy_neighbors = ssmin_enrg.Torsion_neighbors(sslist, 10)
+
+  # Display the number found, and then display them overlaid onto their common reference frame.
+
+  tot = low_energy_neighbors.length
+  low_energy_neighbors.display_overlay()
   
   ```
-  
+
+<center>
+
+![min_overlay](min_overlay.png)
+</center>
+
+## Plotting Disulfide Class Distribution
+
+
+
 # The Future
 
 - I continue to explore disulfide structural classes using the sextant class approach. This offers much higher class resolution than the binary approach described by [@Schmidt_2006] and reveals subgroups within the broad class. I'd also like to explore the catalytic and allosteric classes in more detail to look for common structural elements.
