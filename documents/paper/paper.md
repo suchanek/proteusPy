@@ -246,14 +246,16 @@ Finally, we display the neighbors overlaid against a common reference frame.
   
   ```
 
+18
+
 <center>
 
 ![min_overlay](min_overlay.png)
 </center>
 
-## Plotting Disulfide Class Distribution
+## Plotting Disulfide Class Distributions
 
-
+The package includes the [DisulfideClassConstructer](https://suchanek.github.io/proteusPy/proteusPy/DisulfideClass_Constructor.html) class, which is used to create and manage Disulfide binary and sextant classes. 
 
 # The Future
 
