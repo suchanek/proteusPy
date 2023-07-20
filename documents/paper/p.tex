@@ -1,0 +1,499 @@
+\hypertarget{summary}{%
+\section{Summary}\label{summary}}
+
+\textbf{proteusPy} is a Python package specializing in the modeling and
+analysis of proteins of known structure with an emphasis on Disulfide
+Bonds. This package reprises my molecular modeling program
+\emph{proteus}, (Pabo and Suchanek 1986), and utilizes a new
+implementation of the
+\href{https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html}{Turtle3D}
+class for disulfide and protein modeling. The
+\href{https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html}{Disulfide}
+class implements methods to analyze the protein structure stabilizing
+element known as a \textbf{Disulfide Bond}.
+
+The work has resulted in a freely-accessible database of over 120,494
+disulfide bonds contained within 35,818 proteins in the RCSB protein
+databank.
+
+\hypertarget{motivation}{%
+\section{Motivation}\label{motivation}}
+
+My primary motivation for implementing \texttt{proteusPy} was to revisit
+the \href{https://www.rcsb.org}{RCSB Protein Databank} and do a
+structural analysis of the disulfide bonds contained therein. This
+necessitated the creation an object-oriented database capable of
+introspection, analysis and display. The API (Suchanek 2023a) is
+available online at: https://suchanek.github.io/proteusPy/proteusPy.html
+and provides more details and numerous examples. \# Requirements 1. PC
+running MacOS, Linux, Windows 2. 16 GB RAM 3. 2 GB disk space
+
+\hypertarget{installation}{%
+\section{Installation}\label{installation}}
+
+It's simplest to clone the repo via github since it contains all of the
+notebooks, test programs and raw Disulfide databases.
+
+\begin{itemize}
+\item
+  Install Anaconda: \url{http://anaconda.org}
+\item
+  Install git-lfs
+
+  \begin{itemize}
+  \tightlist
+  \item
+    https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage
+  \end{itemize}
+\item
+  From a shell prompt:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+  \ExtensionTok{$}\NormalTok{ git{-}lfs track }\StringTok{"*.csv"} \StringTok{"*.pkl"} \StringTok{"*.mp4"}
+  \ExtensionTok{$}\NormalTok{ git clone https://github.com/suchanek/proteusPy/proteusPy.git}
+  \ExtensionTok{$}\NormalTok{ cd proteusPy}
+  \ExtensionTok{$}\NormalTok{ conda env create }\AttributeTok{{-}{-}name}\NormalTok{ proteusPy }\AttributeTok{{-}{-}file}\OperatorTok{=}\NormalTok{proteusPy.yml}
+  \ExtensionTok{$}\NormalTok{ conda activate proteusPy}
+  \ExtensionTok{$}\NormalTok{ pip install .}
+  \ExtensionTok{$}\NormalTok{ jupyter nbextension enable }\AttributeTok{{-}{-}py} \AttributeTok{{-}{-}sys{-}prefix}\NormalTok{ widgetsnbextension}
+  \ExtensionTok{$}\NormalTok{ python }\AttributeTok{{-}m}\NormalTok{ ipykernel install }\AttributeTok{{-}{-}user} \AttributeTok{{-}{-}name}\NormalTok{ proteusPy }\AttributeTok{{-}{-}display{-}name} \StringTok{"Python (proteusPy)"}
+\end{Highlighting}
+\end{Shaded}
+\end{itemize}
+
+\hypertarget{general-usage}{%
+\section{General Usage}\label{general-usage}}
+
+Once the package is installed one can use the existing notebooks for
+analysis of the RCSB Disulfide database. The \href{}{notebooks}
+directory contains all of my Jupyter notebooks and is a good place to
+start. The
+\href{https://github.com/suchanek/proteusPy/blob/master/notebooks/DisulfideAnalysis.ipynb}{DisulfideAnalysis.ipynb}
+notebook contains the first analysis paper. The
+\href{https://github.com/suchanek/proteusPy/tree/master/programs}{programs}
+subdirectory contains the primary programs for downloading the RCSB
+disulfide-containing structure files,
+\href{https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py}{DisulfideDownloader.py},
+extracting the disulfides and creating the database loaders
+\href{https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py}{DisulfideExtractor.py}
+and cluster analysis
+\href{https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py}{DisulfideClass\_Analysis.py}.
+
+The first time one loads the database via
+\href{https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html\#Load_PDB_SS}{Load\_PDB\_SS()}
+the system will attempt to download the full and subset database from my
+Google Drive. If this fails the system will attempt to rebuild the
+database from the repo's \texttt{data} subdirectory (not the package's).
+If you've downloaded from github this will work correctly. If you've
+installed from pyPi via \texttt{pip} it will fail.
+
+\hypertarget{class-details}{%
+\section{Class Details}\label{class-details}}
+
+The primary classes developed for \texttt{proteusPy} are described
+briefly below. Please see the
+\href{https://suchanek.github.io/proteusPy/proteusPy.html}{API} for
+details.
+
+\hypertarget{disulfide}{%
+\section{\texorpdfstring{\href{https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html}{Disulfide}}{Disulfide}}\label{disulfide}}
+
+This class provides a Python object and methods representing a physical
+disulfide bond either extracted from the RCSB protein databank or a
+virtual one built using the
+\href{https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html}{Turtle3D}
+class. The disulfide bond is an important intramolecular stabilizing
+structural element and is characterized by:
+
+\begin{itemize}
+\tightlist
+\item
+  Atomic coordinates for the atoms \(N, C_{\alpha}\), \(C_{\beta}\),
+  \(C'\), \(S_\gamma\) for both residues. These are stored as both raw
+  atomic coordinates as read from the RCSB file and internal local
+  coordinates.
+\item
+  The dihedral angles \(\chi_{1} - \chi_{5}\) for the disulfide bond
+\item
+  A name, by default:
+  \texttt{\{pdb\_id\}\{prox\_resnumb\}\{prox\_chain\}\_\{distal\_resnum\}\{distal\_chain\}}
+\item
+  Proximal residue number
+\item
+  Distal residue number
+\item
+  Approximate bond torsional energy (kcal/mol): \[
+    E_{kcal/mol} \approx 2.0 * cos(3.0 * \chi_{1}) + cos(3.0 * \chi_{5}) + cos(3.0 * \chi_{2}) +
+  \] \[
+    cos(3.0 * \chi_{4}) + 3.5 * cos(2.0 * \chi_{3}) + 0.6 * cos(3.0 * \chi_{3}) + 10.1
+  \]
+\item
+  Euclidean length of the dihedral angles (degrees) defined as:
+  \[\sqrt(\chi_{1}^{2} + \chi_{2}^{2} + \chi_{3}^{2} + \chi_{4}^{2} + \chi_{5}^{2})\]
+\item
+  \(C_{\alpha} - C_{\alpha}\) distance (\(\text{\normalfont\AA}\))
+\item
+  \(C_{\beta} - C_{\beta}\) distance (\(\text{\normalfont\AA}\))
+\item
+  The previous C' and next N coordinates for both the proximal and
+  distal residues. These are needed to calculate the backbone dihedral
+  angles \(\phi\), \(\psi\).
+\item
+  Backbone dihedral angles \(\phi\) and \(\psi\), when possible. Not all
+  structures are complete and in those cases the atoms needed may be
+  undefined. In this case the \(\phi\) and \(\psi\) angles are set to
+  -180°.
+\end{itemize}
+
+The class also provides 3D rendering capabilities using the excellent
+\href{https://pyvista.org}{PyVista} library, and can display disulfides
+interactively in a variety of display styles:
+
+\begin{itemize}
+\item
+  `sb' - Split Bonds style - bonds colored by their atom type
+\item
+  `bs' - Ball and Stick style - split bond coloring with small atoms
+\item
+  `pd' - Proximal/Distal style - bonds colored \emph{Red} for proximal
+  residue and \emph{Green} for the distal residue.
+\item
+  `cpk' - CPK style rendering, colored by atom type:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Carbon - Grey
+  \item
+    Nitrogen - Blue
+  \item
+    Sulfur - Yellow
+  \item
+    Oxygen - Red
+  \item
+    Hydrogen - White
+  \end{itemize}
+\end{itemize}
+
+Individual renderings can be saved to a file and animations can be
+created. The \emph{cpk} and \emph{bs} styles are illustrated below:
+
+\includegraphics{logo_cpk.png} \includegraphics{logo_bs.png}
+
+\hypertarget{disulfideloader}{%
+\subsection{\texorpdfstring{\href{https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html}{DisulfideLoader}}{DisulfideLoader}}\label{disulfideloader}}
+
+This class represents the disulfide database itself and is its primary
+means of accession. Instantiation takes 2 parameters: \texttt{subset}
+and \texttt{verbose}. Given the size of the database, one can use the
+\texttt{subset} parameter to load the first 1000 disulfides into memory.
+This facilitates quicker development and testing new functions. I
+recommend using at least a 16 GB machine to work with the full dataset.
+
+The entirety of the RCSB disulfide database is stored within the class
+via a
+\href{\%22https://suchanek.github.io/proteusPy/proteusPy/DisulfideList.html\%22}{DisulfideList},
+a \texttt{Pandas} .csv file, and a \texttt{dict} of indices mapping the
+RCSB IDs into their respective list of disulfides. The datastructures
+allow simple, direct and flexible access to the disulfide structures
+contained within. This makes it possible to access the disulfides by
+array index, RCSB structure ID or disulfide name.
+
+Example:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+  \ImportTok{import}\NormalTok{ proteusPy}
+  \ImportTok{from}\NormalTok{ proteusPy.Disulfide }\ImportTok{import}\NormalTok{ Disulfide}
+  \ImportTok{from}\NormalTok{ proteusPy.DisulfideLoader }\ImportTok{import}\NormalTok{ DisulfideLoader}
+  \ImportTok{from}\NormalTok{ proteusPy.DisulfideList }\ImportTok{import}\NormalTok{ DisulfideList}
+
+\NormalTok{  SS1 }\OperatorTok{=}\NormalTok{ DisulfideList([],}\StringTok{\textquotesingle{}tmp1\textquotesingle{}}\NormalTok{)}
+\NormalTok{  SS2 }\OperatorTok{=}\NormalTok{ DisulfideList([],}\StringTok{\textquotesingle{}tmp2\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{  PDB\_SS }\OperatorTok{=}\NormalTok{ DisulfideLoader(verbose}\OperatorTok{=}\VariableTok{False}\NormalTok{, subset}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+
+  \CommentTok{\# Accessing by index value:}
+\NormalTok{  SS1 }\OperatorTok{=}\NormalTok{ PDB\_SS[}\DecValTok{0}\NormalTok{]}
+\NormalTok{  SS1}
+  \OperatorTok{\textless{}}\NormalTok{Disulfide }\DecValTok{4}\ErrorTok{yys\_22A\_65A}\NormalTok{, Source: }\DecValTok{4}\ErrorTok{yys}\NormalTok{, Resolution: }\FloatTok{1.35}\NormalTok{ Å}\OperatorTok{\textgreater{}}
+
+  \CommentTok{\# Accessing by PDB\_ID returns a list of Disulfides:}
+\NormalTok{  SS2 }\OperatorTok{=}\NormalTok{ PDB\_SS[}\StringTok{\textquotesingle{}4yys\textquotesingle{}}\NormalTok{]}
+\NormalTok{  SS2}
+\NormalTok{  [}\OperatorTok{\textless{}}\NormalTok{Disulfide }\DecValTok{4}\ErrorTok{yys\_22A\_65A}\NormalTok{, Source: }\DecValTok{4}\ErrorTok{yys}\NormalTok{, Resolution: }\FloatTok{1.35}\NormalTok{ Å}\OperatorTok{\textgreater{}}\NormalTok{, }
+  \OperatorTok{\textless{}}\NormalTok{Disulfide }\DecValTok{4}\ErrorTok{yys\_56A\_98A}\NormalTok{, Source: }\DecValTok{4}\ErrorTok{yys}\NormalTok{, Resolution: }\FloatTok{1.35}\NormalTok{ Å}\OperatorTok{\textgreater{}}\NormalTok{, }
+  \OperatorTok{\textless{}}\NormalTok{Disulfide }\DecValTok{4}\ErrorTok{yys\_156A\_207A}\NormalTok{, Source: }\DecValTok{4}\ErrorTok{yys}\NormalTok{, Resolution: }\FloatTok{1.35}\NormalTok{ Å}\OperatorTok{\textgreater{}}\NormalTok{]}
+
+  \CommentTok{\# Accessing individual disulfides by their name:}
+\NormalTok{  SS3 }\OperatorTok{=}\NormalTok{ PDB\_SS[}\StringTok{\textquotesingle{}4yys\_56A\_98A\textquotesingle{}}\NormalTok{]}
+\NormalTok{  SS3}
+  \OperatorTok{\textless{}}\NormalTok{Disulfide }\DecValTok{4}\ErrorTok{yys\_56A\_98A}\NormalTok{, Source: }\DecValTok{4}\ErrorTok{yys}\NormalTok{, Resolution: }\FloatTok{1.35}\NormalTok{ Å}\OperatorTok{\textgreater{}}
+
+  \CommentTok{\# Finally, we can access disulfides by regular slicing:}
+\NormalTok{  SSlist }\OperatorTok{=}\NormalTok{ SS2[:}\DecValTok{2}\NormalTok{]}
+\NormalTok{  [}\OperatorTok{\textless{}}\NormalTok{Disulfide }\DecValTok{4}\ErrorTok{yys\_56A\_98A}\NormalTok{, Source: }\DecValTok{4}\ErrorTok{yys}\NormalTok{, Resolution: }\FloatTok{1.35}\NormalTok{ Å}\OperatorTok{\textgreater{}}\NormalTok{, }
+  \OperatorTok{\textless{}}\NormalTok{Disulfide }\DecValTok{4}\ErrorTok{yys\_156A\_207A}\NormalTok{, Source: }\DecValTok{4}\ErrorTok{yys}\NormalTok{, Resolution: }\FloatTok{1.35}\NormalTok{ Å}\OperatorTok{\textgreater{}}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+The class can also render Disulfides overlaid on a common coordinate
+system to a pyVista window using the
+\href{https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html\#DisulfideLoader.display_overlay}{DisulfideLoader.display\_overlay()}
+method.
+
+\textbf{NB:} For typical usage one accesses the database via the
+\texttt{Load\_PDB\_SS()} function. This function loads the compressed
+database from its single source. Initializing a
+\texttt{DisulfideLoader()} object will load the individual torsions and
+disulfide .pkl files, builds the classlist structures, and writes the
+completely built object to a single \texttt{.pkl} file. This requires
+the raw .pkl files created by download process. These files are
+contained in the repository \texttt{data} directory.
+
+\hypertarget{turtle3d}{%
+\subsection{\texorpdfstring{\href{https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html}{turtle3D}}{turtle3D}}\label{turtle3d}}
+
+The \texttt{turtle3D} is an object that maintains a \emph{local
+coordinate system} in three dimensional space. This coordinate system
+consists of:
+
+\begin{itemize}
+\tightlist
+\item
+  A Position Vector
+\item
+  A Heading Vector
+\item
+  A Left Vector
+\item
+  An Up Vector
+\end{itemize}
+
+These vectors fully define the object's position and orientation in a
+\emph{local} coordinate frame. The Turtle developed in
+\texttt{proteusPy} is based on the excellent book by Abelson: (Abelson
+and DiSessa 1986). The
+\href{\%22https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html\#Turtle3D.to_local\%22}{to\_local}
+and
+\href{\%22https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html\#Turtle3D.to_global\%22}{to\_global}
+methods convert between these two. These methods make it possible to
+readily compare different disulfides by:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Orienting the turtle at the disulfide's proximal residue in a standard
+  orientation.
+\item
+  Converting the global coordinates of the disulfide as read from the
+  RCSB into local coordinates.
+\item
+  Saving all of the local coordinates with the raw coordinates
+\item
+  Performing RMS distance and angle calculations
+\end{enumerate}
+
+The turtle has several molecule-specific functions including
+\href{\%22https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html\#Turtle3D.orient_at_residue\%22}{orient\_at\_residue}
+and
+\href{\%22https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html\#Turtle3D.orient_from_backbone\%22}{orient\_from\_backbone}.
+
+By implementing the functions \texttt{Move}, \texttt{Roll},
+\texttt{Yaw}, \texttt{Pitch} and \texttt{Turn} the turtle is capable of
+movement in a three-dimensional space. See (Pabo and Suchanek 1986) for
+more details.
+
+\hypertarget{database-creation}{%
+\section{Database Creation}\label{database-creation}}
+
+The following steps were performed to create the RCSB database:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Identify disulfide containing proteins in the
+  \href{https://www.rcsb.org}{RCSB}. I generated a query using the
+  web-based query tool for all proteins containing one or more disulfide
+  bond. The resulting file consisted of 35819 IDs.
+\item
+  Download the structure files to disk. This resulted in the program
+  \href{https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py}{DisulfideDownloader.py}.
+  The download took approximately twelve hours.
+\item
+  Extract the disulfides from the downloaded structures. The program
+  \href{https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py}{DisulfideExtractor.py}
+  was used to extract disulfides from the individual structure files.
+  This seemingly simple task was complicated by several factors
+  including:
+
+  \begin{enumerate}
+  \def\labelenumii{\arabic{enumii}.}
+  \tightlist
+  \item
+    Duplicate disulfides contained within a multi-chain protein file.
+  \item
+    Physically impossible disulfides, where the \(C_\alpha - C_\alpha\)
+    distance is \textgreater{} 8 \(\text{\normalfont\AA}\) .
+  \item
+    Structures with disordered CYS atoms.
+  \end{enumerate}
+\end{enumerate}
+
+In the end I elected to only use a single example of a given disulfide
+from a multi-chain entry, and removed any disulfides with a
+\(C_\alpha - C_\alpha\) distance is \textgreater{} 8
+\$\text{\normalfont\AA} \$. This resulted in the current database
+consisting of 35,808 structures and 120,494 disulfide bonds. To my
+knowledge this is the only searchable database of disulfide bonds in
+existence.
+
+\hypertarget{examples}{%
+\section{Examples}\label{examples}}
+
+I illustrate a few use cases for the package below. See the notebooks
+for more examples.
+
+\hypertarget{find-the-lowest-and-highest-energy-disulfides-present-in-the-database.}{%
+\subsection{Find the lowest and highest energy disulfides present in the
+database.}\label{find-the-lowest-and-highest-energy-disulfides-present-in-the-database.}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# default parameters will read from the package itself.}
+
+\NormalTok{PDB\_SS }\OperatorTok{=}\NormalTok{ Load\_PDB\_SS(verbose}\OperatorTok{=}\VariableTok{False}\NormalTok{, subset}\OperatorTok{=}\VariableTok{False}\NormalTok{)}
+
+\CommentTok{\# display the best and worst SS}
+
+\NormalTok{ssMin, ssMax }\OperatorTok{=}\NormalTok{ PDB\_SS.SSList.minmax\_energy()}
+\NormalTok{minmaxlist }\OperatorTok{=}\NormalTok{ DisulfideList([ssMin, ssMax], }\StringTok{\textquotesingle{}mm\textquotesingle{}}\NormalTok{)}
+\NormalTok{minmaxlist.display(style}\OperatorTok{=}\StringTok{\textquotesingle{}bs\textquotesingle{}}\NormalTok{, light}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{minmax.png}
+\caption{minmax}
+\end{figure}
+
+\hypertarget{find-disulfides-within-10-textnormalfontaa-rms-of-the-lowest-energy-structure.}{%
+\subsection{\texorpdfstring{Find disulfides within 10
+\(\text{\normalfont\AA}\) RMS of the lowest energy
+structure.}{Find disulfides within 10 \textbackslash text\{\textbackslash normalfont\textbackslash AA\} RMS of the lowest energy structure.}}\label{find-disulfides-within-10-textnormalfontaa-rms-of-the-lowest-energy-structure.}}
+
+In this example we load the disulfide database, find the disulfides with
+the lowest and highest energies, and then find the nearest
+conformational neighbors. Finally, we display the neighbors overlaid
+against a common reference frame.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ proteusPy}
+\ImportTok{from}\NormalTok{ proteusPy.DisulfideLoader }\ImportTok{import}\NormalTok{ DisulfideLoader}
+\ImportTok{from}\NormalTok{ proteusPy.DisulfideList }\ImportTok{import}\NormalTok{ DisulfideList}
+\ImportTok{from}\NormalTok{ proteusPy.Disulfide }\ImportTok{import}\NormalTok{ Disulfide}
+
+\NormalTok{PDB\_SS }\OperatorTok{=} \VariableTok{None}
+\NormalTok{PDB\_SS }\OperatorTok{=}\NormalTok{ Load\_PDB\_SS(verbose}\OperatorTok{=}\VariableTok{False}\NormalTok{, subset}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+\NormalTok{ss\_list }\OperatorTok{=}\NormalTok{ DisulfideList([], }\StringTok{\textquotesingle{}tmp\textquotesingle{}}\NormalTok{)}
+
+\CommentTok{\# We point to the complete list to search for lowest and highest energies.}
+
+\NormalTok{sslist }\OperatorTok{=}\NormalTok{ PDB\_SS.SSList}
+\NormalTok{ssmin\_enrg, ssmax\_enrg }\OperatorTok{=}\NormalTok{ PDB\_SS.SSList.minmax\_energy()}
+
+\CommentTok{\# Make an empty list and find the nearest neighbors within 10 degrees avg RMS in}
+\CommentTok{\# sidechain dihedral angle space.}
+
+\NormalTok{low\_energy\_neighbors }\OperatorTok{=}\NormalTok{ DisulfideList([],}\StringTok{\textquotesingle{}Neighbors\textquotesingle{}}\NormalTok{)}
+\NormalTok{low\_energy\_neighbors }\OperatorTok{=}\NormalTok{ ssmin\_enrg.Torsion\_neighbors(sslist, }\DecValTok{10}\NormalTok{)}
+
+\CommentTok{\# Display the number found, and then display them overlaid onto their common reference frame.}
+
+\NormalTok{tot }\OperatorTok{=}\NormalTok{ low\_energy\_neighbors.length}
+\NormalTok{low\_energy\_neighbors.display\_overlay()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{min_overlay.png}
+\caption{min\_overlay}
+\end{figure}
+
+\hypertarget{plotting-disulfide-class-distribution}{%
+\subsection{Plotting Disulfide Class
+Distribution}\label{plotting-disulfide-class-distribution}}
+
+\hypertarget{the-future}{%
+\section{The Future}\label{the-future}}
+
+\begin{itemize}
+\item
+  I continue to explore disulfide structural classes using the sextant
+  class approach. This offers much higher class resolution than the
+  binary approach described by (Schmidt 2006) and reveals subgroups
+  within the broad class. I'd also like to explore the catalytic and
+  allosteric classes in more detail to look for common structural
+  elements.
+\item
+  I also intend to deploy a Disulfide Database browser for exploration
+  and analysis. This is ongoing.
+\end{itemize}
+
+\hypertarget{misc}{%
+\section{Misc}\label{misc}}
+
+\emph{Developer's Notes:} The .pkl files needed to instantiate this
+class and save it into its final .pkl file are defined in the
+\href{\%22https://suchanek.github.io/proteusPy/proteusPy/data.html\%22}{proteusPy.data}
+class and should not be changed. Upon initialization the class will load
+them and initialize itself.
+
+\emph{NB:} (Suchanek 2023b) relies on my
+\href{https://github.com/suchanek/biopython}{fork} of the
+\href{https://biopython.org}{Biopython} Python package to download and
+build the database, (\url{https://github.com/suchanek/biopython}). As a
+result, one can't download and create the database locally unless the
+BioPython patch is applied. The changed python file is in the repo's
+data directory - \texttt{parse\_pdb\_header.py}. Database analysis is
+unaffected without the patch. Also, if you're running on an M-series Mac
+then it's important to install Biopython first, since the generic
+release won't build on the M1.
+
+\hypertarget{bibliography}{%
+\section*{Bibliography}\label{bibliography}}
+\addcontentsline{toc}{section}{Bibliography}
+
+\hypertarget{refs}{}
+\begin{CSLReferences}{1}{0}
+\leavevmode\vadjust pre{\hypertarget{ref-Abelson_DiSessa_1986}{}}%
+Abelson, Harold, and Andrea A. DiSessa. 1986. \emph{Turtle Geometry: The
+Computer as a Medium for Exploring Mathematics}. MIT Press.
+
+\leavevmode\vadjust pre{\hypertarget{ref-Pabo_1986}{}}%
+Pabo, C. O., and E. G. Suchanek. 1986. {``Computer-Aided Model-Building
+Strategies for Protein Design.''} \emph{Biochemistry} 25 (20): 5987--91.
+\url{https://doi.org/10.1021/bi00368a023}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-Schmidt_2006}{}}%
+Schmidt, Brian. 2006. {``Multiple Disulfide-Bonded States of Native
+Proteins: Estimate of Number Using Probabilities of Disulfide Bond
+Formation.''} \emph{Biochemistry} 45 (24): 7429--74334.
+\url{https://doi.org/10.1021/bi0603064}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-API}{}}%
+Suchanek, Eric G. 2023a. {``proteusPy API.''} \emph{GitHub Documents}.
+GitHub.
+\url{https://suchanek.github.io/suchanek/proteusPy/proteusPy.html}.
+
+\leavevmode\vadjust pre{\hypertarget{ref-proteusPy}{}}%
+---------. 2023b. {``proteusPy: A Package for the Analysis of Proteins
+of Known Structure.''} \emph{GitHub Repository}. GitHub.
+\url{https://github.com/suchanek/proteusPy}.
+
+\end{CSLReferences}
