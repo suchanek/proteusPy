@@ -10,7 +10,7 @@
        - From a shell prompt: 
          ```
           $ git-lfs track "*.csv" "*.pkl" "*.mp4"
-          $ git clone https://github.com/suchanek/proteusPy/proteusPy.git
+          $ git clone https://github.com/suchanek/proteusPy
           $ cd proteusPy
           $ conda env create --name proteusPy --file=proteusPy.yml
           $ conda activate proteusPy
