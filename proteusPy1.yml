@@ -23,7 +23,6 @@ dependencies:
   - panel
   - jupyterlab
   - ipyparallel
-  - wget
   - pycryptodome
   - nodejs
   - pdoc
@@ -37,5 +36,7 @@ dependencies:
   - pip
   - scikit-learn
   - trame
+  - pip:
+    - wget
 prefix: /Users/egs/miniforge3/envs/proteusPy1
 
