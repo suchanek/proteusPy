@@ -702,20 +702,6 @@ class DisulfideList(UserList):
                 return ss.copy()  # or ss.copy() !!!
         return None
 
-    def Oget_by_name(self, name) -> Disulfide:
-        '''
-        Returns the Disulfide with the given name from the list.
-        '''
-        sslist = self.data
-        res = None
-
-        for ss in sslist:
-            id = ss.name
-            if id == name:
-                res = ss.copy()
-                break
-        return res
-    
     def get_chains(self):
         '''
         Return the chain IDs for chains within the given Disulfide.
