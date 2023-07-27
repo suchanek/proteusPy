@@ -46,7 +46,13 @@
 
         <h2>Contents</h2>
         <ul>
-  <li><a href="#virtual-environment-creation">Virtual Environment Creation</a></li>
+  <li><a href="#summary">Summary</a>
+  <ul>
+    <li><a href="#virtual-environment-creation">Virtual Environment Creation</a></li>
+    <li><a href="#general-usage">General Usage</a></li>
+    <li><a href="#the-future">The Future</a></li>
+    <li><a href="#publications">Publications</a></li>
+  </ul></li>
 </ul>
 
 
@@ -86,49 +92,50 @@
                     <h1 class="modulename">
 proteusPy    </h1>
 
-                        <div class="docstring"><p><em>proteusPy</em> is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide Bonds. This package reprises my molecular modeling program <a href="https://doi.org/10.1021/bi00368a023">Proteus</a>, and relies on the <a href="https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html">Turtle3D</a> class. The turtle implements the functions <code>Move</code>, <code>Roll</code>, <code>Yaw</code>, <code>Pitch</code> and <code>Turn</code> for movement in a three-dimensional space. The <a href="https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html">Disulfide</a> class implements methods to analyze the protein structure stabilizing element known as a <em>Disulfide Bond</em>. This class and its underlying methods are being used to perform a structural analysis of over 35,800 disulfide-bond containing proteins in the RCSB protein data bank.</p>
+                        <div class="docstring"><h1 id="summary">Summary</h1>
 
-<h1 id="virtual-environment-creation">Virtual Environment Creation</h1>
+<p><strong>proteusPy</strong> is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide Bonds. This package reprises my molecular modeling program <a href="https://doi.org/10.1021/bi00368a023">Proteus</a>, and relies on the <a href="https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html">Turtle3D</a> class. The turtle implements the functions <code>Move</code>, <code>Roll</code>, <code>Yaw</code>, <code>Pitch</code> and <code>Turn</code> for movement in a three-dimensional space. The <a href="https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html">Disulfide</a> class implements methods to analyze the protein structure stabilizing element known as a <em>Disulfide Bond</em>. This class and its underlying methods are being used to perform a structural analysis of over 35,800 disulfide-bond containing proteins in the RCSB protein data bank.</p>
+
+<h2 id="virtual-environment-creation">Virtual Environment Creation</h2>
 
 <ol>
 <li><em>Install Anaconda (<a href="http://anaconda.org">http://anaconda.org</a>)</em></li>
-<li><p><em>Build the environment.</em> 
+<li><p><em>Build the environment.</em>
 It's simplest to clone the repo via github since it contains all of the notebooks, test programs and raw Disulfide databases. The source code distribution can be also be used from pyPi as a normal package, within your own environment.</p>
 
 <ul>
-<li>From the gitHub repository:
-<ul>
-<li>Install git-lfs
-<ul>
-<li><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage">https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage</a></a></a></li>
-<li>From a shell prompt: 
-```
- $ git-lfs track "<em>.csv" "</em>.pkl" "*.mp4"
- $ git clone <a href="https://github.com/suchanek/proteusPy/proteusPy.git"><a href="https://github.com/suchanek/proteusPy/proteusPy.git"><a href="https://github.com/suchanek/proteusPy/proteusPy.git">https://github.com/suchanek/proteusPy/proteusPy.git</a></a></a>
- $ cd proteusPy
- $ conda env create --name proteusPy --file=proteusPy.yml
- $ conda activate proteusPy
- $ pip install .
- $ jupyter nbextension enable --py --sys-prefix widgetsnbextension</li>
-</ul></li>
-</ul></li>
-</ul>
+<li><p>From the gitHub repository:</p>
 
-<p>```
-I hope you enjoy using proteusPy and would love to hear any success/insights gleaned from it. The Disulfide database is unique as far as I know, and is ripe for mining. </p></li>
+<ul>
+<li>Install git-lfs</li>
+<li><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage">https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage</a></li>
+<li><p>From a shell prompt:</p>
+
+<p>```console
+$ git-lfs track "<em>.csv" "</em>.pkl" "*.mp4"
+$ git clone <a href="https://github.com/suchanek/proteusPy">https://github.com/suchanek/proteusPy</a>
+$ cd proteusPy
+$ conda env create --name proteusPy --file=proteusPy.yml
+$ conda activate proteusPy
+$ pip install .
+$ jupyter nbextension enable --py --sys-prefix widgetsnbextension</p></li>
+</ul></li>
+</ul></li>
 </ol>
 
-<h3 id="general-usage">General Usage</h3>
+<p>I hope you enjoy using proteusPy and would love to hear any success/insights gleaned from it. The Disulfide database is unique as far as I know, and is ripe for mining.</p>
+
+<h2 id="general-usage">General Usage</h2>
 
 <p>Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. The <code>notebooks</code> directory contains all of my Jupyter notebooks and is a good place to start. The <code>DisulfideAnalysis.ipynb</code> notebook contains the first analysis paper. The <code>programs</code> subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files, (<code>DisulfideDownloader.py</code>), extracting the disulfides and creating the database loaders (<code>DisulfideExtractor.py</code>) and cluster analysis, (<code>DisulfideClass_Analysis.py</code>).</p>
 
 <p>The first time one loads the database via <code>Load_PDB_SS()</code> the system will attempt to download the full and subset database from my Google Drive. If this fails the system will attempt to rebuild the database from the repo's <code>data</code> subdirectory (not the package's). If you've downloaded from github this will work correctly. If you've installed from pyPi via <code>pip</code> it will fail.</p>
 
-<h3 id="the-future">The Future</h3>
+<h2 id="the-future">The Future</h2>
 
 <p>I am continuing to explore the initial disulfide structural classes gleaned from Hogg <em>et al.</em> further using the sextant class approach. This offers much higher class resolution and reveals subgroups within the broad class. I'd also like to explore the catalytic and allosteric classes in more detail to look for common structural elements.</p>
 
-<h3 id="publications">Publications</h3>
+<h2 id="publications">Publications</h2>
 
 <ul>
 <li><a href="https://doi.org/10.1021/bi00368a023">https://doi.org/10.1021/bi00368a023</a></li>
@@ -139,7 +146,7 @@ I hope you enjoy using proteusPy and would love to hear any success/insights gle
 
 <p><em>NB:</em> This distribution is being developed slowly. proteusPy relies on my fork of the <code>Bio</code> Python package to download and build the database. As a result, one can't download and create the database locally unless the BioPython patch is applied. The changed python file is in the repo's data directory - <code>parse_pdb_header.py</code>. Database analysis is unaffected without the patch. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1. 7/4/23 -egs-</p>
 
-<p>Eric G. Suchanek, PhD., <a href="&#109;&#x61;&#105;&#x6c;&#116;&#111;&#58;&#x73;&#x75;c&#104;&#97;&#110;&#x65;&#107;&#x40;&#x6d;&#97;&#x63;.&#x63;&#x6f;&#109;">&#x73;&#x75;c&#104;&#97;&#110;&#x65;&#107;&#x40;&#x6d;&#97;&#x63;.&#x63;&#x6f;&#109;</a></p>
+<p>Eric G. Suchanek, PhD., <a href="&#x6d;&#x61;&#x69;&#108;&#x74;o&#58;&#115;&#x75;c&#104;&#97;&#x6e;&#101;&#107;&#64;&#x6d;&#97;&#99;&#46;&#x63;&#111;&#x6d;">&#115;&#x75;c&#104;&#97;&#x6e;&#101;&#107;&#64;&#x6d;&#97;&#99;&#46;&#x63;&#111;&#x6d;</a></p>
 </div>
 
                         <input id="mod-proteusPy-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
