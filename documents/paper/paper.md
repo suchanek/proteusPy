@@ -27,7 +27,7 @@ bibliography: joss.bib
 <!-- markdownlint-disable MD037 -->
 ## Summary
 
-**proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide Bonds. This package reprises my molecular modeling program **proteus**, [@Pabo_1986], and utilizes a new implementation of the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class for disulfide and protein modeling.  The [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class implements methods to analyze the protein structure stabilizing element known as a **Disulfide Bond**.
+**proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an initial focus on Disulfide Bonds. This package significantly extends my molecular modeling program **proteus**, [@Pabo_1986], and utilizes a new implementation of the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class for disulfide and protein modeling.  The [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class implements methods to analyze the protein structure stabilizing element known as a **Disulfide Bond**.
 
 The work has resulted in a freely-accessible database of over 120,494 disulfide bonds contained within 35,818 proteins in the [RCSB Protein Databank](https:/www.rcsb.org)
 
@@ -51,10 +51,10 @@ It's simplest to clone the repo via github since it contains all of the notebook
 - From a shell prompt:
 
     ```console
-      $ git-lfs track "*.csv" "*.pkl" "*.mp4"
       $ git clone https://github.com/suchanek/proteusPy/proteusPy.git
       $ cd proteusPy
-      $ conda env create --name proteusPy --file=proteusPy.yml
+      $ git-lfs track "*.csv" "*.pkl" "*.mp4"
+      $ conda env create --name proteusPy --file=proteusPy1.yml
       $ conda activate proteusPy
       $ pip install .
       $ jupyter nbextension enable --py --sys-prefix widgetsnbextension
