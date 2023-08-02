@@ -1138,7 +1138,7 @@ class Disulfide:
         :return: DisulfideList within the cutoff
         '''
 
-        res = [ss.copy() for ss in others if self.Distance_RMS(ss) <= cutoff]
+        res = [ss.copy() for ss in others if self.Distance_RMS(ss) < cutoff]
         return DisulfideList(res, 'neighbors')
 
     
