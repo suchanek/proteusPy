@@ -14,7 +14,7 @@ authors:
 affiliations:
  - name: Monterey Institute for Research in Astronomy, Marina, USA
    index: 1
-date: 19 July, 2023
+date: 28 July, 2023
 header-includes:
   - \usepackage[margin=1.0in]{geometry}
   - \let\oldAA\AA
@@ -22,9 +22,12 @@ header-includes:
 bibliography: joss.bib
 ---
 
-# Summary
+<!-- markdownlint-disable MD014 -->
+<!-- markdownlint-disable MD033 -->
+<!-- markdownlint-disable MD037 -->
+## Summary
 
-**proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide Bonds. This package reprises my molecular modeling program *proteus*, [@Pabo_1986], and utilizes a new implementation of the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class for disulfide and protein modeling.  The [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class implements methods to analyze the protein structure stabilizing element known as a **Disulfide Bond**.
+**proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide Bonds. This package reprises my molecular modeling program **proteus**, [@Pabo_1986], and utilizes a new implementation of the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class for disulfide and protein modeling.  The [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class implements methods to analyze the protein structure stabilizing element known as a **Disulfide Bond**.
 
 The work has resulted in a freely-accessible database of over 120,494 disulfide bonds contained within 35,818 proteins in the [RCSB Protein Databank](https:/www.rcsb.org)
 
@@ -59,7 +62,7 @@ It's simplest to clone the repo via github since it contains all of the notebook
 
 ## General Usage
 
-Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. The [notebooks]() directory contains all of my Jupyter notebooks and is a good place to start. The [DisulfideAnalysis.ipynb](https://github.com/suchanek/proteusPy/blob/master/notebooks/DisulfideAnalysis.ipynb) notebook contains the first analysis paper. The [programs](https://github.com/suchanek/proteusPy/tree/master/programs) subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files, [DisulfideDownloader.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py), extracting the disulfides and creating the database loaders [DisulfideExtractor.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py) and cluster analysis [DisulfideClass_Analysis.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py).
+Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. The [notebooks](https://github.com/suchanek/proteusPy/blob/master/notebooks/) directory contains all of my Jupyter notebooks and is a good place to start. The [DisulfideAnalysis.ipynb](https://github.com/suchanek/proteusPy/blob/master/notebooks/DisulfideAnalysis.ipynb) notebook contains the first analysis paper. The [programs](https://github.com/suchanek/proteusPy/tree/master/programs) subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files, [DisulfideDownloader.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py), extracting the disulfides and creating the database loaders [DisulfideExtractor.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py) and cluster analysis [DisulfideClass_Analysis.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py).
 
 The first time one loads the database via [Load_PDB_SS()](https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html#Load_PDB_SS) the system will attempt to download the full and subset database from my Google Drive. If this fails the system will attempt to rebuild the database from the repo's ``data`` subdirectory (not the package's). If you've downloaded from github this will work correctly. If you've installed from pyPi via ``pip`` it will fail.
 
@@ -83,7 +86,7 @@ This class provides a Python object and methods representing a physical disulfid
   $$
     cos(3.0 * \chi_{4}) + 3.5 * cos(2.0 * \chi_{3}) + 0.6 * cos(3.0 * \chi_{3}) + 10.1
   $$
-* Euclidean length of the dihedral angles (degrees) defined as:
+- Euclidean length of the dihedral angles (degrees) defined as:
 $$\sqrt(\chi_{1}^{2} + \chi_{2}^{2} + \chi_{3}^{2} + \chi_{4}^{2} + \chi_{5}^{2})$$
 - $C_{\alpha} - C_{\alpha}$ distance ($\AA$)
 - $C_{\beta} - C_{\beta}$ distance ($\AA$)
@@ -117,6 +120,7 @@ This class represents the disulfide database itself and is its primary means of 
 The entirety of the RCSB disulfide database is stored within the class via a [DisulfideList]("https://suchanek.github.io/proteusPy/proteusPy/DisulfideList.html"), a ```Pandas``` .csv file, and a ```dict``` of indices mapping the RCSB IDs into their respective list of disulfides. The datastructures allow simple, direct and flexible access to the disulfide structures contained within. This makes it possible to access the disulfides by array index, RCSB structure ID or disulfide name.
 
 Example:
+
 ```python
   import proteusPy
   from proteusPy.Disulfide import Disulfide
@@ -193,7 +197,7 @@ In the end I elected to only use a single example of a given disulfide from a mu
 
 I illustrate a few use cases for the package below. See the notebooks for more examples.
 
-### Find the lowest and highest energy disulfides present in the database.
+### Find the lowest and highest energy disulfides present in the database
 
   ```python
   # default parameters will read from the package itself.
@@ -212,12 +216,11 @@ I illustrate a few use cases for the package below. See the notebooks for more e
 ![minmax](minmax.png){width=75%}
 </center>
 
-### Find disulfides within 10 $\AA$ RMS in torsional space of the lowest energy structure.
+### Find disulfides within 10 $\AA$ RMS in torsional space of the lowest energy structure
 
 In this example we load the disulfide database, find the disulfides with
 the lowest and highest energies, and then find the nearest conformational neighbors.
 Finally, we display the neighbors overlaid against a common reference frame.
-
 
   ```python
   import proteusPy
