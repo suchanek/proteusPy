@@ -15,7 +15,6 @@ dependencies:
   - certifi
   - seaborn
   - plotly_express
-  - tqdm
   - ipygany
   - qtpy
   - pyvistaqt
@@ -38,5 +37,6 @@ dependencies:
   - trame
   - pip:
     - wget
-prefix: /Users/egs/miniforge3/envs/proteusPy1
+    - tqdm
+prefix: /Users/suchanek/miniforge3/envs/proteusPy1
 
