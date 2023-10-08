@@ -1,4 +1,4 @@
-name: proteusPy1
+name: proteusPy
 channels:
   - conda-forge
 dependencies:
@@ -38,5 +38,5 @@ dependencies:
   - pip:
     - wget
     - tqdm
-prefix: /Users/suchanek/miniforge3/envs/proteusPy1
+prefix: /Users/suchanek/miniforge3/envs/proteusPy
 

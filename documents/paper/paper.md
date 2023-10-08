@@ -161,7 +161,7 @@ The class can also render Disulfides overlaid on a common coordinate system to a
 
 ## [turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html)
 
-The ``turtle3D`` is an object that maintains a *local coordinate system* in three dimensional space. This coordinate system consists of:
+The ``turtle3D`` class represents an object that maintains a *local coordinate system* in three dimensional space. This coordinate system consists of:
 
 - A Position Vector
 - A Heading Vector
@@ -175,9 +175,10 @@ These vectors fully define the object's position and orientation in a *local* co
 3. Saving all of the local coordinates with the raw coordinates
 4. Performing RMS distance and angle calculations
 
-The turtle has several molecule-specific functions including [orient_at_residue]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.orient_at_residue") and [orient_from_backbone]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.orient_from_backbone").
-
 By implementing the functions ``Move``, ``Roll``, ``Yaw``, ``Pitch`` and ``Turn`` the turtle is capable of movement in a three-dimensional space. See [@Pabo_1986] for more details.
+
+The turtle has several molecule-specific functions including [orient_at_residue]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.orient_at_residue") and [orient_from_backbone]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.orient_from_backbone"). These routines make it possible to build protein backbones of arbitrary conformation and to readily add sidechains to modeled structures. I will use these capabilities in future modeling work, but are available now.
+
 
 ## Database Creation
 
@@ -233,9 +234,10 @@ Finally, we display the neighbors overlaid against a common reference frame.
   ss_list = DisulfideList([], 'tmp')
 
   # We point to the complete list to search for lowest and highest energies.
-
   sslist = PDB_SS.SSList
-  ssmin_enrg, ssmax_enrg = PDB_SS.SSList.minmax_energy()
+
+  # Return the minimum and maximum energy structures. We ignore tha maximum in this case.
+  ssmin_enrg, _ = PDB_SS.SSList.minmax_energy()
 
   # Make an empty list and find the nearest neighbors within 10 degrees avg RMS in
   # sidechain dihedral angle space.
@@ -257,16 +259,15 @@ Finally, we display the neighbors overlaid against a common reference frame.
 ![min_overlay](min_overlay.png)
 </center>
 
-### Plotting Disulfide Class Distributions
+### Analyzing Disulfide Structural Class Distributions
 
-The package includes the [DisulfideClassConstructer](https://suchanek.github.io/proteusPy/proteusPy/DisulfideClass_Constructor.html) class, which is used to create and manage Disulfide binary and sextant classes.
+The package includes the [DisulfideClassConstructer](https://suchanek.github.io/proteusPy/proteusPy/DisulfideClass_Constructor.html) class, which is used to create and manage Disulfide binary and sextant classes. A note about these structural classes is in order. [@Schmidt_2006] described a method of characterizing disulfide structures by describing each individual dihedral angle as either + or - based on its sign. This yields $2^{5} $ or 32 possible classes. The author then was able to identify protein functional families within one of 20 remaining structural classes. Since the binary approach is very coarse and computational resources are much more capable than in 2006 I extended this formalism to a *Sextant* approach. In other words, I created *six* possible classes for each dihedral angle by dividing it into 60 degree segments. This yields a possible $6^5$ or 7,776 possible classes. The notebook [DisulfideClassesPlayground.ipynb](https://github.com/suchanek/proteusPy/blob/master/notebooks/DisulfideClassesPlayground.ipynb) contains some initial results. 
 
 ### The Future
 
 - I continue to explore disulfide structural classes using the sextant class approach. This offers much higher class resolution than the binary approach described by [@Schmidt_2006] and reveals subgroups within the broad class. I'd also like to explore the catalytic and allosteric classes in more detail to look for common structural elements.
 
-- I also intend to deploy a Disulfide Database browser for exploration and analysis. This is ongoing.
-
+- I hope to deploy a Disulfide Database browser for exploration and analysis.
 ### Misc
 
 *Developer's Notes:*
