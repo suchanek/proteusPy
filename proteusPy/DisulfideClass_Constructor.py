@@ -3,10 +3,10 @@ DisulfideBond Class Analysis Dictionary creation
 Author: Eric G. Suchanek, PhD.
 (c) 2023 Eric G. Suchanek, PhD., All Rights Reserved \n
 License: MIT \n
-Last Modification: 3/14/23
+Last Modification: 10/8/23 -egs-
 
-Disulfide Class creation and manipulation using the +/- formalism of Hogg et al. (Biochem, 2006, 45, 7429-7433), 
-across all 32 possible classes. Classes are named per Hogg's convention.
+Disulfide Class creation and manipulation using the +/- formalism of Schmidt et al. (Biochem, 2006, 45, 7429-7433), 
+across all 32 possible classes. Classes are named per Schmidt's convention.
 '''
 # Cα Cβ Sγ
 
@@ -44,8 +44,8 @@ class DisulfideClass_Constructor():
     Build the internal dictionary mapping disulfides to class names.
 
     Disulfide binary classes are defined using the ± formalism described by 
-    Hogg et al. (Biochem, 2006, 45, 7429-7433), across all 32 (2^5), possible 
-    binary sidechain torsional combinations. Classes are named per Hogg's convention.
+    Schmidt et al. (Biochem, 2006, 45, 7429-7433), across all 32 (2^5), possible 
+    binary sidechain torsional combinations. Classes are named per Schmidt's convention.
     The ``class_id`` represents the sign of each dihedral angle $\chi_{1} - \chi_{1'}$
     where *0* repreents *negative* dihedral angle and *2* a *positive* angle.
 
@@ -194,7 +194,7 @@ class DisulfideClass_Constructor():
     def build_yourself(self, loader):
         '''
         Builds the internal structures needed for the binary and six-fold disulfide structural classes
-        based on dihedral angle rules. See Hogg'.
+        based on dihedral angle rules. See Schmidt'.
     
         Parameters
         ----------
