@@ -150,10 +150,10 @@ Author: Eric G. Suchanek, PhD.
 
 <p>License: MIT </p>
 
-<p>Last Modification: 10/8/23 -egs-</p>
+<p>Last Modification: 3/14/23</p>
 
-<p>Disulfide Class creation and manipulation using the +/- formalism of Schmidt et al. (Biochem, 2006, 45, 7429-7433), 
-across all 32 possible classes. Classes are named per Schmidt's convention.</p>
+<p>Disulfide Class creation and manipulation using the +/- formalism of Hogg et al. (Biochem, 2006, 45, 7429-7433), 
+across all 32 possible classes. Classes are named per Hogg's convention.</p>
 </div>
 
                         <input id="mod-DisulfideClass_Constructor-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -165,10 +165,10 @@ across all 32 possible classes. Classes are named per Schmidt's convention.</p>
 </span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="sd">Author: Eric G. Suchanek, PhD.</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a><span class="sd">(c) 2023 Eric G. Suchanek, PhD., All Rights Reserved \n</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="sd">License: MIT \n</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="sd">Last Modification: 10/8/23 -egs-</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="sd">Last Modification: 3/14/23</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a>
-</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="sd">Disulfide Class creation and manipulation using the +/- formalism of Schmidt et al. (Biochem, 2006, 45, 7429-7433), </span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="sd">across all 32 possible classes. Classes are named per Schmidt&#39;s convention.</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a><span class="sd">Disulfide Class creation and manipulation using the +/- formalism of Hogg et al. (Biochem, 2006, 45, 7429-7433), </span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="sd">across all 32 possible classes. Classes are named per Hogg&#39;s convention.</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="c1"># Cα Cβ Sγ</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a>
@@ -206,8 +206,8 @@ across all 32 possible classes. Classes are named per Schmidt's convention.</p>
 </span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="sd">    Build the internal dictionary mapping disulfides to class names.</span>
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="sd">    Disulfide binary classes are defined using the ± formalism described by </span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="sd">    Schmidt et al. (Biochem, 2006, 45, 7429-7433), across all 32 (2^5), possible </span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="sd">    binary sidechain torsional combinations. Classes are named per Schmidt&#39;s convention.</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="sd">    Hogg et al. (Biochem, 2006, 45, 7429-7433), across all 32 (2^5), possible </span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="sd">    binary sidechain torsional combinations. Classes are named per Hogg&#39;s convention.</span>
 </span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="sd">    The ``class_id`` represents the sign of each dihedral angle $\chi_{1} - \chi_{1&#39;}$</span>
 </span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="sd">    where *0* repreents *negative* dihedral angle and *2* a *positive* angle.</span>
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>
@@ -356,7 +356,7 @@ across all 32 possible classes. Classes are named per Schmidt's convention.</p>
 </span><span id="L-194"><a href="#L-194"><span class="linenos">194</span></a>    <span class="k">def</span> <span class="nf">build_yourself</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
 </span><span id="L-195"><a href="#L-195"><span class="linenos">195</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-196"><a href="#L-196"><span class="linenos">196</span></a><span class="sd">        Builds the internal structures needed for the binary and six-fold disulfide structural classes</span>
-</span><span id="L-197"><a href="#L-197"><span class="linenos">197</span></a><span class="sd">        based on dihedral angle rules. See Schmidt&#39;.</span>
+</span><span id="L-197"><a href="#L-197"><span class="linenos">197</span></a><span class="sd">        based on dihedral angle rules. See Hogg&#39;.</span>
 </span><span id="L-198"><a href="#L-198"><span class="linenos">198</span></a><span class="sd">    </span>
 </span><span id="L-199"><a href="#L-199"><span class="linenos">199</span></a><span class="sd">        Parameters</span>
 </span><span id="L-200"><a href="#L-200"><span class="linenos">200</span></a><span class="sd">        ----------</span>
@@ -717,8 +717,8 @@ across all 32 possible classes. Classes are named per Schmidt's convention.</p>
 </span><span id="DisulfideClass_Constructor-45"><a href="#DisulfideClass_Constructor-45"><span class="linenos"> 45</span></a><span class="sd">    Build the internal dictionary mapping disulfides to class names.</span>
 </span><span id="DisulfideClass_Constructor-46"><a href="#DisulfideClass_Constructor-46"><span class="linenos"> 46</span></a>
 </span><span id="DisulfideClass_Constructor-47"><a href="#DisulfideClass_Constructor-47"><span class="linenos"> 47</span></a><span class="sd">    Disulfide binary classes are defined using the ± formalism described by </span>
-</span><span id="DisulfideClass_Constructor-48"><a href="#DisulfideClass_Constructor-48"><span class="linenos"> 48</span></a><span class="sd">    Schmidt et al. (Biochem, 2006, 45, 7429-7433), across all 32 (2^5), possible </span>
-</span><span id="DisulfideClass_Constructor-49"><a href="#DisulfideClass_Constructor-49"><span class="linenos"> 49</span></a><span class="sd">    binary sidechain torsional combinations. Classes are named per Schmidt&#39;s convention.</span>
+</span><span id="DisulfideClass_Constructor-48"><a href="#DisulfideClass_Constructor-48"><span class="linenos"> 48</span></a><span class="sd">    Hogg et al. (Biochem, 2006, 45, 7429-7433), across all 32 (2^5), possible </span>
+</span><span id="DisulfideClass_Constructor-49"><a href="#DisulfideClass_Constructor-49"><span class="linenos"> 49</span></a><span class="sd">    binary sidechain torsional combinations. Classes are named per Hogg&#39;s convention.</span>
 </span><span id="DisulfideClass_Constructor-50"><a href="#DisulfideClass_Constructor-50"><span class="linenos"> 50</span></a><span class="sd">    The ``class_id`` represents the sign of each dihedral angle $\chi_{1} - \chi_{1&#39;}$</span>
 </span><span id="DisulfideClass_Constructor-51"><a href="#DisulfideClass_Constructor-51"><span class="linenos"> 51</span></a><span class="sd">    where *0* repreents *negative* dihedral angle and *2* a *positive* angle.</span>
 </span><span id="DisulfideClass_Constructor-52"><a href="#DisulfideClass_Constructor-52"><span class="linenos"> 52</span></a>
@@ -867,7 +867,7 @@ across all 32 possible classes. Classes are named per Schmidt's convention.</p>
 </span><span id="DisulfideClass_Constructor-195"><a href="#DisulfideClass_Constructor-195"><span class="linenos">195</span></a>    <span class="k">def</span> <span class="nf">build_yourself</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
 </span><span id="DisulfideClass_Constructor-196"><a href="#DisulfideClass_Constructor-196"><span class="linenos">196</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideClass_Constructor-197"><a href="#DisulfideClass_Constructor-197"><span class="linenos">197</span></a><span class="sd">        Builds the internal structures needed for the binary and six-fold disulfide structural classes</span>
-</span><span id="DisulfideClass_Constructor-198"><a href="#DisulfideClass_Constructor-198"><span class="linenos">198</span></a><span class="sd">        based on dihedral angle rules. See Schmidt&#39;.</span>
+</span><span id="DisulfideClass_Constructor-198"><a href="#DisulfideClass_Constructor-198"><span class="linenos">198</span></a><span class="sd">        based on dihedral angle rules. See Hogg&#39;.</span>
 </span><span id="DisulfideClass_Constructor-199"><a href="#DisulfideClass_Constructor-199"><span class="linenos">199</span></a><span class="sd">    </span>
 </span><span id="DisulfideClass_Constructor-200"><a href="#DisulfideClass_Constructor-200"><span class="linenos">200</span></a><span class="sd">        Parameters</span>
 </span><span id="DisulfideClass_Constructor-201"><a href="#DisulfideClass_Constructor-201"><span class="linenos">201</span></a><span class="sd">        ----------</span>
@@ -1185,8 +1185,8 @@ in the proteusPy disulfide database.</p>
 <p>Build the internal dictionary mapping disulfides to class names.</p>
 
 <p>Disulfide binary classes are defined using the ± formalism described by 
-Schmidt et al. (Biochem, 2006, 45, 7429-7433), across all 32 (2^5), possible 
-binary sidechain torsional combinations. Classes are named per Schmidt's convention.
+Hogg et al. (Biochem, 2006, 45, 7429-7433), across all 32 (2^5), possible 
+binary sidechain torsional combinations. Classes are named per Hogg's convention.
 The <code>class_id</code> represents the sign of each dihedral angle $\chi_{1} - \chi_{1'}$
 where <em>0</em> repreents <em>negative</em> dihedral angle and <em>2</em> a <em>positive</em> angle.</p>
 
@@ -1504,7 +1504,7 @@ where <em>0</em> repreents <em>negative</em> dihedral angle and <em>2</em> a <em
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">load_class_dict</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">fname</span><span class="o">=</span><span class="s1">&#39;/Users/egs/repos/proteusPy/proteusPy/data/PDB_ss_classes_dict.pkl&#39;</span></span><span class="return-annotation">) -> <span class="nb">dict</span>:</span></span>
+        <span class="name">load_class_dict</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">fname</span><span class="o">=</span><span class="s1">&#39;/Users/egs/miniforge3/envs/proteusPy1/lib/python3.9/site-packages/proteusPy/data/PDB_ss_classes_dict.pkl&#39;</span></span><span class="return-annotation">) -> <span class="nb">dict</span>:</span></span>
 
                 <label class="view-source-button" for="DisulfideClass_Constructor.load_class_dict-view-source"><span>View Source</span></label>
 
@@ -1525,7 +1525,7 @@ where <em>0</em> repreents <em>negative</em> dihedral angle and <em>2</em> a <em
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">load_consensus_file</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">fname</span><span class="o">=</span><span class="s1">&#39;/Users/egs/repos/proteusPy/proteusPy/data/SS_consensus_class_sext.pkl&#39;</span></span><span class="return-annotation">):</span></span>
+        <span class="name">load_consensus_file</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">fname</span><span class="o">=</span><span class="s1">&#39;/Users/egs/miniforge3/envs/proteusPy1/lib/python3.9/site-packages/proteusPy/data/SS_consensus_class_sext.pkl&#39;</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="DisulfideClass_Constructor.load_consensus_file-view-source"><span>View Source</span></label>
 
@@ -1765,7 +1765,7 @@ of an angle in the range of -180-180 degrees.</li>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideClass_Constructor.build_yourself-195"><a href="#DisulfideClass_Constructor.build_yourself-195"><span class="linenos">195</span></a>    <span class="k">def</span> <span class="nf">build_yourself</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
 </span><span id="DisulfideClass_Constructor.build_yourself-196"><a href="#DisulfideClass_Constructor.build_yourself-196"><span class="linenos">196</span></a><span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="DisulfideClass_Constructor.build_yourself-197"><a href="#DisulfideClass_Constructor.build_yourself-197"><span class="linenos">197</span></a><span class="sd">        Builds the internal structures needed for the binary and six-fold disulfide structural classes</span>
-</span><span id="DisulfideClass_Constructor.build_yourself-198"><a href="#DisulfideClass_Constructor.build_yourself-198"><span class="linenos">198</span></a><span class="sd">        based on dihedral angle rules. See Schmidt&#39;.</span>
+</span><span id="DisulfideClass_Constructor.build_yourself-198"><a href="#DisulfideClass_Constructor.build_yourself-198"><span class="linenos">198</span></a><span class="sd">        based on dihedral angle rules. See Hogg&#39;.</span>
 </span><span id="DisulfideClass_Constructor.build_yourself-199"><a href="#DisulfideClass_Constructor.build_yourself-199"><span class="linenos">199</span></a><span class="sd">    </span>
 </span><span id="DisulfideClass_Constructor.build_yourself-200"><a href="#DisulfideClass_Constructor.build_yourself-200"><span class="linenos">200</span></a><span class="sd">        Parameters</span>
 </span><span id="DisulfideClass_Constructor.build_yourself-201"><a href="#DisulfideClass_Constructor.build_yourself-201"><span class="linenos">201</span></a><span class="sd">        ----------</span>
@@ -1816,7 +1816,7 @@ of an angle in the range of -180-180 degrees.</li>
 
 
             <div class="docstring"><p>Builds the internal structures needed for the binary and six-fold disulfide structural classes
-based on dihedral angle rules. See Schmidt'.</p>
+based on dihedral angle rules. See Hogg'.</p>
 
 <h2 id="parameters">Parameters</h2>
 
@@ -2108,7 +2108,7 @@ percentage of incidence.</li>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">save</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">savepath</span><span class="o">=</span><span class="s1">&#39;/Users/egs/repos/proteusPy/proteusPy/data/&#39;</span></span><span class="return-annotation">):</span></span>
+        <span class="name">save</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">savepath</span><span class="o">=</span><span class="s1">&#39;/Users/egs/miniforge3/envs/proteusPy1/lib/python3.9/site-packages/proteusPy/data/&#39;</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="DisulfideClass_Constructor.save-view-source"><span>View Source</span></label>
 
