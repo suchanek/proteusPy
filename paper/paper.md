@@ -25,23 +25,23 @@ bibliography: joss.bib
 <!-- markdownlint-disable MD014 -->
 <!-- markdownlint-disable MD033 -->
 <!-- markdownlint-disable MD037 -->
-## Summary
+# Summary
 
 **proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an initial focus on Disulfide Bonds. This package significantly extends my molecular modeling program **proteus**, [@Pabo_1986], and utilizes a new implementation of the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class for disulfide and protein modeling.  The [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class implements methods to analyze the protein structure stabilizing element known as a **Disulfide Bond**.
 
 The work has resulted in a freely-accessible database of over 120,494 disulfide bonds contained within 35,818 proteins in the [RCSB Protein Databank](https:/www.rcsb.org)
 
-## Motivation
+# Statement of Need
 
 My primary motivation for implementing ``proteusPy`` was to revisit the [RCSB Protein Databank](https://www.rcsb.org) and do a structural analysis of the disulfide bonds contained therein. This necessitated the creation an object-oriented database capable of introspection, analysis and display. The API [@API] is available online at: <https://suchanek.github.io/proteusPy/proteusPy.html> and provides more details and numerous examples.
 
-## Requirements
+# Requirements
 
 1. PC running MacOS, Linux, Windows
 2. 16 GB RAM
 3. 2 GB disk space
 
-## Installation
+# Installation
 
 It's simplest to clone the repo via github since it contains all of the notebooks, test programs and raw Disulfide databases.
 
@@ -49,7 +49,6 @@ It's simplest to clone the repo via github since it contains all of the notebook
 - Install git-lfs
   - <https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage>
 - From a shell prompt:
-
     ```
       $ git clone https://github.com/suchanek/proteusPy/proteusPy.git
       $ cd proteusPy
@@ -61,7 +60,7 @@ It's simplest to clone the repo via github since it contains all of the notebook
       $ python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy)"
     ```
 
-## General Usage
+# General Usage
 
 Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. The [notebooks](https://github.com/suchanek/proteusPy/blob/master/notebooks/) directory contains all of my Jupyter notebooks and is a good place to start. The [DisulfideAnalysis.ipynb](https://github.com/suchanek/proteusPy/blob/master/notebooks/DisulfideAnalysis.ipynb) notebook contains the first analysis paper. The [programs](https://github.com/suchanek/proteusPy/tree/master/programs) subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files:
 * [DisulfideDownloader.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py): Downloads the raw RCSB structure files.
@@ -70,11 +69,11 @@ Once the package is installed one can use the existing notebooks for analysis of
 
 The first time one loads the database via [Load_PDB_SS()](https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html#Load_PDB_SS) the system will attempt to download the full and subset database from my Google Drive. If this fails the system will attempt to rebuild the database from the repo's ``data`` subdirectory (not the package's). If you've downloaded from github this will work correctly. If you've installed from pyPi via ``pip`` it will fail.
 
-## Class Details
+# Class Details
 
 The primary classes developed for ``proteusPy`` are described briefly below. Please see the [API](https://suchanek.github.io/proteusPy/proteusPy.html) for details.
 
-## [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html)
+# [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html)
 
 This class provides a Python object and methods representing a physical disulfide bond either extracted from the RCSB protein databank or a virtual one built using the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class. The disulfide bond is an important intramolecular stabilizing structural element and is characterized by:
 
@@ -113,11 +112,11 @@ The class also provides 3D rendering capabilities using the excellent [PyVista](
 Individual renderings can be saved to a file and animations can be created. The *cpk* and *bs* styles are illustrated below:
 <center>
 
-![cpk](logo_cpk.png)
-![bs](logo_bs.png)
+![cpk](logo_cpk.png){width=256 height=256}
+![bs](logo_bs.png){width=256 height=256}
 </center>
 
-## [DisulfideLoader](https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html)
+# [DisulfideLoader](https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html)
 
 This class represents the disulfide database itself and is its primary means of accession.  Instantiation takes 2 parameters: ``subset`` and ``verbose``. Given the size of the database, one can use the ``subset`` parameter to load the first 1000 disulfides into memory. This facilitates quicker development and testing new functions. I recommend using at least a 16 GB machine to work with the full dataset.
 
@@ -161,9 +160,9 @@ Example:
 
 The class can also render Disulfides overlaid on a common coordinate system to a pyVista window using the [DisulfideLoader.display_overlay()](https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html#DisulfideLoader.display_overlay) method.
 
-**NB:** For typical usage one accesses the database via the `Load_PDB_SS()` function. This function loads the compressed database from its single source. Initializing a `DisulfideLoader()` object will load the individual torsions and disulfide .pkl files, builds the classlist structures, and writes the completely built object to a single ``.pkl`` file. This requires the raw .pkl files created by download process. These files are contained in the repository ``data`` directory.
+**NB:** For typical usage one accesses the database via the `Load_PDB_SS()` function. This function loads the compressed database from its single source. Initializing a `DisulfideLoader()` object will load the individual torsions and disulfide ``.pkl`` files, builds the classlist structures, and writes the completely built object to a single ``.pkl`` file. This requires the raw ``.pkl`` files created by the download process. These files are contained in the repository ``data`` directory.
 
-## [turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html)
+# [turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html)
 
 The ``turtle3D`` class represents an object that maintains a *local coordinate system* in three dimensional space. This coordinate system consists of:
 
@@ -183,8 +182,7 @@ By implementing the functions ``Move``, ``Roll``, ``Yaw``, ``Pitch`` and ``Turn`
 
 The turtle has several molecule-specific functions including [orient_at_residue]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.orient_at_residue") and [orient_from_backbone]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.orient_from_backbone"). These routines make it possible to build protein backbones of arbitrary conformation and to readily add sidechains to modeled structures. I will use these capabilities in future modeling work, but are available now.
 
-
-## Database Creation
+# Database Creation
 
 The following steps were performed to create the RCSB database:
 
@@ -198,63 +196,63 @@ The following steps were performed to create the RCSB database:
 
 In the end I elected to only use a single example of a given disulfide from a multi-chain entry, and removed any disulfides with a $C_\alpha - C_\alpha$ distance is > 8 $\AA$. This resulted in the current database consisting of 35,808 structures and 120,494 disulfide bonds. To my knowledge this is the only searchable database of disulfide bonds in existence.
 
-## Examples
+# Examples
 
 I illustrate a few use cases for the package below. See the notebooks for more examples.
 
-### Find the lowest and highest energy disulfides present in the database
+## Find the lowest and highest energy disulfides present in the database
 
-  ```python
-  # default parameters will read from the package itself.
+```python
+# default parameters will read from the package itself.
 
-  PDB_SS = Load_PDB_SS(verbose=False, subset=False)
+PDB_SS = Load_PDB_SS(verbose=False, subset=False)
 
-  # display the best and worst SS
+# display the best and worst SS
 
-  ssMin, ssMax = PDB_SS.SSList.minmax_energy()
-  minmaxlist = DisulfideList([ssMin, ssMax], 'mm')
-  minmaxlist.display(style='bs', light=True)
-  ```
+ssMin, ssMax = PDB_SS.SSList.minmax_energy()
+minmaxlist = DisulfideList([ssMin, ssMax], 'mm')
+minmaxlist.display(style='bs', light=True)
+```
 
 <center>
 
-![minmax](minmax.png){width=75%}
+![minmax](minmax.png)
+
 </center>
 
-### Find disulfides within 10 $\AA$ RMS in torsional space of the lowest energy structure
+## Find disulfides within 10 $\AA$ RMS in torsional space of the lowest energy structure
 
 In this example we load the disulfide database, find the disulfides with
 the lowest and highest energies, and then find the nearest conformational neighbors.
 Finally, we display the neighbors overlaid against a common reference frame.
 
-  ```python
-  import proteusPy
-  from proteusPy.DisulfideLoader import DisulfideLoader
-  from proteusPy.DisulfideList import DisulfideList
-  from proteusPy.Disulfide import Disulfide
-  
-  PDB_SS = None
-  PDB_SS = Load_PDB_SS(verbose=False, subset=True)
-  ss_list = DisulfideList([], 'tmp')
+```python
+import proteusPy
+from proteusPy.DisulfideLoader import DisulfideLoader
+from proteusPy.DisulfideList import DisulfideList
+from proteusPy.Disulfide import Disulfide
 
-  # We point to the complete list to search for lowest and highest energies.
-  sslist = PDB_SS.SSList
+PDB_SS = None
+PDB_SS = Load_PDB_SS(verbose=False, subset=True)
+ss_list = DisulfideList([], 'tmp')
 
-  # Return the minimum and maximum energy structures. We ignore tha maximum in this case.
-  ssmin_enrg, _ = PDB_SS.SSList.minmax_energy()
+# We point to the complete list to search for lowest and highest energies.
+sslist = PDB_SS.SSList
 
-  # Make an empty list and find the nearest neighbors within 10 degrees avg RMS in
-  # sidechain dihedral angle space.
+# Return the minimum and maximum energy structures. We ignore tha maximum in this case.
+ssmin_enrg, _ = PDB_SS.SSList.minmax_energy()
 
-  low_energy_neighbors = DisulfideList([],'Neighbors')
-  low_energy_neighbors = ssmin_enrg.Torsion_neighbors(sslist, 10)
+# Make an empty list and find the nearest neighbors within 10 degrees avg RMS in
+# sidechain dihedral angle space.
 
-  # Display the number found, and then display them overlaid onto their common reference frame.
+low_energy_neighbors = DisulfideList([],'Neighbors')
+low_energy_neighbors = ssmin_enrg.Torsion_neighbors(sslist, 10)
 
-  tot = low_energy_neighbors.length
-  low_energy_neighbors.display_overlay()
-  
-  ```
+# Display the number found, and then display them overlaid onto their common reference frame.
+
+tot = low_energy_neighbors.length
+low_energy_neighbors.display_overlay()
+```
 
 18
 
@@ -263,17 +261,17 @@ Finally, we display the neighbors overlaid against a common reference frame.
 ![min_overlay](min_overlay.png)
 </center>
 
-### Analyzing Disulfide Structural Class Distributions
+# Analyzing Disulfide Structural Class Distributions
 
 The package includes the [DisulfideClassConstructer](https://suchanek.github.io/proteusPy/proteusPy/DisulfideClass_Constructor.html) class, which is used to create and manage Disulfide binary and sextant classes. A note about these structural classes is in order. [@Schmidt_2006] described a method of characterizing disulfide structures by describing each individual dihedral angle as either + or - based on its sign. This yields $2^{5}$ or 32 possible classes. The author then was able to identify protein functional families within one of 20 remaining structural classes. Since the binary approach is very coarse and computational resources are much more capable than in 2006 I extended this formalism to a *Sextant* approach. In other words, I created *six* possible classes for each dihedral angle by dividing it into 60 degree segments. This yields a possible $6^5$ or 7,776 possible classes. The notebook [DisulfideClassesPlayground.ipynb](https://github.com/suchanek/proteusPy/blob/master/notebooks/DisulfideClassesPlayground.ipynb) contains some initial results. 
 
-### The Future
+# The Future
 
 - I continue to explore disulfide structural classes using the sextant class approach. This offers much higher class resolution than the binary approach and reveals subgroups within the broad class. I'd also like to explore the catalytic and allosteric classes within the subgroups to look for common structural elements.
 
 - I hope to deploy a Disulfide Database browser for exploration and analysis.
   
-### Miscellaneous
+# Miscellaneous
 
 *Developer's Notes:*
 The .pkl files needed to instantiate this class and save it into its final .pkl file are
@@ -281,4 +279,4 @@ defined in the [proteusPy.data]("https://suchanek.github.io/proteusPy/proteusPy/
 
 *NB:* [@proteusPy] relies on my [fork](https://github.com/suchanek/biopython) of the [Biopython](https://biopython.org) Python package to download and build the database, (<https://github.com/suchanek/biopython>). As a result, one can't download and create the database locally unless the BioPython patch is applied. The changed python file is in the repo's data directory - ``parse_pdb_header.py``. Database analysis is unaffected without the patch. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1.
 
-### Bibliography
+# Bibliography
