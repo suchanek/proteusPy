@@ -1,5 +1,5 @@
 ---
-title: 'proteusPy: A Python Package for Protein Structure and Disulfide Bond Analysis'
+title: 'proteusPy: A Python Package for Protein Structure and Disulfide Bond Modeling and Analysis'
 tags:
   - Python
   - Disulfide Bonds
@@ -14,9 +14,8 @@ authors:
 affiliations:
  - name: Monterey Institute for Research in Astronomy, Marina, USA
    index: 1
-date: 10 October, 2023
+date: 31 October, 2023
 header-includes:
-  - \usepackage[margin=1.0in]{geometry}
   - \let\oldAA\AA
   - \renewcommand{\AA}{\text{\normalfont\oldAA}}
 bibliography: joss.bib
@@ -27,9 +26,9 @@ bibliography: joss.bib
 <!-- markdownlint-disable MD037 -->
 # Summary
 
-**proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an initial focus on Disulfide Bonds. This package significantly extends my molecular modeling program **proteus**, [@Pabo_1986], and utilizes a new implementation of the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class for disulfide and protein modeling.  The [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class implements methods to analyze the protein structure stabilizing element known as a **Disulfide Bond**.
+**proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an initial focus on Disulfide Bonds. This package significantly extends the capabilities of the molecular modeling program **proteus**, [@Pabo_1986], and utilizes a new implementation of the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class for disulfide and protein modeling.  The [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class implements methods to analyze the protein structure stabilizing element known as a **Disulfide Bond**. 
 
-The work has resulted in a freely-accessible database of over 120,494 disulfide bonds contained within 35,818 proteins in the [RCSB Protein Databank](https:/www.rcsb.org)
+The work has resulted in a freely-accessible database of over 120,494 disulfide bonds contained within 35,818 proteins in the [RCSB Protein Databank.](https:/www.rcsb.org) The library is capable of extracting, comparing, building and visualizing the disulfides contained within the database, facilitating analysis and understanding.
 
 # Statement of Need
 
@@ -166,35 +165,24 @@ The class can also render Disulfides overlaid on a common coordinate system to a
 
 The ``turtle3D`` class represents an object that maintains a *local coordinate system* in three dimensional space. This coordinate system consists of:
 
-- A Position Vector
+- A Position in 3D space 
 - A Heading Vector
 - A Left Vector
 - An Up Vector
 
-These vectors fully define the object's position and orientation in a *local* coordinate frame. The Turtle developed in `proteusPy` is based on the excellent book by Abelson: [@Abelson_DiSessa_1986]. The [to_local]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.to_local") and [to_global]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.to_global") methods convert between these two. These methods make it possible to readily compare different disulfides by:
+The Heading, Left and Up vectors are unit vectors that define the 
+object's orientation in a *local* coordinate frame. The Turtle developed in `proteusPy` is based on the excellent book by Abelson: [@Abelson_DiSessa_1986]. The [to_local]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.to_local") and [to_global]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.to_global") methods convert between these two. These methods make it possible to readily compare different disulfides by:
 
 1. Orienting the turtle at the disulfide's proximal residue in a standard orientation.
 2. Converting the global coordinates of the disulfide as read from the RCSB into local coordinates.
 3. Saving all of the local coordinates with the raw coordinates
-4. Performing RMS distance and angle calculations
+4. Performing distance and angle calculations
 
 By implementing the functions ``Move``, ``Roll``, ``Yaw``, ``Pitch`` and ``Turn`` the turtle is capable of movement in a three-dimensional space. See [@Pabo_1986] for more details.
 
-The turtle has several molecule-specific functions including [orient_at_residue]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.orient_at_residue") and [orient_from_backbone]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.orient_from_backbone"). These routines make it possible to build protein backbones of arbitrary conformation and to readily add sidechains to modeled structures. I will use these capabilities in future modeling work, but are available now.
+The turtle has several molecule-specific functions including [orient_at_residue]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.orient_at_residue") and [orient_from_backbone]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.orient_from_backbone"). These routines make it possible to build protein backbones of arbitrary conformation and to readily add sidechains to modeled structures. 
 
-# Database Creation
 
-The following steps were performed to create the RCSB database:
-
-1. Identify disulfide containing proteins in the [RCSB](https://www.rcsb.org). I generated a query using the web-based query tool for all proteins containing one or more disulfide bond. The resulting file consisted of 35,819 IDs.
-2. Download the structure files to disk. This resulted in the program [DisulfideDownloader.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py). The download took approximately twelve hours.
-3. Extract the disulfides from the downloaded structures. The program [DisulfideExtractor.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py) was used to extract disulfides from the individual structure files. This seemingly simple task was complicated by several factors including:
-
-   1. Duplicate disulfides contained within a multi-chain protein file.
-   2. Physically impossible disulfides, where the $C_\alpha - C_\alpha$ distance is > 8 $\AA$ .
-   3. Structures with disordered CYS atoms.
-
-In the end I elected to only use a single example of a given disulfide from a multi-chain entry, and removed any disulfides with a $C_\alpha - C_\alpha$ distance is > 8 $\AA$. This resulted in the current database consisting of 35,808 structures and 120,494 disulfide bonds. To my knowledge this is the only searchable database of disulfide bonds in existence.
 
 # Examples
 
@@ -265,13 +253,28 @@ low_energy_neighbors.display_overlay()
 
 The package includes the [DisulfideClassConstructer](https://suchanek.github.io/proteusPy/proteusPy/DisulfideClass_Constructor.html) class, which is used to create and manage Disulfide binary and sextant classes. A note about these structural classes is in order. [@Schmidt_2006] described a method of characterizing disulfide structures by describing each individual dihedral angle as either + or - based on its sign. This yields $2^{5}$ or 32 possible classes. The author then was able to identify protein functional families within one of 20 remaining structural classes. Since the binary approach is very coarse and computational resources are much more capable than in 2006 I extended this formalism to a *Sextant* approach. In other words, I created *six* possible classes for each dihedral angle by dividing it into 60 degree segments. This yields a possible $6^5$ or 7,776 possible classes. The notebook [DisulfideClassesPlayground.ipynb](https://github.com/suchanek/proteusPy/blob/master/notebooks/DisulfideClassesPlayground.ipynb) contains some initial results. 
 
-# The Future
+# Appendix
+## Database Creation Workflow
+
+The following steps were performed to create the RCSB disulfide database:
+
+1. Identify disulfide containing proteins in the [RCSB](https://www.rcsb.org). I generated a query using the web-based query tool for all proteins containing one or more disulfide bond. The resulting file consisted of 35,819 IDs.
+2. Download the structure files to disk. This resulted in the program [DisulfideDownloader.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py). The download took approximately twelve hours.
+3. Extract the disulfides from the downloaded structures. The program [DisulfideExtractor.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py) was used to extract disulfides from the individual structure files. This seemingly simple task was complicated by several factors including:
+
+   1. The PDB file parser contained in Bio.PDB described in [@Hamelyrck_2003] lacked the ability to parse the `SSBOND` records in PDB files. As a result I forked the Biopython repository and updated the `parse_pdb_header.py` file. My fork is available at: [https://github.com/suchanek/biopython]("https://github.com/suchanek/biopython")
+   2. Duplicate disulfides contained within a multi-chain protein file.
+   3. Physically impossible disulfides, where the $C_\alpha - C_\alpha$ distance is > 8 $\AA$ .
+   4. Structures with disordered CYS atoms.
+
+In the end I elected to only use a single example of a given disulfide from a multi-chain entry, and removed any disulfides with a $C_\alpha - C_\alpha$ distance is > 8 $\AA$. This resulted in the current database consisting of 35,808 structures and 120,494 disulfide bonds. To my knowledge this is the only searchable database of disulfide bonds in existence.
+## The Future
 
 - I continue to explore disulfide structural classes using the sextant class approach. This offers much higher class resolution than the binary approach and reveals subgroups within the broad class. I'd also like to explore the catalytic and allosteric classes within the subgroups to look for common structural elements.
 
 - I hope to deploy a Disulfide Database browser for exploration and analysis.
   
-# Miscellaneous
+## Miscellaneous
 
 *Developer's Notes:*
 The .pkl files needed to instantiate this class and save it into its final .pkl file are
