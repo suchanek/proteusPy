@@ -48,7 +48,7 @@ It's simplest to clone the repo via github since it contains all of the notebook
 - Install git-lfs
   - <https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage>
 - From a shell prompt:
-    ```
+    ```console
       $ git clone https://github.com/suchanek/proteusPy/proteusPy.git
       $ cd proteusPy
       $ git-lfs track "*.csv" "*.pkl" "*.mp4"
@@ -109,11 +109,8 @@ The class also provides 3D rendering capabilities using the excellent [PyVista](
   - Hydrogen - White
 
 Individual renderings can be saved to a file and animations can be created. The *cpk* and *bs* styles are illustrated below:
-<center>
 
-![cpk](logo_cpk.png){width=256 height=256}
-![bs](logo_bs.png){width=256 height=256}
-</center>
+![cpk](bs_cpk.png)
 
 # [DisulfideLoader](https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html)
 
@@ -186,7 +183,7 @@ The turtle has several molecule-specific functions including [orient_at_residue]
 
 # Examples
 
-I illustrate a few use cases for the package below. See the notebooks for more examples.
+I will now illustrate a few use cases for the package below. See the notebooks for more examples.
 
 ## Find the lowest and highest energy disulfides present in the database
 
