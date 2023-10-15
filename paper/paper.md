@@ -12,7 +12,7 @@ authors:
     equal-contrib: true
     affiliation: 1
 affiliations:
- - name: Monterey Institute for Research in Astronomy, Marina, USA
+ - name: Suchanek Institute for Discovery and Innovation
    index: 1
 date: 31 October, 2023
 header-includes:
@@ -48,16 +48,18 @@ It's simplest to clone the repo via github since it contains all of the notebook
 - Install git-lfs
   - <https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage>
 - From a shell prompt:
-    ```console
-      $ git clone https://github.com/suchanek/proteusPy/proteusPy.git
-      $ cd proteusPy
-      $ git-lfs track "*.csv" "*.pkl" "*.mp4"
-      $ conda env create --name proteusPy --file=proteusPy1.yml
-      $ conda activate proteusPy
-      $ pip install .
-      $ jupyter nbextension enable --py --sys-prefix widgetsnbextension
-      $ python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy)"
-    ```
+
+```
+  $ git clone https://github.com/suchanek/proteusPy/proteusPy.git
+  $ cd proteusPy
+  $ git-lfs track "*.csv" "*.pkl" "*.mp4"
+  $ conda env create --name proteusPy --file=proteusPy1.yml
+  $ conda activate proteusPy
+  $ pip install .
+  $ jupyter nbextension enable --py --sys-prefix widgetsnbextension
+  $ python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy)"
+```
+
 
 # General Usage
 
