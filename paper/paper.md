@@ -49,17 +49,7 @@ It's simplest to clone the repo via github since it contains all of the notebook
   - <https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage>
 - From a shell prompt:
 
-```
-  $ git clone https://github.com/suchanek/proteusPy/proteusPy.git
-  $ cd proteusPy
-  $ git-lfs track "*.csv" "*.pkl" "*.mp4"
-  $ conda env create --name proteusPy --file=proteusPy1.yml
-  $ conda activate proteusPy
-  $ pip install .
-  $ jupyter nbextension enable --py --sys-prefix widgetsnbextension
-  $ python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy)"
-```
-
+![install](install.png)
 
 # General Usage
 
