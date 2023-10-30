@@ -7,6 +7,8 @@ import pandas as pd
 from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideLoader import DisulfideLoader
 from proteusPy.DisulfideList import DisulfideList
+import streamlit as st
+from stpyvista import stpyvista
 
 import pyvista as pv
 from pyvista import set_plot_theme

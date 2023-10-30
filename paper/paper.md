@@ -12,7 +12,7 @@ authors:
     equal-contrib: true
     affiliation: 1
 affiliations:
- - name: Suchanek Institute for Discovery and Innovation
+ - name: Suchanek Institute of Applied Informatics
    index: 1
 date: 31 October, 2023
 header-includes:
@@ -32,7 +32,10 @@ The work has resulted in a freely-accessible database of over 120,494 disulfide 
 
 # Statement of Need
 
-My primary motivation for implementing ``proteusPy`` was to revisit the [RCSB Protein Databank](https://www.rcsb.org) and do a structural analysis of the disulfide bonds contained therein. This necessitated the creation an object-oriented database capable of introspection, analysis and display. The API [@API] is available online at: <https://suchanek.github.io/proteusPy/proteusPy.html> and provides more details and numerous examples.
+Disulfide bonds are the only naturally occuring covalent bond in proteins. They provide important structural stabilization both within and between protein subunits. They can also be involved in enzymatic catalysis, regulate protein activities and protect against oxidative stress. 
+I implemented ``proteusPy`` to revisit the [RCSB Protein Databank](https://www.rcsb.org) and do a structural analysis of the disulfide bonds contained therein.
+
+This necessitated the creation an object-oriented database capable of introspection, analysis and display. The API [@API] is available online at: <https://suchanek.github.io/proteusPy/proteusPy.html> and provides more details and numerous examples.
 
 # Requirements
 
