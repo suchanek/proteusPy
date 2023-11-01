@@ -1153,7 +1153,7 @@ class Disulfide:
         
         if single == True:
             _pl = pv.Plotter(window_size=WINSIZE)
-            _pl.add_title(title=title, font_size=FONTSIZE)
+            #_pl.add_title(title=title, font_size=FONTSIZE)
             _pl.enable_anti_aliasing('msaa')
             _pl.add_camera_orientation_widget()            
 
@@ -1168,7 +1168,7 @@ class Disulfide:
             pl = pv.Plotter(window_size=WINSIZE, shape=(2,2))
             pl.subplot(0,0)
             
-            pl.add_title(title=title, font_size=FONTSIZE)
+            #pl.add_title(title=title, font_size=FONTSIZE)
             pl.enable_anti_aliasing('msaa')
 
             pl.add_camera_orientation_widget()
@@ -1178,21 +1178,21 @@ class Disulfide:
                         specpow=SPEC_POWER)
 
             pl.subplot(0,1)
-            pl.add_title(title=title, font_size=FONTSIZE)
+            #pl.add_title(title=title, font_size=FONTSIZE)
             
             self._render(pl, style='bs', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, 
                         specpow=SPEC_POWER)
 
             pl.subplot(1,0)
-            pl.add_title(title=title, font_size=FONTSIZE)
+            #pl.add_title(title=title, font_size=FONTSIZE)
             
             self._render(pl, style='sb', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, 
                         specpow=SPEC_POWER)
 
             pl.subplot(1,1)
-            pl.add_title(title=title, font_size=FONTSIZE)
+            #pl.add_title(title=title, font_size=FONTSIZE)
             
             self._render(pl, style='pd', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, 
@@ -1508,7 +1508,8 @@ class Disulfide:
         pl.open_movie(fname, quality=9)
         path = pl.generate_orbital_path(n_points=steps)
 
-        pl.add_title(title=title, font_size=FONTSIZE)
+        #
+        # pl.add_title(title=title, font_size=FONTSIZE)
         pl.enable_anti_aliasing('msaa')
         # pl.add_camera_orientation_widget()
         pl = self._render(pl, style=style, bondcolor=BOND_COLOR, 
@@ -1718,7 +1719,7 @@ class Disulfide:
 
         if single:
             pl = pv.Plotter(window_size=WINSIZE)
-            pl.add_title(title=title, font_size=FONTSIZE)
+            #pl.add_title(title=title, font_size=FONTSIZE)
             pl.enable_anti_aliasing('msaa')
             pl.add_camera_orientation_widget()
             self._render(pl, style=style, bondcolor=BOND_COLOR, 
@@ -1735,7 +1736,7 @@ class Disulfide:
             pl = pv.Plotter(window_size=WINSIZE, shape=(2,2))
             pl.subplot(0,0)
             
-            pl.add_title(title=title, font_size=FONTSIZE)
+            #pl.add_title(title=title, font_size=FONTSIZE)
             pl.enable_anti_aliasing('msaa')
 
             pl.add_camera_orientation_widget()
@@ -1744,19 +1745,19 @@ class Disulfide:
                         specpow=SPEC_POWER)
 
             pl.subplot(0,1)
-            pl.add_title(title=title, font_size=FONTSIZE)
+            #pl.add_title(title=title, font_size=FONTSIZE)
             self._render(pl, style='pd', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, 
                         specpow=SPEC_POWER)
 
             pl.subplot(1,0)
-            pl.add_title(title=title, font_size=FONTSIZE)
+            #pl.add_title(title=title, font_size=FONTSIZE)
             self._render(pl, style='bs', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, 
                         specpow=SPEC_POWER)
             
             pl.subplot(1,1)
-            pl.add_title(title=title, font_size=FONTSIZE)
+            #pl.add_title(title=title, font_size=FONTSIZE)
             self._render(pl, style='sb', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, 
                         specpow=SPEC_POWER)
