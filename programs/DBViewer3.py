@@ -15,7 +15,7 @@ from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideLoader import Load_PDB_SS
 from proteusPy.DisulfideList import DisulfideList
 
-pn.extension('vtk', sizing_mode='stretch_width', template='material')
+pn.extension('vtk', sizing_mode='stretch_width', template='fast')
 
 _vers = 0.5
 
@@ -61,16 +61,17 @@ def click_plot(event):
     Returns:
         None
     """
-    global render_win
-    plotter = render_ss(event)
-    vtkpan = pn.panel(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
+    global render_win, vtkpan
+    plotter = render_ss(True)
+    print('click')
+    vtkpan = None
+    vtkpan = pn.pane.VTK(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
                          orientation_widget=orientation_widget,
                          enable_keybindings=enable_keybindings, min_height=500
                          )
     # this position is dependent on the vtk panel position in the render_win pane!
-    
-    render_win[1] = vtkpan
-    print(render_win)
+    print(f'Renderwin|{render_win}|')
+    render_win[0] = vtkpan
 
 # Widgets
 
@@ -120,8 +121,6 @@ ss_styles = pn.WidgetBox('# Rendering Styles',
                         )
 
 ss_info = pn.WidgetBox('# Disulfide Info', info_md)
-
-control_widgets = pn.Column(ss_props, ss_styles, ss_info)
 db_info = pn.Column('### RCSB Database Info', db_md)
 
 # Callbacks
@@ -180,8 +179,8 @@ def get_ss(event) -> Disulfide:
 def get_ss_id(event):
     rcsb_ss_widget.value = event.new
 
-def render_ss(event):
-    global PDB_SS
+def render_ss(clk):
+    global PDB_SS, plotter
     light = True
 
     styles = {"Split Bonds": 'sb', "CPK":'cpk', "Ball and Stick":'bs'}
@@ -213,28 +212,24 @@ def render_ss(event):
     return plotter
 
 
-plotter = render_ss(event=True)
+plotter = render_ss(True)
 
-vtkpan = pn.panel(plotter.ren_win, margin=0, sizing_mode='stretch_both', orientation_widget=orientation_widget,
+vtkpan = pn.pane.VTK(plotter.ren_win, margin=0, sizing_mode='stretch_both', orientation_widget=orientation_widget,
         enable_keybindings=enable_keybindings, min_height=600
     )
-
 pn.bind(get_ss_idlist, rcs_id=rcsb_selector_widget)
 pn.bind(update_single, click=styles_group)
+pn.bind()
 
-#render_win = pn.Column(title_md, vtkpan, output_md).servable()
-render_win = pn.Column(title_md, vtkpan)
+render_win = pn.Column(vtkpan)
+#render_win = pn.Column(title_md, vtkpan, output_md)
+widgetbox =  pn.Column(ss_props, ss_styles, ss_info).servable(target='sidebar')        
 
 pn.Column(
-    "This example demonstrates the use of **VTK and pyvista** to display a *scene*",
     pn.Row(
-        pn.Column(
-          ss_props, ss_styles, ss_info  
-        ).servable(target='sidebar'),
-        pn.Column(
-            title_md,        
-            vtkpan,
-            output_md
-        ).servable(target='main')
-    ), min_height=600
+        widgetbox,
+        render_win.servable()
+        #render_win.servable(title='SS Browser')
+    )
 )
+

@@ -15,7 +15,7 @@ from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideLoader import Load_PDB_SS
 from proteusPy.DisulfideList import DisulfideList
 
-pn.extension('vtk', sizing_mode='stretch_width', template='material')
+pn.extension('vtk', sizing_mode='stretch_width', template='fast')
 
 _vers = 0.5
 
@@ -61,16 +61,15 @@ def click_plot(event):
     Returns:
         None
     """
-    global render_win
-    plotter = render_ss(event)
-    vtkpan = pn.panel(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
+    global render_win, vtkpan
+    plotter = render_ss()
+    vtkpan = pn.pane.VTK(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
                          orientation_widget=orientation_widget,
                          enable_keybindings=enable_keybindings, min_height=500
                          )
     # this position is dependent on the vtk panel position in the render_win pane!
-    
+    print(f'RenderWin: {render_win}')
     render_win[1] = vtkpan
-    print(render_win)
 
 # Widgets
 
@@ -104,24 +103,23 @@ shadows_checkbox = pn.widgets.Checkbox(name='Shadows', value=False)
 rcsb_selector_widget = pn.widgets.AutocompleteInput(name="RCSB ID", value=_rcsid, restrict=True,
                                                     placeholder="Search Here", options=RCSB_list)
 
-# markdown panels for various text outputs
-title_md = pn.pane.Markdown("Title")
-output_md = pn.pane.Markdown("Output goes here")
-info_md = pn.pane.Markdown("SS Info")
-db_md = pn.pane.Markdown("Database Info goes here")
 
 # controls on sidebar
 ss_props = pn.WidgetBox('# Disulfide Selection',
                         rcsb_selector_widget, rcsb_ss_widget
-                        )
+                        ).servable(target='sidebar')
 
 ss_styles = pn.WidgetBox('# Rendering Styles',
                          styles_group, single_checkbox
-                        )
+                        ).servable(target='sidebar')
 
-ss_info = pn.WidgetBox('# Disulfide Info', info_md)
+# markdown panels for various text outputs
+title_md = pn.pane.Markdown("Title")
+output_md = pn.pane.Markdown("Output goes here")
+db_md = pn.pane.Markdown("Database Info goes here")
 
-control_widgets = pn.Column(ss_props, ss_styles, ss_info)
+info_md = pn.pane.Markdown("SS Info")
+ss_info = pn.WidgetBox('# Disulfide Info', info_md).servable(target='sidebar')
 db_info = pn.Column('### RCSB Database Info', db_md)
 
 # Callbacks
@@ -180,7 +178,7 @@ def get_ss(event) -> Disulfide:
 def get_ss_id(event):
     rcsb_ss_widget.value = event.new
 
-def render_ss(event):
+def render_ss(clk=True):
     global PDB_SS
     light = True
 
@@ -213,28 +211,16 @@ def render_ss(event):
     return plotter
 
 
-plotter = render_ss(event=True)
+plotter = render_ss()
 
-vtkpan = pn.panel(plotter.ren_win, margin=0, sizing_mode='stretch_both', orientation_widget=orientation_widget,
-        enable_keybindings=enable_keybindings, min_height=600
-    )
+vtkpan = pn.pane.VTK(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
+                               orientation_widget=orientation_widget,
+                               enable_keybindings=enable_keybindings, min_height=600)
 
 pn.bind(get_ss_idlist, rcs_id=rcsb_selector_widget)
 pn.bind(update_single, click=styles_group)
 
-#render_win = pn.Column(title_md, vtkpan, output_md).servable()
-render_win = pn.Column(title_md, vtkpan)
+render_win = pn.Column(title_md, vtkpan).servable()
+print(f'RenderWin: {render_win}')
+render_win
 
-pn.Column(
-    "This example demonstrates the use of **VTK and pyvista** to display a *scene*",
-    pn.Row(
-        pn.Column(
-          ss_props, ss_styles, ss_info  
-        ).servable(target='sidebar'),
-        pn.Column(
-            title_md,        
-            vtkpan,
-            output_md
-        ).servable(target='main')
-    ), min_height=600
-)

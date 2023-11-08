@@ -19,7 +19,7 @@ dependencies:
   - qtpy
   - pyvistaqt
   - pythreejs
-  - panel
+  - panel==0.14.2
   - jupyterlab
   - ipyparallel
   - pycryptodome
