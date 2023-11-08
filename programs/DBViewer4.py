@@ -63,14 +63,12 @@ def click_plot(event):
     """
     global render_win
     plotter = render_ss(event)
-    vtkpan = pn.panel(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
+    vtkpan = pn.pane.VTK(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
                          orientation_widget=orientation_widget,
                          enable_keybindings=enable_keybindings, min_height=500
                          )
     # this position is dependent on the vtk panel position in the render_win pane!
-    
-    render_win[1] = vtkpan
-    print(render_win)
+    render_win[0] = vtkpan
 
 # Widgets
 
@@ -215,15 +213,14 @@ def render_ss(event):
 
 plotter = render_ss(event=True)
 
-vtkpan = pn.panel(plotter.ren_win, margin=0, sizing_mode='stretch_both', orientation_widget=orientation_widget,
+vtkpan = pn.pane.VTK(plotter.ren_win, margin=0, sizing_mode='stretch_both', orientation_widget=orientation_widget,
         enable_keybindings=enable_keybindings, min_height=600
     )
-
 pn.bind(get_ss_idlist, rcs_id=rcsb_selector_widget)
 pn.bind(update_single, click=styles_group)
 
 #render_win = pn.Column(title_md, vtkpan, output_md).servable()
-render_win = pn.Column(title_md, vtkpan)
+render_win = pn.Column(vtkpan)
 
 pn.Column(
     "This example demonstrates the use of **VTK and pyvista** to display a *scene*",

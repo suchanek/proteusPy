@@ -8,12 +8,12 @@ import sys
 import time
 import pyvista as pv
 import panel as pn
+import param
 
 import proteusPy
 
 from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideLoader import Load_PDB_SS
-from proteusPy.DisulfideList import DisulfideList
 
 pn.extension('vtk', sizing_mode='stretch_width', template='material')
 
@@ -29,6 +29,18 @@ _ssidlist = [
     '2q7q_91D_135D',
     '2q7q_98D_129D',
     '2q7q_130D_161D']
+
+class Settings(param.Parameterized):
+    rcsid = param.String(default=_rcsid)
+    ssidlist = param.List(default=_ssidlist)
+    single = param.Boolean(default=True)
+    style = param.String(default='Split Bonds')
+
+settings = Settings()
+
+
+pn.state.location.sync(settings, {'rcsid': 'str', 'ssidlist': 'str', 'single': 'bool', 'style': 'str'})
+print(f'state location: {pn.state.location}')
 
 PDB_SS = Load_PDB_SS(verbose=True, subset=False)
 
@@ -61,16 +73,31 @@ def click_plot(event):
     Returns:
         None
     """
-    global render_win
-    plotter = render_ss(event)
-    vtkpan = pn.panel(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
+    global render_win, vtkpan, _plotter
+
+    plotter = render_ss(True)
+    actors = plotter.actors
+    
+    _plotter = plotter
+    _plotter.ren_win = plotter.ren_win
+    
+    print(f'Query: {pn.state.location.query_params}')
+    
+    '''
+    vtkpan = pn.pane.VTK(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
                          orientation_widget=orientation_widget,
                          enable_keybindings=enable_keybindings, min_height=500
                          )
-    # this position is dependent on the vtk panel position in the render_win pane!
+    '''
     
-    render_win[1] = vtkpan
-    print(render_win)
+    print(f'Vtkpan: {vtkpan}')
+    vtkpan.ren_win = plotter.ren_win
+
+    vtkpan.synchronize()
+
+    # this position is dependent on the vtk panel position in the render_win pane!
+    print(f'Renderwin|{render_win}|')
+    render_win[0] = vtkpan
 
 # Widgets
 
@@ -121,7 +148,6 @@ ss_styles = pn.WidgetBox('# Rendering Styles',
 
 ss_info = pn.WidgetBox('# Disulfide Info', info_md)
 
-control_widgets = pn.Column(ss_props, ss_styles, ss_info)
 db_info = pn.Column('### RCSB Database Info', db_md)
 
 # Callbacks
@@ -132,6 +158,7 @@ def get_ss_idlist(event) -> list:
     Returns:
         List of SS Ids
     """
+    from proteusPy.DisulfideList import DisulfideList
     global PDB_SS
 
     rcs_id = event.new
@@ -180,8 +207,10 @@ def get_ss(event) -> Disulfide:
 def get_ss_id(event):
     rcsb_ss_widget.value = event.new
 
-def render_ss(event):
+def render_ss(clk):
     global PDB_SS
+    global _plotter
+
     light = True
 
     styles = {"Split Bonds": 'sb', "CPK":'cpk', "Ball and Stick":'bs'}
@@ -202,10 +231,9 @@ def render_ss(event):
     style = styles[styles_group.value]
     single = single_checkbox.value
     #shadows = shadows_checkbox.value
-    outputstr = f'--- Rendering: {ss_id} in style |{style}| single: {single} ---'
     
     plotter = ss.plot(single=single, style=style, shadows=False, light=light)
-    
+
     update_title(ss)
     update_info(ss)
     update_output(ss)
@@ -213,28 +241,25 @@ def render_ss(event):
     return plotter
 
 
-plotter = render_ss(event=True)
+_plotter = render_ss(True)
 
-vtkpan = pn.panel(plotter.ren_win, margin=0, sizing_mode='stretch_both', orientation_widget=orientation_widget,
+vtkpan = pn.pane.VTK(_plotter.ren_win, margin=0, sizing_mode='stretch_both', orientation_widget=orientation_widget,
         enable_keybindings=enable_keybindings, min_height=600
     )
+
+vtkpan_clone = vtkpan.clone()
 
 pn.bind(get_ss_idlist, rcs_id=rcsb_selector_widget)
 pn.bind(update_single, click=styles_group)
 
-#render_win = pn.Column(title_md, vtkpan, output_md).servable()
-render_win = pn.Column(title_md, vtkpan)
+render_win = pn.Column(vtkpan).servable()
+#render_win = pn.Column(title_md, vtkpan)
+widgetbox =  pn.Column(ss_props, ss_styles, ss_info, output_md).servable(target='sidebar')        
 
 pn.Column(
-    "This example demonstrates the use of **VTK and pyvista** to display a *scene*",
     pn.Row(
-        pn.Column(
-          ss_props, ss_styles, ss_info  
-        ).servable(target='sidebar'),
-        pn.Column(
-            title_md,        
-            vtkpan,
-            output_md
-        ).servable(target='main')
-    ), min_height=600
+        widgetbox,
+        render_win,
+    )
 )
+
