@@ -15,7 +15,7 @@ import proteusPy
 from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideLoader import Load_PDB_SS
 
-pn.extension('vtk', sizing_mode='stretch_width', template='material')
+pn.extension('vtk', sizing_mode='stretch_width', template='fast')
 
 _vers = 0.5
 
@@ -78,26 +78,25 @@ def click_plot(event):
     plotter = render_ss(True)
     actors = plotter.actors
     
-    _plotter = plotter
     _plotter.ren_win = plotter.ren_win
     
     print(f'Query: {pn.state.location.query_params}')
     
-    '''
-    vtkpan = pn.pane.VTK(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
+    
+    _vtkpan = pn.pane.VTK(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
                          orientation_widget=orientation_widget,
                          enable_keybindings=enable_keybindings, min_height=500
                          )
-    '''
     
-    print(f'Vtkpan: {vtkpan}')
-    vtkpan.ren_win = plotter.ren_win
 
-    vtkpan.synchronize()
+    print(f'Vtkpan: {_vtkpan}')
+    #vtkpan.ren_win = plotter.ren_win
+
+    # vtkpan.synchronize()
 
     # this position is dependent on the vtk panel position in the render_win pane!
     print(f'Renderwin|{render_win}|')
-    render_win[0] = vtkpan
+    render_win[0] = _vtkpan
 
 # Widgets
 
@@ -149,6 +148,8 @@ ss_styles = pn.WidgetBox('# Rendering Styles',
 ss_info = pn.WidgetBox('# Disulfide Info', info_md)
 
 db_info = pn.Column('### RCSB Database Info', db_md)
+
+#widgets =  pn.Column(ss_props, ss_styles, ss_info, output_md)       
 
 # Callbacks
 def get_ss_idlist(event) -> list:
@@ -252,14 +253,13 @@ vtkpan_clone = vtkpan.clone()
 pn.bind(get_ss_idlist, rcs_id=rcsb_selector_widget)
 pn.bind(update_single, click=styles_group)
 
-render_win = pn.Column(vtkpan).servable()
-#render_win = pn.Column(title_md, vtkpan)
-widgetbox =  pn.Column(ss_props, ss_styles, ss_info, output_md).servable(target='sidebar')        
+render_win = pn.Column(vtkpan)
 
-pn.Column(
-    pn.Row(
-        widgetbox,
-        render_win,
-    )
+#render_win = pn.Column(title_md, vtkpan)
+widgets =  pn.WidgetBox(ss_props, ss_styles, ss_info, output_md)       
+
+pn.Row(
+    widgets.servable(target='sidebar'),
+    render_win.servable(),
 )
 

@@ -103,7 +103,6 @@ shadows_checkbox = pn.widgets.Checkbox(name='Shadows', value=False)
 rcsb_selector_widget = pn.widgets.AutocompleteInput(name="RCSB ID", value=_rcsid, restrict=True,
                                                     placeholder="Search Here", options=RCSB_list)
 
-
 # controls on sidebar
 ss_props = pn.WidgetBox('# Disulfide Selection',
                         rcsb_selector_widget, rcsb_ss_widget
@@ -215,12 +214,11 @@ plotter = render_ss()
 
 vtkpan = pn.pane.VTK(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
                                orientation_widget=orientation_widget,
-                               enable_keybindings=enable_keybindings, min_height=600)
+                               enable_keybindings=enable_keybindings, min_height=500)
 
 pn.bind(get_ss_idlist, rcs_id=rcsb_selector_widget)
 pn.bind(update_single, click=styles_group)
 
 render_win = pn.Column(title_md, vtkpan).servable()
-print(f'RenderWin: {render_win}')
 render_win
 
