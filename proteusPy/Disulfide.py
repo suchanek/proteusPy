@@ -1128,7 +1128,7 @@ class Disulfide:
             pl.show()
         return
     
-    def plot(self, single=True, style='sb', light=True, shadows=False):
+    def plot(self, pl, single=True, style='sb', light=True, shadows=False):
         '''
         Return the pyVista Ploter object for the Disulfide bond in the specific rendering style.
 
@@ -1152,20 +1152,18 @@ class Disulfide:
             pv.set_plot_theme('dark')
         
         if single == True:
-            _pl = pv.Plotter(window_size=WINSIZE)
+            #_pl = pv.Plotter(window_size=WINSIZE)
             #_pl.add_title(title=title, font_size=FONTSIZE)
-            _pl.enable_anti_aliasing('msaa')
-            _pl.add_camera_orientation_widget()            
+            pl.enable_anti_aliasing('msaa')
+            pl.add_camera_orientation_widget()            
 
-            self._render(_pl, style=style, bs_scale=BS_SCALE, 
+            self._render(pl, style=style, bs_scale=BS_SCALE, 
                         spec=SPECULARITY, specpow=SPEC_POWER)        
-            _pl.reset_camera()
+            pl.reset_camera()
             if shadows == True:
-                _pl.enable_shadows()
-            pl = _pl
-
+                pl.enable_shadows()
         else:
-            pl = pv.Plotter(window_size=WINSIZE, shape=(2,2))
+            #pl = pv.Plotter(window_size=WINSIZE, shape=(2,2))
             pl.subplot(0,0)
             
             #pl.add_title(title=title, font_size=FONTSIZE)
@@ -1202,7 +1200,7 @@ class Disulfide:
             pl.reset_camera()
             if shadows == True:
                 pl.enable_shadows()
-        return pl
+        return
     
     def Distance_neighbors(self, others: DisulfideList, cutoff: float):
         '''
