@@ -15,7 +15,7 @@ from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideLoader import Load_PDB_SS
 from proteusPy.DisulfideList import DisulfideList
 
-pn.extension('vtk', sizing_mode='stretch_width', template='material')
+pn.extension('vtk', sizing_mode='stretch_width', template='fast')
 
 _vers = 0.5
 
@@ -224,17 +224,15 @@ pn.bind(update_single, click=styles_group)
 
 #render_win = pn.Column(title_md, vtkpan, output_md).servable()
 render_win = pn.Column(title_md, vtkpan)
+widgetbox= pn.Column(ss_props, ss_styles, ss_info).servable(target='sidebar')
 
 pn.Column(
     "This example demonstrates the use of **VTK and pyvista** to display a *scene*",
     pn.Row(
-        pn.Column(
-          ss_props, ss_styles, ss_info  
-        ).servable(target='sidebar'),
+        widgetbox,
         pn.Column(
             title_md,        
             vtkpan,
-            output_md
         ).servable(target='main')
     ), min_height=600
 )
