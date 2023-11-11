@@ -1163,7 +1163,7 @@ class Disulfide:
             if shadows == True:
                 pl.enable_shadows()
         else:
-            #pl = pv.Plotter(window_size=WINSIZE, shape=(2,2))
+            pl = pv.Plotter(shape=(2,2))
             pl.subplot(0,0)
             
             #pl.add_title(title=title, font_size=FONTSIZE)
@@ -1176,22 +1176,18 @@ class Disulfide:
                         specpow=SPEC_POWER)
 
             pl.subplot(0,1)
-            #pl.add_title(title=title, font_size=FONTSIZE)
             
             self._render(pl, style='bs', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, 
                         specpow=SPEC_POWER)
 
             pl.subplot(1,0)
-            #pl.add_title(title=title, font_size=FONTSIZE)
             
             self._render(pl, style='sb', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, 
                         specpow=SPEC_POWER)
 
-            pl.subplot(1,1)
-            #pl.add_title(title=title, font_size=FONTSIZE)
-            
+            pl.subplot(1,1)           
             self._render(pl, style='pd', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, 
                         specpow=SPEC_POWER)
@@ -1200,7 +1196,7 @@ class Disulfide:
             pl.reset_camera()
             if shadows == True:
                 pl.enable_shadows()
-        return
+        return pl
     
     def Distance_neighbors(self, others: DisulfideList, cutoff: float):
         '''

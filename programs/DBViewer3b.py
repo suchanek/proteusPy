@@ -14,6 +14,7 @@ import proteusPy
 
 from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideLoader import Load_PDB_SS
+from proteusPy.atoms import *
 
 pn.extension('vtk', sizing_mode='stretch_width', template='fast')
 
@@ -54,6 +55,7 @@ RCSB_list = sorted(PDB_SS.IDList)
 
 pn.state.template.param.update(title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, V{vers}")
 
+
 def get_theme() -> str:
     """Return the current theme: 'default' or 'dark'
 
@@ -65,7 +67,6 @@ def get_theme() -> str:
         return "dark"
     return "default"
 
-
 def click_plot(event):
     """Force a re-render of the currently selected disulfide. Removes the pane
     and re-adds it to the panel.
@@ -75,24 +76,18 @@ def click_plot(event):
     """
     global render_win, vtkpan, _plotter
 
-    plotter = render_ss(True)
-    actors = plotter.actors
+    render_ss(True)
     
-    _plotter.ren_win = plotter.ren_win
-    
-    print(f'Query: {pn.state.location.query_params}')
-    
-    
-    _vtkpan = pn.pane.VTK(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
+    _vtkpan = pn.panel(_plotter.ren_win, margin=0, sizing_mode='stretch_both', 
                          orientation_widget=orientation_widget,
                          enable_keybindings=enable_keybindings, min_height=500
                          )
     
 
-    print(f'Vtkpan: {_vtkpan}')
-    #vtkpan.ren_win = plotter.ren_win
+    print(f'Vtkpan: {vtkpan}')
+    # vtkpan.ren_win = _plotter.ren_win
 
-    # vtkpan.synchronize()
+    vtkpan.synchronize()
 
     # this position is dependent on the vtk panel position in the render_win pane!
     print(f'Renderwin|{render_win}|')
@@ -207,6 +202,81 @@ def get_ss(event) -> Disulfide:
 
 def get_ss_id(event):
     rcsb_ss_widget.value = event.new
+###
+
+def plot(ss, pl, single=True, style='sb', light=True, shadows=False):
+    '''
+    Return the pyVista Ploter object for the Disulfide bond in the specific rendering style.
+
+    :param single: Display the bond in a single panel in the specific style. 
+    :param style:  Rendering style: One of:
+        * 'sb' - split bonds
+        * 'bs' - ball and stick
+        * 'cpk' - CPK style
+        * 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
+        * 'plain' - boring single color
+    :param light: If True, light background, if False, dark
+    '''
+    src = ss.pdb_id
+    enrg = ss.energy
+
+    title = f'{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Cα: {ss.ca_distance:.2f} Å Cβ: {ss.cb_distance:.2f} Å Tors: {ss.torsion_length:.2f}°'
+
+    if light:
+        pv.set_plot_theme('document')
+    else:
+        pv.set_plot_theme('dark')
+    
+    # clear any actors
+    pl.clear()
+
+    if single == True:
+        #_pl = pv.Plotter(window_size=WINSIZE)
+        #_pl.add_title(title=title, font_size=FONTSIZE)
+        pl.enable_anti_aliasing('msaa')
+        pl.add_camera_orientation_widget()            
+
+        ss._render(pl, style=style, bs_scale=BS_SCALE, 
+                    spec=SPECULARITY, specpow=SPEC_POWER)        
+        pl.reset_camera()
+        if shadows == True:
+            pl.enable_shadows()
+    else:
+        pl = pv.Plotter(shape=(2,2))
+        pl.subplot(0,0)
+        
+        #pl.add_title(title=title, font_size=FONTSIZE)
+        pl.enable_anti_aliasing('msaa')
+
+        pl.add_camera_orientation_widget()
+        
+        ss._render(pl, style='cpk', bondcolor=BOND_COLOR, 
+                    bs_scale=BS_SCALE, spec=SPECULARITY, 
+                    specpow=SPEC_POWER)
+
+        pl.subplot(0,1)
+        
+        ss._render(pl, style='bs', bondcolor=BOND_COLOR, 
+                    bs_scale=BS_SCALE, spec=SPECULARITY, 
+                    specpow=SPEC_POWER)
+
+        pl.subplot(1,0)
+        
+        ss._render(pl, style='sb', bondcolor=BOND_COLOR, 
+                    bs_scale=BS_SCALE, spec=SPECULARITY, 
+                    specpow=SPEC_POWER)
+
+        pl.subplot(1,1)           
+        ss._render(pl, style='pd', bondcolor=BOND_COLOR, 
+                    bs_scale=BS_SCALE, spec=SPECULARITY, 
+                    specpow=SPEC_POWER)
+
+        pl.link_views()
+        pl.reset_camera()
+        if shadows == True:
+            pl.enable_shadows()
+    pl.update()
+    return pl
 
 def render_ss(clk):
     global PDB_SS
@@ -221,7 +291,6 @@ def render_ss(clk):
         light = False
 
     ss = Disulfide()
-    plotter = pv.Plotter()
     ss_id = rcsb_ss_widget.value
     
     ss = PDB_SS[ss_id]
@@ -233,14 +302,15 @@ def render_ss(clk):
     single = single_checkbox.value
     #shadows = shadows_checkbox.value
     
-    plotter = ss.plot(single=single, style=style, shadows=False, light=light)
+    _plotter = plot(ss, _plotter, single=single, style=style, shadows=False, light=light)
 
     update_title(ss)
     update_info(ss)
     update_output(ss)
 
-    return plotter
+    return
 
+_plotter = pv.Plotter()
 
 _plotter = render_ss(True)
 
@@ -248,7 +318,6 @@ vtkpan = pn.pane.VTK(_plotter.ren_win, margin=0, sizing_mode='stretch_both', ori
         enable_keybindings=enable_keybindings, min_height=600
     )
 
-vtkpan_clone = vtkpan.clone()
 
 pn.bind(get_ss_idlist, rcs_id=rcsb_selector_widget)
 pn.bind(update_single, click=styles_group)

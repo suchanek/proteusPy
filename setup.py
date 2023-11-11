@@ -42,13 +42,13 @@ if "bdist_wheel" in sys.argv:
         )
 
 # Make sure we have the right Python version.
-MIN_PY_VER = (3, 9)
-if sys.version_info[:2] < MIN_PY_VER:
-    sys.stderr.write(
-        ("ERROR: proteusPy requires Python %i.%i or later. " % MIN_PY_VER)
-        + ("Python %d.%d detected.\n" % sys.version_info[:2])
-    )
-    sys.exit(1)
+#MIN_PY_VER = (3, 9)
+#if sys.version_info[:2] < MIN_PY_VER:
+#    sys.stderr.write(
+#        ("ERROR: proteusPy requires Python %i.%i or later. " % MIN_PY_VER)
+#        + ("Python %d.%d detected.\n" % sys.version_info[:2])
+#    )
+#   sys.exit(1)
 
 def can_import(module_name):
     """Check we can import the requested module."""
@@ -61,7 +61,7 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
-__version__ = "Undefined"
+__version__ = "UNDEFINED"
 for line in open("proteusPy/__init__.py"):
     if line.startswith("__version__"):
         exec(line.strip())
@@ -99,6 +99,6 @@ setup(name='proteusPy',
       include_package_data=True,
       package_data={'proteusPy': ['data/*.txt', 'data/*.py', 'data/*.json', 'data/*.csv']},
       exclude_package_data={'proteusPy': ['data/PDB_all_ss.pkl', 'data/PDB_SS_ALL_LOADER.pkl', 'PDB_all_ss_dict.pkl']},
-      python_requires=">=%i.%i" % MIN_PY_VER,
+      python_requires=">=3.8",
       zip_safe=False)
       

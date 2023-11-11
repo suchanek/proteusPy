@@ -63,13 +63,17 @@ def click_plot(event):
     """
     global render_win, vtkpan
     plotter = render_ss()
+    plotter.update()
+
+    '''
     vtkpan = pn.pane.VTK(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
                          orientation_widget=orientation_widget,
                          enable_keybindings=enable_keybindings, min_height=500
                          )
+    '''
     # this position is dependent on the vtk panel position in the render_win pane!
     print(f'RenderWin: {render_win}')
-    render_win[0] = vtkpan
+    #render_win[0] = vtkpan
 
 # Widgets
 
@@ -190,7 +194,6 @@ def render_ss(clk=True):
 
     ss = Disulfide()
     plotter.clear()
-    #plotter = pv.Plotter()
 
     ss_id = rcsb_ss_widget.value
     
@@ -202,7 +205,6 @@ def render_ss(clk=True):
     style = styles[styles_group.value]
     single = single_checkbox.value
     #shadows = shadows_checkbox.value
-    outputstr = f'--- Rendering: {ss_id} in style |{style}| single: {single} ---'
     
     plotter = ss.plot(plotter, single=single, style=style, shadows=False, light=light)
     
@@ -212,8 +214,9 @@ def render_ss(clk=True):
 
     return plotter
 
-plotter = pv.Plotter()
+# Main program is trivial...
 
+plotter = pv.Plotter()
 plotter = render_ss()
 
 vtkpan = pn.pane.VTK(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
