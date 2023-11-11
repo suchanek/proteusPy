@@ -108,6 +108,7 @@ def main():
     renderWindow.SetWindowName('ShareCamera')
 
     renderWindowInteractor.Start()
+    renderWindow
 
 
 if __name__ == '__main__':

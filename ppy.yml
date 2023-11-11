@@ -1,0 +1,42 @@
+name: proteusPy
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - biopython
+  - ca-certificates
+  - openssl
+  - pyvista
+  - jupyter
+  - pandas
+  - matplotlib
+  - certifi
+  - seaborn
+  - plotly_express
+  - tqdm
+  - ipygany
+  - qtpy
+  - pyvistaqt
+  - pythreejs
+  - panel
+  - jupyterlab
+  - jupyter_bokeh
+  - ipyparallel
+  - pycryptodome
+  - nodejs
+  - pdoc
+  - pillow
+  - pytube
+  - openai
+  - rdkit
+  - yarn
+  - grpcio
+  - conda=23.5.0
+  - pip
+  - pip:
+    - wget
+    - gdown
+    - tqdm
+  - trame
+prefix: /Users/egs/miniforge3/envs/proteusPy
+
