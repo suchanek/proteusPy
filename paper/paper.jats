@@ -32,8 +32,7 @@ Disulfide Bond Modeling and Analysis</article-title>
 </contrib>
 <aff id="aff-1">
 <institution-wrap>
-<institution>Monterey Institute for Research in Astronomy, Marina,
-USA</institution>
+<institution>tbd</institution>
 </institution-wrap>
 </aff>
 </contrib-group>
@@ -83,13 +82,16 @@ a Creative Commons Attribution 4.0 International License (CC BY
 </sec>
 <sec id="statement-of-need">
   <title>Statement of Need</title>
-  <p>My primary motivation for implementing
-  <monospace>proteusPy</monospace> was to revisit the
+  <p>Disulfide bonds are the only naturally occuring covalent bond in
+  proteins. They provide important structural stabilization both within
+  and between protein subunits. They can also be involved in enzymatic
+  catalysis, regulate protein activities and protect against oxidative
+  stress. I implemented <monospace>proteusPy</monospace> to revisit the
   <ext-link ext-link-type="uri" xlink:href="https://www.rcsb.org">RCSB
   Protein Databank</ext-link> and do a structural analysis of the
-  disulfide bonds contained therein. This necessitated the creation an
-  object-oriented database capable of introspection, analysis and
-  display. The API
+  disulfide bonds contained therein.</p>
+  <p>This necessitated the creation an object-oriented database capable
+  of introspection, analysis and display. The API
   (<xref alt="Suchanek, 2023a" rid="ref-API" ref-type="bibr">Suchanek,
   2023a</xref>) is available online at:
   <ext-link ext-link-type="uri" xlink:href="https://suchanek.github.io/proteusPy/proteusPy.html">https://suchanek.github.io/proteusPy/proteusPy.html</ext-link>
@@ -127,10 +129,13 @@ a Creative Commons Attribution 4.0 International License (CC BY
       </list>
     </list-item>
     <list-item>
-      <p>From a shell prompt:
-      <monospace>$ git clone https://github.com/suchanek/proteusPy/proteusPy.git       $ cd proteusPy       $ git-lfs track &quot;*.csv&quot; &quot;*.pkl&quot; &quot;*.mp4&quot;       $ conda env create --name proteusPy --file=proteusPy1.yml       $ conda activate proteusPy       $ pip install .       $ jupyter nbextension enable --py --sys-prefix widgetsnbextension       $ python -m ipykernel install --user --name proteusPy --display-name &quot;Python (proteusPy)&quot;</monospace></p>
+      <p>From a shell prompt:</p>
     </list-item>
   </list>
+  <fig>
+    <caption><p>install</p></caption>
+    <graphic mimetype="image" mime-subtype="png" xlink:href="media/install.png" />
+  </fig>
 </sec>
 <sec id="general-usage">
   <title>General Usage</title>
@@ -188,8 +193,9 @@ a Creative Commons Attribution 4.0 International License (CC BY
       <inline-formula><alternatives>
       <tex-math><![CDATA[S_\gamma]]></tex-math>
       <mml:math display="inline" xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msub><mml:mi>S</mml:mi><mml:mi>γ</mml:mi></mml:msub></mml:math></alternatives></inline-formula>
-      for both residues. These are stored as both raw atomic coordinates
-      as read from the RCSB file and internal local coordinates.</p>
+      for both amino acid residues. These are stored as both raw atomic
+      coordinates as read from the RCSB file and internal local
+      coordinates.</p>
     </list-item>
     <list-item>
       <p>The dihedral angles <inline-formula><alternatives>
@@ -310,32 +316,30 @@ a Creative Commons Attribution 4.0 International License (CC BY
   <p>Individual renderings can be saved to a file and animations can be
   created. The <italic>cpk</italic> and <italic>bs</italic> styles are
   illustrated below:</p>
-  <p><inline-graphic mimetype="image" mime-subtype="png" xlink:href="media/logo_cpk.png">
-    <alt-text>cpk</alt-text>
-  </inline-graphic>
-  <inline-graphic mimetype="image" mime-subtype="png" xlink:href="media/logo_bs.png">
-    <alt-text>bs</alt-text>
-  </inline-graphic></p>
+  <fig>
+    <caption><p>cpk</p></caption>
+    <graphic mimetype="image" mime-subtype="png" xlink:href="media/bs_cpk.png" />
+  </fig>
 </sec>
 <sec id="disulfideloader">
   <title><ext-link ext-link-type="uri" xlink:href="https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html">DisulfideLoader</ext-link></title>
-  <p>This class represents the disulfide database itself and is its
+  <p>This class encapsulates the disulfide database itself and is its
   primary means of accession. Instantiation takes 2 parameters:
   <monospace>subset</monospace> and <monospace>verbose</monospace>.
   Given the size of the database, one can use the
   <monospace>subset</monospace> parameter to load the first 1000
   disulfides into memory. This facilitates quicker development and
-  testing new functions. I recommend using at least a 16 GB machine to
-  work with the full dataset.</p>
+  testing new functions. I recommend using a machine with 16GB or more
+  to work with the full dataset.</p>
   <p>The entirety of the RCSB disulfide database is stored within the
   class via a
   <ext-link ext-link-type="uri" xlink:href="%22https://suchanek.github.io/proteusPy/proteusPy/DisulfideList.html%22">DisulfideList</ext-link>,
   a <monospace>Pandas</monospace> .csv file, and a
   <monospace>dict</monospace> of indices mapping the RCSB IDs into their
-  respective list of disulfides. The datastructures allow simple, direct
-  and flexible access to the disulfide structures contained within. This
-  makes it possible to access the disulfides by array index, RCSB
-  structure ID or disulfide name.</p>
+  respective list of disulfide bond objects. The datastructures allow
+  simple, direct and flexible access to the disulfide structures
+  contained within. This makes it possible to access the disulfides by
+  array index, RCSB structure ID or disulfide name.</p>
   <p>Example:</p>
   <code language="python">  import proteusPy
   from proteusPy.Disulfide import Disulfide
@@ -380,8 +384,9 @@ a Creative Commons Attribution 4.0 International License (CC BY
   builds the classlist structures, and writes the completely built
   object to a single <monospace>.pkl</monospace> file. This requires the
   raw <monospace>.pkl</monospace> files created by the download process.
-  These files are contained in the repository
-  <monospace>data</monospace> directory.</p>
+  These files are contained in the <italic>repository</italic>
+  <monospace>data</monospace> directory, not in the
+  <monospace>pyPi</monospace> distribution.</p>
 </sec>
 <sec id="turtle3d">
   <title><ext-link ext-link-type="uri" xlink:href="https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html">turtle3D</ext-link></title>
@@ -446,8 +451,8 @@ a Creative Commons Attribution 4.0 International License (CC BY
 </sec>
 <sec id="examples">
   <title>Examples</title>
-  <p>I illustrate a few use cases for the package below. See the
-  notebooks for more examples.</p>
+  <p>I will now illustrate a few use cases for the package below. See
+  the notebooks for more examples.</p>
   <sec id="find-the-lowest-and-highest-energy-disulfides-present-in-the-database">
     <title>Find the lowest and highest energy disulfides present in the
     database</title>
@@ -511,8 +516,8 @@ low_energy_neighbors.display_overlay()</code>
   <ext-link ext-link-type="uri" xlink:href="https://suchanek.github.io/proteusPy/proteusPy/DisulfideClass_Constructor.html">DisulfideClassConstructer</ext-link>
   class, which is used to create and manage Disulfide binary and sextant
   classes. A note about these structural classes is in order.
-  (<xref alt="Schmidt, 2006" rid="ref-Schmidt_2006" ref-type="bibr">Schmidt,
-  2006</xref>) described a method of characterizing disulfide structures
+  (<xref alt="Hogg, 2020" rid="ref-Hogg_2020" ref-type="bibr">Hogg,
+  2020</xref>) described a method of characterizing disulfide structures
   by describing each individual dihedral angle as either + or - based on
   its sign. This yields <inline-formula><alternatives>
   <tex-math><![CDATA[2^{5}]]></tex-math>
@@ -597,8 +602,10 @@ low_energy_neighbors.display_overlay()</code>
     <inline-formula><tex-math><![CDATA[\text{\normalfont\AA}]]></tex-math></inline-formula>.
     This resulted in the current database consisting of 35,808
     structures and 120,494 disulfide bonds. To my knowledge this is the
-    only searchable database of disulfide bonds in existence. ## The
-    Future</p>
+    only searchable database of disulfide bonds in existence.</p>
+  </sec>
+  <sec id="the-future">
+    <title>The Future</title>
     <list list-type="bullet">
       <list-item>
         <p>I continue to explore disulfide structural classes using the
@@ -609,8 +616,8 @@ low_energy_neighbors.display_overlay()</code>
         elements.</p>
       </list-item>
       <list-item>
-        <p>I hope to deploy a Disulfide Database browser for exploration
-        and analysis.</p>
+        <p>I am working to deploy a Disulfide Database browser for
+        exploration and analysis.</p>
       </list-item>
     </list>
   </sec>
@@ -624,7 +631,7 @@ low_energy_neighbors.display_overlay()</code>
     load them and initialize itself.</p>
     <p><italic>NB:</italic>
     (<xref alt="Suchanek, 2023b" rid="ref-proteusPy" ref-type="bibr">Suchanek,
-    2023b</xref>) relies on my
+    2023b</xref>) disulfide database creaton relies on my
     <ext-link ext-link-type="uri" xlink:href="https://github.com/suchanek/biopython">fork</ext-link>
     of the
     <ext-link ext-link-type="uri" xlink:href="https://biopython.org">Biopython</ext-link>
@@ -663,21 +670,21 @@ low_energy_neighbors.display_overlay()</code>
       <lpage>5991</lpage>
     </element-citation>
   </ref>
-  <ref id="ref-Schmidt_2006">
+  <ref id="ref-Hogg_2020">
     <element-citation publication-type="article-journal">
       <person-group person-group-type="author">
-        <name><surname>Schmidt</surname><given-names>Brian</given-names></name>
+        <name><surname>Hogg</surname><given-names>Philip J</given-names></name>
       </person-group>
       <article-title>Multiple disulfide-bonded states of native proteins: Estimate of number using probabilities of disulfide bond formation</article-title>
-      <source>Biochemistry</source>
-      <publisher-name>American Chemical Society (ACS)</publisher-name>
-      <year iso-8601-date="2006-06">2006</year><month>06</month>
-      <volume>45</volume>
-      <issue>24</issue>
-      <uri>https://doi.org/10.1021/bi0603064</uri>
-      <pub-id pub-id-type="doi">10.1021/bi0603064</pub-id>
-      <fpage>7429</fpage>
-      <lpage>74334</lpage>
+      <source>Molecules</source>
+      <publisher-name>Molecules</publisher-name>
+      <year iso-8601-date="2020-12">2020</year><month>12</month>
+      <volume>25</volume>
+      <issue>23</issue>
+      <uri>https://doi.org/10.3390/molecules25235729</uri>
+      <pub-id pub-id-type="doi">10.1021/bi00368a023</pub-id>
+      <fpage>5729</fpage>
+      <lpage>5734</lpage>
     </element-citation>
   </ref>
   <ref id="ref-Hamelyrck_2003">

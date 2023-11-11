@@ -12,7 +12,7 @@ authors:
     equal-contrib: true
     affiliation: 1
 affiliations:
- - name: Suchanek Institute of Applied Informatics
+ - name: tbd
    index: 1
 date: 31 October, 2023
 header-includes:
@@ -71,7 +71,7 @@ The primary classes developed for ``proteusPy`` are described briefly below. Ple
 
 This class provides a Python object and methods representing a physical disulfide bond either extracted from the RCSB protein databank or a virtual one built using the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class. The disulfide bond is an important intramolecular stabilizing structural element and is characterized by:
 
-- Atomic coordinates for the atoms $N, C_{\alpha}$, $C_{\beta}$, $C'$, $S_\gamma$ for both residues. These are stored as both raw atomic coordinates as read from the RCSB file and internal local coordinates.
+- Atomic coordinates for the atoms $N, C_{\alpha}$, $C_{\beta}$, $C'$, $S_\gamma$ for both amino acid residues. These are stored as both raw atomic coordinates as read from the RCSB file and internal local coordinates.
 - The dihedral angles $\chi_{1} - \chi_{5}$ for the disulfide bond
 - A name, by default: ``{pdb_id}{prox_resnumb}{prox_chain}_{distal_resnum}{distal_chain}``
 - Proximal residue number
@@ -109,9 +109,9 @@ Individual renderings can be saved to a file and animations can be created. The 
 
 # [DisulfideLoader](https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html)
 
-This class represents the disulfide database itself and is its primary means of accession.  Instantiation takes 2 parameters: ``subset`` and ``verbose``. Given the size of the database, one can use the ``subset`` parameter to load the first 1000 disulfides into memory. This facilitates quicker development and testing new functions. I recommend using at least a 16 GB machine to work with the full dataset.
+This class encapsulates the disulfide database itself and is its primary means of accession.  Instantiation takes 2 parameters: ``subset`` and ``verbose``. Given the size of the database, one can use the ``subset`` parameter to load the first 1000 disulfides into memory. This facilitates quicker development and testing new functions. I recommend using a machine with 16GB or more to work with the full dataset.
 
-The entirety of the RCSB disulfide database is stored within the class via a [DisulfideList]("https://suchanek.github.io/proteusPy/proteusPy/DisulfideList.html"), a ```Pandas``` .csv file, and a ```dict``` of indices mapping the RCSB IDs into their respective list of disulfides. The datastructures allow simple, direct and flexible access to the disulfide structures contained within. This makes it possible to access the disulfides by array index, RCSB structure ID or disulfide name.
+The entirety of the RCSB disulfide database is stored within the class via a [DisulfideList]("https://suchanek.github.io/proteusPy/proteusPy/DisulfideList.html"), a ```Pandas``` .csv file, and a ```dict``` of indices mapping the RCSB IDs into their respective list of disulfide bond objects. The datastructures allow simple, direct and flexible access to the disulfide structures contained within. This makes it possible to access the disulfides by array index, RCSB structure ID or disulfide name.
 
 Example:
 
@@ -151,7 +151,7 @@ Example:
 
 The class can also render Disulfides overlaid on a common coordinate system to a pyVista window using the [DisulfideLoader.display_overlay()](https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html#DisulfideLoader.display_overlay) method.
 
-**NB:** For typical usage one accesses the database via the `Load_PDB_SS()` function. This function loads the compressed database from its single source. Initializing a `DisulfideLoader()` object will load the individual torsions and disulfide ``.pkl`` files, builds the classlist structures, and writes the completely built object to a single ``.pkl`` file. This requires the raw ``.pkl`` files created by the download process. These files are contained in the repository ``data`` directory.
+**NB:** For typical usage one accesses the database via the `Load_PDB_SS()` function. This function loads the compressed database from its single source. Initializing a `DisulfideLoader()` object will load the individual torsions and disulfide ``.pkl`` files, builds the classlist structures, and writes the completely built object to a single ``.pkl`` file. This requires the raw ``.pkl`` files created by the download process. These files are contained in the *repository* ``data`` directory, not in the ``pyPi`` distribution.
 
 # [turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html)
 
@@ -243,7 +243,7 @@ low_energy_neighbors.display_overlay()
 
 # Analyzing Disulfide Structural Class Distributions
 
-The package includes the [DisulfideClassConstructer](https://suchanek.github.io/proteusPy/proteusPy/DisulfideClass_Constructor.html) class, which is used to create and manage Disulfide binary and sextant classes. A note about these structural classes is in order. [@Schmidt_2006] described a method of characterizing disulfide structures by describing each individual dihedral angle as either + or - based on its sign. This yields $2^{5}$ or 32 possible classes. The author then was able to identify protein functional families within one of 20 remaining structural classes. Since the binary approach is very coarse and computational resources are much more capable than in 2006 I extended this formalism to a *Sextant* approach. In other words, I created *six* possible classes for each dihedral angle by dividing it into 60 degree segments. This yields a possible $6^5$ or 7,776 possible classes. The notebook [DisulfideClassesPlayground.ipynb](https://github.com/suchanek/proteusPy/blob/master/notebooks/DisulfideClassesPlayground.ipynb) contains some initial results. 
+The package includes the [DisulfideClassConstructer](https://suchanek.github.io/proteusPy/proteusPy/DisulfideClass_Constructor.html) class, which is used to create and manage Disulfide binary and sextant classes. A note about these structural classes is in order. [@Hogg_2020] described a method of characterizing disulfide structures by describing each individual dihedral angle as either + or - based on its sign. This yields $2^{5}$ or 32 possible classes. The author then was able to identify protein functional families within one of 20 remaining structural classes. Since the binary approach is very coarse and computational resources are much more capable than in 2006 I extended this formalism to a *Sextant* approach. In other words, I created *six* possible classes for each dihedral angle by dividing it into 60 degree segments. This yields a possible $6^5$ or 7,776 possible classes. The notebook [DisulfideClassesPlayground.ipynb](https://github.com/suchanek/proteusPy/blob/master/notebooks/DisulfideClassesPlayground.ipynb) contains some initial results. 
 
 # Appendix
 ## Database Creation Workflow
@@ -260,11 +260,12 @@ The following steps were performed to create the RCSB disulfide database:
    4. Structures with disordered CYS atoms.
 
 In the end I elected to only use a single example of a given disulfide from a multi-chain entry, and removed any disulfides with a $C_\alpha - C_\alpha$ distance is > 8 $\AA$. This resulted in the current database consisting of 35,808 structures and 120,494 disulfide bonds. To my knowledge this is the only searchable database of disulfide bonds in existence.
+
 ## The Future
 
 - I continue to explore disulfide structural classes using the sextant class approach. This offers much higher class resolution than the binary approach and reveals subgroups within the broad class. I'd also like to explore the catalytic and allosteric classes within the subgroups to look for common structural elements.
 
-- I hope to deploy a Disulfide Database browser for exploration and analysis.
+- I am working to deploy a Disulfide Database browser for exploration and analysis.
   
 ## Miscellaneous
 
@@ -272,6 +273,6 @@ In the end I elected to only use a single example of a given disulfide from a mu
 The .pkl files needed to instantiate this class and save it into its final .pkl file are
 defined in the [proteusPy.data]("https://suchanek.github.io/proteusPy/proteusPy/data.html") class and should not be changed. Upon initialization the class will load them and initialize itself.
 
-*NB:* [@proteusPy] relies on my [fork](https://github.com/suchanek/biopython) of the [Biopython](https://biopython.org) Python package to download and build the database, (<https://github.com/suchanek/biopython>). As a result, one can't download and create the database locally unless the BioPython patch is applied. The changed python file is in the repo's data directory - ``parse_pdb_header.py``. Database analysis is unaffected without the patch. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1.
+*NB:* [@proteusPy] disulfide database creaton relies on my [fork](https://github.com/suchanek/biopython) of the [Biopython](https://biopython.org) Python package to download and build the database, (<https://github.com/suchanek/biopython>). As a result, one can't download and create the database locally unless the BioPython patch is applied. The changed python file is in the repo's data directory - ``parse_pdb_header.py``. Database analysis is unaffected without the patch. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1.
 
 # Bibliography
