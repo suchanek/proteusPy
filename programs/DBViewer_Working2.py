@@ -62,18 +62,18 @@ def click_plot(event):
         None
     """
     global render_win, vtkpan
+    
     plotter = render_ss()
-    plotter.update()
-
-    '''
     vtkpan = pn.pane.VTK(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
-                         orientation_widget=orientation_widget,
-                         enable_keybindings=enable_keybindings, min_height=500
-                         )
-    '''
+                     orientation_widget=orientation_widget,
+                     enable_keybindings=enable_keybindings, min_height=500)
+    
+    vtkpan.param.trigger('object')
+
+    render_win[0] = vtkpan
+    
     # this position is dependent on the vtk panel position in the render_win pane!
     print(f'RenderWin: {render_win}')
-    #render_win[0] = vtkpan
 
 # Widgets
 
@@ -94,12 +94,14 @@ def update_single(click):
     Returns:
         None
     """
+    global plotter
     single_checked = single_checkbox.value
     if single_checked is not True:
         styles_group.disabled = True
     else:
         styles_group.disabled = False
-    click_plot(click)
+    plotter = pv.Plotter()
+    #click_plot(click)
 
 # not used atm    
 shadows_checkbox = pn.widgets.Checkbox(name='Shadows', value=False)
@@ -113,7 +115,7 @@ ss_props = pn.WidgetBox('# Disulfide Selection',
                         ).servable(target='sidebar')
 
 ss_styles = pn.WidgetBox('# Rendering Styles',
-                         styles_group, single_checkbox
+                         styles_group, single_checkbox, button
                         ).servable(target='sidebar')
 
 # markdown panels for various text outputs
@@ -144,8 +146,8 @@ def get_ss_idlist(event) -> list:
     return idlist
 
 rcsb_selector_widget.param.watch(get_ss_idlist, 'value')
-rcsb_ss_widget.param.watch(click_plot, 'value')
-styles_group.param.watch(click_plot, 'value')
+#rcsb_ss_widget.param.watch(click_plot, 'value')
+#styles_group.param.watch(click_plot, 'value')
 single_checkbox.param.watch(update_single, 'value')
 
 def update_title(ss):
@@ -184,6 +186,9 @@ def get_ss_id(event):
 def render_ss(clk=True):
     global PDB_SS
     global plotter
+    #global vtkpan
+    global render_win
+
     light = True
 
     styles = {"Split Bonds": 'sb', "CPK":'cpk', "Ball and Stick":'bs'}
@@ -206,11 +211,16 @@ def render_ss(clk=True):
     single = single_checkbox.value
     #shadows = shadows_checkbox.value
     
-    plotter = ss.plot(plotter, single=single, style=style, shadows=False, light=light)
-    
     update_title(ss)
     update_info(ss)
     update_output(ss)
+
+    plotter = ss.plot(plotter, single=single, style=style, shadows=False, light=light)
+    vtkpan = pn.pane.VTK(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
+                     orientation_widget=orientation_widget,
+                     enable_keybindings=enable_keybindings, min_height=500)
+    
+    vtkpan.param.trigger('object')
 
     return plotter
 
@@ -220,8 +230,8 @@ plotter = pv.Plotter()
 plotter = render_ss()
 
 vtkpan = pn.pane.VTK(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
-                               orientation_widget=orientation_widget,
-                               enable_keybindings=enable_keybindings, min_height=500)
+                     orientation_widget=orientation_widget,
+                     enable_keybindings=enable_keybindings, min_height=500)
 
 pn.bind(get_ss_idlist, rcs_id=rcsb_selector_widget)
 pn.bind(update_single, click=styles_group)

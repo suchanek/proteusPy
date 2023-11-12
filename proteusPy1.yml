@@ -38,5 +38,6 @@ dependencies:
   - pip:
     - wget
     - tqdm
+    - kaleido
 prefix: /Users/suchanek/miniforge3/envs/proteusPy
 
