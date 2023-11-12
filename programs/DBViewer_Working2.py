@@ -69,7 +69,6 @@ def click_plot(event):
                      enable_keybindings=enable_keybindings, min_height=500)
     
     vtkpan.param.trigger('object')
-
     render_win[0] = vtkpan
     
     # this position is dependent on the vtk panel position in the render_win pane!
@@ -101,7 +100,7 @@ def update_single(click):
     else:
         styles_group.disabled = False
     plotter = pv.Plotter()
-    #click_plot(click)
+    click_plot(click)
 
 # not used atm    
 shadows_checkbox = pn.widgets.Checkbox(name='Shadows', value=False)
@@ -146,8 +145,8 @@ def get_ss_idlist(event) -> list:
     return idlist
 
 rcsb_selector_widget.param.watch(get_ss_idlist, 'value')
-#rcsb_ss_widget.param.watch(click_plot, 'value')
-#styles_group.param.watch(click_plot, 'value')
+rcsb_ss_widget.param.watch(click_plot, 'value')
+styles_group.param.watch(click_plot, 'value')
 single_checkbox.param.watch(update_single, 'value')
 
 def update_title(ss):
@@ -237,5 +236,14 @@ pn.bind(get_ss_idlist, rcs_id=rcsb_selector_widget)
 pn.bind(update_single, click=styles_group)
 
 render_win = pn.Column(vtkpan).servable()
-render_win
+#render_win
+
+
+pn.Column(
+    "This example demonstrates the use of **VTK and pyvista** to display a *scene*",
+    pn.Row(
+        render_win
+    ), min_height=500
+)
+
 
