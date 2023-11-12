@@ -92,6 +92,8 @@ def click_plot(event):
     # this position is dependent on the vtk panel position in the render_win pane!
     print(f'Renderwin|{render_win}|')
     render_win[0] = _vtkpan
+    vtkpan.param.trigger('object')
+
 
 # Widgets
 
@@ -275,7 +277,6 @@ def plot(ss, pl, single=True, style='sb', light=True, shadows=False):
         pl.reset_camera()
         if shadows == True:
             pl.enable_shadows()
-    pl.update()
     return pl
 
 def render_ss(clk):
