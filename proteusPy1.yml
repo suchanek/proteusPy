@@ -1,9 +1,9 @@
-name: proteusPy
+name: proteusPy1
 channels:
   - conda-forge
 dependencies:
   - python=3.9
-  - biopython
+  - Bio
   - ca-certificates
   - gdown
   - openssl
@@ -19,7 +19,7 @@ dependencies:
   - qtpy
   - pyvistaqt
   - pythreejs
-  - panel==0.14.2
+  - panel
   - jupyterlab
   - ipyparallel
   - pycryptodome
@@ -39,5 +39,4 @@ dependencies:
     - wget
     - tqdm
     - kaleido
-prefix: /Users/suchanek/miniforge3/envs/proteusPy
-
+prefix: /Users/suchanek/miniforge3/envs/proteusPy1

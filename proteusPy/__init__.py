@@ -20,6 +20,11 @@ import math
 import numpy
 
 import Bio
+import plotly
+import pyvista as pv
+import panel as pn
+
+
 
 from Bio.PDB.vectors import calc_dihedral, calc_angle
 from Bio.PDB import Select, Vector

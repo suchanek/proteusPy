@@ -6,16 +6,11 @@ Author: Eric G. Suchanek, PhD. \n
 
 (c) 2023 Eric G. Suchanek, PhD., All Rights Reserved
 License: MIT
-Last Modification: 2/18/23
+Last Modification: 11/14/23 -egs-
 
 '''
 
-import copy
 from io import StringIO
-import time
-import datetime
-import pickle
-
 import pandas as pd
 import numpy as np
 import proteusPy
@@ -391,7 +386,7 @@ def plot_class_chart(classes: int) -> None:
     # Show the chart
 
 def plot_count_vs_class_df(df, title='title', 
-                        theme='plotly_dark',
+                        theme='light',
                         save=False, savedir='.'):
     """
     Plots a line graph of count vs class ID using Plotly.
@@ -449,7 +444,7 @@ def plot_count_vs_classid(df, cls=None, title='title', theme='light'):
     fig.show()
 
 
-def plot_binary_to_sixclass_incidence(loader: DisulfideLoader, light=True):
+def plot_binary_to_sixclass_incidence(loader: DisulfideLoader, theme='light'):
     '''
     Plot the incidence of all sextant Disulfide classes for a given binary class.
 
@@ -477,7 +472,7 @@ def plot_binary_to_sixclass_incidence(loader: DisulfideLoader, light=True):
     for cls in clslist:
         sixcls = loader.tclass.binary_to_six_class(cls)
         df = enumerate_sixclass_fromlist(sixcls)
-        plot_count_vs_class_df(df, cls, theme='light')
+        plot_count_vs_class_df(df, cls, theme=theme)
     return
 
 def enumerate_sixclass_fromlist(loader, sslist):
