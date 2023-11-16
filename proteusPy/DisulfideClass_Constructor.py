@@ -194,7 +194,7 @@ class DisulfideClass_Constructor():
     def build_yourself(self, loader):
         '''
         Builds the internal structures needed for the binary and six-fold disulfide structural classes
-        based on dihedral angle rules. See Schmidt'.
+        based on dihedral angle rules. See Hogg'.
     
         Parameters
         ----------

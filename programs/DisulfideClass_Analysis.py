@@ -95,23 +95,31 @@ import proteusPy
 from proteusPy import *
 from proteusPy.data import *
 from proteusPy.Disulfide import *
-from proteusPy.DisulfideList import DisulfideList, load_disulfides_from_id
-from proteusPy.DisulfideLoader import Load_PDB_SS, DisulfideLoader
-from proteusPy.ProteusGlobals import PBAR_COLS
+from proteusPy.DisulfideList import DisulfideList
+from proteusPy.DisulfideLoader import Load_PDB_SS
+from proteusPy.ProteusGlobals import DATA_DIR
 
 import os
 _abspath = os.path.dirname(os.path.abspath(__file__))
 
-SAVE_DIR = f'/Users/egs/repos/proteusPy/data/'
+SAVE_DIR = '/Users/egs/Documents/proteusPyData'
 
 start = time.time()
 
-# pyvista setup for notebooks
-pv.set_jupyter_backend('trame')
-set_plot_theme('dark')
 
 def analyze_binary_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -> DisulfideList:
-    class_filename = f'{SAVE_DIR}SS_consensus_class32.pkl'
+    """
+    Analyze the binary disulfide bond classes.
+
+    :param loader: The disulfide loader object.
+    :param do_graph: Whether or not to display torsion statistics graphs. Default is True.
+    :param do_consensus: Whether or not to compute average conformations for each class. Default is True.
+    :param cutoff: The cutoff percentage for each class. If the percentage of disulfides for a class is below
+                   this value, the class will be skipped. Default is 0.1.
+
+    :return: A list of disulfide bonds, where each disulfide bond represents the average conformation for a class.
+    """
+    class_filename = f'{DATA_DIR}SS_consensus_class32.pkl'
     classes = loader.tclass.classdict
     tot_classes = len(classes)
     res_list = DisulfideList([], 'SS_Class_Avg_SS')
@@ -119,7 +127,7 @@ def analyze_binary_classes(loader: DisulfideLoader, do_graph=True, do_consensus=
     pbar = enumerate(classes)
     for idx, cls in pbar:
         fname = f'{SAVE_DIR}ss_class_{idx}.png'
-        print(f'--> analyze_classes(): {cls} {idx+1}/{tot_classes}')
+        #print(f'--> analyze_classes(): {cls} {idx+1}/{tot_classes}')
 
         # get the classes
         class_ss_list = loader.from_class(cls)
@@ -131,7 +139,7 @@ def analyze_binary_classes(loader: DisulfideLoader, do_graph=True, do_consensus=
             # get the average conformation - array of dihedrals
             avg_conformation = np.zeros(5)
 
-            print(f'--> analyze_classes(): Computing avg conformation for: {cls}')
+            #print(f'--> analyze_classes(): Computing avg conformation for: {cls}')
             avg_conformation = class_ss_list.Average_Conformation
 
             # build the average disulfide for the class
@@ -163,7 +171,7 @@ def analyze_six_classes(loader, do_graph=True, do_consensus=True, cutoff=0.1):
     """
     _PBAR_COLS = 85
 
-    class_filename = f'{SAVE_DIR}SS_consensus_class_sext.pkl'
+    class_filename = f'{DATA_DIR}SS_consensus_class_sext.pkl'
 
     six = loader.tclass.sixclass_df
     tot_classes = six.shape[0]
@@ -188,7 +196,10 @@ def analyze_six_classes(loader, do_graph=True, do_consensus=True, cutoff=0.1):
 
         pbar2 = tqdm(ss_list, ncols=_PBAR_COLS, leave=False)
         for ssid in pbar2:
-            class_disulfides.append(loader[ssid])
+            _ss = loader[ssid]
+            class_disulfides.append(_ss)
+            # remove it from the overall list to increase speed for searching
+            loader.SSList.remove(_ss)
 
         if do_graph:
             class_disulfides.display_torsion_statistics(display=False, save=True, 
