@@ -200,7 +200,7 @@ def analyze_six_classes(loader, do_graph=True, do_consensus=True, cutoff=0.1):
             class_disulfides.append(_ss)
             # remove it from the overall list to increase speed for searching
             loader.SSList.remove(_ss)
-
+    
         if do_graph:
             class_disulfides.display_torsion_statistics(display=False, save=True, 
                 fname=fname, light=True, stats=False)
