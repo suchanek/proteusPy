@@ -409,11 +409,14 @@ def plot_count_vs_class_df(df, title='title',
 
     fig.update_layout(showlegend=True, title_x=0.5, title_font=dict(size=20), 
                     xaxis_showgrid=False, yaxis_showgrid=False)
+    fig.update_layout(autosize=True)
+    
     if save:
         fname = f'{savedir}/{title}.png'
         fig.write_image(fname, 'png')
     else:          
         fig.show()
+    return fig
 
 
 def plot_count_vs_classid(df, cls=None, title='title', theme='light'):
@@ -435,13 +438,17 @@ def plot_count_vs_classid(df, cls=None, title='title', theme='light'):
         
     fig.update_layout(xaxis_title='Class ID', yaxis_title='Count', showlegend=True, 
                     title_x=0.5)
+    fig.layout.autosize = True
     
     if theme == 'light':
         fig.update_layout(template='plotly_white')
     else:
         fig.update_layout(template='plotly_dark')
-        
+
+    fig.update_layout(autosize=True)
+    
     fig.show()
+    return fig
 
 
 def plot_binary_to_sixclass_incidence(loader: DisulfideLoader, theme='light'):
@@ -493,6 +500,23 @@ def enumerate_sixclass_fromlist(loader, sslist):
     sslist_df['count'] = y
     return(sslist_df)
 
+def enumerate_sixclass_fromlist(loader: DisulfideLoader, sslist):
+    x = []
+    y = []
+
+    for sixcls in sslist:
+        if sixcls is not None:
+            _y = loader.tclass.sslist_from_classid(sixcls)
+            # it's possible to have 0 SS in a class
+            if _y is not None:
+                # only append if we have both.
+                x.append(sixcls)
+                y.append(len(_y))
+
+    sslist_df = pd.DataFrame(columns=['class_id', 'count'])
+    sslist_df['class_id'] = x
+    sslist_df['count'] = y
+    return(sslist_df)
 
 if __name__ == "__main__":
     import doctest
