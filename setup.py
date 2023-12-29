@@ -18,7 +18,10 @@ proteusPy documentation, linked to from:
 http://suchanek.github.io/proteusPy/
 
 This code is in beta.
+
+Eric G. Suchanek, PhD., suchanek@mac.com
 """
+
 import sys
 import os
 
@@ -40,15 +43,6 @@ if "bdist_wheel" in sys.argv:
             "We need both setuptools AND wheel packages installed "
             "for bdist_wheel to work. Try running: pip install wheel"
         )
-
-# Make sure we have the right Python version.
-#MIN_PY_VER = (3, 9)
-#if sys.version_info[:2] < MIN_PY_VER:
-#    sys.stderr.write(
-#        ("ERROR: proteusPy requires Python %i.%i or later. " % MIN_PY_VER)
-#        + ("Python %d.%d detected.\n" % sys.version_info[:2])
-#    )
-#   sys.exit(1)
 
 def can_import(module_name):
     """Check we can import the requested module."""
@@ -75,9 +69,14 @@ setup(name='proteusPy',
       author='Eric G. Suchanek, PhD',
       author_email='suchanek@mac.com',
       license='MIT',
+      requires_python = "=3.10",
       packages=['proteusPy'],
-      keywords='proteus suchanek disulfide',
-      install_requires=[],
+      keywords='proteusPy suchanek disulfide',
+      install_requires=['numpy', 'matplotlib', 'pandas', 'pyvista', 
+                        'jupyter', 'seaborn', 'pillow',
+                        'tqdm', 'plotly', 'datetime', 'jupyter_bokeh', 'openai',
+                        'plotly', 'panel', 'ipywidgets', 'scikit-learn', 'gdown',
+                        'plotly_express', 'trame', 'biopython'],
       source='https://github.com/suchanek/proteusPy/',
       project_urls={
         "Documentation": "https://suchanek.github.io/proteusPy/",
@@ -90,15 +89,13 @@ setup(name='proteusPy',
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Bio-Informatics',
         'Topic :: Scientific/Engineering :: Chemistry',
-        'Programming Language :: Python :: 3.9'],
+        'Programming Language :: Python :: 3.10'],
       include_package_data=True,
       package_data={'proteusPy': ['data/*.txt', 'data/*.py', 'data/*.json', 'data/*.csv']},
       exclude_package_data={'proteusPy': ['data/PDB_all_ss.pkl', 'data/PDB_SS_ALL_LOADER.pkl', 'PDB_all_ss_dict.pkl']},
-      python_requires=">=3.8",
       zip_safe=False)
       
