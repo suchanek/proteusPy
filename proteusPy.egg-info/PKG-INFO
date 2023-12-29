@@ -9,20 +9,38 @@ License: MIT
 Project-URL: Documentation, https://suchanek.github.io/proteusPy/
 Project-URL: Source, https://github.com/suchanek/proteusPy/
 Project-URL: Tracker, https://github.com/suchanek/proteusPy/issues
-Keywords: proteus suchanek disulfide
+Keywords: proteusPy suchanek disulfide
 Classifier: Development Status :: 4 - Beta
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Intended Audience :: Developers
 Classifier: Intended Audience :: Science/Research
 Classifier: Operating System :: OS Independent
-Classifier: Programming Language :: Python :: 3.9
 Classifier: Programming Language :: Python :: 3.10
 Classifier: Topic :: Scientific/Engineering
 Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
 Classifier: Topic :: Scientific/Engineering :: Chemistry
-Classifier: Programming Language :: Python :: 3.9
-Requires-Python: >=3.8
+Classifier: Programming Language :: Python :: 3.10
 Description-Content-Type: text/markdown
+Requires-Dist: numpy
+Requires-Dist: matplotlib
+Requires-Dist: pandas
+Requires-Dist: pyvista
+Requires-Dist: jupyter
+Requires-Dist: seaborn
+Requires-Dist: pillow
+Requires-Dist: tqdm
+Requires-Dist: plotly
+Requires-Dist: datetime
+Requires-Dist: jupyter_bokeh
+Requires-Dist: openai
+Requires-Dist: plotly
+Requires-Dist: panel
+Requires-Dist: ipywidgets
+Requires-Dist: scikit-learn
+Requires-Dist: gdown
+Requires-Dist: plotly_express
+Requires-Dist: trame
+Requires-Dist: biopython
 
 # Summary
 
