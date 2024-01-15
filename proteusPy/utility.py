@@ -408,6 +408,35 @@ def plot_class_chart(classes: int) -> None:
     # Show the chart
     fig.show()
 
+import requests
+
+def retrieve_git_lfs_files(repo_url, objects):
+    """
+    Retrieves a git-lfs json object from a specified repo.
+    It does NOT download the file.
+    """
+    batch_url = f"{repo_url.rstrip('/')}/info/lfs/objects/batch"
+    headers = {
+        "Accept": "application/vnd.git-lfs+json",
+        "Content-type": "application/json"
+    }
+    data = {
+        "operation": "download",
+        "transfer": ["basic"],
+        "objects": objects
+    }
+
+    response = requests.post(batch_url, headers=headers, json=data)
+    if response.status_code == 200:
+        # Process the response or save the files
+        # For example, you can access the file contents using response.json()
+        # and save them to the desired location on your system.
+        return response.json()
+    else:
+        # Handle error case
+        print(f"Error: {response.status_code} - {response.text}")
+        return None
+
 
 if __name__ == "__main__":
     import doctest

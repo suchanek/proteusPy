@@ -1,30 +1,14 @@
-# Disulfide Bond Analysis
+# Disulfide Bond Display Test
 # Author: Eric G. Suchanek, PhD.
-# Last revision: 1/2/23 -egs-
-# Cα Cβ Sγ
+# Last revision: 1/13/24 -egs-
 
 import pandas as pd
 from proteusPy.Disulfide import Disulfide
-from proteusPy.DisulfideLoader import DisulfideLoader
+from proteusPy.DisulfideLoader import Load_PDB_SS
 from proteusPy.DisulfideList import DisulfideList
-import streamlit as st
-from stpyvista import stpyvista
 
 import pyvista as pv
 from pyvista import set_plot_theme
-
-# the locations below represent the actual location on the dev drive.
-# location for PDB repository
-PDB_BASE = '/Users/egs/PDB/'
-
-# location of cleaned PDB files
-PDB = '/Users/egs/PDB/good/'
-
-# location of the compressed Disulfide .pkl files
-MODELS = f'{PDB_BASE}models/'
-
-import pyvista as pv
-from proteusPy.Disulfide import *
 
 def SS_DisplayTest(ss: Disulfide):
     ss.display(style='bs', single=False)
@@ -46,7 +30,7 @@ def SSlist_DisplayTest(sslist):
 
 if __name__ == '__main__':
     PDB_SS = None
-    PDB_SS = DisulfideLoader(verbose=True, subset=False)
+    PDB_SS = Load_PDB_SS(verbose=True, subset=False)
     
     # one disulfide from the database
     ss = Disulfide()

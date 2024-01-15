@@ -4,6 +4,7 @@ channels:
 dependencies:
   - python=3.10
   - biopython
+  - scikit-learn
   - ca-certificates
   - openssl
   - pyvista
@@ -24,12 +25,10 @@ dependencies:
   - ipyparallel
   - pycryptodome
   - nodejs
-  - pdoc
   - pillow
   - pytube
   - openai
   - rdkit
-  - yarn
   - grpcio
   - conda=23.5.0
   - pip
@@ -37,6 +36,7 @@ dependencies:
     - wget
     - gdown
     - tqdm
+    - ipykernel
   - trame
 prefix: /Users/egs/miniforge3/envs/proteusPy
 
