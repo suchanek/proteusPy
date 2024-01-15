@@ -10,11 +10,9 @@ plotly
 datetime
 jupyter_bokeh
 openai
-plotly
 panel
 ipywidgets
 scikit-learn
 gdown
 plotly_express
 trame
-biopython
