@@ -543,7 +543,7 @@ class DisulfideLoader:
    
 # class ends
 
-def oDownload_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False):
+def _oDownload_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False):
     '''
     Download the databases from Github.
 
