@@ -580,36 +580,11 @@ def oDownload_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False):
     return _good1 + _good2
 
 import requests
-def retrieve_git_lfs_files(repo_url, objects):
-        """
-        Retrieves a git-lfs json object from a specified repo.
-        It does NOT download the file.
-        """
-        batch_url = f"{repo_url.rstrip('/')}/info/lfs/objects/batch"
-        headers = {
-            "Accept": "application/vnd.git-lfs+json",
-            "Content-type": "application/json"
-        }
-        data = {
-            "operation": "download",
-            "transfer": ["basic"],
-            "objects": objects
-        }
-
-        response = requests.post(batch_url, headers=headers, json=data)
-        if response.status_code == 200:
-            # Process the response or save the files
-            # For example, you can access the file contents using response.json()
-            # and save them to the desired location on your system.
-            return response.json()
-        else:
-            # Handle error case
-            print(f"Error: {response.status_code} - {response.text}")
-            return None
 
 def Download_PDB_SS(loadpath=DATA_DIR, verbose=True, subset=False):
     '''
-    Download the databases from Github.
+    Download the databases from Github. Note: if you change the database these sizes will 
+    need to be changed!
 
     :param loadpath: Path from which to load, defaults to DATA_DIR
     :param verbose: Verbosity, defaults to False
@@ -621,7 +596,43 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=True, subset=False):
     
     _fname_sub = f'{loadpath}{LOADER_SUBSET_FNAME}'
     _fname_all = f'{loadpath}{LOADER_FNAME}'
+
+    _all_length = 34037177
+    _subset_length = 8980961
+
+    if verbose:
+        print(f'--> DisulfideLoader: Downloading Disulfide Database from GitHub...')
     
+    resp, headers = urllib.request.urlretrieve("https://github.com/suchanek/proteusPy/raw/master/data/PDB_SS_ALL_LOADER.pkl", _fname_all)
+    num_bytes = headers.get('content-length')
+    if num_bytes == _all_length:
+        _good1 = 1
+
+    if verbose:
+        print(f'--> DisulfideLoader: Downloading Disulfide Subset Database from GitHub...')
+    
+    resp, headers = urllib.request.urlretrieve("https://github.com/suchanek/proteusPy/raw/master/data/PDB_SS_SUBSET_LOADER.pkl", _fname_sub)
+    num_bytes = headers.get('content-length')
+    if num_bytes == _subset_length:
+        _good2 = 1
+    return _good1 + _good2
+
+def _Download_PDB_SS(loadpath=DATA_DIR, verbose=True, subset=False):
+    '''
+    Download the databases from Github. Note: if you change the database these sizes will 
+    need to be changed!
+
+    :param loadpath: Path from which to load, defaults to DATA_DIR
+    :param verbose: Verbosity, defaults to False
+    '''
+
+    import urllib
+    _good1 = 0 # all data
+    _good2 = 0 # subset data
+    
+    _fname_sub = f'{loadpath}{LOADER_SUBSET_FNAME}'
+    _fname_all = f'{loadpath}{LOADER_FNAME}'
+
     def retrieve_git_lfs_files(repo_url, objects):
         """
         Retrieves a git-lfs json object from a specified repo.
@@ -673,7 +684,6 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=True, subset=False):
         if os.path.exists(_fname_all):
                 _good1 = 1
 
-
     res_json = retrieve_git_lfs_files(repo_url, subset_pkl_object)
     if res_json is not None:
         print(f'Downloading SS subset database from GitHub...')
@@ -683,7 +693,6 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=True, subset=False):
         if os.path.exists(_fname_all):
             _good2 = 1
     return _good1 + _good2
-
 
 def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoader:
     '''
