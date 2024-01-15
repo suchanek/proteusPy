@@ -608,13 +608,14 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=True, subset=False):
     if num_bytes == _all_length:
         _good1 = 1
 
-    if verbose:
-        print(f'--> DisulfideLoader: Downloading Disulfide Subset Database from GitHub...')
-    
-    resp, headers = urllib.request.urlretrieve("https://github.com/suchanek/proteusPy/raw/master/data/PDB_SS_SUBSET_LOADER.pkl", _fname_sub)
-    num_bytes = headers.get('content-length')
-    if num_bytes == _subset_length:
-        _good2 = 1
+    if subset:
+        if verbose:
+            print(f'--> DisulfideLoader: Downloading Disulfide Subset Database from GitHub...')
+        
+        resp, headers = urllib.request.urlretrieve("https://github.com/suchanek/proteusPy/raw/master/data/PDB_SS_SUBSET_LOADER.pkl", _fname_sub)
+        num_bytes = headers.get('content-length')
+        if num_bytes == _subset_length:
+            _good2 = 1
     return _good1 + _good2
 
 def _Download_PDB_SS(loadpath=DATA_DIR, verbose=True, subset=False):
