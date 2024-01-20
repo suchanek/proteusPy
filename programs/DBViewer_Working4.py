@@ -93,9 +93,7 @@ def click_plot(event):
     
     vtkpan.param.trigger('object')
     render_win[0] = vtkpan
-   
-    # this position is dependent on the vtk panel position in the render_win pane!
-    # print(f'RenderWin: {render_win}')
+    update_output(f'RenderWin: {render_win}')
 
 # Widgets
 
