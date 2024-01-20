@@ -14,10 +14,13 @@ from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideLoader import Load_PDB_SS
 from proteusPy.DisulfideList import DisulfideList
 
+pn.extension('vtk', sizing_mode='stretch_width', template='fast')
 
 _vers = 0.6
 
-_rcsid = '2q7q'
+# defaults for the UI
+
+_rcsid_default = '2q7q'
 _default_ss = '2q7q_75D_140D'
 _ssidlist = [
     '2q7q_75D_140D',
@@ -28,24 +31,18 @@ _ssidlist = [
     '2q7q_98D_129D',
     '2q7q_130D_161D']
 
+_rcsid = '2q7q'
 _style = 'Split Bonds'
 _single = True
-
-PDB_SS = Load_PDB_SS(verbose=True, subset=False)
-
-ss_state = {}
-vers = tot = pdbs = 0
-
 orientation_widget = True
 enable_keybindings = True
 
+# globals
+ss_state = {}
+vers = tot = pdbs = 0
 RCSB_list = []
 
-app = pn.template.FastListTemplate(
-    title=f"RCSB Disulfide Browser: {tot} Disulfides, {pdbs} Structures, V{vers}",
-    )
-
-pn.extension('vtk', sizing_mode='stretch_width')
+#PDB_SS = Load_PDB_SS(verbose=True, subset=False)
 
 # a few widgets
 styles_group = pn.widgets.RadioBoxGroup(name='Rending Style', 
@@ -57,14 +54,14 @@ rcsb_ss_widget = pn.widgets.Select(name="Disulfide", value=_default_ss, options=
 # not used atm    
 shadows_checkbox = pn.widgets.Checkbox(name='Shadows', value=False)
 
-rcsb_selector_widget = pn.widgets.Select(name="RCSB ID", value=_rcsid, options=RCSB_list)
+#rcsb_selector_widget = pn.widgets.Select(name="RCSB ID", value=_rcsid, options=RCSB_list)
 
-'''
+
 rcsb_selector_widget = pn.widgets.AutocompleteInput(name="RCSB ID (start typing)", 
-													value=_rcsid, restrict=True,
+													value=_rcsid_default, restrict=True,
                                                     placeholder="Search Here", 
                                                     options=RCSB_list)
-'''
+
 
 button = pn.widgets.Button(name='Refresh', button_type='primary')
 
@@ -86,9 +83,6 @@ info_md = pn.pane.Markdown("SS Info")
 ss_info = pn.WidgetBox('# Disulfide Info', info_md).servable(target='sidebar')
 db_info = pn.Column('### RCSB Database Info', db_md)
 
-
-RCSB_list = []
-
 # pn.state.template.param.update(title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, V{vers}")
 
 # default selections
@@ -102,9 +96,11 @@ ss_state_default = {
         '2q7q_91D_135D','2q7q_98D_129D']",
     }
 
-def set_default_state():
+def set_widgets_defaults():
+    global RCSB_list
     styles_group.value = "Split Bonds"
     single_checkbox.value = True
+    rcsb_selector_widget.options = RCSB_list
     rcsb_selector_widget.value = '2qyq'
     rcsb_ss_widget.value = '2q7q_75D_140D'
     return(ss_state_default)
@@ -113,10 +109,10 @@ def set_state(event):
     """
     Set the ss_state dict to the state variables and UI interaface. Push to cache.
     """
-    global ss_state, _rcsid, _ssidlist, _default_ss, single_checkbox, styles_group
+    global ss_state, _rcsid_default, _ssidlist, _default_ss, single_checkbox, styles_group
 
     ss_state['rcsb_list'] = RCSB_list.copy()
-    ss_state['rcsid'] = _rcsid
+    ss_state['rcsid'] = _rcsid_default
     ss_state['ssid_list'] = _ssidlist.copy()
     ss_state['single'] = single_checkbox.value
     ss_state['style'] = styles_group.value
@@ -133,7 +129,7 @@ def load_state():
     """
     Load the state variables from the cache, update the interface.
     """
-    global _ssidlist, _rcsid, _style, _single, _ssbond, _default_ss, single_checkbox, styles_group
+    global _ssidlist, _rcsid, _style, _single, _ssbond, _default_ss, _boot, single_checkbox, styles_group
     _ss_state = {}
 
     if 'ss_state' in pn.state.cache:
@@ -155,14 +151,14 @@ def load_state():
          style: {_ss_state['style']}')
 
     else:
-        print(f'--> adding default state.')
-        set_state(event=None)
+        print(f'--> setting widgets.')
+        set_widgets_defaults()
         print_state(_ss_state)
        
     return _ss_state
 
 def load_data():
-    global vers, tot, pdbs, RCSB_list
+    global vers, tot, pdbs, RCSB_list, _boot
 
     _PDB_SS = Load_PDB_SS(verbose=True, subset=False) # Load some data
     vers = _PDB_SS.version
@@ -170,23 +166,20 @@ def load_data():
     pdbs = len(_PDB_SS.SSDict)
     RCSB_list = sorted(_PDB_SS.IDList)
     print(f'--> Load Data: {len(RCSB_list)}')
-    set_state(event=None)
-
+    #set_state(event=None)
     return _PDB_SS
 
 if 'data' in pn.state.cache:
     PDB_SS = pn.state.cache['data']
-    vers = PDB_SS.version
-    tot = PDB_SS.TotalDisulfides
-    pdbs = len(PDB_SS.SSDict)
-    pn.state.template.param.update(title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, V{vers}")
+    #vers = PDB_SS.version
+    #tot = PDB_SS.TotalDisulfides
+    #pdbs = len(PDB_SS.SSDict)
+    #pn.state.template.param.update(title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, V{vers}")
 else:
     PDB_SS = pn.state.cache['data'] = load_data()
-    vers = PDB_SS.version
-    tot = PDB_SS.TotalDisulfides
-    pdbs = len(PDB_SS.SSDict)
+    set_widgets_defaults()
     pn.state.template.param.update(title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, V{vers}")
-    #RCSB_list = sorted(PDB_SS.IDList)
+    _boot = True
 
 PDB_SS = pn.state.as_cached('data', load_data)
 #ss_state = load_state()
@@ -218,9 +211,8 @@ def click_plot(event):
                      orientation_widget=orientation_widget,
                      enable_keybindings=enable_keybindings, min_height=500)
     
-    vtkpan.param.trigger('object')
     render_win[0] = vtkpan
-    app.Redraw()
+    vtkpan.param.trigger('object')
     
     # this position is dependent on the vtk panel position in the render_win pane!
     print(f'RenderWin: {render_win}')
@@ -367,10 +359,7 @@ pn.bind(get_ss_idlist, rcs_id=rcsb_selector_widget)
 pn.bind(update_single, click=styles_group)
 
 render_win = pn.Column(vtkpan)
-#render_win.servable()
-
-
-app.servable()
+render_win.servable()
 
 
 '''

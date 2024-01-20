@@ -144,8 +144,17 @@ def get_ss_idlist(event) -> list:
     rcsb_ss_widget.options = idlist
     return idlist
 
+def update_info(ss):
+    src = ss.pdb_id
+    enrg = ss.energy
+    name = ss.name
+    resolution = ss.resolution
+
+    info_string = f'### {name}  \n**Resolution:** {resolution:.2f} Å  \n**Energy:** {enrg:.2f} kcal/mol  \n**Cα distance:** {ss.ca_distance:.2f} Å  \n**Cβ distance:** {ss.cb_distance:.2f} Å  \n**Torsion Length:** {ss.torsion_length:.2f}°'
+    info_md.object = info_string
+
 rcsb_selector_widget.param.watch(get_ss_idlist, 'value')
-rcsb_ss_widget.param.watch(click_plot, 'value')
+#rcsb_ss_widget.param.watch(update_info, 'value')
 styles_group.param.watch(click_plot, 'value')
 single_checkbox.param.watch(update_single, 'value')
 
@@ -156,14 +165,6 @@ def update_title(ss):
     title = f'## {name}'
     title_md.object = title
 
-def update_info(ss):
-    src = ss.pdb_id
-    enrg = ss.energy
-    name = ss.name
-    resolution = ss.resolution
-
-    info_string = f'### {name}  \n**Resolution:** {resolution:.2f} Å  \n**Energy:** {enrg:.2f} kcal/mol  \n**Cα distance:** {ss.ca_distance:.2f} Å  \n**Cβ distance:** {ss.cb_distance:.2f} Å  \n**Torsion Length:** {ss.torsion_length:.2f}°'
-    info_md.object = info_string
 
 def update_output(ss):
     enrg = ss.energy
