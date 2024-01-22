@@ -2,7 +2,7 @@ name: proteusPy
 channels:
   - conda-forge
 dependencies:
-  - python>=3.10
+  - python<3.12
   - biopython
   - scikit-learn
   - ca-certificates
@@ -20,11 +20,11 @@ dependencies:
   - pyvistaqt
   - pythreejs
   - panel
+  - notebook=6.4.12
   - jupyterlab
   - jupyter_bokeh
   - ipyparallel
   - pycryptodome
-  - notebook=6.4.12
   - nodejs
   - pillow
   - pytube
