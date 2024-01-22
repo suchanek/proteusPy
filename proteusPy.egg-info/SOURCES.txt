@@ -1,4 +1,4 @@
-MANIFEST.in
+LICENSE
 README.md
 setup.cfg
 setup.py

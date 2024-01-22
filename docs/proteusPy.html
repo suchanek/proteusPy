@@ -103,7 +103,7 @@ proteusPy    </h1>
 <ol>
 <li><em>Install Anaconda (<a href="http://anaconda.org">http://anaconda.org</a>)</em></li>
 <li><p><em>Build the environment.</em>
-It's simplest to clone the repo via github since it contains all of the notebooks, test programs and raw Disulfide databases. The source code distribution can be also be used from pyPi as a normal package, within your own environment.</p>
+It's simplest to clone the repo via github since it contains all of the notebooks, test programs and raw Disulfide databases. The source code distribution can be also be used from pyPi as a normal package, within your own environment. The following instructions are for Unix/Linux/MacOS:</p>
 
 <ul>
 <li><p>From the gitHub repository:</p>
@@ -114,9 +114,9 @@ It's simplest to clone the repo via github since it contains all of the notebook
 <li><p>From a shell prompt:</p>
 
 <p>```console
+$ git-lfs track "<em>.csv" "</em>.pkl" "*.mp4"
 $ git clone <a href="https://github.com/suchanek/proteusPy">https://github.com/suchanek/proteusPy</a>
 $ cd proteusPy
-$ git-lfs track "<em>.csv" "</em>.pkl" "*.mp4"
 $ conda env create --name proteusPy --file=proteusPy.yml
 $ conda activate proteusPy
 $ pip install .
@@ -125,7 +125,7 @@ $ sudo jupyter nbextension enable --py --sys-prefix widgetsnbextension</p></li>
 </ul></li>
 </ol>
 
-<p>I hope you enjoy using proteusPy and would love to hear any success/insights gleaned from it. The Disulfide database is unique as far as I know, and is ripe for mining.</p>
+<p>I hope you enjoy using <code><a href="">proteusPy</a></code> and would love to hear any success/insights gleaned from it. The Disulfide database is unique as far as I know, and is ripe for mining.</p>
 
 <h2 id="general-usage">General Usage</h2>
 
@@ -146,9 +146,9 @@ $ sudo jupyter nbextension enable --py --sys-prefix widgetsnbextension</p></li>
 <li><a href="http://dx.doi.org/10.2174/092986708783330566">http://dx.doi.org/10.2174/092986708783330566</a></li>
 </ul>
 
-<p><em>NB:</em> This distribution is being developed slowly. proteusPy relies on my fork of the <code>Bio</code> Python package to download and build the database. As a result, one can't download and create the database locally unless the BioPython patch is applied. The changed python file is in the repo's data directory - <code>parse_pdb_header.py</code>. Database analysis is unaffected without the patch. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1. 7/4/23 -egs-</p>
+<p><em>NB:</em> This distribution is being developed slowly. proteusPy relies on my fork of the <code>Bio</code> Python package to download and build the database. As a result, one can't download and create the database locally unless the BioPython patch is applied. The changed python file is in the repo's data directory - <code>parse_pdb_header.py</code>. Database analysis is unaffected without the patch. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1. -egs-</p>
 
-<p>Eric G. Suchanek, PhD., <a href="&#x6d;&#97;&#x69;&#108;t&#111;:&#x73;u&#x63;h&#97;&#110;&#x65;&#x6b;&#64;m&#x61;&#99;.&#99;&#111;&#109;">&#x73;u&#x63;h&#97;&#110;&#x65;&#x6b;&#64;m&#x61;&#99;.&#99;&#111;&#109;</a></p>
+<p>Eric G. Suchanek, PhD., <a href="&#109;&#97;&#105;&#108;&#x74;&#111;&#58;&#x73;u&#x63;&#x68;&#x61;&#110;&#x65;&#107;&#x40;&#x6d;&#97;&#99;&#x2e;&#99;&#111;&#109;">&#x73;u&#x63;&#x68;&#x61;&#110;&#x65;&#107;&#x40;&#x6d;&#97;&#99;&#x2e;&#99;&#111;&#109;</a></p>
 </div>
 
                         <input id="mod-proteusPy-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">

@@ -25,7 +25,6 @@ dependencies:
   - ipyparallel
   - pycryptodome
   - notebook
-  - jupyter_contrib_nbextensions
   - nodejs
   - pillow
   - pytube
@@ -37,6 +36,7 @@ dependencies:
     - gdown
     - tqdm
     - ipykernel
+    - jupyter_contrib_nbextensions
   - trame
 prefix: /Users/egs/miniforge3/envs/proteusPy
 

@@ -153,9 +153,6 @@
 
             </li>
             <li>
-                    <a class="function" href="#oDownload_PDB_SS">oDownload_PDB_SS</a>
-            </li>
-            <li>
                     <a class="function" href="#Download_PDB_SS">Download_PDB_SS</a>
             </li>
             <li>
@@ -734,7 +731,7 @@ Last revision: 7/2/2023</p>
 </span><span id="L-543"><a href="#L-543"><span class="linenos">543</span></a>   
 </span><span id="L-544"><a href="#L-544"><span class="linenos">544</span></a><span class="c1"># class ends</span>
 </span><span id="L-545"><a href="#L-545"><span class="linenos">545</span></a>
-</span><span id="L-546"><a href="#L-546"><span class="linenos">546</span></a><span class="k">def</span> <span class="nf">oDownload_PDB_SS</span><span class="p">(</span><span class="n">loadpath</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+</span><span id="L-546"><a href="#L-546"><span class="linenos">546</span></a><span class="k">def</span> <span class="nf">_oDownload_PDB_SS</span><span class="p">(</span><span class="n">loadpath</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 </span><span id="L-547"><a href="#L-547"><span class="linenos">547</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-548"><a href="#L-548"><span class="linenos">548</span></a><span class="sd">    Download the databases from Github.</span>
 </span><span id="L-549"><a href="#L-549"><span class="linenos">549</span></a>
@@ -2488,67 +2485,6 @@ a common reference (the proximal disulfides).</p>
 
 
                             </div>
-                </section>
-                <section id="oDownload_PDB_SS">
-                            <input id="oDownload_PDB_SS-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">oDownload_PDB_SS</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">loadpath</span><span class="o">=</span><span class="s1">&#39;/Users/egs/repos/proteusPy/proteusPy/data/&#39;</span>,</span><span class="param">	<span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>,</span><span class="param">	<span class="n">subset</span><span class="o">=</span><span class="kc">False</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="oDownload_PDB_SS-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#oDownload_PDB_SS"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="oDownload_PDB_SS-547"><a href="#oDownload_PDB_SS-547"><span class="linenos">547</span></a><span class="k">def</span> <span class="nf">oDownload_PDB_SS</span><span class="p">(</span><span class="n">loadpath</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-</span><span id="oDownload_PDB_SS-548"><a href="#oDownload_PDB_SS-548"><span class="linenos">548</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="oDownload_PDB_SS-549"><a href="#oDownload_PDB_SS-549"><span class="linenos">549</span></a><span class="sd">    Download the databases from Github.</span>
-</span><span id="oDownload_PDB_SS-550"><a href="#oDownload_PDB_SS-550"><span class="linenos">550</span></a>
-</span><span id="oDownload_PDB_SS-551"><a href="#oDownload_PDB_SS-551"><span class="linenos">551</span></a><span class="sd">    :param loadpath: Path from which to load, defaults to DATA_DIR</span>
-</span><span id="oDownload_PDB_SS-552"><a href="#oDownload_PDB_SS-552"><span class="linenos">552</span></a><span class="sd">    :param verbose: Verbosity, defaults to False</span>
-</span><span id="oDownload_PDB_SS-553"><a href="#oDownload_PDB_SS-553"><span class="linenos">553</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="oDownload_PDB_SS-554"><a href="#oDownload_PDB_SS-554"><span class="linenos">554</span></a>    <span class="c1"># normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy </span>
-</span><span id="oDownload_PDB_SS-555"><a href="#oDownload_PDB_SS-555"><span class="linenos">555</span></a>    <span class="c1"># distribution. In that case we need to download the files for all disulfides and the subset</span>
-</span><span id="oDownload_PDB_SS-556"><a href="#oDownload_PDB_SS-556"><span class="linenos">556</span></a>    <span class="c1"># from GitHub. Complicated by the fact that they are git-lfs storage.</span>
-</span><span id="oDownload_PDB_SS-557"><a href="#oDownload_PDB_SS-557"><span class="linenos">557</span></a>    
-</span><span id="oDownload_PDB_SS-558"><a href="#oDownload_PDB_SS-558"><span class="linenos">558</span></a>    <span class="kn">import</span> <span class="nn">urllib.request</span>
-</span><span id="oDownload_PDB_SS-559"><a href="#oDownload_PDB_SS-559"><span class="linenos">559</span></a>    <span class="kn">from</span> <span class="nn">proteusPy.data</span> <span class="kn">import</span> <span class="n">LOADER_GITHUB_All_URL</span><span class="p">,</span> <span class="n">LOADER_GITHUB_SUBSET_URL</span>
-</span><span id="oDownload_PDB_SS-560"><a href="#oDownload_PDB_SS-560"><span class="linenos">560</span></a>
-</span><span id="oDownload_PDB_SS-561"><a href="#oDownload_PDB_SS-561"><span class="linenos">561</span></a>    <span class="n">_good1</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># all data</span>
-</span><span id="oDownload_PDB_SS-562"><a href="#oDownload_PDB_SS-562"><span class="linenos">562</span></a>    <span class="n">_good2</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># subset data</span>
-</span><span id="oDownload_PDB_SS-563"><a href="#oDownload_PDB_SS-563"><span class="linenos">563</span></a>    
-</span><span id="oDownload_PDB_SS-564"><a href="#oDownload_PDB_SS-564"><span class="linenos">564</span></a>    <span class="n">_fname_sub</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">loadpath</span><span class="si">}{</span><span class="n">LOADER_SUBSET_FNAME</span><span class="si">}</span><span class="s1">&#39;</span>
-</span><span id="oDownload_PDB_SS-565"><a href="#oDownload_PDB_SS-565"><span class="linenos">565</span></a>    <span class="n">_fname_all</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">loadpath</span><span class="si">}{</span><span class="n">LOADER_FNAME</span><span class="si">}</span><span class="s1">&#39;</span>
-</span><span id="oDownload_PDB_SS-566"><a href="#oDownload_PDB_SS-566"><span class="linenos">566</span></a>    
-</span><span id="oDownload_PDB_SS-567"><a href="#oDownload_PDB_SS-567"><span class="linenos">567</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="oDownload_PDB_SS-568"><a href="#oDownload_PDB_SS-568"><span class="linenos">568</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-&gt; Download_PDB_SS(): Reading disulfides from GitHub ... &#39;</span><span class="p">)</span>
-</span><span id="oDownload_PDB_SS-569"><a href="#oDownload_PDB_SS-569"><span class="linenos">569</span></a>    
-</span><span id="oDownload_PDB_SS-570"><a href="#oDownload_PDB_SS-570"><span class="linenos">570</span></a>    <span class="k">if</span> <span class="n">subset</span><span class="p">:</span>
-</span><span id="oDownload_PDB_SS-571"><a href="#oDownload_PDB_SS-571"><span class="linenos">571</span></a>        <span class="k">if</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">LOADER_GITHUB_SUBSET_URL</span><span class="p">,</span> <span class="n">_fname_sub</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="oDownload_PDB_SS-572"><a href="#oDownload_PDB_SS-572"><span class="linenos">572</span></a>            <span class="n">os</span><span class="o">.</span><span class="n">sync</span><span class="p">()</span>
-</span><span id="oDownload_PDB_SS-573"><a href="#oDownload_PDB_SS-573"><span class="linenos">573</span></a>            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">_fname_sub</span><span class="p">):</span>
-</span><span id="oDownload_PDB_SS-574"><a href="#oDownload_PDB_SS-574"><span class="linenos">574</span></a>                <span class="n">_good2</span> <span class="o">=</span> <span class="mi">2</span>
-</span><span id="oDownload_PDB_SS-575"><a href="#oDownload_PDB_SS-575"><span class="linenos">575</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="oDownload_PDB_SS-576"><a href="#oDownload_PDB_SS-576"><span class="linenos">576</span></a>        <span class="k">if</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">LOADER_GITHUB_All_URL</span><span class="p">,</span> <span class="n">_fname_all</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="oDownload_PDB_SS-577"><a href="#oDownload_PDB_SS-577"><span class="linenos">577</span></a>            <span class="n">os</span><span class="o">.</span><span class="n">sync</span><span class="p">()</span>
-</span><span id="oDownload_PDB_SS-578"><a href="#oDownload_PDB_SS-578"><span class="linenos">578</span></a>            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">_fname_all</span><span class="p">):</span>
-</span><span id="oDownload_PDB_SS-579"><a href="#oDownload_PDB_SS-579"><span class="linenos">579</span></a>                <span class="n">_good1</span> <span class="o">=</span> <span class="mi">1</span>
-</span><span id="oDownload_PDB_SS-580"><a href="#oDownload_PDB_SS-580"><span class="linenos">580</span></a>
-</span><span id="oDownload_PDB_SS-581"><a href="#oDownload_PDB_SS-581"><span class="linenos">581</span></a>    <span class="k">return</span> <span class="n">_good1</span> <span class="o">+</span> <span class="n">_good2</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Download the databases from Github.</p>
-
-<h6 id="parameters">Parameters</h6>
-
-<ul>
-<li><strong>loadpath</strong>:  Path from which to load, defaults to DATA_DIR</li>
-<li><strong>verbose</strong>:  Verbosity, defaults to False</li>
-</ul>
-</div>
-
-
                 </section>
                 <section id="Download_PDB_SS">
                             <input id="Download_PDB_SS-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
