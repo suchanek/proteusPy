@@ -1,18 +1,19 @@
 '''
 RCSB Disulfide Bond Database Browser
 Author: Eric G. Suchanek, PhD
-Last revision: 1/19/2024
+Last revision: 1/21/2024
 '''
 
 import pyvista as pv
 import panel as pn
+import param
 
 pn.extension('vtk', sizing_mode='stretch_width', template='fast')
 
 from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideLoader import Load_PDB_SS
 
-_vers = 0.8
+_vers = 0.81
 _default_rcsid = '2q7q'
 _default_ss = '2q7q_75D_140D'
 _default_style = "Ball and Stick"
@@ -51,6 +52,8 @@ def get_theme() -> str:
         return "dark"
     return "default"
 
+rcsb_ss_widget = pn.widgets.Select(name="Disulfide", value=default_ss, options=ssidlist)
+
 def click_plot(event):
     """Force a re-render of the currently selected disulfide. Removes the pane
     and re-adds it to the panel.
@@ -58,8 +61,7 @@ def click_plot(event):
     Returns:
         None
     """
-    global render_win 
-    # vtkpan
+    global render_win, vtkpan
     cnt = event.new
 
     plotter = render_ss()
@@ -69,13 +71,12 @@ def click_plot(event):
     
     vtkpan.param.trigger('object')
     render_win[0] = vtkpan
-    update_output(f'{render_win[0]}, {cnt}')
+    # update_output(f'{render_win[0]}, {cnt}')
     ss = get_ss()
     
 
 def update_info_cb(event):
     ss_id = event.new
-    update_output(f'Got id: {ss_id}')
     ss = get_ss()
     update_info(ss)
 
@@ -112,7 +113,7 @@ button.on_click(click_plot)
 # not used atm    
 shadows_checkbox = pn.widgets.Checkbox(name='Shadows', value=False)
 
-rcsb_ss_widget = pn.widgets.Select(name="Disulfide", value=default_ss, options=ssidlist)
+#rcsb_ss_widget = pn.widgets.Select(name="Disulfide", value=default_ss, options=ssidlist)
 rcsb_selector_widget = pn.widgets.AutocompleteInput(name="RCSB ID", value=rcsid, restrict=True,
                                                     placeholder="Search Here", options=RCSB_list)
 
@@ -152,7 +153,6 @@ def load_data():
     pn.state.template.param.update(title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, V{_vers}")
     rcsb_selector_widget.options = RCSB_list
     return PDB_SS    
-
 
 # Callbacks
 def get_ss_idlist(id) -> list:
@@ -196,12 +196,14 @@ def get_ss() -> Disulfide:
     else:
         return ss
 
+@param.depends(rcsb_ss_widget)
 def render_ss(clk=True):
     global PDB_SS
     global plotter
     global vtkpan
     global render_win
 
+    _plotter = pv.Plotter()
     light = True
 
     styles = {"Split Bonds": 'sb', "CPK":'cpk', "Ball and Stick":'bs'}
@@ -223,17 +225,18 @@ def render_ss(clk=True):
     single = single_checkbox.value
     shadows = shadows_checkbox.value
 
-    plotter.clear()
-    plotter = ss.plot(plotter, single=single, style=style, shadows=shadows, light=light)
+    update_output(f'Plotter: {plotter}')
+    #plotter.clear()
+    _plotter = ss.plot(_plotter, single=single, style=style, shadows=shadows, light=light)
     
-    vtkpan = pn.pane.VTK(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
+    vtkpan = pn.pane.VTK(_plotter.ren_win, margin=0, sizing_mode='stretch_both', 
                      orientation_widget=orientation_widget,
                      enable_keybindings=enable_keybindings, min_height=500)
     
     
     ### vtkpan.param.trigger('object')
 
-    return plotter
+    return _plotter
 
 '''
 from bokeh.plotting import figure
@@ -275,7 +278,7 @@ current_ss = get_ss()
 update_info(current_ss)
 
 plotter = pv.Plotter()
-#plotter = render_ss()
+plotter = render_ss()
 
 vtkpan = pn.pane.VTK(plotter.ren_win, margin=0, sizing_mode='stretch_both', 
                      orientation_widget=orientation_widget,
@@ -296,7 +299,7 @@ pn.bind(get_ss_idlist, id=rcsb_selector_widget)
 pn.bind(update_single, click=styles_group)
 pn.bind(update_info, rcsb_ss_widget,)
 
-update_output(f'{render_win}')
+#update_output(f'{render_win}')
 
 render_win.servable()
 
