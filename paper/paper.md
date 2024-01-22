@@ -48,9 +48,34 @@ This necessitated the creation an object-oriented database capable of introspect
 It's simplest to clone the repo via github since it contains all of the notebooks, test programs and raw Disulfide databases.
 
 - Install Anaconda: <http://anaconda.org>
-- Install git-lfs
+- Install git-lfs:
   - <https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage>
-- From a shell prompt:
+  - Install mamba:
+    - mamba info
+- From a shell prompt in MacOS:
+  ```console
+  $ git clone https://github.com/suchanek/proeusPy/proteusPy.git
+  $ cd proteusPy
+  $ conda env create --name proteusPy --file=proteusPy.yml
+  $ conda activate proteusPy
+  $ pip install .
+  $ python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy)"
+
+  ## Linux:
+   $ sudo apt-get install dvipng texlive-latex-extra texlive-fonts-recommended cm-super
+   $ git clone https://github.com/suchanek/proeusPy/proteusPy.git
+   $ cd proteusPy 
+   $ conda env create --name proteusPy
+   $ conda activate proteusPy
+   $ conda install vtk
+   $ conda install biopython
+   $ pip install .
+   $ python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy)"
+
+
+  
+
+  ```
 
 ![install](install.png)
 
