@@ -2,6 +2,7 @@ numpy
 matplotlib
 pandas
 pyvista
+notebook
 jupyter
 seaborn
 pillow
@@ -11,8 +12,9 @@ datetime
 jupyter_bokeh
 openai
 panel
-ipywidgets
 scikit-learn
 gdown
 plotly_express
 trame
+jupyter_contrib_nbextensions
+ipywidgets

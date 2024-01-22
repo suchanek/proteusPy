@@ -56,21 +56,24 @@ It's simplest to clone the repo via github since it contains all of the notebook
   ```console
   $ git clone https://github.com/suchanek/proeusPy/proteusPy.git
   $ cd proteusPy
-  $ conda env create --name proteusPy --file=proteusPy.yml
+  $ git-lfs track "*.csv" "*.pkl" "*.mp4"
+  $ mamba env create --name proteusPy --file=proteusPy.yml
   $ conda activate proteusPy
   $ pip install .
+  $ jupyter nbextension enable --py --sys-prefix widgetsnbextension
   $ python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy)"
 
   ## Linux:
-   $ sudo apt-get install dvipng texlive-latex-extra texlive-fonts-recommended cm-super
    $ git clone https://github.com/suchanek/proeusPy/proteusPy.git
    $ cd proteusPy 
-   $ conda env create --name proteusPy
+   $ git-lfs track "*.csv" "*.pkl" "*.mp4"
+   $ mamba env create --file proteusPy.yml
    $ conda activate proteusPy
-   $ conda install vtk
-   $ conda install biopython
    $ pip install .
+   $ jupyter nbextension enable --py --sys-prefix widgetsnbextension
    $ python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy)"
+   $ sudo apt-get install dvipng texlive-latex-extra texlive-fonts-recommended cm-super
+
 
 
   
