@@ -130,8 +130,8 @@ dash2 = pn.Column(binary_class_widget, info_md)
 
 
 # Create a Panel layout
-#layout = pn.Column(binary_class_widget, pn.Column(plot_classes))
-layout = pn.Column(binary_class_widget, plot_classes, info_md, )
+layout = pn.Column(binary_class_widget, pn.Column(plot_classes))
+#layout = pn.Column(binary_class_widget, plot_classes, info_md, )
 
 # Show the Panel
 layout.servable()
