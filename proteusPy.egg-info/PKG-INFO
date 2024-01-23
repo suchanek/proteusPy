@@ -26,7 +26,7 @@ Requires-Dist: numpy
 Requires-Dist: matplotlib
 Requires-Dist: pandas
 Requires-Dist: pyvista
-Requires-Dist: notebook
+Requires-Dist: notebook==6.4.12
 Requires-Dist: jupyter
 Requires-Dist: seaborn
 Requires-Dist: pillow
