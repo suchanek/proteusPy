@@ -20,6 +20,7 @@ dependencies:
   - pyvistaqt
   - pythreejs
   - panel
+  - pandas<2.0
   - notebook=6.4.12
   - jupyterlab
   - jupyter_bokeh

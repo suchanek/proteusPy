@@ -227,7 +227,7 @@ def render_ss(clk=True):
 
     update_output(f'Plotter: {plotter}')
     #plotter.clear()
-    _plotter = ss.plot(_plotter, single=single, style=style, shadows=shadows, light=light)
+    plotter = ss.plot(plotter, single=single, style=style, shadows=shadows, light=light)
     
     vtkpan = pn.pane.VTK(_plotter.ren_win, margin=0, sizing_mode='stretch_both', 
                      orientation_widget=orientation_widget,

@@ -511,9 +511,9 @@ class Disulfide:
             pvp = draw_bonds(pvp, style='plain', bcolor=bondcolor, 
                             missing=missing_atoms, all_atoms=all_atoms)
             
-        return
+        return pvp
 
-    def _plot(self, pvplot: list, style='bs', plain=False,
+    def _plot(self, pvplot, style='bs', plain=False,
                 bondcolor=BOND_COLOR, bs_scale=BS_SCALE, spec=SPECULARITY, 
                 specpow=SPEC_POWER, translate=True,
                 bond_radius=BOND_RADIUS, res=100):
@@ -1154,6 +1154,7 @@ class Disulfide:
         if single == True:
             #_pl = pv.Plotter(window_size=WINSIZE)
             #_pl.add_title(title=title, font_size=FONTSIZE)
+            pl.clear()
             pl.enable_anti_aliasing('msaa')
             pl.add_camera_orientation_widget()            
 
@@ -1196,7 +1197,7 @@ class Disulfide:
             pl.reset_camera()
             if shadows == True:
                 pl.enable_shadows()
-        return pl
+        return pl.update()
     
     def Distance_neighbors(self, others: DisulfideList, cutoff: float):
         '''
@@ -1980,11 +1981,10 @@ class Disulfide:
         the lowest and highest energies, and then find the nearest conformational neighbors.
         Finally, we display the neighbors overlaid against a common reference frame.
 
-        >>> import proteusPy
-        >>> from proteusPy.DisulfideLoader import DisulfideLoader
+        >>> from proteusPy import *
+        >>> from proteusPy.DisulfideLoader import Load_PDB_SS
         >>> from proteusPy.DisulfideList import DisulfideList
         >>> from proteusPy.Disulfide import Disulfide
-        >>> PDB_SS = None
         >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
         >>> ss_list = DisulfideList([], 'tmp')
 
@@ -2243,9 +2243,10 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
        Sγ: <Vector -1.14, -3.69, -0.43>
        Cprev <Vector -0.73, -17.44, -2.01>
        Nnext: <Vector 1.92, -19.18, -0.63>
-     Χ1-Χ5: 174.63°, 82.52°, -83.32°, -62.52° -73.83°, 1.70 kcal/mol
+     Χ1-Χ5: 174.63°, 82.52°, -83.32°, -62.52° -73.83°, 138.89°, 1.70 kcal/mol
      Cα Distance: 4.50 Å
      Torsion length: 231.53 deg>
+    
 
     Get a list of disulfides via slicing and display them oriented against a common
     reference frame (the proximal N, Cα, C').
