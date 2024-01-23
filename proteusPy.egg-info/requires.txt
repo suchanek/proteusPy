@@ -1,6 +1,6 @@
 numpy
 matplotlib
-pandas
+pandas<2.0
 pyvista
 notebook==6.4.12
 jupyter
