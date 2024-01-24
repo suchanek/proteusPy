@@ -1128,9 +1128,9 @@ class Disulfide:
             pl.show()
         return
     
-    def plot(self, pl, single=True, style='sb', light=True, shadows=False):
+    def plot(self, pl, single=True, style='sb', light=True, shadows=False) -> pv.Plotter:
         '''
-        Return the pyVista Ploter object for the Disulfide bond in the specific rendering style.
+        Return the pyVista Plotter object for the Disulfide bond in the specific rendering style.
 
         :param single: Display the bond in a single panel in the specific style. 
         :param style:  Rendering style: One of:
@@ -1197,7 +1197,7 @@ class Disulfide:
             pl.reset_camera()
             if shadows == True:
                 pl.enable_shadows()
-        return pl.update()
+        return pl
     
     def Distance_neighbors(self, others: DisulfideList, cutoff: float):
         '''

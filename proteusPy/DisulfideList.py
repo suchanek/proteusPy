@@ -140,10 +140,9 @@ class DisulfideList(UserList):
        Sγ: <Vector -1.14, -3.69, -0.43>
        Cprev <Vector -0.73, -17.44, -2.01>
        Nnext: <Vector 1.92, -19.18, -0.63>
-     Χ1-Χ5: 174.63°, 82.52°, -83.32°, -62.52° -73.83°, 1.70 kcal/mol
+     Χ1-Χ5: 174.63°, 82.52°, -83.32°, -62.52° -73.83°, 138.89°, 1.70 kcal/mol
      Cα Distance: 4.50 Å
      Torsion length: 231.53 deg>
-
     Get a list of disulfides via slicing
     >>> subset = DisulfideList(PDB_SS[0:10],'subset')
     
