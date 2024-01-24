@@ -1,6 +1,6 @@
 '''
 RCSB Disulfide Bond Database Browser
-Author: Eric G. Suchanek, PhD
+@author Eric G. Suchanek, PhD
 Last revision: 1/21/2024
 '''
 
@@ -107,7 +107,7 @@ def update_single(click):
     else:
         styles_group.disabled = False
 
-button = pn.widgets.Button(name='Refresh', button_type='primary')
+button = pn.widgets.Button(name='Redraw', button_type='primary')
 button.on_click(click_plot)
 
 # not used atm    
@@ -202,8 +202,6 @@ def render_ss(clk=True):
     global plotter
     global vtkpan
     global render_win
-
-    _plotter = pv.Plotter()
     light = True
 
     styles = {"Split Bonds": 'sb', "CPK":'cpk', "Ball and Stick":'bs'}
@@ -225,18 +223,9 @@ def render_ss(clk=True):
     single = single_checkbox.value
     shadows = shadows_checkbox.value
 
-    update_output(f'Plotter: {plotter}')
-    #plotter.clear()
-    plotter = ss.plot(plotter, single=single, style=style, shadows=shadows, light=light)
+    update_output(f'Plotter: {plotter.ren_win}')
     
-    vtkpan = pn.pane.VTK(_plotter.ren_win, margin=0, sizing_mode='stretch_both', 
-                     orientation_widget=orientation_widget,
-                     enable_keybindings=enable_keybindings, min_height=500)
-    
-    
-    ### vtkpan.param.trigger('object')
-
-    return _plotter
+    return ss.plot(plotter, single=single, style=style, shadows=shadows, light=light)
 
 '''
 from bokeh.plotting import figure
@@ -284,11 +273,11 @@ vtkpan = pn.pane.VTK(plotter.ren_win, margin=0, sizing_mode='stretch_both',
                      orientation_widget=orientation_widget,
                      enable_keybindings=enable_keybindings, min_height=500)
 
-vtkpan.param.trigger('object')    
 render_win = pn.Column(vtkpan)
 
-plotter = render_ss()
+vtkpan.param.trigger('object')    
 
+plotter = render_ss()
 rcsb_selector_widget.param.watch(get_ss_idlist, 'value')
 single_checkbox.param.watch(update_single, 'value')
 rcsb_ss_widget.param.watch(update_info_cb, 'value')

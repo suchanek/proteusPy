@@ -62,11 +62,19 @@ It's simplest to clone the repo via github since it contains all of the notebook
   $ pip install .
   $ jupyter nbextension enable --py --sys-prefix widgetsnbextension
   $ python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy)"
+  $ cd ..
+  $ git clone https://github.com/suchanek/biopython
+  $ cd biopython
+  $ pip install .
 
   ## Linux:
    $ git clone https://github.com/suchanek/proeusPy/proteusPy.git
    $ cd proteusPy
    $ ./linux.sh
+   $ cd ..
+   $ git clone https://github.com/suchanek/biopython
+   $ cd biopython
+   $ pip install .
  
   ```
 
