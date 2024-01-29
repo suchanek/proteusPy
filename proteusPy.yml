@@ -8,8 +8,6 @@ dependencies:
   - biopython
   - scikit-learn
   - pyvista
-  - notebook=6.4.12
-  - jupyter
   - seaborn
   - plotly_express
   - tqdm
@@ -18,8 +16,6 @@ dependencies:
   - pyvistaqt
   - pythreejs
   - panel
-  - jupyterlab
-  - jupyter_bokeh
   - ipyparallel
   - pycryptodome
   - nodejs
@@ -33,6 +29,8 @@ dependencies:
     - gdown
     - tqdm
     - ipykernel
+    - jupyterlab
+    - jupyter_bokeh
     - jupyter_contrib_nbextensions
   - trame
 prefix: /Users/egs/miniforge3/envs/proteusPy
