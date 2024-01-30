@@ -1,0 +1,39 @@
+name: proteusPy
+channels:
+  - conda-forge
+dependencies:
+  - python<3.12
+  - notebook=6.4.12
+  - pandas<2.0
+  - matplotlib
+  - biopython
+  - scikit-learn
+  - pyvista
+  - seaborn
+  - plotly_express
+  - tqdm
+  - ipygany
+  - qtpy
+  - pyvistaqt
+  - pythreejs
+  - panel
+  - ipyparallel
+  - pycryptodome
+  - nodejs
+  - pillow
+  - pytube
+  - openai
+  - grpcio
+  - pip
+  - pip:
+    - wget
+    - gdown
+    - tqdm
+    - jupyter
+    - ipykernel
+    - jupyter_bokeh
+    - jupyter_contrib_nbextensions
+  - trame
+  - ipywidgets
+prefix: /Users/egs/miniforge3/envs/proteusPy
+
