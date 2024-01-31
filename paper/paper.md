@@ -32,10 +32,10 @@ The work has resulted in a freely-accessible database of over 120,494 disulfide 
 
 # Statement of Need
 
-Disulfide bonds are the only naturally occuring covalent bond in proteins. They provide important structural stabilization both within and between protein subunits. They can also be involved in enzymatic catalysis, regulate protein activities and protect against oxidative stress. 
-I implemented ``proteusPy`` to revisit the [RCSB Protein Databank](https://www.rcsb.org) and do a structural analysis of the disulfide bonds contained therein.
+Disulfide bonds are the only naturally occuring covalent bond in proteins. They provide important structural stabilization both within and between protein subunits. They are also involved in enzymatic catalysis, regulate protein activities and protect against oxidative stress. 
+I initially implemented ``proteusPy`` to explore the [RCSB Protein Databank](https://www.rcsb.org) and perform a structural analysis of the disulfide bonds contained therein.
 
-This necessitated the creation an object-oriented database capable of introspection, analysis and display. The API [@API] is available online at: <https://suchanek.github.io/proteusPy/proteusPy.html> and provides more details and numerous examples.
+This necessitated the implementation of a python-based package of data structures and algorithms capable of manipulation protein structures and rending them. This has led to the creation an object-oriented database capable of introspection, analysis and display. The API [@API] for the package is available online at: <https://suchanek.github.io/proteusPy/proteusPy.html> and provides more details and numerous examples.
 
 # Requirements
 
@@ -43,39 +43,25 @@ This necessitated the creation an object-oriented database capable of introspect
 2. 16 GB RAM
 3. 2 GB disk space
 
-# Installation
+# Installation (MacOS/Linux)
 
-It's simplest to clone the repo via github since it contains all of the notebooks, test programs and raw Disulfide databases.
+It's simplest to clone the repo via github since it contains all of the notebooks, and test programs. Installing the Biopython fork is optional unless you want to actually rebuild the database. I highly recommend using Miniforge, especially in MacOS.
 
-- Install Anaconda: <http://anaconda.org>
+- Install Miniforge: <https://github.com/conda-forge/miniforge> (existing Anaconda installations are fine but please install mamba)
 - Install git-lfs:
   - <https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage>
-  - Install mamba:
-    - mamba info
-- From a shell prompt in MacOS:
+- From a shell prompt while sitting in your repo dir:
   ```console
   $ git clone https://github.com/suchanek/proeusPy/proteusPy.git
-  $ cd proteusPy
-  $ git-lfs track "*.csv" "*.pkl" "*.mp4"
-  $ mamba env create --name proteusPy --file=proteusPy.yml
-  $ conda activate proteusPy
-  $ pip install .
-  $ jupyter nbextension enable --py --sys-prefix widgetsnbextension
-  $ python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy)"
-  $ cd ..
   $ git clone https://github.com/suchanek/biopython
-  $ cd biopython
+  $ git-lfs track "*.csv" "*.mp4"
+  $ cd proteusPy
+  $ mamba env create --name proteusPy --file=proteusPy.yml
+  $ conda activate proteusPy <-- this is important!
+  $ chmod u+x jupyter.sh
+  $ ./jupyter.sh
+  $ cd ../biopython
   $ pip install .
-
-  ## Linux:
-   $ git clone https://github.com/suchanek/proeusPy/proteusPy.git
-   $ cd proteusPy
-   $ ./linux.sh
-   $ cd ..
-   $ git clone https://github.com/suchanek/biopython
-   $ cd biopython
-   $ pip install .
- 
   ```
 
 ![install](install.png)
