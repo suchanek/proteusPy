@@ -2,6 +2,7 @@ numpy
 matplotlib
 pandas<2.0
 pyvista
+traitlets==5.9.0
 notebook==6.4.12
 jupyter
 jupyterlab
@@ -15,6 +16,18 @@ openai
 panel
 scikit-learn
 gdown
+ipykernel
+seaborn
+ipygany
+qtpy
+pyvistaqt
+pythreejs
+nodejs
+pytube
+openai
+grpcio
+pip
+wget
 plotly_express
 trame
 jupyter_contrib_nbextensions

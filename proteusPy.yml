@@ -3,6 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - python<3.12
+  - traitlets=5.9.0
   - notebook=6.4.12
   - pandas<2.0
   - matplotlib
@@ -11,7 +12,6 @@ dependencies:
   - pyvista
   - seaborn
   - plotly_express
-  - tqdm
   - ipygany
   - qtpy
   - pyvistaqt
@@ -34,5 +34,4 @@ dependencies:
     - jupyter_contrib_nbextensions
   - trame
   - ipywidgets
-prefix: /Users/egs/miniforge3/envs/proteusPy
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 14.2.0"/>
+    <meta name="generator" content="pdoc 14.4.0"/>
     <title>proteusPy API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
@@ -46,9 +46,9 @@
 
             <h2>Contents</h2>
             <ul>
-  <li><a href="#summary">Summary</a>
+  <li><a href="#summary">Summary</a></li>
+  <li><a href="#installation-macoslinux">Installation (MacOS/Linux)</a>
   <ul>
-    <li><a href="#virtual-environment-creation">Virtual Environment Creation</a></li>
     <li><a href="#general-usage">General Usage</a></li>
     <li><a href="#the-future">The Future</a></li>
     <li><a href="#publications">Publications</a></li>
@@ -96,36 +96,33 @@ proteusPy    </h1>
 
 <p><strong>proteusPy</strong> is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide Bonds. This package reprises my molecular modeling program <a href="https://doi.org/10.1021/bi00368a023">Proteus</a>, and relies on the <a href="https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html">Turtle3D</a> class. The turtle implements the functions <code>Move</code>, <code>Roll</code>, <code>Yaw</code>, <code>Pitch</code> and <code>Turn</code> for movement in a three-dimensional space. The <a href="https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html">Disulfide</a> class implements methods to analyze the protein structure stabilizing element known as a <em>Disulfide Bond</em>. This class and its underlying methods are being used to perform a structural analysis of over 35,800 disulfide-bond containing proteins in the RCSB protein data bank.</p>
 
-<h2 id="virtual-environment-creation">Virtual Environment Creation</h2>
+<h1 id="installation-macoslinux">Installation (MacOS/Linux)</h1>
 
-<p>These instructions are Unix/Mac specific. The should also work under WSL.</p>
-
-<ol>
-<li><em>Install Anaconda (<a href="http://anaconda.org">http://anaconda.org</a>)</em></li>
-<li><p><em>Build the environment.</em>
-It's simplest to clone the repo via github since it contains all of the notebooks, test programs and raw Disulfide databases. The source code distribution can be also be used from pyPi as a normal package, within your own environment. The following instructions are for Unix/Linux/MacOS:</p>
+<p>It's simplest to clone the repo via github since it contains all of the notebooks, data and test programs. Installing the Biopython fork is optional unless you want to actually rebuild the database. I highly recommend using Miniforge, especially in MacOS.</p>
 
 <ul>
-<li><p>From the gitHub repository:</p>
-
+<li>Install Miniforge: <a href="https://github.com/conda-forge/miniforge">https://github.com/conda-forge/miniforge</a> (existing Anaconda installations are fine but please install mamba)</li>
+<li>Install git-lfs:
 <ul>
-<li>Install git-lfs</li>
-<li><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage">https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage</a></li>
-<li><p>From a shell prompt:</p>
-
-<p>```console
-$ git-lfs track "<em>.csv" "</em>.pkl" "*.mp4"
-$ git clone <a href="https://github.com/suchanek/proteusPy">https://github.com/suchanek/proteusPy</a>
-$ cd proteusPy
-$ conda env create --name proteusPy --file=proteusPy.yml
-$ conda activate proteusPy
-$ pip install .
-$ sudo jupyter nbextension enable --py --sys-prefix widgetsnbextension</p></li>
+<li><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage">https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage</a></a></li>
 </ul></li>
-</ul></li>
-</ol>
+<li>From a shell prompt while sitting in your repo dir:
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span><a href="https://github.com/suchanek/proeusPy/proteusPy.git">https://github.com/suchanek/proeusPy/proteusPy.git</a>
+<span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span><a href="https://github.com/suchanek/biopython">https://github.com/suchanek/biopython</a>
+<span class="gp">$ </span>git-lfs<span class="w"> </span>track<span class="w"> </span><span class="s2">&quot;<em>.csv&quot;</span><span class="w"> </span><span class="s2">&quot;</em>.mp4&quot;</span>
+<span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>proteusPy
+<span class="gp">$ </span>mamba<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>--name<span class="w"> </span>proteusPy<span class="w"> </span>--file<span class="o">=</span>proteusPy.yml
+<span class="gp">$ </span>conda<span class="w"> </span>activate<span class="w"> </span>proteusPy<span class="w"> </span>&lt;--<span class="w"> </span>this<span class="w"> </span>is<span class="w"> </span>important!
+<span class="gp">$ </span>chmod<span class="w"> </span>u+x<span class="w"> </span>jupyter.sh
+<span class="gp">$ </span>./jupyter.sh
+<span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>../biopython
+<span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>.
+</code></pre>
+</div></li>
+</ul>
 
-<p>I hope you enjoy using <code><a href="">proteusPy</a></code> and would love to hear any success/insights gleaned from it. The Disulfide database is unique as far as I know, and is ripe for mining.</p>
+<p>I hope that <code><a href="">proteusPy</a></code> provides value to you and your research, and would love to hear any success/insights gleaned from it. The Disulfide database is a valuable resource and is ripe for mining. </p>
 
 <h2 id="general-usage">General Usage</h2>
 
@@ -135,7 +132,7 @@ $ sudo jupyter nbextension enable --py --sys-prefix widgetsnbextension</p></li>
 
 <h2 id="the-future">The Future</h2>
 
-<p>I am continuing to explore the initial disulfide structural classes gleaned from Hogg <em>et al.</em> further using the sextant class approach. This offers much higher class resolution and reveals subgroups within the broad class. I'd also like to explore the catalytic and allosteric classes in more detail to look for common structural elements.</p>
+<p>I am continuing to explore the initial disulfide structural classes described by Hogg <em>et al.</em> using the sextant class approach. This offers much higher class resolution and reveals subgroups within the broad class. I'd also like to explore the catalytic and allosteric classes in more detail to look for common structural elements.</p>
 
 <h2 id="publications">Publications</h2>
 
@@ -148,7 +145,7 @@ $ sudo jupyter nbextension enable --py --sys-prefix widgetsnbextension</p></li>
 
 <p><em>NB:</em> This distribution is being developed slowly. proteusPy relies on my fork of the <code>Bio</code> Python package to download and build the database. As a result, one can't download and create the database locally unless the BioPython patch is applied. The changed python file is in the repo's data directory - <code>parse_pdb_header.py</code>. Database analysis is unaffected without the patch. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1. -egs-</p>
 
-<p>Eric G. Suchanek, PhD., <a href="&#x6d;&#97;&#105;&#x6c;&#116;&#x6f;&#58;&#115;&#117;&#x63;&#104;&#97;&#x6e;&#101;k&#64;&#x6d;&#x61;&#99;&#x2e;&#x63;&#x6f;&#x6d;">&#115;&#117;&#x63;&#104;&#97;&#x6e;&#101;k&#64;&#x6d;&#x61;&#99;&#x2e;&#x63;&#x6f;&#x6d;</a></p>
+<p>Eric G. Suchanek, PhD., <a href="&#x6d;&#97;&#105;l&#x74;&#111;&#58;&#115;&#x75;&#99;&#104;&#97;&#110;&#x65;&#107;&#x40;&#x6d;&#97;&#99;&#x2e;c&#111;&#109;">&#115;&#x75;&#99;&#104;&#97;&#110;&#x65;&#107;&#x40;&#x6d;&#97;&#99;&#x2e;c&#111;&#109;</a></p>
 </div>
 
                         <input id="mod-proteusPy-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -163,7 +160,7 @@ $ sudo jupyter nbextension enable --py --sys-prefix widgetsnbextension</p></li>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">.. include:: ../README.md</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.86&quot;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.88&quot;</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="kn">import</span> <span class="nn">sys</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="kn">import</span> <span class="nn">os</span>

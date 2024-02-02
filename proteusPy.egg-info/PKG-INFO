@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: proteusPy
-Version: 0.86
+Version: 0.88
 Summary: proteusPy - Protein Structure Analysis and Modeling Tools
 Home-page: https://github.com/suchanek/proteusPy/
 Author: Eric G. Suchanek, PhD
@@ -15,17 +15,18 @@ Classifier: License :: OSI Approved :: BSD License
 Classifier: Intended Audience :: Developers
 Classifier: Intended Audience :: Science/Research
 Classifier: Operating System :: OS Independent
-Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
 Classifier: Topic :: Scientific/Engineering
 Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
 Classifier: Topic :: Scientific/Engineering :: Chemistry
-Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
 Description-Content-Type: text/markdown
 License-File: LICENSE
 Requires-Dist: numpy
 Requires-Dist: matplotlib
 Requires-Dist: pandas<2.0
 Requires-Dist: pyvista
+Requires-Dist: traitlets==5.9.0
 Requires-Dist: notebook==6.4.12
 Requires-Dist: jupyter
 Requires-Dist: jupyterlab
@@ -39,6 +40,18 @@ Requires-Dist: openai
 Requires-Dist: panel
 Requires-Dist: scikit-learn
 Requires-Dist: gdown
+Requires-Dist: ipykernel
+Requires-Dist: seaborn
+Requires-Dist: ipygany
+Requires-Dist: qtpy
+Requires-Dist: pyvistaqt
+Requires-Dist: pythreejs
+Requires-Dist: nodejs
+Requires-Dist: pytube
+Requires-Dist: openai
+Requires-Dist: grpcio
+Requires-Dist: pip
+Requires-Dist: wget
 Requires-Dist: plotly_express
 Requires-Dist: trame
 Requires-Dist: jupyter_contrib_nbextensions
@@ -48,28 +61,28 @@ Requires-Dist: ipywidgets
 
 **proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide Bonds. This package reprises my molecular modeling program [Proteus](https://doi.org/10.1021/bi00368a023), and relies on the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class. The turtle implements the functions ``Move``, ``Roll``, ``Yaw``, ``Pitch`` and ``Turn`` for movement in a three-dimensional space. The [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class implements methods to analyze the protein structure stabilizing element known as a *Disulfide Bond*. This class and its underlying methods are being used to perform a structural analysis of over 35,800 disulfide-bond containing proteins in the RCSB protein data bank.
 
-## Virtual Environment Creation
+# Installation (MacOS/Linux)
 
-These instructions are Unix/Mac specific. The should also work under WSL.
+It's simplest to clone the repo via github since it contains all of the notebooks, data and test programs. Installing the Biopython fork is optional unless you want to actually rebuild the database. I highly recommend using Miniforge, especially in MacOS.
 
-1. *Install Anaconda (<http://anaconda.org>)*
-2. *Build the environment.*
-   It's simplest to clone the repo via github since it contains all of the notebooks, test programs and raw Disulfide databases. The source code distribution can be also be used from pyPi as a normal package, within your own environment. The following instructions are for Unix/Linux/MacOS:
-   - From the gitHub repository:
-     - Install git-lfs
-       - <https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage>
-       - From a shell prompt:
+- Install Miniforge: <https://github.com/conda-forge/miniforge> (existing Anaconda installations are fine but please install mamba)
+- Install git-lfs:
+  - <https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage>
+- From a shell prompt while sitting in your repo dir:
+  ```console
+  $ git clone https://github.com/suchanek/proeusPy/proteusPy.git
+  $ git clone https://github.com/suchanek/biopython
+  $ git-lfs track "*.csv" "*.mp4"
+  $ cd proteusPy
+  $ mamba env create --name proteusPy --file=proteusPy.yml
+  $ conda activate proteusPy <-- this is important!
+  $ chmod u+x jupyter.sh
+  $ ./jupyter.sh
+  $ cd ../biopython
+  $ pip install .
+  ```
 
-         ```console
-          $ git-lfs track "*.csv" "*.pkl" "*.mp4"
-          $ git clone https://github.com/suchanek/proteusPy
-          $ cd proteusPy
-          $ conda env create --name proteusPy --file=proteusPy.yml
-          $ conda activate proteusPy
-          $ pip install .
-          $ sudo jupyter nbextension enable --py --sys-prefix widgetsnbextension
-
-I hope you enjoy using ``proteusPy`` and would love to hear any success/insights gleaned from it. The Disulfide database is unique as far as I know, and is ripe for mining.
+I hope that ``proteusPy`` provides value to you and your research, and would love to hear any success/insights gleaned from it. The Disulfide database is a valuable resource and is ripe for mining. 
 
 ## General Usage
 
@@ -79,7 +92,7 @@ The first time one loads the database via ``Load_PDB_SS()`` the system will atte
 
 ## The Future
 
-I am continuing to explore the initial disulfide structural classes gleaned from Hogg *et al.* further using the sextant class approach. This offers much higher class resolution and reveals subgroups within the broad class. I'd also like to explore the catalytic and allosteric classes in more detail to look for common structural elements.
+I am continuing to explore the initial disulfide structural classes described by Hogg *et al.* using the sextant class approach. This offers much higher class resolution and reveals subgroups within the broad class. I'd also like to explore the catalytic and allosteric classes in more detail to look for common structural elements.
 
 ## Publications
 
