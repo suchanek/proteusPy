@@ -32,6 +32,6 @@ dependencies:
     - ipykernel
     - jupyter_bokeh
     - jupyter_contrib_nbextensions
-  - trame
-  - ipywidgets
+    - trame
+    - ipywidgets
 

@@ -15,10 +15,10 @@ It's simplest to clone the repo via github since it contains all of the notebook
   $ git clone https://github.com/suchanek/biopython
   $ git-lfs track "*.csv" "*.mp4"
   $ cd proteusPy
-  $ mamba env create --name proteusPy --file=proteusPy.yml
+  $ conda create --name proteusPy python==3.11.7
   $ conda activate proteusPy <-- this is important!
-  $ chmod u+x jupyter.sh
-  $ ./jupyter.sh
+  $ pip install .
+  $ sh ./jupyter.sh
   $ cd ../biopython
   $ pip install .
   ```
