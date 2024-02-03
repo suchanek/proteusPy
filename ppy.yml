@@ -1,0 +1,19 @@
+name: proteusPy
+channels:
+  - conda-forge
+dependencies:
+  - python<3.12
+  - traitlets=5.9.0
+  - notebook=6.4.12
+  - pandas<2.0
+  - matplotlib
+  - biopython
+  - pip
+  - pip:
+    - wget
+    - gdown
+    - tqdm
+    - ipykernel
+  - trame
+  - ipywidgets
+

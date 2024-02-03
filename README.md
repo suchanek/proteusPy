@@ -11,16 +11,15 @@ It's simplest to clone the repo via github since it contains all of the notebook
   - <https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage>
 - From a shell prompt while sitting in your repo dir:
   ```console
-  $ git clone https://github.com/suchanek/proeusPy/proteusPy.git
-  $ git clone https://github.com/suchanek/biopython
+  $ git clone https://github.com/suchanek/proteusPy.git
+  $ git clone https://github.com/suchanek/biopython.git
   $ git-lfs track "*.csv" "*.mp4"
   $ cd proteusPy
-  $ conda create --name proteusPy python==3.11.7
+  $ conda env create --name ppy --file ppy.yml
   $ conda activate proteusPy <-- this is important!
   $ pip install .
   $ sh ./jupyter.sh
-  $ cd ../biopython
-  $ pip install .
+  $ cd ../biopython && pip install . && cd ../proteusPy
   ```
 
 I hope that ``proteusPy`` provides value to you and your research, and would love to hear any success/insights gleaned from it. The Disulfide database is a valuable resource and is ripe for mining. 

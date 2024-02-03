@@ -52,16 +52,14 @@ It's simplest to clone the repo via github since it contains all of the notebook
   - <https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage>
 - From a shell prompt while sitting in your repo dir:
   ```console
-  $ git clone https://github.com/suchanek/proeusPy/proteusPy.git
-  $ git clone https://github.com/suchanek/biopython
+  $ git clone https://github.com/suchanek/proteusPy.git
+  $ git clone https://github.com/suchanek/biopython.git
   $ git-lfs track "*.csv" "*.mp4"
   $ cd proteusPy
-  $ mamba env create --name proteusPy --file=proteusPy.yml
+  $ conda env create --name ppy --file ppy.yml
   $ conda activate proteusPy <-- this is important!
-  $ chmod u+x jupyter.sh
-  $ ./jupyter.sh
-  $ cd ../biopython
   $ pip install .
+  $ sh ./jupyter.sh
   ```
 
 ![install](install.png)
