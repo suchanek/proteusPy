@@ -15,7 +15,7 @@ It's simplest to clone the repo via github since it contains all of the notebook
   $ git clone https://github.com/suchanek/biopython.git
   $ git-lfs track "*.csv" "*.mp4"
   $ cd proteusPy
-  $ conda env create --name ppy --file ppy.yml
+  $ conda env create --name proteusPy --file ppy.yml
   $ conda activate proteusPy <-- this is important!
   $ pip install .
   $ sh ./jupyter.sh
