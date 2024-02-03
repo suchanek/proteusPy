@@ -12,3 +12,4 @@ data/Oclasses/*
 *.mp4
 programs/chatbot.py
 proteusPy/.DS_Store
+proteusPy.egg-info/
