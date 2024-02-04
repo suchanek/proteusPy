@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: proteusPy
-Version: 0.88
+Version: 0.89
 Summary: proteusPy - Protein Structure Analysis and Modeling Tools
 Home-page: https://github.com/suchanek/proteusPy/
 Author: Eric G. Suchanek, PhD
@@ -25,7 +25,7 @@ License-File: LICENSE
 Requires-Dist: numpy
 Requires-Dist: matplotlib
 Requires-Dist: pandas<2.0
-Requires-Dist: pyvista
+Requires-Dist: pyvista[all,trame]
 Requires-Dist: traitlets==5.9.0
 Requires-Dist: notebook==6.4.12
 Requires-Dist: jupyter
@@ -43,9 +43,6 @@ Requires-Dist: gdown
 Requires-Dist: ipykernel
 Requires-Dist: seaborn
 Requires-Dist: ipygany
-Requires-Dist: qtpy
-Requires-Dist: pyvistaqt
-Requires-Dist: pythreejs
 Requires-Dist: nodejs
 Requires-Dist: pytube
 Requires-Dist: openai
@@ -53,7 +50,7 @@ Requires-Dist: grpcio
 Requires-Dist: pip
 Requires-Dist: wget
 Requires-Dist: plotly_express
-Requires-Dist: trame
+Requires-Dist: trame-jupyter-extension
 Requires-Dist: jupyter_contrib_nbextensions
 Requires-Dist: ipywidgets
 
@@ -68,25 +65,21 @@ It's simplest to clone the repo via github since it contains all of the notebook
 - Install Miniforge: <https://github.com/conda-forge/miniforge> (existing Anaconda installations are fine but please install mamba)
 - Install git-lfs:
   - <https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage>
+- Install `make` on your system.
 - From a shell prompt while sitting in your repo dir:
   ```console
   $ git clone https://github.com/suchanek/proteusPy.git
   $ git clone https://github.com/suchanek/biopython.git
   $ git-lfs track "*.csv" "*.mp4"
   $ cd proteusPy
-  $ conda create --name proteusPy python==3.11.7
-  $ conda activate proteusPy <-- this is important!
-  $ pip install .
-  $ sh ./jupyter.sh
-  $ cd ../biopython
-  $ pip install .
+  $ make pkg
+  $ mamba activate proteusPy
+  $ make install
   ```
-
-I hope that ``proteusPy`` provides value to you and your research, and would love to hear any success/insights gleaned from it. The Disulfide database is a valuable resource and is ripe for mining. 
 
 ## General Usage
 
-Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. The ``notebooks`` directory contains all of my Jupyter notebooks and is a good place to start. The ``DisulfideAnalysis.ipynb`` notebook contains the first analysis paper. The ``programs`` subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files, (``DisulfideDownloader.py``), extracting the disulfides and creating the database loaders (``DisulfideExtractor.py``) and cluster analysis, (``DisulfideClass_Analysis.py``).
+Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. The ``notebooks`` directory contains all of my Jupyter notebooks and is a good place to start. The ``Analysis_2q7q.ipynb`` notebook provides an example of visualizing the lowest energy Disulfide contained in the database, and searching for nearest neighbors. The ``programs`` subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files, (``DisulfideDownloader.py``), extracting the disulfides and creating the database loaders (``DisulfideExtractor.py``) and cluster analysis, (``DisulfideClass_Analysis.py``).
 
 The first time one loads the database via ``Load_PDB_SS()`` the system will attempt to download the full and subset database from my Google Drive. If this fails the system will attempt to rebuild the database from the repo's ``data`` subdirectory (not the package's). If you've downloaded from github this will work correctly. If you've installed from pyPi via ``pip`` it will fail.
 
@@ -101,6 +94,6 @@ I am continuing to explore the initial disulfide structural classes described by
 - <https://doi.org/10.1016/0092-8674(92)90140-8>
 - <http://dx.doi.org/10.2174/092986708783330566>
 
-*NB:* This distribution is being developed slowly. proteusPy relies on my fork of the ``Bio`` Python package to download and build the database. As a result, one can't download and create the database locally unless the BioPython patch is applied. The changed python file is in the repo's data directory - ``parse_pdb_header.py``. Database analysis is unaffected without the patch. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1. -egs-
+*NB:* This distribution is being developed slowly. proteusPy relies on my fork of the ``Bio`` Python package to download and build the database. As a result, one can't download and create the database locally unless the BioPython patch is applied. The changed python file is in the repo's data directory - ``parse_pdb_header.py``. Database analysis is unaffected without the patch. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on M series Macs. -egs-
 
 Eric G. Suchanek, PhD., <mailto:suchanek@mac.com>
