@@ -106,27 +106,23 @@ proteusPy    </h1>
 <ul>
 <li><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage"><a href="https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage">https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage</a></a></li>
 </ul></li>
+<li>Install <code>make</code> on your system.</li>
 <li>From a shell prompt while sitting in your repo dir:
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span><a href="https://github.com/suchanek/proeusPy/proteusPy.git">https://github.com/suchanek/proeusPy/proteusPy.git</a>
-<span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span><a href="https://github.com/suchanek/biopython">https://github.com/suchanek/biopython</a>
+<pre><span></span><code><span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span><a href="https://github.com/suchanek/proteusPy.git">https://github.com/suchanek/proteusPy.git</a>
+<span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span><a href="https://github.com/suchanek/biopython.git">https://github.com/suchanek/biopython.git</a>
 <span class="gp">$ </span>git-lfs<span class="w"> </span>track<span class="w"> </span><span class="s2">&quot;<em>.csv&quot;</span><span class="w"> </span><span class="s2">&quot;</em>.mp4&quot;</span>
 <span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>proteusPy
-<span class="gp">$ </span>mamba<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>--name<span class="w"> </span>proteusPy<span class="w"> </span>--file<span class="o">=</span>proteusPy.yml
-<span class="gp">$ </span>conda<span class="w"> </span>activate<span class="w"> </span>proteusPy<span class="w"> </span>&lt;--<span class="w"> </span>this<span class="w"> </span>is<span class="w"> </span>important!
-<span class="gp">$ </span>chmod<span class="w"> </span>u+x<span class="w"> </span>jupyter.sh
-<span class="gp">$ </span>./jupyter.sh
-<span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>../biopython
-<span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>.
+<span class="gp">$ </span>make<span class="w"> </span>pkg
+<span class="gp">$ </span>mamba<span class="w"> </span>activate<span class="w"> </span>proteusPy
+<span class="gp">$ </span>make<span class="w"> </span>install
 </code></pre>
 </div></li>
 </ul>
 
-<p>I hope that <code><a href="">proteusPy</a></code> provides value to you and your research, and would love to hear any success/insights gleaned from it. The Disulfide database is a valuable resource and is ripe for mining. </p>
-
 <h2 id="general-usage">General Usage</h2>
 
-<p>Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. The <code>notebooks</code> directory contains all of my Jupyter notebooks and is a good place to start. The <code>DisulfideAnalysis.ipynb</code> notebook contains the first analysis paper. The <code>programs</code> subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files, (<code>DisulfideDownloader.py</code>), extracting the disulfides and creating the database loaders (<code>DisulfideExtractor.py</code>) and cluster analysis, (<code>DisulfideClass_Analysis.py</code>).</p>
+<p>Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. The <code>notebooks</code> directory contains all of my Jupyter notebooks and is a good place to start. The <code>Analysis_2q7q.ipynb</code> notebook provides an example of visualizing the lowest energy Disulfide contained in the database, and searching for nearest neighbors. The <code>programs</code> subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files, (<code>DisulfideDownloader.py</code>), extracting the disulfides and creating the database loaders (<code>DisulfideExtractor.py</code>) and cluster analysis, (<code>DisulfideClass_Analysis.py</code>).</p>
 
 <p>The first time one loads the database via <code>Load_PDB_SS()</code> the system will attempt to download the full and subset database from my Google Drive. If this fails the system will attempt to rebuild the database from the repo's <code>data</code> subdirectory (not the package's). If you've downloaded from github this will work correctly. If you've installed from pyPi via <code>pip</code> it will fail.</p>
 
@@ -143,9 +139,9 @@ proteusPy    </h1>
 <li><a href="http://dx.doi.org/10.2174/092986708783330566">http://dx.doi.org/10.2174/092986708783330566</a></li>
 </ul>
 
-<p><em>NB:</em> This distribution is being developed slowly. proteusPy relies on my fork of the <code>Bio</code> Python package to download and build the database. As a result, one can't download and create the database locally unless the BioPython patch is applied. The changed python file is in the repo's data directory - <code>parse_pdb_header.py</code>. Database analysis is unaffected without the patch. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on the M1. -egs-</p>
+<p><em>NB:</em> This distribution is being developed slowly. proteusPy relies on my fork of the <code>Bio</code> Python package to download and build the database. As a result, one can't download and create the database locally unless the BioPython patch is applied. The changed python file is in the repo's data directory - <code>parse_pdb_header.py</code>. Database analysis is unaffected without the patch. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on M series Macs. -egs-</p>
 
-<p>Eric G. Suchanek, PhD., <a href="&#x6d;&#97;&#105;l&#x74;&#111;&#58;&#115;&#x75;&#99;&#104;&#97;&#110;&#x65;&#107;&#x40;&#x6d;&#97;&#99;&#x2e;c&#111;&#109;">&#115;&#x75;&#99;&#104;&#97;&#110;&#x65;&#107;&#x40;&#x6d;&#97;&#99;&#x2e;c&#111;&#109;</a></p>
+<p>Eric G. Suchanek, PhD., <a href="&#109;&#97;i&#108;&#116;&#x6f;:&#115;&#x75;&#x63;&#104;&#97;&#x6e;&#101;&#107;&#x40;&#109;&#x61;&#x63;&#46;&#x63;om">&#115;&#x75;&#x63;&#104;&#97;&#x6e;&#101;&#107;&#x40;&#109;&#x61;&#x63;&#46;&#x63;om</a></p>
 </div>
 
                         <input id="mod-proteusPy-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -160,7 +156,7 @@ proteusPy    </h1>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">.. include:: ../README.md</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.88&quot;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.89&quot;</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="kn">import</span> <span class="nn">sys</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="kn">import</span> <span class="nn">os</span>

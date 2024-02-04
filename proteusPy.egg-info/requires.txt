@@ -1,7 +1,7 @@
 numpy
 matplotlib
 pandas<2.0
-pyvista
+pyvista[all,trame]
 traitlets==5.9.0
 notebook==6.4.12
 jupyter
@@ -19,9 +19,6 @@ gdown
 ipykernel
 seaborn
 ipygany
-qtpy
-pyvistaqt
-pythreejs
 nodejs
 pytube
 openai
@@ -29,6 +26,6 @@ grpcio
 pip
 wget
 plotly_express
-trame
+trame-jupyter-extension
 jupyter_contrib_nbextensions
 ipywidgets
