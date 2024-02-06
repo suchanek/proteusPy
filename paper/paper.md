@@ -45,24 +45,40 @@ This necessitated the implementation of a python-based package of data structure
 
 # Installation (MacOS/Linux)
 
-It's simplest to clone the repo via github since it contains all of the notebooks, and test programs. Installing the Biopython fork is optional unless you want to actually rebuild the database. I highly recommend using Miniforge, especially in MacOS.
+It's simplest to clone the repo via github since it contains all of the notebooks, data and test programs. Installation includes installing my fork of Biopython fork. This is required to rebuild the database. I highly recommend using Miniforge, especially in MacOS.
 
+## MacOS/Linux
 - Install Miniforge: <https://github.com/conda-forge/miniforge> (existing Anaconda installations are fine but please install mamba)
 - Install git-lfs:
   - <https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage>
+- Install `make` on your system.
 - From a shell prompt while sitting in your repo dir:
   ```console
   $ git clone https://github.com/suchanek/proteusPy.git
   $ git clone https://github.com/suchanek/biopython.git
-  $ git-lfs track "*.csv" "*.mp4"
   $ cd proteusPy
-  $ conda env create --name proteusPy --file ppy.yml
-  $ conda activate proteusPy <-- this is important!
-  $ pip install .
-  $ sh ./jupyter.sh
+  $ git-lfs track "*.csv" "*.mp4"
+  $ make pkg
+  $ mamba activate proteusPy
+  $ make install
   ```
-
-![install](install.png)
+## Windows
+- Install Miniforge: <https://github.com/conda-forge/miniforge> (existing Anaconda installations are fine but please install mamba)
+- Install git for Windows and configure for Bash:
+  - https://git-scm.com/download/win
+- Install git-lfs:
+  - https://git-lfs.github.com/
+- Install Visual Studio C++ development environment: https://learn.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=msvc-170
+- From an Anaconda Powershell prompt while sitting in your repo dir:
+  ```console
+  $ git clone https://github.com/suchanek/proteusPy.git
+  $ git clone https://github.com/suchanek/biopython.git
+  $ cd proteusPy
+  $ git-lfs track "*.csv" "*.mp4"
+  $ make pkg
+  $ mamba activate proteusPy
+  $ make install
+  ```
 
 # General Usage
 

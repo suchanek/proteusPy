@@ -41,7 +41,7 @@ jup: FORCE
 
 # package development targets
 
-sdist: setup.py
+sdist: FORCE
 	rm dist/*
 	python setup.py sdist
 
