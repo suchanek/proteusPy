@@ -16,11 +16,8 @@ import math
 import numpy as np
 np.set_printoptions(suppress=True)
 
-import copy
-
+import copy, pickle
 from math import cos
-
-import pickle
 from tqdm import tqdm
 
 import pandas as pd
@@ -29,12 +26,9 @@ import pyvista as pv
 pv.global_theme.color = 'white'
 
 import proteusPy
-from proteusPy import *
 from proteusPy.atoms import *
-
 from proteusPy.data import SS_DICT_PICKLE_FILE, SS_ID_FILE
 from proteusPy.data import SS_PICKLE_FILE, SS_TORSIONS_FILE, PROBLEM_ID_FILE
-
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.utility import distance3d, prune_extra_ss
@@ -43,12 +37,9 @@ from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR, WINSIZE
 from Bio.PDB import Vector, PDBParser, PDBList
 from Bio.PDB.vectors import calc_dihedral
 
-# float init for class 
-_FLOAT_INIT = -999.9
-_ANG_INIT = -180.0
-
 # tqdm progress bar width
 from proteusPy.ProteusGlobals import PBAR_COLS
+from proteusPy.ProteusGlobals import _FLOAT_INIT, _ANG_INIT
 
 # columns for the torsions file dataframe.
 global Torsion_DF_Cols

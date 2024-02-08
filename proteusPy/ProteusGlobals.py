@@ -25,6 +25,10 @@ ORIENT_SIDECHAIN = 1
 WINFRAME = 512 # single panel width
 WINSIZE = (1024, 1024)
 CAMERA_POS = ((0, 0, -10), (0,0,0), (0,1,0))
+_FLOAT_INIT = -999.99
+_INT_INIT = -1
+_ANG_INIT = -180.0
+
 
 PBAR_COLS = 105
 # nominal macbook Pro screen resolution
