@@ -13,12 +13,10 @@ Last revision: 7/2/2023
 
 import sys
 import copy
-from io import StringIO
 import time
 import matplotlib.pyplot as plt
 
 import pandas as pd
-import pyvista as pv
 import pickle
 import numpy as np
 
@@ -27,7 +25,7 @@ from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR,  REPO_DATA_DIR
 from proteusPy.atoms import *
 
 from proteusPy.data import SS_PICKLE_FILE, SS_TORSIONS_FILE, SS_DICT_PICKLE_FILE, DATA_DIR
-from proteusPy.data import LOADER_FNAME, LOADER_SUBSET_FNAME, LOADER_ALL_URL, LOADER_SUBSET_URL
+from proteusPy.data import LOADER_FNAME, LOADER_SUBSET_FNAME
 
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.Disulfide import Disulfide
@@ -543,42 +541,6 @@ class DisulfideLoader:
    
 # class ends
 
-def _oDownload_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False):
-    '''
-    Download the databases from Github.
-
-    :param loadpath: Path from which to load, defaults to DATA_DIR
-    :param verbose: Verbosity, defaults to False
-    '''
-    # normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy 
-    # distribution. In that case we need to download the files for all disulfides and the subset
-    # from GitHub. Complicated by the fact that they are git-lfs storage.
-    
-    import urllib.request
-    from proteusPy.data import LOADER_GITHUB_All_URL, LOADER_GITHUB_SUBSET_URL
-
-    _good1 = 0 # all data
-    _good2 = 0 # subset data
-    
-    _fname_sub = f'{loadpath}{LOADER_SUBSET_FNAME}'
-    _fname_all = f'{loadpath}{LOADER_FNAME}'
-    
-    if verbose:
-        print(f'-> Download_PDB_SS(): Reading disulfides from GitHub ... ')
-    
-    if subset:
-        if urllib.request.urlretrieve(LOADER_GITHUB_SUBSET_URL, _fname_sub) is not None:
-            os.sync()
-            if os.path.exists(_fname_sub):
-                _good2 = 2
-    else:
-        if urllib.request.urlretrieve(LOADER_GITHUB_All_URL, _fname_all) is not None:
-            os.sync()
-            if os.path.exists(_fname_all):
-                _good1 = 1
-
-    return _good1 + _good2
-
 import requests
 
 def Download_PDB_SS(loadpath=DATA_DIR, verbose=True, subset=False):
@@ -618,83 +580,6 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=True, subset=False):
             _good2 = 1
     return _good1 + _good2
 
-def _Download_PDB_SS(loadpath=DATA_DIR, verbose=True, subset=False):
-    '''
-    Download the databases from Github. Note: if you change the database these sizes will 
-    need to be changed!
-
-    :param loadpath: Path from which to load, defaults to DATA_DIR
-    :param verbose: Verbosity, defaults to False
-    '''
-
-    import urllib
-    _good1 = 0 # all data
-    _good2 = 0 # subset data
-    
-    _fname_sub = f'{loadpath}{LOADER_SUBSET_FNAME}'
-    _fname_all = f'{loadpath}{LOADER_FNAME}'
-
-    def retrieve_git_lfs_files(repo_url, objects):
-        """
-        Retrieves a git-lfs json object from a specified repo.
-        It does NOT download the file.
-        """
-        batch_url = f"{repo_url.rstrip('/')}/info/lfs/objects/batch"
-        headers = {
-            "Accept": "application/vnd.git-lfs+json",
-            "Content-type": "application/json"
-        }
-        data = {
-            "operation": "download",
-            "transfer": ["basic"],
-            "objects": objects
-        }
-
-        response = requests.post(batch_url, headers=headers, json=data)
-        if response.status_code == 200:
-            # Process the response or save the files
-            # For example, you can access the file contents using response.json()
-            # and save them to the desired location on your system.
-            return response.json()
-        else:
-            # Handle error case
-            print(f"Error: {response.status_code} - {response.text}")
-            return None
-    
-    repo_url = "https://github.com/suchanek/proteusPy.git"
-    all_pkl_object = [
-        {
-            "oid": "f89978dfda420686d38bda5a5e8b67ae90dfae26b13fe57b297c544fc12851de",
-            "size": 319074245
-        }
-    ]
-
-    subset_pkl_object = [
-        {
-            "oid": "f2de267bef28287fd79b496ad2125a816662fd6fa102f27c47f0786ac8d1236d",
-            "size": 8980961
-        }
-    ]
-
-    res_json = retrieve_git_lfs_files(repo_url, all_pkl_object)
-    if res_json is not None:
-        print(f'Downloading SS database from GitHub...')
-        data = res_json['objects'][0]
-        ALL_URL = data['actions']['download']['href']
-        urllib.request.urlretrieve(ALL_URL, _fname_all)
-        if os.path.exists(_fname_all):
-                _good1 = 1
-
-    res_json = retrieve_git_lfs_files(repo_url, subset_pkl_object)
-    if res_json is not None:
-        print(f'Downloading SS subset database from GitHub...')
-        data = res_json['objects'][0]
-        SUBSET_URL = data['actions']['download']['href']
-        urllib.request.urlretrieve(SUBSET_URL, _fname_sub)
-        if os.path.exists(_fname_all):
-            _good2 = 1
-    return _good1 + _good2
-
 def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoader:
     '''
     Load the fully instantiated Disulfide database from the specified file. Use the
@@ -730,12 +615,10 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
     if verbose:
         print(f'-> load_PDB_SS(): Reading {_fname}... ')
 
-
     with open(_fname, 'rb') as f:
         res = pickle.load(f)
     if verbose:
         print(f'-> load_PDB_SS(): Done reading {_fname}... ')
     return res
-
 
 # End of file
