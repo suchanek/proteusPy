@@ -559,8 +559,8 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=True, subset=False):
     _fname_sub = f'{loadpath}{LOADER_SUBSET_FNAME}'
     _fname_all = f'{loadpath}{LOADER_FNAME}'
 
-    _all_length = 34037177
-    _subset_length = 8980961
+    _all_length = 340371775
+    _subset_length = 9636086
 
     if verbose:
         print(f'--> DisulfideLoader: Downloading Disulfide Database from GitHub...')
@@ -569,6 +569,8 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=True, subset=False):
     num_bytes = headers.get('content-length')
     if num_bytes == _all_length:
         _good1 = 1
+    else:
+        print(f'--> Read: {num_bytes}, expecting: {_all_length}')
 
     if subset:
         if verbose:
@@ -578,6 +580,8 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=True, subset=False):
         num_bytes = headers.get('content-length')
         if num_bytes == _subset_length:
             _good2 = 1
+        else:
+            print(f'--> Read: {num_bytes}, expecting: {_subset_length}')
     return _good1 + _good2
 
 def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoader:
