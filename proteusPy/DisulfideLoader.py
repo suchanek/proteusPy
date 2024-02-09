@@ -542,8 +542,70 @@ class DisulfideLoader:
 # class ends
 
 import requests
+def download_file_from_google_drive(id, destination):
+    URL = "https://docs.google.com/uc?export=download"
+
+    session = requests.Session()
+
+    response = session.get(URL, params = { 'id' : id }, stream = True)
+    token = get_confirm_token(response)
+
+    if token:
+        params = { 'id' : id, 'confirm' : token }
+        response = session.get(URL, params = params, stream = True)
+
+    save_response_content(response, destination)    
+
+def get_confirm_token(response):
+    for key, value in response.cookies.items():
+        if key.startswith('download_warning'):
+            return value
+
+    return None
+
+def save_response_content(response, destination):
+    CHUNK_SIZE = 32768
+
+    with open(destination, "wb") as f:
+        for chunk in response.iter_content(CHUNK_SIZE):
+            if chunk: # filter out keep-alive new chunks
+                f.write(chunk)
 
 def Download_PDB_SS(loadpath=DATA_DIR, verbose=True, subset=False):
+    '''
+    Download the databases from Github. Note: if you change the database these sizes will 
+    need to be changed!
+
+    :param loadpath: Path from which to load, defaults to DATA_DIR
+    :param verbose: Verbosity, defaults to False
+    '''
+
+    import gdown
+
+    _good1 = 0 # all data
+    _good2 = 0 # subset data
+    
+    _fname_sub = f'{loadpath}{LOADER_SUBSET_FNAME}'
+    _fname_all = f'{loadpath}{LOADER_FNAME}'
+
+    url_all = 'https://drive.google.com/uc?id=1igF-sppLPaNsBaUS7nkb13vtOGZZmsFp'
+    url_sub = 'https://drive.google.com/uc?id=1puy9pxrClFks0KN9q5PPV_ONKvL-hg33'
+
+    if verbose:
+        print(f'--> DisulfideLoader: Downloading Disulfide Database from Drive...')
+
+    gdown.download(LOADER_ALL_URL, _fname_all, quiet=False)
+
+
+    if subset:
+        if verbose:
+            print(f'--> DisulfideLoader: Downloading Disulfide Subset Database from Drive...')
+
+        gdown.download(LOADER_SUBSET_URL, _fname_sub, quiet=False)
+
+    return _good1 + _good2
+
+def oDownload_PDB_SS(loadpath=DATA_DIR, verbose=True, subset=False):
     '''
     Download the databases from Github. Note: if you change the database these sizes will 
     need to be changed!
