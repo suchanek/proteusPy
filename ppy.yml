@@ -2,18 +2,14 @@ name: proteusPy
 channels:
   - conda-forge
 dependencies:
-  - python<3.12
+  - python==3.11.7
   - traitlets=5.9.0
   - notebook=6.4.12
   - pandas<2.0
   - matplotlib
-  - vtk
   - nodejs
-  - biopython
   - pip
   - pip:
-    - wget
-    - gdown
     - tqdm
     - ipykernel
     - jupyterlab>=3 

@@ -5,7 +5,7 @@ pyvista[all,trame]
 traitlets==5.9.0
 notebook==6.4.12
 jupyter
-jupyterlab
+jupyterlab>=3
 seaborn
 pillow
 tqdm
@@ -25,6 +25,7 @@ openai
 grpcio
 pip
 wget
+vtk
 plotly_express
 trame-jupyter-extension
 jupyter_contrib_nbextensions
