@@ -29,7 +29,7 @@ Requires-Dist: pyvista[all,trame]
 Requires-Dist: traitlets==5.9.0
 Requires-Dist: notebook==6.4.12
 Requires-Dist: jupyter
-Requires-Dist: jupyterlab
+Requires-Dist: jupyterlab>=3
 Requires-Dist: seaborn
 Requires-Dist: pillow
 Requires-Dist: tqdm
@@ -49,6 +49,7 @@ Requires-Dist: openai
 Requires-Dist: grpcio
 Requires-Dist: pip
 Requires-Dist: wget
+Requires-Dist: vtk
 Requires-Dist: plotly_express
 Requires-Dist: trame-jupyter-extension
 Requires-Dist: jupyter_contrib_nbextensions
