@@ -4,21 +4,19 @@ the analysis and modeling of protein structures, with an emphasis on disulfide b
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
 Author: Eric G. Suchanek, PhD
-Last revision: 7/2/2023
+Last revision: 2/9/2024
 '''
 
 # Author: Eric G. Suchanek, PhD.
-# Last modification: 2/20/23
+# Last modification: 2/10/2024
 # Cα N, Cα, Cβ, C', Sγ Å °
 
 import sys
 import copy
 import time
-import matplotlib.pyplot as plt
 
 import pandas as pd
 import pickle
-import numpy as np
 
 import proteusPy
 from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR,  REPO_DATA_DIR
@@ -73,10 +71,8 @@ class DisulfideLoader:
     >>> from proteusPy.Disulfide import Disulfide
     >>> from proteusPy.DisulfideLoader import DisulfideLoader
     >>> from proteusPy.DisulfideList import DisulfideList
-    >>> SS1 = DisulfideList([],'tmp1')
-    >>> SS2 = DisulfideList([],'tmp2')
     
-    >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
+    >>> PDB_SS = DisulfideLoader(verbose=True, subset=True)
 
     Accessing by index value:
     >>> SS1 = PDB_SS[0]
@@ -97,11 +93,13 @@ class DisulfideLoader:
     >>> SSlist = PDB_SS[:4]
     '''
 
-    def __init__(self, verbose=True, datadir=REPO_DATA_DIR, picklefile=SS_PICKLE_FILE, 
-                pickle_dict_file=SS_DICT_PICKLE_FILE,
-                torsion_file=SS_TORSIONS_FILE, quiet=True, 
-                subset=False,
-                cutoff=-1.0):
+    def __init__(self, verbose: bool = True, 
+                 datadir: str = REPO_DATA_DIR, picklefile: str = SS_PICKLE_FILE, 
+                pickle_dict_file: str = SS_DICT_PICKLE_FILE,
+                torsion_file: str = SS_TORSIONS_FILE, 
+                quiet: bool = True, 
+                subset: bool = False,
+                cutoff: float = -1.0) -> None:
         '''
         Initializing the class initiates loading either the entire Disulfide dataset,
         or the 'subset', which consists of the first 1000 PDB structures. The subset
@@ -182,7 +180,20 @@ class DisulfideLoader:
 
     # 
     # overload __getitem__ to handle slicing and indexing, and access by name
+    
     def __getitem__(self, item):
+        """
+        Implements indexing and slicing to retrieve DisulfideList objects from the 
+        DisulfideLoader. Supports:
+        
+        - Integer indexing to retrieve a single DisulfideList 
+        - Slicing to retrieve a subset as a DisulfideList
+        - Lookup by PDB ID to retrieve all Disulfides for that structure
+        - Lookup by full disulfide name
+        
+        Raises DisulfideException on invalid indices or names.
+        """
+
         res = DisulfideList([], 'none')
 
         if isinstance(item, slice):
@@ -266,7 +277,7 @@ class DisulfideLoader:
         '''
         return copy.deepcopy(self)
 
-    def extract_class(self, clsid):
+    def extract_class(self, clsid) -> DisulfideList:
         """
         Return the list of disulfides corresponding to the input `clsid`.
     
@@ -310,7 +321,7 @@ class DisulfideLoader:
             if ss.name == name:
                 return ss  # or ss.copy() !!!
         return None
-    def describe(self):
+    def describe(self) -> None:
         '''
         Provides information about the Disulfide database contained in ```self```.
 
@@ -343,11 +354,11 @@ class DisulfideLoader:
         print(f'Average structure resolution:       {res:.2f} Å')
         print(f'Lowest Energy Disulfide:            {ssMin.name}')
         print(f'Highest Energy Disulfide:           {ssMax.name}')
-        print(f'Ca distance cutoff:                 {cutoff:.2f} Å')
+        print(f'Cα distance cutoff:                 {cutoff:.2f} Å')
         print(f'Total RAM Used:                     {ram:.2f} GB.')
         print(f'    ================= proteusPy: {vers} =======================')
        
-    def display_overlay(self, pdbid):
+    def display_overlay(self, pdbid) -> None:
         ''' 
         Display all disulfides for a given PDB ID overlaid in stick mode against
         a common coordinate frame. This allows us to see all of the disulfides
@@ -447,13 +458,17 @@ class DisulfideLoader:
         '''
         self.QUIET = perm
     
-    def plot_classes_vs_cutoff(self, cutoff, steps):
+    def plot_classes_vs_cutoff(self, cutoff, steps) -> None:
         """
         Plot the total percentage and number of members for each class against the cutoff value.
         
         :param cutoff: Percent cutoff value for filtering the classes.
         :return: None
         """
+
+        import matplotlib.pyplot as plt
+        import numpy as np
+
         _cutoff = np.linspace(0, cutoff, steps)
         tot_list = []
         members_list = []
@@ -477,7 +492,7 @@ class DisulfideLoader:
 
         plt.show()
 
-    def plot_binary_to_sixclass_incidence(self, light=True, save=False, savedir='.'):
+    def plot_binary_to_sixclass_incidence(self, light=True, save=False, savedir='.') -> None:
         '''
         Plot the incidence of all sextant Disulfide classes for a given binary class.
 
@@ -541,40 +556,9 @@ class DisulfideLoader:
    
 # class ends
 
-import requests
-def download_file_from_google_drive(id, destination):
-    URL = "https://docs.google.com/uc?export=download"
-
-    session = requests.Session()
-
-    response = session.get(URL, params = { 'id' : id }, stream = True)
-    token = get_confirm_token(response)
-
-    if token:
-        params = { 'id' : id, 'confirm' : token }
-        response = session.get(URL, params = params, stream = True)
-
-    save_response_content(response, destination)    
-
-def get_confirm_token(response):
-    for key, value in response.cookies.items():
-        if key.startswith('download_warning'):
-            return value
-
-    return None
-
-def save_response_content(response, destination):
-    CHUNK_SIZE = 32768
-
-    with open(destination, "wb") as f:
-        for chunk in response.iter_content(CHUNK_SIZE):
-            if chunk: # filter out keep-alive new chunks
-                f.write(chunk)
-
-def Download_PDB_SS(loadpath=DATA_DIR, verbose=True, subset=False):
+def Download_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False):
     '''
-    Download the databases from Github. Note: if you change the database these sizes will 
-    need to be changed!
+    Download the databases from my Google Drive.
 
     :param loadpath: Path from which to load, defaults to DATA_DIR
     :param verbose: Verbosity, defaults to False
@@ -582,20 +566,13 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=True, subset=False):
 
     import gdown
 
-    _good1 = 0 # all data
-    _good2 = 0 # subset data
-    
     _fname_sub = f'{loadpath}{LOADER_SUBSET_FNAME}'
     _fname_all = f'{loadpath}{LOADER_FNAME}'
-
-    url_all = 'https://drive.google.com/uc?id=1igF-sppLPaNsBaUS7nkb13vtOGZZmsFp'
-    url_sub = 'https://drive.google.com/uc?id=1puy9pxrClFks0KN9q5PPV_ONKvL-hg33'
 
     if verbose:
         print(f'--> DisulfideLoader: Downloading Disulfide Database from Drive...')
 
     gdown.download(LOADER_ALL_URL, _fname_all, quiet=False)
-
 
     if subset:
         if verbose:
@@ -603,15 +580,15 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=True, subset=False):
 
         gdown.download(LOADER_SUBSET_URL, _fname_sub, quiet=False)
 
-    return _good1 + _good2
+    return
 
-def oDownload_PDB_SS(loadpath=DATA_DIR, verbose=True, subset=False):
+def Download_PDB_SS_GitHub(loadpath=DATA_DIR, verbose=True, subset=False):
     '''
     Download the databases from Github. Note: if you change the database these sizes will 
     need to be changed!
 
     :param loadpath: Path from which to load, defaults to DATA_DIR
-    :param verbose: Verbosity, defaults to False
+    :param verbose: Verbosity, defaults to True
     '''
 
     import urllib

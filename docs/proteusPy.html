@@ -47,8 +47,11 @@
             <h2>Contents</h2>
             <ul>
   <li><a href="#summary">Summary</a></li>
-  <li><a href="#installation-macoslinux">Installation (MacOS/Linux)</a>
+  <li><a href="#general-capabilities">General Capabilities</a></li>
+  <li><a href="#installation">Installation</a>
   <ul>
+    <li><a href="#macoslinux">MacOS/Linux</a></li>
+    <li><a href="#windows">Windows</a></li>
     <li><a href="#general-usage">General Usage</a></li>
     <li><a href="#the-future">The Future</a></li>
     <li><a href="#publications">Publications</a></li>
@@ -96,9 +99,21 @@ proteusPy    </h1>
 
 <p><strong>proteusPy</strong> is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide Bonds. This package reprises my molecular modeling program <a href="https://doi.org/10.1021/bi00368a023">Proteus</a>, and relies on the <a href="https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html">Turtle3D</a> class. The turtle implements the functions <code>Move</code>, <code>Roll</code>, <code>Yaw</code>, <code>Pitch</code> and <code>Turn</code> for movement in a three-dimensional space. The <a href="https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html">Disulfide</a> class implements methods to analyze the protein structure stabilizing element known as a <em>Disulfide Bond</em>. This class and its underlying methods are being used to perform a structural analysis of over 35,800 disulfide-bond containing proteins in the RCSB protein data bank.</p>
 
-<h1 id="installation-macoslinux">Installation (MacOS/Linux)</h1>
+<h1 id="general-capabilities">General Capabilities</h1>
 
-<p>It's simplest to clone the repo via github since it contains all of the notebooks, data and test programs. Installing the Biopython fork is optional unless you want to actually rebuild the database. I highly recommend using Miniforge, especially in MacOS.</p>
+<p>1) Display Disulfides contained in the RCSB interactively in multiple display styles
+2) Calculate geometric and energetic properties about these disulfides
+3) Create structural classes by characterizing the disulfide torsional angles into <em>n</em> classes
+4) Overlap disulfides onto a common frame of reference for display
+5) Build protein backbones from a backbone dihedral angle template</p>
+
+<p><em>See <a href="https://suchanek.github.io/proteusPy/proteusPy.html">https://suchanek.github.io/proteusPy/proteusPy.html</a> for the API documentation with examples</em></p>
+
+<h1 id="installation">Installation</h1>
+
+<p>It's simplest to clone the repo via github since it contains all of the notebooks, data and test programs. Installation includes installing my fork of Biopython fork. This is required to rebuild the database. I highly recommend using Miniforge, especially in MacOS.</p>
+
+<h2 id="macoslinux">MacOS/Linux</h2>
 
 <ul>
 <li>Install Miniforge: <a href="https://github.com/conda-forge/miniforge">https://github.com/conda-forge/miniforge</a> (existing Anaconda installations are fine but please install mamba)</li>
@@ -111,8 +126,34 @@ proteusPy    </h1>
 <div class="pdoc-code codehilite">
 <pre><span></span><code><span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span><a href="https://github.com/suchanek/proteusPy.git">https://github.com/suchanek/proteusPy.git</a>
 <span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span><a href="https://github.com/suchanek/biopython.git">https://github.com/suchanek/biopython.git</a>
-<span class="gp">$ </span>git-lfs<span class="w"> </span>track<span class="w"> </span><span class="s2">&quot;<em>.csv&quot;</span><span class="w"> </span><span class="s2">&quot;</em>.mp4&quot;</span>
 <span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>proteusPy
+<span class="gp">$ </span>git-lfs<span class="w"> </span>track<span class="w"> </span><span class="s2">&quot;<em>.csv&quot;</span><span class="w"> </span><span class="s2">&quot;</em>.mp4&quot;</span>
+<span class="gp">$ </span>make<span class="w"> </span>pkg
+<span class="gp">$ </span>mamba<span class="w"> </span>activate<span class="w"> </span>proteusPy
+<span class="gp">$ </span>make<span class="w"> </span>install
+</code></pre>
+</div></li>
+</ul>
+
+<h2 id="windows">Windows</h2>
+
+<ul>
+<li>Install Miniforge: <a href="https://github.com/conda-forge/miniforge">https://github.com/conda-forge/miniforge</a> (existing Anaconda installations are fine but please install mamba)</li>
+<li>Install git for Windows and configure for Bash:
+<ul>
+<li><a href="https://git-scm.com/download/win"><a href="https://git-scm.com/download/win">https://git-scm.com/download/win</a></a></li>
+</ul></li>
+<li>Install git-lfs:
+<ul>
+<li><a href="https://git-lfs.github.com/"><a href="https://git-lfs.github.com/">https://git-lfs.github.com/</a></a></li>
+</ul></li>
+<li>Install Visual Studio C++ development environment: <a href="https://learn.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=msvc-170">https://learn.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=msvc-170</a></li>
+<li>From an Anaconda Powershell prompt while sitting in your repo dir:
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span><a href="https://github.com/suchanek/proteusPy.git">https://github.com/suchanek/proteusPy.git</a>
+<span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span><a href="https://github.com/suchanek/biopython.git">https://github.com/suchanek/biopython.git</a>
+<span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>proteusPy
+<span class="gp">$ </span>git-lfs<span class="w"> </span>track<span class="w"> </span><span class="s2">&quot;<em>.csv&quot;</span><span class="w"> </span><span class="s2">&quot;</em>.mp4&quot;</span>
 <span class="gp">$ </span>make<span class="w"> </span>pkg
 <span class="gp">$ </span>mamba<span class="w"> </span>activate<span class="w"> </span>proteusPy
 <span class="gp">$ </span>make<span class="w"> </span>install
@@ -122,9 +163,9 @@ proteusPy    </h1>
 
 <h2 id="general-usage">General Usage</h2>
 
-<p>Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. The <code>notebooks</code> directory contains all of my Jupyter notebooks and is a good place to start. The <code>Analysis_2q7q.ipynb</code> notebook provides an example of visualizing the lowest energy Disulfide contained in the database, and searching for nearest neighbors. The <code>programs</code> subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files, (<code>DisulfideDownloader.py</code>), extracting the disulfides and creating the database loaders (<code>DisulfideExtractor.py</code>) and cluster analysis, (<code>DisulfideClass_Analysis.py</code>).</p>
+<p>Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. The <code>notebooks</code> directory contains all of my Jupyter notebooks and is a good place to start. The <code>Analysis_2q7q.ipynb</code> notebook provides an example of visualizing the lowest energy Disulfide contained in the database, and searching for nearest neighbors on the basis of conformational similarity. The <code>programs</code> subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files, (<code>DisulfideDownloader.py</code>), extracting the disulfides and creating the database loaders (<code>DisulfideExtractor.py</code>) and cluster analysis, (<code>DisulfideClass_Analysis.py</code>).</p>
 
-<p>The first time one loads the database via <code>Load_PDB_SS()</code> the system will attempt to download the full and subset database from my Google Drive. If this fails the system will attempt to rebuild the database from the repo's <code>data</code> subdirectory (not the package's). If you've downloaded from github this will work correctly. If you've installed from pyPi via <code>pip</code> it will fail.</p>
+<p>The first time one loads the database via <code>Load_PDB_SS()</code> the system will attempt to download the full and subset database from the Github repository. If this fails the system will attempt to rebuild the database from the repo's <code>data</code> subdirectory (not the package's). If you've downloaded from github this will work correctly. If you've installed from pyPi via <code>pip</code> it will fail.</p>
 
 <h2 id="the-future">The Future</h2>
 
@@ -139,9 +180,9 @@ proteusPy    </h1>
 <li><a href="http://dx.doi.org/10.2174/092986708783330566">http://dx.doi.org/10.2174/092986708783330566</a></li>
 </ul>
 
-<p><em>NB:</em> This distribution is being developed slowly. proteusPy relies on my fork of the <code>Bio</code> Python package to download and build the database. As a result, one can't download and create the database locally unless the BioPython patch is applied. The changed python file is in the repo's data directory - <code>parse_pdb_header.py</code>. Database analysis is unaffected without the patch. Also, if you're running on an M-series Mac then it's important to install Biopython first, since the generic release won't build on M series Macs. -egs-</p>
+<p><em>NB:</em> This distribution is being developed slowly. proteusPy relies on my fork of the <code>Bio</code> Python package to download and build the database. This will be installed by default if one follows the installation instructions. -egs-</p>
 
-<p>Eric G. Suchanek, PhD., <a href="&#109;&#97;i&#108;&#116;&#x6f;:&#115;&#x75;&#x63;&#104;&#97;&#x6e;&#101;&#107;&#x40;&#109;&#x61;&#x63;&#46;&#x63;om">&#115;&#x75;&#x63;&#104;&#97;&#x6e;&#101;&#107;&#x40;&#109;&#x61;&#x63;&#46;&#x63;om</a></p>
+<p>Eric G. Suchanek, PhD., <a href="&#x6d;&#x61;&#x69;&#x6c;&#x74;&#111;&#58;&#x73;&#117;&#x63;&#x68;&#x61;&#110;&#x65;&#x6b;&#x40;&#x6d;&#x61;&#x63;&#x2e;&#99;&#x6f;&#x6d;">&#x73;&#117;&#x63;&#x68;&#x61;&#110;&#x65;&#x6b;&#x40;&#x6d;&#x61;&#x63;&#x2e;&#99;&#x6f;&#x6d;</a></p>
 </div>
 
                         <input id="mod-proteusPy-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -156,7 +197,7 @@ proteusPy    </h1>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">.. include:: ../README.md</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.89&quot;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.90&quot;</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="kn">import</span> <span class="nn">sys</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="kn">import</span> <span class="nn">os</span>
@@ -172,7 +213,7 @@ proteusPy    </h1>
 </span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="kn">import</span> <span class="nn">Bio</span>
 </span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="kn">import</span> <span class="nn">plotly</span>
 </span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a><span class="kn">import</span> <span class="nn">pyvista</span> <span class="k">as</span> <span class="nn">pv</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a><span class="kn">import</span> <span class="nn">panel</span> <span class="k">as</span> <span class="nn">pn</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a><span class="c1"># import panel as pn</span>
 </span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>
 </span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a><span class="kn">from</span> <span class="nn">Bio.PDB.vectors</span> <span class="kn">import</span> <span class="n">calc_dihedral</span><span class="p">,</span> <span class="n">calc_angle</span>
 </span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="kn">from</span> <span class="nn">Bio.PDB</span> <span class="kn">import</span> <span class="n">Select</span><span class="p">,</span> <span class="n">Vector</span>
