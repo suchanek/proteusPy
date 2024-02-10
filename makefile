@@ -3,17 +3,21 @@
 # Last revision: 2/5/24 -egs-
 
 CONDA = mamba
-VERS = 0.89
+VERS = 0.90
+DEVNAME = ppydev
 INIT = proteusPy/__init__.py
 
 FORCE: ;
 
 dev:
-	$(CONDA) env create --name ppy_dev --file ppy.yml -y
-	$(CONDA) install --name ppy_dev pdoc -y
+	$(CONDA) env create --name $(DEVNAME) --file ppy.yml -y
+	$(CONDA) install --name $(DEVNAME) pdoc -y
 
 clean: FORCE
 	$(CONDA) env remove --name proteusPy -y
+
+devclean: FORCE
+	$(CONDA) env remove --name $(DEVNAME) -y
 
 pkg:
 	$(CONDA) env create --name proteusPy --file ppy.yml -y

@@ -69,11 +69,11 @@ from proteusPy.Disulfide import Torsion_DF_Cols
 
 _SSdf = PDB_SS.getTorsions()
 # there are a few structures with bad SSBonds. Their
-# CA distances are > 7.0. We remove them from consideration
+# CA distances are > 8.0. We remove them from consideration
 # below
 
-_far = _SSdf['ca_distance'] >= 9.0
-_near = _SSdf['ca_distance'] < 9.0
+_far = _SSdf['ca_distance'] >= 8.0
+_near = _SSdf['ca_distance'] < 8.0
 
 SS_df_Far = _SSdf[_far]
 
