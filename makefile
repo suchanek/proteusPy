@@ -3,7 +3,7 @@
 # Last revision: 2/5/24 -egs-
 
 CONDA = mamba
-VERS = 0.90
+VERS = 0.91
 DEVNAME = ppydev
 INIT = proteusPy/__init__.py
 
@@ -31,10 +31,10 @@ install:
 	pip install . && cd ../biopython && pip install .
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
-	python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy)"
+	python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy) $(VERS)"
 
 install_dev:
-	pip install . && cd ../biopython && pip install .
+	pip install -e . && cd ../biopython && pip install .
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
 	python -m ipykernel install --user --name ppy_dev --display-name "Python (ppy_dev)"
@@ -49,6 +49,8 @@ sdist: FORCE
 	rm dist/*
 	python setup.py sdist
 
+bdist: FORCE
+	python setup.py bdist
 docs: FORCE
 	pdoc -o docs --math --logo "./logo.png" ./proteusPy
 

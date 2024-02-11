@@ -1,27 +1,28 @@
 # Initialization for the proteusPy package
 # Copyright (c) 2024 Eric G. Suchanek, PhD., all rights reserved
-# Subject to the MIT public license.
+# Subject to the BSD public license.
 
 """
 .. include:: ../README.md
 """
 
-__version__ = "0.90"
+__version__ = "0.91"
 
 import sys
 import os
 import glob
 import warnings
 import copy
-
 import time
 import datetime
 import math
 import numpy
-
+import matplotlib
 import Bio
 import plotly
+
 import pyvista as pv
+import pandas as pd
 # import panel as pn
 
 from Bio.PDB.vectors import calc_dihedral, calc_angle
@@ -46,10 +47,12 @@ from .angle_annotation import *
 from .utility import distance_squared, distance3d, get_jet_colormap, Check_chains, print_memory_used
 from .utility import image_to_ascii_art, generate_vector_dataframe, retrieve_git_lfs_files
 
-from .DisulfideClasses import create_classes, create_quat_classes, plot_count_vs_classid, \
-            plot_count_vs_class_df, get_half_quadrant, get_quadrant, get_sixth_quadrant, \
-            filter_by_percentage, torsion_to_sixclass, plot_binary_to_sixclass_incidence, \
-            enumerate_sixclass_fromlist
+from .DisulfideClasses import (
+        create_classes, create_quat_classes, plot_count_vs_classid,
+        plot_count_vs_class_df, get_half_quadrant, get_quadrant, get_sixth_quadrant,
+        filter_by_percentage, torsion_to_sixclass, plot_binary_to_sixclass_incidence, enumerate_sixclass_fromlist
+        )
+
 from .DisulfideClass_Constructor import DisulfideClass_Constructor
 
 # end of file
