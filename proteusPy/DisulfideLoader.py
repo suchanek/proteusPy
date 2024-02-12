@@ -439,7 +439,7 @@ class DisulfideLoader:
         :param perm: True or False
         :type perm: bool
         '''
-        self.QUIET = perm
+        self.quiet = perm
     
     def plot_classes_vs_cutoff(self, cutoff, steps) -> None:
         """

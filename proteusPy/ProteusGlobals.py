@@ -11,6 +11,7 @@ Last revision: 7/2/2023
 # this is relative to the proteusPy package folder hierarchy!
 
 import os
+from Bio.PDB import Vector
 
 PDB_DIR = os.getenv('PDB')
 PROTEUSPY_REPO_HOME = os.getenv("PROTEUSPY_REPO_HOME")
@@ -33,4 +34,6 @@ _ANG_INIT = -180.0
 PBAR_COLS = 105
 # nominal macbook Pro screen resolution
 DPI = 220
+
+ORIGIN = Vector(0,0,0)
 
