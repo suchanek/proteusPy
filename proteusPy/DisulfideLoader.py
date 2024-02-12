@@ -44,9 +44,94 @@ except NameError:
 
 # Now use tqdm as normal, depending on your environment
 
+from dataclasses import dataclass
+
+@dataclass
+class DisulfideLoader:
+    
+    verbose: bool = True
+    datadir: str = REPO_DATA_DIR
+    picklefile: str = SS_PICKLE_FILE
+    pickle_dict_file: str = SS_DICT_PICKLE_FILE
+    torsion_file: str = SS_TORSIONS_FILE  
+    quiet: bool = True
+    subset: bool = False
+    cutoff: float = -1.0
+
+    def __post_init__(self):
+        self.ModelDir = self.datadir
+        self.PickleFile = f'{self.datadir}{self.picklefile}'
+        self.PickleDictFile = f'{self.datadir}{self.pickle_dict_file}'
+        self.PickleClassFile = f'{self.datadir}{SS_CLASS_DICT_FILE}'
+        self.TorsionFile = f'{self.datadir}{self.torsion_file}'
+        self.SSList = DisulfideList([], 'ALL_PDB_SS')
+        self.SSDict = {}
+        self.TorsionDF = pd.DataFrame()
+        self.TotalDisulfides = 0
+        self.IDList = []
+        
+        self.tclass = None        # disulfideClass_constructor to manage classes
+        self.cutoff = self.cutoff      # distance cutoff used to bulid the database
+        self.verbose = self.verbose
+        self.timestamp = time.time()
+        self.version = proteusPy.__version__
+
+        idlist = []
+
+        if self.subset:
+            self.PickleFile = f'{self.datadir}{SS_SUBSET_PICKLE_FILE}'
+            self.PickleDictFile = f'{self.datadir}{SS_SUBSET_DICT_PICKLE_FILE}'
+            self.TorsionFile = f'{self.datadir}{SS_SUBSET_TORSIONS_FILE}'
+        
+        if self.verbose:
+            print(f'-> DisulfideLoader(): Reading disulfides from: {self.PickleFile}... ', end='')
+    
+        with open(self.PickleFile, 'rb') as f:
+            sslist = pickle.load(f)
+            self.SSList = sslist
+            self.TotalDisulfides = len(self.SSList)
+
+        if self.verbose:
+            print(f'done.',)
+
+        if self.verbose:
+            print(f'-> DisulfideLoader(): Reading disulfide dict from: {self.PickleDictFile}...', end='')
+    
+        with open(self.PickleDictFile, 'rb') as f:
+            self.SSDict = pickle.load(f)
+            for key in self.SSDict:
+                idlist.append(key)
+            self.IDList = idlist.copy()
+            totalSS_dict = len(self.IDList)
+    
+        if self.verbose:
+            print(f'done.')
+
+        if self.verbose:
+            print(f'-> DisulfideLoader(): Reading Torsion DF from: {self.TorsionFile}...', end='')
+
+        tmpDF  = pd.read_csv(self.TorsionFile)
+        tmpDF.drop(tmpDF.columns[[0]], axis=1, inplace=True)
+
+        self.TorsionDF = tmpDF.copy()
+        self.TotalDisulfides = len(self.SSList)
+
+        if self.verbose:
+            print(f' done.')
+
+        self.tclass = DisulfideClass_Constructor(self, self.verbose)
+
+        if self.verbose:    
+            print(f'-> DisulfideLoader(): Loading complete.')
+            self.describe()
+        return
+
+from dataclasses import dataclass
+
+@dataclass
 class DisulfideLoader:
     '''
-    This class represents the disulfide database itself and is its primary means of accession. 
+    This dataclass represents the disulfide database itself and is its primary means of accession. 
     The entirety of the RCSB disulfide database is stored within the class via a
     proteusPy.DisulfideList.DisulfideList, a ```Pandas``` .csv file, and a ```dict``` of
     indices mapping the PDB IDs into their respective list of disulfides. The datastructures allow
@@ -93,47 +178,35 @@ class DisulfideLoader:
     >>> SSlist = PDB_SS[:4]
     '''
 
-    def __init__(self, verbose: bool = True, 
-                 datadir: str = REPO_DATA_DIR, picklefile: str = SS_PICKLE_FILE, 
-                pickle_dict_file: str = SS_DICT_PICKLE_FILE,
-                torsion_file: str = SS_TORSIONS_FILE, 
-                quiet: bool = True, 
-                subset: bool = False,
-                cutoff: float = -1.0) -> None:
-        '''
-        Initializing the class initiates loading either the entire Disulfide dataset,
-        or the 'subset', which consists of the first 1000 PDB structures. The subset
-        is useful for testing and debugging since it doesn't require nearly as much
-        memory or time. The name for the subset file is hard-coded. One can pass a
-        different data directory and file names for the pickle files. These different
-        directories are normally established with the proteusPy.Disulfide.Extract_Disulfides 
-        function.
-        '''
+    verbose: bool = True
+    datadir: str = REPO_DATA_DIR
+    picklefile: str = SS_PICKLE_FILE
+    pickle_dict_file: str = SS_DICT_PICKLE_FILE
+    torsion_file: str = SS_TORSIONS_FILE  
+    quiet: bool = True
+    subset: bool = False
+    cutoff: float = -1.0
+    TotalDisulfides: int = 0
 
-        self.ModelDir = datadir
-        self.PickleFile = f'{datadir}{picklefile}'
-        self.PickleDictFile = f'{datadir}{pickle_dict_file}'
-        self.PickleClassFile = f'{datadir}{SS_CLASS_DICT_FILE}'
-        self.TorsionFile = f'{datadir}{torsion_file}'
+    def __post_init__(self):
+        self.ModelDir = self.datadir
+        self.PickleFile = f'{self.datadir}{self.picklefile}'
+        self.PickleDictFile = f'{self.datadir}{self.pickle_dict_file}'
+        self.PickleClassFile = f'{self.datadir}{SS_CLASS_DICT_FILE}'
+        self.TorsionFile = f'{self.datadir}{self.torsion_file}'
         self.SSList = DisulfideList([], 'ALL_PDB_SS')
-        self.SSDict = {}
         self.TorsionDF = pd.DataFrame()
-        self.TotalDisulfides = 0
-        self.IDList = []
-        self.QUIET = quiet
-        
+        self.SSDict = {}
+        self.IDList = []        
         self.tclass = None        # disulfideClass_constructor to manage classes
-        self.cutoff = cutoff      # distance cutoff used to bulid the database
-        self.verbose = verbose
         self.timestamp = time.time()
         self.version = proteusPy.__version__
 
         idlist = []
-
-        if subset:
-            self.PickleFile = f'{datadir}{SS_SUBSET_PICKLE_FILE}'
-            self.PickleDictFile = f'{datadir}{SS_SUBSET_DICT_PICKLE_FILE}'
-            self.TorsionFile = f'{datadir}{SS_SUBSET_TORSIONS_FILE}'
+        if self.subset:
+            self.PickleFile = f'{self.datadir}{SS_SUBSET_PICKLE_FILE}'
+            self.PickleDictFile = f'{self.datadir}{SS_SUBSET_DICT_PICKLE_FILE}'
+            self.TorsionFile = f'{self.datadir}{SS_SUBSET_TORSIONS_FILE}'
         
         if self.verbose:
             print(f'-> DisulfideLoader(): Reading disulfides from: {self.PickleFile}... ', end='')
@@ -142,9 +215,6 @@ class DisulfideLoader:
             sslist = pickle.load(f)
             self.SSList = sslist
             self.TotalDisulfides = len(self.SSList)
-
-        if self.verbose:
-            print(f'done.',)
 
         if self.verbose:
             print(f'-> DisulfideLoader(): Reading disulfide dict from: {self.PickleDictFile}...', end='')
@@ -157,9 +227,6 @@ class DisulfideLoader:
             totalSS_dict = len(self.IDList)
     
         if self.verbose:
-            print(f'done.')
-
-        if self.verbose:
             print(f'-> DisulfideLoader(): Reading Torsion DF from: {self.TorsionFile}...', end='')
 
         tmpDF  = pd.read_csv(self.TorsionFile)
@@ -167,17 +234,12 @@ class DisulfideLoader:
 
         self.TorsionDF = tmpDF.copy()
         self.TotalDisulfides = len(self.SSList)
-
-        if self.verbose:
-            print(f' done.')
-
         self.tclass = DisulfideClass_Constructor(self, self.verbose)
 
         if self.verbose:    
             print(f'-> DisulfideLoader(): Loading complete.')
             self.describe()
         return
-
     # 
     # overload __getitem__ to handle slicing and indexing, and access by name
     
@@ -446,7 +508,7 @@ class DisulfideLoader:
         :return: quiet parameter
         :rtype: bool
         '''
-        return self.QUIET
+        return self.quiet
 
     @quiet.setter
     def quiet(self, perm: bool) -> None:
