@@ -31,14 +31,13 @@ install:
 	pip install . && cd ../biopython && pip install .
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
-	python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy) $(VERS)"
+	python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy $(VERS) )"
 
 install_dev:
 	pip install -e . && cd ../biopython && pip install .
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
 	python -m ipykernel install --user --name ppy_dev --display-name "Python (ppy_dev)"
-
 
 jup: FORCE
 	sh jupyter.sh

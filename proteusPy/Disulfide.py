@@ -2155,7 +2155,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     The following examples illustrate some basic functions of the disulfide classes:
 
     >>> from proteusPy.Disulfide import Disulfide 
-    >>> from proteusPy.DisulfideLoader import DisulfideLoader
+    >>> from proteusPy.DisulfideLoader import DisulfideLoader, Load_PDB_SS
     >>> from proteusPy.DisulfideList import DisulfideList
         
     Instantiate some variables. Note: the list is initialized with an iterable and a name (optional)
