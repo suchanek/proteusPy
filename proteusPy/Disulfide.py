@@ -13,15 +13,27 @@ Last revision: 3/16/2023
 __pdoc__ = {'__all__': True}
 
 import math
+import time
+import datetime
+import glob
 import numpy as np
 np.set_printoptions(suppress=True)
 
 import copy, pickle
 from math import cos
-from tqdm import tqdm
 
 import pandas as pd
 import pyvista as pv
+
+try:
+    # Check if running in Jupyter
+    shell = get_ipython().__class__.__name__
+    if shell == 'ZMQInteractiveShell':
+        from tqdm.notebook import tqdm
+    else:
+        from tqdm import tqdm
+except NameError:
+    from tqdm import tqdm
 
 pv.global_theme.color = 'white'
 
@@ -33,12 +45,14 @@ from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.utility import distance3d, prune_extra_ss
 from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR, WINSIZE
+from proteusPy.turtle3D import Turtle3D
+from proteusPy.Residue import build_residue
 
 from Bio.PDB import Vector, PDBParser, PDBList
 from Bio.PDB.vectors import calc_dihedral
 
 # tqdm progress bar width
-from proteusPy.ProteusGlobals import PBAR_COLS
+from proteusPy.ProteusGlobals import PBAR_COLS, ORIENT_BACKBONE, ORIENT_SIDECHAIN
 from proteusPy.ProteusGlobals import _FLOAT_INIT, _ANG_INIT
 
 # columns for the torsions file dataframe.
@@ -1069,7 +1083,7 @@ class Disulfide:
             _pl = pv.Plotter(window_size=WINSIZE)
             _pl.add_title(title=title, font_size=FONTSIZE)
             _pl.enable_anti_aliasing('msaa')
-            _pl.add_camera_orientation_widget()            
+            #_pl.add_camera_orientation_widget()            
 
             self._render(_pl, style=style, bs_scale=BS_SCALE, 
                         spec=SPECULARITY, specpow=SPEC_POWER)        
@@ -1085,7 +1099,7 @@ class Disulfide:
             pl.add_title(title=title, font_size=FONTSIZE)
             pl.enable_anti_aliasing('msaa')
 
-            pl.add_camera_orientation_widget()
+            #pl.add_camera_orientation_widget()
             
             self._render(pl, style='cpk', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, 
@@ -1147,7 +1161,7 @@ class Disulfide:
             #_pl.add_title(title=title, font_size=FONTSIZE)
             pl.clear()
             pl.enable_anti_aliasing('msaa')
-            pl.add_camera_orientation_widget()            
+            #pl.add_camera_orientation_widget()            
 
             self._render(pl, style=style, bs_scale=BS_SCALE, 
                         spec=SPECULARITY, specpow=SPEC_POWER)        
@@ -1161,7 +1175,7 @@ class Disulfide:
             #pl.add_title(title=title, font_size=FONTSIZE)
             pl.enable_anti_aliasing('msaa')
 
-            pl.add_camera_orientation_widget()
+            #pl.add_camera_orientation_widget()
             
             self._render(pl, style='cpk', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, 
@@ -1707,7 +1721,7 @@ class Disulfide:
             pl = pv.Plotter(window_size=WINSIZE)
             #pl.add_title(title=title, font_size=FONTSIZE)
             pl.enable_anti_aliasing('msaa')
-            pl.add_camera_orientation_widget()
+            #pl.add_camera_orientation_widget()
             self._render(pl, style=style, bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
             pl.reset_camera()
