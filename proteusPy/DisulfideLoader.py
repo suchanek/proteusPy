@@ -7,15 +7,11 @@ Author: Eric G. Suchanek, PhD
 Last revision: 2/9/2024
 '''
 
-# Author: Eric G. Suchanek, PhD.
-# Last modification: 2/10/2024
-# Cα N, Cα, Cβ, C', Sγ Å °
-
 import sys
 import copy
 import time
 
-import pandas as pd
+import pandas
 import pickle
 
 import proteusPy
@@ -72,9 +68,7 @@ class DisulfideLoader:
     >>> from proteusPy.DisulfideLoader import DisulfideLoader
     >>> from proteusPy.DisulfideList import DisulfideList
     
-    >>> PDB_SS = DisulfideLoader(verbose=True, subset=True)
-
-    Accessing by index value:
+    >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
     >>> SS1 = PDB_SS[0]
     >>> SS1
     <Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>
@@ -117,7 +111,7 @@ class DisulfideLoader:
         self.TorsionFile = f'{datadir}{torsion_file}'
         self.SSList = DisulfideList([], 'ALL_PDB_SS')
         self.SSDict = {}
-        self.TorsionDF = pd.DataFrame()
+        self.TorsionDF = pandas.DataFrame()
         self.TotalDisulfides = 0
         self.IDList = []
         self.QUIET = quiet
@@ -162,7 +156,7 @@ class DisulfideLoader:
         if self.verbose:
             print(f'-> DisulfideLoader(): Reading Torsion DF from: {self.TorsionFile}...', end='')
 
-        tmpDF  = pd.read_csv(self.TorsionFile)
+        tmpDF  = pandas.read_csv(self.TorsionFile)
         tmpDF.drop(tmpDF.columns[[0]], axis=1, inplace=True)
 
         self.TorsionDF = tmpDF.copy()
@@ -178,7 +172,6 @@ class DisulfideLoader:
             self.describe()
         return
 
-    # 
     # overload __getitem__ to handle slicing and indexing, and access by name
     
     def __getitem__(self, item):
@@ -285,7 +278,7 @@ class DisulfideLoader:
         :return: The list of disulfide bonds from the class.
         """
         
-        from tqdm import tqdm
+        # from tqdm import tqdm
         six = self.tclass.sixclass_df
         tot_classes = six.shape[0]
         class_disulfides = DisulfideList([], clsid, quiet=True)
@@ -326,16 +319,20 @@ class DisulfideLoader:
         Provides information about the Disulfide database contained in ```self```.
 
         Example:
-        >>> from proteusPy.DisulfideLoader import Load_PDB_SS
-        >>> PDB_SS = Load_PDB_SS(verbose=False, subset=False)
-        >>> PDB_SS.describe()
+        
+        from proteusPy.DisulfideLoader import Load_PDB_SS
+        PDB_SS = Load_PDB_SS(verbose=False, subset=False)
+        PDB_SS.describe()
             =========== RCSB Disulfide Database Summary ==============
-        PDB IDs present:                    35818
-        Disulfides loaded:                  120697
-        Average structure resolution:       2.34 Å
-        Lowest Energy Disulfide:            2q7q_75D_140D
-        Highest Energy Disulfide:           1toz_456A_467A
-        Total RAM Used:                     29.26 GB.
+               =========== Built: 2024-02-12 17:48:13 ==============
+       PDB IDs present:                    35818
+       Disulfides loaded:                  120494
+       Average structure resolution:       2.34 Å
+       Lowest Energy Disulfide:            2q7q_75D_140D
+       Highest Energy Disulfide:           1toz_456A_467A
+       Cα distance cutoff:                 8.00 Å
+       Total RAM Used:                     30.72 GB.
+           ================= proteusPy: 0.91 =======================
 
         '''
         vers = self.version
@@ -392,7 +389,7 @@ class DisulfideLoader:
         return
     
     
-    def getTorsions(self, pdbID=None) -> pd.DataFrame:
+    def getTorsions(self, pdbID=None) -> pandas.DataFrame:
         '''
         Return the torsions, distances and energies defined by Disulfide.Torsion_DF_cols
 
@@ -401,26 +398,14 @@ class DisulfideLoader:
             then return the entire dataset.
         :raises DisulfideParseWarning: Raised if not found
         :return: Torsions Dataframe
-        :rtype: pd.DataFrame
+        :rtype: pandas.DataFrame
 
         Example:
         >>> from proteusPy.DisulfideLoader import DisulfideLoader
         >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
         >>> Tor_DF = PDB_SS.getTorsions()
-        >>> Tor_DF.describe()
-                  proximal       distal         chi1         chi2         chi3         chi4  ...  ca_distance     phi_prox     psi_prox     phi_dist     psi_dist  torsion_length
-        count  3393.000000  3393.000000  3393.000000  3393.000000  3393.000000  3393.000000  ...  3393.000000  3393.000000  3393.000000  3393.000000  3393.000000     3393.000000
-        mean    231.513999   280.056587   -49.134436   -15.616297    -3.727982   -31.909496  ...     5.554563   -98.491326    63.029854   -95.890117    62.408772      225.242256
-        std     292.300344   293.503989    95.456284   104.318483    93.894477   103.553641  ...     1.489138    44.275097    99.266921    44.796764    97.231632       53.309336
-        min       1.000000     6.000000  -179.947368  -179.990782  -179.081812  -179.940602  ...     2.941898  -180.000000  -180.000000  -180.000000  -180.000000      116.478788
-        25%      48.000000    96.000000   -83.281768   -88.455019   -87.763001   -95.240905  ...     5.075491  -129.605300   -26.792543  -123.131231   -25.503215      181.929048
-        50%     136.000000   194.000000   -63.878076   -59.597437   -64.977491   -69.607516  ...     5.612046   -97.569676   112.772998   -97.956322   112.956483      225.617493
-        75%     310.000000   361.000000   -47.459809    82.078365    94.169603    69.488862  ...     6.112471   -69.670087   143.781003   -70.485076   142.808862      263.003492
-        max    2592.000000  2599.000000   179.918814   179.987671   179.554652   179.977181  ...    75.611323   177.021502   179.856474   178.886602   179.735964      368.022621
-        <BLANKLINE>
-        [8 rows x 14 columns]
         '''
-        res_df = pd.DataFrame()
+        res_df = pandas.DataFrame()
 
         if pdbID:
             try:
@@ -514,7 +499,7 @@ class DisulfideLoader:
                         x.append(sixcls)
                         y.append(len(_y))
 
-            sslist_df = pd.DataFrame(columns=['class_id', 'count'])
+            sslist_df = pandas.DataFrame(columns=['class_id', 'count'])
             sslist_df['class_id'] = x
             sslist_df['count'] = y
             return(sslist_df)
@@ -663,5 +648,9 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
     if verbose:
         print(f'-> load_PDB_SS(): Done reading {_fname}... ')
     return res
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
 
 # End of file
