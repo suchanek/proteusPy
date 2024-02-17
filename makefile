@@ -1,9 +1,9 @@
 # makefile for proteusPy
 # Author: Eric G. Suchanek, PhD
-# Last revision: 2/5/24 -egs-
+# Last revision: 2/17/24 -egs-
 
 CONDA = mamba
-VERS = 0.92
+VERS = 0.92.1
 DEVNAME = ppydev
 INIT = proteusPy/__init__.py
 
@@ -37,36 +37,30 @@ install_dev:
 	pip install -e . && cd ../biopython && pip install .
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
-	python -m ipykernel install --user --name ppy_dev --display-name "Python (ppy_dev)"
-
-jup: FORCE
-	sh jupyter.sh
+	python -m ipykernel install --user --name ppy_dev --display-name "Python (ppy_dev $(VERS) )"
 
 # package development targets
 
-sdist.out: FORCE
+sdist.out:
 	rm dist/*
 	python setup.py sdist
-	touch sdist.out
+	echo $(VERS) > sdist.out
 
-bdist.out: FORCE
+bdist.out:
 	python setup.py bdist
-	touch bdist.out
-docs.out: FORCE
+	echo $(VERS) > bdist.out
+docs.out:
 	pdoc -o docs --math --logo "./logo.png" ./proteusPy
-	touch docs.out
+	echo $(VERS) > docs.out
 
 upload: sdist
 	twine upload dist/*
 
 tag.out: FORCE
 	git tag -a $(VERS) -m $(VERS)
-	touch tag.out
+	echo $(VERS) > tag.out
 
-build: FORCE
-	tag.out
-	sdist.out
-	docs.out
+build: sdist.out, docs.out, tag.out
 
 
 # end of file
