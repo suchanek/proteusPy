@@ -1,14 +1,12 @@
 '''
 DisulfideBond Class Analysis Dictionary creation
 Author: Eric G. Suchanek, PhD.
-(c) 2023 Eric G. Suchanek, PhD., All Rights Reserved \n
-License: MIT \n
-Last Modification: 10/8/23 -egs-
+License: BSD
+Last Modification: 2/17/24 -egs-
 
-Disulfide Class creation and manipulation using the +/- formalism of Schmidt et al. (Biochem, 2006, 45, 7429-7433), 
-across all 32 possible classes. Classes are named per Schmidt's convention.
+Disulfide Class creation and manipulation using the +/- formalism of Hogg et al. (Biochem, 2006, 45, 7429-7433), 
+across all 32 possible classes. Classes are named per Hogg's convention.
 '''
-# Cα Cβ Sγ
 
 # this workflow reads in the torsion database, groups it by torsions 
 # to create the classes merges with the master class spreadsheet, and saves the 
@@ -17,8 +15,6 @@ across all 32 possible classes. Classes are named per Schmidt's convention.
 __pdoc__ = {'__all__': True}
 
 import pandas as pd
-import numpy
-
 from io import StringIO
 
 import pyvista as pv
@@ -26,19 +22,16 @@ from pyvista import set_plot_theme
 
 from Bio.PDB import *
 
-# for using from the repo we 
-from proteusPy.data import SS_CLASS_DICT_FILE, SS_CLASS_DEFINITIONS, DATA_DIR
+from proteusPy.data import SS_CLASS_DICT_FILE, SS_CLASS_DEFINITIONS, DATA_DIR, CLASSOBJ_FNAME, SS_CONSENSUS_FILE
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.Disulfide import *
 
 merge_cols = ['chi1_s','chi2_s','chi3_s','chi4_s','chi5_s','class_id','SS_Classname','FXN','count','incidence','percentage','ca_distance_mean',
 'ca_distance_std','torsion_length_mean','torsion_length_std','energy_mean','energy_std', 'ss_id']
 
-SS_CONSENSUS_FILE = 'SS_consensus_class_sext.pkl'
-
 class DisulfideClass_Constructor():
     '''
-    Class manages structural classes for the disulfide bonds contained
+    This Class manages structural classes for the disulfide bonds contained
     in the proteusPy disulfide database.
 
     Build the internal dictionary mapping disulfides to class names.
@@ -127,7 +120,16 @@ class DisulfideClass_Constructor():
         :param classid: Class ID, e.g. '+RHStaple'
         :return: DisulfideList of class members
         '''
-        from tqdm import tqdm
+        try:
+            # Check if running in Jupyter
+            shell = get_ipython().__class__.__name__
+            if shell == 'ZMQInteractiveShell':
+                from tqdm.notebook import tqdm
+            else:
+                from tqdm import tqdm
+        except NameError:
+            from tqdm import tqdm
+
         from proteusPy.ProteusGlobals import PBAR_COLS
         res = DisulfideList([], classid)
 
@@ -193,13 +195,12 @@ class DisulfideClass_Constructor():
 
     def build_yourself(self, loader):
         '''
-        Builds the internal structures needed for the binary and six-fold disulfide structural classes
-        based on dihedral angle rules. See Hogg'.
+        Build the internal structures needed for the binary and six-fold disulfide structural classes
+        based on dihedral angle rules.
     
         Parameters
         ----------
-        loader: proteusPy.utilities.MolecularLoader
-            A MolecularLoader object containing data from the target dataset.
+        loader: DisulfideLoader object
         
         Returns
         -------

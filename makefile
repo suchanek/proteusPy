@@ -3,7 +3,7 @@
 # Last revision: 2/5/24 -egs-
 
 CONDA = mamba
-VERS = 0.91
+VERS = 0.92
 DEVNAME = ppydev
 INIT = proteusPy/__init__.py
 
@@ -44,25 +44,29 @@ jup: FORCE
 
 # package development targets
 
-sdist: FORCE
+sdist.out: FORCE
 	rm dist/*
 	python setup.py sdist
+	touch sdist.out
 
-bdist: FORCE
+bdist.out: FORCE
 	python setup.py bdist
-docs: FORCE
+	touch bdist.out
+docs.out: FORCE
 	pdoc -o docs --math --logo "./logo.png" ./proteusPy
+	touch docs.out
 
 upload: sdist
 	twine upload dist/*
 
-tag: FORCE
+tag.out: FORCE
 	git tag -a $(VERS) -m $(VERS)
+	touch tag.out
 
 build: FORCE
-	tag
-	sdist
-	docs
+	tag.out
+	sdist.out
+	docs.out
 
 
 # end of file

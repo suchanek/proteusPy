@@ -27,6 +27,7 @@ SS_PROBLEM_SUBSET_ID_FILE = 'PDB_subset_problems.csv'
 
 # contains the dihedral classes and their members
 SS_CLASS_DICT_FILE = 'PDB_ss_classes_dict.pkl'
+SS_CONSENSUS_FILE = 'SS_consensus_class_sext.pkl'
 
 LOADER_FNAME = "PDB_SS_ALL_LOADER.pkl"
 LOADER_SUBSET_FNAME = "PDB_SS_SUBSET_LOADER.pkl"

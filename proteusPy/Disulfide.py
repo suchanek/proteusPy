@@ -5,7 +5,7 @@ It represents the core of the current implementation of *proteusPy*.
 
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 Author: Eric G. Suchanek, PhD
-Last revision: 3/16/2023
+Last revision: 2/17/2024
 '''
 
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
@@ -16,6 +16,7 @@ import math
 import time
 import datetime
 import glob
+
 import numpy as np
 np.set_printoptions(suppress=True)
 
@@ -52,7 +53,7 @@ from Bio.PDB import Vector, PDBParser, PDBList
 from Bio.PDB.vectors import calc_dihedral
 
 # tqdm progress bar width
-from proteusPy.ProteusGlobals import PBAR_COLS, ORIENT_BACKBONE, ORIENT_SIDECHAIN
+from proteusPy.ProteusGlobals import PBAR_COLS, ORIENT_SIDECHAIN
 from proteusPy.ProteusGlobals import _FLOAT_INIT, _ANG_INIT
 
 # columns for the torsions file dataframe.
@@ -1995,7 +1996,7 @@ class Disulfide:
 
         We point to the complete list to search for lowest and highest energies.
         >>> sslist = PDB_SS.SSList
-        >>> ssmin_enrg, ssmax_enrg = PDB_SS.SSList.minmax_energy()
+        >>> ssmin_enrg, ssmax_enrg = PDB_SS.SSList.minmax_energy
 
         Make an empty list and find the nearest neighbors within 10 degrees avg RMS in
         sidechain dihedral angle space.
