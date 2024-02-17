@@ -342,7 +342,7 @@ class DisulfideLoader:
         res = self.Average_Resolution
         cutoff = self.cutoff
         timestr = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.timestamp))
-        ssMin, ssMax = self.SSList.minmax_energy()
+        ssMin, ssMax = self.SSList.minmax_energy
         
         print(f'    =========== RCSB Disulfide Database Summary ==============')
         print(f'       =========== Built: {timestr} ==============')

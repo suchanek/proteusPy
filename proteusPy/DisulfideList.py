@@ -10,12 +10,6 @@ Author: Eric G. Suchanek, PhD
 Last revision: 2/24/2023
 '''
 
-# Author Eric G. Suchanek, PhD
-# A part of the proteusPy molecular modeling and analysis suite by
-# Eric G. Suchanek, PhD
-# Last modification: 2/8/2023 -egs-
-# Cα N, Cα, Cβ, C', Sγ Å °
-
 __pdoc__ = {}
 __pdoc__['all'] = True
 
@@ -143,6 +137,7 @@ class DisulfideList(UserList):
      Χ1-Χ5: 174.63°, 82.52°, -83.32°, -62.52° -73.83°, 138.89°, 1.70 kcal/mol
      Cα Distance: 4.50 Å
      Torsion length: 231.53 deg>
+    
     Get a list of disulfides via slicing
     >>> subset = DisulfideList(PDB_SS[0:10],'subset')
     
@@ -856,6 +851,7 @@ class DisulfideList(UserList):
 
         return sslist[ssmin], sslist[ssmax]
 
+    @property
     def minmax_energy(self):
         '''
         Return the Disulfides with the minimum and maximum energies

@@ -11,7 +11,7 @@ Last Modification: 11/14/23 -egs-
 '''
 
 from io import StringIO
-import pandas as pd
+import pandas
 import numpy as np
 import proteusPy
 
@@ -31,7 +31,7 @@ def create_classes(df):
     
     Example:
     >>> import pandas as pd
-    >>> df = pd.DataFrame({
+    >>> df = pandas.DataFrame({
     ...    'ss_id': [1, 2, 3, 4, 5],
     ...    'chi1': [1.0, -1.0, 1.0, 1.0, -1.0],
     ...    'chi2': [-1.0, -1.0, -1.0, 1.0, 1.0],
@@ -226,7 +226,7 @@ def create_quat_classes(df):
 
     return grouped
 
-def filter_by_percentage(df, cutoff):
+def filter_by_percentage(df: pandas.DataFrame, cutoff) -> pandas.DataFrame:
        """
        Filter a pandas DataFrame by incidence
    
@@ -239,7 +239,7 @@ def filter_by_percentage(df, cutoff):
        """
        return df[df['percentage'] >= cutoff]
 
-def get_ss_id(df: pd.DataFrame, cls: str) -> str:
+def get_ss_id(df: pandas.DataFrame, cls: str) -> str:
     '''
     Returns the 'ss_id' value in the given DataFrame that corresponds to the
     input 'cls' string.
@@ -470,7 +470,7 @@ def plot_binary_to_sixclass_incidence(loader: DisulfideLoader, theme='light'):
                     x.append(sixcls)
                     y.append(len(_y))
 
-        sslist_df = pd.DataFrame(columns=['class_id', 'count'])
+        sslist_df = pandas.DataFrame(columns=['class_id', 'count'])
         sslist_df['class_id'] = x
         sslist_df['count'] = y
         return(sslist_df)
@@ -495,7 +495,7 @@ def enumerate_sixclass_fromlist(loader, sslist):
                 x.append(sixcls)
                 y.append(len(_y))
 
-    sslist_df = pd.DataFrame(columns=['class_id', 'count'])
+    sslist_df = pandas.DataFrame(columns=['class_id', 'count'])
     sslist_df['class_id'] = x
     sslist_df['count'] = y
     return(sslist_df)
@@ -513,7 +513,7 @@ def enumerate_sixclass_fromlist(loader: DisulfideLoader, sslist):
                 x.append(sixcls)
                 y.append(len(_y))
 
-    sslist_df = pd.DataFrame(columns=['class_id', 'count'])
+    sslist_df = pandas.DataFrame(columns=['class_id', 'count'])
     sslist_df['class_id'] = x
     sslist_df['count'] = y
     return(sslist_df)
