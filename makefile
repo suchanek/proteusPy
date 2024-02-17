@@ -1,14 +1,18 @@
-# makefile for proteusPy
+# Makefile for proteusPy
 # Author: Eric G. Suchanek, PhD
 # Last revision: 2/17/24 -egs-
 
 CONDA = mamba
+# this MUST match the version in proteusPy/__init__.py
 VERS = 0.92.1
 DEVNAME = ppydev
 INIT = proteusPy/__init__.py
+OUTFILES = sdist.out, bdist.out, docs.out
 
 FORCE: ;
 
+nuke: clean devclean
+	rm $(OUTFILES)
 dev:
 	$(CONDA) env create --name $(DEVNAME) --file ppy.yml -y
 	$(CONDA) install --name $(DEVNAME) pdoc -y
@@ -44,23 +48,25 @@ install_dev:
 sdist.out:
 	rm dist/*
 	python setup.py sdist
-	echo $(VERS) > sdist.out
+	@echo $(VERS) > sdist.out
 
 bdist.out:
 	python setup.py bdist
-	echo $(VERS) > bdist.out
+	@echo $(VERS) > bdist.out
 docs.out:
 	pdoc -o docs --math --logo "./logo.png" ./proteusPy
-	echo $(VERS) > docs.out
+	@echo $(VERS) > docs.out
 
-upload: sdist
+# normally i push to PyPi via github action
+upload: sdist.out
 	twine upload dist/*
 
-tag.out: FORCE
+tag.out:
 	git tag -a $(VERS) -m $(VERS)
-	echo $(VERS) > tag.out
+	@echo $(VERS) > tag.out
 
-build: sdist.out, docs.out, tag.out
+build: docs.out sdist.out 
+
 
 
 # end of file
