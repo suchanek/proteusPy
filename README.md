@@ -4,17 +4,18 @@
 
 # General Capabilities
 
-1) Display Disulfides contained in the RCSB interactively in multiple display styles
-2) Calculate geometric and energetic properties about these disulfides
-3) Create structural classes by characterizing the disulfide torsional angles into *n* classes
-4) Overlap disulfides onto a common frame of reference for display
-5) Build protein backbones from a backbone dihedral angle template
+- Interactively display disulfides contained in the RCSB in a variety of display styles
+- Calculate geometric and energetic properties about these disulfides
+- Create structural classes by characterizing the disulfide torsional angles into *n* classes
+- Overlap disulfides onto a common frame of reference for display
+- Build protein backbones from backbone phi, psi dihedral angle templates
+- more in development
 
 *See https://suchanek.github.io/proteusPy/proteusPy.html for the API documentation with examples*
 
 # Installation 
 
-It's simplest to clone the repo via github since it contains all of the notebooks, data and test programs. Installation includes installing my fork of Biopython fork. This is required to rebuild the database. I highly recommend using Miniforge, especially in MacOS.
+It's simplest to clone the repo via github since it contains all of the notebooks, data and test programs. Installation includes installing my Biopython fork. This is required to rebuild the database. I highly recommend using Miniforge since it includes mamba. The installation instructions below assume a clean install with no package manager or compiler installed.
 
 ## MacOS/Linux
 - Install Miniforge: <https://github.com/conda-forge/miniforge> (existing Anaconda installations are fine but please install mamba)
@@ -26,7 +27,7 @@ It's simplest to clone the repo via github since it contains all of the notebook
   $ git clone https://github.com/suchanek/proteusPy.git
   $ git clone https://github.com/suchanek/biopython.git
   $ cd proteusPy
-  $ git-lfs track "*.csv" "*.mp4"
+  $ git-lfs track "*.csv" "*.mp4" "*.pkl"
   $ make pkg
   $ mamba activate proteusPy
   $ make install
@@ -43,7 +44,7 @@ It's simplest to clone the repo via github since it contains all of the notebook
   $ git clone https://github.com/suchanek/proteusPy.git
   $ git clone https://github.com/suchanek/biopython.git
   $ cd proteusPy
-  $ git-lfs track "*.csv" "*.mp4"
+  $ git-lfs track "*.csv" "*.mp4" "*.pkl"
   $ make pkg
   $ mamba activate proteusPy
   $ make install

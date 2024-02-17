@@ -101,17 +101,20 @@ proteusPy    </h1>
 
 <h1 id="general-capabilities">General Capabilities</h1>
 
-<p>1) Display Disulfides contained in the RCSB interactively in multiple display styles
-2) Calculate geometric and energetic properties about these disulfides
-3) Create structural classes by characterizing the disulfide torsional angles into <em>n</em> classes
-4) Overlap disulfides onto a common frame of reference for display
-5) Build protein backbones from a backbone dihedral angle template</p>
+<ul>
+<li>Interactively display disulfides contained in the RCSB in a variety of display styles</li>
+<li>Calculate geometric and energetic properties about these disulfides</li>
+<li>Create structural classes by characterizing the disulfide torsional angles into <em>n</em> classes</li>
+<li>Overlap disulfides onto a common frame of reference for display</li>
+<li>Build protein backbones from backbone phi, psi dihedral angle templates</li>
+<li>more in development</li>
+</ul>
 
 <p><em>See <a href="https://suchanek.github.io/proteusPy/proteusPy.html">https://suchanek.github.io/proteusPy/proteusPy.html</a> for the API documentation with examples</em></p>
 
 <h1 id="installation">Installation</h1>
 
-<p>It's simplest to clone the repo via github since it contains all of the notebooks, data and test programs. Installation includes installing my fork of Biopython fork. This is required to rebuild the database. I highly recommend using Miniforge, especially in MacOS.</p>
+<p>It's simplest to clone the repo via github since it contains all of the notebooks, data and test programs. Installation includes installing my Biopython fork. This is required to rebuild the database. I highly recommend using Miniforge since it includes mamba. The installation instructions below assume a clean install with no package manager or compiler installed.</p>
 
 <h2 id="macoslinux">MacOS/Linux</h2>
 
@@ -127,7 +130,7 @@ proteusPy    </h1>
 <pre><span></span><code><span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span><a href="https://github.com/suchanek/proteusPy.git">https://github.com/suchanek/proteusPy.git</a>
 <span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span><a href="https://github.com/suchanek/biopython.git">https://github.com/suchanek/biopython.git</a>
 <span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>proteusPy
-<span class="gp">$ </span>git-lfs<span class="w"> </span>track<span class="w"> </span><span class="s2">&quot;<em>.csv&quot;</span><span class="w"> </span><span class="s2">&quot;</em>.mp4&quot;</span>
+<span class="gp">$ </span>git-lfs<span class="w"> </span>track<span class="w"> </span><span class="s2">&quot;<em>.csv&quot;</span><span class="w"> </span><span class="s2">&quot;</em>.mp4&quot;</span><span class="w"> </span><span class="s2">&quot;*.pkl&quot;</span>
 <span class="gp">$ </span>make<span class="w"> </span>pkg
 <span class="gp">$ </span>mamba<span class="w"> </span>activate<span class="w"> </span>proteusPy
 <span class="gp">$ </span>make<span class="w"> </span>install
@@ -153,7 +156,7 @@ proteusPy    </h1>
 <pre><span></span><code><span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span><a href="https://github.com/suchanek/proteusPy.git">https://github.com/suchanek/proteusPy.git</a>
 <span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span><a href="https://github.com/suchanek/biopython.git">https://github.com/suchanek/biopython.git</a>
 <span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>proteusPy
-<span class="gp">$ </span>git-lfs<span class="w"> </span>track<span class="w"> </span><span class="s2">&quot;<em>.csv&quot;</span><span class="w"> </span><span class="s2">&quot;</em>.mp4&quot;</span>
+<span class="gp">$ </span>git-lfs<span class="w"> </span>track<span class="w"> </span><span class="s2">&quot;<em>.csv&quot;</span><span class="w"> </span><span class="s2">&quot;</em>.mp4&quot;</span><span class="w"> </span><span class="s2">&quot;*.pkl&quot;</span>
 <span class="gp">$ </span>make<span class="w"> </span>pkg
 <span class="gp">$ </span>mamba<span class="w"> </span>activate<span class="w"> </span>proteusPy
 <span class="gp">$ </span>make<span class="w"> </span>install
@@ -182,7 +185,7 @@ proteusPy    </h1>
 
 <p><em>NB:</em> This distribution is being developed slowly. proteusPy relies on my fork of the <code>Bio</code> Python package to download and build the database. This will be installed by default if one follows the installation instructions. -egs-</p>
 
-<p>Eric G. Suchanek, PhD., <a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#x6f;&#x3a;&#x73;u&#x63;&#x68;a&#110;&#x65;&#107;&#x40;&#109;&#x61;&#99;&#x2e;&#99;&#111;&#109;">&#x73;u&#x63;&#x68;a&#110;&#x65;&#107;&#x40;&#109;&#x61;&#99;&#x2e;&#99;&#111;&#109;</a></p>
+<p>Eric G. Suchanek, PhD., <a href="&#x6d;&#97;i&#108;&#116;&#111;&#58;&#x73;&#x75;&#99;&#x68;&#97;&#110;&#101;&#107;&#x40;&#x6d;&#97;&#x63;&#46;&#x63;&#111;&#x6d;">&#x73;&#x75;&#99;&#x68;&#97;&#110;&#101;&#107;&#x40;&#x6d;&#97;&#x63;&#46;&#x63;&#111;&#x6d;</a></p>
 </div>
 
                         <input id="mod-proteusPy-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -197,7 +200,7 @@ proteusPy    </h1>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">.. include:: ../README.md</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.92&quot;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.92.1&quot;</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="kn">import</span> <span class="nn">sys</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="kn">import</span> <span class="nn">os</span>
