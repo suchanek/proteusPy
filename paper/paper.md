@@ -26,9 +26,21 @@ bibliography: joss.bib
 <!-- markdownlint-disable MD037 -->
 # Summary
 
-**proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an initial focus on Disulfide Bonds. This package significantly extends the capabilities of the molecular modeling program **proteus**, [@Pabo_1986], and utilizes a new implementation of the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class for disulfide and protein modeling.  The [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class implements methods to analyze the protein structure stabilizing element known as a **Disulfide Bond**. 
+**proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an initial focus on Disulfide bonds. This package significantly extends the capabilities of the molecular modeling program **proteus**, [@Pabo_1986], and utilizes a new implementation of the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class for disulfide and protein modeling.  This initial implementation focuses on the [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class, which implements methods to analyze the protein structure stabilizing element known as a **Disulfide Bond**. 
 
 The work has resulted in a freely-accessible database of over 120,494 disulfide bonds contained within 35,818 proteins in the [RCSB Protein Databank.](https:/www.rcsb.org) The library is capable of extracting, comparing, building and visualizing the disulfides contained within the database, facilitating analysis and understanding.
+
+# General Capabilities
+- Interactively display disulfides contained in the RCSB in a variety of display styles
+- Calculate geometric and energetic properties about these disulfides
+- Create binary and sextant structural classes by characterizing the disulfide torsional angles into *n* classes
+- Build idealized disulfide bonds from dihedral angle input
+- Find disulfide neighbors based on dihedral angle input
+- Overlap disulfides onto a common frame of reference for display
+- Build protein backbones from backbone phi, psi dihedral angle templates
+- More in development
+
+*See https://suchanek.github.io/proteusPy/proteusPy.html for the API documentation with examples*
 
 # Statement of Need
 
@@ -44,7 +56,7 @@ Accordingly, I have developed the `proteusPy` package to delve into the RCSB Pro
 
 # Installation
 
-It's simplest to clone the repo via github since it contains all of the notebooks, data and test programs. Installation also installs my fork of Biopython. While this is not technically required for using the analytical capabilities of the package it is required to rebuild the database. I highly recommend using Miniforge, especially in MacOS.
+It's simplest to clone the repo via GitHub since it contains all of the notebooks, data and test programs. Installation includes installing my Biopython fork. This is required to rebuild the database. I highly recommend using Miniforge since it includes mamba. The installation instructions below assume a clean install with no package manager or compiler installed.
 
 ## MacOS/Linux
 - Install Miniforge: <https://github.com/conda-forge/miniforge> (existing Anaconda installations are fine but please install mamba)
@@ -56,7 +68,7 @@ It's simplest to clone the repo via github since it contains all of the notebook
   $ git clone https://github.com/suchanek/proteusPy.git
   $ git clone https://github.com/suchanek/biopython.git
   $ cd proteusPy
-  $ git-lfs track "*.csv" "*.mp4"
+  $ git-lfs track "*.csv" "*.mp4" "*.pkl"
   $ make pkg
   $ mamba activate proteusPy
   $ make install
@@ -73,7 +85,7 @@ It's simplest to clone the repo via github since it contains all of the notebook
   $ git clone https://github.com/suchanek/proteusPy.git
   $ git clone https://github.com/suchanek/biopython.git
   $ cd proteusPy
-  $ git-lfs track "*.csv" "*.mp4"
+  $ git-lfs track "*.csv" "*.mp4" "*.pkl"
   $ make pkg
   $ mamba activate proteusPy
   $ make install
@@ -87,6 +99,15 @@ Once the package is installed one can use the existing notebooks for analysis of
 * [DisulfideClass_Analysis.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py): Performs cluster analysis on the disulfide database.
 
 The first time one loads the database via [Load_PDB_SS()](https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html#Load_PDB_SS) the system will attempt to download the full and subset database from Google Drive. If this fails the system will attempt to rebuild the database from the repo's ``data`` subdirectory (not the package's). If you've downloaded from github this will work correctly. If you've installed from pyPi via ``pip`` it will fail.
+
+## Quickstart
+
+After installation is complete launch jupyter lab:
+
+```console
+$ jupyter lab 
+```
+and open notebooks/Analysis_2q7q.ipynb. This notebook looks at the disulfide bond with the lowest energy in the entire database. There are several other notebooks in this directory that illustrate using the program. Some of these reflect active development work so may not be 'fully baked'.
 
 # Class Details
 
