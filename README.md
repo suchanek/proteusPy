@@ -17,12 +17,12 @@
 # Requirements
 
 1. PC running MacOS, Linux, Windows with git, git-lfs and C compiler installed.
-2. 16 GB RAM
+2. 8 GB RAM
 3. 3 GB disk space
 
 # Installation 
 
-It's simplest to clone the repo via GitHub since it contains all of the notebooks, data and test programs. Installation includes installing my Biopython fork. This is required to rebuild the database. I highly recommend using Miniforge since it includes mamba. The installation instructions below assume a clean install with no package manager or compiler installed.
+It's simplest to clone the repo via GitHub since it contains all of the notebooks, data and test programs. Installation includes installing my Biopython fork which is required to rebuild the database (this is not needed generally). I highly recommend using Miniforge since it includes mamba. The installation instructions below assume a clean install with no package manager or compiler installed.
 
 ## MacOS/Linux
 - Install Miniforge: <https://github.com/conda-forge/miniforge> (existing Anaconda installations are fine but please install mamba)
@@ -70,7 +70,7 @@ After installation is complete launch jupyter lab:
 ```console
 $ jupyter lab 
 ```
-and open notebooks/Analysis_2q7q.ipynb. This notebook looks at the disulfide bond with the lowest energy in the entire database. There are several other notebooks in this directory that illustrate using the program. Some of these reflect active development work so may not be 'fully baked'.
+and open ``notebooks/Analysis_2q7q.ipynb``. This notebook looks at the disulfide bond with the lowest energy in the entire database. There are several other notebooks in this directory that illustrate using the program. Some of these reflect active development work so may not be 'fully baked'.
 
 ## The Future
 
@@ -82,7 +82,7 @@ The proteusPy package was developed by Eric G. Suchanek, PhD. If you find it use
 
 ```
 @software{proteusPy2024,
-  author = {Eric G. Suchanek},
+  author = {Eric G. Suchanek, PhD},
   title = {proteusPy: A Package for Modeling and Analyzing Proteins of Known Structure},
   year = {2024},
   publisher = {GitHub},
