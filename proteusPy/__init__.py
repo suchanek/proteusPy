@@ -21,8 +21,8 @@ import matplotlib
 import Bio
 import plotly
 
-import pyvista as pv
-import pandas as pd
+# import pyvista as pv
+# import pandas as pd
 # import panel as pn
 
 from Bio.PDB.vectors import calc_dihedral, calc_angle

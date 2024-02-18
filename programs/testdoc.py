@@ -50,10 +50,8 @@ class test():
 from proteusPy.Disulfide import Disulfide 
 from proteusPy.DisulfideLoader import DisulfideLoader
 from proteusPy.DisulfideList import DisulfideList
-from proteusPy.proteusGlobals import MODEL_DIR
+from proteusPy.ProteusGlobals import MODEL_DIR
 
-# override any default PDB globals
-# location for PDB repository
 PDB_ROOT = '/Users/egs/PDB/'
 
 # location of cleaned PDB files - these are not stored in the repo

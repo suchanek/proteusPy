@@ -65,7 +65,7 @@ tag.out: FORCE
 	git tag -a $(VERS) -m $(VERS)
 	@echo $(VERS) > tag.out
 
-build: docs.out sdist.out 
+build: $(OUTFILES) 
 
 
 
