@@ -56,6 +56,7 @@
     <li><a href="#general-usage">General Usage</a></li>
     <li><a href="#quickstart">Quickstart</a></li>
     <li><a href="#the-future">The Future</a></li>
+    <li><a href="#citing-proteuspy">Citing proteusPy</a></li>
     <li><a href="#publications">Publications</a></li>
   </ul></li>
 </ul>
@@ -120,13 +121,13 @@ proteusPy    </h1>
 
 <ol>
 <li>PC running MacOS, Linux, Windows with git, git-lfs and C compiler installed.</li>
-<li>16 GB RAM</li>
+<li>8 GB RAM</li>
 <li>3 GB disk space</li>
 </ol>
 
 <h1 id="installation">Installation</h1>
 
-<p>It's simplest to clone the repo via GitHub since it contains all of the notebooks, data and test programs. Installation includes installing my Biopython fork. This is required to rebuild the database. I highly recommend using Miniforge since it includes mamba. The installation instructions below assume a clean install with no package manager or compiler installed.</p>
+<p>It's simplest to clone the repo via GitHub since it contains all of the notebooks, data and test programs. Installation includes installing my Biopython fork which is required to rebuild the database (this is not needed generally). I highly recommend using Miniforge since it includes mamba. The installation instructions below assume a clean install with no package manager or compiler installed.</p>
 
 <h2 id="macoslinux">MacOS/Linux</h2>
 
@@ -191,11 +192,26 @@ proteusPy    </h1>
 </code></pre>
 </div>
 
-<p>and open notebooks/Analysis_2q7q.ipynb. This notebook looks at the disulfide bond with the lowest energy in the entire database. There are several other notebooks in this directory that illustrate using the program. Some of these reflect active development work so may not be 'fully baked'.</p>
+<p>and open <code>notebooks/Analysis_2q7q.ipynb</code>. This notebook looks at the disulfide bond with the lowest energy in the entire database. There are several other notebooks in this directory that illustrate using the program. Some of these reflect active development work so may not be 'fully baked'.</p>
 
 <h2 id="the-future">The Future</h2>
 
 <p>I am continuing to explore the initial disulfide structural classes described by Hogg <em>et al.</em> using the sextant class approach. This offers much higher class resolution and reveals subgroups within the broad class. I'd also like to explore the catalytic and allosteric classes in more detail to look for common structural elements.</p>
+
+<h2 id="citing-proteuspy">Citing proteusPy</h2>
+
+<p>The proteusPy package was developed by Eric G. Suchanek, PhD. If you find it useful in your research and wish to cite it please use the following BibTeX entry:</p>
+
+<pre><code>@software{proteusPy2024,
+  author = {Eric G. Suchanek, PhD},
+  title = {proteusPy: A Package for Modeling and Analyzing Proteins of Known Structure},
+  year = {2024},
+  publisher = {GitHub},
+  version = {0.92},
+  journal = {GitHub repository},
+  url = {https://github.com/suchanek/proteusPy}
+}
+</code></pre>
 
 <h2 id="publications">Publications</h2>
 
@@ -219,7 +235,7 @@ proteusPy    </h1>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">.. include:: ../README.md</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.92.1&quot;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.92.2&quot;</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="kn">import</span> <span class="nn">sys</span>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="kn">import</span> <span class="nn">os</span>
@@ -242,33 +258,34 @@ proteusPy    </h1>
 </span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a><span class="kn">from</span> <span class="nn">Bio.PDB</span> <span class="kn">import</span> <span class="n">Select</span><span class="p">,</span> <span class="n">Vector</span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>
 </span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a><span class="kn">from</span> <span class="nn">.ProteusPyWarning</span> <span class="kn">import</span> <span class="n">ProteusPyWarning</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="kn">from</span> <span class="nn">.ProteusGlobals</span> <span class="kn">import</span> <span class="n">PDB_DIR</span><span class="p">,</span> <span class="n">MODEL_DIR</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a><span class="kn">from</span> <span class="nn">.DisulfideExceptions</span> <span class="kn">import</span> <span class="n">DisulfideIOException</span><span class="p">,</span> <span class="n">DisulfideConstructionWarning</span><span class="p">,</span> <span class="n">DisulfideConstructionException</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a><span class="kn">from</span> <span class="nn">.turtle3D</span> <span class="kn">import</span> <span class="n">Turtle3D</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="kn">from</span> <span class="nn">.turtle3D</span> <span class="kn">import</span> <span class="n">ORIENT_BACKBONE</span><span class="p">,</span> <span class="n">ORIENT_SIDECHAIN</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="kn">from</span> <span class="nn">.Residue</span> <span class="kn">import</span> <span class="n">build_residue</span><span class="p">,</span> <span class="n">get_backbone_from_chain</span><span class="p">,</span> <span class="n">to_alpha</span><span class="p">,</span> <span class="n">to_carbonyl</span><span class="p">,</span> <span class="n">to_nitrogen</span><span class="p">,</span> <span class="n">to_oxygen</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>
-</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a><span class="kn">from</span> <span class="nn">.Disulfide</span> <span class="kn">import</span> <span class="n">Download_Disulfides</span><span class="p">,</span> <span class="n">Extract_Disulfides</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="kn">from</span> <span class="nn">.DisulfideList</span> <span class="kn">import</span> <span class="n">load_disulfides_from_id</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="kn">from</span> <span class="nn">.DisulfideLoader</span> <span class="kn">import</span> <span class="n">DisulfideLoader</span><span class="p">,</span> <span class="n">Load_PDB_SS</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>
-</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a><span class="kn">from</span> <span class="nn">.atoms</span> <span class="kn">import</span> <span class="o">*</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a><span class="kn">from</span> <span class="nn">.data</span> <span class="kn">import</span> <span class="o">*</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a><span class="kn">from</span> <span class="nn">.angle_annotation</span> <span class="kn">import</span> <span class="o">*</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>
-</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a><span class="kn">from</span> <span class="nn">.utility</span> <span class="kn">import</span> <span class="n">distance_squared</span><span class="p">,</span> <span class="n">distance3d</span><span class="p">,</span> <span class="n">get_jet_colormap</span><span class="p">,</span> <span class="n">Check_chains</span><span class="p">,</span> <span class="n">print_memory_used</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a><span class="kn">from</span> <span class="nn">.utility</span> <span class="kn">import</span> <span class="n">image_to_ascii_art</span><span class="p">,</span> <span class="n">generate_vector_dataframe</span><span class="p">,</span> <span class="n">retrieve_git_lfs_files</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>
-</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a><span class="kn">from</span> <span class="nn">.DisulfideClasses</span> <span class="kn">import</span> <span class="p">(</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>        <span class="n">create_classes</span><span class="p">,</span> <span class="n">create_quat_classes</span><span class="p">,</span> <span class="n">plot_count_vs_classid</span><span class="p">,</span>
-</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>        <span class="n">plot_count_vs_class_df</span><span class="p">,</span> <span class="n">get_half_quadrant</span><span class="p">,</span> <span class="n">get_quadrant</span><span class="p">,</span> <span class="n">get_sixth_quadrant</span><span class="p">,</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>        <span class="n">filter_by_percentage</span><span class="p">,</span> <span class="n">torsion_to_sixclass</span><span class="p">,</span> <span class="n">plot_binary_to_sixclass_incidence</span><span class="p">,</span> <span class="n">enumerate_sixclass_fromlist</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>        <span class="p">)</span>
-</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>
-</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a><span class="kn">from</span> <span class="nn">.DisulfideClass_Constructor</span> <span class="kn">import</span> <span class="n">DisulfideClass_Constructor</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a>
-</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a><span class="c1"># end of file</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="kn">from</span> <span class="nn">.ProteusGlobals</span> <span class="kn">import</span> <span class="n">PDB_DIR</span><span class="p">,</span> <span class="n">MODEL_DIR</span><span class="p">,</span> <span class="n">WINFRAME</span><span class="p">,</span> <span class="n">WINSIZE</span><span class="p">,</span> <span class="n">CAMERA_POS</span><span class="p">,</span> <span class="n">_ANG_INIT</span><span class="p">,</span> <span class="n">_FLOAT_INIT</span><span class="p">,</span> <span class="n">_INT_INIT</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a><span class="kn">from</span> <span class="nn">.DisulfideExceptions</span> <span class="kn">import</span> <span class="n">DisulfideIOException</span><span class="p">,</span> <span class="n">DisulfideConstructionWarning</span><span class="p">,</span> <span class="n">DisulfideConstructionException</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="kn">from</span> <span class="nn">.turtle3D</span> <span class="kn">import</span> <span class="n">Turtle3D</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="kn">from</span> <span class="nn">.turtle3D</span> <span class="kn">import</span> <span class="n">ORIENT_BACKBONE</span><span class="p">,</span> <span class="n">ORIENT_SIDECHAIN</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="kn">from</span> <span class="nn">.Residue</span> <span class="kn">import</span> <span class="n">build_residue</span><span class="p">,</span> <span class="n">get_backbone_from_chain</span><span class="p">,</span> <span class="n">to_alpha</span><span class="p">,</span> <span class="n">to_carbonyl</span><span class="p">,</span> <span class="n">to_nitrogen</span><span class="p">,</span> <span class="n">to_oxygen</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="kn">from</span> <span class="nn">.Disulfide</span> <span class="kn">import</span> <span class="n">Download_Disulfides</span><span class="p">,</span> <span class="n">Extract_Disulfides</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="kn">from</span> <span class="nn">.DisulfideList</span> <span class="kn">import</span> <span class="n">load_disulfides_from_id</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a><span class="kn">from</span> <span class="nn">.DisulfideLoader</span> <span class="kn">import</span> <span class="n">DisulfideLoader</span><span class="p">,</span> <span class="n">Load_PDB_SS</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a><span class="kn">from</span> <span class="nn">.atoms</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a><span class="kn">from</span> <span class="nn">.data</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a><span class="kn">from</span> <span class="nn">.angle_annotation</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a><span class="kn">from</span> <span class="nn">.utility</span> <span class="kn">import</span> <span class="n">distance_squared</span><span class="p">,</span> <span class="n">distance3d</span><span class="p">,</span> <span class="n">get_jet_colormap</span><span class="p">,</span> <span class="n">Check_chains</span><span class="p">,</span> <span class="n">print_memory_used</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a><span class="kn">from</span> <span class="nn">.utility</span> <span class="kn">import</span> <span class="n">image_to_ascii_art</span><span class="p">,</span> <span class="n">generate_vector_dataframe</span><span class="p">,</span> <span class="n">retrieve_git_lfs_files</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a><span class="kn">from</span> <span class="nn">.DisulfideClasses</span> <span class="kn">import</span> <span class="p">(</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>        <span class="n">create_classes</span><span class="p">,</span> <span class="n">create_quat_classes</span><span class="p">,</span> <span class="n">plot_count_vs_classid</span><span class="p">,</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>        <span class="n">plot_count_vs_class_df</span><span class="p">,</span> <span class="n">get_half_quadrant</span><span class="p">,</span> <span class="n">get_quadrant</span><span class="p">,</span> <span class="n">get_sixth_quadrant</span><span class="p">,</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>        <span class="n">filter_by_percentage</span><span class="p">,</span> <span class="n">torsion_to_sixclass</span><span class="p">,</span> <span class="n">plot_binary_to_sixclass_incidence</span><span class="p">,</span> <span class="n">enumerate_sixclass_fromlist</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>        <span class="p">)</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>
+</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a><span class="kn">from</span> <span class="nn">.DisulfideClass_Constructor</span> <span class="kn">import</span> <span class="n">DisulfideClass_Constructor</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>
+</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a><span class="c1"># end of file</span>
 </span></pre></div>
 
 

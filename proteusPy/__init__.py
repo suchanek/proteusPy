@@ -6,7 +6,7 @@
 .. include:: ../README.md
 """
 
-__version__ = "0.92.1"
+__version__ = "0.92.2"
 
 import sys
 import os
@@ -29,7 +29,8 @@ from Bio.PDB.vectors import calc_dihedral, calc_angle
 from Bio.PDB import Select, Vector
 
 from .ProteusPyWarning import ProteusPyWarning
-from .ProteusGlobals import PDB_DIR, MODEL_DIR
+from .ProteusGlobals import PDB_DIR, MODEL_DIR, WINFRAME, WINSIZE, CAMERA_POS, _ANG_INIT, _FLOAT_INIT, _INT_INIT
+
 from .DisulfideExceptions import DisulfideIOException, DisulfideConstructionWarning, DisulfideConstructionException
 
 from .turtle3D import Turtle3D

@@ -7,22 +7,30 @@ The module provides the implmentation and interface for the [DisulfideList](#Dis
 object, used extensively by proteusPy.Disulfide.Disulfide class.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2/24/2023
+Last revision: 2/18/2024 -egs-
 '''
 
 __pdoc__ = {}
 __pdoc__['all'] = True
 
 import numpy as np
-
-import pandas as pd
+import pandas
 import pyvista as pv
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from collections import UserList
-from tqdm import tqdm
 from pathlib import Path
+
+try:
+    # Check if running in Jupyter
+    shell = get_ipython().__class__.__name__
+    if shell == 'ZMQInteractiveShell':
+        from tqdm.notebook import tqdm
+    else:
+        from tqdm import tqdm
+except NameError:
+    from tqdm import tqdm
 
 import proteusPy
 from proteusPy import *
@@ -339,19 +347,19 @@ class DisulfideList(UserList):
         return total/cnt
     
     
-    def build_distance_df(self) -> pd.DataFrame:
+    def build_distance_df(self) -> pandas.DataFrame:
         """
         Create a dataframe containing the input DisulfideList Cα-Cα distance, energy. 
         This can take several minutes for the entire database.
 
         :return: DataFrame containing Ca distances
-        :rtype: pd.DataFrame
+        :rtype: pandas.DataFrame
         """
         
         # create a dataframe with the following columns for the disulfide 
         # conformations extracted from the structure
         
-        SS_df = pd.DataFrame(columns=Distance_DF_Cols)
+        SS_df = pandas.DataFrame(columns=Distance_DF_Cols)
         sslist = self.data
 
         pbar = tqdm(sslist, ncols=PBAR_COLS)
@@ -362,7 +370,7 @@ class DisulfideList(UserList):
         
         return SS_df
 
-    def build_torsion_df(self) -> pd.DataFrame:
+    def build_torsion_df(self) -> pandas.DataFrame:
         '''
         Create a dataframe containing the input DisulfideList torsional parameters,
         Cα-Cα distance, energy, and phi-psi angles. This can take several minutes for the
@@ -374,7 +382,7 @@ class DisulfideList(UserList):
         # create a dataframe with the following columns for the disulfide 
         # conformations extracted from the structure
         
-        SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
+        SS_df = pandas.DataFrame(columns=Torsion_DF_Cols)
         sslist = self.data
         if self.quiet or len(sslist) < 100:
             pbar = sslist
@@ -433,8 +441,8 @@ class DisulfideList(UserList):
         for col in dist_cols:
             dist_stats[col] = {'mean': df[col].mean(), 'std': df[col].std()}
 
-        tor_stats = pd.DataFrame(tor_stats, columns=tor_cols)
-        dist_stats = pd.DataFrame(dist_stats, columns=dist_cols)
+        tor_stats = pandas.DataFrame(tor_stats, columns=tor_cols)
+        dist_stats = pandas.DataFrame(dist_stats, columns=dist_cols)
 
         return tor_stats, dist_stats
 
@@ -459,7 +467,6 @@ class DisulfideList(UserList):
 
         pl = pv.Plotter()
         pl = self._render(style, panelsize)
-        #pl.add_camera_orientation_widget()
         pl.enable_anti_aliasing('msaa')
         pl.link_views()
         pl.reset_camera()
@@ -568,7 +575,7 @@ class DisulfideList(UserList):
         
     
     @property
-    def distance_df(self) -> pd.DataFrame: 
+    def distance_df(self) -> pandas.DataFrame: 
         '''
         Build and return the distance dataframe for the input list.
         This can take considerable time for the entire list.
@@ -629,8 +636,7 @@ class DisulfideList(UserList):
 
         pl.add_title(title=title, font_size=FONTSIZE)
         pl.enable_anti_aliasing('msaa')
-        pl.add_camera_orientation_widget()
-
+        # pl.add_camera_orientation_widget()
         pl.add_axes()
 
         mycol = np.zeros(shape=(tot_ss, 3))

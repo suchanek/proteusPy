@@ -23,8 +23,9 @@ np.set_printoptions(suppress=True)
 import copy, pickle
 from math import cos
 
-import pandas as pd
+import pandas
 import pyvista as pv
+pv.global_theme.color = 'white'
 
 try:
     # Check if running in Jupyter
@@ -36,8 +37,6 @@ try:
 except NameError:
     from tqdm import tqdm
 
-pv.global_theme.color = 'white'
-
 import proteusPy
 from proteusPy.atoms import *
 from proteusPy.data import SS_DICT_PICKLE_FILE, SS_ID_FILE
@@ -45,20 +44,17 @@ from proteusPy.data import SS_PICKLE_FILE, SS_TORSIONS_FILE, PROBLEM_ID_FILE
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.utility import distance3d, prune_extra_ss
-from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR, WINSIZE
-from proteusPy.turtle3D import Turtle3D
+from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR, WINSIZE, _FLOAT_INIT, _ANG_INIT
+from proteusPy.turtle3D import Turtle3D, ORIENT_SIDECHAIN
 from proteusPy.Residue import build_residue
 
 from Bio.PDB import Vector, PDBParser, PDBList
 from Bio.PDB.vectors import calc_dihedral
 
 # tqdm progress bar width
-from proteusPy.ProteusGlobals import PBAR_COLS, ORIENT_SIDECHAIN
-from proteusPy.ProteusGlobals import _FLOAT_INIT, _ANG_INIT
+from proteusPy.ProteusGlobals import PBAR_COLS
 
 # columns for the torsions file dataframe.
-global Torsion_DF_Cols
-
 Torsion_DF_Cols = ['source', 'ss_id', 'proximal', 'distal', 'chi1', 'chi2', 'chi3', 'chi4', \
            'chi5', 'energy', 'ca_distance','cb_distance', 'phi_prox', 'psi_prox', 'phi_dist',\
            'psi_dist', 'torsion_length', 'rho']
@@ -1740,7 +1736,7 @@ class Disulfide:
             #pl.add_title(title=title, font_size=FONTSIZE)
             pl.enable_anti_aliasing('msaa')
 
-            pl.add_camera_orientation_widget()
+            # pl.add_camera_orientation_widget()
             self._render(pl, style='cpk', bondcolor=BOND_COLOR, 
                         bs_scale=BS_SCALE, spec=SPECULARITY, 
                         specpow=SPEC_POWER)
@@ -1801,7 +1797,6 @@ class Disulfide:
         combined_mesh.save(filename + ".stl", binary=True)
         print(pl)
     
-
     def export(self, style='sb', verbose=True, fname='ssbond_plt'):
         '''
         Create and save a screenshot of the Disulfide in the given style
@@ -2311,7 +2306,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     # create a dataframe with the following columns for the disulfide conformations 
     # extracted from the structure
     
-    SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
+    SS_df = pandas.DataFrame(columns=Torsion_DF_Cols)
 
     # define a tqdm progressbar using the fully loaded entrylist list. 
     # If numb is passed then
@@ -2371,7 +2366,7 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     
     if bad > 0:
         prob_cols = ['id']
-        problem_df = pd.DataFrame(columns=prob_cols)
+        problem_df = pandas.DataFrame(columns=prob_cols)
         problem_df['id'] = problem_ids
 
         print(f'-> Extract_Disulfides(): Found and removed: {len(problem_ids)} non-parsable structures.')
