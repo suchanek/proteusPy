@@ -34,8 +34,8 @@ The work has resulted in a freely-accessible database of over 120,494 disulfide 
 - Interactively display disulfides contained in the RCSB in a variety of display styles
 - Calculate geometric and energetic properties about these disulfides
 - Create binary and sextant structural classes by characterizing the disulfide torsional angles into *n* classes
-- Build idealized disulfide bonds from dihedral angle input
-- Find disulfide neighbors based on dihedral angle input
+- Build idealized disulfide bonds from disulfide dihedral angle input
+- Find disulfide neighbors based on dihedral angles
 - Overlap disulfides onto a common frame of reference for display
 - Build protein backbones from backbone phi, psi dihedral angle templates
 - More in development
@@ -46,7 +46,7 @@ The work has resulted in a freely-accessible database of over 120,494 disulfide 
 
 Disulfide bonds represent the sole naturally occurring covalent bond in proteins, playing a pivotal role in structural stabilization within and between protein subunits. Moreover, they participate in enzymatic catalysis, regulate protein activities, and offer protection against oxidative stress. Establishing an accessible structural database of these disulfides would serve as an invaluable resource for exploring these critical structural elements.
 
-Accordingly, I have developed the `proteusPy` package to delve into the RCSB Protein Data Bank, furnishing tools for visualizing and analyzing the contained disulfide bonds. This endeavor necessitated the creation of a python-based package encompassing data structures and algorithms capable of manipulating protein structures and rendering them. Consequently, an object-oriented database has been crafted, facilitating introspection, analysis, and display. The package's API [@API] is accessible online at: [proteusPy API](https://suchanek.github.io/proteusPy/proteusPy.html), offering comprehensive details and numerous illustrative examples.
+Accordingly, I have developed the ``proteusPy`` package to delve into the RCSB Protein Data Bank, furnishing tools for visualizing and analyzing the disulfide bonds contained therein. This endeavor necessitated the creation of a python-based package containing data structures and algorithms capable loading, manipulating and analyzing them. Consequently, an object-oriented database has been crafted, facilitating introspection, analysis, and display. The package's API [@API] is accessible online at: [proteusPy API](https://suchanek.github.io/proteusPy/proteusPy.html), offering comprehensive details and numerous illustrative examples.
 
 # Requirements
 
@@ -236,7 +236,7 @@ PDB_SS = Load_PDB_SS(verbose=True, subset=False)
 
 # display the best and worst SS
 
-ssMin, ssMax = PDB_SS.SSList.minmax_energy()
+ssMin, ssMax = PDB_SS.SSList.minmax_energy
 minmaxlist = DisulfideList([ssMin, ssMax], 'minmax')
 minmaxlist.display(style='bs', light=True)
 ```
