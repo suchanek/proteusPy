@@ -19,9 +19,6 @@ numpy.set_printoptions(suppress=True)
 from Bio.PDB.vectors import Vector
 from Bio.PDB.vectors import calc_angle, calc_dihedral
 
-#from proteusPy import *
-from proteusPy.ProteusGlobals import ORIENT_BACKBONE, ORIENT_SIDECHAIN
-
 _DOWN_ = -1
 _UP_ = 1
 _ORIENTATION_INIT = -1

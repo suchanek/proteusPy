@@ -1,8 +1,13 @@
-# Disulfide Bond Display Test
-# Author: Eric G. Suchanek, PhD.
-# Last revision: 2/18/24 -egs-
+'''
+This module, ``Test_DisplaySS.py``, is part of the proteusPy package, a Python package for 
+the analysis and modeling of protein structures, with an emphasis on disulfide bonds. Note:
+depending on the speed of your hardware it can some time to load the full database and render
+the disulfides.
 
-import pandas as pd
+Author: Eric G. Suchanek, PhD
+Last revision: 2/17/2024
+'''
+
 from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideLoader import Load_PDB_SS
 from proteusPy.DisulfideList import DisulfideList
@@ -30,9 +35,16 @@ def SSlist_DisplayTest(sslist):
     sslist.display_overlay(movie=True, fname=f'{TMP}overlay.mp4')
     sslist.display_overlay(movie=False)
     sslist.screenshot(style='sb', fname=f'{TMP}sslist.png')
-    print('--> SS_DisplayTest done.')
+    print('--> SSList_DisplayTest done.')
 
-if __name__ == '__main__':
+def main():
+    '''
+    Program tests the proteusPy Disulfide rendering routines.
+    Usage: run the program and close each window after manipulating it. The program
+    will run through display styles and save a few files to /tmp. There should be no
+    errors upon execution.
+    '''
+    
     PDB_SS = None
     PDB_SS = Load_PDB_SS(verbose=True, subset=False)
     
@@ -50,10 +62,15 @@ if __name__ == '__main__':
 
     SSlist_DisplayTest(ss4yss)
 
+    # grab the last 12 disulfides
     sslist = DisulfideList([], 'last12')
     print('Getting last 12')
     
     sslist = PDB_SS[:12]
     SSlist_DisplayTest(sslist)
+
+    print('--> Program complete!')
     
-    exit()
+if __name__ == '__main__':
+    main()
+

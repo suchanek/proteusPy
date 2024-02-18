@@ -4,7 +4,7 @@
 
 CONDA = mamba
 # this MUST match the version in proteusPy/__init__.py
-VERS = 0.92.1
+VERS = 0.92.2
 DEVNAME = ppydev
 INIT = proteusPy/__init__.py
 OUTFILES = sdist.out, bdist.out, docs.out
@@ -45,15 +45,15 @@ install_dev:
 
 # package development targets
 
-sdist.out:
+sdist.out: FORCE
 	rm dist/*
 	python setup.py sdist
 	@echo $(VERS) > sdist.out
 
-bdist.out:
+bdist.out: FORCE
 	python setup.py bdist
 	@echo $(VERS) > bdist.out
-docs.out:
+docs.out: FORCE
 	pdoc -o docs --math --logo "./logo.png" ./proteusPy
 	@echo $(VERS) > docs.out
 
@@ -61,7 +61,7 @@ docs.out:
 upload: sdist.out
 	twine upload dist/*
 
-tag.out:
+tag.out: FORCE
 	git tag -a $(VERS) -m $(VERS)
 	@echo $(VERS) > tag.out
 
