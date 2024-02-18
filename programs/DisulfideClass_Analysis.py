@@ -92,20 +92,15 @@ from Bio.PDB import *
 
 # for using from the repo we 
 import proteusPy
-from proteusPy import *
-from proteusPy.data import *
+
+from proteusPy.data import DATA_DIR
 from proteusPy.Disulfide import *
 from proteusPy.DisulfideList import DisulfideList
-from proteusPy.DisulfideLoader import Load_PDB_SS
-from proteusPy.ProteusGlobals import DATA_DIR
+from proteusPy.DisulfideLoader import Load_PDB_SS, DisulfideLoader
 
-import os
-_abspath = os.path.dirname(os.path.abspath(__file__))
-
-SAVE_DIR = '/Users/egs/Documents/proteusPyData'
+SAVE_DIR = '/Users/egs/Documents/proteusPy/ClassAnalysis'
 
 start = time.time()
-
 
 def analyze_binary_classes(loader: DisulfideLoader, do_graph=True, do_consensus=True) -> DisulfideList:
     """
@@ -234,6 +229,8 @@ def plot_classes_vs_cutoff(cutoff, steps):
     :param cutoff: Percent cutoff value for filtering the classes.
     :return: None
     """
+    import matplotlib.pyplot as plt
+
     _cutoff = np.linspace(0, cutoff, steps)
     tot_list = []
     members_list = []
