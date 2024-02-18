@@ -224,7 +224,7 @@ class DisulfideList(UserList):
                     ss = ssList[i]
                     src = ss.pdb_id
                     enrg = ss.energy
-                    title = f'{src} {name}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°'
+                    title = f'{src} {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°'
                     pl.add_title(title=title, font_size=FONTSIZE)
                     ss._render(pl, style=style, bondcolor=BOND_COLOR, bs_scale=BS_SCALE, 
                             spec=SPECULARITY, specpow=SPEC_POWER)
@@ -459,7 +459,7 @@ class DisulfideList(UserList):
 
         pl = pv.Plotter()
         pl = self._render(style, panelsize)
-        pl.add_camera_orientation_widget()
+        #pl.add_camera_orientation_widget()
         pl.enable_anti_aliasing('msaa')
         pl.link_views()
         pl.reset_camera()
