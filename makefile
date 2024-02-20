@@ -46,12 +46,12 @@ install_dev:
 # package development targets
 
 sdist.out: FORCE
-	rm dist/*
-	python setup.py sdist
+	@rm dist/*
+	@python setup.py sdist
 	@echo $(VERS) > sdist.out
 
 bdist.out: FORCE
-	python setup.py bdist
+	@python setup.py bdist
 	@echo $(VERS) > bdist.out
 docs.out: FORCE
 	pdoc -o docs --math --logo "./logo.png" ./proteusPy
@@ -62,11 +62,12 @@ upload: sdist.out
 	twine upload dist/*
 
 tag.out: FORCE
-	git tag -a $(VERS) -m $(VERS)
+	@git tag -a $(VERS) -m $(VERS)
 	@echo $(VERS) > tag.out
 
 build: $(OUTFILES)
 
+# run the docstring tests
 tests: FORCE
 	python proteusPy/Disulfide.py
 	python proteusPy/DisulfideLoader.py
