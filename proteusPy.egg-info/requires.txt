@@ -26,6 +26,7 @@ grpcio
 pip
 wget
 vtk
+kaleido
 plotly_express
 trame-jupyter-extension
 jupyter_contrib_nbextensions

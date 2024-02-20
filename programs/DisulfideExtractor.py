@@ -20,13 +20,11 @@ import time
 import datetime
 from shutil import copytree, ignore_patterns, copy
 
-from proteusPy.Disulfide import Extract_Disulfides
-from proteusPy.DisulfideLoader import DisulfideLoader
+from proteusPy import Extract_Disulfides, DisulfideLoader
 
-from proteusPy.data import DATA_DIR
-from proteusPy.data import SS_PROBLEM_SUBSET_ID_FILE, SS_SUBSET_DICT_PICKLE_FILE
-from proteusPy.data import SS_SUBSET_PICKLE_FILE, SS_SUBSET_TORSIONS_FILE
-from proteusPy.data import LOADER_FNAME, LOADER_SUBSET_FNAME
+from proteusPy.data import (DATA_DIR, SS_PROBLEM_SUBSET_ID_FILE, SS_SUBSET_DICT_PICKLE_FILE, 
+                            SS_SUBSET_PICKLE_FILE, SS_SUBSET_TORSIONS_FILE, LOADER_FNAME, 
+                            LOADER_SUBSET_FNAME)
 
 # the locations below represent the actual location on the dev drive.
 # location for PDB repository
@@ -181,7 +179,5 @@ end = time.time()
 elapsed = end - start
 
 print(f'DisulfideExtractor Complete!\nElapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)')
-
-
 
 # End of file

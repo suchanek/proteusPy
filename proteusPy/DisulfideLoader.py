@@ -486,7 +486,7 @@ class DisulfideLoader:
         
         from proteusPy.DisulfideClasses import plot_count_vs_class_df
 
-        def enumerate_sixclass_fromlist(sslist):
+        def _enumerate_sixclass_fromlist(sslist):
             x = []
             y = []
 
@@ -507,7 +507,7 @@ class DisulfideLoader:
         clslist = self.tclass.classdf['class_id']
         for cls in clslist:
             sixcls = self.tclass.binary_to_six_class(cls)
-            df = enumerate_sixclass_fromlist(sixcls)
+            df = _enumerate_sixclass_fromlist(sixcls)
             plot_count_vs_class_df(df, cls, theme='light', save=save, savedir=savedir)
         return
 

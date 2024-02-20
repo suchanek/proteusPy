@@ -1,12 +1,14 @@
 '''
 Functions to create Disulfide Bond structural classes based on
-dihedral angle rules.
+dihedral angle rules. This module is part of the proteusPy package.
+Many of the plotting functions have been folded into the DisulfideClassConstructor
+object.
 
-Author: Eric G. Suchanek, PhD. \n
+Author: Eric G. Suchanek, PhD.
 
-(c) 2023 Eric G. Suchanek, PhD., All Rights Reserved
-License: MIT
-Last Modification: 11/14/23 -egs-
+(c) 2024 Eric G. Suchanek, PhD., All Rights Reserved
+License: BSD
+Last Modification: 2/19/24 -egs-
 
 '''
 
@@ -185,7 +187,6 @@ def get_half_quadrant(angle_deg):
     else:
         raise ValueError("Invalid angle value: angle must be in the range [-180, 180).")
 
-
 def create_quat_classes(df):
     """
     Add new columns to the input DataFrame with a 4-class encoding for input 'chi' values.
@@ -250,7 +251,6 @@ def get_ss_id(df: pandas.DataFrame, cls: str) -> str:
     elif len(filtered_df) > 1:
         raise ValueError(f"Multiple rows found for class_id '{cls}'")
     return filtered_df.iloc[0]['ss_id']
-
 
 def get_section(angle_deg, basis):
     """
@@ -450,14 +450,13 @@ def plot_count_vs_classid(df, cls=None, title='title', theme='light'):
     fig.show()
     return fig
 
-
 def plot_binary_to_sixclass_incidence(loader: DisulfideLoader, theme='light'):
     '''
     Plot the incidence of all sextant Disulfide classes for a given binary class.
 
     :param loader: `proteusPy.DisulfideLoader` object
     '''
-    def enumerate_sixclass_fromlist(sslist):
+    def _enumerate_sixclass_fromlist(sslist):
         x = []
         y = []
 
@@ -478,27 +477,9 @@ def plot_binary_to_sixclass_incidence(loader: DisulfideLoader, theme='light'):
     clslist = loader.tclass.classdf['class_id']
     for cls in clslist:
         sixcls = loader.tclass.binary_to_six_class(cls)
-        df = enumerate_sixclass_fromlist(sixcls)
+        df = _enumerate_sixclass_fromlist(sixcls)
         plot_count_vs_class_df(df, cls, theme=theme)
     return
-
-def enumerate_sixclass_fromlist(loader, sslist):
-    x = []
-    y = []
-
-    for sixcls in sslist:
-        if sixcls is not None:
-            _y = loader.tclass.sslist_from_classid(sixcls)
-            # it's possible to have 0 SS in a class
-            if _y is not None:
-                # only append if we have both.
-                x.append(sixcls)
-                y.append(len(_y))
-
-    sslist_df = pandas.DataFrame(columns=['class_id', 'count'])
-    sslist_df['class_id'] = x
-    sslist_df['count'] = y
-    return(sslist_df)
 
 def enumerate_sixclass_fromlist(loader: DisulfideLoader, sslist):
     x = []
@@ -517,6 +498,38 @@ def enumerate_sixclass_fromlist(loader: DisulfideLoader, sslist):
     sslist_df['class_id'] = x
     sslist_df['count'] = y
     return(sslist_df)
+
+def plot_classes_vs_cutoff(cutoff, steps):
+    """
+    Plot the total percentage and number of members for each class against the cutoff value.
+    
+    :param cutoff: Percent cutoff value for filtering the classes.
+    :return: None
+    """
+    import matplotlib.pyplot as plt
+
+    _cutoff = np.linspace(0, cutoff, steps)
+    tot_list = []
+    members_list = []
+
+    for c in _cutoff:
+        class_df = PDB_SS.tclass.filter_sixclass_by_percentage(c)
+        tot = class_df['percentage'].sum()
+        tot_list.append(tot)
+        members_list.append(class_df.shape[0])
+        print(f'Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long.')
+
+    fig, ax1 = plt.subplots()
+
+    ax2 = ax1.twinx()
+    ax1.plot(_cutoff, tot_list, label='Total percentage', color='blue')
+    ax2.plot(_cutoff, members_list, label='Number of members', color='red')
+
+    ax1.set_xlabel('Cutoff')
+    ax1.set_ylabel('Total percentage', color='blue')
+    ax2.set_ylabel('Number of members', color='red')
+
+    plt.show()
 
 if __name__ == "__main__":
     import doctest
