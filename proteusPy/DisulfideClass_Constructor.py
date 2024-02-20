@@ -2,7 +2,7 @@
 DisulfideBond Class Analysis Dictionary creation
 Author: Eric G. Suchanek, PhD.
 License: BSD
-Last Modification: 2/17/24 -egs-
+Last Modification: 2/19/24 -egs-
 
 Disulfide Class creation and manipulation using the +/- formalism of Hogg et al. (Biochem, 2006, 45, 7429-7433), 
 across all 32 possible classes. Classes are named per Hogg's convention.
@@ -16,15 +16,16 @@ __pdoc__ = {'__all__': True}
 
 import pandas as pd
 from io import StringIO
-
-import pyvista as pv
-from pyvista import set_plot_theme
+import pickle
+import tqdm
 
 from Bio.PDB import *
 
+import proteusPy
 from proteusPy.data import SS_CLASS_DICT_FILE, SS_CLASS_DEFINITIONS, DATA_DIR, CLASSOBJ_FNAME, SS_CONSENSUS_FILE
 from proteusPy.DisulfideList import DisulfideList
-from proteusPy.Disulfide import *
+from proteusPy.Disulfide import Disulfide
+from proteusPy.ProteusGlobals import DPI
 
 merge_cols = ['chi1_s','chi2_s','chi3_s','chi4_s','chi5_s','class_id','SS_Classname','FXN','count','incidence','percentage','ca_distance_mean',
 'ca_distance_std','torsion_length_mean','torsion_length_std','energy_mean','energy_std', 'ss_id']
@@ -143,6 +144,7 @@ class DisulfideClass_Constructor():
             else:
                 return DisulfideList([self[ssid] for ssid in sslist], classid)
         except KeyError:
+
             print(f'No class: {classid}')
         return
 
@@ -206,7 +208,7 @@ class DisulfideClass_Constructor():
         -------
         None
         '''
-        
+        import proteusPy
         self.version = proteusPy.__version__
         
         tors_df = loader.getTorsions()
@@ -305,7 +307,7 @@ class DisulfideClass_Constructor():
 
         return grouped
 
-    def filter_sixclass_by_percentage(self, cutoff):
+    def filter_sixclass_by_percentage(self, cutoff)-> pd.DataFrame:
        """
        Filter the six-class definitions by percentage.
    
@@ -318,8 +320,6 @@ class DisulfideClass_Constructor():
 
        return df[df['percentage'] >= cutoff].copy()
 
-    
-    
     def get_sixth_quadrant(self, angle_deg):
         """
         Return the sextant in which an angle in degrees lies if the area is described by dividing a unit circle into 6 equal segments.
@@ -347,7 +347,7 @@ class DisulfideClass_Constructor():
         else:
             raise ValueError("Invalid angle value: angle must be in the range [-360, 360).")
 
-    def sslist_from_classid(self, cls: str):
+    def sslist_from_classid(self, cls: str) -> DisulfideList:
         '''
         Return the list of Disulfides from the classID string.
 
@@ -358,7 +358,7 @@ class DisulfideClass_Constructor():
         else:
             return self._ss_from_sixclassid(cls)
     
-    def _ss_from_sixclassid(self, cls: str):
+    def _ss_from_sixclassid(self, cls: str) -> pd.DataFrame:
         '''
         Return the 'ss_id' value in the given DataFrame that corresponds to the
         input 'cls' string in the sixfold class description.
@@ -373,7 +373,7 @@ class DisulfideClass_Constructor():
             raise ValueError(f"Multiple rows found for class_id '{cls}'")
         return filtered_df.iloc[0]['ss_id']
 
-    def _ss_from_binary_classid(self, cls: str):
+    def _ss_from_binary_classid(self, cls: str) -> pd.DataFrame:
         '''
         Return the 'ss_id' value in the given DataFrame that corresponds to the
         input 'cls' string in the binary class description.
@@ -388,14 +388,11 @@ class DisulfideClass_Constructor():
             raise ValueError(f"Multiple rows found for class_id '{cls}'")
         return filtered_df.iloc[0]['ss_id']
 
-    def save(self, savepath=DATA_DIR):
+    def save(self, savepath=DATA_DIR) -> None:
         '''
         Save a copy of the fully instantiated class to the specified file.
 
         :param savepath: Path to save the file, defaults to DATA_DIR
-        :param fname: Filename, defaults to SS_CLASS_FNAME
-        :param verbose: Verbosity, defaults to False
-        :param cutoff: Distance cutoff used to build the database, -1 means no cutoff.
         '''
         self.version = proteusPy.__version__
 
@@ -419,7 +416,7 @@ class DisulfideClass_Constructor():
         negative angle or '2' if it represents a positive angle.
         
         :param cls_str (str): A string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees.
-        :return str: A string of length 5, where each character is either '1' or '2', representing the sign of the corresponding input angle. 
+        :return str: A string of length 5, where each character is either '0' or '2', representing the sign of the corresponding input angle. 
         """
         output_str = ""
         for char in cls_str:
@@ -465,7 +462,7 @@ class DisulfideClass_Constructor():
         #ax1, ax2 = fig.subplots(1, 2, sharey=True, sharex=True)
 
         fig.suptitle("SS Torsion Classes")
-        fig.set_dpi(220)
+        fig.set_dpi(DPI)
         fig.set_size_inches(6.2, 6)
 
         fig.canvas.draw()  # Need to draw the figure to define renderer

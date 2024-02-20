@@ -4,7 +4,7 @@
 
 CONDA = mamba
 # this MUST match the version in proteusPy/__init__.py
-VERS = 0.92.2
+VERS = 0.92.3
 DEVNAME = ppydev
 INIT = proteusPy/__init__.py
 OUTFILES = sdist.out, bdist.out, docs.out
@@ -65,7 +65,16 @@ tag.out: FORCE
 	git tag -a $(VERS) -m $(VERS)
 	@echo $(VERS) > tag.out
 
-build: $(OUTFILES) 
+build: $(OUTFILES)
+
+tests: FORCE
+	python proteusPy/Disulfide.py
+	python proteusPy/DisulfideLoader.py
+	python proteusPy/DisulfideList.py
+	python proteusPy/DisulfideClasses.py
+	python proteusPy/turtle3D.py
+
+	
 
 
 

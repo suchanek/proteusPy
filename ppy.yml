@@ -16,4 +16,5 @@ dependencies:
     - ipywidgets 
     - pyvista[all,trame]
     - jupyter_contrib_nbextensions
+    - kaleido
 

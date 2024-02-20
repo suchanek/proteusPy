@@ -50,6 +50,7 @@ Requires-Dist: grpcio
 Requires-Dist: pip
 Requires-Dist: wget
 Requires-Dist: vtk
+Requires-Dist: kaleido
 Requires-Dist: plotly_express
 Requires-Dist: trame-jupyter-extension
 Requires-Dist: jupyter_contrib_nbextensions
