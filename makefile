@@ -3,8 +3,11 @@
 # Last revision: 2/17/24 -egs-
 
 CONDA = mamba
+
 # this MUST match the version in proteusPy/__init__.py
 VERS = 0.92.3
+MESS = "JOSS work"
+
 DEVNAME = ppydev
 INIT = proteusPy/__init__.py
 OUTFILES = sdist.out, bdist.out, docs.out
@@ -44,28 +47,31 @@ install_dev:
 	python -m ipykernel install --user --name ppy_dev --display-name "Python (ppy_dev $(VERS) )"
 
 # package development targets
+build_dev: sdist docs
 
-sdist.out: FORCE
-	@rm dist/*
-	@python setup.py sdist
+sdist:
+	python setup.py sdist
 	@echo $(VERS) > sdist.out
 
-bdist.out: FORCE
-	@python setup.py bdist
+bdist:
+	python setup.py bdist
 	@echo $(VERS) > bdist.out
-docs.out: FORCE
+
+docs:
 	pdoc -o docs --math --logo "./logo.png" ./proteusPy
 	@echo $(VERS) > docs.out
 
 # normally i push to PyPi via github action
-upload: sdist.out
+upload: sdist
 	twine upload dist/*
 
-tag.out: FORCE
-	@git tag -a $(VERS) -m $(VERS)
+tag:
+	git tag -a $(VERS) -m $(VERS)
 	@echo $(VERS) > tag.out
 
-build: $(OUTFILES)
+commit:
+	git commit -a -m $(MESS)
+	git push --all origin
 
 # run the docstring tests
 tests: FORCE
