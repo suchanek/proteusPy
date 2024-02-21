@@ -1,6 +1,6 @@
 # Makefile for proteusPy
 # Author: Eric G. Suchanek, PhD
-# Last revision: 2/17/24 -egs-
+# Last revision: 2/20/24 -egs-
 
 CONDA = mamba
 
@@ -9,25 +9,28 @@ VERS = 0.92.3
 MESS = "JOSS work"
 
 DEVNAME = ppydev
-INIT = proteusPy/__init__.py
 OUTFILES = sdist.out, bdist.out, docs.out
-
-FORCE: ;
-
 nuke: clean devclean
-	rm $(OUTFILES)
+	@rm $(OUTFILES)
+
 dev:
-	$(CONDA) env create --name $(DEVNAME) --file ppy.yml -y
-	$(CONDA) install --name $(DEVNAME) pdoc -y
+	@echo "Building... $(DEVNAME)"
+	@$(CONDA) env create --name $(DEVNAME) --file ppy.yml -y -q
+	@$(CONDA) install --name $(DEVNAME) pdoc -y -q
+	@echo "Step 1 done. Now activate the environment with 'conda activate $(DEVNAME)' and run 'make install'"
 
-clean: FORCE
-	$(CONDA) env remove --name proteusPy -y
+clean:
+	@echo "Removing proteusPy environment..."
+	@$(CONDA) env remove --name proteusPy -y
 
-devclean: FORCE
+devclean:
+	@echo "Removing $(DEVNAME) environment..."
 	$(CONDA) env remove --name $(DEVNAME) -y
 
 pkg:
-	$(CONDA) env create --name proteusPy --file ppy.yml -y
+	@echo "Starting installation step 1..."
+	@$(CONDA) env create --name proteusPy --file ppy.yml -y -q
+	@echo "Step 1 done. Now activate the environment with 'conda activate proteusPy' and run 'make install'"
 
 pkg2:
 	$(CONDA) create --name proteusPy -y python=3.11.7
@@ -35,30 +38,32 @@ pkg2:
 # activate the package before running!
 
 install:
-	pip install . && cd ../biopython && pip install .
-	jupyter contrib nbextension install --sys-prefix
-	jupyter nbextension enable --py --sys-prefix widgetsnbextension
-	python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy $(VERS) )"
+	@echo "Starting installation step 2..."
+	@pip install --quiet . && cd ../biopython && pip install --quiet .
+	@jupyter contrib nbextension install --sys-prefix
+	@jupyter nbextension enable --py --sys-prefix widgetsnbextension
+	@python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy $(VERS) )"
+	
 
 install_dev:
 	pip install -e . && cd ../biopython && pip install .
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
-	python -m ipykernel install --user --name ppy_dev --display-name "Python (ppy_dev $(VERS) )"
+	@python -m ipykernel install --user --name ppy_dev --display-name "Python (ppy_dev $(VERS) )"
 
 # package development targets
 build_dev: sdist docs
 
 sdist:
-	python setup.py sdist
+	@python setup.py sdist
 	@echo $(VERS) > sdist.out
 
 bdist:
-	python setup.py bdist
+	@python setup.py bdist
 	@echo $(VERS) > bdist.out
 
 docs:
-	pdoc -o docs --math --logo "./logo.png" ./proteusPy
+	@pdoc -o docs --math --logo "./logo.png" ./proteusPy
 	@echo $(VERS) > docs.out
 
 # normally i push to PyPi via github action
@@ -66,7 +71,7 @@ upload: sdist
 	twine upload dist/*
 
 tag:
-	git tag -a $(VERS) -m $(VERS)
+	@git tag -a $(VERS) -m $(VERS)
 	@echo $(VERS) > tag.out
 
 commit:
@@ -74,7 +79,7 @@ commit:
 	git push --all origin
 
 # run the docstring tests
-tests: FORCE
+tests:
 	python proteusPy/Disulfide.py
 	python proteusPy/DisulfideLoader.py
 	python proteusPy/DisulfideList.py
