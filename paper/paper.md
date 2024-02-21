@@ -91,6 +91,12 @@ It's simplest to clone the repo via GitHub since it contains all of the notebook
   $ make install
   ```
 
+# Testing
+I currently have docstring testing for the modules in place. To run them cd into the repository and run:
+```console
+$ make test
+```
+The modules will run their docstring tests and disulfide visualization windows will open. Simply close them. If all goes normally there will be no errors.
 # General Usage
 
 Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. The [notebooks](https://github.com/suchanek/proteusPy/blob/master/notebooks/) directory contains all of my Jupyter notebooks and is a good place to start: 
