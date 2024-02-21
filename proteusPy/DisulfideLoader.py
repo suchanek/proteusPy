@@ -511,6 +511,24 @@ class DisulfideLoader:
             plot_count_vs_class_df(df, cls, theme='light', save=save, savedir=savedir)
         return
 
+    def enumerate_sixclass_fromlist(self, sslist) -> pandas.DataFrame:
+        x = []
+        y = []
+
+        for sixcls in sslist:
+            if sixcls is not None:
+                _y = self.tclass.sslist_from_classid(sixcls)
+                # it's possible to have 0 SS in a class
+                if _y is not None:
+                    # only append if we have both.
+                    x.append(sixcls)
+                    y.append(len(_y))
+
+        sslist_df = pandas.DataFrame(columns=['class_id', 'count'])
+        sslist_df['class_id'] = x
+        sslist_df['count'] = y
+        return(sslist_df)
+
     def save(self, savepath=DATA_DIR, subset=False, cutoff=-1.0):
         '''
         Save a copy of the fully instantiated Loader to the specified file.

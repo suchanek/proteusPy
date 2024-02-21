@@ -51,6 +51,7 @@ from proteusPy.Residue import build_residue
 from Bio.PDB import Vector, PDBParser, PDBList
 from Bio.PDB.vectors import calc_dihedral
 
+
 # tqdm progress bar width
 from proteusPy.ProteusGlobals import PBAR_COLS
 

@@ -444,10 +444,8 @@ def plot_count_vs_classid(df, cls=None, title='title', theme='light'):
         fig.update_layout(template='plotly_white')
     else:
         fig.update_layout(template='plotly_dark')
-
-    fig.update_layout(autosize=True)
     
-    fig.show()
+    fig.update_layout(autosize=True)
     return fig
 
 def plot_binary_to_sixclass_incidence(loader: DisulfideLoader, theme='light'):
