@@ -21,3 +21,6 @@ proteus_logo_sb.png
 subset.png
 proteusPy.egg-info/requires.txt
 proteusPy.egg-info/PKG-INFO
+proteusPy/.DS_Store
+out.ps
+cleaned.py
