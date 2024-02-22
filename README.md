@@ -1,6 +1,6 @@
 # Summary
 
-**proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide bonds. This package reprises my molecular modeling program [Proteus](https://doi.org/10.1021/bi00368a023), a structure-based program developed as part of my graduate thesis. The package relies on the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class to create and manipulate local coordinate systems. The turtle implements the functions ``Move``, ``Roll``, ``Yaw``, ``Pitch`` and ``Turn`` for movement in a three-dimensional space. This initial implementation focuses on the [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class. The class implements methods to analyze the protein structure stabilizing element known as a *Disulfide Bond*. This class and its underlying methods are being used to perform a structural analysis of over 35,800 disulfide-bond containing proteins in the RCSB protein data bank (https://www.rcsb.org).
+**proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide bonds. This package reprises my molecular modeling program [Proteus](https://doi.org/10.1021/bi00368a023), a structure-based program developed as part of my graduate thesis. The package relies on the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class to create and manipulate local coordinate systems. It does this by implementing the functions ``Move``, ``Roll``, ``Yaw``, ``Pitch`` and ``Turn`` for movement in a three-dimensional space.  The initial implementation focuses on the [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class. The class implements methods to analyze the protein structure stabilizing element known as a *Disulfide Bond*. This class and its underlying methods are being used to perform a structural analysis of over 35,800 disulfide-bond containing proteins in the RCSB protein data bank (https://www.rcsb.org).
 
 # General Capabilities
 - Interactively display disulfides contained in the RCSB in a variety of display styles
@@ -12,7 +12,7 @@
 - Build protein backbones from backbone phi, psi dihedral angle templates
 - More in development
 
-*See https://suchanek.github.io/proteusPy/proteusPy.html for the API documentation with examples*
+*See https://suchanek.github.io/proteusPy/proteusPy.html for the API documentation with examples*.
 
 # Requirements
 
@@ -57,11 +57,28 @@ It's simplest to clone the repo via GitHub since it contains all of the notebook
   $ make install
   ```
 
-## General Usage
+# Testing
+I currently have docstring testing for the modules in place. To run them ``cd`` into the repository and run:
+```console
+$ make tests
+```
+The modules will run their docstring tests and disulfide visualization windows will open. Simply close them. If all goes normally there will be no errors.
 
-Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. The ``notebooks`` directory contains all of my Jupyter notebooks and is a good place to start. The ``Analysis_2q7q.ipynb`` notebook provides an example of visualizing the lowest energy Disulfide contained in the database, and searching for nearest neighbors on the basis of conformational similarity. The ``programs`` subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files, (``DisulfideDownloader.py``), extracting the disulfides and creating the database loaders (``DisulfideExtractor.py``) and cluster analysis, (``DisulfideClass_Analysis.py``).
 
-The first time one loads the database via ``Load_PDB_SS()`` the system will attempt to download the full and subset database from the GitHub repository. If this fails the system will attempt to rebuild the database from the repo's ``data`` subdirectory (not the package's). If you've downloaded from GitHub this will work correctly. If you've installed from pyPi via ``pip`` it will fail.
+# General Usage
+
+Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. 
+
+The [notebooks](https://github.com/suchanek/proteusPy/blob/master/notebooks/) directory contains all of my Jupyter notebooks and is a good place to start: 
+- [Analysis_2q7q.ipynb](https://github.com/suchanek/proteusPy/blob/master/notebooks/Analysis_2q7q.ipynb) provides an example of visualizing the lowest energy Disulfide contained in the database and searching for nearest neighbors on the basis of conformational similarity. 
+
+The [programs](https://github.com/suchanek/proteusPy/tree/master/programs) subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files:
+* [DisulfideDownloader.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py): Downloads the raw RCSB structure files.
+* [DisulfideExtractor.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py): Extracts the disulfides and creating the database loaders
+* [DisulfideClass_Analysis.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py): Performs binary or sextant analysis on the disulfide database.
+
+The first time one loads the database via [Load_PDB_SS()](https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html#Load_PDB_SS) the system will attempt to download the full and subset database from Google Drive. If this fails the system will attempt to rebuild the database from the repo's **data** subdirectory (not the package's). If you've downloaded from github this will work correctly. If you've installed from pyPi via **pip** it will fail.
+
 
 ## Quickstart
 
@@ -72,9 +89,14 @@ $ jupyter lab
 ```
 and open ``notebooks/Analysis_2q7q.ipynb``. This notebook looks at the disulfide bond with the lowest energy in the entire database. There are several other notebooks in this directory that illustrate using the program. Some of these reflect active development work so may not be 'fully baked'.
 
-## The Future
+## Visualizing Disulfides with pyVista
+PyVista is an excellent 3D visualization framework and I've used it for the Disulfide visualization engine. It uses the VTK library on the back end and provides high-level access to 3d rendering. The menu strip provided in the Disulfide visualization windows allows the user to turn borders, rulers, bounding boxes on and off and reset the orientations. Please try them out! There is also a button for *local* vs *server* rendering. *Local* rendering is usually much smoother. To manipulate:
+- Click and drag your mouse to rotate
+- Use the mouse wheel to zoom (3 finger zoom on trackpad)
 
-I am continuing to explore the initial disulfide structural classes described by Hogg *et al.* using the sextant class approach. This offers much higher class resolution and reveals subgroups within the broad class. I'd also like to explore the catalytic and allosteric classes in more detail to look for common structural elements.
+## Performance
+- Manipulating and searching through long lists of disulfides can take time. I've added progress bars for many of these operations. 
+- Rendering many disulfides in **pyvista** can also take time to load and may be slow to dispay in real time, depending on your hardware. I added optimization to reduce cylinder complexity as a function of total cylinders rendered, but it can still be less than perfect. The faster your GPU the better! 
 
 ## Citing proteusPy
 
@@ -98,3 +120,5 @@ The proteusPy package was developed by Eric G. Suchanek, PhD. If you find it use
 - <https://doi.org/10.1021/bi00368a024>
 - <https://doi.org/10.1016/0092-8674(92)90140-8>
 - <http://dx.doi.org/10.2174/092986708783330566>
+- <http://dx.doi.org/10.1111/j.1538-7836.2010.03894.x>
+
