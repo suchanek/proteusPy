@@ -107,9 +107,9 @@ The [notebooks](https://github.com/suchanek/proteusPy/blob/master/notebooks/) di
 - [Analysis_2q7q.ipynb](https://github.com/suchanek/proteusPy/blob/master/notebooks/Analysis_2q7q.ipynb) provides an example of visualizing the lowest energy Disulfide contained in the database and searching for nearest neighbors on the basis of conformational similarity. 
 
 The [programs](https://github.com/suchanek/proteusPy/tree/master/programs) subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files:
-* [DisulfideDownloader.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py): Downloads the raw RCSB structure files.
-* [DisulfideExtractor.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py): Extracts the disulfides and creating the database loaders
-* [DisulfideClass_Analysis.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py): Performs binary or sextant analysis on the disulfide database.
+- [DisulfideDownloader.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py): Downloads the raw RCSB structure files.
+- [DisulfideExtractor.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py): Extracts the disulfides and creating the database loaders
+- [DisulfideClass_Analysis.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py): Performs binary or sextant analysis on the disulfide database.
 
 The first time one loads the database via [Load_PDB_SS()](https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html#Load_PDB_SS) the system will attempt to download the full and subset database from Google Drive. If this fails the system will attempt to rebuild the database from the repo's **data** subdirectory (not the package's). If you've downloaded from github this will work correctly. If you've installed from pyPi via **pip** it will fail.
 
@@ -132,7 +132,7 @@ This class provides a Python object and methods representing a physical disulfid
 
 - Atomic coordinates for the atoms $N, C_{\alpha}$, $C_{\beta}$, $C'$, $S_\gamma$ for both amino acid residues. These are stored as both raw atomic coordinates as read from the RCSB file and internal local coordinates.
 - The dihedral angles $\chi_{1} - \chi_{5}$ for the disulfide bond
-- A name, by default: **{pdb_id}{prox_resnumb}{prox_chain}_{distal_resnum}{distal_chain}**
+- A name, by default: {pdb_id}{prox_resnumb}{prox_chain}_{distal_resnum}{distal_chain}
 - Proximal residue number
 - Distal residue number
 - Approximate bond torsional energy (kcal/mol):
@@ -221,8 +221,8 @@ The **turtle3D** class represents an object that maintains a *local coordinate s
 - A Left Vector
 - An Up Vector
 
-The Heading, Left and Up vectors are unit vectors that define the 
-object's orientation in a *local* coordinate frame. The Turtle developed in **proteusPy** is based on the excellent book by Abelson: [@Abelson_DiSessa_1986]. The [to_local]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.to_local") and [to_global]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.to_global") methods convert between these two coordinate systems. These methods make it possible to readily compare different disulfides by:
+The *Heading*, *Left* and *Up* vectors are unit vectors that define the 
+object's orientation in a *local* coordinate frame. The turtle developed in **proteusPy** is based on the excellent book by Abelson: [@Abelson_DiSessa_1986]. The [to_local]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.to_local") and [to_global]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.to_global") methods convert between these two coordinate systems. These methods make it possible to readily compare different disulfides by:
 
 1. Orienting the turtle at the disulfide's proximal residue in a standard orientation.
 2. Converting the global coordinates of the disulfide as read from the RCSB into local coordinates.
@@ -245,12 +245,16 @@ from proteusPy.DisulfideLoader import Load_PDB_SS
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.Disulfide import Disulfide
 
+# load the database
 PDB_SS = Load_PDB_SS(verbose=True, subset=False)
 
-# display the best and worst SS
-
+# retrieve the minimum and maximum energy structures
 ssMin, ssMax = PDB_SS.SSList.minmax_energy
+
+# make a list to hold them
 minmaxlist = DisulfideList([ssMin, ssMax], 'minmax')
+
+# display them as ball and stick style
 minmaxlist.display(style='bs', light=True)
 ```
 
