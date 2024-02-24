@@ -820,6 +820,27 @@ class Disulfide:
             # exceptions are fatal - raise again with new message (including line nr)
             raise DisulfideConstructionException(message) from None
     
+    @property
+    def dihedrals(self) -> list:
+        """
+        Return a ist containing the dihedral angles for the disulfide.
+        
+        """
+        return [self.chi1, self.chi2, self.chi3, self.chi4, self.chi5]
+    
+    @dihedrals.setter
+    def dihedrals(self, dihedrals: list):
+        '''
+        Sets the disulfide dihedral angles to the inputs specified in the list.
+
+        :param dihedrals: list of dihedral angles.
+        '''
+        self.chi1 = dihedrals[0]
+        self.chi2 = dihedrals[1]
+        self.chi3 = dihedrals[3]
+        self.chi4 = dihedrals[4]
+        self.chi5 = dihedrals[5]
+
     def bounding_box(self):
         '''
         Return the bounding box array for the given disulfide
@@ -841,6 +862,20 @@ class Disulfide:
 
         return res
 
+    def build_yourself(self):
+        '''
+        Build a model Disulfide based its internal dihedral state
+        Routine assumes turtle is in orientation #1 (at Ca, headed toward
+        Cb, with N on left), builds disulfide, and updates the object's internal
+        coordinates. It also adds the distal protein backbone,
+        and computes the disulfide conformational energy.
+        '''
+        chi1 = self.chi1
+        chi2 = self.chi2
+        chi3 = self.chi3
+        chi4 = self.chi4
+        chi5 = self.chi5
+        self.build_model(chi1, chi2, chi3, chi4, chi5)
 
     def build_model(self, chi1: float, chi2: float, 
                     chi3: float, chi4: float, chi5: float):
@@ -856,6 +891,12 @@ class Disulfide:
         :param chi3: Chi3 (degrees)
         :param chi4: Chi4 (degrees)
         :param chi5: Chi5 (degrees)
+
+        Example:
+        >>> from proteusPy.Disulfide import Disulfide
+        >>> modss = Disulfide('model')
+        >>> modss.build_model(-60, -60, -90, -60, -60)
+        >>> modss.display(style='sb') 
         '''
 
         self.set_dihedrals(chi1, chi2, chi3, chi4, chi5)

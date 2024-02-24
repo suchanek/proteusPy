@@ -5,8 +5,8 @@
 CONDA = mamba
 
 # this MUST match the version in proteusPy/__init__.py
-VERS = 0.92.5
-MESS = "JOSS work, docs"
+VERS = 0.92.6
+MESS = "JOSS work, docs, added fxns to Disulfide.py for modeling"
 
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out
@@ -33,7 +33,7 @@ pkg:
 	@echo "Step 1 done. Now activate the environment with 'conda activate proteusPy' and run 'make install'"
 
 pkg2:
-	$(CONDA) create --name proteusPy -y python=3.11.7
+	$(CONDA) create --name ppy2 -y python=3.11.7
 	
 # activate the package before running!
 
@@ -70,7 +70,7 @@ docs: sdist
 upload: sdist
 	twine upload dist/*
 
-tag:
+tag: sdist
 	@git tag -a $(VERS) -m $(VERS)
 	@echo $(VERS) > tag.out
 
@@ -85,10 +85,6 @@ tests:
 	python proteusPy/DisulfideList.py
 	python proteusPy/DisulfideClasses.py
 	python proteusPy/turtle3D.py
-
-	
-
-
 
 # end of file
 
