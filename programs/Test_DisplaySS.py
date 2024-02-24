@@ -5,7 +5,7 @@ depending on the speed of your hardware it can some time to load the full databa
 the disulfides.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2/17/2024
+Last revision: 2/14/2024
 '''
 
 from proteusPy.Disulfide import Disulfide
@@ -14,15 +14,24 @@ from proteusPy.DisulfideList import DisulfideList
 
 import pyvista as pv
 from pyvista import set_plot_theme
+import tempfile
+import shutil
+import os
 
-TMP = '/tmp/'
+TMP = tempfile.mkdtemp()
+
 def SS_DisplayTest(ss: Disulfide):
     ss.display(style='bs', single=True)
     ss.display(style='cpk', single=True)
     ss.display(style='sb', single=True)
     ss.display(style='pd', single=False)
-    ss.screenshot(style='cpk', single=True, fname=f'{TMP}cpk3.png', verbose=True)
-    ss.screenshot(style='sb', single=False, fname=f'{TMP}sb3.png', verbose=True)
+
+    filename = os.path.join(TMP, "cpk3.png" )
+    ss.screenshot(style='cpk', single=True, fname=filename, verbose=True)
+
+    filename = os.path.join(TMP, "sb3.png" )
+    ss.screenshot(style='sb', single=False, fname=filename, verbose=True)
+
     print('--> SS_DisplayTest done.')
     return
 
@@ -32,9 +41,13 @@ def SSlist_DisplayTest(sslist):
     sslist.display(style='sb')
     sslist.display(style='pd')
     sslist.display(style='plain')
-    sslist.display_overlay(movie=True, fname=f'{TMP}overlay.mp4')
-    sslist.display_overlay(movie=False)
-    sslist.screenshot(style='sb', fname=f'{TMP}sslist.png')
+
+    filename = os.path.join(TMP, "overlay.mp4" )
+    sslist.display_overlay(movie=True, fname=filename)
+
+    filename = os.path.join(TMP, "overlay.png" )
+    sslist.display_overlay(screenshot=True, fname=filename)
+
     print('--> SSList_DisplayTest done.')
 
 def main():
@@ -52,15 +65,15 @@ def main():
     ss = Disulfide()
     ss = PDB_SS[0]
     
-    SS_DisplayTest(ss)
+    # SS_DisplayTest(ss)
     
     # get all disulfides for one structure. Make a 
     # DisulfideList object to hold it
-    
+
     ss4yss = DisulfideList([], '4yss')
     ss4yss = PDB_SS['4yys']
 
-    SSlist_DisplayTest(ss4yss)
+    # SSlist_DisplayTest(ss4yss)
 
     # grab the last 12 disulfides
     sslist = DisulfideList([], 'last12')
@@ -70,6 +83,7 @@ def main():
     SSlist_DisplayTest(sslist)
 
     print('--> Program complete!')
+    shutil.rmtree(TMP)
     
 if __name__ == '__main__':
     main()

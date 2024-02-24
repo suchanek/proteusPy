@@ -668,7 +668,7 @@ class DisulfideList(UserList):
             if verbose:
                 print(f' -> display_overlay(): Saving mp4 animation to: {fname}')
                 
-            pl.open_movie(fname, quality=9)
+            pl.open_movie(fname)
             path = pl.generate_orbital_path(n_points=360)
             pl.orbit_on_path(path, write_frames=True)
             pl.close()
@@ -934,45 +934,6 @@ class DisulfideList(UserList):
         for ss in sslist:
             ss.pprint_all()
     
-    def screenshot(self, style='bs', fname='sslist.png', verbose=True, light=True):
-        '''
-        Save the interactive window displaying the list of 
-        disulfides in the given style. Position the disulfide then
-        close the window to save.
-
-        :param style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd', defaults to 'bs'
-        :type style: str, optional
-        :param fname: filename to save image, defaults to 'sslist.png'
-        :type fname: str, optional
-        :param verbose: Verbose reporting, defaults to True
-        :type verbose: bool, optional
-        :param light: True for white display, False for dark.
-        :type light: bool, optional
-        '''
-
-        if light:
-            pv.set_plot_theme('document')
-        else:
-            pv.set_plot_theme('dark')
-
-        pl = pv.Plotter()
-        pl = self._render(style=style)
-
-        pl.enable_anti_aliasing('msaa')
-        pl.link_views()
-        pl.reset_camera()
-        pl.show(auto_close=False)
-
-        if verbose:
-            print(f'---> screenshot(): Saving file: {fname}')
-        
-        pl.screenshot(fname)
-        
-        if verbose:
-            print(f'---> screenshot(): Saved file: {fname}')
-        
-        return
-
     @property
     def torsion_df(self):
         return self.build_torsion_df()

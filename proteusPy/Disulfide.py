@@ -1544,7 +1544,7 @@ class Disulfide:
             print(f'Rendering animation to {fname}...')
 
         pl = pv.Plotter(window_size=WINSIZE, off_screen=True)
-        pl.open_movie(fname, quality=9)
+        pl.open_movie(fname)
         path = pl.generate_orbital_path(n_points=steps)
 
         #
