@@ -5,8 +5,8 @@
 CONDA = mamba
 
 # this MUST match the version in proteusPy/__init__.py
-VERS = 0.92.3
-MESS = "JOSS work"
+VERS = 0.92.5
+MESS = "JOSS work, docs"
 
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out
@@ -28,7 +28,7 @@ devclean:
 	$(CONDA) env remove --name $(DEVNAME) -y
 
 pkg:
-	@echo "Starting installation step 1..."
+	@echo "Starting installation step 1/2..."
 	@$(CONDA) env create --name proteusPy --file ppy.yml -y -q
 	@echo "Step 1 done. Now activate the environment with 'conda activate proteusPy' and run 'make install'"
 
@@ -38,31 +38,31 @@ pkg2:
 # activate the package before running!
 
 install:
-	@echo "Starting installation step 2..."
+	@echo "Starting installation step 2/2..."
 	@pip install --quiet . && cd ../biopython && pip install --quiet .
-	@jupyter contrib nbextension install --sys-prefix
-	@jupyter nbextension enable --py --sys-prefix widgetsnbextension
-	@python -m ipykernel install --user --name proteusPy --display-name "Python (proteusPy $(VERS) )"
+	jupyter contrib nbextension install --sys-prefix
+	jupyter nbextension enable --py --sys-prefix widgetsnbextension
+	python -m ipykernel install --user --name proteusPy --display-name "proteusPy $(VERS)"
 	
 
 install_dev:
-	pip install -e . && cd ../biopython && pip install .
-	jupyter contrib nbextension install --sys-prefix
-	jupyter nbextension enable --py --sys-prefix widgetsnbextension
-	@python -m ipykernel install --user --name ppy_dev --display-name "Python (ppy_dev $(VERS) )"
+	@pip install -e . && cd ../biopython && pip install .
+	@jupyter contrib nbextension install --sys-prefix
+	@jupyter nbextension enable --py --sys-prefix widgetsnbextension
+	python -m ipykernel install --user --name ppy_dev --display-name "ppy_dev $(VERS)"
 
 # package development targets
 build_dev: sdist docs
 
-sdist:
+sdist: proteusPy/__init__.py
 	@python setup.py sdist
 	@echo $(VERS) > sdist.out
 
-bdist:
+bdist: sdist
 	@python setup.py bdist
 	@echo $(VERS) > bdist.out
 
-docs:
+docs: sdist
 	@pdoc -o docs --math --logo "./logo.png" ./proteusPy
 	@echo $(VERS) > docs.out
 
