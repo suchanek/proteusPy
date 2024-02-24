@@ -31,3 +31,4 @@ plotly_express
 trame-jupyter-extension
 jupyter_contrib_nbextensions
 ipywidgets
+imageio[ffmpeg]

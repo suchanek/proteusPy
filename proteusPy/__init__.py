@@ -6,7 +6,7 @@
 .. include:: ../README.md
 """
 
-__version__ = "0.92.7"
+__version__ = "0.92.8"
 
 import sys
 import os

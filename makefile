@@ -5,8 +5,8 @@
 CONDA = mamba
 
 # this MUST match the version in proteusPy/__init__.py
-VERS = 0.92.7
-MESS = "example notebooks, makefile work"
+VERS = 0.92.8
+MESS = "corrections for animation creation"
 
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out

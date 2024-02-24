@@ -78,7 +78,7 @@ setup(name='proteusPy',
                         'panel', 'scikit-learn', 'gdown', 'ipykernel', 'seaborn', 'ipygany',
                         'nodejs', 'pytube', 'openai','grpcio', 'pip', 'wget', 'vtk', 'kaleido',
                         'plotly_express', 'trame-jupyter-extension', 'jupyter_contrib_nbextensions',
-                        'ipywidgets'],
+                        'ipywidgets', 'imageio[ffmpeg]'],
       source='https://github.com/suchanek/proteusPy/',
       project_urls={
         "Documentation": "https://suchanek.github.io/proteusPy/",
