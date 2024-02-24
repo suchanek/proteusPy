@@ -97,7 +97,7 @@ setup(name='proteusPy',
         'Topic :: Scientific/Engineering :: Chemistry',
         'Programming Language :: Python :: 3.11'],
       include_package_data=True,
-      package_data={'proteusPy': ['data/*.txt', 'data/*.py', 'data/*.json', 'data/*.csv']},
+      package_data={'proteusPy': ['data/*.txt', 'data/*.py', 'data/*.json', 'data/*.csv', 'data/SS_consensus_class_sext.pkl']},
       exclude_package_data={'proteusPy': ['data/PDB_all_ss.pkl', 'data/PDB_SS_ALL_LOADER.pkl', 'data/PDB_all_ss_dict.pkl']},
       zip_safe=False)
       

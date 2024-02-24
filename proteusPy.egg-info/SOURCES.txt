@@ -24,6 +24,7 @@ proteusPy.egg-info/dependency_links.txt
 proteusPy.egg-info/not-zip-safe
 proteusPy.egg-info/requires.txt
 proteusPy.egg-info/top_level.txt
+proteusPy/data/SS_consensus_class_sext.pkl
 proteusPy/data/__init__.py
 proteusPy/data/ss_completed.txt
 proteusPy/data/ss_ids.txt

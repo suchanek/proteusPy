@@ -362,6 +362,9 @@
             <li>
                     <a class="function" href="#check_header_from_id">check_header_from_id</a>
             </li>
+            <li>
+                    <a class="function" href="#Disulfide_Energy_Function">Disulfide_Energy_Function</a>
+            </li>
     </ul>
 
 
@@ -3004,12 +3007,33 @@ Last revision: 2/17/2024</p>
 </span><span id="L-2610"><a href="#L-2610"><span class="linenos">2610</span></a>        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
 </span><span id="L-2611"><a href="#L-2611"><span class="linenos">2611</span></a>    <span class="k">return</span> <span class="kc">True</span>
 </span><span id="L-2612"><a href="#L-2612"><span class="linenos">2612</span></a>
-</span><span id="L-2613"><a href="#L-2613"><span class="linenos">2613</span></a>
-</span><span id="L-2614"><a href="#L-2614"><span class="linenos">2614</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="L-2615"><a href="#L-2615"><span class="linenos">2615</span></a>    <span class="kn">import</span> <span class="nn">doctest</span>
-</span><span id="L-2616"><a href="#L-2616"><span class="linenos">2616</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
-</span><span id="L-2617"><a href="#L-2617"><span class="linenos">2617</span></a>
-</span><span id="L-2618"><a href="#L-2618"><span class="linenos">2618</span></a><span class="c1"># End of file</span>
+</span><span id="L-2613"><a href="#L-2613"><span class="linenos">2613</span></a><span class="k">def</span> <span class="nf">Disulfide_Energy_Function</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="L-2614"><a href="#L-2614"><span class="linenos">2614</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-2615"><a href="#L-2615"><span class="linenos">2615</span></a><span class="sd">    Compute the approximate torsional energy (kcal/mpl) for the input dihedral angles.</span>
+</span><span id="L-2616"><a href="#L-2616"><span class="linenos">2616</span></a>
+</span><span id="L-2617"><a href="#L-2617"><span class="linenos">2617</span></a><span class="sd">    :param x: A list of dihedral angles: [chi1, chi2, chi3, chi4, chi5]</span>
+</span><span id="L-2618"><a href="#L-2618"><span class="linenos">2618</span></a><span class="sd">    :return: Energy in kcal/mol</span>
+</span><span id="L-2619"><a href="#L-2619"><span class="linenos">2619</span></a>
+</span><span id="L-2620"><a href="#L-2620"><span class="linenos">2620</span></a><span class="sd">    Example:</span>
+</span><span id="L-2621"><a href="#L-2621"><span class="linenos">2621</span></a><span class="sd">    &gt;&gt;&gt; from proteusPy.Disulfide import Disulfide_Energy_Function</span>
+</span><span id="L-2622"><a href="#L-2622"><span class="linenos">2622</span></a><span class="sd">    &gt;&gt;&gt; dihed = [-60.0, -60.0, -90.0, -60.0, -90.0]</span>
+</span><span id="L-2623"><a href="#L-2623"><span class="linenos">2623</span></a><span class="sd">    &gt;&gt;&gt; res = Disulfide_Energy_Function(dihed)</span>
+</span><span id="L-2624"><a href="#L-2624"><span class="linenos">2624</span></a><span class="sd">    &gt;&gt;&gt; res</span>
+</span><span id="L-2625"><a href="#L-2625"><span class="linenos">2625</span></a><span class="sd">    2.5999999999999996</span>
+</span><span id="L-2626"><a href="#L-2626"><span class="linenos">2626</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-2627"><a href="#L-2627"><span class="linenos">2627</span></a>    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span><span id="L-2628"><a href="#L-2628"><span class="linenos">2628</span></a>
+</span><span id="L-2629"><a href="#L-2629"><span class="linenos">2629</span></a>    <span class="n">chi1</span><span class="p">,</span> <span class="n">chi2</span><span class="p">,</span> <span class="n">chi3</span><span class="p">,</span> <span class="n">chi4</span><span class="p">,</span> <span class="n">chi5</span> <span class="o">=</span> <span class="n">x</span>
+</span><span id="L-2630"><a href="#L-2630"><span class="linenos">2630</span></a>    <span class="n">energy</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi1</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi5</span><span class="p">)))</span>
+</span><span id="L-2631"><a href="#L-2631"><span class="linenos">2631</span></a>    <span class="n">energy</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi2</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi4</span><span class="p">))</span>
+</span><span id="L-2632"><a href="#L-2632"><span class="linenos">2632</span></a>    <span class="n">energy</span> <span class="o">+=</span> <span class="mf">3.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">chi3</span><span class="p">))</span> <span class="o">+</span> <span class="mf">0.6</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi3</span><span class="p">))</span> <span class="o">+</span> <span class="mf">10.1</span>
+</span><span id="L-2633"><a href="#L-2633"><span class="linenos">2633</span></a>    <span class="k">return</span> <span class="n">energy</span>
+</span><span id="L-2634"><a href="#L-2634"><span class="linenos">2634</span></a>
+</span><span id="L-2635"><a href="#L-2635"><span class="linenos">2635</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="L-2636"><a href="#L-2636"><span class="linenos">2636</span></a>    <span class="kn">import</span> <span class="nn">doctest</span>
+</span><span id="L-2637"><a href="#L-2637"><span class="linenos">2637</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</span><span id="L-2638"><a href="#L-2638"><span class="linenos">2638</span></a>
+</span><span id="L-2639"><a href="#L-2639"><span class="linenos">2639</span></a><span class="c1"># End of file</span>
 </span></pre></div>
 
 
@@ -9136,6 +9160,69 @@ Assumes the file is downloaded in <code>MODEL_DIR</code> path.</p>
 <span class="go"> -&gt; SSBond: 4: 5rsa: 65A - 72A</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">OK</span>
 <span class="go">True</span>
+</code></pre>
+</div>
+</div>
+
+
+                </section>
+                <section id="Disulfide_Energy_Function">
+                            <input id="Disulfide_Energy_Function-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">Disulfide_Energy_Function</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">x</span><span class="p">:</span> <span class="nb">list</span></span><span class="return-annotation">) -> <span class="nb">float</span>:</span></span>
+
+                <label class="view-source-button" for="Disulfide_Energy_Function-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#Disulfide_Energy_Function"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Disulfide_Energy_Function-2614"><a href="#Disulfide_Energy_Function-2614"><span class="linenos">2614</span></a><span class="k">def</span> <span class="nf">Disulfide_Energy_Function</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="Disulfide_Energy_Function-2615"><a href="#Disulfide_Energy_Function-2615"><span class="linenos">2615</span></a><span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="Disulfide_Energy_Function-2616"><a href="#Disulfide_Energy_Function-2616"><span class="linenos">2616</span></a><span class="sd">    Compute the approximate torsional energy (kcal/mpl) for the input dihedral angles.</span>
+</span><span id="Disulfide_Energy_Function-2617"><a href="#Disulfide_Energy_Function-2617"><span class="linenos">2617</span></a>
+</span><span id="Disulfide_Energy_Function-2618"><a href="#Disulfide_Energy_Function-2618"><span class="linenos">2618</span></a><span class="sd">    :param x: A list of dihedral angles: [chi1, chi2, chi3, chi4, chi5]</span>
+</span><span id="Disulfide_Energy_Function-2619"><a href="#Disulfide_Energy_Function-2619"><span class="linenos">2619</span></a><span class="sd">    :return: Energy in kcal/mol</span>
+</span><span id="Disulfide_Energy_Function-2620"><a href="#Disulfide_Energy_Function-2620"><span class="linenos">2620</span></a>
+</span><span id="Disulfide_Energy_Function-2621"><a href="#Disulfide_Energy_Function-2621"><span class="linenos">2621</span></a><span class="sd">    Example:</span>
+</span><span id="Disulfide_Energy_Function-2622"><a href="#Disulfide_Energy_Function-2622"><span class="linenos">2622</span></a><span class="sd">    &gt;&gt;&gt; from proteusPy.Disulfide import Disulfide_Energy_Function</span>
+</span><span id="Disulfide_Energy_Function-2623"><a href="#Disulfide_Energy_Function-2623"><span class="linenos">2623</span></a><span class="sd">    &gt;&gt;&gt; dihed = [-60.0, -60.0, -90.0, -60.0, -90.0]</span>
+</span><span id="Disulfide_Energy_Function-2624"><a href="#Disulfide_Energy_Function-2624"><span class="linenos">2624</span></a><span class="sd">    &gt;&gt;&gt; res = Disulfide_Energy_Function(dihed)</span>
+</span><span id="Disulfide_Energy_Function-2625"><a href="#Disulfide_Energy_Function-2625"><span class="linenos">2625</span></a><span class="sd">    &gt;&gt;&gt; res</span>
+</span><span id="Disulfide_Energy_Function-2626"><a href="#Disulfide_Energy_Function-2626"><span class="linenos">2626</span></a><span class="sd">    2.5999999999999996</span>
+</span><span id="Disulfide_Energy_Function-2627"><a href="#Disulfide_Energy_Function-2627"><span class="linenos">2627</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="Disulfide_Energy_Function-2628"><a href="#Disulfide_Energy_Function-2628"><span class="linenos">2628</span></a>    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span><span id="Disulfide_Energy_Function-2629"><a href="#Disulfide_Energy_Function-2629"><span class="linenos">2629</span></a>
+</span><span id="Disulfide_Energy_Function-2630"><a href="#Disulfide_Energy_Function-2630"><span class="linenos">2630</span></a>    <span class="n">chi1</span><span class="p">,</span> <span class="n">chi2</span><span class="p">,</span> <span class="n">chi3</span><span class="p">,</span> <span class="n">chi4</span><span class="p">,</span> <span class="n">chi5</span> <span class="o">=</span> <span class="n">x</span>
+</span><span id="Disulfide_Energy_Function-2631"><a href="#Disulfide_Energy_Function-2631"><span class="linenos">2631</span></a>    <span class="n">energy</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi1</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi5</span><span class="p">)))</span>
+</span><span id="Disulfide_Energy_Function-2632"><a href="#Disulfide_Energy_Function-2632"><span class="linenos">2632</span></a>    <span class="n">energy</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi2</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi4</span><span class="p">))</span>
+</span><span id="Disulfide_Energy_Function-2633"><a href="#Disulfide_Energy_Function-2633"><span class="linenos">2633</span></a>    <span class="n">energy</span> <span class="o">+=</span> <span class="mf">3.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">chi3</span><span class="p">))</span> <span class="o">+</span> <span class="mf">0.6</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi3</span><span class="p">))</span> <span class="o">+</span> <span class="mf">10.1</span>
+</span><span id="Disulfide_Energy_Function-2634"><a href="#Disulfide_Energy_Function-2634"><span class="linenos">2634</span></a>    <span class="k">return</span> <span class="n">energy</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Compute the approximate torsional energy (kcal/mpl) for the input dihedral angles.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>x: A list of dihedral angles</strong>:  [chi1, chi2, chi3, chi4, chi5]</li>
+</ul>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <p>Energy in kcal/mol</p>
+</blockquote>
+
+<p>Example:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn"><a href="">proteusPy.Disulfide</a></span> <span class="kn">import</span> <span class="n">Disulfide_Energy_Function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dihed</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">60.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">60.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">60.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">Disulfide_Energy_Function</span><span class="p">(</span><span class="n">dihed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span>
+<span class="go">2.5999999999999996</span>
 </code></pre>
 </div>
 </div>

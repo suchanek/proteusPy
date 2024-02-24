@@ -2610,6 +2610,27 @@ def check_header_from_id(struct_name: str, pdb_dir='.', model_numb=0,
         i += 1
     return True
 
+def Disulfide_Energy_Function(x: list) -> float:
+    '''
+    Compute the approximate torsional energy (kcal/mpl) for the input dihedral angles.
+
+    :param x: A list of dihedral angles: [chi1, chi2, chi3, chi4, chi5]
+    :return: Energy in kcal/mol
+
+    Example:
+    >>> from proteusPy.Disulfide import Disulfide_Energy_Function
+    >>> dihed = [-60.0, -60.0, -90.0, -60.0, -90.0]
+    >>> res = Disulfide_Energy_Function(dihed)
+    >>> res
+    2.5999999999999996
+    '''
+    import numpy as np
+
+    chi1, chi2, chi3, chi4, chi5 = x
+    energy = 2.0 * (np.cos(np.deg2rad(3.0 * chi1)) + np.cos(np.deg2rad(3.0 * chi5)))
+    energy += np.cos(np.deg2rad(3.0 * chi2)) + np.cos(np.deg2rad(3.0 * chi4))
+    energy += 3.5 * np.cos(np.deg2rad(2.0 * chi3)) + 0.6 * np.cos(np.deg2rad(3.0 * chi3)) + 10.1
+    return energy
 
 if __name__ == "__main__":
     import doctest
