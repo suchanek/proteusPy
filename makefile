@@ -83,13 +83,14 @@ commit:
 	git commit -a -m $(MESS)
 	git push --all origin
 
-# run the docstring tests
+# run the tests
 tests:
 	python proteusPy/Disulfide.py
 	python proteusPy/DisulfideLoader.py
 	python proteusPy/DisulfideList.py
 	python proteusPy/DisulfideClasses.py
 	python proteusPy/turtle3D.py
+	python programs/Test_DisplaySS.py
 
 # end of file
 

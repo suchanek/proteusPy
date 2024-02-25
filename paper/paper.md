@@ -349,8 +349,8 @@ defined in the [proteusPy.data]("https://suchanek.github.io/proteusPy/proteusPy/
 
 *NB:* [@proteusPy] disulfide database creaton relies on my [fork](https://github.com/suchanek/biopython) of the [Biopython](https://biopython.org) Python package to download and build the database, (<https://github.com/suchanek/biopython>). As a result, one can't download and create the database locally unless the BioPython patch is applied. Database analysis is unaffected without this, however. 
 
-## Contributing
+## Contributing/Reporting
 
-I welcome anyone interested in collaborating on proteusPy! Feel free to contact me, fork the [repo](https://github.com/suchanek/proteusPy/) and get coding. 
+I welcome anyone interested in collaborating on proteusPy! Feel free to contact me at suchanek@mac.com, fork the [repo](https://github.com/suchanek/proteusPy/) and get coding. Issues can be reported to https://github.com/suchanek/proteusPy/issues. 
 
 # Bibliography
