@@ -13,7 +13,7 @@ OUTFILES = sdist.out, bdist.out, docs.out
 nuke: clean devclean
 	@rm $(OUTFILES)
 
-Odev:
+OOdev:
 	@echo "Building... $(DEVNAME)"
 	@$(CONDA) env create --name $(DEVNAME) --file ppy.yml -y -q
 	@$(CONDA) install --name $(DEVNAME) pdoc twine -y -q
