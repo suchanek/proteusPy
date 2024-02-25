@@ -241,7 +241,7 @@ object's orientation in a *local* coordinate frame. The turtle developed in **pr
 
 By implementing the functions **Move**, **Roll**, **Yaw**, **Pitch** and **Turn** the turtle is capable of movement in a three-dimensional space. See [@Pabo_1986] for more details.
 
-The turtle has several molecule-specific functions including [orient_at_residue]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.orient_at_residue") and [orient_from_backbone]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.orient_from_backbone"). These routines make it possible to build protein backbones of arbitrary conformation and to readily add sidechains to modeled structures. The structural building functions are available, but are currently not used within the scope of the Disulfide bond database creation and analysis.
+The turtle has several molecule-specific functions including [orient_at_residue]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.orient_at_residue") and [orient_from_backbone]("https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html#Turtle3D.orient_from_backbone"). These routines make it possible to build protein backbones of arbitrary conformation and to readily add sidechains to modeled structures. These functions are currently used to build model disulfides from dihedral angle input.
 
 
 # Examples
@@ -277,7 +277,7 @@ minmaxlist.display(style='bs', light=True)
 ## Find disulfides within 10 $\AA$ RMS in torsional space of the lowest energy structure
 
 In this example we load the disulfide database, find the disulfides with
-the lowest and highest energies, and then find the nearest conformational neighbors. Finally, we display the neighbors overlaid against a common reference frame.
+the lowest and highest energies, and then find the nearest conformational neighbors. Finally, we display the neighbors overlaid against a common reference frame. Note that the window title gives statistics about the list of disulfides being displayed, including list name, resolution, number, average energy, and average atom positional error.
 
 ```python
 import proteusPy

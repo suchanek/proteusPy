@@ -5,8 +5,8 @@
 CONDA = mamba
 
 # this MUST match the version in proteusPy/__init__.py
-VERS = 0.92.8
-MESS = "corrections for animation creation"
+VERS = 0.92.9
+MESS = "added avg resolution calcs, updated docs"
 
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out
