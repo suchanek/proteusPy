@@ -56,8 +56,8 @@ Installing in Windows is a bit more involved than Linux or Macos. Sadly, the pac
 
 - Open a Miniforge prompt and cd into your repo dir:
   ```console
-  (base) C:\Users\egs\repos> clone https://github.com/suchanek/proteusPy.git
-  (base) C:\Users\egs\repos> clone https://github.com/suchanek/biopython.git
+  (base) C:\Users\egs\repos> git clone https://github.com/suchanek/proteusPy.git
+  (base) C:\Users\egs\repos> git clone https://github.com/suchanek/biopython.git
   (base) C:\Users\egs\repos> cd proteusPy
   (base) C:\Users\egs\repos\proteuspy> git-lfs track "*.csv" "*.mp4" "*.pkl"
   (base) C:\Users\egs\repos\proteuspy> make pkg

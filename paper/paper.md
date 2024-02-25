@@ -91,8 +91,8 @@ Installing in Windows is a bit more involved than Linux or Macos. Sadly, the pac
 
 - Open a Miniforge prompt and cd into your repo dir:
   ```console
-  (base) C:\Users\egs\repos> clone https://github.com/suchanek/proteusPy.git
-  (base) C:\Users\egs\repos> clone https://github.com/suchanek/biopython.git
+  (base) C:\Users\egs\repos> git clone https://github.com/suchanek/proteusPy.git
+  (base) C:\Users\egs\repos> git clone https://github.com/suchanek/biopython.git
   (base) C:\Users\egs\repos> cd proteusPy
   (base) C:\Users\egs\repos\proteuspy> git-lfs track "*.csv" "*.mp4" "*.pkl"
   (base) C:\Users\egs\repos\proteuspy> make pkg
@@ -111,13 +111,15 @@ The modules will run their docstring tests and disulfide visualization windows w
 
 Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. 
 
-The [notebooks](https://github.com/suchanek/proteusPy/blob/master/notebooks/) directory contains all of my Jupyter notebooks and is a good place to start: 
-- [Analysis_2q7q.ipynb](https://github.com/suchanek/proteusPy/blob/master/notebooks/Analysis_2q7q.ipynb) provides an example of visualizing the lowest energy Disulfide contained in the database and searching for nearest neighbors on the basis of conformational similarity. 
+The [notebooks](https://github.com/suchanek/proteusPy/blob/master/notebooks/) directory contains all of my Jupyter notebooks and is a good place to start:
+
+* [Analysis_2q7q.ipynb](https://github.com/suchanek/proteusPy/blob/master/notebooks/Analysis_2q7q.ipynb) provides an example of visualizing the lowest energy Disulfide contained in the database and searching for nearest neighbors on the basis of conformational similarity. 
 
 The [programs](https://github.com/suchanek/proteusPy/tree/master/programs) subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files:
-- [DisulfideDownloader.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py): Downloads the raw RCSB structure files.
-- [DisulfideExtractor.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py): Extracts the disulfides and creating the database loaders
-- [DisulfideClass_Analysis.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py): Performs binary or sextant analysis on the disulfide database.
+
+* [DisulfideDownloader.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py): Downloads the raw RCSB structure files.
+* [DisulfideExtractor.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py): Extracts the disulfides and creating the database loaders
+* [DisulfideClass_Analysis.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py): Performs binary or sextant analysis on the disulfide database.
 
 The first time one loads the database via [Load_PDB_SS()](https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html#Load_PDB_SS) the system will attempt to download the full and subset database from Google Drive. If this fails the system will attempt to rebuild the database from the repo's **data** subdirectory (not the package's). If you've downloaded from github this will work correctly. If you've installed from pyPi via **pip** it will fail.
 
