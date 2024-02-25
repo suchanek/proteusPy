@@ -46,6 +46,7 @@ It's simplest to clone the repo via GitHub since it contains all of the notebook
 - Install git-lfs:
   - https://git-lfs.github.com/
 - Install Visual Studio C++ development environment: https://learn.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=msvc-170
+- Make a link to nmake in c:\windows: >mklink /H make.exe  "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.39.33519\bin\Hostx64\x86\nmake.exe"
 - From an Anaconda Powershell prompt while sitting in your repo dir:
   ```console
   $ git clone https://github.com/suchanek/proteusPy.git

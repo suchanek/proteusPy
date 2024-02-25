@@ -21,7 +21,7 @@ Odev:
 
 pkg:
 	@echo "Starting installation step 1/2..."
-	@$(CONDA) create --name proteusPy -y python=3.11.7
+	$(CONDA) create --name proteusPy -y python=3.11.7
 	@echo "Step 1 done. Now activate the environment with 'conda activate proteusPy' and run 'make install'"
 dev:
 	@echo "Building $(DEVNAME)..."
@@ -40,17 +40,15 @@ devclean:
 # activate the package before running!
 install:
 	@echo "Starting installation step 2/2..."
-	@pip install --quiet . && cd ../biopython && pip install --quiet .
+	pip install --quiet . && cd ../biopython && pip install --quiet .
 	@jupyter contrib nbextension install --sys-prefix
 	@jupyter nbextension enable --py --sys-prefix widgetsnbextension
-	@python -m ipykernel install --user --name proteusPy --display-name "proteusPy $(VERS)"
+	python -m ipykernel install --user --name proteusPy --display-name "proteusPy $(VERS)"
 	@echo "Installation finished!"
 
 install_dev:
-	@pip install . 
-	@cd ../biopython 
-	@pip install --quiet . && cd ../biopython && pip install --quiet .
-	@pip install pdoc twine
+	pip install --quiet . && cd ../biopython && pip install --quiet .
+	pip install pdoc twine
 	@jupyter contrib nbextension install --sys-prefix
 	@jupyter nbextension enable --py --sys-prefix widgetsnbextension
 	@python -m ipykernel install --user --name ppydev --display-name "ppydev $(VERS)"
