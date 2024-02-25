@@ -837,9 +837,9 @@ class Disulfide:
         '''
         self.chi1 = dihedrals[0]
         self.chi2 = dihedrals[1]
-        self.chi3 = dihedrals[3]
-        self.chi4 = dihedrals[4]
-        self.chi5 = dihedrals[5]
+        self.chi3 = dihedrals[2]
+        self.chi4 = dihedrals[3]
+        self.chi5 = dihedrals[4]
 
     def bounding_box(self):
         '''
