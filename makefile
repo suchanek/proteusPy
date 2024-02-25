@@ -13,12 +13,6 @@ OUTFILES = sdist.out, bdist.out, docs.out
 nuke: clean devclean
 	@rm $(OUTFILES)
 
-OOdev:
-	@echo "Building... $(DEVNAME)"
-	@$(CONDA) env create --name $(DEVNAME) --file ppy.yml -y -q
-	@$(CONDA) install --name $(DEVNAME) pdoc twine -y -q
-	@echo "Step 1 done. Now activate the environment with 'conda activate $(DEVNAME)' and run 'make install'"
-
 pkg:
 	@echo "Starting installation step 1/2..."
 	$(CONDA) create --name proteusPy -y python=3.11.7
@@ -40,7 +34,9 @@ devclean:
 # activate the package before running!
 install:
 	@echo "Starting installation step 2/2..."
-	pip install --quiet . && cd ../biopython && pip install --quiet .
+	pip install . 
+	@cd ../biopython 
+	pip install .
 	@jupyter contrib nbextension install --sys-prefix
 	@jupyter nbextension enable --py --sys-prefix widgetsnbextension
 	python -m ipykernel install --user --name proteusPy --display-name "proteusPy $(VERS)"
