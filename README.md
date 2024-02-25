@@ -16,7 +16,7 @@
 
 # Requirements
 
-1. PC running MacOS, Linux, Windows with git, git-lfs and C compiler installed.
+1. PC running MacOS, Linux, Windows with git, git-lfs, make and C compiler installed.
 2. 8 GB RAM
 3. 3 GB disk space
 
@@ -36,26 +36,33 @@ It's simplest to clone the repo via GitHub since it contains all of the notebook
   $ cd proteusPy
   $ git-lfs track "*.csv" "*.mp4" "*.pkl"
   $ make pkg
-  $ mamba activate proteusPy
+  $ conda activate proteusPy
   $ make install
   ```
 ## Windows
+Installing in Windows is a bit more involved than Linux or Macos. Sadly, the package will not run under WSL, failing with graphics issues. 
 - Install Miniforge: <https://github.com/conda-forge/miniforge> (existing Anaconda installations are fine but please install mamba)
 - Install git for Windows and configure for Bash:
   - https://git-scm.com/download/win
 - Install git-lfs:
   - https://git-lfs.github.com/
-- Install Visual Studio C++ development environment: https://learn.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=msvc-170
-- Make a link to nmake in c:\windows: >mklink /H make.exe  "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.39.33519\bin\Hostx64\x86\nmake.exe"
-- From an Anaconda Powershell prompt while sitting in your repo dir:
+- Install Visual Studio C++ development environment: 
+  - https://learn.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=msvc-170
+- From a command prompt opened as administrator enter:
   ```console
-  $ git clone https://github.com/suchanek/proteusPy.git
-  $ git clone https://github.com/suchanek/biopython.git
-  $ cd proteusPy
-  $ git-lfs track "*.csv" "*.mp4" "*.pkl"
-  $ make pkg
-  $ mamba activate proteusPy
-  $ make install
+  PS C:\Users\egs> cd c:\windows
+  PS C:\Users\egs> mklink /H make.exe  "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.39.33519\bin\Hostx64\x86\nmake.exe"
+  ```
+
+- Open a Miniforge prompt and cd into your repo dir:
+  ```console
+  (base) C:\Users\egs\repos> clone https://github.com/suchanek/proteusPy.git
+  (base) C:\Users\egs\repos> clone https://github.com/suchanek/biopython.git
+  (base) C:\Users\egs\repos> cd proteusPy
+  (base) C:\Users\egs\repos\proteuspy> git-lfs track "*.csv" "*.mp4" "*.pkl"
+  (base) C:\Users\egs\repos\proteuspy> make pkg
+  (base) C:\Users\egs\repos>\proteuspy> conda activate proteusPy
+  (proteusPy) C:\Users\egs\repos> make install
   ```
 
 # Testing
