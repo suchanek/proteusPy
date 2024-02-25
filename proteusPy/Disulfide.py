@@ -2298,10 +2298,8 @@ def Extract_Disulfides(numb=-1, verbose=False, quiet=True, pdbdir=PDB_DIR,
     >>> subset.display_overlay()
 
     Take a screenshot. You can position the orientation, then close the window:
-    >>> subset.screenshot(style='sb', fname='subset.png')
-    ---> screenshot(): Saving file: subset.png
-    ---> screenshot(): Saved file: subset.png
-
+    >>> subset.display_overlay(screenshot=True, fname='subset.png')
+    
     Browse the documentation for more functionality. The display functions are particularly useful.
     '''
 

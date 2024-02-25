@@ -184,10 +184,24 @@ class DisulfideList(UserList):
         [<Disulfide ss1, Source: 1egs, Resolution: -1.0 Å>, <Disulfide ss2, Source: 1egs, Resolution: -1.0 Å>, <Disulfide ss3, Source: 1egs, Resolution: -1.0 Å>]
         '''
         
-        self.pdb_id = id
-        self.res = res
-        self.quiet = quiet
         super().__init__(self.validate_ss(item) for item in iterable)
+
+        self.pdb_id = id
+        self.quiet = quiet
+        total = 0
+        count = 0
+
+        if res == -1:
+            for ss in iterable:
+                if ss.resolution is not None:
+                    total += ss.resolution
+                    count += 1
+            if count != 0:
+                self.res = total / count
+            else:
+                self.res = -1.0
+        else:
+            self.res = res
 
     def __getitem__(self, item):
         '''
@@ -459,15 +473,24 @@ class DisulfideList(UserList):
             - 'plain' - boring single color
         :light: If True, light background, if False, dark
         '''
+        id = self.pdb_id
+        ssbonds = self.data
+        tot_ss = len(ssbonds) # number off ssbonds
+        avg_enrg = self.Average_Energy
+        avg_dist = self.Average_Distance
+        resolution = self.resolution
 
         if light:
             pv.set_plot_theme('document')
         else:
             pv.set_plot_theme('dark')
 
+        title = f'<{id}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å'
+
         pl = pv.Plotter()
         pl = self._render(style, panelsize)
         pl.enable_anti_aliasing('msaa')
+        pl.add_title(title=title, font_size=FONTSIZE)
         pl.link_views()
         pl.reset_camera()
         pl.show()
@@ -622,7 +645,7 @@ class DisulfideList(UserList):
         if tot_ss > 300:
             res = 8
 
-        title = f'<{id}> {resolution} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å'
+        title = f'<{id}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å'
 
         if light:
             pv.set_plot_theme('document')
