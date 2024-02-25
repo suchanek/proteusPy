@@ -60,6 +60,7 @@
     <li><a href="#quickstart">Quickstart</a></li>
     <li><a href="#visualizing-disulfides-with-pyvista">Visualizing Disulfides with pyVista</a></li>
     <li><a href="#performance">Performance</a></li>
+    <li><a href="#contributingreporting">Contributing/Reporting</a></li>
     <li><a href="#citing-proteuspy">Citing proteusPy</a></li>
     <li><a href="#publications">Publications</a></li>
   </ul></li>
@@ -124,7 +125,7 @@ proteusPy    </h1>
 <h1 id="requirements">Requirements</h1>
 
 <ol>
-<li>PC running MacOS, Linux, Windows with git, git-lfs and C compiler installed.</li>
+<li>PC running MacOS, Linux, Windows with git, git-lfs, make and C compiler installed.</li>
 <li>8 GB RAM</li>
 <li>3 GB disk space</li>
 </ol>
@@ -149,13 +150,15 @@ proteusPy    </h1>
 <span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>proteusPy
 <span class="gp">$ </span>git-lfs<span class="w"> </span>track<span class="w"> </span><span class="s2">&quot;<em>.csv&quot;</span><span class="w"> </span><span class="s2">&quot;</em>.mp4&quot;</span><span class="w"> </span><span class="s2">&quot;*.pkl&quot;</span>
 <span class="gp">$ </span>make<span class="w"> </span>pkg
-<span class="gp">$ </span>mamba<span class="w"> </span>activate<span class="w"> </span>proteusPy
+<span class="gp">$ </span>conda<span class="w"> </span>activate<span class="w"> </span>proteusPy
 <span class="gp">$ </span>make<span class="w"> </span>install
 </code></pre>
 </div></li>
 </ul>
 
 <h2 id="windows">Windows</h2>
+
+<p>Installing in Windows is a bit more involved than Linux or Macos. Sadly, the package will not run under WSL, failing with graphics issues. </p>
 
 <ul>
 <li>Install Miniforge: <a href="https://github.com/conda-forge/miniforge">https://github.com/conda-forge/miniforge</a> (existing Anaconda installations are fine but please install mamba)</li>
@@ -167,16 +170,28 @@ proteusPy    </h1>
 <ul>
 <li><a href="https://git-lfs.github.com/"><a href="https://git-lfs.github.com/">https://git-lfs.github.com/</a></a></li>
 </ul></li>
-<li>Install Visual Studio C++ development environment: <a href="https://learn.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=msvc-170">https://learn.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=msvc-170</a></li>
-<li>From an Anaconda Powershell prompt while sitting in your repo dir:
+<li>Install Visual Studio C++ development environment: 
+<ul>
+<li><a href="https://learn.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=msvc-170"><a href="https://learn.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=msvc-170">https://learn.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=msvc-170</a></a></li>
+</ul></li>
+<li>From a command prompt opened as administrator enter:
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span><a href="https://github.com/suchanek/proteusPy.git">https://github.com/suchanek/proteusPy.git</a>
-<span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span><a href="https://github.com/suchanek/biopython.git">https://github.com/suchanek/biopython.git</a>
-<span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>proteusPy
-<span class="gp">$ </span>git-lfs<span class="w"> </span>track<span class="w"> </span><span class="s2">&quot;<em>.csv&quot;</span><span class="w"> </span><span class="s2">&quot;</em>.mp4&quot;</span><span class="w"> </span><span class="s2">&quot;*.pkl&quot;</span>
-<span class="gp">$ </span>make<span class="w"> </span>pkg
-<span class="gp">$ </span>mamba<span class="w"> </span>activate<span class="w"> </span>proteusPy
-<span class="gp">$ </span>make<span class="w"> </span>install
+<pre><span></span><code><span class="go">PS C:\Users\egs&gt; cd c:\windows</span>
+<span class="go">PS C:\Users\egs&gt; mklink /H make.exe  &quot;C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.39.33519\bin\Hostx64\x86\nmake.exe&quot;</span>
+</code></pre>
+</div></li>
+</ul>
+
+<ul>
+<li>Open a Miniforge prompt and cd into your repo dir:
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp gp-VirtualEnv">(base)</span> <span class="go">C:\Users\egs\repos&gt; clone <a href="https://github.com/suchanek/proteusPy.git">https://github.com/suchanek/proteusPy.git</a></span>
+<span class="gp gp-VirtualEnv">(base)</span> <span class="go">C:\Users\egs\repos&gt; clone <a href="https://github.com/suchanek/biopython.git">https://github.com/suchanek/biopython.git</a></span>
+<span class="gp gp-VirtualEnv">(base)</span> <span class="go">C:\Users\egs\repos&gt; cd proteusPy</span>
+<span class="gp gp-VirtualEnv">(base)</span> <span class="go">C:\Users\egs\repos\proteuspy&gt; git-lfs track &quot;<em>.csv&quot; &quot;</em>.mp4&quot; &quot;*.pkl&quot;</span>
+<span class="gp gp-VirtualEnv">(base)</span> <span class="go">C:\Users\egs\repos\proteuspy&gt; make pkg</span>
+<span class="gp gp-VirtualEnv">(base)</span> <span class="go">C:\Users\egs\repos&gt;\proteuspy&gt; conda activate proteusPy</span>
+<span class="gp gp-VirtualEnv">(proteusPy)</span> <span class="go">C:\Users\egs\repos&gt; make install</span>
 </code></pre>
 </div></li>
 </ul>
@@ -238,6 +253,10 @@ proteusPy    </h1>
 <li>Manipulating and searching through long lists of disulfides can take time. I've added progress bars for many of these operations. </li>
 <li>Rendering many disulfides in <strong>pyvista</strong> can also take time to load and may be slow to dispay in real time, depending on your hardware. I added optimization to reduce cylinder complexity as a function of total cylinders rendered, but it can still be less than perfect. The faster your GPU the better! </li>
 </ul>
+
+<h2 id="contributingreporting">Contributing/Reporting</h2>
+
+<p>I welcome anyone interested in collaborating on proteusPy! Feel free to contact me at suchanek@mac.com, fork the repository: <a href="https://github.com/suchanek/proteusPy/">https://github.com/suchanek/proteusPy/</a> and get coding. Issues can be reported to <a href="https://github.com/suchanek/proteusPy/issues">https://github.com/suchanek/proteusPy/issues</a>. </p>
 
 <h2 id="citing-proteuspy">Citing proteusPy</h2>
 
