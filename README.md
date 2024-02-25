@@ -95,8 +95,13 @@ PyVista is an excellent 3D visualization framework and I've used it for the Disu
 - Use the mouse wheel to zoom (3 finger zoom on trackpad)
 
 ## Performance
+
 - Manipulating and searching through long lists of disulfides can take time. I've added progress bars for many of these operations. 
 - Rendering many disulfides in **pyvista** can also take time to load and may be slow to dispay in real time, depending on your hardware. I added optimization to reduce cylinder complexity as a function of total cylinders rendered, but it can still be less than perfect. The faster your GPU the better! 
+
+## Contributing/Reporting
+
+I welcome anyone interested in collaborating on proteusPy! Feel free to contact me at suchanek@mac.com, fork the repository: https://github.com/suchanek/proteusPy/ and get coding. Issues can be reported to https://github.com/suchanek/proteusPy/issues. 
 
 ## Citing proteusPy
 

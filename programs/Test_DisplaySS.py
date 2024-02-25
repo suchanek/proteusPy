@@ -5,15 +5,13 @@ depending on the speed of your hardware it can some time to load the full databa
 the disulfides.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2/14/2024
+Last revision: 2/24/2024
 '''
 
 from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideLoader import Load_PDB_SS
 from proteusPy.DisulfideList import DisulfideList
 
-import pyvista as pv
-from pyvista import set_plot_theme
 import tempfile
 import shutil
 import os

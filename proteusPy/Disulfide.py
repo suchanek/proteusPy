@@ -1058,7 +1058,7 @@ class Disulfide:
         self._o_dist = Vector(turt.to_local(o2))
         self._cb_dist = Vector(turt.to_local(cb2))
         self._sg_dist = Vector(turt.to_local(sg2))
-
+    
     def compute_torsional_energy(self) -> float:
         '''
         Compute the approximate torsional energy for the Disulfide's
