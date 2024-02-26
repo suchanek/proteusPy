@@ -23,7 +23,6 @@ Eric G. Suchanek, PhD., suchanek@mac.com
 """
 
 import sys
-import os
 
 try:
     from setuptools import setup
@@ -56,7 +55,7 @@ this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
 __version__ = "UNDEFINED"
-for line in open("proteusPy/__init__.py"):
+for line in open(this_directory / "__version__.txt"):
     if line.startswith("__version__"):
         exec(line.strip())
 
