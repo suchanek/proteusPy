@@ -1,12 +1,13 @@
 # Makefile for proteusPy
 # Author: Eric G. Suchanek, PhD
-# Last revision: 2/20/24 -egs-
+# Last revision: 2/25/24 -egs-
 
+include __version__.txt
+
+VERS = $(__version__)
 CONDA = mamba
 
-# this MUST match the version in proteusPy/__init__.py
-VERS = 0.92.9
-MESS = "added avg resolution calcs, updated docs"
+MESS = "moved versioning into __version__.txt, docs"
 
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out
@@ -33,28 +34,27 @@ devclean:
 	
 # activate the package before running!
 install:
-	@echo "Starting installation step 2/2..."
-	pip install . 
-	@cd ../biopython 
-	pip install .
-	@jupyter contrib nbextension install --sys-prefix
-	@jupyter nbextension enable --py --sys-prefix widgetsnbextension
+	@echo "Starting installation step 2/2 for $(VERS)..."
+	pip install . && cd ../biopython && pip install .
+	jupyter contrib nbextension install --sys-prefix
+	jupyter nbextension enable --py --sys-prefix widgetsnbextension
 	python -m ipykernel install --user --name proteusPy --display-name "proteusPy $(VERS)"
 	@echo "Installation finished!"
 
 install_dev:
+	@echo "Starting installation step 2/2 for $(VERS)..."
 	pip install --quiet . && cd ../biopython && pip install --quiet .
 	pip install pdoc twine
-	@jupyter contrib nbextension install --sys-prefix
-	@jupyter nbextension enable --py --sys-prefix widgetsnbextension
-	@python -m ipykernel install --user --name ppydev --display-name "ppydev $(VERS)"
+	jupyter contrib nbextension install --sys-prefix
+	jupyter nbextension enable --py --sys-prefix widgetsnbextension
+	python -m ipykernel install --user --name ppydev --display-name "ppydev $(VERS)"
 	@echo "Installation finished!"
 
 # package development targets
 build_dev: sdist docs
 
-sdist: proteusPy/__init__.py
-	@python setup.py sdist
+sdist: __version__.txt
+	python setup.py sdist
 	@echo $(VERS) > sdist.out
 
 bdist: sdist
