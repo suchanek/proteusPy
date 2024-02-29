@@ -6,8 +6,13 @@
 .. include:: ../README.md
 """
 
-""".. include:: ../__version__.txt
-"""
+from pathlib import Path
+this_directory = Path(__file__).parent
+
+__version__ = "UNDEFINED"
+for line in open(this_directory / "__version__.py"):
+    if line.startswith("__version__"):
+        exec(line.strip())
 
 import sys
 import os

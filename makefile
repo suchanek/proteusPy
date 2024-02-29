@@ -2,12 +2,16 @@
 # Author: Eric G. Suchanek, PhD
 # Last revision: 2/25/24 -egs-
 
-include __version__.txt
+include proteusPy/__version__.py
 
-VERS = $(__version__)
+PHONY = .
+
+VERS := $(shell cat proteusPy/__version__.py)
+VERSION_FILE = proteusPy/__version__.py
+
 CONDA = mamba
 
-MESS = "moved versioning into __version__.txt, docs"
+MESS = "disulfide module work, docs"
 
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out
@@ -53,7 +57,7 @@ install_dev:
 # package development targets
 build_dev: sdist docs
 
-sdist: __version__.txt
+sdist: .
 	python setup.py sdist
 	@echo $(VERS) > sdist.out
 

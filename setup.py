@@ -55,7 +55,7 @@ this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
 __version__ = "UNDEFINED"
-for line in open(this_directory / "__version__.txt"):
+for line in open("proteusPy/__version__.py"):
     if line.startswith("__version__"):
         exec(line.strip())
 
