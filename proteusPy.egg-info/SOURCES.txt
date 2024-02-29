@@ -12,6 +12,7 @@ proteusPy/ProteusGlobals.py
 proteusPy/ProteusPyWarning.py
 proteusPy/Residue.py
 proteusPy/__init__.py
+proteusPy/__version__.py
 proteusPy/angle_annotation.py
 proteusPy/atoms.py
 proteusPy/proteusPyWarning.py
