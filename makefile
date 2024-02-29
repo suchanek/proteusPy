@@ -4,8 +4,6 @@
 
 include proteusPy/__version__.py
 
-PHONY = .
-
 VERS := $(shell cat proteusPy/__version__.py)
 VERSION_FILE = proteusPy/__version__.py
 
@@ -15,6 +13,9 @@ MESS = "disulfide module work, docs"
 
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out
+
+PHONY = .
+
 nuke: clean devclean
 	@rm $(OUTFILES)
 
