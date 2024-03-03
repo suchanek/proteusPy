@@ -1,4 +1,4 @@
-'''
+"""
 DisulfideBond Class Analysis Dictionary creation
 Author: Eric G. Suchanek, PhD.
 License: BSD
@@ -6,13 +6,13 @@ Last Modification: 2/19/24 -egs-
 
 Disulfide Class creation and manipulation using the +/- formalism of Hogg et al. (Biochem, 2006, 45, 7429-7433), 
 across all 32 possible classes. Classes are named per Hogg's convention.
-'''
+"""
 
-# this workflow reads in the torsion database, groups it by torsions 
-# to create the classes merges with the master class spreadsheet, and saves the 
+# this workflow reads in the torsion database, groups it by torsions
+# to create the classes merges with the master class spreadsheet, and saves the
 # resulting dict to {DATA_DIR}PDB_SS_merged.csv
 
-__pdoc__ = {'__all__': True}
+__pdoc__ = {"__all__": True}
 
 import pandas as pd
 from io import StringIO
@@ -22,23 +22,48 @@ import tqdm
 from Bio.PDB import *
 
 import proteusPy
-from proteusPy.data import SS_CLASS_DICT_FILE, SS_CLASS_DEFINITIONS, DATA_DIR, CLASSOBJ_FNAME, SS_CONSENSUS_FILE
+from proteusPy.data import (
+    SS_CLASS_DICT_FILE,
+    SS_CLASS_DEFINITIONS,
+    DATA_DIR,
+    CLASSOBJ_FNAME,
+    SS_CONSENSUS_FILE,
+)
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.Disulfide import Disulfide
 from proteusPy.ProteusGlobals import DPI
 
-merge_cols = ['chi1_s','chi2_s','chi3_s','chi4_s','chi5_s','class_id','SS_Classname','FXN','count','incidence','percentage','ca_distance_mean',
-'ca_distance_std','torsion_length_mean','torsion_length_std','energy_mean','energy_std', 'ss_id']
+merge_cols = [
+    "chi1_s",
+    "chi2_s",
+    "chi3_s",
+    "chi4_s",
+    "chi5_s",
+    "class_id",
+    "SS_Classname",
+    "FXN",
+    "count",
+    "incidence",
+    "percentage",
+    "ca_distance_mean",
+    "ca_distance_std",
+    "torsion_length_mean",
+    "torsion_length_std",
+    "energy_mean",
+    "energy_std",
+    "ss_id",
+]
 
-class DisulfideClass_Constructor():
-    '''
+
+class DisulfideClass_Constructor:
+    """
     This Class manages structural classes for the disulfide bonds contained
     in the proteusPy disulfide database.
 
     Build the internal dictionary mapping disulfides to class names.
 
-    Disulfide binary classes are defined using the ± formalism described by 
-    Schmidt et al. (Biochem, 2006, 45, 7429-7433), across all 32 (2^5), possible 
+    Disulfide binary classes are defined using the ± formalism described by
+    Schmidt et al. (Biochem, 2006, 45, 7429-7433), across all 32 (2^5), possible
     binary sidechain torsional combinations. Classes are named per Schmidt's convention.
     The ``class_id`` represents the sign of each dihedral angle $\chi_{1} - \chi_{1'}$
     where *0* repreents *negative* dihedral angle and *2* a *positive* angle.
@@ -77,8 +102,8 @@ class DisulfideClass_Constructor():
     |      22202 | +RHHook        | UNK        |     593 |  0.00491313 |
     |      22220 | ±RHSpiral      | UNK        |    2544 |  0.0210776  |
     |      22222 | +RHSpiral      | UNK        |    3665 |  0.0303653  |
-    
-    '''
+
+    """
 
     def __init__(self, loader, verbose=True) -> None:
         self.verbose = verbose
@@ -87,44 +112,44 @@ class DisulfideClass_Constructor():
         self.sixclass_df = None
 
         if self.verbose:
-            print(f'-> DisulfideClass_Constructor(): Building SS classes...')
+            print(f"-> DisulfideClass_Constructor(): Building SS classes...")
         self.build_yourself(loader)
-    
-    def load_class_dict(self, fname=f'{DATA_DIR}{SS_CLASS_DICT_FILE}') -> dict:
-        with open(fname,'rb') as f:
-            #res = pickle.load(f)
+
+    def load_class_dict(self, fname=f"{DATA_DIR}{SS_CLASS_DICT_FILE}") -> dict:
+        with open(fname, "rb") as f:
+            # res = pickle.load(f)
             self.classdict = pickle.load(f)
-    
-    def load_consensus_file(self, fname=f'{DATA_DIR}{SS_CONSENSUS_FILE}'):
-        with open(fname,'rb') as f:
+
+    def load_consensus_file(self, fname=f"{DATA_DIR}{SS_CONSENSUS_FILE}"):
+        with open(fname, "rb") as f:
             res = pickle.load(f)
             return res
-            
+
     def build_class_df(self, class_df, group_df):
-        ss_id_col = group_df['ss_id']
+        ss_id_col = group_df["ss_id"]
         result_df = pd.concat([class_df, ss_id_col], axis=1)
         return result_df
 
     def list_binary_classes(self):
-        for k,v in enumerate(self.classdict):
-            print(f'Class: |{k}|, |{v}|')
+        for k, v in enumerate(self.classdict):
+            print(f"Class: |{k}|, |{v}|")
 
     #  class_cols = ['Idx','chi1_s','chi2_s','chi3_s','chi4_s','chi5_s','class_id','SS_Classname','FXN',
     # 'count','incidence','percentage','ca_distance_mean',
     # 'ca_distance_std','torsion_length_mean','torsion_length_std','energy_mean','energy_std']
 
     def from_class(self, classid: str) -> DisulfideList:
-        '''
+        """
         Return a list of disulfides corresponding to the input class ID
         string.
 
         :param classid: Class ID, e.g. '+RHStaple'
         :return: DisulfideList of class members
-        '''
+        """
         try:
             # Check if running in Jupyter
             shell = get_ipython().__class__.__name__
-            if shell == 'ZMQInteractiveShell':
+            if shell == "ZMQInteractiveShell":
                 from tqdm.notebook import tqdm
             else:
                 from tqdm import tqdm
@@ -132,6 +157,7 @@ class DisulfideClass_Constructor():
             from tqdm import tqdm
 
         from proteusPy.ProteusGlobals import PBAR_COLS
+
         res = DisulfideList([], classid)
 
         try:
@@ -145,12 +171,12 @@ class DisulfideClass_Constructor():
                 return DisulfideList([self[ssid] for ssid in sslist], classid)
         except KeyError:
 
-            print(f'No class: {classid}')
+            print(f"No class: {classid}")
         return
 
     def concat_dataframes(self, df1, df2):
         """
-        Concatenates columns from one data frame into the other 
+        Concatenates columns from one data frame into the other
         and returns the new result.
 
         Parameters
@@ -167,7 +193,7 @@ class DisulfideClass_Constructor():
 
         """
         # Merge the data frames based on the 'SS_Classname' column
-        result = pd.merge(df1, df2, on='class_id')
+        result = pd.merge(df1, df2, on="class_id")
 
         return result
 
@@ -175,111 +201,116 @@ class DisulfideClass_Constructor():
         """
         Convert a binary input string to a list of possible six-class strings.
 
-        Returns a list of all possible combinations of ordinal sections of a unit circle 
-        divided into 6 equal segments, originating at 0 degrees, rotating counterclockwise, 
+        Returns a list of all possible combinations of ordinal sections of a unit circle
+        divided into 6 equal segments, originating at 0 degrees, rotating counterclockwise,
         based on the sign of each angle in the input string.
-        
-        :param angle_str (str): A string of length 5, where each character represents the sign 
+
+        :param angle_str (str): A string of length 5, where each character represents the sign
         of an angle in the range of -180-180 degrees.
 
         :return list: A list of strings of length 5, representing all possible six-class strings.
         """
         import itertools
-        
-        angle_maps = {
-            "0": ["4", "5", "6"],
-            "2": ["1", "2", "3"]
-        }
+
+        angle_maps = {"0": ["4", "5", "6"], "2": ["1", "2", "3"]}
         class_lists = [angle_maps[char] for char in class_str]
         class_combinations = itertools.product(*class_lists)
         class_strings = ["".join(combination) for combination in class_combinations]
         return class_strings
 
     def build_yourself(self, loader) -> None:
-        '''
+        """
         Build the internal structures needed for the binary and six-fold disulfide structural classes
         based on dihedral angle rules.
-    
+
         Parameters
         ----------
         loader: DisulfideLoader object
-        
+
         Returns
         -------
         None
-        '''
+        """
         import proteusPy
+
         self.version = proteusPy.__version__
-        
+
         tors_df = loader.getTorsions()
-        
+
         if self.verbose:
-            print(f'-> DisulfideClass_Constructor(): creating binary SS classes...')
-        
-        grouped = self.create_binary_classes(tors_df)        
-        
-        class_df = pd.read_csv(StringIO(SS_CLASS_DEFINITIONS), dtype={'class_id': 'string', 'FXN': 'string', 'SS_Classname': 'string'})
-        class_df['FXN'].str.strip()
-        class_df['SS_Classname'].str.strip()
-        class_df['class_id'].str.strip()
-        
+            print(f"-> DisulfideClass_Constructor(): creating binary SS classes...")
+
+        grouped = self.create_binary_classes(tors_df)
+
+        class_df = pd.read_csv(
+            StringIO(SS_CLASS_DEFINITIONS),
+            dtype={"class_id": "string", "FXN": "string", "SS_Classname": "string"},
+        )
+        class_df["FXN"].str.strip()
+        class_df["SS_Classname"].str.strip()
+        class_df["class_id"].str.strip()
+
         if self.verbose:
-            print(f'-> DisulfideClass_Constructor(): merging...')
-        
+            print(f"-> DisulfideClass_Constructor(): merging...")
+
         merged = self.concat_dataframes(class_df, grouped)
-        merged.drop(columns=['Idx', 'chi1_s', 'chi2_s', 'chi3_s', 'chi4_s', 'chi5_s'], inplace=True)
-        
-        classdict = dict(zip(merged['SS_Classname'], merged['ss_id']))
+        merged.drop(
+            columns=["Idx", "chi1_s", "chi2_s", "chi3_s", "chi4_s", "chi5_s"],
+            inplace=True,
+        )
+
+        classdict = dict(zip(merged["SS_Classname"], merged["ss_id"]))
         self.classdict = classdict
         self.classdf = merged.copy()
-        
+
         if self.verbose:
-            print(f'-> DisulfideClass_Constructor(): creating sixfold SS classes...')
-        
+            print(f"-> DisulfideClass_Constructor(): creating sixfold SS classes...")
+
         grouped_sixclass = self.create_six_classes(tors_df)
-        
+
         self.sixclass_df = grouped_sixclass.copy()
-        
+
         if self.verbose:
-            print(f'-> DisulfideClass_Constructor(): initialization complete.')
-        
+            print(f"-> DisulfideClass_Constructor(): initialization complete.")
+
         return
-    
-    
+
     def create_binary_classes(self, df) -> pd.DataFrame:
         """
         Group the DataFrame by the sign of the chi columns and create a new class ID column for each unique grouping.
 
-        :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 
+        :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance',
         'cb_distance', 'torsion_length', and 'energy'.
-        :return: A pandas DataFrame containing columns 'class_id', 'ss_id', and 'count', where 'class_id' is a unique identifier for each grouping of chi signs, 'ss_id' is a list of all 'ss_id' values in that grouping, and 'count' 
+        :return: A pandas DataFrame containing columns 'class_id', 'ss_id', and 'count', where 'class_id' is a unique identifier for each grouping of chi signs, 'ss_id' is a list of all 'ss_id' values in that grouping, and 'count'
         is the number of rows in that grouping.
         """
         # Create new columns with the sign of each chi column
-        chi_columns = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']
-        sign_columns = [col + '_s' for col in chi_columns]
+        chi_columns = ["chi1", "chi2", "chi3", "chi4", "chi5"]
+        sign_columns = [col + "_s" for col in chi_columns]
         df[sign_columns] = df[chi_columns].applymap(lambda x: 1 if x >= 0 else -1)
-        
+
         # Create a new column with the class ID for each row
-        class_id_column = 'class_id'
-        df[class_id_column] = (df[sign_columns] + 1).apply(lambda x: ''.join(x.astype(str)), axis=1)
+        class_id_column = "class_id"
+        df[class_id_column] = (df[sign_columns] + 1).apply(
+            lambda x: "".join(x.astype(str)), axis=1
+        )
 
         # Group the DataFrame by the class ID and return the grouped data
-        grouped = df.groupby(class_id_column)['ss_id'].unique().reset_index()
-        grouped['count'] = grouped['ss_id'].apply(lambda x: len(x))
-        grouped['incidence'] = grouped['ss_id'].apply(lambda x: len(x)/len(df))
-        grouped['percentage'] = grouped['incidence'].apply(lambda x: 100 * x)
+        grouped = df.groupby(class_id_column)["ss_id"].unique().reset_index()
+        grouped["count"] = grouped["ss_id"].apply(lambda x: len(x))
+        grouped["incidence"] = grouped["ss_id"].apply(lambda x: len(x) / len(df))
+        grouped["percentage"] = grouped["incidence"].apply(lambda x: 100 * x)
 
         return grouped
 
     def create_six_classes(self, df) -> pd.DataFrame:
         """
         Create a new DataFrame from the input with a 6-class encoding for input 'chi' values.
-        
+
         The function takes a pandas DataFrame containing the following columns:
         'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'cb_distance',
         'torsion_length', 'energy', and 'rho', and adds a class ID column based on the following rules:
-        
+
         1. A new column named `class_id` is added, which is the concatenation of the individual class IDs per Chi.
         2. The DataFrame is grouped by the `class_id` column, and a new DataFrame is returned that shows the unique `ss_id` values for each group,
         the count of unique `ss_id` values, the incidence of each group as a proportion of the total DataFrame, and the
@@ -289,36 +320,38 @@ class DisulfideClass_Constructor():
                 'ca_distance', 'cb_distance', 'torsion_length', 'energy', and 'rho'
         :return: The grouped DataFrame with the added class column.
         """
-        
+
         _df = pd.DataFrame()
         # create the chi_t columns for each chi column
-        for col_name in ['chi1', 'chi2', 'chi3', 'chi4', 'chi5']:
-            _df[col_name + '_t'] = df[col_name].apply(self.get_sixth_quadrant)
-        
+        for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
+            _df[col_name + "_t"] = df[col_name].apply(self.get_sixth_quadrant)
+
         # create the class_id column
-        df['class_id'] = _df[['chi1_t', 'chi2_t', 'chi3_t', 'chi4_t', 'chi5_t']].apply(lambda x: ''.join(x), axis=1)
+        df["class_id"] = _df[["chi1_t", "chi2_t", "chi3_t", "chi4_t", "chi5_t"]].apply(
+            lambda x: "".join(x), axis=1
+        )
 
         # group the DataFrame by class_id and return the grouped data
-        grouped = df.groupby('class_id').agg({'ss_id': 'unique'})
-        grouped['count'] = grouped['ss_id'].apply(lambda x: len(x))
-        grouped['incidence'] = grouped['count'] / len(df)
-        grouped['percentage'] = grouped['incidence'] * 100
+        grouped = df.groupby("class_id").agg({"ss_id": "unique"})
+        grouped["count"] = grouped["ss_id"].apply(lambda x: len(x))
+        grouped["incidence"] = grouped["count"] / len(df)
+        grouped["percentage"] = grouped["incidence"] * 100
         grouped.reset_index(inplace=True)
 
         return grouped
 
-    def filter_sixclass_by_percentage(self, cutoff)-> pd.DataFrame:
-       """
-       Filter the six-class definitions by percentage.
-   
-       :param df: A Pandas DataFrame with an 'percentage' column to filter by
-       :param cutoff: A numeric value specifying the minimum percentage required for a row to be included in the output
-       :return: A new Pandas DataFrame containing only rows where the percentage is greater than or equal to the cutoff
-       :rtype: pandas.DataFrame
-       """
-       df = self.sixclass_df
+    def filter_sixclass_by_percentage(self, cutoff) -> pd.DataFrame:
+        """
+        Filter the six-class definitions by percentage.
 
-       return df[df['percentage'] >= cutoff].copy()
+        :param df: A Pandas DataFrame with an 'percentage' column to filter by
+        :param cutoff: A numeric value specifying the minimum percentage required for a row to be included in the output
+        :return: A new Pandas DataFrame containing only rows where the percentage is greater than or equal to the cutoff
+        :rtype: pandas.DataFrame
+        """
+        df = self.sixclass_df
+
+        return df[df["percentage"] >= cutoff].copy()
 
     def get_sixth_quadrant(self, angle_deg):
         """
@@ -345,85 +378,87 @@ class DisulfideClass_Constructor():
         elif angle_deg >= 300 and angle_deg < 360:
             return str(1)
         else:
-            raise ValueError("Invalid angle value: angle must be in the range [-360, 360).")
+            raise ValueError(
+                "Invalid angle value: angle must be in the range [-360, 360)."
+            )
 
     def sslist_from_classid(self, cls: str) -> DisulfideList:
-        '''
+        """
         Return the list of Disulfides from the classID string.
 
         :param cls: ClassID string
-        '''
-        if '0' in cls:
+        """
+        if "0" in cls:
             return self._ss_from_binary_classid(cls)
         else:
             return self._ss_from_sixclassid(cls)
-    
+
     def _ss_from_sixclassid(self, cls: str) -> pd.DataFrame:
-        '''
+        """
         Return the 'ss_id' value in the given DataFrame that corresponds to the
         input 'cls' string in the sixfold class description.
-        '''
-        
+        """
+
         df = self.sixclass_df
 
-        filtered_df = df[df['class_id'] == cls]
+        filtered_df = df[df["class_id"] == cls]
         if len(filtered_df) == 0:
             return None
         elif len(filtered_df) > 1:
             raise ValueError(f"Multiple rows found for class_id '{cls}'")
-        return filtered_df.iloc[0]['ss_id']
+        return filtered_df.iloc[0]["ss_id"]
 
     def _ss_from_binary_classid(self, cls: str) -> pd.DataFrame:
-        '''
+        """
         Return the 'ss_id' value in the given DataFrame that corresponds to the
         input 'cls' string in the binary class description.
-        '''
-        
+        """
+
         df = self.classdf
 
-        filtered_df = df[df['class_id'] == cls]
+        filtered_df = df[df["class_id"] == cls]
         if len(filtered_df) == 0:
             raise ValueError(f"No rows found for class_id '{cls}'")
         elif len(filtered_df) > 1:
             raise ValueError(f"Multiple rows found for class_id '{cls}'")
-        return filtered_df.iloc[0]['ss_id']
+        return filtered_df.iloc[0]["ss_id"]
 
     def save(self, savepath=DATA_DIR) -> None:
-        '''
+        """
         Save a copy of the fully instantiated class to the specified file.
 
         :param savepath: Path to save the file, defaults to DATA_DIR
-        '''
+        """
         self.version = proteusPy.__version__
 
         fname = CLASSOBJ_FNAME
 
-        _fname = f'{savepath}{fname}'
+        _fname = f"{savepath}{fname}"
 
         if self.verbose:
-            print(f'-> DisulfideLoader.save(): Writing {_fname}... ')
-        
-        with open(_fname, 'wb+') as f:
+            print(f"-> DisulfideLoader.save(): Writing {_fname}... ")
+
+        with open(_fname, "wb+") as f:
             pickle.dump(self, f)
-        
+
         if self.verbose:
-            print(f'-> DisulfideLoader.save(): Done.')
-    
+            print(f"-> DisulfideLoader.save(): Done.")
+
     def six_class_to_binary(self, cls_str):
         """
-        Transforms a string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees 
-        into a string of 5 characters, where each character is either '1' if the corresponding input character represents a 
+        Transforms a string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees
+        into a string of 5 characters, where each character is either '1' if the corresponding input character represents a
         negative angle or '2' if it represents a positive angle.
-        
+
         :param cls_str (str): A string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees.
-        :return str: A string of length 5, where each character is either '0' or '2', representing the sign of the corresponding input angle. 
+        :return str: A string of length 5, where each character is either '0' or '2', representing the sign of the corresponding input angle.
         """
         output_str = ""
         for char in cls_str:
-            if char in ['1', '2', '3']:
-                output_str += '2'
-            elif char in ['4', '5', '6']:
-                output_str += '0'
+            if char in ["1", "2", "3"]:
+                output_str += "2"
+            elif char in ["4", "5", "6"]:
+                output_str += "0"
         return output_str
 
     def plot_class_chart(self, classes: int) -> None:
@@ -446,20 +481,20 @@ class DisulfideClass_Constructor():
         """
         import matplotlib.pyplot as plt
         import numpy as np
-        
+
         from proteusPy.angle_annotation import AngleAnnotation
 
         # Helper function to draw angle easily.
         def plot_angle(ax, pos, angle, length=0.95, acol="C0", **kwargs):
             vec2 = np.array([np.cos(np.deg2rad(angle)), np.sin(np.deg2rad(angle))])
-            xy = np.c_[[length, 0], [0, 0], vec2*length].T + np.array(pos)
+            xy = np.c_[[length, 0], [0, 0], vec2 * length].T + np.array(pos)
             ax.plot(*xy.T, color=acol)
             return AngleAnnotation(pos, xy[0], xy[2], ax=ax, **kwargs)
 
-        #fig = plt.figure(figsize=(WIDTH, HEIGHT), dpi=DPI)
-        fig, ax1= plt.subplots(sharex=True)
+        # fig = plt.figure(figsize=(WIDTH, HEIGHT), dpi=DPI)
+        fig, ax1 = plt.subplots(sharex=True)
 
-        #ax1, ax2 = fig.subplots(1, 2, sharey=True, sharex=True)
+        # ax1, ax2 = fig.subplots(1, 2, sharey=True, sharex=True)
 
         fig.suptitle("SS Torsion Classes")
         fig.set_dpi(DPI)
@@ -473,36 +508,43 @@ class DisulfideClass_Constructor():
         _text = f"${360/classes}°$"
         kw = dict(size=75, unit="points", text=_text)
 
-        am7 = plot_angle(ax1, (0, 0), 360/classes, textposition="outside", **kw)
+        am7 = plot_angle(ax1, (0, 0), 360 / classes, textposition="outside", **kw)
 
         # Create a list of segment values
         # !!!
         values = [1 for _ in range(classes)]
 
         # Create the pie chart
-        #fig, ax = plt.subplots()
+        # fig, ax = plt.subplots()
         wedges, _ = ax1.pie(
-            values, startangle=0, counterclock=False, wedgeprops=dict(width=0.65))
+            values, startangle=0, counterclock=False, wedgeprops=dict(width=0.65)
+        )
 
         # Set the chart title and size
-        ax1.set_title(f'{classes}-Class Angular Layout')
+        ax1.set_title(f"{classes}-Class Angular Layout")
 
         # Set the segment colors
-        color_palette = plt.cm.get_cmap('tab20', classes)
-        ax1.set_prop_cycle('color', [color_palette(i) for i in range(classes)])
+        color_palette = plt.cm.get_cmap("tab20", classes)
+        ax1.set_prop_cycle("color", [color_palette(i) for i in range(classes)])
 
         # Create the legend
-        legend_labels = [f'Class {i+1}' for i in range(classes)]
-        legend = ax1.legend(wedges, legend_labels, title='Classes', loc='center left', bbox_to_anchor=(1.1, 0.5))
+        legend_labels = [f"Class {i+1}" for i in range(classes)]
+        legend = ax1.legend(
+            wedges,
+            legend_labels,
+            title="Classes",
+            loc="center left",
+            bbox_to_anchor=(1.1, 0.5),
+        )
 
         # Set the legend fontsize
-        plt.setp(legend.get_title(), fontsize='large')
-        plt.setp(legend.get_texts(), fontsize='medium')
+        plt.setp(legend.get_title(), fontsize="large")
+        plt.setp(legend.get_texts(), fontsize="medium")
 
         # Show the chart
         fig.show()
 
+
 # class definition ends
 
 # end of file
-

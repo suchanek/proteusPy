@@ -10,6 +10,5 @@ class ProteusPyWarning(Warning):
 
     Consult the warnings module documentation for more details.
     """
+
     pass
-
-

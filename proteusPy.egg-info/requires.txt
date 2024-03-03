@@ -17,11 +17,9 @@ panel
 scikit-learn
 gdown
 ipykernel
-seaborn
 ipygany
 nodejs
 pytube
-openai
 grpcio
 pip
 wget

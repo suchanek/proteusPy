@@ -1,6 +1,6 @@
-'''
+"""
 Global declarations for the proteusPy package
-'''
+"""
 
 # init for proteusPy data module
 # Copyright (c) 2023 Eric G. Suchanek, PhD., all rights reserved
@@ -11,23 +11,23 @@ import os
 # absolute location for the disulfide .pkl files
 _abspath = os.path.dirname(os.path.abspath(__file__))
 
-DATA_DIR = f'{_abspath}/'
-SS_PICKLE_FILE = 'PDB_all_ss.pkl'
-SS_DICT_PICKLE_FILE = 'PDB_all_ss_dict.pkl'
-SS_DICT_PICKLE_FILE2 = 'PDB_all_ss_dict_ind.pkl'
-SS_TORSIONS_FILE = 'PDB_all_SS_torsions.csv'
-PROBLEM_ID_FILE = 'PDB_all_SS_problems.csv'
-SS_ID_FILE = 'ss_ids.txt'
+DATA_DIR = f"{_abspath}/"
+SS_PICKLE_FILE = "PDB_all_ss.pkl"
+SS_DICT_PICKLE_FILE = "PDB_all_ss_dict.pkl"
+SS_DICT_PICKLE_FILE2 = "PDB_all_ss_dict_ind.pkl"
+SS_TORSIONS_FILE = "PDB_all_SS_torsions.csv"
+PROBLEM_ID_FILE = "PDB_all_SS_problems.csv"
+SS_ID_FILE = "ss_ids.txt"
 
-SS_SUBSET_PICKLE_FILE = 'PDB_subset_ss.pkl'
-SS_SUBSET_DICT_PICKLE_FILE = 'PDB_subset_ss_dict.pkl'
-SS_SUBSET_DICT_PICKLE_FILE_IND = 'PDB_subset_ss_dict_ind.pkl'
-SS_SUBSET_TORSIONS_FILE = 'PDB_subset_torsions.csv'
-SS_PROBLEM_SUBSET_ID_FILE = 'PDB_subset_problems.csv'
+SS_SUBSET_PICKLE_FILE = "PDB_subset_ss.pkl"
+SS_SUBSET_DICT_PICKLE_FILE = "PDB_subset_ss_dict.pkl"
+SS_SUBSET_DICT_PICKLE_FILE_IND = "PDB_subset_ss_dict_ind.pkl"
+SS_SUBSET_TORSIONS_FILE = "PDB_subset_torsions.csv"
+SS_PROBLEM_SUBSET_ID_FILE = "PDB_subset_problems.csv"
 
 # contains the dihedral classes and their members
-SS_CLASS_DICT_FILE = 'PDB_ss_classes_dict.pkl'
-SS_CONSENSUS_FILE = 'SS_consensus_class_sext.pkl'
+SS_CLASS_DICT_FILE = "PDB_ss_classes_dict.pkl"
+SS_CONSENSUS_FILE = "SS_consensus_class_sext.pkl"
 
 LOADER_FNAME = "PDB_SS_ALL_LOADER.pkl"
 LOADER_SUBSET_FNAME = "PDB_SS_SUBSET_LOADER.pkl"
@@ -40,7 +40,7 @@ LOADER_SUBSET_FNAME_URL = "https://raw.githubusercontent.com/suchanek/proteusPy/
 LOADER_ALL_URL = "https://drive.google.com/uc?id=1igF-sppLPaNsBaUS7nkb13vtOGZZmsFp"
 LOADER_SUBSET_URL = "https://drive.google.com/uc?id=1puy9pxrClFks0KN9q5PPV_ONKvL-hg33"
 
-SS_CLASS_DEFINITIONS = '''
+SS_CLASS_DEFINITIONS = """
 Idx,chi1_s,chi2_s,chi3_s,chi4_s,chi5_s,class_id,SS_Classname,FXN
 0,-1,-1,-1,-1,-1,00000,-LHSpiral,UNK
 1,-1,-1,-1,-1,1,00002,00002,UNK
@@ -74,7 +74,7 @@ Idx,chi1_s,chi2_s,chi3_s,chi4_s,chi5_s,class_id,SS_Classname,FXN
 29,1,1,1,-1,1,22202,+RHHook,UNK
 30,1,1,1,1,-1,22220,±RHSpiral,UNK
 31,1,1,1,1,1,22222,+RHSpiral,UNK
-'''
+"""
 
-CLASSOBJ_FNAME = 'PDB_CLASS_OBJ.pkl'
+CLASSOBJ_FNAME = "PDB_CLASS_OBJ.pkl"
 # end of file

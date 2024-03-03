@@ -2,7 +2,7 @@ import requests
 import json
 
 repo_url = "https://github.com/suchanek/proteusPy"
-file_path = "proteusPy/data/PDB_SS_LOADER.pkl" 
+file_path = "proteusPy/data/PDB_SS_LOADER.pkl"
 
 # Get object ID
 response = requests.get(f"{repo_url}/info/lfs/objects")
@@ -13,7 +13,7 @@ for obj in data["objects"]:
         object_id = obj["oid"]
         break
 
-# Construct download URL 
+# Construct download URL
 download_url = f"{repo_url}/git/lfs/objects/{object_id}/blobs/{object_id}"
 
 # Download file

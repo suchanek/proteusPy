@@ -121,9 +121,8 @@ def set_state(event):
     print_state(ss_state)
     pn.state.cache['ss_state'] = ss_state
 
-
-def print_state(ss_stat):
-    print(f'--> State: {ss_state['rcsid']}, SS: {ss_state['defaultss']}, sslist: {ss_state['ssid_list']} single: {ss_state['single']}, style: {ss_state['style']}')
+def print_state():
+    return
 
 def load_state():
     """

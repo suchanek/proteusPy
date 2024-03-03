@@ -1,4 +1,4 @@
-# Cluster Analysis of Disulfide Bonds in Proteins of Known Structure 
+# Cluster Analysis of Disulfide Bonds in Proteins of Known Structure
 # Author: Eric G. Suchanek, PhD.
 # Last revision: 1/19/23 -egs-
 # Cα Cβ Sγ
@@ -19,24 +19,24 @@ import pandas as pd
 import pyvista as pv
 from pyvista import set_plot_theme
 
-#print(pv.Report())
+# print(pv.Report())
 
-plt.style.use('dark_background')
+plt.style.use("dark_background")
 
 # ipyvtklink
-#pv.set_jupyter_backend('ipyvtklink')
+# pv.set_jupyter_backend('ipyvtklink')
 
-set_plot_theme('document')
+set_plot_theme("document")
 
 # the locations below represent the actual location on the dev drive.
 # location for PDB repository
-PDB_BASE = '/Users/egs/PDB/'
+PDB_BASE = "/Users/egs/PDB/"
 
 # location of cleaned PDB files
-PDB = '/Users/egs/PDB/good/'
+PDB = "/Users/egs/PDB/good/"
 
 # location of the compressed Disulfide .pkl files
-MODELS = f'{PDB_BASE}data/'
+MODELS = f"{PDB_BASE}data/"
 
 # default parameters will read from the package itself.
 PDB_SS = DisulfideLoader(verbose=True, subset=True)
@@ -51,7 +51,7 @@ _SSdf = PDB_SS.getTorsions()
 # CA distances are > 7.0. We remove them from consideration
 # below
 
-_near = _SSdf['ca_distance'] < 9.0
+_near = _SSdf["ca_distance"] < 9.0
 
 # entire database with near cutoff of 9.0
 SS_df = _SSdf[_near]
@@ -59,14 +59,24 @@ SS_df = SS_df[Torsion_DF_Cols].copy()
 
 
 from sklearn.mixture import GaussianMixture
+
 n_clusters = 8
 
-_cols = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'torsion_length', 'energy', 'ca_distance']
+_cols = [
+    "chi1",
+    "chi2",
+    "chi3",
+    "chi4",
+    "chi5",
+    "torsion_length",
+    "energy",
+    "ca_distance",
+]
 
 tor_df = SS_df[_cols]
 tor_df.head(1)
 
-'''
+"""
 gmm_model = GaussianMixture(n_components=n_clusters)
 gmm_model.fit(tor_df)
 cluster_labels = gmm_model.predict(tor_df)
@@ -79,7 +89,7 @@ for k in range(n_clusters):
     plt.scatter(data['torsion_length'], data['ca_distance'], s=2)
 
 plt.show()
-'''
+"""
 
 # takes over an hour for full dataset
 from sklearn.cluster import AffinityPropagation
@@ -87,24 +97,24 @@ import seaborn as sns
 
 n_clusters = 6
 
-_cols = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'torsion_length']
+_cols = ["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]
 tor_df = SS_df[_cols].copy()
 
 # takes over an hour for full dataset
 from sklearn.cluster import AffinityPropagation
 import seaborn as sns
+
 n_clusters = 3
 
-_cols = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'torsion_length']
+_cols = ["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]
 tor_df = SS_df[_cols].copy()
 
 X = tor_df.copy()
 
 aff_model = AffinityPropagation(max_iter=100, random_state=25)
 # takes 51 min with full dataset
-X['cluster'] = aff_model.fit_predict(X[['torsion_length']])
+X["cluster"] = aff_model.fit_predict(X[["torsion_length"]])
 
 fig, ax = plt.subplots()
-ax.set(title='Affinity Propagation')
-sns.scatterplot(x='chi1', y='torsion_length', data=X, hue='cluster', ax=ax, size=2)
-
+ax.set(title="Affinity Propagation")
+sns.scatterplot(x="chi1", y="torsion_length", data=X, hue="cluster", ax=ax, size=2)
