@@ -2,11 +2,8 @@
 # Author: Eric G. Suchanek, PhD
 # Last revision: 2/25/24 -egs-
 
-include proteusPy/__version__.py
-
 VERS := $(shell cat proteusPy/__version__.py)
-VERSION_FILE = proteusPy/__version__.py
-
+PYPI_PASSWORD := $(shell echo $$PYPI_PASSWORD)
 CONDA = mamba
 
 MESS = "disulfide module work, docs"
@@ -71,8 +68,8 @@ docs: sdist
 	@echo $(VERS) > docs.out
 
 # normally i push to PyPi via github action
-upload: sdist
-	twine upload dist/*
+upload: .
+	@poetry publish --build --username "__token__" --password $(PYPI_PASSWORD)
 
 tag: sdist
 	@git tag -a $(VERS) -m $(VERS)
@@ -83,7 +80,7 @@ commit:
 	git push --all origin
 
 # run the tests
-tests:
+tests: .
 	python proteusPy/Disulfide.py
 	python proteusPy/DisulfideLoader.py
 	python proteusPy/DisulfideList.py

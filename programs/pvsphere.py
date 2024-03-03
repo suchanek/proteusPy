@@ -8,16 +8,18 @@ plotter = pv.Plotter()
 mesh = pv.Sphere()
 plotter.add_mesh(mesh)
 
+
 def update_plotter(event):
     # Update the plotter
     mesh.points[:, 0] += 0.3
     plotter.update()
 
+
 # Create a VTK pane
 vtk_pane = pn.pane.VTK(plotter.ren_win)
 
 # Create a button to update the plotter
-button = pn.widgets.Button(name='Update')
+button = pn.widgets.Button(name="Update")
 button.on_click(update_plotter)
 
 # Create a Panel app

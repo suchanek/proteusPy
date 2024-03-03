@@ -12,11 +12,13 @@ from proteusPy.ProteusPyWarning import ProteusPyWarning
 
 """Some Disulfide-specific exceptions."""
 
+
 # General error
 class DisulfideException(Exception):
     """Define class DisulfideException."""
 
     pass
+
 
 class DisulfideConstructionException(Exception):
     """Define class DisulfideConstructionException."""
@@ -29,10 +31,12 @@ class DisulfideConstructionWarning(ProteusPyWarning):
 
     pass
 
+
 class DisulfideParseWarning(ProteusPyWarning):
     """Define class DisulfideConstructionWarning."""
 
     pass
+
 
 # The SMCRA structure could not be written to file
 class DisulfideIOException(Exception):

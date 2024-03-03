@@ -67,8 +67,20 @@ class AngleAnnotation(Arc):
     """
     Draws an arc between two vectors which appears circular in display space.
     """
-    def __init__(self, xy, p1, p2, size=75, unit="points", ax=None,
-                 text="", textposition="inside", text_kw=None, **kwargs):
+
+    def __init__(
+        self,
+        xy,
+        p1,
+        p2,
+        size=75,
+        unit="points",
+        ax=None,
+        text="",
+        textposition="inside",
+        text_kw=None,
+        **kwargs
+    ):
         """
         Parameters
         ----------
@@ -116,28 +128,42 @@ class AngleAnnotation(Arc):
         self.unit = unit
         self.textposition = textposition
 
-        super().__init__(self._xydata, size, size, angle=0.0,
-                         theta1=self.theta1, theta2=self.theta2, **kwargs)
+        super().__init__(
+            self._xydata,
+            size,
+            size,
+            angle=0.0,
+            theta1=self.theta1,
+            theta2=self.theta2,
+            **kwargs
+        )
 
         self.set_transform(IdentityTransform())
         self.ax.add_patch(self)
 
-        self.kw = dict(ha="center", va="center",
-                       xycoords=IdentityTransform(),
-                       xytext=(0, 0), textcoords="offset points",
-                       annotation_clip=True)
+        self.kw = dict(
+            ha="center",
+            va="center",
+            xycoords=IdentityTransform(),
+            xytext=(0, 0),
+            textcoords="offset points",
+            annotation_clip=True,
+        )
         self.kw.update(text_kw or {})
         self.text = ax.annotate(text, xy=self._center, **self.kw)
 
     def get_size(self):
-        factor = 1.
+        factor = 1.0
         if self.unit == "points":
-            factor = self.ax.figure.dpi / 72.
+            factor = self.ax.figure.dpi / 72.0
         elif self.unit[:4] == "axes":
             b = TransformedBbox(Bbox.unit(), self.ax.transAxes)
-            dic = {"max": max(b.width, b.height),
-                   "min": min(b.width, b.height),
-                   "width": b.width, "height": b.height}
+            dic = {
+                "max": max(b.width, b.height),
+                "min": min(b.width, b.height),
+                "width": b.width,
+                "height": b.height,
+            }
             factor = dic[self.unit[5:]]
         return self.size * factor
 
@@ -184,38 +210,40 @@ class AngleAnnotation(Arc):
         angle = np.deg2rad(self.theta1 + angle_span / 2)
         r = s / 2
         if self.textposition == "inside":
-            r = s / np.interp(angle_span, [60, 90, 135, 180],
-                                          [3.3, 3.5, 3.8, 4])
+            r = s / np.interp(angle_span, [60, 90, 135, 180], [3.3, 3.5, 3.8, 4])
         self.text.xy = c + r * np.array([np.cos(angle), np.sin(angle)])
         if self.textposition == "outside":
+
             def R90(a, r, w, h):
-                if a < np.arctan(h/2/(r+w/2)):
-                    return np.sqrt((r+w/2)**2 + (np.tan(a)*(r+w/2))**2)
+                if a < np.arctan(h / 2 / (r + w / 2)):
+                    return np.sqrt((r + w / 2) ** 2 + (np.tan(a) * (r + w / 2)) ** 2)
                 else:
-                    c = np.sqrt((w/2)**2+(h/2)**2)
-                    T = np.arcsin(c * np.cos(np.pi/2 - a + np.arcsin(h/2/c))/r)
+                    c = np.sqrt((w / 2) ** 2 + (h / 2) ** 2)
+                    T = np.arcsin(c * np.cos(np.pi / 2 - a + np.arcsin(h / 2 / c)) / r)
                     xy = r * np.array([np.cos(a + T), np.sin(a + T)])
-                    xy += np.array([w/2, h/2])
+                    xy += np.array([w / 2, h / 2])
                     return np.sqrt(np.sum(xy**2))
 
             def R(a, r, w, h):
-                aa = (a % (np.pi/4))*((a % (np.pi/2)) <= np.pi/4) + \
-                     (np.pi/4 - (a % (np.pi/4)))*((a % (np.pi/2)) >= np.pi/4)
-                return R90(aa, r, *[w, h][::int(np.sign(np.cos(2*a)))])
+                aa = (a % (np.pi / 4)) * ((a % (np.pi / 2)) <= np.pi / 4) + (
+                    np.pi / 4 - (a % (np.pi / 4))
+                ) * ((a % (np.pi / 2)) >= np.pi / 4)
+                return R90(aa, r, *[w, h][:: int(np.sign(np.cos(2 * a)))])
 
             bbox = self.text.get_window_extent()
             X = R(angle, r, bbox.width, bbox.height)
             trans = self.ax.figure.dpi_scale_trans.inverted()
-            offs = trans.transform(((X-s/2), 0))[0] * 72 # !!!
-            self.text.set_position([offs*np.cos(angle), offs*np.sin(angle)])
+            offs = trans.transform(((X - s / 2), 0))[0] * 72  # !!!
+            self.text.set_position([offs * np.cos(angle), offs * np.sin(angle)])
 
 
 # Helper function to draw angle easily.
 def plot_angle(ax, pos, angle, length=0.95, acol="C0", **kwargs):
     vec2 = np.array([np.cos(np.deg2rad(angle)), np.sin(np.deg2rad(angle))])
-    xy = np.c_[[length, 0], [0, 0], vec2*length].T + np.array(pos)
+    xy = np.c_[[length, 0], [0, 0], vec2 * length].T + np.array(pos)
     ax.plot(*xy.T, color=acol)
     return AngleAnnotation(pos, xy[0], xy[2], ax=ax, **kwargs)
+
 
 #########################################################################
 # .. _angle-annotation-usage:
@@ -230,7 +258,7 @@ def plot_angle(ax, pos, angle, length=0.95, acol="C0", **kwargs):
 # *text* can be specified, that will be drawn either in- or outside of the arc,
 # according to the value of *textposition*. Usage of those arguments is shown
 # below.
-'''
+"""
 fig, ax = plt.subplots()
 fig.canvas.draw()  # Need to draw the figure to define renderer
 ax.set_title("AngleLabel example")
@@ -257,7 +285,7 @@ am5 = AngleAnnotation(p[1], p[0], p[2], ax=ax, size=40, text=r"$\Phi$",
                       linestyle="--", color="gray", textposition="outside",
                       text_kw=dict(fontsize=16, color="gray"))
 
-'''
+"""
 
 #########################################################################
 # ``AngleLabel`` options
@@ -267,7 +295,7 @@ am5 = AngleAnnotation(p[1], p[0], p[2], ax=ax, size=40, text=r"$\Phi$",
 # location of the text label, as shown below:
 
 
-'''
+"""
 fig, (ax1, ax2) = plt.subplots(nrows=2, sharex=True)
 fig.suptitle("AngleLabel keyword arguments")
 fig.canvas.draw()  # Need to draw the figure to define renderer
@@ -310,7 +338,7 @@ for x, text in zip([2.0, 3.5, 5.0, 6.5], ['"pixels"', '"points"',
 
 plt.show()
 
-'''
+"""
 
 
 #############################################################################
