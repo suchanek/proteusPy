@@ -2,6 +2,7 @@
 __pycache__
 
 .DS_Store
+dist/*.whl
 build/*
 proteusPy/.DS_Store
 proteusPy/pdb/.DS_Store
