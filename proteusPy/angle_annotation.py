@@ -69,7 +69,17 @@ class AngleAnnotation(Arc):
     """
 
     def __init__(
-        self, xy, p1, p2, size=75, unit="points", ax=None, text="", textposition="inside", text_kw=None, **kwargs
+        self,
+        xy,
+        p1,
+        p2,
+        size=75,
+        unit="points",
+        ax=None,
+        text="",
+        textposition="inside",
+        text_kw=None,
+        **kwargs
     ):
         """
         Parameters
@@ -118,7 +128,15 @@ class AngleAnnotation(Arc):
         self.unit = unit
         self.textposition = textposition
 
-        super().__init__(self._xydata, size, size, angle=0.0, theta1=self.theta1, theta2=self.theta2, **kwargs)
+        super().__init__(
+            self._xydata,
+            size,
+            size,
+            angle=0.0,
+            theta1=self.theta1,
+            theta2=self.theta2,
+            **kwargs
+        )
 
         self.set_transform(IdentityTransform())
         self.ax.add_patch(self)
@@ -207,9 +225,9 @@ class AngleAnnotation(Arc):
                     return np.sqrt(np.sum(xy**2))
 
             def R(a, r, w, h):
-                aa = (a % (np.pi / 4)) * ((a % (np.pi / 2)) <= np.pi / 4) + (np.pi / 4 - (a % (np.pi / 4))) * (
-                    (a % (np.pi / 2)) >= np.pi / 4
-                )
+                aa = (a % (np.pi / 4)) * ((a % (np.pi / 2)) <= np.pi / 4) + (
+                    np.pi / 4 - (a % (np.pi / 4))
+                ) * ((a % (np.pi / 2)) >= np.pi / 4)
                 return R90(aa, r, *[w, h][:: int(np.sign(np.cos(2 * a)))])
 
             bbox = self.text.get_window_extent()

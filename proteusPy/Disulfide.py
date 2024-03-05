@@ -177,7 +177,9 @@ class Disulfide:
         self.QUIET = quiet
         self.ca_distance = _FLOAT_INIT
         self.cb_distance = _FLOAT_INIT
-        self.torsion_array = np.array((_ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT))
+        self.torsion_array = np.array(
+            (_ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT)
+        )
         self.phiprox = _ANG_INIT
         self.psiprox = _ANG_INIT
         self.phidist = _ANG_INIT
@@ -529,7 +531,9 @@ class Disulfide:
                 cap2 = pv.Sphere(center=distal_pos, radius=bradius)
 
                 if style == "plain":
-                    cyl = pv.Cylinder(origin, direction, radius=bradius, height=height * 2.0)
+                    cyl = pv.Cylinder(
+                        origin, direction, radius=bradius, height=height * 2.0
+                    )
                     pvp.add_mesh(cyl, color=orig_col)
                 else:
                     cyl1 = pv.Cylinder(
@@ -597,13 +601,19 @@ class Disulfide:
                     specular_power=specpow,
                 )
                 i += 1
-            pvp = draw_bonds(pvp, style="bs", missing=missing_atoms, all_atoms=all_atoms)
+            pvp = draw_bonds(
+                pvp, style="bs", missing=missing_atoms, all_atoms=all_atoms
+            )
 
         elif style == "sb":  # splitbonds
-            pvp = draw_bonds(pvp, style="sb", missing=missing_atoms, all_atoms=all_atoms)
+            pvp = draw_bonds(
+                pvp, style="sb", missing=missing_atoms, all_atoms=all_atoms
+            )
 
         elif style == "pd":  # proximal-distal
-            pvp = draw_bonds(pvp, style="pd", missing=missing_atoms, all_atoms=all_atoms)
+            pvp = draw_bonds(
+                pvp, style="pd", missing=missing_atoms, all_atoms=all_atoms
+            )
 
         else:  # plain
             pvp = draw_bonds(
@@ -869,7 +879,9 @@ class Disulfide:
                 cap2 = pv.Sphere(center=distal_pos, radius=bradius)
 
                 if style == "plain":
-                    cyl = pv.Cylinder(origin, direction, radius=bradius, height=height * 2.0)
+                    cyl = pv.Cylinder(
+                        origin, direction, radius=bradius, height=height * 2.0
+                    )
                     # pvp.add_mesh(cyl, color=orig_col)
                     pvp.append(cyl)
                 else:
@@ -924,13 +936,19 @@ class Disulfide:
 
                 pvp.append(pv.Sphere(center=coords[i]))
                 i += 1
-            pvp = draw_bonds(pvp, style="bs", missing=missing_atoms, all_atoms=all_atoms)
+            pvp = draw_bonds(
+                pvp, style="bs", missing=missing_atoms, all_atoms=all_atoms
+            )
 
         elif style == "sb":  # splitbonds
-            pvp = draw_bonds(pvp, style="sb", missing=missing_atoms, all_atoms=all_atoms)
+            pvp = draw_bonds(
+                pvp, style="sb", missing=missing_atoms, all_atoms=all_atoms
+            )
 
         elif style == "pd":  # proximal-distal
-            pvp = draw_bonds(pvp, style="pd", missing=missing_atoms, all_atoms=all_atoms)
+            pvp = draw_bonds(
+                pvp, style="pd", missing=missing_atoms, all_atoms=all_atoms
+            )
 
         else:  # plain
             pvp = draw_bonds(
@@ -1025,7 +1043,9 @@ class Disulfide:
         chi5 = self.chi5
         self.build_model(chi1, chi2, chi3, chi4, chi5)
 
-    def build_model(self, chi1: float, chi2: float, chi3: float, chi4: float, chi5: float):
+    def build_model(
+        self, chi1: float, chi2: float, chi3: float, chi4: float, chi5: float
+    ):
         """
         Build a model Disulfide based on the input dihedral angles.
         Routine assumes turtle is in orientation #1 (at Ca, headed toward
@@ -1103,7 +1123,9 @@ class Disulfide:
         self.compute_local_coords()
         self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
         self.cb_distance = distance3d(self.cb_prox, self.cb_dist)
-        self.torsion_array = np.array((self.chi1, self.chi2, self.chi3, self.chi4, self.chi5))
+        self.torsion_array = np.array(
+            (self.chi1, self.chi2, self.chi3, self.chi4, self.chi5)
+        )
         self.torsion_length = self.Torsion_Length()
         self.compute_rho()
         self.missing_atoms = True
@@ -1342,7 +1364,9 @@ class Disulfide:
             pl.show()
         return
 
-    def plot(self, pl, single=True, style="sb", light=True, shadows=False) -> pv.Plotter:
+    def plot(
+        self, pl, single=True, style="sb", light=True, shadows=False
+    ) -> pv.Plotter:
         """
         Return the pyVista Plotter object for the Disulfide bond in the specific rendering style.
 
@@ -1372,7 +1396,9 @@ class Disulfide:
             pl.enable_anti_aliasing("msaa")
             # pl.add_camera_orientation_widget()
 
-            self._render(pl, style=style, bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER)
+            self._render(
+                pl, style=style, bs_scale=BS_SCALE, spec=SPECULARITY, specpow=SPEC_POWER
+            )
             pl.reset_camera()
             if shadows == True:
                 pl.enable_shadows()
@@ -1491,7 +1517,9 @@ class Disulfide:
         """
         return (self.proximal_residue_fullid, self.distal_residue_fullid)
 
-    def initialize_disulfide_from_chain(self, chain1, chain2, proximal, distal, resolution, quiet=True):
+    def initialize_disulfide_from_chain(
+        self, chain1, chain2, proximal, distal, resolution, quiet=True
+    ):
         """
         Initialize a new Disulfide object with atomic coordinates from
         the proximal and distal coordinates, typically taken from a PDB file.
@@ -1566,7 +1594,9 @@ class Disulfide:
             sg2 = dist_residue["SG"].get_vector()
 
         except Exception:
-            raise DisulfideConstructionWarning(f"Invalid or missing coordinates for distal residue {distal}") from None
+            raise DisulfideConstructionWarning(
+                f"Invalid or missing coordinates for distal residue {distal}"
+            ) from None
 
         # previous residue and next residue - optional, used for phi, psi calculations
         try:
@@ -1624,7 +1654,9 @@ class Disulfide:
 
         self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
         self.cb_distance = distance3d(self.cb_prox, self.cb_dist)
-        self.torsion_array = np.array((self.chi1, self.chi2, self.chi3, self.chi4, self.chi5))
+        self.torsion_array = np.array(
+            (self.chi1, self.chi2, self.chi3, self.chi4, self.chi5)
+        )
         self.torsion_length = self.Torsion_Length()
 
         # calculate and set the SS bond torsional energy
@@ -2065,36 +2097,21 @@ class Disulfide:
             print(f"Saved: {fname}")
 
     def save_meshes_as_stl(self, meshes, filename):
-        # create a PyVista merged mesh object
+        """Saves a list of meshes as a single STL file.
+
+        Args:
+            meshes (list): List of pyvista mesh objects to save.
+            filename (str): Path to save the STL file to.
+        """
         merged_mesh = pv.UnstructuredGrid()
         for mesh in meshes:
             merged_mesh += mesh
         merged_mesh.save(filename)
 
-    def Osave_meshes_as_stl(self, pl, filename):
-        import pyvista as pv
-
-        # Combine all meshes into a single dataset
-        combined_mesh = pv.PolyData()
-        for i, actor in enumerate(pl.actors):
-            if isinstance(actor, pv.pyvista_ndarray):
-                mesh = actor.to_mesh()
-                if isinstance(mesh, pv.PolyData):
-                    combined_mesh += mesh
-                    print(f"Added mesh_{i} to combined_mesh")
-                else:
-                    print(f"Skipping non-PolyData mesh_{i} of type {type(mesh)} |{mesh}|")
-            else:
-                print(f"Skipping non-mesh actor_{i} of type {type(actor)}")
-
-        # Save the combined mesh as an STL file
-        combined_mesh.save(filename + ".stl", binary=True)
-        print(pl)
-
     def export(self, style="sb", verbose=True, fname="ssbond_plt"):
         """
         Create and save a screenshot of the Disulfide in the given style
-        and filename
+        and filename.
 
         :param single: Display a single vs panel view, defaults to True
         :param style: Rendering style, one of:
@@ -2103,6 +2120,7 @@ class Disulfide:
         * 'cpk' - CPK style
         * 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
         * 'plain' - boring single color,
+
         :param fname: output filename,, defaults to 'ssbond.stl'
         :param verbose: Verbosit, defaults to False
         """
@@ -2127,9 +2145,11 @@ class Disulfide:
 
     def set_permissive(self, perm: bool) -> None:
         """
-        Sets PERMISSIVE flag for Disulfide parsing
+        Set PERMISSIVE flag for Disulfide parsing.
+
         :return: None
         """
+
         self.PERMISSIVE = perm
 
     def set_positions(
@@ -2191,7 +2211,9 @@ class Disulfide:
         self.c_prev_dist = c_prev_dist.copy()
         self.n_next_dist = n_next_dist.copy()
 
-    def set_dihedrals(self, chi1: float, chi2: float, chi3: float, chi4: float, chi5: float):
+    def set_dihedrals(
+        self, chi1: float, chi2: float, chi3: float, chi4: float, chi5: float
+    ):
         """
         Set the disulfide's dihedral angles, Chi1-Chi5. -180 - 180 degrees.
 
@@ -2212,11 +2234,10 @@ class Disulfide:
 
     def set_name(self, namestr="Disulfide"):
         """
-        Set's the Disulfide's name
+        Set the Disulfide's name.
 
         :param namestr: Name, by default "Disulfide"
         """
-
         self.name = namestr
 
     def set_resnum(self, proximal: int, distal: int) -> None:
@@ -2226,18 +2247,15 @@ class Disulfide:
         :param proximal: Proximal residue number
         :param distal: Distal residue number
         """
-
         self.proximal = proximal
         self.distal = distal
 
     def Torsion_Length(self) -> float:
         """
-        Compute the 5D Euclidean length of the Disulfide object
-        and update the Disulfide internal state.
+        Compute the 5D Euclidean length of the Disulfide object.
 
         :return: Torsion length (Degrees)
         """
-
         # Use numpy array to compute element-wise square
         tors2 = np.square(self.torsion_array)
 
@@ -2260,9 +2278,13 @@ class Disulfide:
         :return: Euclidean distance (Degrees) between ```self``` and ```other```.
         """
 
+        from ProteusPyWarning import ProteusPyWarning
+
         # Check length of torsion arrays
         if len(self.torsion_array) != 5 or len(other.torsion_array) != 5:
-            raise ProteusPyWarning("--> Torsion_Distance() requires vectors of length 5!")
+            raise ProteusPyWarning(
+                "--> Torsion_Distance() requires vectors of length 5!"
+            )
 
         # Convert to numpy arrays and add 180 to each element
         p1 = np.array(self.torsion_array) + 180.0
@@ -2275,7 +2297,7 @@ class Disulfide:
 
     def Torsion_neighbors(self, others, cutoff):
         """
-        Returns list of Disulfides within the angular cutoff in the others list.
+        Return a list of Disulfides within the angular cutoff in the others list.
         This routine is used to find Disulfides having the same torsion length
         within the others list. This is used to find families of Disulfides with
         similar conformations. Assumes self is properly initialized.
@@ -2318,7 +2340,6 @@ class Disulfide:
         >>> low_energy_neighbors.display_overlay()
 
         """
-
         res = [ss for ss in others if self.Torsion_Distance(ss) <= cutoff]
         return DisulfideList(res, "neighbors")
 
@@ -2365,9 +2386,11 @@ def parse_ssbond_header_rec(ssbond_dict: dict) -> list:
 #
 
 
-def Download_Disulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR, verbose=False, reset=False) -> None:
+def Download_Disulfides(
+    pdb_home=PDB_DIR, model_home=MODEL_DIR, verbose=False, reset=False
+) -> None:
     """
-    Reads a comma separated list of PDB IDs and downloads them
+    Read a comma separated list of PDB IDs and downloads them
     to the pdb_home path.
 
     This utility function is used to download proteins containing at least
@@ -2386,6 +2409,8 @@ def Download_Disulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR, verbose=False, r
     :param reset: Reset the downloaded files index. Used to restart the download.
     :raises DisulfideIOException: I/O error raised when the PDB file is not found.
     """
+    import os
+
     start = time.time()
     donelines = []
     SS_done = []
@@ -2412,7 +2437,7 @@ def Download_Disulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR, verbose=False, r
     completed = {"xxx"}  # set to keep track of downloaded
 
     # file to track already downloaded entries.
-    if reset == True:
+    if reset is True:
         completed_file = open(f"{model_home}ss_completed.txt", "w")
         donelines = []
         SS_DONE = []
@@ -2462,7 +2487,7 @@ def Extract_Disulfides(
     dist_cutoff=-1.0,
 ) -> None:
     """
-    This function creates .pkl files needed for the
+    Create the .pkl files needed for the
     proteusPy.DisulfideLoader.DisulfideLoader class.
     The ```Disulfide``` objects are contained in a ```DisulfideList``` object and
     ```Dict``` within these files. In addition, .csv files containing all of
@@ -2548,6 +2573,8 @@ def Extract_Disulfides(
         ent = fname[3:-4]
         return ent
 
+    import os
+
     entrylist = []
     problem_ids = []
     bad = bad_dist = 0
@@ -2566,7 +2593,7 @@ def Extract_Disulfides(
 
     os.chdir(pdbdir)
 
-    ss_filelist = glob.glob(f"*.ent")
+    ss_filelist = glob.glob("*.ent")
     tot = len(ss_filelist)
 
     if verbose:
@@ -2596,7 +2623,9 @@ def Extract_Disulfides(
     cnt = 0
     # loop over ss_filelist, create disulfides and initialize them
     for entry in pbar:
-        pbar.set_postfix({"ID": entry, "Bad": bad, "Ca": bad_dist, "Cnt": tot})  # update the progress bar
+        pbar.set_postfix(
+            {"ID": entry, "Bad": bad, "Ca": bad_dist, "Cnt": tot}
+        )  # update the progress bar
 
         # returns an empty list if none are found.
         _sslist = DisulfideList([], entry)
@@ -2658,8 +2687,12 @@ def Extract_Disulfides(
         problem_df = pandas.DataFrame(columns=prob_cols)
         problem_df["id"] = problem_ids
 
-        print(f"-> Extract_Disulfides(): Found and removed: {len(problem_ids)} non-parsable structures.")
-        print(f"-> Extract_Disulfides(): Saving problem IDs to file: {datadir}{problemfile}")
+        print(
+            f"-> Extract_Disulfides(): Found and removed: {len(problem_ids)} non-parsable structures."
+        )
+        print(
+            f"-> Extract_Disulfides(): Saving problem IDs to file: {datadir}{problemfile}"
+        )
 
         problem_df.to_csv(f"{datadir}{problemfile}")
     else:
@@ -2674,7 +2707,9 @@ def Extract_Disulfides(
 
     # dump the all_ss list of disulfides to a .pkl file. ~520 MB.
     fname = f"{datadir}{picklefile}"
-    print(f"-> Extract_Disulfides(): Saving {len(All_ss_list)} Disulfides to file: {fname}")
+    print(
+        f"-> Extract_Disulfides(): Saving {len(All_ss_list)} Disulfides to file: {fname}"
+    )
 
     with open(fname, "wb+") as f:
         pickle.dump(All_ss_list, f)
@@ -2693,7 +2728,9 @@ def Extract_Disulfides(
     # dump the dict2 disulfides to a .pkl file. ~520 MB.
     dict_len = len(All_ss_dict2)
     fname = f"{datadir}{dictfile}"
-    print(f"-> Extract_Disulfides(): Saving indices of {dict_len} Disulfide-containing PDB IDs to file: {fname}")
+    print(
+        f"-> Extract_Disulfides(): Saving indices of {dict_len} Disulfide-containing PDB IDs to file: {fname}"
+    )
 
     with open(fname, "wb+") as f:
         pickle.dump(All_ss_dict2, f)
@@ -2716,9 +2753,11 @@ def Extract_Disulfides(
     return
 
 
-def check_header_from_file(filename: str, model_numb=0, verbose=False, dbg=False) -> bool:
+def check_header_from_file(
+    filename: str, model_numb=0, verbose=False, dbg=False
+) -> bool:
     """
-    Checks the Disulfides by PDB ID and initializes the Disulfide objects.
+    Check the Disulfides by PDB ID and initializes the Disulfide objects.
     Assumes the file is downloaded in the pdb_dir path.
 
     NB: Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython/
@@ -2745,10 +2784,10 @@ def check_header_from_file(filename: str, model_numb=0, verbose=False, dbg=False
     >>> OK
     True
     """
+    import os
 
     i = 1
     proximal = distal = -1
-    SSList = []
     _chaina = None
     _chainb = None
 
@@ -2813,17 +2852,23 @@ def check_header_from_file(filename: str, model_numb=0, verbose=False, dbg=False
                 continue
             else:
                 if verbose:
-                    print(f" -> SSBond: {i}: {struct_name}: {proximal}{chain1_id} - {distal}{chain2_id}")
+                    print(
+                        f" -> SSBond: {i}: {struct_name}: {proximal}{chain1_id} - {distal}{chain2_id}"
+                    )
         else:
             if dbg:
-                print(f" -> NULL chain(s): {struct_name}: {proximal}{chain1_id} - {distal}{chain2_id}")
+                print(
+                    f" -> NULL chain(s): {struct_name}: {proximal}{chain1_id} - {distal}{chain2_id}"
+                )
         i += 1
     return True
 
 
-def check_header_from_id(struct_name: str, pdb_dir=".", model_numb=0, verbose=False, dbg=False) -> bool:
+def check_header_from_id(
+    struct_name: str, pdb_dir=".", model_numb=0, verbose=False, dbg=False
+) -> bool:
     """
-    Checks parsability PDB ID and initializes the Disulfide objects.
+    Check parsability PDB ID and initializes the Disulfide objects.
     Assumes the file is downloaded in ```MODEL_DIR``` path.
 
     NB: Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython/
@@ -2849,7 +2894,6 @@ def check_header_from_id(struct_name: str, pdb_dir=".", model_numb=0, verbose=Fa
     >>> OK
     True
     """
-
     parser = PDBParser(PERMISSIVE=True, QUIET=True)
     structure = parser.get_structure(struct_name, file=f"{pdb_dir}pdb{struct_name}.ent")
     model = structure[0]
@@ -2865,7 +2909,7 @@ def check_header_from_id(struct_name: str, pdb_dir=".", model_numb=0, verbose=Fa
 
     if len(bondlist) == 0:
         if verbose:
-            print(f"-> check_header_from_id(): no bonds found in bondlist.")
+            print("-> check_header_from_id(): no bonds found in bondlist.")
         return False
 
     for pair in bondlist:
@@ -2885,7 +2929,10 @@ def check_header_from_id(struct_name: str, pdb_dir=".", model_numb=0, verbose=Fa
             prox_residue.disordered_select("CYS")
             dist_residue.disordered_select("CYS")
 
-            if prox_residue.get_resname() != "CYS" or dist_residue.get_resname() != "CYS":
+            if (
+                prox_residue.get_resname() != "CYS"
+                or dist_residue.get_resname() != "CYS"
+            ):
                 if verbose:
                     print(
                         f"build_disulfide() requires CYS at both residues:\
@@ -2894,11 +2941,15 @@ def check_header_from_id(struct_name: str, pdb_dir=".", model_numb=0, verbose=Fa
                 return False
         except KeyError:
             if dbg:
-                print(f"Keyerror: {struct_name}: {proximal} {chain1} - {distal} {chain2}")
+                print(
+                    f"Keyerror: {struct_name}: {proximal} {chain1} - {distal} {chain2}"
+                )
                 return False
 
         if verbose:
-            print(f" -> SSBond: {i+1}: {struct_name}: {proximal}{chain1} - {distal}{chain2}")
+            print(
+                f" -> SSBond: {i+1}: {struct_name}: {proximal}{chain1} - {distal}{chain2}"
+            )
 
         i += 1
     return True
@@ -2923,7 +2974,11 @@ def Disulfide_Energy_Function(x: list) -> float:
     chi1, chi2, chi3, chi4, chi5 = x
     energy = 2.0 * (np.cos(np.deg2rad(3.0 * chi1)) + np.cos(np.deg2rad(3.0 * chi5)))
     energy += np.cos(np.deg2rad(3.0 * chi2)) + np.cos(np.deg2rad(3.0 * chi4))
-    energy += 3.5 * np.cos(np.deg2rad(2.0 * chi3)) + 0.6 * np.cos(np.deg2rad(3.0 * chi3)) + 10.1
+    energy += (
+        3.5 * np.cos(np.deg2rad(2.0 * chi3))
+        + 0.6 * np.cos(np.deg2rad(3.0 * chi3))
+        + 10.1
+    )
     return energy
 
 

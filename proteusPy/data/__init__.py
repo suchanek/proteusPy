@@ -34,9 +34,7 @@ LOADER_SUBSET_FNAME = "PDB_SS_SUBSET_LOADER.pkl"
 
 # "https://github.com/suchanek/proteusPy/raw/master/data/PDB_SS_ALL_LOADER.pkl
 LOADER_FNAME_URL = "https://raw.githubusercontent.com/suchanek/proteusPy/master/proteusPy/data/PDB_SS_ALL_LOADER.pkl"
-LOADER_SUBSET_FNAME_URL = (
-    "https://raw.githubusercontent.com/suchanek/proteusPy/blob/master/proteusPy/data/PDB_SS_SUBSET_LOADER.pkl"
-)
+LOADER_SUBSET_FNAME_URL = "https://raw.githubusercontent.com/suchanek/proteusPy/blob/master/proteusPy/data/PDB_SS_SUBSET_LOADER.pkl"
 
 
 LOADER_ALL_URL = "https://drive.google.com/uc?id=1igF-sppLPaNsBaUS7nkb13vtOGZZmsFp"

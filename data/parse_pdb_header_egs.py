@@ -338,9 +338,13 @@ def _parse_pdb_header_list(header):
                     remark_99_keyval = tail.replace("ASTRAL ", "").split(": ")
                     if type(remark_99_keyval) == list and len(remark_99_keyval) == 2:
                         if "astral" not in pdbh_dict:
-                            pdbh_dict["astral"] = {remark_99_keyval[0]: remark_99_keyval[1]}
+                            pdbh_dict["astral"] = {
+                                remark_99_keyval[0]: remark_99_keyval[1]
+                            }
                         else:
-                            pdbh_dict["astral"][remark_99_keyval[0]] = remark_99_keyval[1]
+                            pdbh_dict["astral"][remark_99_keyval[0]] = remark_99_keyval[
+                                1
+                            ]
         else:
             # print(key)
             pass

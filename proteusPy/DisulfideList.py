@@ -550,7 +550,9 @@ class DisulfideList(UserList):
         pl.reset_camera()
         pl.show()
 
-    def display_torsion_statistics(self, display=True, save=False, fname="ss_torsions.png", stats=False, light=True):
+    def display_torsion_statistics(
+        self, display=True, save=False, fname="ss_torsions.png", stats=False, light=True
+    ):
         """
         Display torsion and distance statistics for a given Disulfide list.
 
@@ -577,7 +579,9 @@ class DisulfideList(UserList):
         mean_vals = df_stats.loc["mean"].values
         std_vals = df_stats.loc["std"].values
 
-        fig = make_subplots(rows=2, cols=2, vertical_spacing=0.125, column_widths=[1, 1])
+        fig = make_subplots(
+            rows=2, cols=2, vertical_spacing=0.125, column_widths=[1, 1]
+        )
         fig.update_layout(template="plotly" if light else "plotly_dark")
 
         fig.update_layout(
@@ -617,7 +621,9 @@ class DisulfideList(UserList):
         # Update the layout of the subplot
         # Cα N, Cα, Cβ, C', Sγ Å °
 
-        fig.update_yaxes(title_text="Torsion Angle (°)", range=[-200, 200], row=1, col=1)
+        fig.update_yaxes(
+            title_text="Torsion Angle (°)", range=[-200, 200], row=1, col=1
+        )
         fig.update_yaxes(range=[0, 320], row=2, col=2)
 
         # Add another subplot for the mean values of energy
@@ -626,7 +632,9 @@ class DisulfideList(UserList):
                 x=["Strain Energy (kcal/mol)"],
                 y=[mean_vals[5]],
                 name="Energy (kcal/mol)",
-                error_y=dict(type="data", array=[std_vals[5].tolist()], width=0.25, visible=True),
+                error_y=dict(
+                    type="data", array=[std_vals[5].tolist()], width=0.25, visible=True
+                ),
             ),
             row=1,
             col=2,
@@ -635,7 +643,9 @@ class DisulfideList(UserList):
 
         # Update the layout of the subplot
         # fig.update_xaxes(title_text="Energy", row=1, col=2)
-        fig.update_yaxes(title_text="kcal/mol", range=[0, 20], row=1, col=2)  # max possible DSE
+        fig.update_yaxes(
+            title_text="kcal/mol", range=[0, 20], row=1, col=2
+        )  # max possible DSE
 
         # Add another subplot for the mean values of ca_distance
         fig.add_trace(
@@ -663,7 +673,9 @@ class DisulfideList(UserList):
                 x=["Torsion Length, (Å)"],
                 y=[mean_vals[12]],
                 name="Torsion Length, (Å)",
-                error_y=dict(type="data", array=[std_vals[12]], width=0.25, visible=True),
+                error_y=dict(
+                    type="data", array=[std_vals[12]], width=0.25, visible=True
+                ),
             ),
             row=2,
             col=2,
@@ -915,9 +927,13 @@ class DisulfideList(UserList):
         """
         self.res = value
 
-    def TorsionGraph(self, display=True, save=False, fname="ss_torsions.png", light=True):
+    def TorsionGraph(
+        self, display=True, save=False, fname="ss_torsions.png", light=True
+    ):
         # tor_stats, dist_stats = self.calculate_torsion_statistics()
-        self.display_torsion_statistics(display=display, save=save, fname=fname, light=light)
+        self.display_torsion_statistics(
+            display=display, save=save, fname=fname, light=light
+        )
 
     def insert(self, index, item):
         """
@@ -1210,7 +1226,9 @@ def load_disulfides_from_id(
                     )
                 ssbond_name = f"{struct_name}_{proximal}{chain1_id}_{distal}{chain2_id}"
                 new_ss = proteusPy.Disulfide.Disulfide(ssbond_name)
-                new_ss.initialize_disulfide_from_chain(_chaina, _chainb, proximal, distal, resolution, quiet=quiet)
+                new_ss.initialize_disulfide_from_chain(
+                    _chaina, _chainb, proximal, distal, resolution, quiet=quiet
+                )
                 SSList.append(new_ss)
         i += 1
     return copy.deepcopy(SSList)
