@@ -11,15 +11,12 @@ Last Modification: 2/9/23
 # Cα Cβ Sγ
 
 import pandas as pd
-
 import pyvista as pv
-from pyvista import set_plot_theme
-
 from Bio.PDB import *
+from pyvista import set_plot_theme
 
 # for using from the repo we
 import proteusPy
-
 from proteusPy import *
 from proteusPy.data import *
 from proteusPy.Disulfide import *

@@ -1,9 +1,7 @@
 import dash
-from dash import dcc
-from dash import html
-from dash.dependencies import Input, Output
-
 import plotly.graph_objects as go
+from dash import dcc, html
+from dash.dependencies import Input, Output
 
 # Initialize the Dash app
 app = dash.Dash(__name__)

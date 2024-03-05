@@ -7,20 +7,18 @@ import math
 
 import matplotlib
 import matplotlib.pyplot as plt
-
+import pandas as pd
 import plotly_express as px
-
-# import seaborn as sns
+import pyvista as pv
+from pyvista import set_plot_theme
 
 import proteusPy
 from proteusPy import *
 from proteusPy.Disulfide import *
-
 from proteusPy.ProteusGlobals import *
 
-import pandas as pd
-import pyvista as pv
-from pyvista import set_plot_theme
+# import seaborn as sns
+
 
 plt.style.use("dark_background")
 

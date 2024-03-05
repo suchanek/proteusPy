@@ -81,20 +81,21 @@ Binary analysis takes approximately 28 minutes with Sextant analysis taking abou
 Author: Eric G. Suchanek, PhD.
 """
 
+import argparse
+import pickle
+
 # Last Modification: 2/19/2024
 # Cα Cβ Sγ
 import time
-import numpy as np
-import pickle
-import argparse
-
 from datetime import timedelta
+
+import numpy as np
 from tqdm import tqdm
 
 import proteusPy
-from proteusPy import Load_PDB_SS, DATA_DIR
-from proteusPy.DisulfideList import DisulfideList
+from proteusPy import DATA_DIR, Load_PDB_SS
 from proteusPy.Disulfide import Disulfide
+from proteusPy.DisulfideList import DisulfideList
 
 SAVE_DIR = "/Users/egs/Documents/proteusPy/"
 

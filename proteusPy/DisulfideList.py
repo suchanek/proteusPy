@@ -13,14 +13,15 @@ Last revision: 2/18/2024 -egs-
 __pdoc__ = {}
 __pdoc__["all"] = True
 
-import numpy as np
-import pandas
-import pyvista as pv
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 from collections import UserList
 from pathlib import Path
+
+import numpy as np
+import pandas
+import plotly.express as px
+import plotly.graph_objects as go
+import pyvista as pv
+from plotly.subplots import make_subplots
 
 try:
     # Check if running in Jupyter
@@ -32,15 +33,14 @@ try:
 except NameError:
     from tqdm import tqdm
 
-import proteusPy
-from proteusPy import *
-from proteusPy.atoms import *
-from proteusPy.utility import grid_dimensions, get_jet_colormap
-from proteusPy import Disulfide
-from proteusPy.ProteusGlobals import MODEL_DIR, WINSIZE
 from Bio.PDB import PDBParser
 
-from proteusPy.ProteusGlobals import PBAR_COLS
+import proteusPy
+from proteusPy import *
+from proteusPy import Disulfide
+from proteusPy.atoms import *
+from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, WINSIZE
+from proteusPy.utility import get_jet_colormap, grid_dimensions
 
 # Set the figure sizes and axis limits.
 DPI = 220

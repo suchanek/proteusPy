@@ -11,13 +11,13 @@ Based on the C implementation originally authored by Eric G. Suchanek PhD, 1990.
 
 __pdoc__ = {"__all__": True}
 
-import numpy
 import math
+
+import numpy
 
 numpy.set_printoptions(suppress=True)
 
-from Bio.PDB.vectors import Vector
-from Bio.PDB.vectors import calc_angle, calc_dihedral
+from Bio.PDB.vectors import Vector, calc_angle, calc_dihedral
 
 _DOWN_ = -1
 _UP_ = 1

@@ -10,11 +10,11 @@
 #
 #
 
-import numpy
 import os
 
-from tqdm import tqdm
+import numpy
 from Bio.PDB import PDBList
+from tqdm import tqdm
 
 PDB_DIR = "/Users/egs/PDB"
 

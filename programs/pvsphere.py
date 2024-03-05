@@ -1,5 +1,5 @@
-import pyvista as pv
 import panel as pn
+import pyvista as pv
 
 # Create a PyVista plotter object
 plotter = pv.Plotter()

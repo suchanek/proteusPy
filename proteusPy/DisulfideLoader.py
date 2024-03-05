@@ -7,31 +7,29 @@ Author: Eric G. Suchanek, PhD
 Last revision: 2/9/2024
 """
 
-import sys
 import copy
+import pickle
+import sys
 import time
 
 import pandas
-import pickle
 
 import proteusPy
-from proteusPy.ProteusGlobals import PDB_DIR, MODEL_DIR, REPO_DATA_DIR
 from proteusPy.atoms import *
-
+from proteusPy.data import *
 from proteusPy.data import (
+    DATA_DIR,
+    LOADER_FNAME,
+    LOADER_SUBSET_FNAME,
+    SS_DICT_PICKLE_FILE,
     SS_PICKLE_FILE,
     SS_TORSIONS_FILE,
-    SS_DICT_PICKLE_FILE,
-    DATA_DIR,
 )
-from proteusPy.data import LOADER_FNAME, LOADER_SUBSET_FNAME
-
-from proteusPy.DisulfideList import DisulfideList
 from proteusPy.Disulfide import Disulfide
-
-from proteusPy.DisulfideExceptions import *
-from proteusPy.data import *
 from proteusPy.DisulfideClass_Constructor import DisulfideClass_Constructor
+from proteusPy.DisulfideExceptions import *
+from proteusPy.DisulfideList import DisulfideList
+from proteusPy.ProteusGlobals import MODEL_DIR, PDB_DIR, REPO_DATA_DIR
 
 try:
     # Check if running in Jupyter
