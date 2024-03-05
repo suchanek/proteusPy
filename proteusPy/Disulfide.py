@@ -12,22 +12,19 @@ Last revision: 2/17/2024
 
 __pdoc__ = {"__all__": True}
 
+import copy
 import datetime
 import glob
 import math
-import time
-
-import numpy as np
-
-np.set_printoptions(suppress=True)
-
-import copy
 import pickle
+import time
 from math import cos
 
+import numpy as np
 import pandas
 import pyvista as pv
 
+np.set_printoptions(suppress=True)
 pv.global_theme.color = "white"
 
 try:
@@ -1723,7 +1720,7 @@ class Disulfide:
 
     def internal_coords_res(self, resnumb) -> np.array:
         """
-        Returns the internal coordinates for the internal coordinates of
+        Return the internal coordinates for the internal coordinates of
         the given Disulfide. Missing atoms are not included.
 
         :param resnumb: Residue number for disulfide

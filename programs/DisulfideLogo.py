@@ -4,14 +4,12 @@
 # Cα Cβ Sγ
 
 import pandas as pd
-from proteusPy.Disulfide import Disulfide
-from proteusPy.DisulfideLoader import Load_PDB_SS
-from proteusPy.DisulfideList import DisulfideList
-
 import pyvista as pv
 from pyvista import set_plot_theme
 
-import pyvista as pv
+from proteusPy.Disulfide import Disulfide
+from proteusPy.DisulfideList import DisulfideList
+from proteusPy.DisulfideLoader import Load_PDB_SS
 
 
 def SS_DisplayTest(ss: Disulfide):

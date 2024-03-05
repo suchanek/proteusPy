@@ -5,31 +5,27 @@ License: MIT\n
 Copyright (c)2023 Eric G. Suchanek, PhD, all rights reserved
 """
 
-# Last modification 2/18/23 -egs-
+# Last modification 3/5/24 -egs-
 
 __pdoc__ = {"__all__": True}
 
-import os
-import math
-import numpy as np
-import matplotlib.pyplot as plt
-
-import itertools
-
 import copy
+import itertools
+import math
+import os
 import subprocess
-import pandas as pd
 
-from numpy import linspace
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from Bio.PDB import PDBParser
+from Bio.PDB.vectors import Vector
 from matplotlib import cm
+from numpy import linspace
 
 import proteusPy
-from proteusPy.ProteusPyWarning import ProteusPyWarning
-
-from Bio.PDB.vectors import Vector
-from Bio.PDB import PDBParser
-
 from proteusPy.data import DATA_DIR
+from proteusPy.ProteusPyWarning import ProteusPyWarning
 
 
 def distance_squared(p1: np.array, p2: np.array) -> np.array:
@@ -328,8 +324,9 @@ def generate_vector_dataframe(base=3):
              and '-' '+' '*' and '@' for base 4.
     :raises ValueError: If the specified base is not supported (i.e., not 2, 3, or 4).
     """
-    import pandas as pd
     import itertools
+
+    import pandas as pd
 
     if base == 2:
         states = ["-", "+"]

@@ -16,20 +16,19 @@ Last revision: 2/26/23 -egs-
 """
 
 import argparse
-import time
 import datetime
-from shutil import copytree, ignore_patterns, copy
+import time
+from shutil import copy, copytree, ignore_patterns
 
-from proteusPy import Extract_Disulfides, DisulfideLoader
-
+from proteusPy import DisulfideLoader, Extract_Disulfides
 from proteusPy.data import (
     DATA_DIR,
+    LOADER_FNAME,
+    LOADER_SUBSET_FNAME,
     SS_PROBLEM_SUBSET_ID_FILE,
     SS_SUBSET_DICT_PICKLE_FILE,
     SS_SUBSET_PICKLE_FILE,
     SS_SUBSET_TORSIONS_FILE,
-    LOADER_FNAME,
-    LOADER_SUBSET_FNAME,
 )
 
 # the locations below represent the actual location on the dev drive.

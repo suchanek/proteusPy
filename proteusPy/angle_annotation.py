@@ -56,11 +56,10 @@ the :ref:`angle-annotation-usage` section.
 # The arc and the text will be added to the provided Axes at instantiation: it
 # is hence not strictly necessary to keep a reference to it.
 
-
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.patches import Arc
-from matplotlib.transforms import IdentityTransform, TransformedBbox, Bbox
+from matplotlib.transforms import Bbox, IdentityTransform, TransformedBbox
 
 
 class AngleAnnotation(Arc):

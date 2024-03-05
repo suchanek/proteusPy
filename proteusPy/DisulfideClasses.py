@@ -13,15 +13,19 @@ Last Modification: 2/19/24 -egs-
 """
 
 from io import StringIO
-import pandas
+
 import numpy as np
+import pandas
+
 import proteusPy
-
-from proteusPy.DisulfideLoader import DisulfideLoader
-
-from proteusPy.data import DATA_DIR, SS_CLASS_DICT_FILE, CLASSOBJ_FNAME
-from proteusPy.data import SS_CLASS_DEFINITIONS
 from proteusPy.angle_annotation import AngleAnnotation
+from proteusPy.data import (
+    CLASSOBJ_FNAME,
+    DATA_DIR,
+    SS_CLASS_DEFINITIONS,
+    SS_CLASS_DICT_FILE,
+)
+from proteusPy.DisulfideLoader import DisulfideLoader
 from proteusPy.ProteusGlobals import DPI
 
 
@@ -328,6 +332,7 @@ def plot_class_chart(classes: int) -> None:
 
     import matplotlib.pyplot as plt
     import numpy as np
+
     from proteusPy.angle_annotation import AngleAnnotation
 
     # Helper function to draw angle easily.

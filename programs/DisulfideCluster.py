@@ -4,20 +4,19 @@
 # Cα Cβ Sγ
 
 import math
+
 import matplotlib
 import matplotlib.pyplot as plt
-
+import pandas as pd
 import plotly_express as px
+import pyvista as pv
 import seaborn as sns
+from pyvista import set_plot_theme
 
 import proteusPy
 from proteusPy import *
 from proteusPy.Disulfide import *
 from proteusPy.ProteusGlobals import *
-
-import pandas as pd
-import pyvista as pv
-from pyvista import set_plot_theme
 
 # print(pv.Report())
 
@@ -91,18 +90,20 @@ for k in range(n_clusters):
 plt.show()
 """
 
+import seaborn as sns
+
 # takes over an hour for full dataset
 from sklearn.cluster import AffinityPropagation
-import seaborn as sns
 
 n_clusters = 6
 
 _cols = ["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]
 tor_df = SS_df[_cols].copy()
 
+import seaborn as sns
+
 # takes over an hour for full dataset
 from sklearn.cluster import AffinityPropagation
-import seaborn as sns
 
 n_clusters = 3
 

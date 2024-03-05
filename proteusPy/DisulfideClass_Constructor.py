@@ -14,23 +14,23 @@ across all 32 possible classes. Classes are named per Hogg's convention.
 
 __pdoc__ = {"__all__": True}
 
-import pandas as pd
-from io import StringIO
 import pickle
-import tqdm
+from io import StringIO
 
+import pandas as pd
+import tqdm
 from Bio.PDB import *
 
 import proteusPy
 from proteusPy.data import (
-    SS_CLASS_DICT_FILE,
-    SS_CLASS_DEFINITIONS,
-    DATA_DIR,
     CLASSOBJ_FNAME,
+    DATA_DIR,
+    SS_CLASS_DEFINITIONS,
+    SS_CLASS_DICT_FILE,
     SS_CONSENSUS_FILE,
 )
-from proteusPy.DisulfideList import DisulfideList
 from proteusPy.Disulfide import Disulfide
+from proteusPy.DisulfideList import DisulfideList
 from proteusPy.ProteusGlobals import DPI
 
 merge_cols = [

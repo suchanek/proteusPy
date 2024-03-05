@@ -7,15 +7,14 @@
 #
 #
 
-import numpy
 import os
 import shutil
 from glob import glob
 
-from tqdm import tqdm
+import numpy
 from Bio.PDB import PDBList, PDBParser
-
 from Disulfide import check_header_from_file
+from tqdm import tqdm
 
 PDB_DIR = "/Users/egs/PDB"
 BAD_DIR = PDB_DIR + "/bad"
