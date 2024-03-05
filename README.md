@@ -103,7 +103,7 @@ PyVista is an excellent 3D visualization framework and I've used it for the Disu
 ## Performance
 
 - Manipulating and searching through long lists of disulfides can take time. I've added progress bars for many of these operations. 
-- Rendering many disulfides in **pyvista** can also take time to load and may be slow to dispay in real time, depending on your hardware. I added optimization to reduce cylinder complexity as a function of total cylinders rendered, but it can still be less than perfect. The faster your GPU the better! 
+- Rendering many disulfides in **pyvista** can also take time to load and may be slow to display in real time, depending on your hardware. I added optimization to reduce cylinder complexity as a function of total cylinders rendered, but it can still be less than perfect. The faster your GPU the better! 
 
 ## Contributing/Reporting
 

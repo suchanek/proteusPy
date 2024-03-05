@@ -5,7 +5,7 @@
 I describe the results of a structural analysis of Disulfide bonds contained in 35,819 proteins within the RCSB Protein databank, https://www.rcsb.org. These protein structures contained 120,697 Disulfide Bonds.  The analysis utilizes Python functions from my ``ProteusPy`` package https://github.com/suchanek/proteusPy/, which is built upon the excellent ``BioPython`` library (https://www.biopython.org). 
 
 ## Background
-This work represents a reprise of my original Disulfide modeling analysis conducted in 1986 ([publications](#publications) item 1) as part of my doctoral dissertation. Given the original Disulfide database contained only 2xx Disulfide Bonds I felt it would be interesting to revisit the RCSB and mine the thousands of new structures. The analysis would not have been possible withoug the creation and now ongoing development of ```proteusPy```, which represents a modern object-oriented rewrite of my original ```proteus``` code base. The ```C``` implementation still exists and is available at https://github.com/suchanek/proteus/.
+This work represents a reprise of my original Disulfide modeling analysis conducted in 1986 ([publications](#publications) item 1) as part of my doctoral dissertation. Given the original Disulfide database contained only 2xx Disulfide Bonds I felt it would be interesting to revisit the RCSB and mine the thousands of new structures. The analysis would not have been possible without the creation and now ongoing development of ```proteusPy```, which represents a modern object-oriented rewrite of my original ```proteus``` code base. The ```C``` implementation still exists and is available at https://github.com/suchanek/proteus/.
 
 
 ## Intended Audience
@@ -27,7 +27,7 @@ The function ``Extract_Disulfides()`` processes all the .ent files in ``PDB_DIR`
 Outputs are saved in ``MODEL_DIR``:
 1) ``SS_PICKLE_FILE``: The ``DisulfideList`` of ``Disulfide`` objects initialized from the PDB file scan, needed by the ``DisulfideLoader()`` class.
 2) ``SS_DICT_PICKLE_FILE``: the ``Dict Disulfide`` objects also needed by the ``DisulfideLoader()`` class
-3) ``PROBLEM_ID_FILE``: a .csv containining the problem ids.
+3) ``PROBLEM_ID_FILE``: a .csv containing the problem ids.
 
 In general, the process only needs to be run once for a full scan. Setting the ``numb`` argument to -1 scans the entire directory. Entering a positive number allows parsing a subset of the dataset, which is useful when debugging. Setting ``verbose`` enables verbose messages. Setting ``quiet`` to ``True`` disables all warnings.
 
@@ -38,7 +38,7 @@ Now that the Disulfides have been extracted and the Disulfide .pkl files have be
 
 NB: Loading the data takes 3.5 minutes on my MacbookPro. Be patient if it seems to take a long time to load.
 
-The ```Disulfide``` and ```DisulfideList``` classes include rendering capabiities using the excellent PyVista interface to the VTK package. (http://pyvista.org). The following cell displays the first Disulfide bond in the database in ball-and stick style. Atoms are colored by atom type:
+The ```Disulfide``` and ```DisulfideList``` classes include rendering capabilities using the excellent PyVista interface to the VTK package. (http://pyvista.org). The following cell displays the first Disulfide bond in the database in ball-and stick style. Atoms are colored by atom type:
 - Grey = Carbon
 - Blue = Nitrogen
 - Red = Oxygen
