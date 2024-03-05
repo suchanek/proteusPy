@@ -100,7 +100,7 @@ tag: sdist
 	@git tag -a $(VERS) -m $(VERS)
 	@echo $(VERS) > tag.out
 
-commit: .
+commit:
 	git commit -a -m $(MESS)
 	git push --all origin
 

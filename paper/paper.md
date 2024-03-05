@@ -51,7 +51,7 @@ Accordingly, I have developed the **proteusPy** package to delve into the RCSB P
 # Requirements
 
 1. PC running MacOS, Linux, Windows with git, git-lfs and C compiler installed.
-2. 16 GB RAM
+2. 8 GB RAM
 3. 3 GB disk space
 
 # Installation
@@ -67,7 +67,6 @@ It's simplest to clone the repo via GitHub since it contains all of the notebook
   
   ```console
   $ git clone https://github.com/suchanek/proteusPy.git
-  $ git clone https://github.com/suchanek/biopython.git
   $ cd proteusPy
   $ git-lfs track "*.csv" "*.mp4" "*.pkl"
   $ make pkg
@@ -92,7 +91,6 @@ Installing in Windows is a bit more involved than Linux or Macos. Sadly, the pac
 - Open a Miniforge prompt and cd into your repo dir:
   ```console
   (base) C:\Users\egs\repos> git clone https://github.com/suchanek/proteusPy.git
-  (base) C:\Users\egs\repos> git clone https://github.com/suchanek/biopython.git
   (base) C:\Users\egs\repos> cd proteusPy
   (base) C:\Users\egs\repos\proteuspy> git-lfs track "*.csv" "*.mp4" "*.pkl"
   (base) C:\Users\egs\repos\proteuspy> make pkg
