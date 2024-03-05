@@ -59,9 +59,7 @@ for _, pdbid_tuple in zip(pbar, enumerate(ssdict)):
     xchain = 0
     removed = 0
     pdbid = pdbid_tuple[1]
-    pbar.set_postfix(
-        {"ID": pdbid, "Rem": removed_tot, "XC": xchain_tot}
-    )  # update the progress bar
+    pbar.set_postfix({"ID": pdbid, "Rem": removed_tot, "XC": xchain_tot})  # update the progress bar
     sslist = PDB_SS[pdbid]
     pruned, xchain = prune_extra_ss(sslist)
     removed = len(sslist) - len(pruned)

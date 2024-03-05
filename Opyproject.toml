@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "proteuspy"
-version = "0.92.13"
+version = "0.92.14"
 description = "proteusPy - Protein Structure Analysis and Modeling Tools"
 authors = ["Eric Suchanek <suchanek@mac.com>"]
 license = "BSD"
@@ -29,7 +29,7 @@ packages = [{include = "proteusPy"}]
 python = "^3.11"
 numpy = "^1.26.4"
 kaleido = "0.2.1"
-pandas = "<2.0"
+pandas = "^1.0.0"
 notebook = "6.4.12"
 jupyter = "^1.0.0"
 jupyterlab = ">=3"
@@ -57,14 +57,14 @@ jupyter-contrib-nbextensions = "^0.7.0"
 ipywidgets = "^8.1.2"
 imageio = {extras = ["ffmpeg"], version = "^2.34.0"}
 poethepoet = "^0.25.0"
+pyvista = {extras = ["trame"], version = "^0.43.3"}
+biopython = {git = "https://github.com/suchanek/biopython.git"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.1"
-black = "^24.2.0"
+black = {extras = ["jupyter"], version = "^24.2.0"}
 pdoc = "^14.4.0"
-
-[tool.poetry.group.dev.dependencies]
-black = "^24.2.0"
+poethepoet = "^0.25.0"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -73,18 +73,29 @@ testpaths = [
     "tests",  # You should have a "tests" directory
 ]
 
-[tool.poetry.plugins."ppy"]
-build-docs = "pdoc -o docs --math --logo ./logo.png ./proteusPy"
-format = "black {proteusPy}/**/*.py"
+[tool.black]
+line-length = 120
 
 [tool.poe.tasks]
-
+_build = "poetry build"
+_install = "poetry install"
+_jup_install = "poe jupyter"
 _clean_sdist.script = "shutil:rmtree('sdist', ignore_errors=1)"
 _clean_docs.script = "shutil:rmtree('docs', ignore_errors=1)"
+_jup1 = "jupyter contrib nbextension install --sys-prefix"
+_jup2 = "jupyter nbextension enable --py --sys-prefix widgetsnbextension"
+_jup3 = "python -m ipykernel install --user --name proteusPy --display-name 'proteusPy'"
+
+build = ["_build"]
+install = ["_install", "_jup_install"]
+
+  [tool.poe.tasks.jupyter]
+  help = "Add jupyter extensions"
+  sequence = ['_jup1', '_jup2', '_jup3']
 
   [tool.poe.tasks.format]
   help = "Run formatting tools on the code base"
-  sequence = ['format-black']
+  cmd = "black ."
 
   [tool.poe.tasks.format-black]
   help = "Run black on the code base"
@@ -94,7 +105,6 @@ _clean_docs.script = "shutil:rmtree('docs', ignore_errors=1)"
   help = "Build the docs with pdoc"
   cmd = "pdoc -o docs --math --logo ./logo.png ./proteusPy"
   deps = ["_clean_docs"]
-
 
 [build-system]
 requires = ["poetry-core"]

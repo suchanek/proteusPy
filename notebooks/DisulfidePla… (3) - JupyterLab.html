@@ -1,0 +1,25 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>JupyterLab</title><meta name="viewport" content="width=device-width,initial-scale=1">   <script id="jupyter-config-data" type="application/json">{"allow_hidden_files": false, "appName": "JupyterLab", "appNamespace": "lab", "appSettingsDir": "/Users/egs/miniforge3/envs/proteusPy/share/jupyter/lab/settings", "appUrl": "/lab", "appVersion": "4.1.3", "baseUrl": "/", "buildAvailable": true, "buildCheck": true, "cacheFiles": false, "copyAbsolutePath": false, "devMode": false, "disabledExtensions": [], "exposeAppInBrowser": false, "extensionManager": {"can_install": true, "install_path": "/Users/egs/miniforge3/envs/proteusPy", "name": "PyPI"}, "extraLabextensionsPath": [], "federated_extensions": [{"extension": "./extension", "load": "static/remoteEntry.8d04f4bf19b3ea22cbf5.js", "name": "ipygany"}, {"extension": "./extension", "load": "static/remoteEntry.eb1438c6091204ef3c24.js", "name": "trame-jupyter-extension", "style": "./style"}, {"extension": "./extension", "load": "static/remoteEntry.5cbb9d2323598fbda535.js", "name": "jupyterlab_pygments", "style": "./style"}, {"extension": "./extension", "load": "static/remoteEntry.c764a537ae4fed4fb4ca.js", "mimeExtension": "./mimeExtension", "name": "jupyterlab-plotly"}, {"extension": "./extension", "load": "static/remoteEntry.efd2da6d46ebaed03028.js", "name": "@jupyterhub/jupyter-server-proxy"}, {"extension": "./extension", "load": "static/remoteEntry.e32a0a8e32155667dea0.js", "name": "@bokeh/jupyter_bokeh", "style": "./style"}, {"extension": "./extension", "load": "static/remoteEntry.781d9899a66a674daeb6.js", "name": "@pyviz/jupyterlab_pyviz", "style": "./style"}, {"extension": "./extension", "load": "static/remoteEntry.9f387e5e108e458f62c3.js", "name": "@jupyter-widgets/jupyterlab-manager"}], "fullAppUrl": "/lab", "fullLabextensionsUrl": "/lab/extensions", "fullLicensesUrl": "/lab/api/licenses", "fullListingsUrl": "/lab/api/listings", "fullMathjaxUrl": "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js", "fullSettingsUrl": "/lab/api/settings", "fullStaticUrl": "/static/lab", "fullThemesUrl": "/lab/api/themes", "fullTranslationsApiUrl": "/lab/api/translations", "fullTreeUrl": "/lab/tree", "fullWorkspacesApiUrl": "/lab/api/workspaces", "ignorePlugins": [], "labextensionsPath": ["/Users/egs/miniforge3/envs/proteusPy/share/jupyter/labextensions", "/Users/egs/Library/Jupyter/labextensions", "/Users/egs/.local/share/jupyter/labextensions", "/usr/local/share/jupyter/labextensions", "/usr/share/jupyter/labextensions"], "labextensionsUrl": "/lab/extensions", "licensesUrl": "/lab/api/licenses", "listingsUrl": "/lab/api/listings", "mathjaxConfig": "TeX-AMS_HTML-full,Safe", "mode": "multiple-document", "news": {"disabled": false}, "notebookStartsKernel": true, "notebookVersion": "[2, 13, 0]", "preferredPath": "/", "quitButton": true, "rootUri": "file:///Users/egs/repos/proteusPy", "schemasDir": "/Users/egs/miniforge3/envs/proteusPy/share/jupyter/lab/schemas", "serverRoot": "~/repos/proteusPy", "settingsUrl": "/lab/api/settings", "staticDir": "/Users/egs/miniforge3/envs/proteusPy/share/jupyter/lab/static", "store_id": 0, "templatesDir": "/Users/egs/miniforge3/envs/proteusPy/share/jupyter/lab/static", "terminalsAvailable": true, "themesDir": "/Users/egs/miniforge3/envs/proteusPy/share/jupyter/lab/themes", "themesUrl": "/lab/api/themes", "token": "d572e6ea7268c361e85cd6b10552914fd52d1293c5a8bfd3", "translationsApiUrl": "/lab/api/translations", "treePath": "", "treeUrl": "/lab/tree", "userSettingsDir": "/Users/egs/.jupyter/lab/user-settings", "virtualDocumentsUri": "file:///Users/egs/repos/proteusPy/.virtual_documents", "workspace": "default", "workspacesApiUrl": "/lab/api/workspaces", "workspacesDir": "/Users/egs/.jupyter/lab/workspaces", "wsUrl": ""}</script><link rel="icon" type="image/x-icon" href="/static/favicons/favicon.ico" class="idle favicon"><link rel="" type="image/x-icon" href="/static/favicons/favicon-busy-1.ico" class="busy favicon"> <script defer="defer" src="/static/lab/main.cea49ccbbe07d3cabe73.js?v=cea49ccbbe07d3cabe73"></script></head><body><script>/* Remove token from URL. */
+  (function () {
+    var location = window.location;
+    var search = location.search;
+
+    // If there is no query string, bail.
+    if (search.length <= 1) {
+      return;
+    }
+
+    // Rebuild the query string without the `token`.
+    var query = '?' + search.slice(1).split('&')
+      .filter(function (param) { return param.split('=')[0] !== 'token'; })
+      .join('&');
+
+    // Rebuild the URL with the new query string.
+    var url = location.origin + location.pathname +
+      (query !== '?' ? query : '') + location.hash;
+
+    if (url === location.href) {
+      return;
+    }
+
+    window.history.replaceState({ }, '', url);
+  })();</script></body></html>

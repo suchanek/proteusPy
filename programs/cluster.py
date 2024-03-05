@@ -135,9 +135,7 @@ tor_df = SS_df[_cols].copy()
 X = tor_df
 n_clusters = 4
 
-scm_model = SpectralClustering(
-    n_clusters=n_clusters, random_state=25, n_neighbors=8, affinity="nearest_neighbors"
-)
+scm_model = SpectralClustering(n_clusters=n_clusters, random_state=25, n_neighbors=8, affinity="nearest_neighbors")
 # takes 51 min with full dataset
 """
 print(f'Spectral Clustering starts')
