@@ -41,7 +41,9 @@ enable_keybindings = True
 
 RCSB_list = sorted(PDB_SS.IDList)
 
-pn.state.template.param.update(title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, V{vers}")
+pn.state.template.param.update(
+    title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, V{vers}"
+)
 
 
 def get_theme() -> str:
@@ -84,7 +86,9 @@ def click_plot(event):
 
 # Widgets
 
-rcsb_ss_widget = pn.widgets.Select(name="Disulfide", value=_default_ss, options=_ssidlist)
+rcsb_ss_widget = pn.widgets.Select(
+    name="Disulfide", value=_default_ss, options=_ssidlist
+)
 
 button = pn.widgets.Button(name="Refresh", button_type="primary")
 button.on_click(click_plot)
@@ -124,9 +128,13 @@ rcsb_selector_widget = pn.widgets.AutocompleteInput(
 )
 
 # controls on sidebar
-ss_props = pn.WidgetBox("# Disulfide Selection", rcsb_selector_widget, rcsb_ss_widget).servable(target="sidebar")
+ss_props = pn.WidgetBox(
+    "# Disulfide Selection", rcsb_selector_widget, rcsb_ss_widget
+).servable(target="sidebar")
 
-ss_styles = pn.WidgetBox("# Rendering Styles", styles_group, single_checkbox, button).servable(target="sidebar")
+ss_styles = pn.WidgetBox(
+    "# Rendering Styles", styles_group, single_checkbox, button
+).servable(target="sidebar")
 
 # markdown panels for various text outputs
 title_md = pn.pane.Markdown("Title")

@@ -134,9 +134,13 @@ rcsb_selector_widget = pn.widgets.AutocompleteInput(
 )
 
 # controls on sidebar
-ss_props = pn.WidgetBox("# Disulfide Selection", rcsb_selector_widget, rcsb_ss_widget).servable(target="sidebar")
+ss_props = pn.WidgetBox(
+    "# Disulfide Selection", rcsb_selector_widget, rcsb_ss_widget
+).servable(target="sidebar")
 
-ss_styles = pn.WidgetBox("# Rendering Styles", styles_group, single_checkbox, button).servable(target="sidebar")
+ss_styles = pn.WidgetBox(
+    "# Rendering Styles", styles_group, single_checkbox, button
+).servable(target="sidebar")
 
 # markdown panels for various text outputs
 title_md = pn.pane.Markdown("Title")
@@ -163,7 +167,9 @@ def load_data():
     pdbs = len(PDB_SS.SSDict)
     RCSB_list = sorted(PDB_SS.IDList)
     pn.state.cache["data"] = PDB_SS
-    pn.state.template.param.update(title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, V{_vers}")
+    pn.state.template.param.update(
+        title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, V{_vers}"
+    )
     rcsb_selector_widget.options = RCSB_list
     return PDB_SS
 
@@ -233,7 +239,9 @@ def render_ss(clk=True):
         update_title(ss)
         update_info(ss)
     else:
-        update_output("# Error: \nClick_plot can't find a disulfide for the current UI?")
+        update_output(
+            "# Error: \nClick_plot can't find a disulfide for the current UI?"
+        )
         return
 
     style = styles[styles_group.value]
@@ -278,7 +286,9 @@ if "data" in pn.state.cache:
     tot = PDB_SS.TotalDisulfides
     pdbs = len(PDB_SS.SSDict)
     rcsb_selector_widget.options = RCSB_list
-    pn.state.template.param.update(title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, V{_vers}")
+    pn.state.template.param.update(
+        title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, V{_vers}"
+    )
     print(f"--> Data cached: {len(RCSB_list)}")
 else:
     PDB_SS = load_data()
@@ -287,7 +297,9 @@ else:
     dbvers = PDB_SS.version
     tot = PDB_SS.TotalDisulfides
     pdbs = len(PDB_SS.SSDict)
-    pn.state.template.param.update(title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, V{_vers}")
+    pn.state.template.param.update(
+        title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, V{_vers}"
+    )
     print(f"--> Data not cached: {len(RCSB_list)}")
 
 # PDB_SS = Load_PDB_SS(verbose=True, subset=False)

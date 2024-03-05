@@ -99,7 +99,9 @@ from proteusPy.Disulfide import Disulfide
 SAVE_DIR = "/Users/egs/Documents/proteusPy/"
 
 
-def analyze_six_classes(loader, do_graph=True, do_consensus=True, cutoff=0.1) -> DisulfideList:
+def analyze_six_classes(
+    loader, do_graph=True, do_consensus=True, cutoff=0.1
+) -> DisulfideList:
     """
     Analyze the six classes of disulfide bonds.
 
@@ -145,7 +147,9 @@ def analyze_six_classes(loader, do_graph=True, do_consensus=True, cutoff=0.1) ->
             loader.SSList.remove(_ss)
 
         if do_graph:
-            class_disulfides.display_torsion_statistics(display=False, save=True, fname=fname, light=True, stats=False)
+            class_disulfides.display_torsion_statistics(
+                display=False, save=True, fname=fname, light=True, stats=False
+            )
 
         if do_consensus:
             # get the average conformation - array of dihedrals
@@ -167,14 +171,18 @@ def analyze_six_classes(loader, do_graph=True, do_consensus=True, cutoff=0.1) ->
             res_list.append(exemplar)
 
     if do_consensus:
-        print(f"--> analyze_six_classes(): Writing consensus structures to: {class_filename}")
+        print(
+            f"--> analyze_six_classes(): Writing consensus structures to: {class_filename}"
+        )
         with open(class_filename, "wb+") as f:
             pickle.dump(res_list, f)
 
     return res_list
 
 
-def analyze_binary_classes(loader, do_graph=True, do_consensus=True, cutoff=0.1) -> DisulfideList:
+def analyze_binary_classes(
+    loader, do_graph=True, do_consensus=True, cutoff=0.1
+) -> DisulfideList:
     """
     Analyze the binary classes of disulfide bonds.
 
@@ -220,13 +228,17 @@ def analyze_binary_classes(loader, do_graph=True, do_consensus=True, cutoff=0.1)
             # loader.SSList.remove(_ss)
 
         if do_graph:
-            class_disulfides.display_torsion_statistics(display=False, save=True, fname=fname, light=True, stats=False)
+            class_disulfides.display_torsion_statistics(
+                display=False, save=True, fname=fname, light=True, stats=False
+            )
 
         if do_consensus:
             # get the average conformation - array of dihedrals
             avg_conformation = np.zeros(5)
 
-            print(f"--> analyze_binary_classes(): Computing avg conformation for: {cls}")
+            print(
+                f"--> analyze_binary_classes(): Computing avg conformation for: {cls}"
+            )
             avg_conformation = class_disulfides.Average_Conformation
 
             # build the average disulfide for the class
@@ -242,7 +254,9 @@ def analyze_binary_classes(loader, do_graph=True, do_consensus=True, cutoff=0.1)
             res_list.append(exemplar)
 
     if do_consensus:
-        print(f"--> analyze_binary_classes(): Writing consensus structures to: {class_filename}")
+        print(
+            f"--> analyze_binary_classes(): Writing consensus structures to: {class_filename}"
+        )
         with open(class_filename, "wb+") as f:
             pickle.dump(res_list, f)
 
@@ -267,7 +281,9 @@ def plot_classes_vs_cutoff(cutoff, steps):
         tot = class_df["percentage"].sum()
         tot_list.append(tot)
         members_list.append(class_df.shape[0])
-        print(f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long.")
+        print(
+            f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
+        )
 
     fig, ax1 = plt.subplots()
 
@@ -291,11 +307,15 @@ def analyze_classes(binary: bool, sextant: bool, all: bool):
 
     if sextant:
         # ss_classlist = DisulfideList([], 'PDB_SS_SIX_CLASSES')
-        ss_classlist = analyze_six_classes(PDB_SS, do_graph=True, do_consensus=True, cutoff=0.0)
+        ss_classlist = analyze_six_classes(
+            PDB_SS, do_graph=True, do_consensus=True, cutoff=0.0
+        )
 
     if binary:
         # ss_classlist = DisulfideList([], 'PDB_SS_BINARY_CLASSES')
-        ss_classlist = analyze_binary_classes(PDB_SS, do_graph=True, do_consensus=True, cutoff=0.0)
+        ss_classlist = analyze_binary_classes(
+            PDB_SS, do_graph=True, do_consensus=True, cutoff=0.0
+        )
 
     return
 
@@ -337,6 +357,8 @@ end = time.time()
 
 elapsed = end - start
 
-print(f"Disulfide Class Analysis Complete! \nElapsed time: {timedelta(seconds=elapsed)} (h:m:s)")
+print(
+    f"Disulfide Class Analysis Complete! \nElapsed time: {timedelta(seconds=elapsed)} (h:m:s)"
+)
 
 # end of file

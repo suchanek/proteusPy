@@ -7,6 +7,7 @@ Last revision: 2/18/24 -egs-
 """
 
 import os
+import math
 
 PDB_DIR = os.getenv("PDB")
 PROTEUSPY_REPO_HOME = os.getenv("PROTEUSPY_REPO_HOME")
@@ -19,7 +20,7 @@ WINSIZE = (1024, 1024)
 CAMERA_POS = ((0, 0, -10), (0, 0, 0), (0, 1, 0))
 
 # global for initialization of dihedrals and energies
-_FLOAT_INIT = -999.99
+_FLOAT_INIT = math.nan
 _INT_INIT = -1
 _ANG_INIT = -180.0
 

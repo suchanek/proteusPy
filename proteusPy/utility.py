@@ -299,13 +299,18 @@ def image_to_ascii_art(fname, nwidth):
 
     # Normalize the pixel values in the image.
     pixel_data = list(image.getdata())
-    pixel_data_norm = minmax_scale(pixel_data, feature_range=(0, len(char_set) - 1), copy=True)
+    pixel_data_norm = minmax_scale(
+        pixel_data, feature_range=(0, len(char_set) - 1), copy=True
+    )
     pixel_data_norm = [int(x) for x in pixel_data_norm]
 
     char_array = [char_set[pixel] for pixel in pixel_data_norm]
     # Generate the ASCII art string
     ascii_art = "\n".join(
-        ["".join([char_array[i + j] for j in range(new_width)]) for i in range(0, len(char_array), new_width)]
+        [
+            "".join([char_array[i + j] for j in range(new_width)])
+            for i in range(0, len(char_array), new_width)
+        ]
     )
 
     # Print the ASCII art string.
@@ -406,7 +411,9 @@ def plot_class_chart(classes: int) -> None:
 
     # Create the pie chart
     # fig, ax = plt.subplots()
-    wedges, _ = ax1.pie(values, startangle=0, counterclock=False, wedgeprops=dict(width=0.65))
+    wedges, _ = ax1.pie(
+        values, startangle=0, counterclock=False, wedgeprops=dict(width=0.65)
+    )
 
     # Set the chart title and size
     ax1.set_title(f"{classes}-Class Angular Layout")

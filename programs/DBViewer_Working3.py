@@ -51,7 +51,9 @@ styles_group = pn.widgets.RadioBoxGroup(
 )
 
 single_checkbox = pn.widgets.Checkbox(name="Single View", value=True)
-rcsb_ss_widget = pn.widgets.Select(name="Disulfide", value=_default_ss, options=_ssidlist)
+rcsb_ss_widget = pn.widgets.Select(
+    name="Disulfide", value=_default_ss, options=_ssidlist
+)
 # not used atm
 shadows_checkbox = pn.widgets.Checkbox(name="Shadows", value=False)
 
@@ -59,16 +61,24 @@ shadows_checkbox = pn.widgets.Checkbox(name="Shadows", value=False)
 
 
 rcsb_selector_widget = pn.widgets.AutocompleteInput(
-    name="RCSB ID (start typing)", value=_rcsid_default, restrict=True, placeholder="Search Here", options=RCSB_list
+    name="RCSB ID (start typing)",
+    value=_rcsid_default,
+    restrict=True,
+    placeholder="Search Here",
+    options=RCSB_list,
 )
 
 
 button = pn.widgets.Button(name="Refresh", button_type="primary")
 
 # controls on sidebar
-ss_props = pn.WidgetBox("# Disulfide Selection", rcsb_selector_widget, rcsb_ss_widget).servable(target="sidebar")
+ss_props = pn.WidgetBox(
+    "# Disulfide Selection", rcsb_selector_widget, rcsb_ss_widget
+).servable(target="sidebar")
 
-ss_styles = pn.WidgetBox("# Rendering Styles", styles_group, single_checkbox, button).servable(target="sidebar")
+ss_styles = pn.WidgetBox(
+    "# Rendering Styles", styles_group, single_checkbox, button
+).servable(target="sidebar")
 
 # markdown panels for various text outputs
 title_md = pn.pane.Markdown("Title")
@@ -174,7 +184,9 @@ if "data" in pn.state.cache:
 else:
     PDB_SS = pn.state.cache["data"] = load_data()
     set_widgets_defaults()
-    pn.state.template.param.update(title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, V{vers}")
+    pn.state.template.param.update(
+        title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, V{vers}"
+    )
     _boot = True
 
 PDB_SS = pn.state.as_cached("data", load_data)

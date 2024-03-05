@@ -492,10 +492,14 @@ class Turtle3D:
         :type orientation: int
         """
 
-        assert self._orientation == 1 or self._orientation == 2, f"orient_at_residue() requires Turtle3D to be #1 or #2"
+        assert (
+            self._orientation == 1 or self._orientation == 2
+        ), f"orient_at_residue() requires Turtle3D to be #1 or #2"
 
         residue = chain[resnumb]
-        assert residue is not None, f"get_backbone_from_sidechain() requires valid residue number"
+        assert (
+            residue is not None
+        ), f"get_backbone_from_sidechain() requires valid residue number"
 
         # by this point I'm pretty confident I have coordinates
         # we pull the actual numpy.array from the coordinates since that's what the
@@ -537,7 +541,9 @@ class Turtle3D:
         Returns: None. Turtle internal state is modified
         """
 
-        assert orientation == 1 or orientation == 2, f"orient_at_residue() requires Turtle3D to be #1 or #2"
+        assert (
+            orientation == 1 or orientation == 2
+        ), f"orient_at_residue() requires Turtle3D to be #1 or #2"
 
         _n = n.copy()
         _ca = ca.copy()
@@ -578,9 +584,23 @@ class Turtle3D:
         Returns the global coordinates for input local vector (3d)
         """
 
-        p1 = self._position[0] + self._heading[0] * local[0] + self._left[0] * local[1] + self._up[0] * local[2]
-        p2 = self._position[1] + self._heading[1] * local[0] + self._left[1] * local[1] + self._up[1] * local[2]
-        p3 = self._position[2] + self._heading[2] * local[0] + self._left[2] * local[1] * self._up[2] * local[2]
+        p1 = (
+            self._position[0]
+            + self._heading[0] * local[0]
+            + self._left[0] * local[1]
+            + self._up[0] * local[2]
+        )
+        p2 = (
+            self._position[1]
+            + self._heading[1] * local[0]
+            + self._left[1] * local[1]
+            + self._up[1] * local[2]
+        )
+        p3 = (
+            self._position[2]
+            + self._heading[2] * local[0]
+            + self._left[2] * local[1] * self._up[2] * local[2]
+        )
 
         return numpy.array((p1, p2, p3), "d")
 

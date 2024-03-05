@@ -291,7 +291,9 @@ class DisulfideClass_Constructor:
 
         # Create a new column with the class ID for each row
         class_id_column = "class_id"
-        df[class_id_column] = (df[sign_columns] + 1).apply(lambda x: "".join(x.astype(str)), axis=1)
+        df[class_id_column] = (df[sign_columns] + 1).apply(
+            lambda x: "".join(x.astype(str)), axis=1
+        )
 
         # Group the DataFrame by the class ID and return the grouped data
         grouped = df.groupby(class_id_column)["ss_id"].unique().reset_index()
@@ -325,7 +327,9 @@ class DisulfideClass_Constructor:
             _df[col_name + "_t"] = df[col_name].apply(self.get_sixth_quadrant)
 
         # create the class_id column
-        df["class_id"] = _df[["chi1_t", "chi2_t", "chi3_t", "chi4_t", "chi5_t"]].apply(lambda x: "".join(x), axis=1)
+        df["class_id"] = _df[["chi1_t", "chi2_t", "chi3_t", "chi4_t", "chi5_t"]].apply(
+            lambda x: "".join(x), axis=1
+        )
 
         # group the DataFrame by class_id and return the grouped data
         grouped = df.groupby("class_id").agg({"ss_id": "unique"})
@@ -374,7 +378,9 @@ class DisulfideClass_Constructor:
         elif angle_deg >= 300 and angle_deg < 360:
             return str(1)
         else:
-            raise ValueError("Invalid angle value: angle must be in the range [-360, 360).")
+            raise ValueError(
+                "Invalid angle value: angle must be in the range [-360, 360)."
+            )
 
     def sslist_from_classid(self, cls: str) -> DisulfideList:
         """
@@ -510,7 +516,9 @@ class DisulfideClass_Constructor:
 
         # Create the pie chart
         # fig, ax = plt.subplots()
-        wedges, _ = ax1.pie(values, startangle=0, counterclock=False, wedgeprops=dict(width=0.65))
+        wedges, _ = ax1.pie(
+            values, startangle=0, counterclock=False, wedgeprops=dict(width=0.65)
+        )
 
         # Set the chart title and size
         ax1.set_title(f"{classes}-Class Angular Layout")

@@ -29,7 +29,10 @@ try:
     from setuptools import Command
     from setuptools import Extension
 except ImportError:
-    sys.exit("We need the Python library setuptools to be installed. " "Try running: python -m ensurepip")
+    sys.exit(
+        "We need the Python library setuptools to be installed. "
+        "Try running: python -m ensurepip"
+    )
 
 if "bdist_wheel" in sys.argv:
     try:
