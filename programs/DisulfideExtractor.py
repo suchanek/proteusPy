@@ -95,18 +95,14 @@ def do_build(verbose, full, subset, cutoff):
     """
     if full:
         if verbose:
-            print(
-                f"--> Building the packed loader for the full dataset with cutoff: {cutoff}..."
-            )
+            print(f"--> Building the packed loader for the full dataset with cutoff: {cutoff}...")
         PDB_SS = DisulfideLoader(datadir=DATA_DIR, subset=False)
         PDB_SS.cutoff = cutoff
         PDB_SS.save(savepath=DATA_DIR, subset=False, cutoff=cutoff)
 
     if subset:
         if verbose:
-            print(
-                f"--> Building the packed loader for the Disulfide subset with cutoff: {cutoff}..."
-            )
+            print(f"--> Building the packed loader for the Disulfide subset with cutoff: {cutoff}...")
         PDB_SS = DisulfideLoader(datadir=DATA_DIR, subset=True)
         PDB_SS.cutoff = cutoff
         PDB_SS.save(savepath=DATA_DIR, subset=True, cutoff=cutoff)
@@ -186,9 +182,7 @@ parser.add_argument(
     help="update the repo package",
     action=argparse.BooleanOptionalAction,
 )
-parser.add_argument(
-    "-v", "--verbose", help="level of verbosity", action=argparse.BooleanOptionalAction
-)
+parser.add_argument("-v", "--verbose", help="level of verbosity", action=argparse.BooleanOptionalAction)
 parser.add_argument(
     "-e",
     "--extract",
@@ -201,9 +195,7 @@ parser.add_argument(
     help="extract all disulfides from the PDB structure files",
     action=argparse.BooleanOptionalAction,
 )
-parser.add_argument(
-    "-b", "--build", help="rebuild the loader", action=argparse.BooleanOptionalAction
-)
+parser.add_argument("-b", "--build", help="rebuild the loader", action=argparse.BooleanOptionalAction)
 parser.add_argument(
     "-s",
     "--subset",
@@ -245,8 +237,6 @@ do_stuff(
 end = time.time()
 elapsed = end - start
 
-print(
-    f"DisulfideExtractor Complete!\nElapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)"
-)
+print(f"DisulfideExtractor Complete!\nElapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)")
 
 # End of file

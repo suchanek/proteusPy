@@ -1,8 +1,9 @@
 # Makefile for proteusPy
 # Author: Eric G. Suchanek, PhD
-# Last revision: 2/25/24 -egs-
+# Last revision: 3/4/24 -egs-
 
-VERS := $(shell cat proteusPy/__version__.py)
+VERS := $(shell grep ^__version__ proteusPy/__version__.py | cut -d= -f2 | tr -d \" | sed 's/^[[:space:]]*//')
+
 PYPI_PASSWORD := $(shell echo $$PYPI_PASSWORD)
 CONDA = mamba
 
@@ -25,7 +26,7 @@ dev:
 	$(CONDA) create --name $(DEVNAME) -y python=3.11.7
 	@echo "Step 1 done. Now activate the environment with 'conda activate $(DEVNAME)' and run 'make install_dev'"
 
-clean:
+clean: remove_jupyter
 	@echo "Removing proteusPy environment..."
 	@$(CONDA) env remove --name proteusPy -y
 
@@ -37,7 +38,8 @@ devclean:
 # activate the package before running!
 install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install . && cd ../biopython && pip install .
+	pip install . 
+	# && cd ../biopython && pip install .
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
 	python -m ipykernel install --user --name proteusPy --display-name "proteusPy $(VERS)"
@@ -45,15 +47,38 @@ install:
 
 install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install --quiet . && cd ../biopython && pip install --quiet .
+	pip install .
 	pip install pdoc twine
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
 	python -m ipykernel install --user --name ppydev --display-name "ppydev $(VERS)"
 	@echo "Installation finished!"
 
+jup: .
+	jupyter contrib nbextension install --sys-prefix
+	jupyter nbextension enable --py --sys-prefix widgetsnbextension
+	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
+
+jup_dev: .
+	jupyter contrib nbextension install --sys-prefix
+	jupyter nbextension enable --py --sys-prefix widgetsnbextension
+	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
+
+
+remove_jupyter: 
+	jupyter kernelspec uninstall proteuspy -y
+
+remove_jupyter_dev: 
+	#python -m ipykernel uninstall --user --name=ppydev -y
+	jupyter kernelspec uninstall ppydev -y
+
+
 # package development targets
-build_dev: sdist docs
+
+format: sdist
+	black proteusPy
+
+build: sdist docs
 
 sdist: .
 	python setup.py sdist
@@ -69,13 +94,13 @@ docs: sdist
 
 # normally i push to PyPi via github action
 upload: .
-	@poetry publish --build --username "__token__" --password $(PYPI_PASSWORD)
-
+	# @poetry publish --build --username "__token__" --password $(PYPI_PASSWORD)
+	twine upload dist/*.gz
 tag: sdist
 	@git tag -a $(VERS) -m $(VERS)
 	@echo $(VERS) > tag.out
 
-commit:
+commit: .
 	git commit -a -m $(MESS)
 	git push --all origin
 

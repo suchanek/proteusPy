@@ -321,6 +321,24 @@ html5lib = ["html5lib"]
 lxml = ["lxml"]
 
 [[package]]
+name = "biopython"
+version = "1.82.dev0"
+description = "Freely available tools for computational molecular biology."
+optional = false
+python-versions = ">=3.8"
+files = []
+develop = false
+
+[package.dependencies]
+numpy = "*"
+
+[package.source]
+type = "git"
+url = "https://github.com/suchanek/biopython.git"
+reference = "HEAD"
+resolved_reference = "9965ece1d76adc8ee65904f87ea68c0b1206050a"
+
+[[package]]
 name = "black"
 version = "24.2.0"
 description = "The uncompromising code formatter."
@@ -353,10 +371,12 @@ files = [
 
 [package.dependencies]
 click = ">=8.0.0"
+ipython = {version = ">=7.8.0", optional = true, markers = "extra == \"jupyter\""}
 mypy-extensions = ">=0.4.3"
 packaging = ">=22.0"
 pathspec = ">=0.9.0"
 platformdirs = ">=2"
+tokenize-rt = {version = ">=3.2.0", optional = true, markers = "extra == \"jupyter\""}
 
 [package.extras]
 colorama = ["colorama (>=0.4.3)"]
@@ -1255,13 +1275,13 @@ test = ["flaky", "ipyparallel", "pre-commit", "pytest (>=7.0)", "pytest-asyncio 
 
 [[package]]
 name = "ipython"
-version = "8.22.1"
+version = "8.22.2"
 description = "IPython: Productive Interactive Computing"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "ipython-8.22.1-py3-none-any.whl", hash = "sha256:869335e8cded62ffb6fac8928e5287a05433d6462e3ebaac25f4216474dd6bc4"},
-    {file = "ipython-8.22.1.tar.gz", hash = "sha256:39c6f9efc079fb19bfb0f17eee903978fe9a290b1b82d68196c641cecb76ea22"},
+    {file = "ipython-8.22.2-py3-none-any.whl", hash = "sha256:3c86f284c8f3d8f2b6c662f885c4889a91df7cd52056fd02b7d8d6195d7f56e9"},
+    {file = "ipython-8.22.2.tar.gz", hash = "sha256:2dcaad9049f9056f1fef63514f176c7d41f930daa78d05b82a176202818f2c14"},
 ]
 
 [package.dependencies]
@@ -1383,13 +1403,13 @@ files = [
 
 [[package]]
 name = "json5"
-version = "0.9.19"
+version = "0.9.20"
 description = "A Python implementation of the JSON5 data format."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "json5-0.9.19-py2.py3-none-any.whl", hash = "sha256:1d9847bcec99eac66426c0c2ae3b2e82b116390f16f12e24b898dbe5c27832c6"},
-    {file = "json5-0.9.19.tar.gz", hash = "sha256:e7713017bdad329ce91773d73d814c62356313e3d191aec7d6a2e936e82f1558"},
+    {file = "json5-0.9.20-py3-none-any.whl", hash = "sha256:f623485b37fad95783233bad9352d21526709cbd9a2ec41ddc3e950fca85b701"},
+    {file = "json5-0.9.20.tar.gz", hash = "sha256:20a255981244081d5aaa4adc90d31cdbf05bed1863993cbf300b8e2cd2b6de88"},
 ]
 
 [package.extras]
@@ -1673,13 +1693,13 @@ test = ["jupyter-contrib-core[testing-utils]", "mock", "nose", "requests", "sele
 
 [[package]]
 name = "jupyter-server"
-version = "2.12.5"
+version = "2.13.0"
 description = "The backend—i.e. core services, APIs, and REST endpoints—to Jupyter web applications."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "jupyter_server-2.12.5-py3-none-any.whl", hash = "sha256:184a0f82809a8522777cfb6b760ab6f4b1bb398664c5860a27cec696cb884923"},
-    {file = "jupyter_server-2.12.5.tar.gz", hash = "sha256:0edb626c94baa22809be1323f9770cf1c00a952b17097592e40d03e6a3951689"},
+    {file = "jupyter_server-2.13.0-py3-none-any.whl", hash = "sha256:77b2b49c3831fbbfbdb5048cef4350d12946191f833a24e5f83e5f8f4803e97b"},
+    {file = "jupyter_server-2.13.0.tar.gz", hash = "sha256:c80bfb049ea20053c3d9641c2add4848b38073bf79f1729cea1faed32fc1c78e"},
 ]
 
 [package.dependencies]
@@ -1705,7 +1725,7 @@ websocket-client = "*"
 
 [package.extras]
 docs = ["ipykernel", "jinja2", "jupyter-client", "jupyter-server", "myst-parser", "nbformat", "prometheus-client", "pydata-sphinx-theme", "send2trash", "sphinx-autodoc-typehints", "sphinxcontrib-github-alt", "sphinxcontrib-openapi (>=0.8.0)", "sphinxcontrib-spelling", "sphinxemoji", "tornado", "typing-extensions"]
-test = ["flaky", "ipykernel", "pre-commit", "pytest (>=7.0)", "pytest-console-scripts", "pytest-jupyter[server] (>=0.4)", "pytest-timeout", "requests"]
+test = ["flaky", "ipykernel", "pre-commit", "pytest (>=7.0)", "pytest-console-scripts", "pytest-jupyter[server] (>=0.7)", "pytest-timeout", "requests"]
 
 [[package]]
 name = "jupyter-server-terminals"
@@ -3011,6 +3031,27 @@ tomli = ">=1.2.2"
 poetry-plugin = ["poetry (>=1.0,<2.0)"]
 
 [[package]]
+name = "pooch"
+version = "1.8.1"
+description = "\"Pooch manages your Python library's sample data files: it automatically downloads and stores them in a local directory, with support for versioning and corruption checks.\""
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pooch-1.8.1-py3-none-any.whl", hash = "sha256:6b56611ac320c239faece1ac51a60b25796792599ce5c0b1bb87bf01df55e0a9"},
+    {file = "pooch-1.8.1.tar.gz", hash = "sha256:27ef63097dd9a6e4f9d2694f5cfbf2f0a5defa44fccafec08d601e731d746270"},
+]
+
+[package.dependencies]
+packaging = ">=20.0"
+platformdirs = ">=2.5.0"
+requests = ">=2.19.0"
+
+[package.extras]
+progress = ["tqdm (>=4.41.0,<5.0.0)"]
+sftp = ["paramiko (>=2.7.0)"]
+xxhash = ["xxhash (>=1.4.3)"]
+
+[[package]]
 name = "prometheus-client"
 version = "0.20.0"
 description = "Python client for the Prometheus monitoring system."
@@ -3334,6 +3375,31 @@ files = [
     {file = "pytz-2024.1-py2.py3-none-any.whl", hash = "sha256:328171f4e3623139da4983451950b28e95ac706e13f3f2630a879749e7a8b319"},
     {file = "pytz-2024.1.tar.gz", hash = "sha256:2a29735ea9c18baf14b448846bde5a48030ed267578472d8955cd0e7443a9812"},
 ]
+
+[[package]]
+name = "pyvista"
+version = "0.43.3"
+description = "Easier Pythonic interface to VTK"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pyvista-0.43.3-py3-none-any.whl", hash = "sha256:5eb589bbea294761cd44aed0330481019e8eca2ddb950a1f332a5a132000e93d"},
+    {file = "pyvista-0.43.3.tar.gz", hash = "sha256:e039cdeb0c7cbb42a16fbdfbbede65a7dc656def787e76c79a43eb0badc88c9b"},
+]
+
+[package.dependencies]
+matplotlib = ">=3.0.1"
+numpy = ">=1.21.0"
+pillow = "*"
+pooch = "*"
+scooby = ">=0.5.1"
+vtk = "*"
+
+[package.extras]
+all = ["pyvista[colormaps,io,jupyter]"]
+colormaps = ["cmocean", "colorcet"]
+io = ["imageio", "meshio (>=5.2)"]
+jupyter = ["ipywidgets", "jupyter-server-proxy", "nest-asyncio", "trame (>=2.5.2)", "trame-client (>=2.12.7)", "trame-server (>=2.11.7)", "trame-vtk (>=2.5.8)", "trame-vuetify (>=2.3.1)"]
 
 [[package]]
 name = "pyviz-comms"
@@ -3854,6 +3920,20 @@ doc = ["jupytext", "matplotlib (>2)", "myst-nb", "numpydoc", "pooch", "pydata-sp
 test = ["asv", "gmpy2", "hypothesis", "mpmath", "pooch", "pytest", "pytest-cov", "pytest-timeout", "pytest-xdist", "scikit-umfpack", "threadpoolctl"]
 
 [[package]]
+name = "scooby"
+version = "0.9.2"
+description = "A Great Dane turned Python environment detective"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "scooby-0.9.2-py3-none-any.whl", hash = "sha256:3cbc59de9febf8c8ba1e01bc7d08b4eca18ece3212d38b08a6f45188f88c8ea9"},
+    {file = "scooby-0.9.2.tar.gz", hash = "sha256:28df643bb7c2087547b2e2220070e2f89e815ddbc515fbc28dd5df2b0a14293e"},
+]
+
+[package.extras]
+cpu = ["mkl", "psutil"]
+
+[[package]]
 name = "seaborn"
 version = "0.13.2"
 description = "Statistical data visualization"
@@ -4073,6 +4153,17 @@ doc = ["sphinx", "sphinx_rtd_theme"]
 test = ["flake8", "isort", "pytest"]
 
 [[package]]
+name = "tokenize-rt"
+version = "5.2.0"
+description = "A wrapper around the stdlib `tokenize` which roundtrips."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "tokenize_rt-5.2.0-py2.py3-none-any.whl", hash = "sha256:b79d41a65cfec71285433511b50271b05da3584a1da144a0752e9c621a285289"},
+    {file = "tokenize_rt-5.2.0.tar.gz", hash = "sha256:9fe80f8a5c1edad2d3ede0f37481cc0cc1538a2f442c9c2f9e4feacd2792d054"},
+]
+
+[[package]]
 name = "toml"
 version = "0.10.2"
 description = "Python Library for Tom's Obvious, Minimal Language"
@@ -4183,13 +4274,13 @@ trame-server = ">=2.13.1"
 
 [[package]]
 name = "trame-client"
-version = "2.16.1"
+version = "2.16.2"
 description = "Internal client of trame"
 optional = false
 python-versions = "*"
 files = [
-    {file = "trame-client-2.16.1.tar.gz", hash = "sha256:0a9a4d0652fc8c35a2b14d366987a6748b630a092b0b572e38fa7b358f4b2e45"},
-    {file = "trame_client-2.16.1-py3-none-any.whl", hash = "sha256:d16798cf8b2e67b88aca5ff20f798017c8f043eaebef2aa350a8c9f671841591"},
+    {file = "trame-client-2.16.2.tar.gz", hash = "sha256:252d1b91724ad6d921f03442eb14f6c7779fbe600545172894f60b4115cf70f6"},
+    {file = "trame_client-2.16.2-py3-none-any.whl", hash = "sha256:f3d04996f8b7199d0226cbfb3c2a95c0d106f65c1e07a322e9667cd1be69953f"},
 ]
 
 [package.extras]
@@ -4595,4 +4686,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "bdb0059599f105dbcb45d683956cea0b13c563ef4d95c49ce595af6233bc3e91"
+content-hash = "10c96b711ee64700cf28046131bae631bdfbaf90481bd4ab3035488bd23e07f2"

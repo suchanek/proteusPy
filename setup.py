@@ -72,7 +72,7 @@ setup(
     author="Eric G. Suchanek, PhD",
     author_email="suchanek@mac.com",
     license="BSD",
-    requires_python="3.11.7",
+    requires_python="^3.11",
     packages=["proteusPy"],
     keywords="proteusPy suchanek disulfide",
     install_requires=[
@@ -108,6 +108,7 @@ setup(
         "jupyter_contrib_nbextensions",
         "ipywidgets",
         "imageio[ffmpeg]",
+        "biopython @ git+https://github.com/suchanek/biopython.git@egs_221115#egg=biopython",
     ],
     source="https://github.com/suchanek/proteusPy/",
     project_urls={

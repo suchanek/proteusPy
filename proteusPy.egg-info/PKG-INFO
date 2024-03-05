@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: proteusPy
-Version: 0.92.13
+Version: 0.92.14
 Summary: proteusPy - Protein Structure Analysis and Modeling Tools
 Home-page: https://github.com/suchanek/proteusPy/
 Author: Eric G. Suchanek, PhD
@@ -54,6 +54,7 @@ Requires-Dist: trame-jupyter-extension
 Requires-Dist: jupyter_contrib_nbextensions
 Requires-Dist: ipywidgets
 Requires-Dist: imageio[ffmpeg]
+Requires-Dist: biopython@ git+https://github.com/suchanek/biopython.git@egs_221115#egg=biopython
 
 # Summary
 
