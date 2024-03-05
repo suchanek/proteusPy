@@ -2097,7 +2097,7 @@ class Disulfide:
             print(f"Saved: {fname}")
 
     def save_meshes_as_stl(self, meshes, filename):
-        """Saves a list of meshes as a single STL file.
+        """Save a list of meshes as a single STL file.
 
         Args:
             meshes (list): List of pyvista mesh objects to save.
@@ -2110,8 +2110,7 @@ class Disulfide:
 
     def export(self, style="sb", verbose=True, fname="ssbond_plt"):
         """
-        Create and save a screenshot of the Disulfide in the given style
-        and filename.
+        Create and save a screenshot of the Disulfide in the given style and filename.
 
         :param single: Display a single vs panel view, defaults to True
         :param style: Rendering style, one of:
