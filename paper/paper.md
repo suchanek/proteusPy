@@ -182,7 +182,7 @@ The entirety of the RCSB disulfide database is stored within the class via a [Di
 
 Example:
 
-```python
+```
   import proteusPy
   from proteusPy.Disulfide import Disulfide
   from proteusPy.DisulfideLoader import DisulfideLoader
@@ -260,10 +260,10 @@ PDB_SS = Load_PDB_SS(verbose=True, subset=False)
 ssMin, ssMax = PDB_SS.SSList.minmax_energy
 
 # make a list to hold them
-minmaxlist = DisulfideList([ssMin, ssMax], 'minmax')
+minmaxlist = DisulfideList([ssMin, ssMax], "minmax")
 
 # display them as ball and stick style
-minmaxlist.display(style='bs', light=True)
+minmaxlist.display(style="bs", light=True)
 ```
 
 <center>
@@ -285,7 +285,7 @@ from proteusPy.Disulfide import Disulfide
 
 PDB_SS = None
 PDB_SS = Load_PDB_SS(verbose=False, subset=False)
-ss_list = DisulfideList([], 'tmp')
+ss_list = DisulfideList([], "tmp")
 
 # Return the minimum and maximum energy structures. We ignore the maximum in this case.
 ssmin_enrg, _ = PDB_SS.SSList.minmax_energy
@@ -293,7 +293,7 @@ ssmin_enrg, _ = PDB_SS.SSList.minmax_energy
 # Make an empty list and find the nearest neighbors within 10 degrees avg RMS in
 # sidechain dihedral angle space.
 
-low_energy_neighbors = DisulfideList([],'Neighbors')
+low_energy_neighbors = DisulfideList([], "Neighbors")
 low_energy_neighbors = ssmin_enrg.Torsion_neighbors(sslist, 10)
 
 # Display the number found, and then display them overlaid onto their common reference frame.
