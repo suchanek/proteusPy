@@ -29,10 +29,7 @@ try:
     from setuptools import Command
     from setuptools import Extension
 except ImportError:
-    sys.exit(
-        "We need the Python library setuptools to be installed. "
-        "Try running: python -m ensurepip"
-    )
+    sys.exit("We need the Python library setuptools to be installed. " "Try running: python -m ensurepip")
 
 if "bdist_wheel" in sys.argv:
     try:
@@ -108,7 +105,7 @@ setup(
         "jupyter_contrib_nbextensions",
         "ipywidgets",
         "imageio[ffmpeg]",
-        "biopython @ git+https://github.com/suchanek/biopython.git@egs_221115#egg=biopython",
+        "biopython @ git+https://github.com/suchanek/biopython.git@egs_ssbond_240305",
     ],
     source="https://github.com/suchanek/proteusPy/",
     project_urls={

@@ -62,9 +62,7 @@ def create_classes(df):
 
     # Create a new column with the class ID for each row
     class_id_column = "class_id"
-    df[class_id_column] = (df[sign_columns] + 1).apply(
-        lambda x: "".join(x.astype(str)), axis=1
-    )
+    df[class_id_column] = (df[sign_columns] + 1).apply(lambda x: "".join(x.astype(str)), axis=1)
 
     # Group the DataFrame by the class ID and return the grouped data
     grouped = df.groupby(class_id_column)["ss_id"].unique().reset_index()
@@ -379,9 +377,7 @@ def plot_class_chart(classes: int) -> None:
     values = [1 for _ in range(classes)]
 
     # Create the pie chart
-    wedges, _ = ax1.pie(
-        values, startangle=0, counterclock=True, wedgeprops=dict(width=0.65)
-    )
+    wedges, _ = ax1.pie(values, startangle=0, counterclock=True, wedgeprops=dict(width=0.65))
 
     # Set the chart title and size
     ax1.set_title(f"{classes}-Class Angular Layout")
@@ -466,9 +462,7 @@ def plot_count_vs_classid(df, cls=None, title="title", theme="light"):
         subset = df[df["class_id"] == cls]
         fig = px.line(subset, x="class_id", y="count", title=f"{title}")
 
-    fig.update_layout(
-        xaxis_title="Class ID", yaxis_title="Count", showlegend=True, title_x=0.5
-    )
+    fig.update_layout(xaxis_title="Class ID", yaxis_title="Count", showlegend=True, title_x=0.5)
     fig.layout.autosize = True
 
     if theme == "light":
@@ -550,9 +544,7 @@ def plot_classes_vs_cutoff(cutoff, steps):
         tot = class_df["percentage"].sum()
         tot_list.append(tot)
         members_list.append(class_df.shape[0])
-        print(
-            f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
-        )
+        print(f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long.")
 
     fig, ax1 = plt.subplots()
 

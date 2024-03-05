@@ -78,7 +78,7 @@ remove_jupyter_dev:
 format: sdist
 	black proteusPy
 
-build: sdist docs
+build: sdist docs format
 
 sdist: .
 	python setup.py sdist
@@ -111,7 +111,7 @@ tests: .
 	python proteusPy/DisulfideList.py
 	python proteusPy/DisulfideClasses.py
 	python proteusPy/turtle3D.py
-	python programs/Test_DisplaySS.py
+	python tests/Test_DisplaySS.py
 
 # end of file
 

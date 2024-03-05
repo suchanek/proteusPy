@@ -360,11 +360,7 @@ class DisulfideLoader:
         vers = self.version
         tot = self.TotalDisulfides
         pdbs = len(self.SSDict)
-        ram = (
-            sys.getsizeof(self.SSList)
-            + sys.getsizeof(self.SSDict)
-            + sys.getsizeof(self.TorsionDF)
-        ) / (1024 * 1024)
+        ram = (sys.getsizeof(self.SSList) + sys.getsizeof(self.SSDict) + sys.getsizeof(self.TorsionDF)) / (1024 * 1024)
         res = self.Average_Resolution
         cutoff = self.cutoff
         timestr = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.timestamp))
@@ -488,9 +484,7 @@ class DisulfideLoader:
             tot = class_df["percentage"].sum()
             tot_list.append(tot)
             members_list.append(class_df.shape[0])
-            print(
-                f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
-            )
+            print(f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long.")
 
         fig, ax1 = plt.subplots()
 
@@ -504,9 +498,7 @@ class DisulfideLoader:
 
         plt.show()
 
-    def plot_binary_to_sixclass_incidence(
-        self, light=True, save=False, savedir="."
-    ) -> None:
+    def plot_binary_to_sixclass_incidence(self, light=True, save=False, savedir=".") -> None:
         """
         Plot the incidence of all sextant Disulfide classes for a given binary class.
 
@@ -610,9 +602,7 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False):
 
     if subset:
         if verbose:
-            print(
-                f"--> DisulfideLoader: Downloading Disulfide Subset Database from Drive..."
-            )
+            print(f"--> DisulfideLoader: Downloading Disulfide Subset Database from Drive...")
 
         gdown.download(LOADER_SUBSET_URL, _fname_sub, quiet=False)
 
@@ -654,9 +644,7 @@ def Download_PDB_SS_GitHub(loadpath=DATA_DIR, verbose=True, subset=False):
 
     if subset:
         if verbose:
-            print(
-                f"--> DisulfideLoader: Downloading Disulfide Subset Database from GitHub..."
-            )
+            print(f"--> DisulfideLoader: Downloading Disulfide Subset Database from GitHub...")
 
         resp, headers = urllib.request.urlretrieve(
             "https://github.com/suchanek/proteusPy/raw/master/data/PDB_SS_SUBSET_LOADER.pkl",

@@ -54,7 +54,7 @@ Requires-Dist: trame-jupyter-extension
 Requires-Dist: jupyter_contrib_nbextensions
 Requires-Dist: ipywidgets
 Requires-Dist: imageio[ffmpeg]
-Requires-Dist: biopython@ git+https://github.com/suchanek/biopython.git@egs_221115#egg=biopython
+Requires-Dist: biopython@ git+https://github.com/suchanek/biopython.git@egs_ssbond_240305
 
 # Summary
 
