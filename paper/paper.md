@@ -287,7 +287,7 @@ PDB_SS = None
 PDB_SS = Load_PDB_SS(verbose=False, subset=False)
 ss_list = DisulfideList([], 'tmp')
 
-# Return the minimum and maximum energy structures. We ignore tha maximum in this case.
+# Return the minimum and maximum energy structures. We ignore the maximum in this case.
 ssmin_enrg, _ = PDB_SS.SSList.minmax_energy
 
 # Make an empty list and find the nearest neighbors within 10 degrees avg RMS in
@@ -344,7 +344,7 @@ I ultimately elected to only use a single example of a given disulfide from a mu
 
 ### Performance
 - Manipulating and searching through long lists of disulfides can take time. I've added progress bars for many of these operations. 
-- Rendering many disulfides in **pyvista** can also take time to load and may be slow to dispay in real time, depending on your hardware. I added optimization to reduce cylinder complexity as a function of total cylinders rendered, but it can still be less than perfect. The faster your GPU the better! 
+- Rendering many disulfides in **pyvista** can also take time to load and may be slow to display in real time, depending on your hardware. I added optimization to reduce cylinder complexity as a function of total cylinders rendered, but it can still be less than perfect. The faster your GPU the better! 
 
 ### Visualizing Disulfides with pyVista
 PyVista is an excellent 3D visualization framework and I've used it for the Disulfide visualization engine. It uses the VTK library on the back end and provides high-level access to 3d rendering. The menu strip provided in the Disulfide visualization windows allows the user to turn borders, rulers, bounding boxes on and off and reset the orientations. Please try them out! There is also a button for *local* vs *server* rendering. *Local* rendering is usually much smoother. To manipulate:
