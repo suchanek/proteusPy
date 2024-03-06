@@ -1,12 +1,12 @@
 [project]
-name = "proteuspy"
-version = "0.92.14"
+name = "proteusPy"
 description = "proteusPy - Protein Structure Analysis and Modeling Tools"
 authors = [{name = "Eric Suchanek", email = "suchanek@mac.com"}]
 license = {file = "LICENSE"}
 readme = "README.md"
 keywords = ["structural biophysics", "proteus", "disulfide bonds", "RCSB"]
 requires-python = "<3.12"
+dynamic = ["version"]
 
 classifiers=[
         "Development Status :: 4 - Beta",
@@ -18,8 +18,7 @@ classifiers=[
         "Topic :: Scientific/Engineering",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "Topic :: Scientific/Engineering :: Chemistry",
-        "Programming Language :: Python :: 3.11",
-        ]
+]
 
 dependencies = [
 "numpy",
@@ -66,6 +65,14 @@ proteusPy = ["data/*.txt", "data/*.py", "data/*.json", "data/*.csv", "data/SS_co
 [tool.setuptools.exclude-package-data]
 proteusPy = ["data/PDB_all_ss.pkl", "data/PDB_SS_ALL_LOADER.pkl", "data/PDB_all_ss_dict.pkl"]
 
+[tool.setuptools-git-versioning]
+enabled = true
+version_file = "VERSION"
+count_commits_from_version_file = true
+template = "{tag}" # default setting
+dev_template = "{tag}+{branch}.{ccount}"
+dirty_template = "{tag}+{branch}.{ccount}"
+
 [project.urls]
 repository = "https://github.com/suchanek/proteusPy/"
 homepage = "https://github.com/suchanek/proteusPy/"
@@ -103,15 +110,11 @@ install = ["_install", "_jup_install"]
   help = "Run formatting tools on the code base"
   cmd = "black ."
 
-  [tool.poe.tasks.format-black]
-  help = "Run black on the code base"
-  cmd = "black ."
-
   [tool.poe.tasks.docs]
   help = "Build the docs with pdoc"
   cmd = "pdoc -o docs --math --logo ./logo.png ./proteusPy"
   deps = ["_clean_docs"]
 
 [build-system]
-requires = ["setuptools >= 61.0"]
+requires = ["setuptools >= 61.0", "setuptools-git-versioning<2"]
 build-backend = "setuptools.build_meta"
