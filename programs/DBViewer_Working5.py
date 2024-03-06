@@ -55,7 +55,9 @@ def get_theme() -> str:
     return "default"
 
 
-rcsb_ss_widget = pn.widgets.Select(name="Disulfide", value=default_ss, options=ssidlist)
+rcsb_ss_widget = pn.widgets.Select(
+    name="Disulfide", value=default_ss, options=ssidlist
+)
 
 
 def click_plot(event):
@@ -101,7 +103,9 @@ def update_info(ss: Disulfide):
 
 # Widgets
 styles_group = pn.widgets.RadioBoxGroup(
-    name="Rending Style", options=["Split Bonds", "CPK", "Ball and Stick"], inline=False
+    name="Rending Style",
+    options=["Split Bonds", "CPK", "Ball and Stick"],
+    inline=False,
 )
 
 single_checkbox = pn.widgets.Checkbox(name="Single View", value=True)
@@ -150,8 +154,12 @@ output_md = pn.pane.Markdown("Output goes here")
 db_md = pn.pane.Markdown("Database Info goes here")
 info_md = pn.pane.Markdown("SS Info")
 
-ss_info = pn.WidgetBox("# Disulfide Info \n ", info_md).servable(target="sidebar")
-output_info = pn.WidgetBox("## Program Output\n ", output_md).servable(target="sidebar")
+ss_info = pn.WidgetBox("# Disulfide Info \n ", info_md).servable(
+    target="sidebar"
+)
+output_info = pn.WidgetBox("## Program Output\n ", output_md).servable(
+    target="sidebar"
+)
 db_info = pn.Column("### RCSB Database Info", db_md)
 
 
@@ -252,7 +260,9 @@ def render_ss(clk=True):
 
     update_output(f"Plotter: {plotter.ren_win}")
 
-    return ss.plot(plotter, single=single, style=style, shadows=shadows, light=light)
+    return ss.plot(
+        plotter, single=single, style=style, shadows=shadows, light=light
+    )
 
 
 """

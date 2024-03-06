@@ -27,7 +27,11 @@ app.layout = html.Div(
 # Define the app callbacks
 @app.callback(
     Output("output", "children"),
-    [Input("sb", "n_clicks"), Input("cpk", "n_clicks"), Input("bs", "n_clicks")],
+    [
+        Input("sb", "n_clicks"),
+        Input("cpk", "n_clicks"),
+        Input("bs", "n_clicks"),
+    ],
 )
 def update_output(sb, cpk, bs):
     ctx = dash.callback_context

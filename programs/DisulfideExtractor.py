@@ -70,7 +70,9 @@ def do_extract(verbose, full, subset, cutoff):
 
     if full:
         if verbose:
-            print("--> Extracting the SS full dataset. This will take ~1.5 hours.")
+            print(
+                "--> Extracting the SS full dataset. This will take ~1.5 hours."
+            )
 
         Extract_Disulfides(
             numb=-1,
@@ -186,7 +188,10 @@ parser.add_argument(
     action=argparse.BooleanOptionalAction,
 )
 parser.add_argument(
-    "-v", "--verbose", help="level of verbosity", action=argparse.BooleanOptionalAction
+    "-v",
+    "--verbose",
+    help="level of verbosity",
+    action=argparse.BooleanOptionalAction,
 )
 parser.add_argument(
     "-e",
@@ -201,7 +206,10 @@ parser.add_argument(
     action=argparse.BooleanOptionalAction,
 )
 parser.add_argument(
-    "-b", "--build", help="rebuild the loader", action=argparse.BooleanOptionalAction
+    "-b",
+    "--build",
+    help="rebuild the loader",
+    action=argparse.BooleanOptionalAction,
 )
 parser.add_argument(
     "-s",

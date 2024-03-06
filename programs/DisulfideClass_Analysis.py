@@ -302,8 +302,12 @@ def plot_classes_vs_cutoff(cutoff, steps):
 def analyze_classes(binary: bool, sextant: bool, all: bool):
     # main program begins
     if all:
-        analyze_six_classes(PDB_SS, do_graph=True, do_consensus=True, cutoff=0.0)
-        analyze_binary_classes(PDB_SS, do_graph=True, do_consensus=True, cutoff=0.0)
+        analyze_six_classes(
+            PDB_SS, do_graph=True, do_consensus=True, cutoff=0.0
+        )
+        analyze_binary_classes(
+            PDB_SS, do_graph=True, do_consensus=True, cutoff=0.0
+        )
         return
 
     if sextant:

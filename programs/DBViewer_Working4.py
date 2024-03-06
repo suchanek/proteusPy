@@ -99,7 +99,9 @@ def update_info(ss: Disulfide):
 
 # Widgets
 styles_group = pn.widgets.RadioBoxGroup(
-    name="Rending Style", options=["Split Bonds", "CPK", "Ball and Stick"], inline=False
+    name="Rending Style",
+    options=["Split Bonds", "CPK", "Ball and Stick"],
+    inline=False,
 )
 
 single_checkbox = pn.widgets.Checkbox(name="Single View", value=True)
@@ -124,7 +126,9 @@ button.on_click(click_plot)
 # not used atm
 shadows_checkbox = pn.widgets.Checkbox(name="Shadows", value=False)
 
-rcsb_ss_widget = pn.widgets.Select(name="Disulfide", value=default_ss, options=ssidlist)
+rcsb_ss_widget = pn.widgets.Select(
+    name="Disulfide", value=default_ss, options=ssidlist
+)
 rcsb_selector_widget = pn.widgets.AutocompleteInput(
     name="RCSB ID",
     value=rcsid,
@@ -148,8 +152,12 @@ output_md = pn.pane.Markdown("Output goes here")
 db_md = pn.pane.Markdown("Database Info goes here")
 info_md = pn.pane.Markdown("SS Info")
 
-ss_info = pn.WidgetBox("# Disulfide Info \n ", info_md).servable(target="sidebar")
-output_info = pn.WidgetBox("## Program Output\n ", output_md).servable(target="sidebar")
+ss_info = pn.WidgetBox("# Disulfide Info \n ", info_md).servable(
+    target="sidebar"
+)
+output_info = pn.WidgetBox("## Program Output\n ", output_md).servable(
+    target="sidebar"
+)
 db_info = pn.Column("### RCSB Database Info", db_md)
 
 
@@ -249,7 +257,9 @@ def render_ss(clk=True):
     shadows = shadows_checkbox.value
 
     plotter.clear()
-    plotter = ss.plot(plotter, single=single, style=style, shadows=shadows, light=light)
+    plotter = ss.plot(
+        plotter, single=single, style=style, shadows=shadows, light=light
+    )
 
     vtkpan = pn.pane.VTK(
         plotter.ren_win,

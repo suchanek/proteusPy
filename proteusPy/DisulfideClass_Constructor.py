@@ -215,7 +215,9 @@ class DisulfideClass_Constructor:
         angle_maps = {"0": ["4", "5", "6"], "2": ["1", "2", "3"]}
         class_lists = [angle_maps[char] for char in class_str]
         class_combinations = itertools.product(*class_lists)
-        class_strings = ["".join(combination) for combination in class_combinations]
+        class_strings = [
+            "".join(combination) for combination in class_combinations
+        ]
         return class_strings
 
     def build_yourself(self, loader) -> None:
@@ -238,13 +240,19 @@ class DisulfideClass_Constructor:
         tors_df = loader.getTorsions()
 
         if self.verbose:
-            print(f"-> DisulfideClass_Constructor(): creating binary SS classes...")
+            print(
+                f"-> DisulfideClass_Constructor(): creating binary SS classes..."
+            )
 
         grouped = self.create_binary_classes(tors_df)
 
         class_df = pd.read_csv(
             StringIO(SS_CLASS_DEFINITIONS),
-            dtype={"class_id": "string", "FXN": "string", "SS_Classname": "string"},
+            dtype={
+                "class_id": "string",
+                "FXN": "string",
+                "SS_Classname": "string",
+            },
         )
         class_df["FXN"].str.strip()
         class_df["SS_Classname"].str.strip()
@@ -264,7 +272,9 @@ class DisulfideClass_Constructor:
         self.classdf = merged.copy()
 
         if self.verbose:
-            print(f"-> DisulfideClass_Constructor(): creating sixfold SS classes...")
+            print(
+                f"-> DisulfideClass_Constructor(): creating sixfold SS classes..."
+            )
 
         grouped_sixclass = self.create_six_classes(tors_df)
 
@@ -287,7 +297,9 @@ class DisulfideClass_Constructor:
         # Create new columns with the sign of each chi column
         chi_columns = ["chi1", "chi2", "chi3", "chi4", "chi5"]
         sign_columns = [col + "_s" for col in chi_columns]
-        df[sign_columns] = df[chi_columns].applymap(lambda x: 1 if x >= 0 else -1)
+        df[sign_columns] = df[chi_columns].applymap(
+            lambda x: 1 if x >= 0 else -1
+        )
 
         # Create a new column with the class ID for each row
         class_id_column = "class_id"
@@ -298,7 +310,9 @@ class DisulfideClass_Constructor:
         # Group the DataFrame by the class ID and return the grouped data
         grouped = df.groupby(class_id_column)["ss_id"].unique().reset_index()
         grouped["count"] = grouped["ss_id"].apply(lambda x: len(x))
-        grouped["incidence"] = grouped["ss_id"].apply(lambda x: len(x) / len(df))
+        grouped["incidence"] = grouped["ss_id"].apply(
+            lambda x: len(x) / len(df)
+        )
         grouped["percentage"] = grouped["incidence"].apply(lambda x: 100 * x)
 
         return grouped
@@ -327,9 +341,9 @@ class DisulfideClass_Constructor:
             _df[col_name + "_t"] = df[col_name].apply(self.get_sixth_quadrant)
 
         # create the class_id column
-        df["class_id"] = _df[["chi1_t", "chi2_t", "chi3_t", "chi4_t", "chi5_t"]].apply(
-            lambda x: "".join(x), axis=1
-        )
+        df["class_id"] = _df[
+            ["chi1_t", "chi2_t", "chi3_t", "chi4_t", "chi5_t"]
+        ].apply(lambda x: "".join(x), axis=1)
 
         # group the DataFrame by class_id and return the grouped data
         grouped = df.groupby("class_id").agg({"ss_id": "unique"})
@@ -486,7 +500,9 @@ class DisulfideClass_Constructor:
 
         # Helper function to draw angle easily.
         def plot_angle(ax, pos, angle, length=0.95, acol="C0", **kwargs):
-            vec2 = np.array([np.cos(np.deg2rad(angle)), np.sin(np.deg2rad(angle))])
+            vec2 = np.array(
+                [np.cos(np.deg2rad(angle)), np.sin(np.deg2rad(angle))]
+            )
             xy = np.c_[[length, 0], [0, 0], vec2 * length].T + np.array(pos)
             ax.plot(*xy.T, color=acol)
             return AngleAnnotation(pos, xy[0], xy[2], ax=ax, **kwargs)
@@ -508,7 +524,9 @@ class DisulfideClass_Constructor:
         _text = f"${360/classes}°$"
         kw = dict(size=75, unit="points", text=_text)
 
-        am7 = plot_angle(ax1, (0, 0), 360 / classes, textposition="outside", **kw)
+        am7 = plot_angle(
+            ax1, (0, 0), 360 / classes, textposition="outside", **kw
+        )
 
         # Create a list of segment values
         # !!!
@@ -517,7 +535,10 @@ class DisulfideClass_Constructor:
         # Create the pie chart
         # fig, ax = plt.subplots()
         wedges, _ = ax1.pie(
-            values, startangle=0, counterclock=False, wedgeprops=dict(width=0.65)
+            values,
+            startangle=0,
+            counterclock=False,
+            wedgeprops=dict(width=0.65),
         )
 
         # Set the chart title and size

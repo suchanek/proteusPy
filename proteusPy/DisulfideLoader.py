@@ -235,7 +235,9 @@ class DisulfideLoader:
             try:
                 res = self.SSList.get_by_name(item)  # full disulfide name
             except:
-                mess = f"DisulfideLoader(): Cannot find key {item} in SSBond dict!"
+                mess = (
+                    f"DisulfideLoader(): Cannot find key {item} in SSBond dict!"
+                )
                 raise DisulfideException(mess)
         return res
 
@@ -245,7 +247,9 @@ class DisulfideLoader:
     def _validate_ss(self, value):
         if isinstance(value, (Disulfide)):
             return value
-        raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
+        raise TypeError(
+            f"Disulfide object expected, got {type(value).__name__}"
+        )
 
     @property
     def Average_Resolution(self) -> float:
@@ -365,7 +369,9 @@ class DisulfideLoader:
         ) / (1024 * 1024)
         res = self.Average_Resolution
         cutoff = self.cutoff
-        timestr = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.timestamp))
+        timestr = time.strftime(
+            "%Y-%m-%d %H:%M:%S", time.localtime(self.timestamp)
+        )
         ssMin, ssMax = self.SSList.minmax_energy
 
         print(f"    =========== RCSB Disulfide Database Summary ==============")
@@ -377,7 +383,9 @@ class DisulfideLoader:
         print(f"Highest Energy Disulfide:           {ssMax.name}")
         print(f"Cα distance cutoff:                 {cutoff:.2f} Å")
         print(f"Total RAM Used:                     {ram:.2f} GB.")
-        print(f"    ================= proteusPy: {vers} =======================")
+        print(
+            f"    ================= proteusPy: {vers} ======================="
+        )
 
     def display_overlay(self, pdbid) -> None:
         """
@@ -535,7 +543,9 @@ class DisulfideLoader:
         for cls in clslist:
             sixcls = self.tclass.binary_to_six_class(cls)
             df = _enumerate_sixclass_fromlist(sixcls)
-            plot_count_vs_class_df(df, cls, theme="light", save=save, savedir=savedir)
+            plot_count_vs_class_df(
+                df, cls, theme="light", save=save, savedir=savedir
+            )
         return
 
     def enumerate_sixclass_fromlist(self, sslist) -> pandas.DataFrame:
@@ -602,7 +612,9 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False):
     _fname_all = f"{loadpath}{LOADER_FNAME}"
 
     if verbose:
-        print(f"--> DisulfideLoader: Downloading Disulfide Database from Drive...")
+        print(
+            f"--> DisulfideLoader: Downloading Disulfide Database from Drive..."
+        )
 
     gdown.download(LOADER_ALL_URL, _fname_all, quiet=False)
 
@@ -638,7 +650,9 @@ def Download_PDB_SS_GitHub(loadpath=DATA_DIR, verbose=True, subset=False):
     _subset_length = 9636086
 
     if verbose:
-        print(f"--> DisulfideLoader: Downloading Disulfide Database from GitHub...")
+        print(
+            f"--> DisulfideLoader: Downloading Disulfide Database from GitHub..."
+        )
 
     resp, headers = urllib.request.urlretrieve(
         "https://github.com/suchanek/proteusPy/raw/master/data/PDB_SS_ALL_LOADER.pkl",
@@ -668,7 +682,9 @@ def Download_PDB_SS_GitHub(loadpath=DATA_DIR, verbose=True, subset=False):
     return _good1 + _good2
 
 
-def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoader:
+def Load_PDB_SS(
+    loadpath=DATA_DIR, verbose=False, subset=False
+) -> DisulfideLoader:
     """
     Load the fully instantiated Disulfide database from the specified file. Use the
     defaults unless you are building the database by hand. *This is the function

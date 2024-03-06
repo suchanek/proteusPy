@@ -5,53 +5,79 @@
 """
 .. include:: ../README.md
 """
-__pdoc__ = {"__all__": False}
 
 from pathlib import Path
 
-# this_directory = Path(__file__).parent
-
+__pdoc__ = {"__all__": False}
 __version__ = "UNDEFINED"
-for line in open(Path(__file__).parent / "__version__.py"):
-    if line.startswith("__version__"):
-        exec(line.strip())
 
-import sys
-import os
-import glob
-import warnings
+version_file = Path(__file__).parent.parent / "VERSION"
+if version_file.is_file():
+    with open(version_file) as f:
+        __version__ = f.read().strip()
+
 import copy
-import time
 import datetime
+import glob
 import math
-import numpy
-import matplotlib
+import os
+import sys
+import time
+import warnings
+
 import Bio
+import matplotlib
+import numpy
 import plotly
-
-from Bio.PDB.vectors import calc_dihedral, calc_angle
 from Bio.PDB import Select, Vector
+from Bio.PDB.vectors import calc_angle, calc_dihedral
 
-from .ProteusPyWarning import ProteusPyWarning
+from .angle_annotation import *
+from .atoms import *
+from .data import *
+from .Disulfide import (
+    Disulfide_Energy_Function,
+    Download_Disulfides,
+    Extract_Disulfides,
+    check_header_from_file,
+    check_header_from_id,
+)
+from .DisulfideClass_Constructor import DisulfideClass_Constructor
+from .DisulfideClasses import (
+    create_classes,
+    create_quat_classes,
+    enumerate_sixclass_fromlist,
+    filter_by_percentage,
+    get_half_quadrant,
+    get_quadrant,
+    get_sixth_quadrant,
+    plot_binary_to_sixclass_incidence,
+    plot_count_vs_class_df,
+    plot_count_vs_classid,
+    torsion_to_sixclass,
+)
+from .DisulfideExceptions import (
+    DisulfideConstructionException,
+    DisulfideConstructionWarning,
+    DisulfideIOException,
+)
+from .DisulfideList import load_disulfides_from_id
+from .DisulfideLoader import (
+    Download_PDB_SS,
+    Download_PDB_SS_GitHub,
+    Load_PDB_SS,
+)
 from .ProteusGlobals import (
-    PDB_DIR,
-    MODEL_DIR,
-    WINFRAME,
-    WINSIZE,
-    CAMERA_POS,
     _ANG_INIT,
     _FLOAT_INIT,
     _INT_INIT,
+    CAMERA_POS,
+    MODEL_DIR,
+    PDB_DIR,
+    WINFRAME,
+    WINSIZE,
 )
-
-from .DisulfideExceptions import (
-    DisulfideIOException,
-    DisulfideConstructionWarning,
-    DisulfideConstructionException,
-)
-
-from .turtle3D import Turtle3D, test_turtle
-from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN
+from .ProteusPyWarning import ProteusPyWarning
 from .Residue import (
     build_residue,
     get_backbone_from_chain,
@@ -60,46 +86,16 @@ from .Residue import (
     to_nitrogen,
     to_oxygen,
 )
-
-from .Disulfide import (
-    Download_Disulfides,
-    Extract_Disulfides,
-    check_header_from_file,
-    check_header_from_id,
-    Disulfide_Energy_Function,
-)
-from .DisulfideList import load_disulfides_from_id
-from .DisulfideLoader import Load_PDB_SS, Download_PDB_SS, Download_PDB_SS_GitHub
-
-from .atoms import *
-from .data import *
-from .angle_annotation import *
-
+from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN, Turtle3D, test_turtle
 from .utility import (
-    distance_squared,
-    distance3d,
-    get_jet_colormap,
     Check_chains,
-    print_memory_used,
-    image_to_ascii_art,
+    distance3d,
+    distance_squared,
     generate_vector_dataframe,
+    get_jet_colormap,
+    image_to_ascii_art,
+    print_memory_used,
     retrieve_git_lfs_files,
 )
-
-from .DisulfideClasses import (
-    create_classes,
-    create_quat_classes,
-    plot_count_vs_classid,
-    plot_count_vs_class_df,
-    get_half_quadrant,
-    get_quadrant,
-    get_sixth_quadrant,
-    filter_by_percentage,
-    torsion_to_sixclass,
-    plot_binary_to_sixclass_incidence,
-    enumerate_sixclass_fromlist,
-)
-
-from .DisulfideClass_Constructor import DisulfideClass_Constructor
 
 # end of file

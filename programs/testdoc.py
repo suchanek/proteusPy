@@ -69,7 +69,9 @@ MODELS = f"{PDB_ROOT}models/"
 SS = Disulfide("tmp")
 SSlist = DisulfideList([], "ss")
 
-PDB_SS = DisulfideLoader(verbose=True, datadir=MODELS)  # load the Disulfide database\n
+PDB_SS = DisulfideLoader(
+    verbose=True, datadir=MODELS
+)  # load the Disulfide database\n
 SS = PDB_SS[0]  # returns a Disulfide object at index 0
 SSlist = PDB_SS["4yys"]  # returns a DisulfideList containing all
 #  disulfides for 4yys\n
