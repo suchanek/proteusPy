@@ -136,7 +136,10 @@ X = tor_df
 n_clusters = 4
 
 scm_model = SpectralClustering(
-    n_clusters=n_clusters, random_state=25, n_neighbors=8, affinity="nearest_neighbors"
+    n_clusters=n_clusters,
+    random_state=25,
+    n_neighbors=8,
+    affinity="nearest_neighbors",
 )
 # takes 51 min with full dataset
 """
@@ -169,7 +172,9 @@ X["cluster"] = aff_model.fit_predict(X[["torsion_length"]])
 
 fig, ax = plt.subplots()
 ax.set(title="Affinity Propagation")
-sns.scatterplot(x="torsion_length", y="energy", data=X, hue="cluster", ax=ax, size=2)
+sns.scatterplot(
+    x="torsion_length", y="energy", data=X, hue="cluster", ax=ax, size=2
+)
 
 from sklearn.mixture import GaussianMixture
 

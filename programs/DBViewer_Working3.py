@@ -47,7 +47,9 @@ RCSB_list = []
 
 # a few widgets
 styles_group = pn.widgets.RadioBoxGroup(
-    name="Rending Style", options=["Split Bonds", "CPK", "Ball and Stick"], inline=False
+    name="Rending Style",
+    options=["Split Bonds", "CPK", "Ball and Stick"],
+    inline=False,
 )
 
 single_checkbox = pn.widgets.Checkbox(name="Single View", value=True)
@@ -357,7 +359,9 @@ def render_ss(clk=True):
     update_info(ss)
     update_output(ss)
 
-    plotter = ss.plot(plotter, single=single, style=style, shadows=False, light=light)
+    plotter = ss.plot(
+        plotter, single=single, style=style, shadows=False, light=light
+    )
     vtkpan = pn.pane.VTK(
         plotter.ren_win,
         margin=0,

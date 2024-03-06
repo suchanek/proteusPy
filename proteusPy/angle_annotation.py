@@ -209,16 +209,22 @@ class AngleAnnotation(Arc):
         angle = np.deg2rad(self.theta1 + angle_span / 2)
         r = s / 2
         if self.textposition == "inside":
-            r = s / np.interp(angle_span, [60, 90, 135, 180], [3.3, 3.5, 3.8, 4])
+            r = s / np.interp(
+                angle_span, [60, 90, 135, 180], [3.3, 3.5, 3.8, 4]
+            )
         self.text.xy = c + r * np.array([np.cos(angle), np.sin(angle)])
         if self.textposition == "outside":
 
             def R90(a, r, w, h):
                 if a < np.arctan(h / 2 / (r + w / 2)):
-                    return np.sqrt((r + w / 2) ** 2 + (np.tan(a) * (r + w / 2)) ** 2)
+                    return np.sqrt(
+                        (r + w / 2) ** 2 + (np.tan(a) * (r + w / 2)) ** 2
+                    )
                 else:
                     c = np.sqrt((w / 2) ** 2 + (h / 2) ** 2)
-                    T = np.arcsin(c * np.cos(np.pi / 2 - a + np.arcsin(h / 2 / c)) / r)
+                    T = np.arcsin(
+                        c * np.cos(np.pi / 2 - a + np.arcsin(h / 2 / c)) / r
+                    )
                     xy = r * np.array([np.cos(a + T), np.sin(a + T)])
                     xy += np.array([w / 2, h / 2])
                     return np.sqrt(np.sum(xy**2))

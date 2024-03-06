@@ -551,7 +551,12 @@ class DisulfideList(UserList):
         pl.show()
 
     def display_torsion_statistics(
-        self, display=True, save=False, fname="ss_torsions.png", stats=False, light=True
+        self,
+        display=True,
+        save=False,
+        fname="ss_torsions.png",
+        stats=False,
+        light=True,
     ):
         """
         Display torsion and distance statistics for a given Disulfide list.
@@ -633,7 +638,10 @@ class DisulfideList(UserList):
                 y=[mean_vals[5]],
                 name="Energy (kcal/mol)",
                 error_y=dict(
-                    type="data", array=[std_vals[5].tolist()], width=0.25, visible=True
+                    type="data",
+                    array=[std_vals[5].tolist()],
+                    width=0.25,
+                    visible=True,
                 ),
             ),
             row=1,
@@ -664,7 +672,9 @@ class DisulfideList(UserList):
             col=1,
         )
         # Update the layout of the subplot
-        fig.update_yaxes(title_text="Distance (A)", range=[0, 10], row=2, col=1)  #
+        fig.update_yaxes(
+            title_text="Distance (A)", range=[0, 10], row=2, col=1
+        )  #
         fig.update_traces(width=0.25, row=2, col=1)
 
         # Add a scatter subplot for torsion length column
@@ -681,7 +691,9 @@ class DisulfideList(UserList):
             col=2,
         )
         # Update the layout of the subplot
-        fig.update_yaxes(title_text="Torsion Length", range=[0, 350], row=2, col=2)
+        fig.update_yaxes(
+            title_text="Torsion Length", range=[0, 350], row=2, col=2
+        )
         fig.update_traces(width=0.25, row=2, col=2)
 
         # Update the error bars
@@ -806,7 +818,9 @@ class DisulfideList(UserList):
 
         elif movie:
             if verbose:
-                print(f" -> display_overlay(): Saving mp4 animation to: {fname}")
+                print(
+                    f" -> display_overlay(): Saving mp4 animation to: {fname}"
+                )
 
             pl.open_movie(fname)
             path = pl.generate_orbital_path(n_points=360)
@@ -1145,13 +1159,19 @@ def load_disulfides_from_id(
     # Biopython uses the Structure -> Model -> Chain hierarchy to organize
     # structures. All are iterable.
 
-    structure = parser.get_structure(struct_name, file=f"{pdb_dir}pdb{struct_name}.ent")
+    structure = parser.get_structure(
+        struct_name, file=f"{pdb_dir}pdb{struct_name}.ent"
+    )
     model = structure[model_numb]
 
     if verbose:
-        print(f"-> load_disulfide_from_id() - Parsing structure: {struct_name}:")
+        print(
+            f"-> load_disulfide_from_id() - Parsing structure: {struct_name}:"
+        )
 
-    ssbond_dict = structure.header["ssbond"]  # NB: this requires the modified code
+    ssbond_dict = structure.header[
+        "ssbond"
+    ]  # NB: this requires the modified code
     resolution = structure.header["resolution"]
 
     SSList = DisulfideList([], struct_name, resolution)
@@ -1213,7 +1233,10 @@ def load_disulfides_from_id(
             # make a new Disulfide object, name them based on proximal and distal
             # initialize SS bond from the proximal, distal coordinates
 
-            if _chaina[proximal].is_disordered() or _chainb[distal].is_disordered():
+            if (
+                _chaina[proximal].is_disordered()
+                or _chainb[distal].is_disordered()
+            ):
                 mess = f" -> load_disulfides_from_id(): Disordered chain(s): {struct_name}: {proximal} {chain1_id}\
                 - {distal} {chain2_id}, ignoring!"
                 warnings.warn(mess, DisulfideConstructionWarning)
@@ -1224,7 +1247,9 @@ def load_disulfides_from_id(
                         f" -> load_disulfides_from_id(): SSBond: {i}: {struct_name}: {proximal} {chain1_id}\
                     - {distal} {chain2_id}"
                     )
-                ssbond_name = f"{struct_name}_{proximal}{chain1_id}_{distal}{chain2_id}"
+                ssbond_name = (
+                    f"{struct_name}_{proximal}{chain1_id}_{distal}{chain2_id}"
+                )
                 new_ss = proteusPy.Disulfide.Disulfide(ssbond_name)
                 new_ss.initialize_disulfide_from_chain(
                     _chaina, _chainb, proximal, distal, resolution, quiet=quiet

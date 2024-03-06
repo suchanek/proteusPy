@@ -90,8 +90,8 @@ testpaths = [
 line-length = 80
 
 [tool.poe.tasks]
-_build = "poetry build"
-_install = "poetry install"
+_build = "python -m build"
+_install = "python -m install"
 _jup_install = "poe jupyter"
 _clean_sdist.script = "shutil:rmtree('sdist', ignore_errors=1)"
 _clean_docs.script = "shutil:rmtree('docs', ignore_errors=1)"

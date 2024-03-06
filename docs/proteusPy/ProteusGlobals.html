@@ -115,26 +115,27 @@ Last revision: 2/18/24 -egs-</p>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">Last revision: 2/18/24 -egs-</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="kn">import</span> <span class="nn">os</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="n">PDB_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PDB&quot;</span><span class="p">)</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="n">PROTEUSPY_REPO_HOME</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PROTEUSPY_REPO_HOME&quot;</span><span class="p">)</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="n">REPO_DATA_DIR</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PROTEUSPY_REPO_HOME</span><span class="si">}</span><span class="s2">data/&quot;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="kn">import</span> <span class="nn">math</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="kn">import</span> <span class="nn">os</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="n">PDB_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PDB&quot;</span><span class="p">)</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="n">PROTEUSPY_REPO_HOME</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PROTEUSPY_REPO_HOME&quot;</span><span class="p">)</span>
 </span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="n">MODEL_DIR</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PDB_DIR</span><span class="si">}</span><span class="s2">good/&quot;</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="n">WINFRAME</span> <span class="o">=</span> <span class="mi">512</span>  <span class="c1"># single panel width</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="n">WINSIZE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="n">CAMERA_POS</span> <span class="o">=</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="c1"># global for initialization of dihedrals and energies</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="n">_FLOAT_INIT</span> <span class="o">=</span> <span class="o">-</span><span class="mf">999.99</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="n">_INT_INIT</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a><span class="n">_ANG_INIT</span> <span class="o">=</span> <span class="o">-</span><span class="mf">180.0</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a><span class="n">PBAR_COLS</span> <span class="o">=</span> <span class="mi">105</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a><span class="c1"># nominal macbook Pro screen resolution</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="n">DPI</span> <span class="o">=</span> <span class="mi">220</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="n">REPO_DATA_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PROTEUSPY_REPO_HOME</span><span class="p">,</span> <span class="s2">&quot;data/&quot;</span><span class="p">)</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="n">MODEL_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PDB_DIR</span><span class="p">,</span> <span class="s2">&quot;good/&quot;</span><span class="p">)</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="n">WINFRAME</span> <span class="o">=</span> <span class="mi">512</span>  <span class="c1"># single panel width</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="n">WINSIZE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="n">CAMERA_POS</span> <span class="o">=</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="c1"># global for initialization of dihedrals and energies</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="n">_FLOAT_INIT</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">nan</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a><span class="n">_INT_INIT</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a><span class="n">_ANG_INIT</span> <span class="o">=</span> <span class="o">-</span><span class="mf">180.0</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a><span class="n">PBAR_COLS</span> <span class="o">=</span> <span class="mi">105</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="c1"># nominal macbook Pro screen resolution</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a><span class="n">DPI</span> <span class="o">=</span> <span class="mi">220</span>
 </span></pre></div>
 
 

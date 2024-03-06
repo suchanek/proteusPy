@@ -123,7 +123,7 @@
 </span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>
 </span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a>    <span class="k">assert</span> <span class="p">(</span>
 </span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>        <span class="n">turtle</span><span class="o">.</span><span class="n">_orientation</span> <span class="o">==</span> <span class="mi">2</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>    <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;build_residue() requires Turtle3D to be in orientation #2&quot;</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>    <span class="p">),</span> <span class="s2">&quot;build_residue() requires Turtle3D to be in orientation #2&quot;</span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a>
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>    <span class="c1"># canonical internal coordinates for backbone atoms with Turtle3D at Ca, heading towards C with N on the left</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>    <span class="c1"># AKA Orientation #2</span>
@@ -153,7 +153,7 @@
 </span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>
 </span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a>    <span class="k">assert</span> <span class="p">(</span>
 </span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>        <span class="n">residue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>    <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;get_backbone_from_sidechain() requires valid residue number&quot;</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>    <span class="p">),</span> <span class="s2">&quot;get_backbone_from_sidechain() requires valid residue number&quot;</span>
 </span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>
 </span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>    <span class="c1"># proximal residue</span>
 </span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>    <span class="n">n</span> <span class="o">=</span> <span class="n">residue</span><span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_vector</span><span class="p">()</span>
@@ -280,7 +280,7 @@
 </span><span id="build_residue-27"><a href="#build_residue-27"><span class="linenos">27</span></a>
 </span><span id="build_residue-28"><a href="#build_residue-28"><span class="linenos">28</span></a>    <span class="k">assert</span> <span class="p">(</span>
 </span><span id="build_residue-29"><a href="#build_residue-29"><span class="linenos">29</span></a>        <span class="n">turtle</span><span class="o">.</span><span class="n">_orientation</span> <span class="o">==</span> <span class="mi">2</span>
-</span><span id="build_residue-30"><a href="#build_residue-30"><span class="linenos">30</span></a>    <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;build_residue() requires Turtle3D to be in orientation #2&quot;</span>
+</span><span id="build_residue-30"><a href="#build_residue-30"><span class="linenos">30</span></a>    <span class="p">),</span> <span class="s2">&quot;build_residue() requires Turtle3D to be in orientation #2&quot;</span>
 </span><span id="build_residue-31"><a href="#build_residue-31"><span class="linenos">31</span></a>
 </span><span id="build_residue-32"><a href="#build_residue-32"><span class="linenos">32</span></a>    <span class="c1"># canonical internal coordinates for backbone atoms with Turtle3D at Ca, heading towards C with N on the left</span>
 </span><span id="build_residue-33"><a href="#build_residue-33"><span class="linenos">33</span></a>    <span class="c1"># AKA Orientation #2</span>
@@ -332,7 +332,7 @@ Returns: <Vector> n, ca, cb, c</p>
 </span><span id="get_backbone_from_chain-57"><a href="#get_backbone_from_chain-57"><span class="linenos">57</span></a>
 </span><span id="get_backbone_from_chain-58"><a href="#get_backbone_from_chain-58"><span class="linenos">58</span></a>    <span class="k">assert</span> <span class="p">(</span>
 </span><span id="get_backbone_from_chain-59"><a href="#get_backbone_from_chain-59"><span class="linenos">59</span></a>        <span class="n">residue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-</span><span id="get_backbone_from_chain-60"><a href="#get_backbone_from_chain-60"><span class="linenos">60</span></a>    <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;get_backbone_from_sidechain() requires valid residue number&quot;</span>
+</span><span id="get_backbone_from_chain-60"><a href="#get_backbone_from_chain-60"><span class="linenos">60</span></a>    <span class="p">),</span> <span class="s2">&quot;get_backbone_from_sidechain() requires valid residue number&quot;</span>
 </span><span id="get_backbone_from_chain-61"><a href="#get_backbone_from_chain-61"><span class="linenos">61</span></a>
 </span><span id="get_backbone_from_chain-62"><a href="#get_backbone_from_chain-62"><span class="linenos">62</span></a>    <span class="c1"># proximal residue</span>
 </span><span id="get_backbone_from_chain-63"><a href="#get_backbone_from_chain-63"><span class="linenos">63</span></a>    <span class="n">n</span> <span class="o">=</span> <span class="n">residue</span><span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_vector</span><span class="p">()</span>

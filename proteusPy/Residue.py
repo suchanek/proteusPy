@@ -26,7 +26,7 @@ def build_residue(turtle: Turtle3D):
 
     assert (
         turtle._orientation == 2
-    ), f"build_residue() requires Turtle3D to be in orientation #2"
+    ), "build_residue() requires Turtle3D to be in orientation #2"
 
     # canonical internal coordinates for backbone atoms with Turtle3D at Ca, heading towards C with N on the left
     # AKA Orientation #2
@@ -56,7 +56,7 @@ def get_backbone_from_chain(chain, resnumb):
 
     assert (
         residue is not None
-    ), f"get_backbone_from_sidechain() requires valid residue number"
+    ), "get_backbone_from_sidechain() requires valid residue number"
 
     # proximal residue
     n = residue["N"].get_vector()

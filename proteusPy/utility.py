@@ -116,19 +116,6 @@ def grid_dimensions(n: int) -> tuple:
         return rows, cols
 
 
-def Ogrid_dimensions(n):
-    """
-    Calculate rows and columns for the given needed to display
-    a given number of disulfides in a square aspect.
-
-    :param n: Number of Disulfides
-    :return: int rows, columns
-    """
-
-    res = math.ceil(math.sqrt(n))
-    return res, res
-
-
 def Check_chains(pdbid, pdbdir, verbose=True):
     """
     Returns True if structure has multiple chains of identical length,
@@ -169,7 +156,9 @@ def Check_chains(pdbid, pdbdir, verbose=True):
         else:
             same = True
             if verbose:
-                print(f"Chains are equal length, assuming the same. {chain_lens}")
+                print(
+                    f"Chains are equal length, assuming the same. {chain_lens}"
+                )
     return same
 
 
@@ -338,7 +327,9 @@ def generate_vector_dataframe(base=3):
         raise ValueError("Unsupported base")
 
     combinations = list(itertools.product(states, repeat=5))
-    df = pd.DataFrame(combinations, columns=["chi1", "chi2", "chi3", "chi4", "chi5"])
+    df = pd.DataFrame(
+        combinations, columns=["chi1", "chi2", "chi3", "chi4", "chi5"]
+    )
     return df
 
 

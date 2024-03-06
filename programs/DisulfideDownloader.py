@@ -48,7 +48,9 @@ def DisulfideLoader(ssfilename="./ss_ids.txt"):
     for entry in pbar:
         pbar.set_postfix({"Entry": entry})
         if entry not in completed:
-            if pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=PDB_DIR):
+            if pdblist.retrieve_pdb_file(
+                entry, file_format="pdb", pdir=PDB_DIR
+            ):
                 completed.update(entry)
                 completed_file.write(f"{entry},")
                 count += 1

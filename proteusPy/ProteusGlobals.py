@@ -6,14 +6,14 @@ Author: Eric G. Suchanek, PhD
 Last revision: 2/18/24 -egs-
 """
 
-import os
 import math
+import os
 
 PDB_DIR = os.getenv("PDB")
 PROTEUSPY_REPO_HOME = os.getenv("PROTEUSPY_REPO_HOME")
-REPO_DATA_DIR = f"{PROTEUSPY_REPO_HOME}data/"
 
-MODEL_DIR = f"{PDB_DIR}good/"
+REPO_DATA_DIR = os.path.join(PROTEUSPY_REPO_HOME, "data/")
+MODEL_DIR = os.path.join(PDB_DIR, "good/")
 
 WINFRAME = 512  # single panel width
 WINSIZE = (1024, 1024)

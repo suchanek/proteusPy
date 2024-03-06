@@ -7,7 +7,7 @@ VERS := $(shell grep ^0 VERSION | cut -d= -f2 | tr -d \" | sed 's/^[[:space:]]*/
 PYPI_PASSWORD := $(shell echo $$PYPI_PASSWORD)
 CONDA = mamba
 
-MESS = "cleanup"
+MESS = "more cleanup"
 
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
@@ -68,18 +68,16 @@ remove_jupyter:
 	jupyter kernelspec uninstall proteuspy -y
 
 remove_jupyter_dev: 
-	#python -m ipykernel uninstall --user --name=ppydev -y
 	jupyter kernelspec uninstall ppydev -y
-
 
 # package development targets
 
 format: sdist
 	black proteusPy
 
-build: sdist docs format
+bld: sdist docs format
 
-sdist: tag
+sdist: .
 	python -m build
 	@echo $(VERS) > sdist.out
 

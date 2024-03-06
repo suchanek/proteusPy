@@ -118,4 +118,6 @@ X["cluster"] = aff_model.fit_predict(X[["torsion_length"]])
 
 fig, ax = plt.subplots()
 ax.set(title="Affinity Propagation")
-sns.scatterplot(x="chi1", y="torsion_length", data=X, hue="cluster", ax=ax, size=2)
+sns.scatterplot(
+    x="chi1", y="torsion_length", data=X, hue="cluster", ax=ax, size=2
+)
