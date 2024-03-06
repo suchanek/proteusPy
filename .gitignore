@@ -2,9 +2,10 @@
 __pycache__
 
 .DS_Store
+proteusPy/.DS_Store
+notebooks/.ipynb_checkpoints
 dist/*.whl
 build/*
-proteusPy/.DS_Store
 proteusPy/pdb/.DS_Store
 data/*.png
 data/Nclasses/*
@@ -17,10 +18,8 @@ proteusPy.egg-info
 proteusPy/proteusPy.egg-info
 proteus_logo_sb.png
 proteus_logo_sb.png
-.DS_Store
 proteus_logo_sb.png
 subset.png
-proteusPy/.DS_Store
 out.ps
 cleaned.py
 subset.png
