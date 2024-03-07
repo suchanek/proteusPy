@@ -994,7 +994,7 @@ class Disulfide:
         return [self.chi1, self.chi2, self.chi3, self.chi4, self.chi5]
 
     @dihedrals.setter
-    def dihedrals(self, dihedrals: list):
+    def dihedrals(self, dihedrals: list) -> None:
         """
         Sets the disulfide dihedral angles to the inputs specified in the list.
 
@@ -1132,7 +1132,7 @@ class Disulfide:
 
     def cofmass(self) -> np.array:
         """
-        Returns the geometric center of mass for the internal coordinates of
+        Return the geometric center of mass for the internal coordinates of
         the given Disulfide. Missing atoms are not included.
 
         :return: 3D array for the geometric center of mass
@@ -1465,7 +1465,7 @@ class Disulfide:
 
     def Distance_neighbors(self, others: DisulfideList, cutoff: float):
         """
-        Returns list of Disulfides whose RMS atomic distance is within
+        Return list of Disulfides whose RMS atomic distance is within
         the cutoff (Å) in the others list.
 
         :param others: DisulfideList to search
@@ -1679,7 +1679,7 @@ class Disulfide:
 
     def internal_coords(self) -> np.array:
         """
-        Returns the internal coordinates for the Disulfide.
+        Return the internal coordinates for the Disulfide.
         If there are missing atoms the extra atoms for the proximal
         and distal N and C are set to [0,0,0]. This is needed for the center of
         mass calculations, used when rendering.
