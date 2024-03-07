@@ -4,7 +4,6 @@ __pycache__
 .DS_Store
 proteusPy/.DS_Store
 notebooks/.ipynb_checkpoints
-dist/*.whl
 build/*
 proteusPy/pdb/.DS_Store
 data/*.png
