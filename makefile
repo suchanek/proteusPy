@@ -1,6 +1,6 @@
 # Makefile for proteusPy
 # Author: Eric G. Suchanek, PhD
-# Last revision: 3/4/24 -egs-
+# Last revision: 3/8/24 -egs-
 
 VERS := $(shell grep ^0 VERSION | cut -d= -f2 | tr -d \" | sed 's/^[[:space:]]*//')
 
@@ -49,10 +49,10 @@ install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	pip install .
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=proteusPy
-	pip install pdoc twine
+	pip install pdoc twine black
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
-	python -m ipykernel install --user --name ppydev --display-name "ppydev $(VERS)"
+	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
 	@echo "Installation finished!"
 
 jup: .
@@ -83,13 +83,13 @@ sdist: .
 	python -m build
 	@echo $(VERS) > sdist.out
 
-docs: sdist
+docs: .
 	@pdoc -o docs --math --logo "./logo.png" ./proteusPy
 	@echo $(VERS) > docs.out
 
 # normally i push to PyPi via github action
 upload: sdist
-	twine upload dist/*
+	twine upload -r proteusPy dist/proteusPy-$(VERS)*
 tag: .
 	@git tag -a $(VERS) -m $(MESS)
 	@echo $(VERS) > tag.out
