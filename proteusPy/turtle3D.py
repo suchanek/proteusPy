@@ -53,11 +53,10 @@ class Turtle3D:
     def new(
         self,
         name: str,
-        pos: Vector,
-        head: Vector,
-        left=Vector(0, 1, 0),
-        up=Vector(0, 0, 1),
-        pen="up",
+        pos: Vector = (0, 0, 0),
+        head: Vector = (1, 0, 0),
+        left: Vector = (0.0, 1.0, 0.0),
+        up: Vector = (0.0, 0.0, 1.0),
         recording=False,
     ):
         """
@@ -76,7 +75,6 @@ class Turtle3D:
         self._heading = head
         self._left = left
         self._up = up
-        self._pen = pen
         self._recording = recording
 
     def copy_coords(self, source):
@@ -303,7 +301,7 @@ class Turtle3D:
         :return: Position
         :rtype: Vector
         """
-        return self._position
+        return self.position
 
     @property
     def Name(self):
