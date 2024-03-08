@@ -54,7 +54,7 @@ class Turtle3D:
         self,
         name: str,
         pos: Vector,
-        head=Vector(1, 0, 0),
+        head: Vector,
         left=Vector(0, 1, 0),
         up=Vector(0, 0, 1),
         pen="up",
@@ -71,13 +71,13 @@ class Turtle3D:
         :param pen: Pen state, defaults to 'up'
         :param recording: _description_, defaults to False
         """
-        self.Name = name
-        self.Position = pos
-        self.Heading = head
-        self.Left = left
-        self.Up = up
-        self.Pen = pen
-        self.Recording = recording
+        self._name = name
+        self._position = pos
+        self._heading = head
+        self._left = left
+        self._up = up
+        self._pen = pen
+        self._recording = recording
 
     def copy_coords(self, source):
         """

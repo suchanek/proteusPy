@@ -39,6 +39,7 @@ devclean:
 install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	pip install . 
+	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
 	python -m ipykernel install --user --name proteusPy --display-name "proteusPy $(VERS)"
@@ -47,6 +48,7 @@ install:
 install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	pip install .
+	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=proteusPy
 	pip install pdoc twine
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
@@ -87,7 +89,7 @@ docs: sdist
 
 # normally i push to PyPi via github action
 upload: sdist
-	twine upload dist/*.gz
+	twine upload dist/*
 tag: .
 	@git tag -a $(VERS) -m $(MESS)
 	@echo $(VERS) > tag.out

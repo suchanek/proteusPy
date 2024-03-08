@@ -53,7 +53,6 @@ dependencies = [
 "jupyter_contrib_nbextensions",
 "ipywidgets",
 "imageio[ffmpeg]",
-"biopython @ git+https://github.com/suchanek/biopython.git@egs_ssbond_240305",
 ]
 
 [tool.setuptools.packages.find]
@@ -70,9 +69,9 @@ enabled = true
 version_file = "VERSION"
 count_commits_from_version_file = true
 template = "{tag}" # default setting
-dev_template = "{tag}+{branch}.{ccount}"
-dirty_template = "{tag}+{branch}.{ccount}"
-
+dev_template = "{tag}"
+#dirty_template = "{tag}+{branch}.{ccount}"
+dirty_template = "{tag}"
 [project.urls]
 repository = "https://github.com/suchanek/proteusPy/"
 homepage = "https://github.com/suchanek/proteusPy/"

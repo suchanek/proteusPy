@@ -1,7 +1,8 @@
 import unittest
 
-from proteusPy.turtle3D import Turtle3D
 from Bio.PDB.vectors import Vector
+
+from proteusPy.turtle3D import Turtle3D
 
 
 class TestTurtle3D(unittest.TestCase):
@@ -21,23 +22,23 @@ class TestTurtle3D(unittest.TestCase):
 
     def test_forward(self):
         turtle = Turtle3D()
-        turtle.forward(10)
+        turtle.move(10)
         self.assertEqual(turtle.position, Vector(10, 0, 0))
 
     def test_back(self):
         turtle = Turtle3D()
-        turtle.forward(10)
-        turtle.back(5)
+        turtle.move(10)
+        turtle.move(-5)
         self.assertEqual(turtle.position, Vector(5, 0, 0))
 
     def test_right(self):
         turtle = Turtle3D()
-        turtle.right(90)
+        turtle.turn(90)
         self.assertEqual(turtle.heading, Vector(0, 1, 0))
 
     def test_left(self):
         turtle = Turtle3D()
-        turtle.left(90)
+        turtle.turn(-90)
         self.assertEqual(turtle.heading, Vector(0, -1, 0))
 
     def test_roll(self):
@@ -49,11 +50,11 @@ class TestTurtle3D(unittest.TestCase):
     def test_pitch(self):
         turtle = Turtle3D()
         turtle.pitch(90)
-        self.assertEqual(turtle.heading, Vector(0, 0, -1))
-        self.assertEqual(turtle.left, Vector(0, 1, 0))
+        self.assertEqual(turtle.Heading, Vector(0, 0, -1))
+        self.assertEqual(turtle.Up, Vector(0, 1, 0))
 
     def test_yaw(self):
         turtle = Turtle3D()
         turtle.yaw(90)
-        self.assertEqual(turtle.heading, Vector(0, 1, 0))
-        self.assertEqual(turtle.up, Vector(0, 0, 1))
+        self.assertEqual(turtle.Heading, Vector(0, 1, 0))
+        self.assertEqual(turtle.Left, Vector(0, 0, 1))
