@@ -70,8 +70,8 @@ version_file = "VERSION"
 count_commits_from_version_file = true
 template = "{tag}" # default setting
 dev_template = "{tag}"
-#dirty_template = "{tag}+{branch}.{ccount}"
-dirty_template = "{tag}"
+dirty_template = "{tag}+{branch}.{ccount}"
+
 [project.urls]
 repository = "https://github.com/suchanek/proteusPy/"
 homepage = "https://github.com/suchanek/proteusPy/"
