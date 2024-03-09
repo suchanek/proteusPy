@@ -53,35 +53,8 @@ class Turtle3D:
     def new(
         self,
         name: str,
-        pos: Vector = (0, 0, 0),
-        head: Vector = (1, 0, 0),
-        left: Vector = (0.0, 1.0, 0.0),
-        up: Vector = (0.0, 0.0, 1.0),
-        recording=False,
-    ):
-        """
-        Initialize a Turtle with a name and initial position
-
-        :param name: Turtle's Name
-        :param pos: Turtle's Position
-        :param head: Turtle's Heading vector, defaults to Vector(1,0,0)
-        :param left: Turtle's Left vector, defaults to Vector(0,1,0)
-        :param up: Turtle's Up vector, defaults to Vector(0,0,1)
-        :param pen: Pen state, defaults to 'up'
-        :param recording: _description_, defaults to False
-        """
-        self._name = name
-        self._position = pos
-        self._heading = head
-        self._left = left
-        self._up = up
-        self._recording = recording
-
-    def new2(
-        self,
-        name: str,
-        pos: Vector = (0, 0, 0),
-        head: Vector = (1, 0, 0),
+        pos: Vector = (0.0, 0.0, 0.0),
+        head: Vector = (1.0, 0.0, 0.0),
         left: Vector = (0.0, 1.0, 0.0),
         up: Vector = (0.0, 0.0, 1.0),
         recording=False,

@@ -38,7 +38,7 @@ devclean:
 # activate the package before running!
 install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install . 
+	pip install -U . 
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
@@ -47,7 +47,7 @@ install:
 
 install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install .
+	pip install -U .
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	pip install pdoc twine black
 	jupyter contrib nbextension install --sys-prefix
