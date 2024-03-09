@@ -192,7 +192,7 @@ class Turtle3D:
         :type x: Vector
         :raises ValueError: Type error
         """
-        if pos is not Vector:
+        if not isinstance(pos, Vector):
             raise ValueError("Turtle3d: pos is not a Vector")
 
         self._position = pos._ar
