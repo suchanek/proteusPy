@@ -49,7 +49,7 @@ install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	pip install -U .
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
-	pip install pdoc twine black
+	pip install pdoc twine black pytest
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
 	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
