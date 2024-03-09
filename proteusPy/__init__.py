@@ -86,7 +86,7 @@ from .Residue import (
     to_nitrogen,
     to_oxygen,
 )
-from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN, Turtle3D, test_turtle
+from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN, Turtle3D
 from .utility import (
     Check_chains,
     distance3d,
