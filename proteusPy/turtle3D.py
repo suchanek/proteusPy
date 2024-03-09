@@ -70,11 +70,11 @@ class Turtle3D:
         :param pen: Pen state, defaults to 'up'
         :param recording: _description_, defaults to False
         """
-        self._name = name
-        self._position = pos
-        self._heading = head
-        self._left = left
-        self._up = up
+        self.name = name
+        self.position = pos
+        self.heading = head
+        self.left = left
+        self.up = up
         self._recording = recording
 
     def copy_coords(self, source):
