@@ -7,7 +7,7 @@ VERS := $(shell grep ^0 VERSION | cut -d= -f2 | tr -d \" | sed 's/^[[:space:]]*/
 PYPI_PASSWORD := $(shell echo $$PYPI_PASSWORD)
 CONDA = mamba
 
-MESS = "more cleanup"
+MESS = "turtle3D"
 
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
@@ -49,7 +49,7 @@ install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	pip install -U .
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
-	pip install pdoc twine black pytest
+	pip install pdoc twine black pytest build
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
 	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
@@ -91,7 +91,7 @@ docs: .
 upload: sdist
 	twine upload -r proteusPy dist/proteusPy-$(VERS)*
 tag: .
-	@git tag -a $(VERS) -m $(MESS)
+	git tag -a $(VERS) -m $(MESS)
 	@echo $(VERS) > tag.out
 
 commit:
