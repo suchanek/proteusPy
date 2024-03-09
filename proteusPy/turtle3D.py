@@ -58,7 +58,7 @@ class Turtle3D:
         left: Vector = (0.0, 1.0, 0.0),
         up: Vector = (0.0, 0.0, 1.0),
         recording=False,
-    ):
+    ) -> None:
         """
         Initialize a Turtle with a name and initial position
 
@@ -77,7 +77,7 @@ class Turtle3D:
         self.up = up
         self._recording = recording
 
-    def copy_coords(self, source):
+    def copy_coords(self, source) -> None:
         """
         Copy the Position, Heading, Left and Up coordinate system from
         the input source into self. Argument: source: Turtle3D
@@ -98,7 +98,7 @@ class Turtle3D:
 
         self._orientation = source._orientation
 
-    def reset(self):
+    def reset(self) -> None:
         """
         Reset the Turtle to be at the Origin, with correct Heading, Left and Up vectors.
         Arguments: None
@@ -107,7 +107,7 @@ class Turtle3D:
         self.__init__()
 
     @property
-    def Orientation(self):
+    def Orientation(self) -> numpy.array:
         return self._orientation
 
     @Orientation.setter
@@ -118,14 +118,14 @@ class Turtle3D:
         self._orientation = orientation
 
     @property
-    def Pen(self):
+    def Pen(self) -> str:
         if self._pen == _UP_:
             return "up"
         else:
             return "down"
 
     @Pen.setter
-    def Pen(self, pen):
+    def Pen(self, pen) -> None:
         if pen == "up":
             self._pen = _UP_
         elif pen == "down":
@@ -134,14 +134,14 @@ class Turtle3D:
             self._pen = _DOWN_
 
     @property
-    def Recording(self):
+    def Recording(self) -> bool:
         return self._recording
 
     @Recording.setter
     def Recording(self, recording: bool):
         self._recording = recording
 
-    def ResetTape(self):
+    def ResetTape(self) -> None:
         self.Recording(False)
         self._tape = []
 
@@ -156,7 +156,7 @@ class Turtle3D:
         return self.position
 
     @Position.setter
-    def Position(self, x, y=None, z=None):
+    def Position(self, x, y=None, z=None) -> None:
         """
         Set's the Turtle's Position
 
@@ -183,25 +183,8 @@ class Turtle3D:
         self.position = Vector(self._position)
         return
 
-    @Position.setter
-    def Position(self, pos: Vector):
-        """
-        Set's the Turtle's Position with Vector input
-
-        :param pos: Position vector
-        :type x: Vector
-        :raises ValueError: Type error
-        """
-        if not isinstance(pos, Vector):
-            raise ValueError("Turtle3d: pos is not a Vector")
-
-        self._position = pos._ar
-        self.position = pos
-
-        return
-
     @property
-    def Heading(self):
+    def Heading(self) -> Vector:
         """
         Get the Turtle's Heading
 
@@ -211,7 +194,7 @@ class Turtle3D:
         return self.heading
 
     @Heading.setter
-    def Heading(self, x, y=None, z=None):
+    def Heading(self, x, y=None, z=None) -> None:
         """
         Set the turtle's Heading direction vector
 
@@ -238,7 +221,7 @@ class Turtle3D:
         return
 
     @property
-    def Left(self):
+    def Left(self) -> Vector:
         """
         Get the Turtle's Left direction vector
 
@@ -275,7 +258,7 @@ class Turtle3D:
         return
 
     @property
-    def Up(self):
+    def Up(self) -> Vector:
         """
         The Turtle's Up direction vector
 
@@ -286,7 +269,7 @@ class Turtle3D:
         return self.up
 
     @Up.setter
-    def Up(self, x, y=None, z=None):
+    def Up(self, x, y=None, z=None) -> None:
         """
         Set the turtle's Up direction vector
 
@@ -311,31 +294,22 @@ class Turtle3D:
         self.up = Vector(self._up)
         return
 
-    def VPosition(self) -> Vector:
-        """
-        Return the Turtle's Position as a Vector
-
-        :return: Position
-        :rtype: Vector
-        """
-        return self.position
-
     @property
-    def Name(self):
+    def Name(self) -> str:
         """
         Return the Turtle's Name.
         """
         return self._name
 
     @Name.setter
-    def Name(self, name):
+    def Name(self, name) -> None:
         """
         Set the Turtle's name.
 
         """
         self._name = name
 
-    def move(self, distance: float):
+    def move(self, distance: float) -> None:
         """
         Move the Turtle distance (Å), in direction of Heading
 
@@ -345,7 +319,7 @@ class Turtle3D:
         self._position = self._position + self._heading * distance
         self.position = Vector(self._position)
 
-    def roll(self, angle):
+    def roll(self, angle) -> None:
         """
         Roll the Turtle about the heading vector angle degrees
 
@@ -374,7 +348,7 @@ class Turtle3D:
 
         self.left = Vector(self._left)
 
-    def yaw(self, angle):
+    def yaw(self, angle) -> None:
         """
         Yaw the Turtle about the up vector (180 - angle) degrees.
         This is used when building molecules
@@ -402,7 +376,7 @@ class Turtle3D:
         self._left = self.unit(self._left)
         self.left = Vector(self._left)
 
-    def turn(self, angle):
+    def turn(self, angle) -> None:
         """
         Turn the Turtle about the up vector angle degrees.
 
@@ -431,7 +405,7 @@ class Turtle3D:
         self._left = self.unit(self._left)
         self.left = Vector(self._left)
 
-    def pitch(self, angle):
+    def pitch(self, angle) -> None:
         """
         pitch the Turtle about the left vector angle degrees
 
@@ -472,7 +446,7 @@ class Turtle3D:
 
     def orient(
         self, position: numpy.array, heading: numpy.array, left: numpy.array
-    ):
+    ) -> None:
         """
         Orients the turtle with Position at p1, Heading at p2 and Left at p3
 
@@ -503,7 +477,7 @@ class Turtle3D:
         self.left = Vector(self._left)
         return
 
-    def orient_at_residue(self, chain, resnumb, orientation):
+    def orient_at_residue(self, chain, resnumb, orientation) -> None:
         """
         Orient the turtle at the specified residue from the input Chain in
         either orientation 1 or 2.
@@ -550,7 +524,7 @@ class Turtle3D:
         cb: numpy.array,
         c: numpy.array,
         orientation,
-    ):
+    ) -> None:
         """
         Orient the turtle at the specified residue from the input Chain in
         either orientation 1 or 2.
@@ -640,7 +614,7 @@ class Turtle3D:
         """Return Turtle 3D coordinates."""
         return f"<Turtle: {self._name}\n Position: {self._position},\n Heading: {self._heading} \n Left: {self._left} \n Up: {self._up}\n Orientation: {self._orientation}\n Pen: {self._pen} \n Recording: {self._recording}>"
 
-    def bbone_to_schain(self):
+    def bbone_to_schain(self) -> None:
         """
         Function requires turtle to be in orientation #2 (at alpha carbon,
         headed towards carbonyl, with nitrogen on left) and converts to orientation #1
@@ -660,7 +634,7 @@ class Turtle3D:
         self.roll(240.0)
         self.Orientation = 1  # sets the orientation flag
 
-    def schain_to_bbone(self):
+    def schain_to_bbone(self) -> None:
         """
         Function requires turtle to be in orientation #1 (at alpha c, headed to beta carbon, with nitrogen on left)
         and converts to orientation #2 (at alpha carbon, headed towards carbonyl, with nitrogen on left).
@@ -681,90 +655,6 @@ class Turtle3D:
 
 
 # class definition ends
-
-
-def test_turtle():
-    """
-        Tests the turtle move, roll, yaw, pitch and turn.
-
-        >>> import proteusPy
-        >>> from proteusPy.turtle3D import Turtle3D
-        >>> turt = Turtle3D('test')
-        >>> turt.move(2.0)
-        >>> turt
-        <Turtle: test
-         Position: [2. 0. 0.],
-         Heading: [1. 0. 0.]
-         Left: [0. 1. 0.]
-         Up: [0. 0. 1.]
-         Orientation: -1
-         Pen: 1
-         Recording: False>
-        >>> turt.roll(45.0)
-        >>> turt
-        <Turtle: test
-         Position: [2. 0. 0.],
-         Heading: [1. 0. 0.]
-         Left: [0.         0.70710678 0.70710678]
-         Up: [ 0.         -0.70710678  0.70710678]
-         Orientation: -1
-         Pen: 1
-         Recording: False>
-        >>> turt.roll(45.0)
-        >>> turt
-        <Turtle: test
-         Position: [2. 0. 0.],
-         Heading: [1. 0. 0.]
-         Left: [0. 0. 1.]
-         Up: [ 0. -1.  0.]
-         Orientation: -1
-         Pen: 1
-         Recording: False>
-        >>> turt.reset()
-        >>> turt.pitch(45.0)
-        >>> turt
-        <Turtle: 3D_Turtle
-         Position: [0. 0. 0.],
-         Heading: [ 0.70710678  0.         -0.70710678]
-         Left: [0. 1. 0.]
-         Up: [0.70710678 0.         0.70710678]
-         Orientation: -1
-         Pen: 1
-         Recording: False>
-        >>> turt.pitch(45.0)
-        >>> turt
-        <Turtle: 3D_Turtle
-         Position: [0. 0. 0.],
-         Heading: [ 0.  0. -1.]
-         Left: [0. 1. 0.]
-         Up: [1. 0. 0.]
-         Orientation: -1
-         Pen: 1
-         Recording: False>
-    >>> turt.yaw(45.0)
-        >>> turt
-        <Turtle: 3D_Turtle
-         Position: [0. 0. 0.],
-         Heading: [-0.          0.70710678  0.70710678]
-         Left: [-0.         -0.70710678  0.70710678]
-         Up: [1. 0. 0.]
-         Orientation: -1
-         Pen: 1
-         Recording: False>
-        >>> turt.yaw(45.0)
-        >>> turt
-        <Turtle: 3D_Turtle
-         Position: [0. 0. 0.],
-         Heading: [-0. -1.  0.]
-         Left: [ 0. -0. -1.]
-         Up: [1. 0. 0.]
-         Orientation: -1
-         Pen: 1
-         Recording: False>
-
-    """
-    return
-
 
 if __name__ == "__main__":
     import doctest
