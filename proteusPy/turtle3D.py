@@ -146,7 +146,7 @@ class Turtle3D:
         self._tape = []
 
     @property
-    def Position(self):
+    def Position(self) -> Vector:
         """
         The Turtle's Position
 
@@ -181,6 +181,23 @@ class Turtle3D:
             self._position = numpy.array((x, y, z), "d")
 
         self.position = Vector(self._position)
+        return
+
+    @Position.setter
+    def Position(self, pos: Vector):
+        """
+        Set's the Turtle's Position with Vector input
+
+        :param pos: Position vector
+        :type x: Vector
+        :raises ValueError: Type error
+        """
+        if pos is not Vector:
+            raise ValueError("Turtle3d: pos is not a Vector")
+
+        self._position = pos._ar
+        self.position = pos
+
         return
 
     @property
