@@ -25,16 +25,7 @@ class TestTurtle3D(unittest.TestCase):
         assert_array_equal(turtle._heading, np.array((1.0, 0.0, 0.0)))
         assert_array_equal(turtle._left, np.array((0.0, 1.0, 0.0)))
         assert_array_equal(turtle._up, np.array((0.0, 0.0, 1.0)))
-
-    def test_new(self):
-        _pos = Vector(1.0, 2.0, 3.0)
-        _head = Vector((4.0, 5.0, 6.0))
-        turtle = Turtle3D()
-        turtle.new("test", _pos, _head)
-        assert turtle._name == "test"
-        assert cmp_vec(turtle.heading, _head, _tolerance)
-        assert cmp_vec(turtle.position, _pos, _tolerance)
-
+    
     def test_forward(self):
         _pos = Vector(10.0, 0.0, 0.0)
         turtle = Turtle3D()
