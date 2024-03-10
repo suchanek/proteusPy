@@ -38,16 +38,17 @@ devclean:
 # activate the package before running!
 install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install -U . 
-	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305
+	pip install . 
+	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
-	python -m ipykernel install --user --name proteusPy --display-name "proteusPy $(VERS)"
+	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS)
+	)"
 	@echo "Installation finished!"
 
 install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install -U .
+	pip install .
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	pip install pdoc twine black pytest build
 	jupyter contrib nbextension install --sys-prefix
@@ -100,11 +101,11 @@ commit:
 
 # run the tests
 tests: .
+	pytest .
 	python proteusPy/Disulfide.py
 	python proteusPy/DisulfideLoader.py
 	python proteusPy/DisulfideList.py
 	python proteusPy/DisulfideClasses.py
-	python proteusPy/turtle3D.py
 	python tests/Test_DisplaySS.py
 
 # end of file
