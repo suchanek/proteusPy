@@ -156,9 +156,7 @@ def Check_chains(pdbid, pdbdir, verbose=True):
         else:
             same = True
             if verbose:
-                print(
-                    f"Chains are equal length, assuming the same. {chain_lens}"
-                )
+                print(f"Chains are equal length, assuming the same. {chain_lens}")
     return same
 
 
@@ -327,9 +325,7 @@ def generate_vector_dataframe(base=3):
         raise ValueError("Unsupported base")
 
     combinations = list(itertools.product(states, repeat=5))
-    df = pd.DataFrame(
-        combinations, columns=["chi1", "chi2", "chi3", "chi4", "chi5"]
-    )
+    df = pd.DataFrame(combinations, columns=["chi1", "chi2", "chi3", "chi4", "chi5"])
     return df
 
 

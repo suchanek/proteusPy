@@ -124,9 +124,7 @@ def get_quadrant(angle_deg):
     elif angle_deg >= -90 and angle_deg < 0:
         return str(4)
     else:
-        raise ValueError(
-            "Invalid angle value: angle must be in the range [-180, 180)."
-        )
+        raise ValueError("Invalid angle value: angle must be in the range [-180, 180).")
 
 
 def torsion_to_sixclass(tors):
@@ -169,9 +167,7 @@ def get_sixth_quadrant(angle_deg):
     elif angle_deg >= 300 and angle_deg < 360:
         return str(1)
     else:
-        raise ValueError(
-            "Invalid angle value: angle must be in the range [-360, 360)."
-        )
+        raise ValueError("Invalid angle value: angle must be in the range [-360, 360).")
 
 
 def get_half_quadrant(angle_deg):
@@ -202,9 +198,7 @@ def get_half_quadrant(angle_deg):
     elif angle_deg >= -180 and angle_deg < -135:
         return str(8)
     else:
-        raise ValueError(
-            "Invalid angle value: angle must be in the range [-180, 180)."
-        )
+        raise ValueError("Invalid angle value: angle must be in the range [-180, 180).")
 
 
 def create_quat_classes(df):
@@ -418,9 +412,7 @@ def plot_class_chart(classes: int) -> None:
     # Show the chart
 
 
-def plot_count_vs_class_df(
-    df, title="title", theme="light", save=False, savedir="."
-):
+def plot_count_vs_class_df(df, title="title", theme="light", save=False, savedir="."):
     """
     Plots a line graph of count vs class ID using Plotly.
 

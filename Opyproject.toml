@@ -6,8 +6,8 @@ license = {file = "LICENSE"}
 readme = "README.md"
 keywords = ["structural biophysics", "proteus", "disulfide bonds", "RCSB"]
 requires-python = "<3.12"
-dynamic = []
-version = "0.92.20"
+dynamic = ["version"]
+#version = "0.92.20"
 classifiers=[
         "Development Status :: 4 - Beta",
         "License :: OSI Approved :: BSD License",
@@ -59,6 +59,7 @@ dependencies = [
 dev = [
     "pdoc",
     "black",
+    "build"
 ]
 test = [
     "pytest-cov ~=3.0.0",
@@ -77,7 +78,7 @@ proteusPy = ["data/*.txt", "data/*.py", "data/*.json", "data/*.csv", "data/SS_co
 proteusPy = ["data/PDB_all_ss.pkl", "data/PDB_SS_ALL_LOADER.pkl", "data/PDB_all_ss_dict.pkl"]
 
 [tool.setuptools-git-versioning]
-enabled = false
+enabled = true
 version_file = "VERSION"
 count_commits_from_version_file = true
 template = "{tag}" # default setting

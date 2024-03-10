@@ -55,7 +55,7 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
-__version__ = "0.92.23"
+__version__ = "0.92.22"
 version_file = this_directory / "VERSION"
 if version_file.is_file():
     with open(version_file) as f:
@@ -107,6 +107,7 @@ setup(
         "jupyter_contrib_nbextensions",
         "ipywidgets",
         "imageio[ffmpeg]",
+        "biopython @ git+https://github.com/suchanek/biopython.git@egs_ssbond_240305",
     ],
     source="https://github.com/suchanek/proteusPy/",
     project_urls={

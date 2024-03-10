@@ -30,4 +30,3 @@ trame-jupyter-extension
 jupyter_contrib_nbextensions
 ipywidgets
 imageio[ffmpeg]
-biopython@ git+https://github.com/suchanek/biopython.git@egs_ssbond_240305

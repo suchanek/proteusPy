@@ -5,9 +5,9 @@
 VERS := $(shell grep ^0 VERSION | cut -d= -f2 | tr -d \" | sed 's/^[[:space:]]*//')
 
 PYPI_PASSWORD := $(shell echo $$PYPI_PASSWORD)
-CONDA = conda
+CONDA = mamba
 
-MESS = "0.92.20"
+MESS = "0.92.23 docs, turtle testing"
 
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
@@ -47,8 +47,8 @@ install:
 
 install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install -U .
-	#pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
+	pip install dist/proteusPy-$(VERS)-py3-none-any.whl
+	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	pip install pdoc twine black pytest build
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
@@ -84,7 +84,7 @@ sdist: .
 	@echo $(VERS) > sdist.out
 
 docs: .
-	@pdoc -o docs --math --logo "./logo.png" ./proteusPy
+	pdoc -o docs --math --logo "./assets/logo.png" ./proteusPy
 	@echo $(VERS) > docs.out
 
 # normally i push to PyPi via github action
