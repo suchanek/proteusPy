@@ -39,10 +39,10 @@ class Turtle3D:
         self._up = numpy.array((0.0, 0.0, 1.0), "d")
 
         # expose these as Vectors
-        self.position = Vector(0.0, 0.0, 0.0)
-        self.heading = Vector(1.0, 0.0, 0.0)
-        self.left = Vector(0.0, 1.0, 0.0)
-        self.up = Vector(0.0, 0.0, 1.0)
+        self.pos = Vector(0.0, 0.0, 0.0)
+        self.h = Vector(1.0, 0.0, 0.0)
+        self.l = Vector(0.0, 1.0, 0.0)
+        self.u = Vector(0.0, 0.0, 1.0)
 
         self._name = name
         self._pen = _UP_
@@ -70,11 +70,11 @@ class Turtle3D:
         :param pen: Pen state, defaults to 'up'
         :param recording: _description_, defaults to False
         """
-        self.name = name
-        self.position = pos
-        self.heading = head
-        self.left = left
-        self.up = up
+        self._name = name
+        self.pos = pos
+        self.h = head
+        self.l = left
+        self.u = up
         self._recording = recording
 
     def copy_coords(self, source) -> None:
@@ -153,7 +153,7 @@ class Turtle3D:
         :return: Position
         :rtype: Vector
         """
-        return self.position
+        return self.pos
 
     @Position.setter
     def Position(self, x, y=None, z=None) -> None:
@@ -170,17 +170,22 @@ class Turtle3D:
         """
 
         if y is None and z is None:
-            # Array, list, tuple...
-            if len(x) != 3:
+            # Vector, Array, list, tuple...
+            if isinstance(x, Vector):
+                self.pos = x
+                self._position = x.get_array()
+
+            elif len(x) != 3:
                 raise ValueError(
-                    "Turtle3D: x is not a list/tuple/array of 3 numbers"
+                    "Turtle3D: x is not a vector list/tuple/array of 3 numbers"
                 )
-            self._position = numpy.array(x, "d")
+            else:
+                self._position = numpy.array(x, "d")
         else:
             # Three numbers
             self._position = numpy.array((x, y, z), "d")
 
-        self.position = Vector(self._position)
+        self.pos = Vector(self._position)
         return
 
     @property
@@ -191,7 +196,7 @@ class Turtle3D:
         :return: Heading
         :rtype: Vector
         """
-        return self.heading
+        return self.h
 
     @Heading.setter
     def Heading(self, x, y=None, z=None) -> None:
