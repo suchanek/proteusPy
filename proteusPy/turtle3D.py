@@ -7,7 +7,7 @@ Based on the C implementation originally authored by Eric G. Suchanek PhD, 1990.
 
 """
 
-# Last modification 7/15/23 -egs-
+# Last modification 3/9/24 -egs-
 
 __pdoc__ = {"__all__": True}
 
