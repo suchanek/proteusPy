@@ -5,7 +5,7 @@
 VERS := $(shell grep ^0 VERSION | cut -d= -f2 | tr -d \" | sed 's/^[[:space:]]*//')
 
 PYPI_PASSWORD := $(shell echo $$PYPI_PASSWORD)
-CONDA = mamba
+CONDA = conda
 
 MESS = "0.92.20"
 
@@ -38,7 +38,7 @@ devclean:
 # activate the package before running!
 install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install . 
+	pip install -U . 
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
@@ -47,7 +47,7 @@ install:
 
 install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install .
+	pip install -U .
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	pip install pdoc twine black pytest build
 	jupyter contrib nbextension install --sys-prefix
