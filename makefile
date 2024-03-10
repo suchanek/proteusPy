@@ -42,8 +42,7 @@ install:
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
-	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS)
-	)"
+	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Installation finished!"
 
 install_dev:
