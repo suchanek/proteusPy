@@ -72,14 +72,14 @@ class Turtle3D:
         """
         self._name = name
         self.pos = pos
-        self.h = head.norm()
-        self.l = left.norm()
-        self.u = up.norm()
+        self.h = head.normalized()
+        self.l = left.normalized()
+        self.u = up.normalized()
 
         self._position = pos._ar
-        self._left = self.l._ar
-        self._heading = self.h._ar
-        self._up = self.u._ar
+        self._left = left.normalized()._ar
+        self._heading = head.normalized()._ar
+        self._up = up.normalized()._ar
 
         self._recording = recording
 

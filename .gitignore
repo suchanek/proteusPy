@@ -10,7 +10,6 @@ data/*.png
 data/Nclasses/*
 data/classes/*
 data/Oclasses/*
-*.mp4
 programs/chatbot.py
 proteusPy/.DS_Store
 proteusPy.egg-info
@@ -22,3 +21,5 @@ subset.png
 out.ps
 cleaned.py
 subset.png
+*.mp4
+
