@@ -25,7 +25,7 @@ class TestTurtle3D(unittest.TestCase):
         assert_array_equal(turtle._heading, np.array((1.0, 0.0, 0.0)))
         assert_array_equal(turtle._left, np.array((0.0, 1.0, 0.0)))
         assert_array_equal(turtle._up, np.array((0.0, 0.0, 1.0)))
-    
+
     def test_forward(self):
         _pos = Vector(10.0, 0.0, 0.0)
         turtle = Turtle3D()
