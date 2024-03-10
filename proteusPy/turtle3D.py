@@ -53,14 +53,14 @@ class Turtle3D:
     def new(
         self,
         name: str,
-        pos: Vector = (0.0, 0.0, 0.0),
-        head: Vector = (1.0, 0.0, 0.0),
-        left: Vector = (0.0, 1.0, 0.0),
-        up: Vector = (0.0, 0.0, 1.0),
+        pos: Vector,
+        head: Vector = Vector(1.0, 0.0, 0.0),
+        left: Vector = Vector(0.0, 1.0, 0.0),
+        up: Vector = Vector(0.0, 0.0, 1.0),
         recording=False,
     ) -> None:
         """
-        Initialize a Turtle with a name and initial position
+        Initialize a Turtle with a name, position, optionally heading and left.
 
         :param name: Turtle's Name
         :param pos: Turtle's Position
@@ -72,9 +72,15 @@ class Turtle3D:
         """
         self._name = name
         self.pos = pos
-        self.h = head
-        self.l = left
-        self.u = up
+        self.h = head.norm()
+        self.l = left.norm()
+        self.u = up.norm()
+
+        self._position = pos._ar
+        self._left = self.l._ar
+        self._heading = self.h._ar
+        self._up = self.u._ar
+
         self._recording = recording
 
     def copy_coords(self, source) -> None:
@@ -91,10 +97,10 @@ class Turtle3D:
         self._up = source._up.copy()
 
         # copy the Vectors - create new ones from the source arrays
-        self.position = Vector(source._position)
-        self.heading = Vector(source._heading)
-        self.left = Vector(source._left)
-        self.up = Vector(source._up)
+        self.pos = Vector(source._position)
+        self.h = Vector(source._heading)
+        self.l = Vector(source._left)
+        self.u = Vector(source._up)
 
         self._orientation = source._orientation
 
@@ -212,17 +218,19 @@ class Turtle3D:
         :raises ValueError: illegal value
         """
 
-        if y is None and z is None:
+        if isinstance(x, Vector):
+            self.h = x
+            self._heading = x.get_array()
+
+        elif y is None and z is None:
             # Array, list, tuple...
             if len(x) != 3:
-                raise ValueError(
-                    "Turtle3D: x is not a list/tuple/array of 3 numbers"
-                )
+                raise ValueError("Turtle3D: x is not a list/tuple/array of 3 numbers")
             self._heading = numpy.array(x, "d")
         else:
             # Three numbers
             self._heading = numpy.array((x, y, z), "d")
-        self.heading = Vector(self._heading)
+        self.h = Vector(self._heading)
         return
 
     @property
@@ -234,7 +242,7 @@ class Turtle3D:
         :rtype: Vector
         """
 
-        return self.left
+        return self.l
 
     @Left.setter
     def Left(self, x, y=None, z=None):
@@ -249,17 +257,19 @@ class Turtle3D:
         :type z: float, optional
         :raises ValueError: illegal value
         """
-        if y is None and z is None:
+        if isinstance(x, Vector):
+            self.l = x
+            self._left = x.get_array()
+
+        elif y is None and z is None:
             # Array, list, tuple...
             if len(x) != 3:
-                raise ValueError(
-                    "Turtle3D: x is not a list/tuple/array of 3 numbers"
-                )
+                raise ValueError("Turtle3D: x is not a list/tuple/array of 3 numbers")
             self._left = numpy.array(x, "d")
         else:
             # Three numbers
             self._left = numpy.array((x, y, z), "d")
-        self.left = Vector(self._left)
+        self.l = Vector(self._left)
         return
 
     @property
@@ -271,7 +281,7 @@ class Turtle3D:
         :rtype: Vector
         """
 
-        return self.up
+        return self.u
 
     @Up.setter
     def Up(self, x, y=None, z=None) -> None:
@@ -286,17 +296,19 @@ class Turtle3D:
         :type z: float, optional
         :raises ValueError: illegal value
         """
-        if y is None and z is None:
+        if isinstance(x, Vector):
+            self.u = x
+            self._up = x.get_array()
+
+        elif y is None and z is None:
             # Array, list, tuple...
             if len(x) != 3:
-                raise ValueError(
-                    "Turtle3D: x is not a list/tuple/array of 3 numbers"
-                )
+                raise ValueError("Turtle3D: x is not a list/tuple/array of 3 numbers")
             self._up = numpy.array(x, "d")
         else:
             # Three numbers
             self._up = numpy.array((x, y, z), "d")
-        self.up = Vector(self._up)
+        self.u = Vector(self._up)
         return
 
     @property
@@ -322,7 +334,7 @@ class Turtle3D:
         :type distance: float
         """
         self._position = self._position + self._heading * distance
-        self.position = Vector(self._position)
+        self.pos = Vector(self._position)
 
     def roll(self, angle) -> None:
         """
@@ -344,14 +356,14 @@ class Turtle3D:
         self._up[2] = cosang * uold[2] - sinang * lold[2]
         self._up = self.unit(self._up)
 
-        self.up = Vector(self._up)
+        self.u = Vector(self._up)
 
         self._left[0] = cosang * lold[0] + sinang * uold[0]
         self._left[1] = cosang * lold[1] + sinang * uold[1]
         self._left[2] = cosang * lold[2] + sinang * uold[2]
         self._left = self.unit(self._left)
 
-        self.left = Vector(self._left)
+        self.l = Vector(self._left)
 
     def yaw(self, angle) -> None:
         """
@@ -373,13 +385,13 @@ class Turtle3D:
         self._heading[1] = cosang * hold[1] + sinang * lold[1]
         self._heading[2] = cosang * hold[2] + sinang * lold[2]
         self._heading = self.unit(self._heading)
-        self.heading = Vector(self._heading)
+        self.h = Vector(self._heading)
 
         self._left[0] = cosang * lold[0] - sinang * hold[0]
         self._left[1] = cosang * lold[1] - sinang * hold[1]
         self._left[2] = cosang * lold[2] - sinang * hold[2]
         self._left = self.unit(self._left)
-        self.left = Vector(self._left)
+        self.l = Vector(self._left)
 
     def turn(self, angle) -> None:
         """
@@ -402,13 +414,13 @@ class Turtle3D:
         self._heading[2] = cosang * heading[2] + sinang * left[2]
 
         self._heading = self.unit(self._heading)
-        self.heading = Vector(self._heading)
+        self.h = Vector(self._heading)
 
         self._left[0] = cosang * left[0] - sinang * heading[0]
         self._left[1] = cosang * left[1] - sinang * heading[1]
         self._left[2] = cosang * left[2] - sinang * heading[2]
         self._left = self.unit(self._left)
-        self.left = Vector(self._left)
+        self.l = Vector(self._left)
 
     def pitch(self, angle) -> None:
         """
@@ -429,13 +441,13 @@ class Turtle3D:
         self._heading[1] = heading[1] * cosang - up[1] * sinang
         self._heading[2] = heading[2] * cosang - up[2] * sinang
         self._heading = self.unit(self._heading)
-        self.heading = Vector(self._heading)
+        self.h = Vector(self._heading)
 
         self._up[0] = up[0] * cosang + heading[0] * sinang
         self._up[1] = up[1] * cosang + heading[1] * sinang
         self._up[2] = up[2] * cosang + heading[2] * sinang
         self._up = self.unit(self._up)
-        self.up = Vector(self._up)
+        self.u = Vector(self._up)
 
     def unit(self, v):
         """
@@ -467,19 +479,19 @@ class Turtle3D:
 
         temp = heading - position
         self._heading = self.unit(temp)
-        self.heading = Vector(self._heading)
+        self.h = Vector(self._heading)
 
         temp = left - position
         self._left = self.unit(temp)
 
         temp = numpy.cross(self._heading, self._left)
         self._up = self.unit(temp)
-        self.up = Vector(self._up)
+        self.u = Vector(self._up)
 
         # fix left to be orthogonal
         temp = numpy.cross(self._up, self._heading)
         self._left = self.unit(temp)
-        self.left = Vector(self._left)
+        self.l = Vector(self._left)
         return
 
     def orient_at_residue(self, chain, resnumb, orientation) -> None:
