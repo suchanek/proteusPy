@@ -1,7 +1,7 @@
 numpy
 matplotlib
 pandas<2.0
-pyvista[all,trame]
+pyvista[all]
 traitlets==5.9.0
 notebook==6.4.12
 jupyter

@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: proteusPy
-Version: 0.92.15
+Version: 0.92.21
 Summary: proteusPy - Protein Structure Analysis and Modeling Tools
 Home-page: https://github.com/suchanek/proteusPy/
 Author: Eric G. Suchanek, PhD
@@ -25,7 +25,7 @@ License-File: LICENSE
 Requires-Dist: numpy
 Requires-Dist: matplotlib
 Requires-Dist: pandas<2.0
-Requires-Dist: pyvista[all,trame]
+Requires-Dist: pyvista[all]
 Requires-Dist: traitlets==5.9.0
 Requires-Dist: notebook==6.4.12
 Requires-Dist: jupyter
@@ -161,7 +161,7 @@ PyVista is an excellent 3D visualization framework and I've used it for the Disu
 ## Performance
 
 - Manipulating and searching through long lists of disulfides can take time. I've added progress bars for many of these operations. 
-- Rendering many disulfides in **pyvista** can also take time to load and may be slow to dispay in real time, depending on your hardware. I added optimization to reduce cylinder complexity as a function of total cylinders rendered, but it can still be less than perfect. The faster your GPU the better! 
+- Rendering many disulfides in **pyvista** can also take time to load and may be slow to display in real time, depending on your hardware. I added optimization to reduce cylinder complexity as a function of total cylinders rendered, but it can still be less than perfect. The faster your GPU the better! 
 
 ## Contributing/Reporting
 

@@ -127,5 +127,5 @@ install = ["_install", "_jup_install"]
   deps = ["_clean_docs"]
 
 [build-system]
-requires = ["setuptools >= 61.0", "setuptools-git-versioning<2", "poethepoet"]
+requires = ["setuptools < 60.0", "setuptools-git-versioning<2", "poethepoet"]
 build-backend = "setuptools.build_meta"

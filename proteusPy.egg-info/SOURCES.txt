@@ -1,6 +1,5 @@
 LICENSE
 README.md
-setup.cfg
 setup.py
 proteusPy/Disulfide.py
 proteusPy/DisulfideClass_Constructor.py
@@ -12,7 +11,6 @@ proteusPy/ProteusGlobals.py
 proteusPy/ProteusPyWarning.py
 proteusPy/Residue.py
 proteusPy/__init__.py
-proteusPy/__version__.py
 proteusPy/angle_annotation.py
 proteusPy/atoms.py
 proteusPy/proteusPyWarning.py
@@ -30,3 +28,4 @@ proteusPy/data/__init__.py
 proteusPy/data/ss_completed.txt
 proteusPy/data/ss_ids.txt
 proteusPy/data/ss_query.json
+tests/test_turtle3d.py

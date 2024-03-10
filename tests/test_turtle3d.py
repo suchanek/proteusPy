@@ -30,42 +30,42 @@ class TestTurtle3D(unittest.TestCase):
         _pos = Vector(10.0, 0.0, 0.0)
         turtle = Turtle3D()
         turtle.move(10.0)
-        assert cmp_vec(turtle.position, _pos, _tolerance)
+        assert cmp_vec(turtle.pos, _pos, _tolerance)
 
     def test_back(self):
         _pos = Vector(5.0, 0.0, 0.0)
         turtle = Turtle3D()
         turtle.move(10.0)
         turtle.move(-5.0)
-        assert cmp_vec(turtle.position, _pos, _tolerance)
+        assert cmp_vec(turtle.pos, _pos, _tolerance)
 
     def test_right(self):
         _head = Vector(0.0, 1.0, 0.0)
         turtle = Turtle3D()
         turtle.turn(90.0)
-        _h2 = turtle.heading
+        _h2 = turtle.h
         assert cmp_vec(_h2, _head, _tolerance)
 
     def test_left(self):
         _head = Vector(0.0, -1.0, 0.0)
         turtle = Turtle3D()
         turtle.turn(-90.0)
-        assert cmp_vec(turtle.heading, _head, _tolerance)
+        assert cmp_vec(turtle.h, _head, _tolerance)
 
     def test_roll(self):
         _left = Vector(0.0, 0.0, 1.0)
         _up = Vector(0.0, -1.0, 0.0)
         turtle = Turtle3D()
         turtle.roll(90)
-        assert cmp_vec(turtle.left, _left, _tolerance)
-        assert cmp_vec(turtle.up, _up, _tolerance)
+        assert cmp_vec(turtle.l, _left, _tolerance)
+        assert cmp_vec(turtle.u, _up, _tolerance)
 
     def test_pitch(self):
         _head = Vector(0.0, 0.0, -1.0)
         _up = Vector(1.0, 0.0, 0.0)
         turtle = Turtle3D()
         turtle.pitch(90)
-        assert cmp_vec(turtle.heading, _head, _tolerance)
+        assert cmp_vec(turtle.h, _head, _tolerance)
 
     def test_yaw(self):
         _head = Vector(0.0, 1.0, 0.0)
@@ -73,4 +73,4 @@ class TestTurtle3D(unittest.TestCase):
 
         turtle = Turtle3D()
         turtle.yaw(90)
-        assert cmp_vec(turtle.heading, _head, _tolerance)
+        assert cmp_vec(turtle.h, _head, _tolerance)
