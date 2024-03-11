@@ -64,7 +64,11 @@ from .DisulfideExceptions import (
     DisulfideIOException,
 )
 from .DisulfideList import load_disulfides_from_id
-from .DisulfideLoader import Download_PDB_SS, Download_PDB_SS_GitHub, Load_PDB_SS
+from .DisulfideLoader import (
+    Download_PDB_SS,
+    Download_PDB_SS_GitHub,
+    Load_PDB_SS,
+)
 from .ProteusGlobals import (
     _ANG_INIT,
     _FLOAT_INIT,
