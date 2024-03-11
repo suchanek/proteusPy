@@ -117,12 +117,13 @@ class DisulfideClass_Constructor:
 
     def load_class_dict(self, fname=f"{DATA_DIR}{SS_CLASS_DICT_FILE}") -> dict:
         with open(fname, "rb") as f:
-            # res = pickle.load(f)
-            self.classdict = pickle.load(f)
+            self.classdict = pd.compat.pickle_compat.load(f)
+            # self.classdict = pickle.load(f)
 
     def load_consensus_file(self, fname=f"{DATA_DIR}{SS_CONSENSUS_FILE}"):
         with open(fname, "rb") as f:
-            res = pickle.load(f)
+            res = pd.compat.pickle_compat.load(f)
+            # res = pickle.load(f)
             return res
 
     def build_class_df(self, class_df, group_df):
@@ -133,10 +134,6 @@ class DisulfideClass_Constructor:
     def list_binary_classes(self):
         for k, v in enumerate(self.classdict):
             print(f"Class: |{k}|, |{v}|")
-
-    #  class_cols = ['Idx','chi1_s','chi2_s','chi3_s','chi4_s','chi5_s','class_id','SS_Classname','FXN',
-    # 'count','incidence','percentage','ca_distance_mean',
-    # 'ca_distance_std','torsion_length_mean','torsion_length_std','energy_mean','energy_std']
 
     def from_class(self, classid: str) -> DisulfideList:
         """

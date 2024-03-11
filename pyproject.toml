@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "proteuspy"
-version = "0.92.24"
+version = "0.92.25"
 description = "proteusPy - Protein Structure Analysis and Modeling Tools"
 authors = ["Eric Suchanek <suchanek@mac.com>"]
 license = "LICENSE"
@@ -31,7 +31,6 @@ documentation = "https://suchanek.github.io/proteusPy/"
 python = "^3.12"
 numpy = "^1.26.4"
 matplotlib = "^3.8.3"
-pandas = "^2.0.0"
 traitlets = "5.9.0"
 pyvista = "^0.43.3"
 notebook = "6.4.12"
@@ -62,6 +61,8 @@ jupyter-contrib-nbextensions = "^0.7.0"
 ipywidgets = "^8.1.2"
 imageio-ffmpeg = {extras = ["ffmpeg"], version = "^0.4.9"}
 biopython = {git = "https://github.com/suchanek/biopython.git", rev = "egs_ssbond_240305"}
+imageio = "^2.34.0"
+pandas = "^2.2.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.2.0"
@@ -86,7 +87,7 @@ _jup2 = "jupyter nbextension enable --py --sys-prefix widgetsnbextension"
 _jup3 = "python -m ipykernel install --user --name proteusPy --display-name 'proteusPy'"
 
 build = ["_build"]
-install = ["_install", "_jup_install"]
+install = [ "_install", "_jup_install"]
 test = ["_test"]
 
   [tool.poe.tasks.jupyter]

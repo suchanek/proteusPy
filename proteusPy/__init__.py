@@ -9,7 +9,7 @@
 from pathlib import Path
 
 __pdoc__ = {"__all__": False}
-__version__ = "0.92.23"
+__version__ = "0.92.25"
 
 """
 version_file = Path(__file__).parent.parent / "VERSION"

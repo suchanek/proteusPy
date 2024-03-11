@@ -12,7 +12,7 @@ import pickle
 import sys
 import time
 
-import pandas
+import pandas as pd
 
 import proteusPy
 from proteusPy.atoms import *
@@ -119,7 +119,7 @@ class DisulfideLoader:
         self.TorsionFile = f"{datadir}{torsion_file}"
         self.SSList = DisulfideList([], "ALL_PDB_SS")
         self.SSDict = {}
-        self.TorsionDF = pandas.DataFrame()
+        self.TorsionDF = pd.DataFrame()
         self.TotalDisulfides = 0
         self.IDList = []
         self.QUIET = quiet
@@ -144,7 +144,8 @@ class DisulfideLoader:
             )
 
         with open(self.PickleFile, "rb") as f:
-            sslist = pickle.load(f)
+            sslist = pd.compat.pickle_compat.load(f)
+            # sslist = pickle.load(f)
             self.SSList = sslist
             self.TotalDisulfides = len(self.SSList)
 
@@ -160,7 +161,10 @@ class DisulfideLoader:
             )
 
         with open(self.PickleDictFile, "rb") as f:
-            self.SSDict = pickle.load(f)
+
+            # self.SSDict = pickle.load(f)
+            self.SSDict = pd.compat.pickle_compat.load(f)
+
             for key in self.SSDict:
                 idlist.append(key)
             self.IDList = idlist.copy()
@@ -175,7 +179,7 @@ class DisulfideLoader:
                 end="",
             )
 
-        tmpDF = pandas.read_csv(self.TorsionFile)
+        tmpDF = pd.read_csv(self.TorsionFile)
         tmpDF.drop(tmpDF.columns[[0]], axis=1, inplace=True)
 
         self.TorsionDF = tmpDF.copy()
@@ -420,7 +424,7 @@ class DisulfideLoader:
         ssbonds.display_overlay()
         return
 
-    def getTorsions(self, pdbID=None) -> pandas.DataFrame:
+    def getTorsions(self, pdbID=None) -> pd.DataFrame:
         """
         Return the torsions, distances and energies defined by Disulfide.Torsion_DF_cols
 
@@ -429,14 +433,14 @@ class DisulfideLoader:
             then return the entire dataset.
         :raises DisulfideParseWarning: Raised if not found
         :return: Torsions Dataframe
-        :rtype: pandas.DataFrame
+        :rtype: pd.DataFrame
 
         Example:
         >>> from proteusPy.DisulfideLoader import DisulfideLoader
         >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
         >>> Tor_DF = PDB_SS.getTorsions()
         """
-        res_df = pandas.DataFrame()
+        res_df = pd.DataFrame()
 
         if pdbID:
             try:
@@ -534,7 +538,7 @@ class DisulfideLoader:
                         x.append(sixcls)
                         y.append(len(_y))
 
-            sslist_df = pandas.DataFrame(columns=["class_id", "count"])
+            sslist_df = pd.DataFrame(columns=["class_id", "count"])
             sslist_df["class_id"] = x
             sslist_df["count"] = y
             return sslist_df
@@ -548,7 +552,7 @@ class DisulfideLoader:
             )
         return
 
-    def enumerate_sixclass_fromlist(self, sslist) -> pandas.DataFrame:
+    def enumerate_sixclass_fromlist(self, sslist) -> pd.DataFrame:
         x = []
         y = []
 
@@ -561,7 +565,7 @@ class DisulfideLoader:
                     x.append(sixcls)
                     y.append(len(_y))
 
-        sslist_df = pandas.DataFrame(columns=["class_id", "count"])
+        sslist_df = pd.DataFrame(columns=["class_id", "count"])
         sslist_df["class_id"] = x
         sslist_df["count"] = y
         return sslist_df
@@ -720,7 +724,9 @@ def Load_PDB_SS(
         print(f"-> load_PDB_SS(): Reading {_fname}... ")
 
     with open(_fname, "rb") as f:
-        res = pickle.load(f)
+        # res = pickle.load(f)
+        res = pd.compat.pickle_compat.load(f)
+
     if verbose:
         print(f"-> load_PDB_SS(): Done reading {_fname}... ")
     return res
