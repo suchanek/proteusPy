@@ -238,7 +238,9 @@ class Disulfide:
         self.chi3 = _ANG_INIT
         self.chi4 = _ANG_INIT
         self.chi5 = _ANG_INIT
-        self.rho = _ANG_INIT  # new dihedral angle: Nprox - Ca_prox - Ca_dist - N_dist
+        self.rho = (
+            _ANG_INIT  # new dihedral angle: Nprox - Ca_prox - Ca_dist - N_dist
+        )
 
         self.torsion_length = _FLOAT_INIT
 
@@ -1244,7 +1246,9 @@ class Disulfide:
 
         energy = 2.0 * (cos(torad(3.0 * chi1)) + cos(torad(3.0 * chi5)))
         energy += cos(torad(3.0 * chi2)) + cos(torad(3.0 * chi4))
-        energy += 3.5 * cos(torad(2.0 * chi3)) + 0.6 * cos(torad(3.0 * chi3)) + 10.1
+        energy += (
+            3.5 * cos(torad(2.0 * chi3)) + 0.6 * cos(torad(3.0 * chi3)) + 10.1
+        )
 
         self.energy = energy
         return energy
@@ -1546,7 +1550,10 @@ class Disulfide:
         prox_residue = chain1[prox]
         dist_residue = chain2[dist]
 
-        if prox_residue.get_resname() != "CYS" or dist_residue.get_resname() != "CYS":
+        if (
+            prox_residue.get_resname() != "CYS"
+            or dist_residue.get_resname() != "CYS"
+        ):
             print(
                 f"build_disulfide() requires CYS at both residues: {prox} {prox_residue.get_resname()} {dist} {dist_residue.get_resname()} Chain: {prox_residue.get_segid()}"
             )
@@ -1564,7 +1571,9 @@ class Disulfide:
         self.distal_residue_fullid = dist_residue.get_full_id()
 
         if quiet:
-            warnings.filterwarnings("ignore", category=DisulfideConstructionWarning)
+            warnings.filterwarnings(
+                "ignore", category=DisulfideConstructionWarning
+            )
         else:
             warnings.simplefilter("always")
 
@@ -1621,7 +1630,9 @@ class Disulfide:
 
         except Exception:
             mess = f"Missing coords for: {id} {prox-1} or {dist+1} for SS {proximal}-{distal}"
-            cprev_prox = nnext_prox = cprev_dist = nnext_dist = Vector(-1.0, -1.0, -1.0)
+            cprev_prox = nnext_prox = cprev_dist = nnext_dist = Vector(
+                -1.0, -1.0, -1.0
+            )
             self.missing_atoms = True
             warnings.warn(mess, DisulfideConstructionWarning)
 
@@ -1763,7 +1774,9 @@ class Disulfide:
              Unable to find residue: {resnumb} "
             raise DisulfideConstructionWarning(mess)
 
-    def make_movie(self, style="sb", fname="ssbond.mp4", verbose=False, steps=360):
+    def make_movie(
+        self, style="sb", fname="ssbond.mp4", verbose=False, steps=360
+    ):
         """
         Create an animation for ```self``` rotating one revolution about the Y axis,
         in the given ```style```, saving to ```filename```.
@@ -1953,7 +1966,9 @@ class Disulfide:
         return f"{self.repr_ss_chain_ids()}"
 
     def compute_rho(self):
-        self.rho = calc_dihedral(self.n_prox, self.ca_prox, self.ca_dist, self.n_dist)
+        self.rho = calc_dihedral(
+            self.n_prox, self.ca_prox, self.ca_dist, self.n_dist
+        )
         return self.rho
 
     def reset(self) -> None:
@@ -2458,7 +2473,9 @@ def Download_Disulfides(
     for entry in pbar:
         pbar.set_postfix({"Entry": entry})
         if entry not in completed:
-            if pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=pdb_home):
+            if pdblist.retrieve_pdb_file(
+                entry, file_format="pdb", pdir=pdb_home
+            ):
                 completed.update(entry)
                 completed_file.write(f"{entry},")
                 count += 1
@@ -2469,7 +2486,9 @@ def Download_Disulfides(
     elapsed = end - start
 
     print(f"Overall files processed: {count}")
-    print(f"Complete. Elapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)")
+    print(
+        f"Complete. Elapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)"
+    )
     os.chdir(cwd)
     return
 
@@ -2700,7 +2719,9 @@ def Extract_Disulfides(
             print("-> Extract_Disulfides(): No non-parsable structures found.")
 
     if bad_dist > 0:
-        print(f"-> Extract_Disulfides(): Found and ignored: {bad_dist} long SS bonds.")
+        print(
+            f"-> Extract_Disulfides(): Found and ignored: {bad_dist} long SS bonds."
+        )
     else:
         if verbose:
             print("No problems found.")
@@ -2804,7 +2825,9 @@ def check_header_from_file(
     if verbose:
         print(f"-> check_header_from_file() - Parsing file: {filename}:")
 
-    ssbond_dict = structure.header["ssbond"]  # NB: this requires the modified code
+    ssbond_dict = structure.header[
+        "ssbond"
+    ]  # NB: this requires the modified code
 
     # list of tuples with (proximal distal chaina chainb)
     ssbonds = parse_ssbond_header_rec(ssbond_dict)
@@ -2848,7 +2871,10 @@ def check_header_from_file(
         # make a new Disulfide object, name them based on proximal and distal
         # initialize SS bond from the proximal, distal coordinates
         if (_chaina is not None) and (_chainb is not None):
-            if _chaina[proximal].is_disordered() or _chainb[distal].is_disordered():
+            if (
+                _chaina[proximal].is_disordered()
+                or _chainb[distal].is_disordered()
+            ):
                 continue
             else:
                 if verbose:
@@ -2895,10 +2921,14 @@ def check_header_from_id(
     True
     """
     parser = PDBParser(PERMISSIVE=True, QUIET=True)
-    structure = parser.get_structure(struct_name, file=f"{pdb_dir}pdb{struct_name}.ent")
+    structure = parser.get_structure(
+        struct_name, file=f"{pdb_dir}pdb{struct_name}.ent"
+    )
     model = structure[0]
 
-    ssbond_dict = structure.header["ssbond"]  # NB: this requires the modified code
+    ssbond_dict = structure.header[
+        "ssbond"
+    ]  # NB: this requires the modified code
 
     bondlist = []
     i = 0
@@ -2972,7 +3002,9 @@ def Disulfide_Energy_Function(x: list) -> float:
     import numpy as np
 
     chi1, chi2, chi3, chi4, chi5 = x
-    energy = 2.0 * (np.cos(np.deg2rad(3.0 * chi1)) + np.cos(np.deg2rad(3.0 * chi5)))
+    energy = 2.0 * (
+        np.cos(np.deg2rad(3.0 * chi1)) + np.cos(np.deg2rad(3.0 * chi5))
+    )
     energy += np.cos(np.deg2rad(3.0 * chi2)) + np.cos(np.deg2rad(3.0 * chi4))
     energy += (
         3.5 * np.cos(np.deg2rad(2.0 * chi3))

@@ -225,7 +225,9 @@ class Turtle3D:
         elif y is None and z is None:
             # Array, list, tuple...
             if len(x) != 3:
-                raise ValueError("Turtle3D: x is not a list/tuple/array of 3 numbers")
+                raise ValueError(
+                    "Turtle3D: x is not a list/tuple/array of 3 numbers"
+                )
             self._heading = numpy.array(x, "d")
         else:
             # Three numbers
@@ -264,7 +266,9 @@ class Turtle3D:
         elif y is None and z is None:
             # Array, list, tuple...
             if len(x) != 3:
-                raise ValueError("Turtle3D: x is not a list/tuple/array of 3 numbers")
+                raise ValueError(
+                    "Turtle3D: x is not a list/tuple/array of 3 numbers"
+                )
             self._left = numpy.array(x, "d")
         else:
             # Three numbers
@@ -303,7 +307,9 @@ class Turtle3D:
         elif y is None and z is None:
             # Array, list, tuple...
             if len(x) != 3:
-                raise ValueError("Turtle3D: x is not a list/tuple/array of 3 numbers")
+                raise ValueError(
+                    "Turtle3D: x is not a list/tuple/array of 3 numbers"
+                )
             self._up = numpy.array(x, "d")
         else:
             # Three numbers

@@ -209,16 +209,22 @@ class AngleAnnotation(Arc):
         angle = np.deg2rad(self.theta1 + angle_span / 2)
         r = s / 2
         if self.textposition == "inside":
-            r = s / np.interp(angle_span, [60, 90, 135, 180], [3.3, 3.5, 3.8, 4])
+            r = s / np.interp(
+                angle_span, [60, 90, 135, 180], [3.3, 3.5, 3.8, 4]
+            )
         self.text.xy = c + r * np.array([np.cos(angle), np.sin(angle)])
         if self.textposition == "outside":
 
             def R90(a, r, w, h):
                 if a < np.arctan(h / 2 / (r + w / 2)):
-                    return np.sqrt((r + w / 2) ** 2 + (np.tan(a) * (r + w / 2)) ** 2)
+                    return np.sqrt(
+                        (r + w / 2) ** 2 + (np.tan(a) * (r + w / 2)) ** 2
+                    )
                 else:
                     c = np.sqrt((w / 2) ** 2 + (h / 2) ** 2)
-                    T = np.arcsin(c * np.cos(np.pi / 2 - a + np.arcsin(h / 2 / c)) / r)
+                    T = np.arcsin(
+                        c * np.cos(np.pi / 2 - a + np.arcsin(h / 2 / c)) / r
+                    )
                     xy = r * np.array([np.cos(a + T), np.sin(a + T)])
                     xy += np.array([w / 2, h / 2])
                     return np.sqrt(np.sum(xy**2))
@@ -243,48 +249,6 @@ def plot_angle(ax, pos, angle, length=0.95, acol="C0", **kwargs):
     ax.plot(*xy.T, color=acol)
     return AngleAnnotation(pos, xy[0], xy[2], ax=ax, **kwargs)
 
-
-#########################################################################
-# .. _angle-annotation-usage:
-#
-# Usage
-# ~~~~~
-#
-# Required arguments to ``AngleAnnotation`` are the center of the arc, *xy*,
-# and two points, such that the arc spans between the two vectors connecting
-# *p1* and *p2* with *xy*, respectively. Those are given in data coordinates.
-# Further arguments are the *size* of the arc and its *unit*. Additionally, a
-# *text* can be specified, that will be drawn either in- or outside of the arc,
-# according to the value of *textposition*. Usage of those arguments is shown
-# below.
-"""
-fig, ax = plt.subplots()
-fig.canvas.draw()  # Need to draw the figure to define renderer
-ax.set_title("AngleLabel example")
-
-# Plot two crossing lines and label each angle between them with the above
-# ``AngleAnnotation`` tool.
-center = (4.5, 650)
-p1 = [(2.5, 710), (6.0, 605)]
-p2 = [(3.0, 275), (5.5, 900)]
-line1, = ax.plot(*zip(*p1))
-line2, = ax.plot(*zip(*p2))
-point, = ax.plot(*center, marker="o")
-
-am1 = AngleAnnotation(center, p1[1], p2[1], ax=ax, size=75, text=r"$\alpha$")
-am2 = AngleAnnotation(center, p2[1], p1[0], ax=ax, size=35, text=r"$\beta$")
-am3 = AngleAnnotation(center, p1[0], p2[0], ax=ax, size=75, text=r"$\gamma$")
-am4 = AngleAnnotation(center, p2[0], p1[1], ax=ax, size=35, text=r"$\theta$")
-
-
-# Showcase some styling options for the angle arc, as well as the text.
-p = [(6.0, 400), (5.3, 410), (5.6, 300)]
-ax.plot(*zip(*p))
-am5 = AngleAnnotation(p[1], p[0], p[2], ax=ax, size=40, text=r"$\Phi$",
-                      linestyle="--", color="gray", textposition="outside",
-                      text_kw=dict(fontsize=16, color="gray"))
-
-"""
 
 #########################################################################
 # ``AngleLabel`` options

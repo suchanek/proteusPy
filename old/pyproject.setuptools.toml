@@ -1,0 +1,132 @@
+[project]
+name = "proteusPy"
+description = "proteusPy - Protein Structure Analysis and Modeling Tools"
+authors = [{name = "Eric Suchanek", email = "suchanek@mac.com"}]
+license = {file = "LICENSE"}
+readme = "README.md"
+keywords = ["structural biophysics", "proteus", "disulfide bonds", "RCSB"]
+requires-python = "<3.12"
+dynamic = ["version"]
+#version = "0.92.20"
+classifiers=[
+        "Development Status :: 4 - Beta",
+        "License :: OSI Approved :: BSD License",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Science/Research",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3.11",
+        "Topic :: Scientific/Engineering",
+        "Topic :: Scientific/Engineering :: Bio-Informatics",
+        "Topic :: Scientific/Engineering :: Chemistry",
+]
+
+dependencies = [
+"numpy",
+"matplotlib",
+"pandas<2.0",
+"pyvista[all,trame]",
+"traitlets==5.9.0",
+"notebook==6.4.12",
+"jupyter",
+"jupyterlab>=3",
+"seaborn",
+"pillow",
+"tqdm",
+"plotly",
+"datetime",
+"jupyter_bokeh",
+"openai",
+"panel",
+"scikit-learn",
+"gdown",
+"ipykernel",
+"ipygany",
+"nodejs",
+"pytube",
+"grpcio",
+"pip",
+"wget",
+"vtk",
+"kaleido",
+"plotly_express",
+"trame-jupyter-extension",
+"jupyter_contrib_nbextensions",
+"ipywidgets",
+"imageio[ffmpeg]",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pdoc",
+    "black",
+    "build"
+]
+test = [
+    "pytest-cov ~=3.0.0",
+]
+
+[tool.coverage.run]
+source = ["proteusPy"]
+
+[tool.setuptools.packages.find]
+where = ["proteusPy"]
+
+[tool.setuptools.package-data]
+proteusPy = ["data/*.txt", "data/*.py", "data/*.json", "data/*.csv", "data/SS_consensus_class_sext.pkl"]
+
+[tool.setuptools.exclude-package-data]
+proteusPy = ["data/PDB_all_ss.pkl", "data/PDB_SS_ALL_LOADER.pkl", "data/PDB_all_ss_dict.pkl"]
+
+[tool.setuptools-git-versioning]
+enabled = true
+version_file = "VERSION"
+count_commits_from_version_file = true
+template = "{tag}" # default setting
+dev_template = "{tag}+{branch}.{ccount}"
+dirty_template = "{tag}+{branch}.{ccount}"
+
+[project.urls]
+repository = "https://github.com/suchanek/proteusPy/"
+homepage = "https://github.com/suchanek/proteusPy/"
+issues = "https://github.com/suchanek/proteusPy/issues"
+documentation = "https://suchanek.github.io/proteusPy/"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",  # You should have a "tests" directory
+]
+
+[tool.black]
+line-length = 80
+
+[tool.poe.tasks]
+_build = "python -m build"
+_install = "python -m install"
+_jup_install = "poe jupyter"
+_clean_sdist.script = "shutil:rmtree('sdist', ignore_errors=1)"
+_clean_docs.script = "shutil:rmtree('docs', ignore_errors=1)"
+_jup1 = "jupyter contrib nbextension install --sys-prefix"
+_jup2 = "jupyter nbextension enable --py --sys-prefix widgetsnbextension"
+_jup3 = "python -m ipykernel install --user --name proteusPy --display-name 'proteusPy'"
+
+build = ["_build"]
+install = ["_install", "_jup_install"]
+
+  [tool.poe.tasks.jupyter]
+  help = "Add jupyter extensions"
+  sequence = ['_jup1', '_jup2', '_jup3']
+
+  [tool.poe.tasks.format]
+  help = "Run formatting tools on the code base"
+  cmd = "black ."
+
+  [tool.poe.tasks.docs]
+  help = "Build the docs with pdoc"
+  cmd = "pdoc -o docs --math --logo ./logo.png ./proteusPy"
+  deps = ["_clean_docs"]
+
+[build-system]
+requires = ["setuptools < 60.0", "setuptools-git-versioning<2", "poethepoet"]
+build-backend = "setuptools.build_meta"
