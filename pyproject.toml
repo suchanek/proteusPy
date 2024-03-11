@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "proteuspy"
+name = "proteusPy"
 version = "0.92.25"
 description = "proteusPy - Protein Structure Analysis and Modeling Tools"
 authors = ["Eric Suchanek <suchanek@mac.com>"]
@@ -63,6 +63,9 @@ imageio-ffmpeg = {extras = ["ffmpeg"], version = "^0.4.9"}
 biopython = {git = "https://github.com/suchanek/biopython.git", rev = "egs_ssbond_240305"}
 imageio = "^2.34.0"
 pandas = "^2.2.1"
+trame = "^3.5.2"
+trame-vtk = "^2.8.5"
+trame-vuetify = "^2.4.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.2.0"

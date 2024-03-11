@@ -12,8 +12,8 @@ data/classes/*
 data/Oclasses/*
 programs/chatbot.py
 proteusPy/.DS_Store
-proteusPy.egg-info
-proteusPy/proteusPy.egg-info
+proteusPy.egg-info/*
+proteusPy/proteusPy.egg-info/*
 proteus_logo_sb.png
 proteus_logo_sb.png
 proteus_logo_sb.png

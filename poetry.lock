@@ -4252,6 +4252,34 @@ more-itertools = "*"
 wslink = ">=1.12.2"
 
 [[package]]
+name = "trame-vtk"
+version = "2.8.5"
+description = "VTK widgets for trame"
+optional = false
+python-versions = "*"
+files = [
+    {file = "trame-vtk-2.8.5.tar.gz", hash = "sha256:bd370840de78a73ed112948da6c8de66711e84003c76da0d1258a3ef5ba587d9"},
+    {file = "trame_vtk-2.8.5-py3-none-any.whl", hash = "sha256:b89c6a164b6ec7e63b8a181547a7dda2a859f0fb16835e2686afc861d8c7b397"},
+]
+
+[package.dependencies]
+trame-client = "*"
+
+[[package]]
+name = "trame-vuetify"
+version = "2.4.2"
+description = "Vuetify widgets for trame"
+optional = false
+python-versions = "*"
+files = [
+    {file = "trame-vuetify-2.4.2.tar.gz", hash = "sha256:85989236e9fb743448e807fe7ee341b8d65c0970cf95669cc5924c42053df9f6"},
+    {file = "trame_vuetify-2.4.2-py3-none-any.whl", hash = "sha256:7723a620a604aed5c2d9c4d577a76d8dfc8b41ba8f1b49b8b2ba02ce45961a22"},
+]
+
+[package.dependencies]
+trame-client = "*"
+
+[[package]]
 name = "types-python-dateutil"
 version = "2.8.19.20240311"
 description = "Typing stubs for python-dateutil"
@@ -4631,4 +4659,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "6c65c5925b7de26df357236f532583698186c3187eb010ed1171b14e50dd5f2d"
+content-hash = "dfbb18934294a41dc622a86c322247bf01bd4c8dfb1cc7e607f9d22897ac07b2"
