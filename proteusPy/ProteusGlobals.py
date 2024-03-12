@@ -3,16 +3,21 @@ This file contains global declarations for the *proteusPy* package, a Python pac
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2/18/24 -egs-
+Last revision: 3/12/24 -egs-
 """
 
 import math
 import os
+from pathlib import Path
+
+_this_dir = Path(__file__).parent
 
 PDB_DIR = os.getenv("PDB")
-PROTEUSPY_REPO_HOME = os.getenv("PROTEUSPY_REPO_HOME")
+if PDB_DIR is None:
+    PDB_DIR = "."
 
-REPO_DATA_DIR = os.path.join(PROTEUSPY_REPO_HOME, "data/")
+REPO_DATA_DIR = _this_dir / "data"
+
 MODEL_DIR = os.path.join(PDB_DIR, "good/")
 
 WINFRAME = 512  # single panel width

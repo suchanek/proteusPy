@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "proteusPy"
-version = "0.92.25"
+version = "0.92.26"
 description = "proteusPy - Protein Structure Analysis and Modeling Tools"
 authors = ["Eric Suchanek <suchanek@mac.com>"]
 license = "LICENSE"
