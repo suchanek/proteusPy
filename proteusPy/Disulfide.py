@@ -238,9 +238,7 @@ class Disulfide:
         self.chi3 = _ANG_INIT
         self.chi4 = _ANG_INIT
         self.chi5 = _ANG_INIT
-        self.rho = (
-            _ANG_INIT  # new dihedral angle: Nprox - Ca_prox - Ca_dist - N_dist
-        )
+        self.rho = _ANG_INIT  # new dihedral angle: Nprox - Ca_prox - Ca_dist - N_dist
 
         self.torsion_length = _FLOAT_INIT
 
@@ -1006,7 +1004,7 @@ class Disulfide:
         self.chi4 = dihedrals[3]
         self.chi5 = dihedrals[4]
 
-    def bounding_box(self):
+    def bounding_box(self) -> np.array:
         """
         Return the bounding box array for the given disulfide
 
@@ -1027,7 +1025,7 @@ class Disulfide:
 
         return res
 
-    def build_yourself(self):
+    def build_yourself(self) -> None:
         """
         Build a model Disulfide based its internal dihedral state
         Routine assumes turtle is in orientation #1 (at Ca, headed toward
@@ -1044,7 +1042,7 @@ class Disulfide:
 
     def build_model(
         self, chi1: float, chi2: float, chi3: float, chi4: float, chi5: float
-    ):
+    ) -> None:
         """
         Build a model Disulfide based on the input dihedral angles.
         Routine assumes turtle is in orientation #1 (at Ca, headed toward
@@ -1172,7 +1170,7 @@ class Disulfide:
         _max = ic[:, idx].max()
         return _min, _max
 
-    def compute_local_coords(self):
+    def compute_local_coords(self) -> None:
         """
         Compute the internal coordinates for a properly initialized Disulfide Object.
 
@@ -1246,14 +1244,12 @@ class Disulfide:
 
         energy = 2.0 * (cos(torad(3.0 * chi1)) + cos(torad(3.0 * chi5)))
         energy += cos(torad(3.0 * chi2)) + cos(torad(3.0 * chi4))
-        energy += (
-            3.5 * cos(torad(2.0 * chi3)) + 0.6 * cos(torad(3.0 * chi3)) + 10.1
-        )
+        energy += 3.5 * cos(torad(2.0 * chi3)) + 0.6 * cos(torad(3.0 * chi3)) + 10.1
 
         self.energy = energy
         return energy
 
-    def display(self, single=True, style="sb", light=True, shadows=False):
+    def display(self, single=True, style="sb", light=True, shadows=False) -> None:
         """
         Display the Disulfide bond in the specific rendering style.
 
@@ -1463,7 +1459,7 @@ class Disulfide:
                 pl.enable_shadows()
         return pl
 
-    def Distance_neighbors(self, others: DisulfideList, cutoff: float):
+    def Distance_neighbors(self, others: DisulfideList, cutoff: float) -> DisulfideList:
         """
         Return list of Disulfides whose RMS atomic distance is within
         the cutoff (Å) in the others list.
@@ -1514,7 +1510,7 @@ class Disulfide:
         """
         return self.PERMISIVE
 
-    def get_full_id(self):
+    def get_full_id(self) -> tuple:
         """
         Return the Disulfide full IDs (Used with BIO.PDB)
 
@@ -1524,7 +1520,7 @@ class Disulfide:
 
     def initialize_disulfide_from_chain(
         self, chain1, chain2, proximal, distal, resolution, quiet=True
-    ):
+    ) -> None:
         """
         Initialize a new Disulfide object with atomic coordinates from
         the proximal and distal coordinates, typically taken from a PDB file.
@@ -1550,10 +1546,7 @@ class Disulfide:
         prox_residue = chain1[prox]
         dist_residue = chain2[dist]
 
-        if (
-            prox_residue.get_resname() != "CYS"
-            or dist_residue.get_resname() != "CYS"
-        ):
+        if prox_residue.get_resname() != "CYS" or dist_residue.get_resname() != "CYS":
             print(
                 f"build_disulfide() requires CYS at both residues: {prox} {prox_residue.get_resname()} {dist} {dist_residue.get_resname()} Chain: {prox_residue.get_segid()}"
             )
@@ -1571,9 +1564,7 @@ class Disulfide:
         self.distal_residue_fullid = dist_residue.get_full_id()
 
         if quiet:
-            warnings.filterwarnings(
-                "ignore", category=DisulfideConstructionWarning
-            )
+            warnings.filterwarnings("ignore", category=DisulfideConstructionWarning)
         else:
             warnings.simplefilter("always")
 
@@ -1630,9 +1621,7 @@ class Disulfide:
 
         except Exception:
             mess = f"Missing coords for: {id} {prox-1} or {dist+1} for SS {proximal}-{distal}"
-            cprev_prox = nnext_prox = cprev_dist = nnext_dist = Vector(
-                -1.0, -1.0, -1.0
-            )
+            cprev_prox = nnext_prox = cprev_dist = nnext_dist = Vector(-1.0, -1.0, -1.0)
             self.missing_atoms = True
             warnings.warn(mess, DisulfideConstructionWarning)
 
@@ -1776,7 +1765,7 @@ class Disulfide:
 
     def make_movie(
         self, style="sb", fname="ssbond.mp4", verbose=False, steps=360
-    ):
+    ) -> None:
         """
         Create an animation for ```self``` rotating one revolution about the Y axis,
         in the given ```style```, saving to ```filename```.
@@ -1852,14 +1841,14 @@ class Disulfide:
         print(res)
 
     # repr functions. The class is large, so I split it up into sections
-    def repr_ss_info(self):
+    def repr_ss_info(self) -> str:
         """
         Representation for the Disulfide class
         """
         s1 = f"<Disulfide {self.name}, Source: {self.pdb_id}, Resolution: {self.resolution} Å"
         return s1
 
-    def repr_ss_coords(self):
+    def repr_ss_coords(self) -> str:
         """
         Representation for Disulfide coordinates
         """
@@ -1868,7 +1857,7 @@ class Disulfide:
         stot = f"{s2} {s3}"
         return stot
 
-    def repr_ss_conformation(self):
+    def repr_ss_conformation(self) -> str:
         """
         Representation for Disulfide conformation
         """
@@ -1876,7 +1865,7 @@ class Disulfide:
         stot = f"{s4}"
         return stot
 
-    def repr_ss_local_coords(self):
+    def repr_ss_local_coords(self) -> str:
         """
         Representation for the Disulfide internal coordinates.
         """
@@ -1885,27 +1874,27 @@ class Disulfide:
         stot = f"{s2i}{s3i}"
         return stot
 
-    def repr_ss_chain_ids(self):
+    def repr_ss_chain_ids(self) -> str:
         """
         Representation for Disulfide chain IDs
         """
         return f"Proximal Chain fullID: <{self.proximal_residue_fullid}> Distal Chain fullID: <{self.distal_residue_fullid}>"
 
-    def repr_ss_ca_dist(self):
+    def repr_ss_ca_dist(self) -> str:
         """
         Representation for Disulfide Ca distance
         """
         s1 = f"Cα Distance: {self.ca_distance:.2f} Å"
         return s1
 
-    def repr_ss_cb_dist(self):
+    def repr_ss_cb_dist(self) -> str:
         """
         Representation for Disulfide Ca distance
         """
         s1 = f"Cβ Distance: {self.cb_distance:.2f} Å"
         return s1
 
-    def repr_ss_torsion_length(self):
+    def repr_ss_torsion_length(self) -> str:
         """
         Representation for Disulfide torsion length
         """
@@ -1937,38 +1926,36 @@ class Disulfide:
         """
         return f"{self.repr_ss_info()} {self.repr_ss_conformation()}"
 
-    def repr_conformation(self):
+    def repr_conformation(self) -> str:
         """
         Return a string representation of the Disulfide object's conformation.
         :return: string
         """
         return f"{self.repr_ss_conformation()}"
 
-    def repr_coords(self):
+    def repr_coords(self) -> str:
         """
         Return a string representation of the Disulfide object's coordinates.
         :return: string
         """
         return f"{self.repr_ss_coords()}"
 
-    def repr_internal_coords(self):
+    def repr_internal_coords(self) -> str:
         """
         Return a string representation of the Disulfide object's internal coordinaes.
         :return: string
         """
         return f"{self.repr_ss_local_coords()}"
 
-    def repr_chain_ids(self):
+    def repr_chain_ids(self) -> str:
         """
         Return a string representation of the Disulfide object's chain ids.
         :return: string
         """
         return f"{self.repr_ss_chain_ids()}"
 
-    def compute_rho(self):
-        self.rho = calc_dihedral(
-            self.n_prox, self.ca_prox, self.ca_dist, self.n_dist
-        )
+    def compute_rho(self) -> float:
+        self.rho = calc_dihedral(self.n_prox, self.ca_prox, self.ca_dist, self.n_dist)
         return self.rho
 
     def reset(self) -> None:
@@ -2000,7 +1987,7 @@ class Disulfide:
         verbose=False,
         shadows=False,
         light=True,
-    ):
+    ) -> None:
         """
         Create and save a screenshot of the Disulfide in the given style
         and filename
@@ -2112,7 +2099,7 @@ class Disulfide:
         if verbose:
             print(f"Saved: {fname}")
 
-    def save_meshes_as_stl(self, meshes, filename):
+    def save_meshes_as_stl(self, meshes, filename) -> None:
         """Save a list of meshes as a single STL file.
 
         Args:
@@ -2124,7 +2111,7 @@ class Disulfide:
             merged_mesh += mesh
         merged_mesh.save(filename)
 
-    def export(self, style="sb", verbose=True, fname="ssbond_plt"):
+    def export(self, style="sb", verbose=True, fname="ssbond_plt") -> None:
         """
         Create and save a screenshot of the Disulfide in the given style and filename.
 
@@ -2185,7 +2172,7 @@ class Disulfide:
         n_next_prox: Vector,
         c_prev_dist: Vector,
         n_next_dist: Vector,
-    ):
+    ) -> None:
         """
         Set the atomic coordinates for all atoms in the Disulfide object.
 
@@ -2228,7 +2215,7 @@ class Disulfide:
 
     def set_dihedrals(
         self, chi1: float, chi2: float, chi3: float, chi4: float, chi5: float
-    ):
+    ) -> None:
         """
         Set the disulfide's dihedral angles, Chi1-Chi5. -180 - 180 degrees.
 
@@ -2247,7 +2234,7 @@ class Disulfide:
         self.compute_torsional_energy()
         self.Torsion_Length()
 
-    def set_name(self, namestr="Disulfide"):
+    def set_name(self, namestr="Disulfide") -> None:
         """
         Set the Disulfide's name.
 
@@ -2310,7 +2297,7 @@ class Disulfide:
 
         return dist
 
-    def Torsion_neighbors(self, others, cutoff):
+    def Torsion_neighbors(self, others, cutoff) -> DisulfideList:
         """
         Return a list of Disulfides within the angular cutoff in the others list.
         This routine is used to find Disulfides having the same torsion length
@@ -2358,7 +2345,7 @@ class Disulfide:
         res = [ss for ss in others if self.Torsion_Distance(ss) <= cutoff]
         return DisulfideList(res, "neighbors")
 
-    def torsion_to_sixclass(self):
+    def torsion_to_sixclass(self) -> str:
         """
         Return the sextant class string for ``self``.
 
@@ -2473,9 +2460,7 @@ def Download_Disulfides(
     for entry in pbar:
         pbar.set_postfix({"Entry": entry})
         if entry not in completed:
-            if pdblist.retrieve_pdb_file(
-                entry, file_format="pdb", pdir=pdb_home
-            ):
+            if pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=pdb_home):
                 completed.update(entry)
                 completed_file.write(f"{entry},")
                 count += 1
@@ -2486,9 +2471,7 @@ def Download_Disulfides(
     elapsed = end - start
 
     print(f"Overall files processed: {count}")
-    print(
-        f"Complete. Elapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)"
-    )
+    print(f"Complete. Elapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)")
     os.chdir(cwd)
     return
 
@@ -2719,9 +2702,7 @@ def Extract_Disulfides(
             print("-> Extract_Disulfides(): No non-parsable structures found.")
 
     if bad_dist > 0:
-        print(
-            f"-> Extract_Disulfides(): Found and ignored: {bad_dist} long SS bonds."
-        )
+        print(f"-> Extract_Disulfides(): Found and ignored: {bad_dist} long SS bonds.")
     else:
         if verbose:
             print("No problems found.")
@@ -2825,9 +2806,7 @@ def check_header_from_file(
     if verbose:
         print(f"-> check_header_from_file() - Parsing file: {filename}:")
 
-    ssbond_dict = structure.header[
-        "ssbond"
-    ]  # NB: this requires the modified code
+    ssbond_dict = structure.header["ssbond"]  # NB: this requires the modified code
 
     # list of tuples with (proximal distal chaina chainb)
     ssbonds = parse_ssbond_header_rec(ssbond_dict)
@@ -2871,10 +2850,7 @@ def check_header_from_file(
         # make a new Disulfide object, name them based on proximal and distal
         # initialize SS bond from the proximal, distal coordinates
         if (_chaina is not None) and (_chainb is not None):
-            if (
-                _chaina[proximal].is_disordered()
-                or _chainb[distal].is_disordered()
-            ):
+            if _chaina[proximal].is_disordered() or _chainb[distal].is_disordered():
                 continue
             else:
                 if verbose:
@@ -2921,14 +2897,10 @@ def check_header_from_id(
     True
     """
     parser = PDBParser(PERMISSIVE=True, QUIET=True)
-    structure = parser.get_structure(
-        struct_name, file=f"{pdb_dir}pdb{struct_name}.ent"
-    )
+    structure = parser.get_structure(struct_name, file=f"{pdb_dir}pdb{struct_name}.ent")
     model = structure[0]
 
-    ssbond_dict = structure.header[
-        "ssbond"
-    ]  # NB: this requires the modified code
+    ssbond_dict = structure.header["ssbond"]  # NB: this requires the modified code
 
     bondlist = []
     i = 0
@@ -3002,9 +2974,7 @@ def Disulfide_Energy_Function(x: list) -> float:
     import numpy as np
 
     chi1, chi2, chi3, chi4, chi5 = x
-    energy = 2.0 * (
-        np.cos(np.deg2rad(3.0 * chi1)) + np.cos(np.deg2rad(3.0 * chi5))
-    )
+    energy = 2.0 * (np.cos(np.deg2rad(3.0 * chi1)) + np.cos(np.deg2rad(3.0 * chi5)))
     energy += np.cos(np.deg2rad(3.0 * chi2)) + np.cos(np.deg2rad(3.0 * chi4))
     energy += (
         3.5 * np.cos(np.deg2rad(2.0 * chi3))
