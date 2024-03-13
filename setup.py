@@ -77,7 +77,7 @@ setup(
     install_requires=[
         "numpy",
         "matplotlib",
-        "pandas<2.0",
+        "pandas==2.2.1",
         "pyvista[all]",
         "traitlets==5.9.0",
         "notebook==6.4.12",
