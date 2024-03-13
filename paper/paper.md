@@ -71,6 +71,7 @@ It's simplest to clone the repo via GitHub since it contains all of the notebook
   $ git-lfs track "*.csv" "*.mp4" "*.pkl"
   $ make pkg
   $ mamba activate proteusPy
+  $ mamba install vtk
   $ make install
   ```
 ## Windows
