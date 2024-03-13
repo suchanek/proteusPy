@@ -39,6 +39,7 @@ devclean:
 # activate the package before running!
 install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
+	mamba install -y vtk
 	pip install -U . 
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	jupyter contrib nbextension install --sys-prefix
@@ -48,6 +49,7 @@ install:
 
 install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
+	mamba install -y vtk
 	pip install dist/proteusPy-$(VERS)-py3-none-any.whl
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	pip install pdoc twine black pytest build
