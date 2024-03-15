@@ -2280,7 +2280,7 @@ class Disulfide:
         :return: Euclidean distance (Degrees) between ```self``` and ```other```.
         """
 
-        from ProteusPyWarning import ProteusPyWarning
+        from proteusPy.ProteusPyWarning import ProteusPyWarning
 
         # Check length of torsion arrays
         if len(self.torsion_array) != 5 or len(other.torsion_array) != 5:
