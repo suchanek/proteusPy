@@ -9,12 +9,11 @@
 from pathlib import Path
 
 __pdoc__ = {"__all__": False}
-# __version__ = "0.92.25"
+# __version__ = "0.92.28"
 
-
-version_file = Path(__file__).parent.parent / "VERSION"
-if version_file.is_file():
-    with open(version_file) as f:
+_version_file = Path(__file__).parent.parent / "VERSION"
+if _version_file.is_file():
+    with open(_version_file) as f:
         __version__ = f.read().strip()
 
 
@@ -64,11 +63,7 @@ from .DisulfideExceptions import (
     DisulfideIOException,
 )
 from .DisulfideList import load_disulfides_from_id
-from .DisulfideLoader import (
-    Download_PDB_SS,
-    Download_PDB_SS_GitHub,
-    Load_PDB_SS,
-)
+from .DisulfideLoader import Download_PDB_SS, Download_PDB_SS_GitHub, Load_PDB_SS
 from .ProteusGlobals import (
     _ANG_INIT,
     _FLOAT_INIT,
