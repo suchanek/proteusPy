@@ -7,8 +7,8 @@ VERS := $(shell grep ^0 VERSION | cut -d= -f2 | tr -d \" | sed 's/^[[:space:]]*/
 #PYPI_PASSWORD := $(shell echo $$PYPI_PASSWORD)
 CONDA = mamba
 
-MESS = "0.92.27"
-# VERS = "0.92.27"
+MESS = "0.92.28"
+# VERS = "0.92.28"
 
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
