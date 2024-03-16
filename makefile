@@ -1,37 +1,49 @@
 # Makefile for proteusPy
 # Author: Eric G. Suchanek, PhD
-# Last revision: 3/8/24 -egs-
+# Last revision: 3/16/24 -egs-
 
-VERS := $(shell grep ^0 VERSION | cut -d= -f2 | tr -d \" | sed 's/^[[:space:]]*//')
+# assumes file VERSION contains only the version number
+ifeq ($(OS),Windows_NT) 
+	VERS = $(shell type VERSION)
+else 
+	VERS = $(shell cat VERSION)
+endif
 
-#PYPI_PASSWORD := $(shell echo $$PYPI_PASSWORD)
 CONDA = mamba
 
-MESS = "0.92.29"
-# VERS = "0.92.29"
-
+MESS = VERS
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
 
 PHONY = .
 
+vers: .
+	@echo "Version = $(VERS)"
+
 nuke: clean devclean
-	@rm $(OUTFILES)
+	ifeq ($(OS),Windows_NT) 
+		@del $(OUTFILES)
+	else 
+		@rm $(OUTFILES)
+	endif
 
 pkg:
 	@echo "Starting installation step 1/2..."
 	$(CONDA) create --name proteusPy -y python=3.11.7
 	@echo "Step 1 done. Now activate the environment with 'conda activate proteusPy' and run 'make install'"
+
 dev:
 	@echo "Building $(DEVNAME)..."
 	$(CONDA) create --name $(DEVNAME) -y python=3.11.7
 	@echo "Step 1 done. Now activate the environment with 'conda activate $(DEVNAME)' and run 'make install_dev'"
 
-clean: remove_jupyter
+clean: .
 	@echo "Removing proteusPy environment..."
+	jupyter kernelspec uninstall proteuspy -y
 	@$(CONDA) env remove --name proteusPy -y
 
-devclean:
+devclean: .
+	jupyter kernelspec uninstall ppydev -y
 	@echo "Removing $(DEVNAME) environment..."
 	$(CONDA) env remove --name $(DEVNAME) -y
 
@@ -69,13 +81,6 @@ jup_dev: .
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
 	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
 
-
-remove_jupyter: 
-	jupyter kernelspec uninstall proteuspy -y
-
-remove_jupyter_dev: 
-	jupyter kernelspec uninstall ppydev -y
-
 # package development targets
 
 format: sdist
@@ -94,6 +99,7 @@ docs: .
 # normally i push to PyPi via github action
 upload: sdist
 	twine upload -r proteusPy dist/proteusPy-$(VERS)*
+
 tag: .
 	git tag -a $(VERS) -m $(MESS)
 	@echo $(VERS) > tag.out

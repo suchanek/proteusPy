@@ -144,8 +144,8 @@ class DisulfideLoader:
             )
 
         with open(self.PickleFile, "rb") as f:
-            sslist = pd.compat.pickle_compat.load(f)
-            # sslist = pickle.load(f)
+            # sslist = pd.compat.pickle_compat.load(f)
+            sslist = pickle.load(f)
             self.SSList = sslist
             self.TotalDisulfides = len(self.SSList)
 
@@ -162,8 +162,8 @@ class DisulfideLoader:
 
         with open(self.PickleDictFile, "rb") as f:
 
-            # self.SSDict = pickle.load(f)
-            self.SSDict = pd.compat.pickle_compat.load(f)
+            self.SSDict = pickle.load(f)
+            # self.SSDict = pd.compat.pickle_compat.load(f)
 
             for key in self.SSDict:
                 idlist.append(key)
@@ -708,8 +708,8 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
         print(f"-> load_PDB_SS(): Reading {_fname}... ")
 
     with open(_fname, "rb") as f:
-        # res = pickle.load(f)
-        res = pd.compat.pickle_compat.load(f)
+        res = pickle.load(f)
+        # res = pd.compat.pickle_compat.load(f)
 
     if verbose:
         print(f"-> load_PDB_SS(): Done reading {_fname}... ")

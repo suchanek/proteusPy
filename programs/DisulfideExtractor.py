@@ -70,9 +70,7 @@ def do_extract(verbose, full, subset, cutoff):
 
     if full:
         if verbose:
-            print(
-                "--> Extracting the SS full dataset. This will take ~1.5 hours."
-            )
+            print("--> Extracting the SS full dataset. This will take ~1.5 hours.")
 
         Extract_Disulfides(
             numb=-1,
@@ -94,6 +92,8 @@ def do_build(verbose, full, subset, cutoff):
     :param full: Whether to load and save the full dataset, boolean
     :param subset: Whether to load and save the subset database, boolean
     """
+    from proteusPy.DisulfideLoader import DisulfideLoader
+
     if full:
         if verbose:
             print(
@@ -120,11 +120,11 @@ def do_stuff(
     all=False,
     extract=False,
     build=True,
-    full=False,
+    full=True,
     update=True,
     subset=True,
     verbose=True,
-    cutoff=-1.0,
+    cutoff=8.0,
 ):
     """
     Main entrypoint for the proteusPy Disulfide database extraction and creation workflow.
@@ -221,10 +221,10 @@ parser.add_argument(
 parser.set_defaults(all=False)
 parser.set_defaults(update=True)
 parser.set_defaults(verbose=True)
-parser.set_defaults(extract=True)
+parser.set_defaults(extract=False)
 parser.set_defaults(subset=True)
 parser.set_defaults(build=True)
-parser.set_defaults(full=False)
+parser.set_defaults(full=True)
 parser.set_defaults(cutoff=8.0)
 
 args = parser.parse_args()
