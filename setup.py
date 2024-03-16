@@ -55,7 +55,8 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
-__version__ = "0.92.29"
+__version__ = "UNKNOWN"
+
 version_file = this_directory / "VERSION"
 if version_file.is_file():
     with open(version_file) as f:
