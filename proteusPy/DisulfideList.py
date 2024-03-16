@@ -1065,6 +1065,7 @@ class DisulfideList(UserList):
 # utility functions
 from proteusPy.DisulfideExceptions import DisulfideConstructionWarning
 
+
 def load_disulfides_from_id(
     struct_name: str,
     pdb_dir=MODEL_DIR,

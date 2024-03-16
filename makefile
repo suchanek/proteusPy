@@ -86,7 +86,7 @@ jup_dev: .
 format: sdist
 	black proteusPy
 
-bld: sdist docs format
+bld:  format sdist docs 
 
 sdist: .
 	python -m build
