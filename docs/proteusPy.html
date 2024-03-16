@@ -46,7 +46,7 @@
 
             <h2>Contents</h2>
             <ul>
-  <li><a href="#summary">Summary</a></li>
+  <li><a href="#proteuspy">proteusPy</a></li>
   <li><a href="#general-capabilities">General Capabilities</a></li>
   <li><a href="#requirements">Requirements</a></li>
   <li><a href="#installation">Installation</a>
@@ -107,7 +107,7 @@ proteusPy    </h1>
 <a href="https://travis-ci.com/suchanek/proteusPy"><img src="https://travis-ci.com/suchanek/proteusPy.svg?branch=master" alt="Build Status" /></a>
 <a href="http://makeapullrequest.com"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome" /></a></p>
 
-<h1 id="summary">Summary</h1>
+<h1 id="proteuspy">proteusPy</h1>
 
 <p><strong>proteusPy</strong> is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide bonds. This package reprises my molecular modeling program <a href="https://doi.org/10.1021/bi00368a023">Proteus</a>, a structure-based program developed as part of my graduate thesis. The package relies on the <a href="https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html">Turtle3D</a> class to create and manipulate local coordinate systems. It does this by implementing the functions <code>Move</code>, <code>Roll</code>, <code>Yaw</code>, <code>Pitch</code> and <code>Turn</code> for movement in a three-dimensional space.  The initial implementation focuses on the <a href="https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html">Disulfide</a> class. The class implements methods to analyze the protein structure stabilizing element known as a <em>Disulfide Bond</em>. This class and its underlying methods are being used to perform a structural analysis of over 35,800 disulfide-bond containing proteins in the RCSB protein data bank (https://www.rcsb.org).</p>
 
@@ -301,7 +301,7 @@ proteusPy    </h1>
 </span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="n">__pdoc__</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;__all__&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="c1"># __version__ = &quot;0.92.28&quot;</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="c1"># __version__ = &quot;0.92.29&quot;</span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>
 </span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="n">_version_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;VERSION&quot;</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="k">if</span> <span class="n">_version_file</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>

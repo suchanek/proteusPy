@@ -7,8 +7,8 @@ VERS := $(shell grep ^0 VERSION | cut -d= -f2 | tr -d \" | sed 's/^[[:space:]]*/
 #PYPI_PASSWORD := $(shell echo $$PYPI_PASSWORD)
 CONDA = mamba
 
-MESS = "0.92.28"
-# VERS = "0.92.28"
+MESS = "0.92.29"
+# VERS = "0.92.29"
 
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
@@ -50,7 +50,8 @@ install:
 install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	$(CONDA) install -y vtk
-	pip install dist/proteusPy-$(VERS)-py3-none-any.whl
+	#pip install dist/proteusPy-$(VERS)-py3-none-any.whl
+	pip install -U .
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	pip install pdoc twine black pytest build
 	jupyter contrib nbextension install --sys-prefix

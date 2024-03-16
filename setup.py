@@ -55,7 +55,7 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
-__version__ = "0.92.28"
+__version__ = "0.92.29"
 version_file = this_directory / "VERSION"
 if version_file.is_file():
     with open(version_file) as f:
@@ -80,8 +80,8 @@ setup(
         "pandas==2.2.1",
         "pyvista[all]",
         "traitlets==5.9.0",
-        "notebook==6.4.12",
         "jupyter",
+        "jupyter_server<2.0",
         "jupyterlab>=3",
         "seaborn",
         "pillow",
