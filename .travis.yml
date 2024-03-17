@@ -1,6 +1,6 @@
 language: python
 python:
-  - "3.11-dev
+  - "3.11-dev"
 
 install:
     - pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
