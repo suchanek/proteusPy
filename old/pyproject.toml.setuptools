@@ -7,7 +7,7 @@ readme = "README.md"
 keywords = ["structural biophysics", "proteus", "disulfide bonds", "RCSB"]
 requires-python = "<3.12"
 dynamic = ["version"]
-#version = "0.92.20"
+#version = "0.93.5"
 classifiers=[
         "Development Status :: 4 - Beta",
         "License :: OSI Approved :: BSD License",
@@ -24,11 +24,12 @@ dependencies = [
 "numpy",
 "matplotlib",
 "pandas<2.0",
-"pyvista[all,trame]",
+"pyvista[all]",
 "traitlets==5.9.0",
 "notebook==6.4.12",
 "jupyter",
-"jupyterlab>=3",
+"jupyterlab<4",
+"jupyter_server<2.0",
 "seaborn",
 "pillow",
 "tqdm",
@@ -78,8 +79,8 @@ proteusPy = ["data/*.txt", "data/*.py", "data/*.json", "data/*.csv", "data/SS_co
 proteusPy = ["data/PDB_all_ss.pkl", "data/PDB_SS_ALL_LOADER.pkl", "data/PDB_all_ss_dict.pkl"]
 
 [tool.setuptools-git-versioning]
-enabled = true
-version_file = "VERSION"
+enabled = false
+version_file = "proteusPy/version.py"
 count_commits_from_version_file = true
 template = "{tag}" # default setting
 dev_template = "{tag}+{branch}.{ccount}"
