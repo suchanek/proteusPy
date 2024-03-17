@@ -1,8 +1,9 @@
 
 [![PyPI version](https://badge.fury.io/py/proteusPy.svg)](https://badge.fury.io/py/proteusPy)
-![Pytest](https://github.com/suchanek/proteusPy/actions/workflows/pytest.yml/badge.svg)
+![Testing](https://github.com/suchanek/proteusPy/actions/workflows/pytest.yml/badge.svg)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
+# proteusPy
 **proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide bonds. This package reprises my molecular modeling program [Proteus](https://doi.org/10.1021/bi00368a023), a structure-based program developed as part of my graduate thesis. The package relies on the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class to create and manipulate local coordinate systems. It does this by implementing the functions ``Move``, ``Roll``, ``Yaw``, ``Pitch`` and ``Turn`` for movement in a three-dimensional space.  The initial implementation focuses on the [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class. The class implements methods to analyze the protein structure stabilizing element known as a *Disulfide Bond*. This class and its underlying methods are being used to perform a structural analysis of over 35,800 disulfide-bond containing proteins in the RCSB protein data bank (https://www.rcsb.org).
 
 # General Capabilities
@@ -130,8 +131,7 @@ The proteusPy package was developed by Eric G. Suchanek, PhD. If you find it use
 
 ## Publications
 
-- <https://doi.org/10.1021/bi00368a023>
-- <https://doi.org/10.1021/bi00368a024>
-- <https://doi.org/10.1016/0092-8674(92)90140-8>
-- <http://dx.doi.org/10.2174/092986708783330566>
-- <http://dx.doi.org/10.1111/j.1538-7836.2010.03894.x>
+- [Computer-aided Strategies for Protein Design](https://doi.org/10.1021/bi00368a023)
+- [An engineered intersubunit disulfide enhances the stability and DNA binding of the N-terminal domain of .lambda. repressor](https://doi.org/10.1021/bi00368a024)
+- [Introduction of intersubunit disulfide bonds in the membrane-distal region of the influenza hemagglutinin abolishes membrane fusion activity](https://doi.org/10.1016/0092-8674(92)90140-8)
+- [Analysis of disulfide bonds in protein structures](http://dx.doi.org/10.1111/j.1538-7836.2010.03894.x)
