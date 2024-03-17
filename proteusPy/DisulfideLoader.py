@@ -66,29 +66,6 @@ class DisulfideLoader:
     defined in the proteusPy.data class and should not be changed. Upon initialization the class
     will load them and initialize itself.
 
-    Example:
-    >>> import proteusPy
-    >>> from proteusPy.Disulfide import Disulfide
-    >>> from proteusPy.DisulfideLoader import DisulfideLoader
-    >>> from proteusPy.DisulfideList import DisulfideList
-
-    >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
-    >>> SS1 = PDB_SS[0]
-    >>> SS1
-    <Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>
-
-    Accessing by PDB_ID returns a list of Disulfides:
-    >>> SS2 = PDB_SS['4yys']
-    >>> SS2
-    [<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>]
-
-    Accessing individual disulfides by their name:
-    >>> SS3 = PDB_SS['4yys_56A_98A']
-    >>> SS3
-    <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>
-
-    Finally, we can access disulfides by regular slicing:
-    >>> SSlist = PDB_SS[:4]
     """
 
     def __init__(
@@ -395,12 +372,12 @@ class DisulfideLoader:
 
         Example:
         >>> from proteusPy.Disulfide import Disulfide
-        >>> from proteusPy.DisulfideLoader import DisulfideLoader
+        >>> from proteusPy.DisulfideLoader import Load_PDB_SS
         >>> from proteusPy.DisulfideList import DisulfideList
 
         Instantiate the Loader with the SS database subset.
 
-        >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
+        >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
 
         Display the Disulfides from the PDB ID ```4yys```, overlaid onto
         a common reference (the proximal disulfides).
@@ -428,8 +405,8 @@ class DisulfideLoader:
         :rtype: pd.DataFrame
 
         Example:
-        >>> from proteusPy.DisulfideLoader import DisulfideLoader
-        >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
+        >>> from proteusPy.DisulfideLoader import Load_PDB_SS
+        >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
         >>> Tor_DF = PDB_SS.getTorsions()
         """
         res_df = pd.DataFrame()
