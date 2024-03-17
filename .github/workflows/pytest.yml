@@ -22,5 +22,4 @@ jobs:
 
         - name: Test with pytest
           run: |
-            pytestname: proteusPy
             pytest
