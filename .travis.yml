@@ -2,6 +2,8 @@ language: python
 python:
     - "3.11"
 install:
+    - pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
+    - pip install pytest
     - pip install .
 script:
     - pytest
