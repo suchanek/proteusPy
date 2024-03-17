@@ -5,7 +5,6 @@ arch:
 python:
   - "3.11"
 
-
 #  - arm64  # No Python images yet on xenial
 
 matrix:
