@@ -11,7 +11,7 @@ endif
 
 CONDA = mamba
 
-MESS = VERS
+MESS = $(VERS)
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
 
