@@ -4,9 +4,9 @@
 
 # assumes file VERSION contains only the version number
 ifeq ($(OS),Windows_NT) 
-	VERS = $(shell powershell -Command "(Select-String -Path proteusPy/version.py -Pattern '^__version__ = ""(.*)""').Matches.Groups[1].Value")
+    VERS := $(shell python -c "exec(open('proteusPy/version.py').read()); print(__version__)")
 else 
-	VERS = $(shell sed -n 's/^__version__ = "\(.*\)"/\1/p' proteusPy/version.py)
+	VERS = $(shell python get_version.py)
 endif
 
 CONDA = mamba
