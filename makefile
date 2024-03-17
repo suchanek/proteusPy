@@ -31,8 +31,10 @@ newvers: .
 nuke: clean devclean
 	ifeq ($(OS),Windows_NT) 
 		@del $(OUTFILES)
+		@del dist/*
 	else 
 		@rm $(OUTFILES)
+		@rm dist/*
 	endif
 
 pkg:
@@ -47,24 +49,28 @@ dev:
 
 clean: .
 	@echo "Removing proteusPy environment..."
-	jupyter kernelspec uninstall proteuspy -y
-	@$(CONDA) env remove --name proteusPy -y
+	-@jupyter kernelspec uninstall proteuspy -y
+	-@$(CONDA) env remove --name proteusPy -y
 
 devclean: .
-	jupyter kernelspec uninstall ppydev -y
 	@echo "Removing $(DEVNAME) environment..."
-	$(CONDA) env remove --name $(DEVNAME) -y
+	-@jupyter kernelspec uninstall ppydev -y
+	-@$(CONDA) env remove --name $(DEVNAME) -y
 
 	
 # activate the package before running!
 install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
+	@echo "Installing VTK..."
 	$(CONDA) install -y vtk
-	pip install -U . 
-	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
-	jupyter contrib nbextension install --sys-prefix
-	jupyter nbextension enable --py --sys-prefix widgetsnbextension
-	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
+	@echo "Installing proteusPy..."
+	@pip install -U . 
+	@echo "Installing Biopython..."
+	@pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
+	@echo "Installing jupyter..."
+	@jupyter contrib nbextension install --sys-prefix
+	@jupyter nbextension enable --py --sys-prefix widgetsnbextension
+	@python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Installation finished!"
 
 install_dev:
