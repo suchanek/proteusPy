@@ -21,10 +21,12 @@ vers: .
 	@echo "Version = $(VERS)"
 
 newvers: .
+	@echo "Current version number is: $(VERS)"	
 	@echo "Enter new version number: "
-	@read nvers; echo $$nvers > VERSION
-	@echo "New version number is: "
-	@cat VERSION
+	@read VERS; echo "__version__ = \"$$VERS\"" > proteusPy/version.py
+	@echo "New version number is: $(VERS)"
+	@echo "Enter a new message: "
+	@read MESS
 
 nuke: clean devclean
 	ifeq ($(OS),Windows_NT) 
