@@ -16,7 +16,7 @@
 - Build protein backbones from backbone phi, psi dihedral angle templates
 - More in development
 
-*See https://suchanek.github.io/proteusPy/proteusPy.html for the API documentation with examples*.
+*See [API Reference](https://suchanek.github.io/proteusPy/proteusPy.html) for the API documentation with examples*.
 
 # Requirements
 
