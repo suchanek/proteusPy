@@ -4,9 +4,9 @@
 
 # assumes file VERSION contains only the version number
 ifeq ($(OS),Windows_NT) 
-	VERS = $(shell type VERSION)
+	VERS = $(shell powershell -Command "(Select-String -Path proteusPy/version.py -Pattern '^__version__ = ""(.*)""').Matches.Groups[1].Value")
 else 
-	VERS = $(shell cat VERSION)
+	VERS = $(shell sed -n 's/^__version__ = "\(.*\)"/\1/p' proteusPy/version.py)
 endif
 
 CONDA = mamba
@@ -19,6 +19,12 @@ PHONY = .
 
 vers: .
 	@echo "Version = $(VERS)"
+
+newvers: .
+	@echo "Enter new version number: "
+	@read nvers; echo $$nvers > VERSION
+	@echo "New version number is: "
+	@cat VERSION
 
 nuke: clean devclean
 	ifeq ($(OS),Windows_NT) 
@@ -66,6 +72,7 @@ install_dev:
 	pip install -U .
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	pip install pdoc twine black pytest build
+
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
 	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
@@ -83,10 +90,10 @@ jup_dev: .
 
 # package development targets
 
-format: sdist
+format: .
 	black proteusPy
 
-bld:  format sdist docs 
+bld:  format  docs sdist
 
 sdist: .
 	python -m build
