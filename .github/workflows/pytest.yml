@@ -1,4 +1,4 @@
-name: proteusPy
+name: proteusPy Testing
 
 on: [push, pull_request]
 
