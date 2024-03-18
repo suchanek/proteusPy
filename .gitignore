@@ -1,8 +1,7 @@
-.ipynb_checkpoints/
-**/__pycache__/
-**/.DS_Store/
+**/.ipynb_checkpoints
+**/__pycache__
+**/.DS_Store
 .venv
-proteusPy/.DS_Store
 notebooks/.ipynb_checkpoints
 build/*
 proteusPy/pdb/.DS_Store
