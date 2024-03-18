@@ -81,7 +81,7 @@ setup(
         "pyvista[all]",
         "traitlets==5.9.0",
         "jupyter",
-        "jupyter_server<2.0",
+        "jupyter_server<3.0",
         "jupyterlab<4.0",
         "seaborn",
         "pillow",

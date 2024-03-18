@@ -30,25 +30,26 @@ pyvista = "[all]"
 traitlets = "5.9.0"
 notebook = "6.4.12"
 jupyter = "1.0.0"
-jupyterlab = ">=3"
+jupyterlab = "<4.0"
+jupyter_server = "<2.0"
 seaborn = "^0.13.2"
 pillow = "^10.2.0"
 tqdm
 plotly
 datetime
 jupyter_bokeh
-"openai",
+"openai"
 "panel",
-"scikit-learn",
-"gdown",
-"ipykernel",
-"ipygany",
-"nodejs",
-"pytube",
-"grpcio",
-"pip",
-"wget",
-"vtk",
+"scikit-learn"
+"gdown"
+"ipykernel"
+"ipygany"
+"nodejs"
+"pytube"
+"grpcio"
+"pip"
+"wget"
+"vtk"
 "kaleido",
 "plotly_express",
 "trame-jupyter-extension",
