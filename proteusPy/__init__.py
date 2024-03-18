@@ -10,15 +10,6 @@ from pathlib import Path
 
 __pdoc__ = {"__all__": False}
 
-"""
-_version_file = Path(__file__).parent.parent / "VERSION"
-if _version_file.is_file():
-    with open(_version_file) as f:
-        __version__ = f.read().strip()
-
-__version__ = "0.93.0"
-"""
-
 import copy
 import datetime
 import glob

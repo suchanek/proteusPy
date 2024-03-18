@@ -83,13 +83,16 @@ def get_jet_colormap(steps):
     Example:
         >>> get_jet_colormap(5)
         array([[  0,   0, 127],
-               [  0, 127, 255],
-               [123, 255, 123],
-               [255, 151,   0],
+               [  0, 128, 255],
+               [124, 255, 121],
+               [255, 148,   0],
                [127,   0,   0]], dtype=uint8)
     """
+    import matplotlib
+
     norm = np.linspace(0.0, 1.0, steps)
-    colormap = cm.get_cmap("jet", steps)
+    colormap = matplotlib.colormaps["jet"]
+    #    colormap = cm.get_cmap("jet", steps)
     rgbcol = colormap(norm, bytes=True)[:, :3]
 
     return rgbcol
@@ -97,7 +100,7 @@ def get_jet_colormap(steps):
 
 def grid_dimensions(n: int) -> tuple:
     """
-    Computes the number of rows and columns needed to display a list of length `n`.
+    Compute the number of rows and columns needed to display a list of length `n`.
 
     Args:
         n (int): Length of input list
@@ -118,7 +121,7 @@ def grid_dimensions(n: int) -> tuple:
 
 def Check_chains(pdbid, pdbdir, verbose=True):
     """
-    Returns True if structure has multiple chains of identical length,
+    Return True if structure has multiple chains of identical length,
     False otherwise. Primarily internal use.
 
     :param pdbid: PDBID identifier
@@ -167,7 +170,7 @@ def Check_chains(pdbid, pdbdir, verbose=True):
 
 def extract_firstchain_ss(sslist, verbose=False):
     """
-    Function extracts disulfides from the first chain found in
+    Extract disulfides from the first chain found in
     the SSdict, returns them as a DisulfideList along with the
     number of Xchain disulfides.
 
@@ -234,10 +237,9 @@ def download_file(url, directory):
         print(f"{file_name} already exists in {directory}.")
 
 
-import psutil
-
-
 def get_memory_usage():
+    import psutil
+
     process = psutil.Process()
     mem_info = process.memory_info()
     return mem_info.rss
@@ -331,7 +333,7 @@ def generate_vector_dataframe(base=3):
 
 def sort_by_column(df, column):
     """
-    Sorts a Pandas DataFrame by the values in the 'incidence' column in descending order.
+    Sort a Pandas DataFrame by the values in the 'incidence' column in descending order.
 
     :param df: The input DataFrame to be sorted.
     :type df: pandas.DataFrame
@@ -357,6 +359,7 @@ def plot_class_chart(classes: int) -> None:
 
     This will create a pie chart with 4 equal segments.
     """
+    import matplotlib
     import matplotlib.pyplot as plt
     import numpy as np
 
@@ -403,7 +406,9 @@ def plot_class_chart(classes: int) -> None:
     ax1.set_title(f"{classes}-Class Angular Layout")
 
     # Set the segment colors
-    color_palette = plt.cm.get_cmap("tab20", classes)
+    color_palette = matplotlib.colormaps["tab20"]
+
+    # color_palette = plt.cm.get_cmap("tab20", classes)
     ax1.set_prop_cycle("color", [color_palette(i) for i in range(classes)])
 
     # Create the legend
@@ -424,14 +429,13 @@ def plot_class_chart(classes: int) -> None:
     fig.show()
 
 
-import requests
-
-
 def retrieve_git_lfs_files(repo_url, objects):
     """
     Retrieves a git-lfs json object from a specified repo.
     It does NOT download the file.
     """
+    import requests
+
     batch_url = f"{repo_url.rstrip('/')}/info/lfs/objects/batch"
     headers = {
         "Accept": "application/vnd.git-lfs+json",
