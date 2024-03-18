@@ -55,15 +55,15 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
-__version__ = "0.92.23"
-version_file = this_directory / "VERSION"
-if version_file.is_file():
-    with open(version_file) as f:
-        __version__ = f.read().strip()
+# Get the version from the version file
+version = {}
+with open("proteusPy/version.py") as fp:
+    exec(fp.read(), version)
+
 
 setup(
     name="proteusPy",
-    version=__version__,
+    version=version["__version__"],
     description="proteusPy - Protein Structure Analysis and Modeling Tools",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -77,12 +77,12 @@ setup(
     install_requires=[
         "numpy",
         "matplotlib",
-        "pandas<2.0",
+        "pandas==2.2.1",
         "pyvista[all]",
         "traitlets==5.9.0",
-        "notebook==6.4.12",
         "jupyter",
-        "jupyterlab>=3",
+        "jupyter_server<2.0",
+        "jupyterlab<4.0",
         "seaborn",
         "pillow",
         "tqdm",
