@@ -2,9 +2,7 @@
 **/__pycache__
 **/.DS_Store
 .venv
-notebooks/.ipynb_checkpoints
 build/*
-proteusPy/pdb/.DS_Store
 data/*.png
 data/Nclasses/*
 data/classes/*
