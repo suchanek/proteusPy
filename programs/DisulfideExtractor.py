@@ -38,6 +38,7 @@ PDB_BASE = "/Users/egs/PDB/"
 # location of cleaned PDB files, created with DisulfideDownloader.py
 PDB_DIR = "/Users/egs/PDB/good/"
 MODULE_DATA = "/Users/egs/repos/proteusPy/proteusPy/data/"
+REPO_DATA = "/Users/egs/repos/proteusPy/data/"
 
 # location of the compressed Disulfide .pkl files
 DATA_DIR = f"{PDB_BASE}data/"
@@ -157,10 +158,11 @@ def do_stuff(
         do_build(_verbose, _full, _subset, cutoff)
 
     if _update == True:
-        print(f"Copying: {DATA_DIR} to {MODULE_DATA}")
-        copy(f"{DATA_DIR}{LOADER_FNAME}", {MODULE_DATA})
-        copy(f"{DATA_DIR}{LOADER_SUBSET_FNAME}", {MODULE_DATA})
-        # copytree(DATA_DIR, MODULE_DATA, dirs_exist_ok=True, ignore=ignore_patterns('*_pruned_*'))
+        print(f"Copying: {DATA_DIR} to {REPO_DATA}")
+        # copy(f"{DATA_DIR}{LOADER_FNAME}", f"{MODULE_DATA}")
+        # copy(f"{DATA_DIR}{LOADER_SUBSET_FNAME}", f"{MODULE_DATA}")
+        copy(f"{DATA_DIR}{LOADER_FNAME}", f"{REPO_DATA}")
+        copy(f"{DATA_DIR}{LOADER_SUBSET_FNAME}", f"{REPO_DATA}")
     return
 
 
@@ -224,7 +226,7 @@ parser.set_defaults(verbose=True)
 parser.set_defaults(extract=False)
 parser.set_defaults(subset=True)
 parser.set_defaults(build=True)
-parser.set_defaults(full=True)
+parser.set_defaults(full=False)
 parser.set_defaults(cutoff=8.0)
 
 args = parser.parse_args()
