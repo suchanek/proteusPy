@@ -1265,9 +1265,9 @@ class Disulfide:
         Example:
         >>> import proteusPy
         >>> from proteusPy.Disulfide import Disulfide
-        >>> from proteusPy.DisulfideLoader import DisulfideLoader
+        >>> from proteusPy.DisulfideLoader import DisulfideLoader, Load_PDB_SS
 
-        >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
+        >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
         >>> ss = PDB_SS[0]
         >>> ss.display(style='cpk')
         >>> ss.screenshot(style='bs', fname='proteus_logo_sb.png')
@@ -2522,7 +2522,7 @@ def Extract_Disulfides(
     Load the Disulfide subset database. This contains around 8300 disulfides and loads
     fairly quickly.
 
-    >>> PDB_SS = DisulfideLoader(verbose=False, subset=True)
+    >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
 
     The dataset can be indexed numerically, up to index: PDB_SS.Length(). Get the first SS:
     >>> SS = PDB_SS[0]
