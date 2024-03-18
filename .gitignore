@@ -1,8 +1,10 @@
 **/.ipynb_checkpoints
 **/__pycache__
 **/.DS_Store
+**/.pytest_cache
 .venv
-build/*
+.vscode
+build/
 data/*.png
 data/Nclasses/*
 data/classes/*
