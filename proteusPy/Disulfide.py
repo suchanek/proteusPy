@@ -2392,7 +2392,7 @@ def Download_Disulfides(
     pdb_home=PDB_DIR, model_home=MODEL_DIR, verbose=False, reset=False
 ) -> None:
     """
-    Read a comma separated list of PDB IDs and downloads them
+    Read a comma separated list of PDB IDs and download them
     to the pdb_home path.
 
     This utility function is used to download proteins containing at least
@@ -2412,6 +2412,7 @@ def Download_Disulfides(
     :raises DisulfideIOException: I/O error raised when the PDB file is not found.
     """
     import os
+    import time
 
     start = time.time()
     donelines = []
@@ -2759,13 +2760,11 @@ def check_header_from_file(
     filename: str, model_numb=0, verbose=False, dbg=False
 ) -> bool:
     """
-    Check the Disulfides by PDB ID and initializes the Disulfide objects.
-    Assumes the file is downloaded in the pdb_dir path.
+    Check the Disulfides in the PDB file.
 
     NB: Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython/
 
-    :param struct_name: the name of the PDB entry.
-    :param pdb_dir: path to the PDB files, defaults to ```MODEL_DIR```
+    :param filename: the name of the PDB entry.
     :param model_numb: model number to use, defaults to 0 for single structure files.
     :param verbose: print info while parsing
     :return: True if parsable
@@ -2775,10 +2774,10 @@ def check_header_from_file(
       with the following:
 
     >>> from proteusPy.Disulfide import Disulfide, check_header_from_file
-    >>> MODEL_DIR = '/Users/egs/PDB/good/'
+    >>> MODEL_DIR = '../data/'
     >>> OK = False
     >>> OK = check_header_from_file(f'{MODEL_DIR}pdb5rsa.ent', verbose=True)
-    -> check_header_from_file() - Parsing file: /Users/egs/PDB/good/pdb5rsa.ent:
+    -> check_header_from_file() - Parsing file: ../data/pdb5rsa.ent:
      -> SSBond: 1: tmp: 26A - 84A
      -> SSBond: 2: tmp: 40A - 95A
      -> SSBond: 3: tmp: 58A - 110A
@@ -2847,8 +2846,6 @@ def check_header_from_file(
             )
             return False
 
-        # make a new Disulfide object, name them based on proximal and distal
-        # initialize SS bond from the proximal, distal coordinates
         if (_chaina is not None) and (_chainb is not None):
             if _chaina[proximal].is_disordered() or _chainb[distal].is_disordered():
                 continue
