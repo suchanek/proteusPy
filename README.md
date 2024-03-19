@@ -3,7 +3,7 @@
 ![Testing](https://github.com/suchanek/proteusPy/actions/workflows/pytest.yml/badge.svg)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-# proteusPy
+# Summary
 **proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide bonds. This package reprises my molecular modeling program [Proteus](https://doi.org/10.1021/bi00368a023), a structure-based program developed as part of my graduate thesis. The package relies on the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class to create and manipulate local coordinate systems. It does this by implementing the functions ``Move``, ``Roll``, ``Yaw``, ``Pitch`` and ``Turn`` for movement in a three-dimensional space.  The initial implementation focuses on the [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class. The class implements methods to analyze the protein structure stabilizing element known as a *Disulfide Bond*. This class and its underlying methods are being used to perform a structural analysis of over 35,800 disulfide-bond containing proteins in the RCSB protein data bank (https://www.rcsb.org).
 
 # General Capabilities
@@ -42,21 +42,15 @@ It's simplest to clone the repo via GitHub since it contains all of the notebook
   $ conda activate proteusPy
   $ make install
   ```
+
 ## Windows
-Installing in Windows is a bit more involved than Linux or Macos. Sadly, the package will not run under WSL, failing with graphics issues. 
 - Install Miniforge: <https://github.com/conda-forge/miniforge> (existing Anaconda installations are fine but please install mamba)
 - Install git for Windows and configure for Bash:
   - https://git-scm.com/download/win
 - Install git-lfs:
   - https://git-lfs.github.com/
-- Install Visual Studio C++ development environment: 
-  - https://learn.microsoft.com/en-us/cpp/build/vscpp-step-0-installation?view=msvc-170
-- From a command prompt opened as administrator enter:
-  ```console
-  PS C:\Users\egs> cd c:\windows
-  PS C:\Users\egs> mklink /H make.exe  "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.39.33519\bin\Hostx64\x86\nmake.exe"
-  ```
-
+- Install GNU make:
+  - https://gnuwin32.sourceforge.net/packages/make.htm
 - Open a Miniforge prompt and cd into your repo dir:
   ```console
   (base) C:\Users\egs\repos> git clone https://github.com/suchanek/proteusPy.git
