@@ -1,28 +1,32 @@
 import unittest
 
 import numpy as np
+from Bio.PDB import PDBList
 from Bio.PDB.vectors import Vector
-from numpy.testing import assert_array_equal
 
 from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideLoader import Load_PDB_SS
-
-# Define a _tolerance threshold
-_tolerance = 1e-8
-
-
-def cmp_vec(v1: Vector, v2: Vector, tol: float) -> bool:
-    "Return true if the length of the difference between the two vectors is less than a tolerance."
-    _diff = v2 - v1
-    _len = _diff.norm()
-    return _len < tol
 
 
 class TestDisulfide(unittest.TestCase):
 
     def setUp(self):
-        self.PDB_SS = Load_PDB_SS(verbose=False, subset=True)
+        import tempfile
+
+        from proteusPy.DisulfideList import load_disulfides_from_id
+
+        temp_dir = tempfile.TemporaryDirectory()
+        pdb_home = f"{temp_dir.name}/"
+        entry = "5rsa"
+        ok = False
+        pdblist = PDBList(pdb=pdb_home, verbose=False)
+        if not pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=pdb_home):
+            ok = False
+        else:
+            self.sslist = load_disulfides_from_id(entry, pdb_dir=pdb_home)
+            ok = True
         self.disulfide = Disulfide(name="tst")
+        self.assertEqual(ok, True)
 
     def test_name(self):
         result = self.disulfide.name
@@ -30,20 +34,20 @@ class TestDisulfide(unittest.TestCase):
         self.assertEqual(result, expected_result)
 
     def test_extract(self):
-        ss1 = self.PDB_SS[0]
+        ss1 = self.sslist[0]
         result = ss1.name
-        expected_result = "4yys_22A_65A"
+        expected_result = "5rsa_26A_84A"
         self.assertEqual(result, expected_result)
 
     def test_dihedrals(self):
-        ss1 = self.PDB_SS[0]
+        ss1 = self.sslist[0]
         result = ss1.dihedrals
         expected_result = [
-            174.62923341948851,
-            82.51771039903726,
-            -83.32224872066772,
-            -62.52364351964355,
-            -73.82728569383424,
+            -68.64177700691641,
+            -87.08310517280916,
+            -81.44489804423738,
+            -50.83886936309293,
+            -66.09666929641922,
         ]
         self.assertEqual(result, expected_result)
 
@@ -70,7 +74,6 @@ class TestDisulfide(unittest.TestCase):
             -60.0,
         ]
 
-        dihedrals = [-60.0, -60.0, -90.0, -60.0, -90.0]
         result = minimize(
             Disulfide_Energy_Function, initial_guess, method="Nelder-Mead"
         )
@@ -79,12 +82,41 @@ class TestDisulfide(unittest.TestCase):
         self.assertEqual(minimum_energy, expected_result)
 
     def test_header(self):
-        from proteusPy.Disulfide import check_header_from_file
+        import tempfile
 
-        filename = "../data/pdb5rsa.ent"
+        from proteusPy.Disulfide import check_header_from_file
+        from proteusPy.DisulfideList import load_disulfides_from_id
+
+        temp_dir = tempfile.TemporaryDirectory()
+        pdb_home = f"{temp_dir.name}/"
+        entry = "5rsa"
+        pdblist = PDBList(pdb=pdb_home, verbose=False)
         ok = False
-        ok = check_header_from_file(filename)
+        if not pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=pdb_home):
+            ok = False
+        else:
+            sslist = load_disulfides_from_id(entry, pdb_dir=pdb_home)
+            filename = f"{pdb_home}pdb5rsa.ent"
+            ok = check_header_from_file(filename)
+
         self.assertTrue(ok)
+
+    def test_load(self):
+        import tempfile
+
+        from proteusPy.DisulfideList import DisulfideList, load_disulfides_from_id
+
+        temp_dir = tempfile.TemporaryDirectory()
+        pdb_home = f"{temp_dir.name}/"
+        entry = "5rsa"
+        pdblist = PDBList(pdb=pdb_home, verbose=False)
+        if not pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=pdb_home):
+            return False
+        else:
+            filename = "{pdb_home}pdb5rsa.ent"
+            sslist = DisulfideList([], "tst")
+            sslist = load_disulfides_from_id("5rsa", pdb_dir=pdb_home)
+            self.assertTrue(len(sslist) > 0)
 
 
 if __name__ == "__main__":
