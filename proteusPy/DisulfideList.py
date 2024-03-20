@@ -1075,7 +1075,7 @@ def load_disulfides_from_id(
     verbose=False,
     quiet=False,
     dbg=False,
-):
+) -> DisulfideList:
     """
     Loads the Disulfides by PDB ID and returns a ```DisulfideList``` of Disulfide objects.
     Assumes the file is downloaded in the pdb_dir path.
