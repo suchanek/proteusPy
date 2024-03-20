@@ -24,7 +24,10 @@ class TestDisulfide(unittest.TestCase):
             ok = False
         else:
             self.sslist = load_disulfides_from_id(entry, pdb_dir=pdb_home)
-            ok = True
+            if len(self.sslist) > 0:
+                ok = True
+            else:
+                ok = False
         self.disulfide = Disulfide(name="tst")
         self.assertEqual(ok, True)
 
@@ -40,6 +43,8 @@ class TestDisulfide(unittest.TestCase):
         self.assertEqual(result, expected_result)
 
     def test_dihedrals(self):
+        from numpy.testing import assert_array_equal
+
         ss1 = self.sslist[0]
         result = ss1.dihedrals
         expected_result = [
@@ -49,7 +54,7 @@ class TestDisulfide(unittest.TestCase):
             -50.83886936309293,
             -66.09666929641922,
         ]
-        self.assertAlmostEqual(result, expected_result)
+        assert_array_equal(result, expected_result)
 
     def test_energy(self):
         from proteusPy.Disulfide import Disulfide_Energy_Function
@@ -95,7 +100,6 @@ class TestDisulfide(unittest.TestCase):
         if not pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=pdb_home):
             ok = False
         else:
-            sslist = load_disulfides_from_id(entry, pdb_dir=pdb_home)
             filename = f"{pdb_home}pdb5rsa.ent"
             ok = check_header_from_file(filename)
 
@@ -113,7 +117,6 @@ class TestDisulfide(unittest.TestCase):
         if not pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=pdb_home):
             return False
         else:
-            filename = "{pdb_home}pdb5rsa.ent"
             sslist = DisulfideList([], "tst")
             sslist = load_disulfides_from_id("5rsa", pdb_dir=pdb_home)
             self.assertTrue(len(sslist) > 0)
