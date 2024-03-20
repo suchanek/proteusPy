@@ -88,6 +88,7 @@ Torsion_DF_Cols = [
 ]
 
 
+# class for the Disulfide bond
 class Disulfide:
     """
     This class provides a Python object and methods representing a physical disulfide bond

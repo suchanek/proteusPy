@@ -55,6 +55,7 @@ merge_cols = [
 ]
 
 
+# class DisulfideClass_Constructor:
 class DisulfideClass_Constructor:
     """
     This Class manages structural classes for the disulfide bonds contained
