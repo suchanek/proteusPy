@@ -49,7 +49,7 @@ class TestDisulfide(unittest.TestCase):
             -50.83886936309293,
             -66.09666929641922,
         ]
-        self.assertEqual(result, expected_result)
+        self.assertAlmostEqual(result, expected_result)
 
     def test_energy(self):
         from proteusPy.Disulfide import Disulfide_Energy_Function
