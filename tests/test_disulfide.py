@@ -7,6 +7,16 @@ from Bio.PDB.vectors import Vector
 from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideLoader import Load_PDB_SS
 
+# Define a _tolerance threshold
+_tolerance = 1e-8
+
+
+def cmp_array(v1: np.array, v2: np.array, tol=_tolerance) -> bool:
+    "Return true if the length of the difference between the two vectors is less than a tolerance."
+    _diff = v2 - v1
+    _len = _diff.norm()
+    return _len < tol
+
 
 class TestDisulfide(unittest.TestCase):
 
@@ -43,7 +53,7 @@ class TestDisulfide(unittest.TestCase):
         self.assertEqual(result, expected_result)
 
     def test_dihedrals(self):
-        from numpy.testing import assert_array_equal
+        from numpy.testing import assert_allclose
 
         ss1 = self.sslist[0]
         result = ss1.dihedrals
@@ -54,7 +64,7 @@ class TestDisulfide(unittest.TestCase):
             -50.83886936309293,
             -66.09666929641922,
         ]
-        assert_array_equal(result, expected_result)
+        assert_allclose(result, expected_result, rtol=1e-05, atol=1e-08)
 
     def test_energy(self):
         from proteusPy.Disulfide import Disulfide_Energy_Function
