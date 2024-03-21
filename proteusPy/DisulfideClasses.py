@@ -362,6 +362,8 @@ def plot_class_chart(classes: int) -> None:
         ax.plot(*xy.T, color=acol)
         return AngleAnnotation(pos, xy[0], xy[2], ax=ax, **kwargs)
 
+    import matplotlib
+
     fig, ax1 = plt.subplots(sharex=True)
 
     # Set up the figure
@@ -392,7 +394,8 @@ def plot_class_chart(classes: int) -> None:
     ax1.set_title(f"{classes}-Class Angular Layout")
 
     # Set the segment colors
-    color_palette = plt.cm.get_cmap("tab20", classes)
+    # color_palette = plt.cm.get_cmap("tab20", classes)
+    color_palette = matplotlib.colormaps["tab20"]
     ax1.set_prop_cycle("color", [color_palette(i) for i in range(classes)])
 
     # Create the legend

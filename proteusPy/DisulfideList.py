@@ -917,7 +917,8 @@ class DisulfideList(UserList):
     def length(self):
         return len(self.data)
 
-    def min(self):
+    @property
+    def min(self) -> Disulfide:
         """
         Return Disulfide from the list with the minimum energy
 
@@ -926,7 +927,8 @@ class DisulfideList(UserList):
         sslist = sorted(self.data)
         return sslist[0]
 
-    def max(self):
+    @property
+    def max(self) -> Disulfide:
         """
         Return Disulfide from the list with the maximum energy
 

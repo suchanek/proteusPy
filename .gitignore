@@ -4,6 +4,7 @@
 **/.pytest_cache
 .venv
 .vscode
+.eggs
 build/
 data/*.png
 data/Nclasses/*
