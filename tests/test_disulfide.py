@@ -7,16 +7,6 @@ from Bio.PDB.vectors import Vector
 from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideLoader import Load_PDB_SS
 
-# Define a _tolerance threshold
-_tolerance = 1e-8
-
-
-def cmp_array(v1: np.array, v2: np.array, tol=_tolerance) -> bool:
-    "Return true if the length of the difference between the two vectors is less than a tolerance."
-    _diff = v2 - v1
-    _len = _diff.norm()
-    return _len < tol
-
 
 class TestDisulfide(unittest.TestCase):
 
@@ -100,7 +90,6 @@ class TestDisulfide(unittest.TestCase):
         import tempfile
 
         from proteusPy.Disulfide import check_header_from_file
-        from proteusPy.DisulfideList import load_disulfides_from_id
 
         temp_dir = tempfile.TemporaryDirectory()
         pdb_home = f"{temp_dir.name}/"

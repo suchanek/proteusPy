@@ -130,7 +130,6 @@ tests: .
 	python proteusPy/DisulfideLoader.py
 	python proteusPy/DisulfideList.py
 	python proteusPy/DisulfideClasses.py
-	python tests/Test_DisplaySS.py
 
 # end of file
 

@@ -74,6 +74,9 @@ setup(
     requires_python="^3.11",
     packages=["proteusPy"],
     keywords="proteusPy suchanek disulfide",
+    tests_require=["pytest"],
+    test_suite="tests",
+    setup_requires=["pytest-runner"],
     install_requires=[
         "numpy",
         "matplotlib",
