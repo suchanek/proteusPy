@@ -987,7 +987,7 @@ class Disulfide:
     @property
     def dihedrals(self) -> list:
         """
-        Return a ist containing the dihedral angles for the disulfide.
+        Return a list containing the dihedral angles for the disulfide.
 
         """
         return [self.chi1, self.chi2, self.chi3, self.chi4, self.chi5]
@@ -1484,9 +1484,29 @@ class Disulfide:
         ic1 = self.internal_coords()
         ic2 = other.internal_coords()
 
-        # Compute the sum of squared distances between corresponding internal coordinates
-        totsq = sum(math.dist(p1, p2) ** 2 for p1, p2 in zip(ic1, ic2))
+        # Compute the sum of squared differences between corresponding internal coordinates
+        totsq = sum((p1 - p2) ** 2 for p1, p2 in zip(ic1, ic2))
 
+        # Compute the mean of the squared distances
+        totsq /= len(ic1)
+
+        # Take the square root of the mean to get the RMS distance
+        return math.sqrt(totsq)
+
+    def Torsion_RMS(self, other) -> float:
+        """
+        Calculate the RMS distance between the dihedral angles of self and another Disulfide.
+        :param other: Comparison Disulfide
+        :return: RMS distance (deg)
+        """
+        import math
+
+        # Get internal coordinates of both objects
+        ic1 = self.torsion_array
+        ic2 = other.torsion_array
+
+        # Compute the sum of squared differences between corresponding internal coordinates
+        totsq = sum((p1 - p2) ** 2 for p1, p2 in zip(ic1, ic2))
         # Compute the mean of the squared distances
         totsq /= len(ic1)
 
@@ -2980,6 +3000,30 @@ def Disulfide_Energy_Function(x: list) -> float:
         + 10.1
     )
     return energy
+
+
+def Minimize(inputSS: Disulfide) -> Disulfide:
+    """
+    Minimizes the energy of a Disulfide object using the Nelder-Mead optimization method.
+
+    Parameters:
+        inputSS (Disulfide): The Disulfide object to be minimized.
+
+    Returns:
+        Disulfide: The minimized Disulfide object.
+
+    """
+    from scipy.optimize import minimize
+
+    from proteusPy import Disulfide, Disulfide_Energy_Function
+
+    initial_guess = inputSS.torsion_array
+    result = minimize(Disulfide_Energy_Function, initial_guess, method="Nelder-Mead")
+    minimum_conformation = result.x
+    modelled_min = Disulfide("minimized")
+    modelled_min.dihedrals = minimum_conformation
+    modelled_min.build_yourself()
+    return modelled_min
 
 
 if __name__ == "__main__":

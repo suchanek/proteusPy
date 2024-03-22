@@ -5,7 +5,6 @@ from Bio.PDB import PDBList
 from Bio.PDB.vectors import Vector
 
 from proteusPy.Disulfide import Disulfide
-from proteusPy.DisulfideLoader import Load_PDB_SS
 
 
 class TestDisulfide(unittest.TestCase):
@@ -119,6 +118,27 @@ class TestDisulfide(unittest.TestCase):
             sslist = DisulfideList([], "tst")
             sslist = load_disulfides_from_id("5rsa", pdb_dir=pdb_home)
             self.assertTrue(len(sslist) > 0)
+
+    def test_compare(self):
+        import tempfile
+
+        from proteusPy.DisulfideList import DisulfideList, load_disulfides_from_id
+
+        diff = 1.0
+
+        temp_dir = tempfile.TemporaryDirectory()
+        pdb_home = f"{temp_dir.name}/"
+        entry = "5rsa"
+        pdblist = PDBList(pdb=pdb_home, verbose=False)
+        if not pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=pdb_home):
+            return False
+        else:
+            sslist = DisulfideList([], "tst")
+            sslist = load_disulfides_from_id("5rsa", pdb_dir=pdb_home)
+            ss1 = sslist[0]
+            diff = ss1.Torsion_RMS(ss1)
+
+        self.assertTrue(diff == 0)
 
 
 if __name__ == "__main__":
