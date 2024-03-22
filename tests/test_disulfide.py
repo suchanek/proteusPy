@@ -2,7 +2,6 @@ import unittest
 
 import numpy as np
 from Bio.PDB import PDBList
-from Bio.PDB.vectors import Vector
 
 from proteusPy.Disulfide import Disulfide
 
