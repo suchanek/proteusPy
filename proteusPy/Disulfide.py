@@ -1497,7 +1497,7 @@ class Disulfide:
         """
         Calculate the RMS distance between the dihedral angles of self and another Disulfide.
         :param other: Comparison Disulfide
-        :return: RMS distance (deg)
+        :return: RMS distance (deg).
         """
         import math
 
