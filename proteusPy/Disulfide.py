@@ -1004,6 +1004,8 @@ class Disulfide:
         self.chi3 = dihedrals[2]
         self.chi4 = dihedrals[3]
         self.chi5 = dihedrals[4]
+        self.compute_torsional_energy()
+        self.compute_torsion_length()
 
     def bounding_box(self) -> np.array:
         """
@@ -1124,7 +1126,7 @@ class Disulfide:
         self.torsion_array = np.array(
             (self.chi1, self.chi2, self.chi3, self.chi4, self.chi5)
         )
-        self.torsion_length = self.Torsion_Length()
+        self.torsion_length = self.compute_torsion_length()
         self.compute_rho()
         self.missing_atoms = True
         self.modelled = True
@@ -1485,7 +1487,7 @@ class Disulfide:
         ic2 = other.internal_coords()
 
         # Compute the sum of squared differences between corresponding internal coordinates
-        totsq = sum((p1 - p2) ** 2 for p1, p2 in zip(ic1, ic2))
+        totsq = sum(math.dist(p1, p2) ** 2 for p1, p2 in zip(ic1, ic2))
 
         # Compute the mean of the squared distances
         totsq /= len(ic1)
@@ -1679,7 +1681,7 @@ class Disulfide:
         self.torsion_array = np.array(
             (self.chi1, self.chi2, self.chi3, self.chi4, self.chi5)
         )
-        self.torsion_length = self.Torsion_Length()
+        self.compute_torsion_length()
 
         # calculate and set the SS bond torsional energy
         self.compute_torsional_energy()
@@ -2253,7 +2255,7 @@ class Disulfide:
         self.chi5 = chi5
         self.torsion_array = np.array([chi1, chi2, chi3, chi4, chi5])
         self.compute_torsional_energy()
-        self.Torsion_Length()
+        self.compute_torsion_length()
 
     def set_name(self, namestr="Disulfide") -> None:
         """
@@ -2273,9 +2275,9 @@ class Disulfide:
         self.proximal = proximal
         self.distal = distal
 
-    def Torsion_Length(self) -> float:
+    def compute_torsion_length(self) -> float:
         """
-        Compute the 5D Euclidean length of the Disulfide object.
+        Compute the 5D Euclidean length of the Disulfide object. Update the disulfide internal state.
 
         :return: Torsion length (Degrees)
         """
