@@ -1126,7 +1126,7 @@ class Disulfide:
         self.torsion_array = np.array(
             (self.chi1, self.chi2, self.chi3, self.chi4, self.chi5)
         )
-        self.torsion_length = self.compute_torsion_length()
+        self.compute_torsion_length()
         self.compute_rho()
         self.missing_atoms = True
         self.modelled = True
@@ -2404,7 +2404,7 @@ def parse_ssbond_header_rec(ssbond_dict: dict) -> list:
 
 
 #
-# function reads a comma separated list of PDB IDs and download the corresponding
+# Function reads a comma separated list of PDB IDs and download the corresponding
 # .ent files to the PDB_DIR global.
 # Used to download the list of proteins containing at least one SS bond
 # with the ID list generated from: http://www.rcsb.org/
@@ -2500,6 +2500,10 @@ def Download_Disulfides(
     return
 
 
+# Function extracts the disulfide bonds from the PDB files and creates the .pkl files
+# needed for the proteusPy.DisulfideLoader.DisulfideLoader class.
+
+
 def Extract_Disulfides(
     numb=-1,
     verbose=False,
@@ -2513,7 +2517,7 @@ def Extract_Disulfides(
     dist_cutoff=-1.0,
 ) -> None:
     """
-    Create the .pkl files needed for the
+    Read the PDB files contained in ``pdbdir`` and create the .pkl files needed for the
     proteusPy.DisulfideLoader.DisulfideLoader class.
     The ```Disulfide``` objects are contained in a ```DisulfideList``` object and
     ```Dict``` within these files. In addition, .csv files containing all of
@@ -2531,62 +2535,6 @@ def Extract_Disulfides(
     :param problemfile:    name of the .csv file containing problem ids
     :param dictfile:       name of the .pkl file
     :param dist_cutoff:    Ca distance cutoff to reject a Disulfide.
-
-    The following examples illustrate some basic functions of the disulfide classes:
-
-    >>> from proteusPy.Disulfide import Disulfide
-    >>> from proteusPy.DisulfideLoader import DisulfideLoader, Load_PDB_SS
-    >>> from proteusPy.DisulfideList import DisulfideList
-
-    Instantiate some variables. Note: the list is initialized with an iterable and a name (optional)
-
-    >>> SS = Disulfide('tmp')
-    >>> SSlist = DisulfideList([],'ss')
-
-    Load the Disulfide subset database. This contains around 8300 disulfides and loads
-    fairly quickly.
-
-    >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
-
-    The dataset can be indexed numerically, up to index: PDB_SS.Length(). Get the first SS:
-    >>> SS = PDB_SS[0]
-    >>> SS
-    <Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>
-
-    The dataset can also be indexed by PDB ID. Get the DisulfideList for ID 4yys:
-
-    >>> SS4yys = PDB_SS['4yys']
-    >>> SS4yys
-    [<Disulfide 4yys_22A_65A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_56A_98A, Source: 4yys, Resolution: 1.35 Å>, <Disulfide 4yys_156A_207A, Source: 4yys, Resolution: 1.35 Å>]
-
-    Make some empty disulfides:
-
-    >>> ss1 = Disulfide('ss1')
-    >>> ss2 = Disulfide('ss2')
-
-    Make a DisulfideList containing ss1, named 'tmp':
-
-    >>> sslist = DisulfideList([ss1], 'tmp')
-
-    Append ss2:
-    >>> sslist.append(ss2)
-
-    Extract the first disulfide and print it:
-
-    >>> ss1 = PDB_SS[0]
-    >>> ss1.dihedrals
-    [174.62923341948851, 82.51771039903726, -83.32224872066772, -62.52364351964355, -73.82728569383424]
-
-    Get a list of disulfides via slicing and display them oriented against a common
-    reference frame (the proximal N, Cα, C').
-
-    >>> subset = DisulfideList(PDB_SS[0:10],'subset')
-    >>> subset.display_overlay()
-
-    Take a screenshot. You can position the orientation, then close the window:
-    >>> subset.display_overlay(screenshot=True, fname='subset.png')
-
-    Browse the documentation for more functionality. The display functions are particularly useful.
     """
 
     def name_to_id(fname: str) -> str:
@@ -2739,17 +2687,6 @@ def Extract_Disulfides(
 
     with open(fname, "wb+") as f:
         pickle.dump(All_ss_list, f)
-
-    """
-    SS_SUBSET_DICT_PICKLE_FILE
-    # dump the dict of disulfides to a .pkl file. ~520 MB.
-    dict_len = len(All_ss_dict)
-    fname = f'{datadir}{dictfile}'
-    print(f'-> Extract_Disulfides(): Saving {dict_len} Disulfide-containing PDB IDs to file: {fname}')
-
-    with open(fname, 'wb+') as f:
-        pickle.dump(All_ss_dict, f)
-    """
 
     # dump the dict2 disulfides to a .pkl file. ~520 MB.
     dict_len = len(All_ss_dict2)

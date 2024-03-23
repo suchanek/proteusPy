@@ -77,7 +77,7 @@ install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	$(CONDA) install -y vtk
 	#pip install dist/proteusPy-$(VERS)-py3-none-any.whl
-	pip install -e -U .
+	pip install -e .
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	pip install pdoc twine black pytest build
 
