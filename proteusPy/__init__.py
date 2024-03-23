@@ -30,6 +30,7 @@ from .angle_annotation import *
 from .atoms import *
 from .data import *
 from .Disulfide import (
+    Disulfide,
     Disulfide_Energy_Function,
     Download_Disulfides,
     Extract_Disulfides,
@@ -55,8 +56,13 @@ from .DisulfideExceptions import (
     DisulfideConstructionWarning,
     DisulfideIOException,
 )
-from .DisulfideList import load_disulfides_from_id
-from .DisulfideLoader import Download_PDB_SS, Download_PDB_SS_GitHub, Load_PDB_SS
+from .DisulfideList import DisulfideList, load_disulfides_from_id
+from .DisulfideLoader import (
+    DisulfideLoader,
+    Download_PDB_SS,
+    Download_PDB_SS_GitHub,
+    Load_PDB_SS,
+)
 from .ProteusGlobals import (
     _ANG_INIT,
     _FLOAT_INIT,
