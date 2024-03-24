@@ -21,9 +21,7 @@ import pandas as pd
 from Bio.PDB import PDBParser
 from Bio.PDB.vectors import Vector
 from matplotlib import cm
-from numpy import linspace
 
-import proteusPy
 from proteusPy.data import DATA_DIR
 from proteusPy.ProteusPyWarning import ProteusPyWarning
 
