@@ -64,7 +64,7 @@ install:
 	@echo "Installing VTK..."
 	$(CONDA) install -y vtk
 	@echo "Installing proteusPy..."
-	@pip install -U . 
+	@pip install -U -q . 
 	@echo "Installing Biopython..."
 	@pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	@echo "Installing jupyter..."
