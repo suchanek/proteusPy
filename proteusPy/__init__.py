@@ -36,6 +36,7 @@ from .Disulfide import (
     Extract_Disulfides,
     check_header_from_file,
     check_header_from_id,
+    parse_ssbond_header_rec,
 )
 from .DisulfideClass_Constructor import DisulfideClass_Constructor
 from .DisulfideClasses import (

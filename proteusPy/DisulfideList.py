@@ -13,16 +13,6 @@ Last revision: 2/18/2024 -egs-
 __pdoc__ = {}
 __pdoc__["all"] = True
 
-from collections import UserList
-from pathlib import Path
-
-import numpy as np
-import pandas
-import plotly.express as px
-import plotly.graph_objects as go
-import pyvista as pv
-from plotly.subplots import make_subplots
-
 try:
     # Check if running in Jupyter
     shell = get_ipython().__class__.__name__
@@ -33,7 +23,16 @@ try:
 except NameError:
     from tqdm import tqdm
 
+from collections import UserList
+from pathlib import Path
+
+import numpy as np
+import pandas
+import plotly.express as px
+import plotly.graph_objects as go
+import pyvista as pv
 from Bio.PDB import PDBParser
+from plotly.subplots import make_subplots
 
 import proteusPy
 from proteusPy import *
@@ -94,9 +93,7 @@ class DisulfideList(UserList):
     See below for examples.\n
 
     Examples:
-    >>> from proteusPy.Disulfide import Disulfide
-    >>> from proteusPy.DisulfideLoader import DisulfideLoader
-    >>> from proteusPy.DisulfideList import DisulfideList
+    >>> from proteusPy import Disulfide, DisulfideLoader, DisulfideList
 
     Instantiate some variables. Note: the list is initialized with an iterable and a name (optional)
 
@@ -152,8 +149,7 @@ class DisulfideList(UserList):
         :type id: str
 
         Example:
-        >>> from proteusPy.DisulfideList import DisulfideList
-        >>> from proteusPy.Disulfide import Disulfide
+        >>> from proteusPy import DisulfideList, Disulfide
 
         Initialize some empty disulfides.
         >>> ss1 = Disulfide('ss1')
@@ -678,10 +674,7 @@ class DisulfideList(UserList):
         :return: Dataframe containing the Cα-Cα distances for the given list.
 
         Example:
-        >>> from proteusPy.Disulfide import Disulfide
-        >>> from proteusPy.DisulfideLoader import Load_PDB_SS
-        >>> from proteusPy.DisulfideList import DisulfideList
-
+        >>> from proteusPy import Disulfide, Load_PDB_SS, DisulfideList
         >>> PDB_SS = Load_PDB_SS()
 
         """
@@ -1096,12 +1089,13 @@ def load_disulfides_from_id(
     PDB_DIR defaults to os.getenv('PDB').
     To load the Disulfides from the PDB ID 5rsa we'd use the following:
 
-    >>> from proteusPy.DisulfideList import DisulfideList
+    >>> from proteusPy import DisulfideList, load_disulfides_from_id
     >>> SSlist = DisulfideList([],'5rsa')
     >>> SSlist = load_disulfides_from_id('5rsa', verbose=False)
     >>> SSlist
     [<Disulfide 5rsa_26A_84A, Source: 5rsa, Resolution: 2.0 Å>, <Disulfide 5rsa_40A_95A, Source: 5rsa, Resolution: 2.0 Å>, <Disulfide 5rsa_58A_110A, Source: 5rsa, Resolution: 2.0 Å>, <Disulfide 5rsa_65A_72A, Source: 5rsa, Resolution: 2.0 Å>]
     """
+    from proteusPy.Disulfide import Disulfide, parse_ssbond_header_rec
 
     i = 1
     proximal = distal = -1
@@ -1127,7 +1121,7 @@ def load_disulfides_from_id(
     SSList = DisulfideList([], struct_name, resolution)
 
     # list of tuples with (proximal distal chaina chainb)
-    ssbonds = proteusPy.Disulfide.parse_ssbond_header_rec(ssbond_dict)
+    ssbonds = parse_ssbond_header_rec(ssbond_dict)
 
     with warnings.catch_warnings():
         if quiet:
@@ -1195,7 +1189,7 @@ def load_disulfides_from_id(
                     - {distal} {chain2_id}"
                     )
                 ssbond_name = f"{struct_name}_{proximal}{chain1_id}_{distal}{chain2_id}"
-                new_ss = proteusPy.Disulfide.Disulfide(ssbond_name)
+                new_ss = Disulfide(ssbond_name)
                 new_ss.initialize_disulfide_from_chain(
                     _chaina, _chainb, proximal, distal, resolution, quiet=quiet
                 )
@@ -1209,4 +1203,5 @@ if __name__ == "__main__":
 
     doctest.testmod()
 
+# end of file
 # end of file
