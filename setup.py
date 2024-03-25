@@ -103,7 +103,7 @@ setup(
         "grpcio",
         "pip",
         "wget",
-        "vtk",
+        "vtk==9.2.6",
         "kaleido",
         "plotly_express",
         "trame-jupyter-extension",
