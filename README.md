@@ -60,11 +60,11 @@ It's simplest to clone the repo via GitHub since it contains all of the notebook
   ```
 
 # Testing
-I currently have docstring testing for the modules in place. To run them ``cd`` into the repository and run:
+I currently have ``pytest`` and docstring testing for the modules in place. To run them ``cd`` into the repository and run:
 ```console
 $ make tests
 ```
-The modules will run their docstring tests and disulfide visualization windows will open. Simply close them. If all goes normally there will be no errors.
+The modules will run their docstring tests and disulfide visualization windows will open. Simply close them. If all goes normally there will be no errors. If you're not running the development version of proteusPy you may need to install ``pytest``. Simply perform: ``pip install pytest``. Docstring testing is sensitive to formatting; occasionally the ``black`` formatter changes the docstrings. As a result there may be some docstring tests that fail.
 
 
 # General Usage
