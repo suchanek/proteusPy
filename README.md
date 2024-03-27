@@ -37,7 +37,6 @@ It's simplest to clone the repo via GitHub since it contains all of the notebook
   ```console
   $ git clone https://github.com/suchanek/proteusPy.git
   $ cd proteusPy
-  $ git-lfs track "*.csv" "*.mp4" "*.pkl"
   $ make pkg
   $ conda activate proteusPy
   $ make install
