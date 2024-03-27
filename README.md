@@ -54,7 +54,6 @@ It's simplest to clone the repo via GitHub since it contains all of the notebook
   ```console
   (base) C:\Users\egs\repos> git clone https://github.com/suchanek/proteusPy.git
   (base) C:\Users\egs\repos> cd proteusPy
-  (base) C:\Users\egs\repos\proteuspy> git-lfs track "*.csv" "*.mp4" "*.pkl"
   (base) C:\Users\egs\repos\proteuspy> make pkg
   (base) C:\Users\egs\repos>\proteuspy> conda activate proteusPy
   (proteusPy) C:\Users\egs\repos> make install
