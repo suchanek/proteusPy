@@ -68,7 +68,6 @@ It's simplest to clone the repo via GitHub since it contains all of the notebook
   ```console
   $ git clone https://github.com/suchanek/proteusPy.git
   $ cd proteusPy
-  $ git-lfs track "*.csv" "*.mp4" "*.pkl"
   $ make pkg
   $ mamba activate proteusPy
   $ mamba install vtk
@@ -87,18 +86,17 @@ It's simplest to clone the repo via GitHub since it contains all of the notebook
   ```console
   (base) C:\Users\egs\repos> git clone https://github.com/suchanek/proteusPy.git
   (base) C:\Users\egs\repos> cd proteusPy
-  (base) C:\Users\egs\repos\proteuspy> git-lfs track "*.csv" "*.mp4" "*.pkl"
   (base) C:\Users\egs\repos\proteuspy> make pkg
   (base) C:\Users\egs\repos>\proteuspy> conda activate proteusPy
   (proteusPy) C:\Users\egs\repos> make install
   ```
 
 # Testing
-I currently have docstring testing for the modules in place. To run them cd into the repository and run:
+I currently have ``pytest`` and docstring testing for the modules in place. To run them cd into the repository and run:
 ```console
 $ make tests
 ```
-The modules will run their docstring tests and disulfide visualization windows will open. Simply close them. If all goes normally there will be no errors.
+The modules will 1) run pytest for the main modules and 2) performdocstring tests. This will result in a number of disulfide visualization windows to open. Simply close them. If all goes normally there will be no errors.
 
 # General Usage
 
