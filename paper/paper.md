@@ -46,13 +46,13 @@ The work has resulted in a freely-accessible database of over 120,494 disulfide 
 
 Disulfide bonds represent the sole naturally occurring covalent bond in proteins, playing a pivotal role in structural stabilization within and between protein subunits. Moreover, they participate in enzymatic catalysis, regulate protein activities, and offer protection against oxidative stress. Establishing an accessible structural database of these disulfides would serve as an invaluable resource for exploring these critical structural elements. While the capability to visualize protein structures is well established with excellent protein visualization tools like Pymol, Chimera and the RCSB itself, the tools for disulfide bond analysis are more limited. [@Wong_2010] describe a web-based disulfide visualization tool; this is currently unavailable.
 
-Accordingly, I have developed the **proteusPy** package to delve into the RCSB Protein Data Bank, furnishing tools for visualizing and analyzing the disulfide bonds contained therein. This endeavor necessitated the creation of a python-based package containing data structures and algorithms capable loading, manipulating and analyzing them. Consequently, an object-oriented database has been crafted, facilitating introspection, analysis, and display. The package's API [@API] is accessible online at: [proteusPy API](https://suchanek.github.io/proteusPy/proteusPy.html), offering comprehensive details and numerous illustrative examples.
+Accordingly, I have developed the **proteusPy** package to delve into the RCSB Protein Data Bank, furnishing tools for visualizing and analyzing the disulfide bonds contained therein. This endeavor necessitated the creation of a python-based package containing data structures and algorithms capable loading, manipulating and analyzing these entities. Consequently, an object-oriented database has been crafted, facilitating introspection, analysis, and display. The package's API [@API] is accessible online at: [proteusPy API](https://suchanek.github.io/proteusPy/proteusPy.html), offering comprehensive details and numerous illustrative examples.
 
 # Requirements
 
-1. PC running MacOS, Linux, Windows with git, git-lfs and C compiler installed.
+1. PC running MacOS, Linux, Windows with git, git-lfs and make installed
 2. 8 GB RAM
-3. 3 GB disk space
+3. 1 GB disk space
 
 # Installation
 
@@ -96,7 +96,7 @@ I currently have ``pytest`` and docstring testing for the modules in place. To r
 ```console
 $ make tests
 ```
-The modules will 1) run pytest for the main modules and 2) performdocstring tests. This will result in a number of disulfide visualization windows to open. Simply close them. If all goes normally there will be no errors.
+The modules will 1) run pytest for the main modules and 2) perform docstring tests. This will result in a number of disulfide visualization windows to open. Simply close them. If all goes normally there will be no errors. (you may need to install ``pytest`` via ``pip install pytest``.
 
 # General Usage
 
