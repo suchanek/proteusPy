@@ -1,6 +1,7 @@
 
 [![PyPI version](https://badge.fury.io/py/proteusPy.svg)](https://badge.fury.io/py/proteusPy)
 ![Testing](https://github.com/suchanek/proteusPy/actions/workflows/pytest.yml/badge.svg)
+[![status](https://joss.theoj.org/papers/45de839b48a550d6ab955c5fbbc508f2/status.svg)](https://joss.theoj.org/papers/45de839b48a550d6ab955c5fbbc508f2)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
 # Summary
@@ -22,7 +23,7 @@
 
 1. PC running MacOS, Linux, Windows with git, git-lfs, make and C compiler installed.
 2. 8 GB RAM
-3. 3 GB disk space
+3. 1 GB disk space
 
 # Installation 
 
