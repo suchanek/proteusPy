@@ -94,8 +94,7 @@ from tqdm import tqdm
 
 import proteusPy
 from proteusPy import DATA_DIR, Load_PDB_SS
-from proteusPy.Disulfide import Disulfide
-from proteusPy.DisulfideList import DisulfideList
+from proteusPy import Disulfide, DisulfideList
 
 SAVE_DIR = "/Users/egs/Documents/proteusPy/"
 
