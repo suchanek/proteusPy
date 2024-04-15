@@ -177,9 +177,7 @@ Example:
 
 ```
   import proteusPy
-  from proteusPy.Disulfide import Disulfide
-  from proteusPy.DisulfideLoader import DisulfideLoader
-  from proteusPy.DisulfideList import DisulfideList
+  from proteusPy import Disulfide, DisulfideLoader, DisulfideList
 
   SS1 = DisulfideList([],'tmp1')
   SS2 = DisulfideList([],'tmp2')
@@ -242,9 +240,7 @@ I illustrate a few use cases for the package below. Use the **jupyter lab** comm
 ## Find the lowest and highest energy disulfides present in the database
 
 ```python
-from proteusPy.DisulfideLoader import Load_PDB_SS
-from proteusPy.DisulfideList import DisulfideList
-from proteusPy.Disulfide import Disulfide
+from proteusPy import Load_PDB_SS, DisulfideList, Disulfide
 
 # load the database
 PDB_SS = Load_PDB_SS(verbose=True, subset=False)
@@ -272,9 +268,7 @@ the lowest and highest energies, and then find the nearest conformational neighb
 
 ```python
 import proteusPy
-from proteusPy.DisulfideLoader import Load_PDB_SS
-from proteusPy.DisulfideList import DisulfideList
-from proteusPy.Disulfide import Disulfide
+from proteusPy Load_PDB_SS, DisulfideList, Disulfide
 
 PDB_SS = None
 PDB_SS = Load_PDB_SS(verbose=False, subset=False)
