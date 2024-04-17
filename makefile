@@ -62,8 +62,9 @@ devclean: .
 install: 
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	@echo "Installing VTK..."
-	@$(CONDA) install vtk==9.2.6
+	@$(CONDA) install vtk==9.2.6 -y
 	@echo "Installing proteusPy..."
+
 	@pip install .
 	@echo "Installing Biopython..."
 	@pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
