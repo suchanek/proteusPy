@@ -10,7 +10,6 @@ Copyright (c)2023 Eric G. Suchanek, PhD, all rights reserved
 __pdoc__ = {"__all__": True}
 
 import copy
-import itertools
 import math
 import os
 import subprocess
@@ -22,8 +21,7 @@ from Bio.PDB import PDBParser
 from Bio.PDB.vectors import Vector
 from matplotlib import cm
 
-from proteusPy.data import DATA_DIR
-from proteusPy.ProteusPyWarning import ProteusPyWarning
+from proteusPy import DATA_DIR, DisulfideList, ProteusPyWarning
 
 
 def distance_squared(p1: np.array, p2: np.array) -> np.array:
@@ -178,7 +176,7 @@ def extract_firstchain_ss(sslist, verbose=False):
 
     chainlist = []
     pc = dc = ""
-    res = proteusPy.DisulfideList.DisulfideList([], sslist.id)
+    res = DisulfideList([], sslist.id)
     xchain = 0
 
     # build list of chains
@@ -210,7 +208,7 @@ def prune_extra_ss(sslist):
 
     # print(f'Processing: {ss} with: {sslist}')
     id = sslist.pdb_id
-    pruned_list = proteusPy.DisulfideList.DisulfideList([], id)
+    pruned_list = DisulfideList([], id)
     pruned_list, xchain = extract_firstchain_ss(sslist)
 
     return copy.deepcopy(pruned_list), xchain
