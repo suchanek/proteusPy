@@ -62,10 +62,9 @@ devclean: .
 install: 
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	@echo "Installing VTK..."
-	$(CONDA) install vtk==9.2.6
+	@$(CONDA) install vtk==9.2.6
 	@echo "Installing proteusPy..."
-	#@pip install dist/proteusPy-$(VERS).tar.gz
-	pip install .
+	@pip install .
 	@echo "Installing Biopython..."
 	@pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	@echo "Installing jupyter..."
@@ -77,7 +76,6 @@ install:
 install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	$(CONDA) install -y vtk
-	#pip install dist/proteusPy-$(VERS)-py3-none-any.whl
 	pip install -e .
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	pip install pdoc twine black pytest build
