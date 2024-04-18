@@ -12,8 +12,6 @@ across all 32 possible classes. Classes are named per Hogg's convention.
 # to create the classes merges with the master class spreadsheet, and saves the
 # resulting dict to {DATA_DIR}PDB_SS_merged.csv
 
-__pdoc__ = {"__all__": True}
-
 import pickle
 from io import StringIO
 

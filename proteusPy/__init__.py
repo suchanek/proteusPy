@@ -8,7 +8,10 @@
 
 from pathlib import Path
 
-__pdoc__ = {"__all__": False}
+__pdoc__ = {
+    "version": None,
+    "__all__": False,
+}
 
 import copy
 import datetime

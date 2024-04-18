@@ -7,8 +7,6 @@ Copyright (c)2023 Eric G. Suchanek, PhD, all rights reserved
 
 # Last modification 3/5/24 -egs-
 
-__pdoc__ = {"__all__": True}
-
 import copy
 import math
 import os

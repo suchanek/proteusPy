@@ -10,8 +10,6 @@ Last revision: 2/17/2024
 
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
 
-__pdoc__ = {"__all__": True}
-
 import copy
 import datetime
 import glob

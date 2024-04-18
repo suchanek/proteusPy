@@ -4,14 +4,11 @@ the analysis and modeling of protein structures, with an emphasis on disulfide b
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
 The module provides the implmentation and interface for the [DisulfideList](#DisulfideList)
-object, used extensively by proteusPy.Disulfide.Disulfide class.
+object, used extensively by Disulfide class.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2/18/2024 -egs-
+Last revision: 3/18/2024 -egs-
 """
-
-__pdoc__ = {}
-__pdoc__["all"] = True
 
 try:
     # Check if running in Jupyter
@@ -35,7 +32,6 @@ from Bio.PDB import PDBParser
 from plotly.subplots import make_subplots
 
 import proteusPy
-from proteusPy import *
 from proteusPy import Disulfide
 from proteusPy.atoms import *
 from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, WINSIZE
@@ -93,7 +89,7 @@ class DisulfideList(UserList):
     See below for examples.\n
 
     Examples:
-    >>> from proteusPy import Disulfide, DisulfideLoader, DisulfideList
+    >>> from proteusPy import Disulfide, DisulfideLoader, DisulfideList, Load_PDB_SS
 
     Instantiate some variables. Note: the list is initialized with an iterable and a name (optional)
 
@@ -793,7 +789,7 @@ class DisulfideList(UserList):
         else:
             self.data.extend(self.validate_ss(item) for item in other)
 
-    def get_by_name(self, name) -> Disulfide:
+    def get_by_name(self, name):
         """
         Returns the Disulfide with the given name from the list.
         """
@@ -982,8 +978,7 @@ class DisulfideList(UserList):
         cutoff: float,
     ):
         """
-        Given a torsional array of chi1-chi5, return list of Disulfides
-        within cutoff.
+        Given a torsional array of chi1-chi5,
 
         :param chi1: Chi1 (degrees)
         :param chi2: Chi2 (degrees)
@@ -995,7 +990,7 @@ class DisulfideList(UserList):
         """
 
         sslist = self.data
-        modelss = proteusPy.Disulfide.Disulfide("model")
+        modelss = proteusPy.Disulfide("model")
 
         modelss.build_model(chi1, chi2, chi3, chi4, chi5)
         res = DisulfideList([], "neighbors")
@@ -1021,7 +1016,7 @@ class DisulfideList(UserList):
         chi5 = ss.chi5
 
         sslist = self.data
-        modelss = proteusPy.Disulfide.Disulfide("model")
+        modelss = proteusPy.Disulfide("model")
 
         modelss.build_model(chi1, chi2, chi3, chi4, chi5)
         res = DisulfideList([], "neighbors")
@@ -1095,6 +1090,9 @@ def load_disulfides_from_id(
     >>> SSlist
     [<Disulfide 5rsa_26A_84A, Source: 5rsa, Resolution: 2.0 Å>, <Disulfide 5rsa_40A_95A, Source: 5rsa, Resolution: 2.0 Å>, <Disulfide 5rsa_58A_110A, Source: 5rsa, Resolution: 2.0 Å>, <Disulfide 5rsa_65A_72A, Source: 5rsa, Resolution: 2.0 Å>]
     """
+    import copy
+    import warnings
+
     from proteusPy.Disulfide import Disulfide, parse_ssbond_header_rec
 
     i = 1
