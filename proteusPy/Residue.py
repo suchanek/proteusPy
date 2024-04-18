@@ -6,8 +6,6 @@
 # Last Modification: 11/22/2022
 #
 
-__pdoc__ = {"__all__": True}
-
 import numpy  # type: ignore
 from Bio.PDB import Vector
 
