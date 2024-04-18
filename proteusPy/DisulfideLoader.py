@@ -48,7 +48,7 @@ class DisulfideLoader:
     """
     This class represents the disulfide database itself and is its primary means of accession.
     The entirety of the RCSB disulfide database is stored within the class via a
-    proteusPy.DisulfideList.DisulfideList, a ```Pandas``` .csv file, and a ```dict``` of
+    proteusPy.DisulfideList, a ```Pandas``` .csv file, and a ```dict``` of
     indices mapping the PDB IDs into their respective list of disulfides. The datastructures allow
     simple, direct and flexible access to the disulfide structures contained herein.
     This makes it possible to access the disulfides by array index, PDB structure ID or disulfide name.
@@ -85,7 +85,7 @@ class DisulfideLoader:
         is useful for testing and debugging since it doesn't require nearly as much
         memory or time. The name for the subset file is hard-coded. One can pass a
         different data directory and file names for the pickle files. These different
-        directories are normally established with the proteusPy.Disulfide.Extract_Disulfides
+        directories are normally established with the proteusPy.Extract_Disulfides
         function.
         """
 
@@ -251,7 +251,7 @@ class DisulfideLoader:
         Given a list of PDBid, return a DisulfideList of Disulfides
 
         :param idlist: List of PDBIDs, e.g. ['4yys', '2q7q']
-        :return: ProteusPy.DisulfideList.DisulfideList of ProteusPy.Disulfide.Disulfide
+        :return: DisulfideList
         """
         res = DisulfideList([], "tmp")
 
@@ -321,7 +321,7 @@ class DisulfideLoader:
 
          Example:
 
-         from proteusPy.DisulfideLoader import Load_PDB_SS
+         from proteusPy import Load_PDB_SS
          PDB_SS = Load_PDB_SS(verbose=False, subset=False)
          PDB_SS.describe()
              =========== RCSB Disulfide Database Summary ==============
@@ -371,9 +371,7 @@ class DisulfideLoader:
         :return: None
 
         Example:
-        >>> from proteusPy.Disulfide import Disulfide
-        >>> from proteusPy.DisulfideLoader import Load_PDB_SS
-        >>> from proteusPy.DisulfideList import DisulfideList
+        >>> from proteusPy import Disulfide, Load_PDB_SS, DisulfideList
 
         Instantiate the Loader with the SS database subset.
 
@@ -405,7 +403,7 @@ class DisulfideLoader:
         :rtype: pd.DataFrame
 
         Example:
-        >>> from proteusPy.DisulfideLoader import Load_PDB_SS
+        >>> from proteusPy import Load_PDB_SS
         >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
         >>> Tor_DF = PDB_SS.getTorsions()
         """

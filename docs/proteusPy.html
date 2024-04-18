@@ -55,7 +55,7 @@
     <li><a href="#windows">Windows</a></li>
   </ul></li>
   <li><a href="#testing">Testing</a></li>
-  <li><a href="#general-usage">General Usage</a>
+  <li><a href="#usage">Usage</a>
   <ul>
     <li><a href="#quickstart">Quickstart</a></li>
     <li><a href="#visualizing-disulfides-with-pyvista">Visualizing Disulfides with pyVista</a></li>
@@ -198,17 +198,38 @@ proteusPy    </h1>
 
 <p>The modules will run their docstring tests and disulfide visualization windows will open. Simply close them. If all goes normally there will be no errors. If you're not running the development version of proteusPy you may need to install <code>pytest</code>. Simply perform: <code>pip install pytest</code>. Docstring testing is sensitive to formatting; occasionally the <code>black</code> formatter changes the docstrings. As a result there may be some docstring tests that fail.</p>
 
-<h1 id="general-usage">General Usage</h1>
+<h1 id="usage">Usage</h1>
 
-<p>Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. </p>
+<p>Once the package is installed it's possible to load, visualize and analyze the Disulfide bonds in the RCSB Disulfide database. The general approach is:</p>
 
-<p>The <a href="https://github.com/suchanek/proteusPy/blob/master/notebooks/">notebooks</a> directory contains all of my Jupyter notebooks and is a good place to start: </p>
+<ul>
+<li>Load the database</li>
+<li>Access disulfide(s)</li>
+<li>Analyze</li>
+<li>Visualize</li>
+</ul>
+
+<p>A simple example is shown below:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="kn">import</span> <span class="nn">proteusPy</span>
+<span class="kn">from</span> <span class="nn">proteusPy</span> <span class="kn">import</span> <span class="n">Load_PDB_SS</span><span class="p">,</span> <span class="n">Disulfide</span>
+
+<span class="n">PDB_SS</span> <span class="o">=</span> <span class="n">Load_PDB_SS</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">best_ss</span> <span class="o">=</span> <span class="n">PDB_SS</span><span class="p">[</span><span class="s2">&quot;2q7q_75D_140D&quot;</span><span class="p">]</span>
+<span class="n">best_ss</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;sb&quot;</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>The <a href="https://github.com/suchanek/proteusPy/blob/master/notebooks/">notebooks</a> directory contains my Jupyter notebooks and is a good place to start: </p>
 
 <ul>
 <li><a href="https://github.com/suchanek/proteusPy/blob/master/notebooks/Analysis_2q7q.ipynb">Analysis_2q7q.ipynb</a> provides an example of visualizing the lowest energy Disulfide contained in the database and searching for nearest neighbors on the basis of conformational similarity. </li>
+<li><a href="https://github.com/suchanek/proteusPy/blob/master/notebooks/Anearest_relatives.ipynb">Anearest_relatives.ipynb</a> gives an example of searching for disulfides based on sequence similarity.</li>
 </ul>
 
-<p>The <a href="https://github.com/suchanek/proteusPy/tree/master/programs">programs</a> subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files:</p>
+<p>The <a href="https://github.com/suchanek/proteusPy/tree/master/programs">programs</a> subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files, extracting the disulfides and creating the disulfide database:</p>
 
 <ul>
 <li><a href="https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py">DisulfideDownloader.py</a>: Downloads the raw RCSB structure files.</li>

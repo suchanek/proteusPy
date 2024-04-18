@@ -98,21 +98,38 @@ $ make tests
 ```
 The modules will 1) run pytest for the main modules and 2) perform docstring tests. This will result in a number of disulfide visualization windows to open. Simply close them. If all goes normally there will be no errors. (you may need to install ``pytest`` via ``pip install pytest``.
 
-# General Usage
+# Usage
 
-Once the package is installed one can use the existing notebooks for analysis of the RCSB Disulfide database. 
+Once the package is installed it's possible to load, visualize and analyze the Disulfide bonds in the RCSB Disulfide database. The general approach is:
+- Load the database
+- Access disulfide(s)
+- Analyze
+- Visualize
 
-The [notebooks](https://github.com/suchanek/proteusPy/blob/master/notebooks/) directory contains all of my Jupyter notebooks and is a good place to start:
+A simple example is shown below:
 
-* [Analysis_2q7q.ipynb](https://github.com/suchanek/proteusPy/blob/master/notebooks/Analysis_2q7q.ipynb) provides an example of visualizing the lowest energy Disulfide contained in the database and searching for nearest neighbors on the basis of conformational similarity. 
+```python
+import proteusPy
+from proteusPy import Load_PDB_SS, Disulfide
 
-The [programs](https://github.com/suchanek/proteusPy/tree/master/programs) subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files:
+PDB_SS = Load_PDB_SS(verbose=True)
 
+best_ss = PDB_SS["2q7q_75D_140D"]
+best_ss.display(style="sb", light=True)
+```
+
+
+The [notebooks](https://github.com/suchanek/proteusPy/blob/master/notebooks/) directory contains my Jupyter notebooks and is a good place to start: 
+- [Analysis_2q7q.ipynb](https://github.com/suchanek/proteusPy/blob/master/notebooks/Analysis_2q7q.ipynb) provides an example of visualizing the lowest energy Disulfide contained in the database and searching for nearest neighbors on the basis of conformational similarity. 
+- [Anearest_relatives.ipynb](https://github.com/suchanek/proteusPy/blob/master/notebooks/Anearest_relatives.ipynb) gives an example of searching for disulfides based on sequence similarity.
+
+The [programs](https://github.com/suchanek/proteusPy/tree/master/programs) subdirectory contains the primary programs for downloading the RCSB disulfide-containing structure files, extracting the disulfides and creating the disulfide database:
 * [DisulfideDownloader.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py): Downloads the raw RCSB structure files.
 * [DisulfideExtractor.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py): Extracts the disulfides and creating the database loaders
 * [DisulfideClass_Analysis.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideClass_Analysis.py): Performs binary or sextant analysis on the disulfide database.
 
 The first time one loads the database via [Load_PDB_SS()](https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html#Load_PDB_SS) the system will attempt to download the full and subset database from Google Drive. If this fails the system will attempt to rebuild the database from the repo's **data** subdirectory (not the package's). If you've downloaded from github this will work correctly. If you've installed from pyPi via **pip** it will fail.
+
 
 ## Quickstart
 
