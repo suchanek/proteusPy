@@ -317,15 +317,16 @@ class DisulfideLoader:
 
     def describe(self) -> None:
         """
-         Provides information about the Disulfide database contained in ```self```.
+        Provides information about the Disulfide database contained in `self`.
 
-         Example:
+        Example:<br>
 
-         from proteusPy import Load_PDB_SS
-         PDB_SS = Load_PDB_SS(verbose=False, subset=False)
-         PDB_SS.describe()
+        ```python
+        from proteusPy import Load_PDB_SS
+        PDB_SS = Load_PDB_SS(verbose=False, subset=False)
+        PDB_SS.describe()
              =========== RCSB Disulfide Database Summary ==============
-                =========== Built: 2024-02-12 17:48:13 ==============
+                 =========== Built: 2024-02-12 17:48:13 ==============
         PDB IDs present:                    35818
         Disulfides loaded:                  120494
         Average structure resolution:       2.34 Å
@@ -334,7 +335,7 @@ class DisulfideLoader:
         Cα distance cutoff:                 8.00 Å
         Total RAM Used:                     30.72 GB.
             ================= proteusPy: 0.91 =======================
-
+        ```
         """
         vers = self.version
         tot = self.TotalDisulfides
