@@ -88,7 +88,7 @@ The first time one loads the database via [Load_PDB_SS()](https://suchanek.githu
 After installation is complete launch jupyter lab:
 
 ```console
-$ jupyter lab 
+$ jupyter notebook 
 ```
 and open ``notebooks/Analysis_2q7q.ipynb``. This notebook looks at the disulfide bond with the lowest energy in the entire database. There are several other notebooks in this directory that illustrate using the program. Some of these reflect active development work so may not be 'fully baked'.
 
