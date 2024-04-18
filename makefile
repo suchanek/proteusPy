@@ -2,11 +2,15 @@
 # Author: Eric G. Suchanek, PhD
 # Last revision: 3/16/24 -egs-
 
+
 # assumes file VERSION contains only the version number
 ifeq ($(OS),Windows_NT) 
     VERS := $(shell python -c "exec(open('proteusPy/version.py').read()); print(__version__)")
+	RM = del
 else 
 	VERS = $(shell python get_version.py)
+	RM = rm
+
 endif
 
 CONDA = mamba
@@ -28,14 +32,11 @@ newvers: .
 	@echo "Enter a new message: "
 	@read MESS
 
+
+
 nuke: clean devclean
-	ifeq ($(OS),Windows_NT) 
-		@del $(OUTFILES)
-		@del dist/*
-	else 
-		@rm $(OUTFILES)
-		@rm dist/*
-	endif
+	-@$(RM) $(OUTFILES)
+	-@$(RM) dist/*
 
 pkg:
 	@echo "Starting installation step 1/2..."
