@@ -3,7 +3,7 @@
 # Last revision: 3/16/24 -egs-
 
 
-# assumes file VERSION contains only the version number
+# assumes file version.py contains only the version number
 ifeq ($(OS),Windows_NT) 
     VERS := $(shell python -c "exec(open('proteusPy/version.py').read()); print(__version__)")
 	RM = del
@@ -65,7 +65,6 @@ install:
 	@echo "Installing VTK..."
 	@$(CONDA) install vtk==9.2.6 -y
 	@echo "Installing proteusPy..."
-
 	@pip install .
 	@echo "Installing Biopython..."
 	@pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython

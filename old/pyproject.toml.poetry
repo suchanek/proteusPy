@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "proteusPy"
-version = "0.92.26"
+version = "0.95.2"
 description = "proteusPy - Protein Structure Analysis and Modeling Tools"
 authors = ["Eric Suchanek <suchanek@mac.com>"]
 license = "LICENSE"
@@ -36,6 +36,7 @@ pyvista = "^0.43.3"
 notebook = "6.4.12"
 jupyter = "^1.0.0"
 jupyterlab = ">=3"
+jupyter_server = "<2"
 seaborn = "^0.13.2"
 pillow = "^10.2.0"
 tqdm = "^4.66.2"
@@ -53,7 +54,7 @@ pytube = "^15.0.0"
 grpcio = "^1.62.1"
 pip = "^24.0"
 wget = "^3.2"
-vtk = "^9.3.0"
+vtk = "^9.2.6"
 kaleido = "0.2.1"
 plotly-express = "^0.4.1"
 trame-jupyter-extension = "^2.0.1"
@@ -63,9 +64,9 @@ imageio-ffmpeg = {extras = ["ffmpeg"], version = "^0.4.9"}
 biopython = {git = "https://github.com/suchanek/biopython.git", rev = "egs_ssbond_240305"}
 imageio = "^2.34.0"
 pandas = "^2.2.1"
-trame = "^3.5.2"
+trame = "^3.6.0"
 trame-vtk = "^2.8.5"
-trame-vuetify = "^2.4.2"
+trame-vuetify = "^2.4.3"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.2.0"
