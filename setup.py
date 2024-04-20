@@ -84,7 +84,6 @@ setup(
         "pyvista[all,trame]",
         "traitlets==5.9.0",
         "jupyter",
-        "jupyter_server<2.0",
         "seaborn",
         "pillow",
         "tqdm",

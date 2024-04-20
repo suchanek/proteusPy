@@ -72,6 +72,7 @@ trame-vuetify = "^2.4.3"
 black = "^24.2.0"
 pytest = "^8.1.1"
 pdoc = "^14.4.0"
+poethepoet = "^0.25.1"
 
 [tool.coverage.run]
 source = ["proteusPy"]
@@ -95,7 +96,7 @@ _jup4 = "python -m ipykernel install --user --name proteusPy --display-name 'ppy
 build = ["_build"]
 install = [ "_install", "_jup_install"]
 install_dev = [ "_install", "_jup_install_dev"] 
-clean = ["_clean_sdist"]] 
+clean = ["_clean_sdist"]
 
 test = ["_test"]
 
