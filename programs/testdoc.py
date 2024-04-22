@@ -48,8 +48,8 @@ class test:
 
 
 from proteusPy.Disulfide import Disulfide
-from proteusPy.DisulfideLoader import DisulfideLoader
 from proteusPy.DisulfideList import DisulfideList
+from proteusPy.DisulfideLoader import DisulfideLoader
 from proteusPy.ProteusGlobals import MODEL_DIR
 
 PDB_ROOT = "/Users/egs/PDB/"
@@ -61,7 +61,7 @@ PDB_GOOD = "/Users/egs/PDB/good/"
 PDB_REPO = "../pdb/"
 
 # location of the compressed Disulfide .pkl files
-MODELS = f"{PDB_ROOT}models/"
+MODELS = f"{PDB_ROOT}data/"
 
 # instantiate some variables
 # Note: the list is initialized with an iterable and a name (optional)
