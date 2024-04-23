@@ -68,6 +68,8 @@ trame = "^3.6.0"
 trame-vtk = "^2.8.5"
 trame-vuetify = "^2.4.3"
 toml = "^0.10.2"
+self = "^2020.12.3"
+poethepoet = "^0.25.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.2.0"
@@ -85,24 +87,28 @@ line-length = 80
 _test = "pytest"
 _build = "poetry build"
 _install = "poetry install"
-_jup_install = "poetry poe jupyter"
-_jup_install_dev = "poetry poe jupyter_dev"
+_jup_install = "poe jupyter"
+_jup_install_dev = "poe jupyter_dev"
 _clean_sdist.script = "shutil:rmtree('sdist', ignore_errors=1)"
 _jup1 = "jupyter contrib nbextension install --sys-prefix"
 _jup2 = "jupyter nbextension enable --py --sys-prefix widgetsnbextension"
 _jup3 = "python programs/run_jupyter.py proteusPy"
 _jup4 = "python programs/run_jupyter.py ppydev"
+_jup_rem = "jupyter kernelspec uninstall proteuspy -y"
+_jup_rem_dev = "jupyter kernelspec uninstall ppydev -y"
+
 
 build = ["_build"]
 install = [ "_install", "_jup_install"]
 install_dev = [ "_install", "_jup_install_dev"] 
-clean = ["_clean_sdist"]
+clean_dev = ["_clean_sdist", "_jup_rem_dev"]
+clean = ["_jup_rem" ]
 
 test = ["_test"]
 
   [tool.poe.tasks.jupyter]
   help = "Add jupyter extensions"
-  sequence = ['_jup1', '_jup2', '_jup3']
+  sequence = ['_jup1', '_jup2']
 
   [tool.poe.tasks.jupyter_dev]
   help = "Add jupyter extensions"

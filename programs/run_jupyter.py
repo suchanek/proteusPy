@@ -33,6 +33,6 @@ subprocess.run(
         "--name",
         args.package,
         "--display-name",
-        f"'{args.package} ({version})'",
+        f"{args.package} ({version})",
     ]
 )
