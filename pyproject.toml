@@ -28,7 +28,7 @@ issues = "https://github.com/suchanek/proteusPy/issues"
 documentation = "https://suchanek.github.io/proteusPy/"
 
 [tool.poetry.dependencies]
-python = "^3.11.7"
+python = "^3.11"
 numpy = "^1.26.4"
 matplotlib = "^3.8.3"
 traitlets = "5.9.0"
