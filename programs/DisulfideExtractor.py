@@ -12,11 +12,15 @@ build the DisulfideLoader object, and save it into the proteusPy module data dir
 * Subset: Only extract and process the first 1000 Disulfides found in the PDB directory.
 
 Author: Eric G. Suchanek, PhD.
-Last revision: 2/26/23 -egs-
+Last revision: 4/24/24 -egs-
 """
 
 import argparse
 import datetime
+
+# the locations below represent the actual location on the dev drive.
+# location for PDB repository
+import os
 import time
 from shutil import copy, copytree, ignore_patterns
 
@@ -31,21 +35,19 @@ from proteusPy.data import (
     SS_SUBSET_TORSIONS_FILE,
 )
 
-# the locations below represent the actual location on the dev drive.
-# location for PDB repository
-PDB_BASE = "/Users/egs/PDB/"
+HOME_DIR = os.path.expanduser("~")
+PDB_BASE = os.getenv("PDB")
 
 # location of cleaned PDB files, created with DisulfideDownloader.py
-PDB_DIR = "/Users/egs/PDB/good/"
-MODULE_DATA = "/Users/egs/repos/proteusPy/proteusPy/data/"
-REPO_DATA = "/Users/egs/repos/proteusPy/data/"
+PDB_DIR = os.path.join(PDB_BASE, "good/")
+
+# this is specific to having a directory structure of ~/repos/proteusPy
+
+MODULE_DATA = os.path.join(HOME_DIR, "repos/proteusPy/proteusPy/data/")
+REPO_DATA = os.path.join(HOME_DIR, "repos/proteusPy/data/")
 
 # location of the compressed Disulfide .pkl files
-DATA_DIR = f"{PDB_BASE}data/"
-
-# The following performs an extraction of 1000 SS and saves them with
-# the correct filenames to be read as 'subset'. Do not change the filenames
-# defined above
+DATA_DIR = os.path.join(PDB_BASE, "data/")
 
 
 def do_extract(verbose, full, subset, cutoff):
@@ -86,7 +88,7 @@ def do_extract(verbose, full, subset, cutoff):
 
 def do_build(verbose, full, subset, cutoff):
     """
-    Loads and saves a ```proteusPy.DisulfideLoader.DisulfideLoader``` object
+    Loads and saves a ```proteusPy.DisulfideLoader``` object
     to a .pkl file.
 
     :param verbose: Verbosity, boolean

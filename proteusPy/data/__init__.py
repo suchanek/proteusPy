@@ -8,6 +8,13 @@ Global declarations for the proteusPy package
 
 import os
 
+HOME_DIR = os.path.expanduser("~")
+PDB_BASE = os.getenv("PDB")
+
+if PDB_BASE is None:
+    print(f"The PDB environment variable is not set. Defaulting to {HOME_DIR}.")
+    PDB_BASE = HOME_DIR
+
 # absolute location for the disulfide .pkl files
 _abspath = os.path.dirname(os.path.abspath(__file__))
 
