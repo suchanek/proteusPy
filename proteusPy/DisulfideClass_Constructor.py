@@ -27,7 +27,6 @@ from proteusPy.data import (
     SS_CLASS_DICT_FILE,
     SS_CONSENSUS_FILE,
 )
-from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.ProteusGlobals import DPI
 
@@ -116,12 +115,10 @@ class DisulfideClass_Constructor:
 
     def load_class_dict(self, fname=f"{DATA_DIR}{SS_CLASS_DICT_FILE}") -> dict:
         with open(fname, "rb") as f:
-            # self.classdict = pd.compat.pickle_compat.load(f)
             self.classdict = pickle.load(f)
 
     def load_consensus_file(self, fname=f"{DATA_DIR}{SS_CONSENSUS_FILE}"):
         with open(fname, "rb") as f:
-            # res = pd.compat.pickle_compat.load(f)
             res = pickle.load(f)
             return res
 

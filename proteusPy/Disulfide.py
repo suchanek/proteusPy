@@ -2839,9 +2839,12 @@ def check_header_from_id(
 
     Example:
       Assuming the PDB_DIR has the pdb5rsa.ent file we can check the file thusly:
+      (assumes the PDB environment variable is set to the PDB directory.)
 
+    >>> import os
     >>> from proteusPy.Disulfide import Disulfide, check_header_from_id
-    >>> MODEL_DIR = '/Users/egs/PDB/good/'
+    >>> PDB = os.getenv('PDB')
+    >>> MODEL_DIR = os.path.join(PDB, 'good/')
     >>> OK = False
     >>> OK = check_header_from_id('5rsa', pdb_dir=MODEL_DIR, verbose=True)
      -> SSBond: 1: 5rsa: 26A - 84A
