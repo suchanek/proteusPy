@@ -88,7 +88,7 @@ Torsion_DF_Cols = [
 
 # class for the Disulfide bond
 class Disulfide:
-    """
+    r"""
     This class provides a Python object and methods representing a physical disulfide bond
     either extracted from the RCSB protein databank or built using the
     [proteusPy.Turtle3D](turtle3D.html) class. The disulfide bond is an important
@@ -1034,12 +1034,7 @@ class Disulfide:
         coordinates. It also adds the distal protein backbone,
         and computes the disulfide conformational energy.
         """
-        chi1 = self.chi1
-        chi2 = self.chi2
-        chi3 = self.chi3
-        chi4 = self.chi4
-        chi5 = self.chi5
-        self.build_model(chi1, chi2, chi3, chi4, chi5)
+        self.build_model(self.chi1, self.chi2, self.chi3, self.chi4, self.chi5)
 
     def build_model(
         self, chi1: float, chi2: float, chi3: float, chi4: float, chi5: float
@@ -2338,10 +2333,7 @@ class Disulfide:
         the lowest and highest energies, and then find the nearest conformational neighbors.
         Finally, we display the neighbors overlaid against a common reference frame.
 
-        >>> from proteusPy import *
-        >>> from proteusPy.DisulfideLoader import Load_PDB_SS
-        >>> from proteusPy.DisulfideList import DisulfideList
-        >>> from proteusPy.Disulfide import Disulfide
+        >>> from proteusPy import Load_PDB_SS, DisulfideList, Disulfide
         >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
         >>> ss_list = DisulfideList([], 'tmp')
 
