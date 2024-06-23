@@ -16,7 +16,8 @@ jobs:
         - name: Install dependencies
           run: |
               python -m pip install --upgrade pip
-              pip install pytest, wheel
+              pip install pytest
+              pip install wheel
               pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
               pip install .
 
