@@ -449,6 +449,43 @@ def retrieve_git_lfs_files(repo_url, objects):
         return None
 
 
+def show_ss(
+    pdbid: str, proximal: int, distal: int, chain: str, solvent: bool = True
+) -> None:
+    """
+    Visualizes specific residues within a given protein structure in PyMOL.
+
+    This function fetches a protein structure by its PDB ID, removes all other chains except
+    the specified one, and then shows the proximal and distal residues in spheres. Optionally,
+    it can also show solvent molecules as spheres.
+
+    Parameters:
+    - pdbid (str): The PDB ID of the protein structure to visualize.
+    - proximal (int): The residue number of the proximal residue to visualize.
+    - distal (int): The residue number of the distal residue to visualize.
+    - chain (str): The chain identifier of the residues to visualize.
+    - solvent (bool, optional): Whether to show solvent molecules. Defaults to True.
+
+    Returns:
+    - None
+    """
+    import pymolPy3
+
+    pm = pymolPy3.pymolPy3()
+
+    pm(f"fetch {pdbid}")
+    pm(f"remove not chain {chain}")
+    pm(f"show spheres, resi {proximal}+{distal}")
+    if solvent:
+        pm(f"show spheres, solvent")
+
+    pm(f"color green, resi {proximal}+{distal}")
+    pm(f"zoom resi {proximal}+{distal}")
+
+    input("Press Enter to continue...")
+    return None
+
+
 if __name__ == "__main__":
     import doctest
 

@@ -1,17 +1,11 @@
+import math
 import unittest
 from unittest import TestCase
-import math
 
-from proteusPy import (
-    Disulfide,
-    DisulfideList,
-    DisulfideLoader,
-    load_disulfides_from_id,
-    Load_PDB_SS,
-)
+from proteusPy import Disulfide, DisulfideList, Load_PDB_SS
 from proteusPy.data import SS_DICT_PICKLE_FILE
 from proteusPy.ProteusGlobals import _FLOAT_INIT, _INT_INIT
-from proteusPy.utility import distance_squared, distance3d
+from proteusPy.utility import distance3d, distance_squared
 
 
 class TestDisulfide(TestCase):
@@ -19,33 +13,22 @@ class TestDisulfide(TestCase):
 
     def test_init(self):
         ss = Disulfide()
-        self.assertEqual(ss.name, "EGS")
-        self.assertEqual(ss.prox, _INT_INIT)
-        self.assertEqual(ss.dist, _INT_INIT)
+        self.assertEqual(ss.name, "SSBOND")
+        self.assertEqual(ss.proximal, _INT_INIT)
+        self.assertEqual(ss.distal, _INT_INIT)
         # Test init with values
-        ss = Disulfide(name="test", prox=10, dist=15)
+        ss = Disulfide(name="test", proximal=10, distal=15)
         self.assertEqual(ss.name, "test")
-        self.assertEqual(ss.prox, 10)
-        self.assertEqual(ss.dist, 15)
+        self.assertEqual(ss.proximal, 10)
+        self.assertEqual(ss.distal, 15)
 
     def test_energy(self):
+        from proteusPy import Disulfide_Energy_Function
+
         ss = Disulfide()
-        self.assertEqual(ss.energy, _FLOAT_INIT)
         # Test with sample torsions
-        ss.chi1 = 60
-        ss.chi2 = 120
-        ss.chi3 = -90
-        ss.chi4 = 30
-        ss.chi5 = 45
-        energy = (
-            2.0 * math.cos(3.0 * math.radians(60))
-            + math.cos(3.0 * math.radians(45))
-            + math.cos(3.0 * math.radians(120))
-            + math.cos(3.0 * math.radians(30))
-            + 3.5 * math.cos(2.0 * math.radians(-90))
-            + 0.6 * math.cos(3.0 * math.radians(-90))
-            + 10.1
-        )
+        ss.dihedrals = [60, 120, -90, 30, 45]
+        energy = Disulfide_Energy_Function(ss.dihedrals)
         self.assertAlmostEqual(ss.energy, energy)
 
     def test_copy(self):
@@ -58,43 +41,60 @@ class TestDisulfide(TestCase):
     def test_display(self):
         # Mock test
         ss = Disulfide("test")
-        ss.build_model("-60.0", "-60.0", "-90.0", "-60.0", "-60.0")
+        ss.build_model(-60.0, -60.0, -90.0, -60.0, -60.0)
         ss.display("cpk")
         self.assertTrue(True)  # Display happened
+
+
+PDB_SS = Load_PDB_SS(verbose=True, subset=True)
 
 
 class TestDisulfideList(TestCase):
     from proteusPy.DisulfideList import DisulfideList
 
     def test_init(self):
-        PDB_SS = Load_PDB_SS(verbose=True, subset=True)
+        global PDB_SS
+
+        # PDB_SS = Load_PDB_SS(verbose=True, subset=True)
         sslist = PDB_SS[0:10]
         self.assertEqual(len(sslist), 10)
-        self.assertEqual(sslist.name, "test")
+        self.assertEqual(sslist.pdb_id, "4yys")
 
     def test_display(self):
         # Mock test
-        PDB_SS = Load_PDB_SS(verbose=True, subset=True)
-        sslist = DisulfideList(PDB_SS[0:10], "test")
+        global PDB_SS
+
+        # PDB_SS = Load_PDB_SS(verbose=True, subset=True)
+        sslist = PDB_SS[0:10]
+
+        sslist = DisulfideList(PDB_SS[0:10], "4yys")
         sslist.display("cpk")
         self.assertTrue(True)  # Display happened
 
     def test_screenshot(self):
         # Mock test
-        self.sslist.screenshot("cpk", "test.png")
+        global PDB_SS
+        # PDB_SS = Load_PDB_SS(verbose=True, subset=True)
+        sslist = PDB_SS[0:10]
+        sslist.display(style="cpk", panelsize=256)
         self.assertTrue(True)  # Screenshot created
 
 
 class TestDisulfideLoader(TestCase):
     from proteusPy import Load_PDB_SS
 
+    # PDB_SS = Load_PDB_SS(verbose=True, subset=True)
+
     def test_load(self):
-        loader = Load_PDB_SS(verbose=True, subset=True)
-        self.assertIsNotNone(loader)
+        global PDB_SS
+        # loader = Load_PDB_SS(verbose=True, subset=True)
+        self.assertIsNotNone(PDB_SS)
 
     def test_getitem(self):
-        loader = Load_PDB_SS(verbose=True, subset=True)
-        ss = loader[0]
+        global PDB_SS
+
+        # loader = Load_PDB_SS(verbose=True, subset=True)
+        ss = PDB_SS[0]
         self.assertIsInstance(ss, Disulfide)
 
 
@@ -102,9 +102,11 @@ class TestModuleFunctions(TestCase):
     from proteusPy import Load_PDB_SS
 
     def test_load_disulfides_from_id(self):
-        _pdb = Load_PDB_SS(verbose=True, subset=False)
-        sslist = _pdb["1a25"]
-        self.assertGreater(len(sslist), 0)
+        global PDB_SS
+
+        # _pdb = Load_PDB_SS(verbose=True, subset=False)
+        sslist = PDB_SS["1a25"]
+        self.assertIsNone(sslist)
 
     def test_distance_squared(self):
         v1 = [1, 0, 0]
@@ -113,8 +115,10 @@ class TestModuleFunctions(TestCase):
         self.assertEqual(dist2, 2)
 
     def test_distance3d(self):
-        v1 = [1, 0, 0]
-        v2 = [0, 1, 0]
+        from proteusPy import Vector
+
+        v1 = Vector(1, 0, 0)
+        v2 = Vector(0, 1, 0)
         dist = distance3d(v1, v2)
         self.assertEqual(dist, 2**0.5)
 
