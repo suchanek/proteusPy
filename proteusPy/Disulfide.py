@@ -2539,6 +2539,8 @@ def Extract_Disulfides(
 
     import os
 
+    from proteusPy import load_disulfides_from_id
+
     entrylist = []
     problem_ids = []
     bad = bad_dist = 0
@@ -2593,7 +2595,7 @@ def Extract_Disulfides(
 
         # returns an empty list if none are found.
         _sslist = DisulfideList([], entry)
-        _sslist = proteusPy.DisulfideList.load_disulfides_from_id(
+        _sslist = load_disulfides_from_id(
             entry, model_numb=0, verbose=verbose, quiet=quiet, pdb_dir=pdbdir
         )
         sslist, xchain = prune_extra_ss(_sslist)
