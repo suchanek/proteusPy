@@ -449,8 +449,17 @@ def retrieve_git_lfs_files(repo_url, objects):
         return None
 
 
-def show_ss(
-    pdbid: str, proximal: int, distal: int, chain: str, solvent: bool = True
+def display_ss_pymol(
+    pdbid: str,
+    proximal: int,
+    distal: int,
+    chain: str,
+    solvent: bool = True,
+    ray=True,
+    width=800,
+    height=600,
+    dpi=300,
+    fname="ss_pymol.png",
 ) -> None:
     """
     Visualizes specific residues within a given protein structure in PyMOL.
@@ -481,6 +490,9 @@ def show_ss(
 
     pm(f"color green, resi {proximal}+{distal}")
     pm(f"zoom resi {proximal}+{distal}")
+    if ray:
+        pm(f"ray {width}, {height}")
+        pm(f"png {fname}, dpi={dpi}")
 
     input("Press Enter to continue...")
     return None
