@@ -68,7 +68,7 @@ install:
 
 	@pip install .
 	@echo "Installing Biopython..."
-	@pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
+	#@pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	@echo "Installing jupyter..."
 	@jupyter contrib nbextension install --sys-prefix
 	@jupyter nbextension enable --py --sys-prefix widgetsnbextension
@@ -77,7 +77,8 @@ install:
 
 install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	$(CONDA) install -y vtk
+	@pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
+	$(CONDA) install vtk==9.2.6 -y
 	pip install -e .
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	pip install pdoc twine black pytest build

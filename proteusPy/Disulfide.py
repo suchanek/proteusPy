@@ -1536,7 +1536,7 @@ class Disulfide:
 
     def initialize_disulfide_from_chain(
         self, chain1, chain2, proximal, distal, resolution, quiet=True
-    ) -> None:
+    ) -> bool:
         """
         Initialize a new Disulfide object with atomic coordinates from
         the proximal and distal coordinates, typically taken from a PDB file.
@@ -1597,9 +1597,8 @@ class Disulfide:
             sg1 = prox_residue["SG"].get_vector()
 
         except Exception:
-            raise DisulfideConstructionWarning(
-                f"Invalid or missing coordinates for proximal residue {proximal}"
-            ) from None
+            print(f"Invalid or missing coordinates for proximal residue {proximal}")
+            return False
 
         # distal residue
         try:
@@ -1611,9 +1610,8 @@ class Disulfide:
             sg2 = dist_residue["SG"].get_vector()
 
         except Exception:
-            raise DisulfideConstructionWarning(
-                f"Invalid or missing coordinates for distal residue {distal}"
-            ) from None
+            print(f"Invalid or missing coordinates for distal residue {distal}")
+            return False
 
         # previous residue and next residue - optional, used for phi, psi calculations
         try:
@@ -1639,7 +1637,7 @@ class Disulfide:
             mess = f"Missing coords for: {id} {prox-1} or {dist+1} for SS {proximal}-{distal}"
             cprev_prox = nnext_prox = cprev_dist = nnext_dist = Vector(-1.0, -1.0, -1.0)
             self.missing_atoms = True
-            warnings.warn(mess, DisulfideConstructionWarning)
+            # print(f"{mess}")
 
         # update the positions and conformation
         self.set_positions(
@@ -1681,6 +1679,7 @@ class Disulfide:
 
         # compute and set the local coordinates
         self.compute_local_coords()
+        return True
 
     def internal_coords(self) -> np.array:
         """
@@ -2538,6 +2537,11 @@ def Extract_Disulfides(
         return ent
 
     import os
+    import shutil
+
+    from proteusPy import DisulfideList, load_disulfides_from_id
+
+    bad_dir = pdbdir + "/bad"
 
     entrylist = []
     problem_ids = []
@@ -2593,7 +2597,7 @@ def Extract_Disulfides(
 
         # returns an empty list if none are found.
         _sslist = DisulfideList([], entry)
-        _sslist = proteusPy.DisulfideList.load_disulfides_from_id(
+        _sslist = load_disulfides_from_id(
             entry, model_numb=0, verbose=verbose, quiet=quiet, pdb_dir=pdbdir
         )
         sslist, xchain = prune_extra_ss(_sslist)
@@ -2605,7 +2609,7 @@ def Extract_Disulfides(
                 dist = ss.ca_distance
                 if dist >= dist_cutoff and dist_cutoff != -1.0:
                     bad_dist += 1
-                    continue
+                    break  ## was continue
 
                 All_ss_list.append(ss)
                 new_row = [
@@ -2644,7 +2648,7 @@ def Extract_Disulfides(
             # at this point I really shouldn't have any bad non-parsible file
             bad += 1
             problem_ids.append(entry)
-            # os.remove(f'pdb{entry}.ent')
+            shutil.move(f"pdb{entry}.ent", bad_dir)
 
     if bad > 0:
         prob_cols = ["id"]
@@ -2652,7 +2656,7 @@ def Extract_Disulfides(
         problem_df["id"] = problem_ids
 
         print(
-            f"-> Extract_Disulfides(): Found and removed: {len(problem_ids)} non-parsable structures."
+            f"-> Extract_Disulfides(): Found and moved: {len(problem_ids)} non-parsable structures."
         )
         print(
             f"-> Extract_Disulfides(): Saving problem IDs to file: {datadir}{problemfile}"
@@ -2704,6 +2708,80 @@ def Extract_Disulfides(
     # return to original directory
     os.chdir(cwd)
     return
+
+
+from proteusPy import DisulfideList
+
+
+# !!!
+def Extract_Disulfide(
+    pdbid: str,
+    verbose=False,
+    quiet=True,
+    pdbdir=PDB_DIR,
+) -> DisulfideList:
+    """
+    Read the PDB files contained in ``pdbdir`` and create the .pkl files needed for the
+    proteusPy.DisulfideLoader.DisulfideLoader class.
+    The ```Disulfide``` objects are contained in a ```DisulfideList``` object and
+    ```Dict``` within these files. In addition, .csv files containing all of
+    the torsions for the disulfides and problem IDs are written. The optional
+    ```dist_cutoff``` allows for removal of Disufides whose Cα-Cα distance is >
+    than the cutoff value. If it's -1.0 then the function keeps all Disulfides.
+
+    :param verbose:        more messages
+    :param quiet:          turns off DisulfideConstruction warnings
+    """
+
+    import os
+    import shutil
+
+    from proteusPy import DisulfideList, load_disulfides_from_id
+
+    def extract_id_from_filename(filename: str) -> str:
+        """
+        Extracts the ID from a filename formatted as 'pdb{id}.ent'.
+
+        Parameters:
+        - filename (str): The filename to extract the ID from.
+
+        Returns:
+        - str: The extracted ID.
+        """
+        # Check if the filename follows the expected format
+        if filename.startswith("pdb") and filename.endswith(".ent"):
+            # Extract the ID part of the filename
+            return filename[3:-4]
+        else:
+            raise ValueError(
+                "Filename does not follow the expected format 'pdb{id}.ent'"
+            )
+
+    bad_dir = pdbdir + "/bad"
+    cwd = os.getcwd()
+    bad = 0
+
+    # Build a list of PDB files in PDB_DIR that are readable. These files were downloaded
+    # via the RCSB web query interface for structures containing >= 1 SS Bond.
+
+    os.chdir(pdbdir)
+    id = extract_id_from_filename(pdbid)
+
+    # returns an empty list if none are found.
+    _sslist = DisulfideList([], id)
+    _sslist = load_disulfides_from_id(
+        id, model_numb=0, verbose=verbose, quiet=quiet, pdb_dir=pdbdir
+    )
+    sslist, xchain = prune_extra_ss(_sslist)
+
+    if len(sslist) == 0:
+        print(f"--> Can't parse: {pdbid}")
+        bad += 1
+        # shutil.move(f"pdb{pdbid}.ent", bad_dir)
+
+    # return to original directory
+    os.chdir(cwd)
+    return sslist
 
 
 def check_header_from_file(

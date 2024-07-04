@@ -36,6 +36,7 @@ from .Disulfide import (
     Disulfide,
     Disulfide_Energy_Function,
     Download_Disulfides,
+    Extract_Disulfide,
     Extract_Disulfides,
     check_header_from_file,
     check_header_from_id,

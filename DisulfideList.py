@@ -1103,20 +1103,25 @@ def load_disulfides_from_id(
     _chainb = None
 
     parser = PDBParser(PERMISSIVE=True)
+    SSList = DisulfideList([], struct_name, resolution)
 
     # Biopython uses the Structure -> Model -> Chain hierarchy to organize
     # structures. All are iterable.
+    fname = f"{pdb_dir}pdb{struct_name}.ent"
 
-    structure = parser.get_structure(struct_name, file=f"{pdb_dir}pdb{struct_name}.ent")
+    if not os.path.exists(fname):
+        print(f" -> load_disulfides_from_id(): File not found: {fname}")
+        # return empty list
+        return DisulfideList([], struct_name, resolution)
+
+    structure = parser.get_structure(struct_name, file=fname)
     model = structure[model_numb]
-
-    if verbose:
-        print(f"-> load_disulfide_from_id() - Parsing structure: {struct_name}:")
 
     ssbond_dict = structure.header["ssbond"]  # NB: this requires the modified code
     resolution = structure.header["resolution"]
 
-    SSList = DisulfideList([], struct_name, resolution)
+    if verbose:
+        print(f"-> load_disulfide_from_id() - Parsing structure: {struct_name}:")
 
     # list of tuples with (proximal distal chaina chainb)
     ssbonds = parse_ssbond_header_rec(ssbond_dict)

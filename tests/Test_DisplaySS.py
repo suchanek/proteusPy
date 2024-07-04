@@ -8,13 +8,13 @@ Author: Eric G. Suchanek, PhD
 Last revision: 2/24/2024
 """
 
-from proteusPy.Disulfide import Disulfide
-from proteusPy.DisulfideLoader import Load_PDB_SS
-from proteusPy.DisulfideList import DisulfideList
-
-import tempfile
-import shutil
 import os
+import shutil
+import tempfile
+
+from proteusPy.Disulfide import Disulfide
+from proteusPy.DisulfideList import DisulfideList
+from proteusPy.DisulfideLoader import Load_PDB_SS
 
 TMP = tempfile.mkdtemp()
 
@@ -60,7 +60,8 @@ def main():
     """
 
     PDB_SS = None
-    PDB_SS = Load_PDB_SS(verbose=True, subset=False)
+    PDB_SS = Load_PDB_SS(verbose=True, subset=True)
+    PDB_SS.describe()
 
     # one disulfide from the database
     ss = Disulfide()

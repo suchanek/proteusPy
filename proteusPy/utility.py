@@ -1,8 +1,8 @@
 """
 Utility functions for the proteusPy package \n
 Author: Eric G. Suchanek, PhD. \n
-License: MIT\n
-Copyright (c)2023 Eric G. Suchanek, PhD, all rights reserved
+License: BSD\n
+Copyright (c)2024 Eric G. Suchanek, PhD, all rights reserved
 """
 
 # Last modification 3/5/24 -egs-
@@ -11,15 +11,20 @@ import copy
 import math
 import os
 import subprocess
+import warnings
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from Bio.PDB import PDBParser
+from Bio.PDB.PDBExceptions import PDBConstructionWarning
 from Bio.PDB.vectors import Vector
 from matplotlib import cm
 
 from proteusPy import DATA_DIR, DisulfideList, ProteusPyWarning
+
+# Ignore PDBConstructionWarning
+warnings.simplefilter("ignore", PDBConstructionWarning)
 
 
 def distance_squared(p1: np.array, p2: np.array) -> np.array:
@@ -171,7 +176,9 @@ def extract_firstchain_ss(sslist, verbose=False):
     :param sslist: Starting SS list
     :return: (Pruned SS list, xchain)
     """
+    from proteusPy import DisulfideList
 
+    chain = ""
     chainlist = []
     pc = dc = ""
     res = DisulfideList([], sslist.id)
@@ -186,7 +193,11 @@ def extract_firstchain_ss(sslist, verbose=False):
             if verbose:
                 print(f"--> extract_firstchain_ss(): Cross chain ss: {ss}")
         chainlist.append(pc)
-    chain = chainlist[0]
+    try:
+        chain = chainlist[0]
+    except IndexError:
+        print(f"--> extract_firstchain_ss(): No chains found in SS list: {chain}")
+        return res, xchain
 
     for ss in sslist:
         if ss.proximal_chain == chain:
@@ -203,6 +214,7 @@ def prune_extra_ss(sslist):
     :param ssdict: input dictionary with disulfides
     """
     xchain = 0
+    from proteusPy import DisulfideList
 
     # print(f'Processing: {ss} with: {sslist}')
     id = sslist.pdb_id
