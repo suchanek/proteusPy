@@ -50,7 +50,7 @@ REPO_DATA = os.path.join(HOME_DIR, "repos/proteusPy/data/")
 DATA_DIR = os.path.join(PDB_BASE, "data/")
 
 
-def do_extract(verbose, full, subset, cutoff):
+def do_extract(verbose, full, subset, cutoff, homedir):
     if subset:
         if verbose:
             print("--> Extracting the SS subset...")
@@ -120,8 +120,8 @@ def do_build(verbose, full, subset, cutoff):
 
 ###
 def do_stuff(
-    all=False,
-    extract=False,
+    all=True,
+    extract=True,
     build=True,
     full=True,
     update=True,
@@ -153,7 +153,7 @@ def do_stuff(
 
     if _extract == True:
         print(f"Extracting with cutoff: {cutoff}")
-        do_extract(_verbose, _full, _subset, cutoff)
+        do_extract(_verbose, _full, _subset, cutoff, PDB_DIR)
 
     if _build == True:
         print(f"Building:")
@@ -167,8 +167,6 @@ def do_stuff(
         copy(f"{DATA_DIR}{LOADER_SUBSET_FNAME}", f"{REPO_DATA}")
     return
 
-
-start = time.time()
 
 parser = argparse.ArgumentParser()
 
@@ -225,10 +223,10 @@ parser.add_argument(
 parser.set_defaults(all=False)
 parser.set_defaults(update=True)
 parser.set_defaults(verbose=True)
-parser.set_defaults(extract=False)
-parser.set_defaults(subset=True)
+parser.set_defaults(extract=True)
+parser.set_defaults(subset=False)
 parser.set_defaults(build=True)
-parser.set_defaults(full=False)
+parser.set_defaults(full=True)
 parser.set_defaults(cutoff=8.0)
 
 args = parser.parse_args()
@@ -241,6 +239,9 @@ full = args.full
 subset = args.subset
 verbose = args.verbose
 cutoff = args.cutoff
+
+print(f"DisulfideExtractor parsing {PDB_DIR}: {datetime.datetime.now()}")
+start = time.time()
 
 do_stuff(
     all=all,
