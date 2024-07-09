@@ -90,6 +90,7 @@ from .Residue import (
 from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN, Turtle3D
 from .utility import (
     Check_chains,
+    display_ss_pymol,
     distance3d,
     distance_squared,
     generate_vector_dataframe,

@@ -2355,10 +2355,12 @@ class Disulfide:
 
         >>> tot = low_energy_neighbors.length
         >>> print(f'Neighbors: {tot}')
-        Neighbors: 2
+        Neighbors: 4
         >>> low_energy_neighbors.display_overlay()
 
         """
+        from proteusPy import DisulfideList
+
         res = [ss for ss in others if self.Torsion_Distance(ss) <= cutoff]
         return DisulfideList(res, "neighbors")
 
