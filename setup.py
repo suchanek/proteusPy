@@ -102,6 +102,7 @@ setup(
         "grpcio",
         "pip",
         "wget",
+        "wheel",
         "vtk==9.2.6",
         "kaleido",
         "plotly_express",
