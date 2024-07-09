@@ -20,20 +20,41 @@ PDB_DIR = "/Users/egs/PDB"
 GOOD_DIR = PDB_DIR + "/good"
 BAD_DIR = PDB_DIR + "/bad"
 
+
+def extract_pdb_id(filename: str) -> str:
+    """
+    Extracts the PDB ID from a filename formatted as 'pdb{id}.ent'.
+
+    Parameters:
+    - filename (str): The filename to extract the ID from.
+
+    Returns:
+    - str: The extracted PDB ID.
+    """
+    if filename.startswith("pdb") and filename.endswith(".ent"):
+        return filename[3:-4]
+    else:
+        raise ValueError(
+            "Filename {filename} does not follow the expected format 'pdb{id}.ent'"
+        )
+
+
 pdblist = PDBList(pdb=GOOD_DIR, verbose=False)
 parser = PDBParser(PERMISSIVE=True)
 
-os.chdir(GOOD_DIR)
+os.chdir(PDB_DIR)
 all_pdb_files = glob("*.ent")
 
 print(f"Found: {len(all_pdb_files)} PDB files")
-
 badcount = 0
 count = 0
 
 # Loop over all entries,
 pbar = tqdm(all_pdb_files, ncols=100)
 for entry in pbar:
+    # Assuming entry is a filename or a relative path
+    entry_path = os.path.abspath(entry)  # Ensure entry_path is an absolute path
+
     pbar.set_postfix({"Entry": entry, "Bad": badcount})
     if not check_header_from_file(entry):
         badcount += 1
@@ -44,12 +65,15 @@ for entry in pbar:
         sslist = Extract_Disulfide(entry)
         if sslist is None:
             badcount += 1
-            shutil.copy2(entry, BAD_DIR)
-            os.remove(entry)
-        else:
-            destination_path = os.path.join(GOOD_DIR, entry)
+            destination_path = os.path.join(BAD_DIR, os.path.basename(entry))
+
             if not os.path.exists(destination_path):
-                shutil.move(entry, GOOD_DIR)
+                shutil.move(entry_path, destination_path)
+        else:
+            destination_path = os.path.join(GOOD_DIR, os.path.basename(entry))
+
+            if not os.path.exists(destination_path):
+                shutil.move(entry_path, destination_path)
 
     count += 1
 
