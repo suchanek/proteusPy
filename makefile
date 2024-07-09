@@ -68,10 +68,10 @@ install:
 
 	@pip install .
 	@echo "Installing Biopython..."
-	#@pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
+	@pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	@echo "Installing jupyter..."
-	@jupyter contrib nbextension install --sys-prefix
-	@jupyter nbextension enable --py --sys-prefix widgetsnbextension
+	#@jupyter contrib nbextension install --sys-prefix
+	#@jupyter nbextension enable --py --sys-prefix widgetsnbextension
 	@python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Installation finished!"
 
@@ -126,7 +126,9 @@ commit:
 	git push --all origin
 
 # run the tests
-tests: .
+
+.PHONY: tests
+tests: 
 	pytest .
 	python proteusPy/Disulfide.py
 	python proteusPy/DisulfideLoader.py

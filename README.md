@@ -105,7 +105,7 @@ The first time one loads the database via [Load_PDB_SS()](https://suchanek.githu
 
 ## Quickstart
 
-After installation is complete launch jupyter lab:
+After installation is complete launch jupyter:
 
 ```console
 $ jupyter notebook 
@@ -136,7 +136,7 @@ The proteusPy package was developed by Eric G. Suchanek, PhD. If you find it use
   title = {proteusPy: A Package for Modeling and Analyzing Proteins of Known Structure},
   year = {2024},
   publisher = {GitHub},
-  version = {0.92},
+  version = {0.95},
   journal = {GitHub repository},
   url = {https://github.com/suchanek/proteusPy}
 }
