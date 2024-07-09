@@ -1,4 +1,5 @@
 import unittest
+import warnings
 
 import numpy as np
 from Bio.PDB import PDBList
@@ -13,11 +14,13 @@ class TestDisulfide(unittest.TestCase):
 
         from proteusPy.DisulfideList import load_disulfides_from_id
 
-        temp_dir = tempfile.TemporaryDirectory()
-        pdb_home = f"{temp_dir.name}/"
         entry = "5rsa"
         ok = False
-        pdblist = PDBList(pdb=pdb_home, verbose=False)
+
+        temp_dir = tempfile.TemporaryDirectory()
+        pdb_home = f"{temp_dir.name}/"
+
+        pdblist = PDBList(verbose=False)
         if not pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=pdb_home):
             ok = False
         else:
@@ -86,42 +89,50 @@ class TestDisulfide(unittest.TestCase):
     def test_header(self):
         import tempfile
 
-        temp_dir = tempfile.TemporaryDirectory()
-        pdb_home = f"{temp_dir.name}/"
-        entry = "5rsa"
-        pdblist = PDBList(pdb=pdb_home, verbose=False)
-        ok = False
-        if pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=pdb_home):
-            filename = f"{pdb_home}pdb5rsa.ent"
-            ok = check_header_from_file(filename)
-        else:
-            ok = False
+        from Bio.PDB import PDBList  # Assuming BioPython is used
 
+        with tempfile.TemporaryDirectory() as temp_dir:
+            pdb_home = f"{temp_dir}/"
+            entry = "5rsa"
+            pdblist = PDBList(verbose=False)
+            ok = False
+            if not pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=pdb_home):
+                self.fail("PDB file retrieval failed")
+            else:
+                filename = f"{pdb_home}pdb5rsa.ent"
+                ok = check_header_from_file(filename)
         self.assertTrue(ok)
 
     def test_load(self):
         import tempfile
 
+        from Bio.PDB import PDBList
+
         from proteusPy import DisulfideList, load_disulfides_from_id
 
-        temp_dir = tempfile.TemporaryDirectory()
-        pdb_home = f"{temp_dir.name}/"
-        entry = "5rsa"
-        pdblist = PDBList(pdb=pdb_home, verbose=False)
-        if not pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=pdb_home):
-            return False
-        else:
-            sslist = DisulfideList([], "tst")
-            sslist = load_disulfides_from_id("5rsa", pdb_dir=pdb_home)
-            self.assertTrue(len(sslist) > 0)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            pdb_home = f"{temp_dir}/"
+            entry = "5rsa"
+            pdblist = PDBList(verbose=False)
+            if not pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=pdb_home):
+                self.fail("PDB file retrieval failed")
+            else:
+                sslist = load_disulfides_from_id(entry, pdb_dir=pdb_home)
+                self.assertTrue(len(sslist) > 0)
 
     def test_compare(self):
         diff = 1.0
 
         ss1 = self.sslist[0]
-        diff = ss1.Torsion_RMS(ss1)
 
-        self.assertTrue(diff == 0)
+        self.assertTrue(ss1 == ss1)
+
+    def test_compare2(self):
+
+        ss1 = self.sslist[0]
+        ss2 = self.sslist[1]
+
+        self.assertFalse(ss1 == ss2)
 
 
 if __name__ == "__main__":

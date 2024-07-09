@@ -83,8 +83,8 @@ install_dev:
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	pip install pdoc twine black pytest build
 
-	jupyter contrib nbextension install --sys-prefix
-	jupyter nbextension enable --py --sys-prefix widgetsnbextension
+	#jupyter contrib nbextension install --sys-prefix
+	#jupyter nbextension enable --py --sys-prefix widgetsnbextension
 	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
 	@echo "Installation finished!"
 

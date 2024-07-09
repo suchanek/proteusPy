@@ -1091,9 +1091,10 @@ def load_disulfides_from_id(
     [<Disulfide 5rsa_26A_84A, Source: 5rsa, Resolution: 2.0 Å>, <Disulfide 5rsa_40A_95A, Source: 5rsa, Resolution: 2.0 Å>, <Disulfide 5rsa_58A_110A, Source: 5rsa, Resolution: 2.0 Å>, <Disulfide 5rsa_65A_72A, Source: 5rsa, Resolution: 2.0 Å>]
     """
     import copy
+    import os
     import warnings
 
-    from proteusPy.Disulfide import Disulfide, parse_ssbond_header_rec
+    from proteusPy import Disulfide, parse_ssbond_header_rec
 
     i = 1
     proximal = distal = -1
@@ -1106,8 +1107,8 @@ def load_disulfides_from_id(
 
     # Biopython uses the Structure -> Model -> Chain hierarchy to organize
     # structures. All are iterable.
-
-    structure = parser.get_structure(struct_name, file=f"{pdb_dir}pdb{struct_name}.ent")
+    structure_fname = os.path.join(pdb_dir, f"pdb{struct_name}.ent")
+    structure = parser.get_structure(struct_name, file=structure_fname)
     model = structure[model_numb]
 
     if verbose:
