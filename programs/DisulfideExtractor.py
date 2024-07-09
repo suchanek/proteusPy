@@ -118,7 +118,6 @@ def do_build(verbose, full, subset, cutoff):
     return
 
 
-###
 def do_stuff(
     all=True,
     extract=True,

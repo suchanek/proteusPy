@@ -39,7 +39,7 @@ def extract_pdb_id(filename: str) -> str:
         )
 
 
-pdblist = PDBList(pdb=GOOD_DIR, verbose=False)
+pdblist = PDBList(verbose=False)
 parser = PDBParser(PERMISSIVE=True)
 
 os.chdir(PDB_DIR)

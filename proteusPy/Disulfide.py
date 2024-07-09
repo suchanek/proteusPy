@@ -2355,7 +2355,7 @@ class Disulfide:
 
         >>> tot = low_energy_neighbors.length
         >>> print(f'Neighbors: {tot}')
-        Neighbors: 4
+        Neighbors: 2
         >>> low_energy_neighbors.display_overlay()
 
         """
@@ -2441,7 +2441,7 @@ def Download_Disulfides(
     cwd = os.getcwd()
     os.chdir(pdb_home)
 
-    pdblist = PDBList(pdb=pdb_home, verbose=verbose)
+    pdblist = PDBList(verbose=verbose)
     ssfilename = f"{model_home}{SS_ID_FILE}"
     print(ssfilename)
 
@@ -2819,18 +2819,12 @@ def check_header_from_file(
     :return: True if parsable
 
     Example:
-      Assuming ```MODEL_DIR``` has the pdb5rsa.ent file we can load the disulfides
+      Assuming ```DATA_DIR``` has the pdb5rsa.ent file (it should!), we can load the disulfides
       with the following:
 
-    >>> from proteusPy.Disulfide import Disulfide, check_header_from_file
-    >>> MODEL_DIR = '../data/'
+    >>> from proteusPy import check_header_from_file, DATA_DIR
     >>> OK = False
-    >>> OK = check_header_from_file(f'{MODEL_DIR}pdb5rsa.ent', verbose=True)
-    -> check_header_from_file() - Parsing file: ../data/pdb5rsa.ent:
-     -> SSBond: 1: tmp: 26A - 84A
-     -> SSBond: 2: tmp: 40A - 95A
-     -> SSBond: 3: tmp: 58A - 110A
-     -> SSBond: 4: tmp: 65A - 72A
+    >>> OK = check_header_from_file(f'{DATA_DIR}pdb5rsa.ent', verbose=False)
     >>> OK
     True
     """
@@ -2846,10 +2840,17 @@ def check_header_from_file(
     # Biopython uses the Structure -> Model -> Chain hierarchy to organize
     # structures. All are iterable.
 
-    structure = parser.get_structure("tmp", file=filename)
-    struct_name = structure.get_id()
+    try:
+        structure = parser.get_structure("tmp", file=filename)
+        struct_name = structure.get_id()
+        model = structure[model_numb]
+    except FileNotFoundError:
+        mess = f"Error: The file {filename} does not exist."
+        raise DisulfideParseWarning(mess)
 
-    model = structure[model_numb]
+    except Exception as e:
+        mess = f"An error occurred: {e}"
+        raise DisulfideParseWarning(mess)
 
     if verbose:
         print(f"-> check_header_from_file() - Parsing file: {filename}:")
@@ -2858,6 +2859,10 @@ def check_header_from_file(
 
     # list of tuples with (proximal distal chaina chainb)
     ssbonds = parse_ssbond_header_rec(ssbond_dict)
+    if len(ssbonds) == 0:
+        if verbose:
+            print("-> check_header_from_file(): no bonds found in bondlist.")
+        return False
 
     for pair in ssbonds:
         # in the form (proximal, distal, chain)

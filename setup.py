@@ -126,13 +126,11 @@ setup(
         "Topic :: Scientific/Engineering",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "Topic :: Scientific/Engineering :: Chemistry",
-        "Programming Language :: Python :: 3.11",
     ],
-    include_package_data=True,
     package_data={
         "proteusPy": [
+            "data/pdb5rsa.ent",
             "data/*.txt",
-            "data/*.py",
             "data/*.json",
             "data/*.csv",
             "data/SS_consensus_class_sext.pkl",

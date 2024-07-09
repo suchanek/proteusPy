@@ -1,6 +1,4 @@
-# This script assumes you have PyMOL installed and are using its API directly.
-# PyMOL's API is compatible with Python 3.
-
+import os
 import sys
 
 from pymol import cmd, finish_launching
@@ -9,21 +7,24 @@ from pymol import cmd, finish_launching
 finish_launching(["pymol", "-cq"])  # '-cq' for command line quiet mode
 
 
-def fetch_and_save_pdb(pdbid, save_path):
+def fetch_and_save_pdb(pdbid, save_path=".", verbose=True):
     """
     Fetches a PDB file using its ID and saves it to the specified path using PyMOL.
 
     Parameters:
     pdbid (str): The PDB ID to fetch.
-    save_path (str): The full path (including filename) where the PDB file will be saved.
+    save_path (str): The full path where the PDB file will be saved.
     """
+    # Ensure the save_path ends with '.pdb'
+    save_filename = os.path.join(save_path, pdbid) + ".pdb"
+
     # Fetch the PDB file
     cmd.fetch(pdbid, name=pdbid, type="pdb")
 
     # Save the PDB file
-    cmd.save(save_path, pdbid)
-
-    print(f"File saved as {save_path}")
+    cmd.save(save_filename, pdbid)
+    if verbose:
+        print(f"File saved as {save_filename}")
 
 
 if __name__ == "__main__":

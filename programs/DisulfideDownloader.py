@@ -10,11 +10,44 @@
 #
 #
 
+import logging
 import os
 
 import numpy
 from Bio.PDB import PDBList
+from pymol import cmd, finish_launching
 from tqdm import tqdm
+
+# Initialize PyMOL in command-line mode (no GUI)
+finish_launching(["pymol", "-cq"])  # '-cq' for command line quiet mode
+
+
+def fetch_and_save_pdb(pdbid, save_path=".", verbose=True):
+    """
+    Fetches a PDB file using its ID and saves it to the specified path using PyMOL.
+
+    Parameters:
+    pdbid (str): The PDB ID to fetch.
+    save_path (str): The full path where the PDB file will be saved.
+    """
+    # Ensure the save_path ends with '.pdb'
+    filename = f"pdb{pdbid}.ent"
+    save_filename = os.path.join(save_path, filename)
+
+    # Fetch the PDB file
+    fetched = cmd.fetch(pdbid, name=pdbid, type="pdb")
+    if not fetched:
+        if verbose:
+            print(f"Failed to fetch {pdbid}")
+        return False
+
+    # Save the PDB file
+    cmd.save(save_filename, pdbid)
+    os.remove(f"{pdbid}.pdb")
+
+    if verbose:
+        print(f"File saved as {save_filename}")
+    return True
 
 
 def read_ids_from_file(file_path):
@@ -61,7 +94,7 @@ input_directory_path = PDB_DIR + "/good/"
 
 
 def DisulfideLoader(idfilename="./ss_ids.txt"):
-    pdblist = PDBList(pdb=PDB_DIR, verbose=False)
+    pdblist = PDBList(verbose=False)
     count = 0
     bad = set()
     entries = set()
@@ -79,15 +112,21 @@ def DisulfideLoader(idfilename="./ss_ids.txt"):
     for entry in pbar:
         pbar.set_postfix({"Ent": entry, "Bad": bad_cnt})
         if entry not in completed:
-            if pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=PDB_DIR):
-                completed.add(entry)
-                count += 1
-            else:
+            try:
+                if fetch_and_save_pdb(entry, save_path=PDB_DIR):
+                    # if pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=PDB_DIR):
+                    completed.add(entry)
+                    count += 1
+                else:
+                    bad.add(entry)
+                    bad_cnt += 1
+            except Exception as e:
+                logging.error(f"Failed to download {entry}: {e}")
                 bad.add(entry)
                 bad_cnt += 1
 
     print(f"Overall count processed: {count}")
-    print(f"Bad entries: {bad}")
+    print(f"Bad entries: {bad_cnt}")
 
     # Write the completed and bad sets to files
     with open(PDB_DIR + "/completed_entries.txt", "w") as comp_file:
@@ -100,11 +139,4 @@ def DisulfideLoader(idfilename="./ss_ids.txt"):
 
 
 os.chdir(PDB_DIR)
-DisulfideLoader(idfilename="data/pdb_ids_24_07_03.txt")
-
-"""
-ent = set()
-entl = []
-ent, entl = read_ids_from_file(ids_file_path)
-print(len(entl))
-"""
+DisulfideLoader(idfilename="data/pdb_ids_240709.txt")
