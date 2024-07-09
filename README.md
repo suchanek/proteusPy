@@ -3,6 +3,7 @@
 ![Testing](https://github.com/suchanek/proteusPy/actions/workflows/pytest.yml/badge.svg)
 [![status](https://joss.theoj.org/papers/45de839b48a550d6ab955c5fbbc508f2/status.svg)](https://joss.theoj.org/papers/45de839b48a550d6ab955c5fbbc508f2)
 [![DOI](https://zenodo.org/badge/575657091.svg)](https://zenodo.org/doi/10.5281/zenodo.11148440)
+[![API Docs](https://img.shields.io/badge/API%20Documentation-8A2BE2)](https://suchanek.github.io/proteusPy/proteusPy.html)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
 # Summary

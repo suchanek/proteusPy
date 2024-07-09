@@ -14,7 +14,7 @@ authors:
 affiliations:
  - name: Flux-Frontiers
    index: 1
-date: 16 February, 2024
+date: 8 July, 2024
 header-includes:
   - \let\oldAA\AA
   - \renewcommand{\AA}{\text{\normalfont\oldAA}}
@@ -26,7 +26,7 @@ bibliography: joss.bib
 <!-- markdownlint-disable MD037 -->
 # Summary
 
-**proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an initial focus on Disulfide bonds. This package significantly extends the capabilities of the molecular modeling program **proteus**, [@Pabo_1986], and utilizes a new implementation of the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class for disulfide and protein modeling.  This initial implementation focuses on the [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class, which implements methods to analyze the protein structure stabilizing element known as a **Disulfide Bond**. 
+**proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an initial focus on Disulfide bonds. This package significantly extends the capabilities of the molecular modeling program **proteus**, [@Pabo_1986], and utilizes a new implementation of the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class for disulfide and protein modeling.  This initial implementation focuses on the [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class, which implements methods to analyze the protein structure stabilizing element known as a **Disulfide Bond**, [DOI](https://zenodo.org/doi/10.5281/zenodo.11148440). 
 
 The work has resulted in a freely-accessible database of over 120,494 disulfide bonds contained within 35,818 proteins in the [RCSB Protein Databank.](https:/www.rcsb.org) The routines within the library are capable of extracting, comparing, and visualizing the disulfides contained within the database, facilitating analysis and understanding. In addition, the package can readily model disulfide bonds of arbitrary conformation, facilitating predictive analysis.
 
@@ -44,7 +44,7 @@ The work has resulted in a freely-accessible database of over 120,494 disulfide 
 
 # Statement of Need
 
-Disulfide bonds represent the sole naturally occurring covalent bond in proteins, playing a pivotal role in structural stabilization within and between protein subunits. Moreover, they participate in enzymatic catalysis, regulate protein activities, and offer protection against oxidative stress. Establishing an accessible structural database of these disulfides would serve as an invaluable resource for exploring these critical structural elements. While the capability to visualize protein structures is well established with excellent protein visualization tools like Pymol, Chimera and the RCSB itself, the tools for disulfide bond analysis are more limited. [@Wong_2010] describe a web-based disulfide visualization tool; this is currently unavailable.
+Disulfide bonds, formed when two Cysteine residues are oxidized resulting in a sulfur-sulfur covalent bond, play pivotal roles in structural stabilization within and between protein subunits. Moreover, they participate in enzymatic catalysis, regulate protein activities, and offer protection against oxidative stress. Establishing an accessible structural database of these disulfides would serve as an invaluable resource for exploring these critical structural elements. While the capability to visualize protein structures is well established with excellent protein visualization tools like Pymol, Chimera and the RCSB itself, the tools for disulfide bond analysis are more limited. [@Wong_2010] describe a web-based disulfide visualization tool; this is currently unavailable.
 
 Accordingly, I have developed the **proteusPy** package to delve into the RCSB Protein Data Bank, furnishing tools for visualizing and analyzing the disulfide bonds contained therein. This endeavor necessitated the creation of a python-based package containing data structures and algorithms capable loading, manipulating and analyzing these entities. Consequently, an object-oriented database has been crafted, facilitating introspection, analysis, and display. The package's API is accessible online at: [proteusPy API](https://suchanek.github.io/proteusPy/proteusPy.html), offering comprehensive details and numerous illustrative examples.
 

@@ -210,7 +210,7 @@ class DisulfideLoader:
             sslist = self.SSList
             for ind in indices:
                 res.append(sslist[ind])
-            res.resolution = res[0].resolution
+            # res.resolution = res[0].resolution
 
         except KeyError:
             try:

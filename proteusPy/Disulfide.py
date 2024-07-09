@@ -260,11 +260,16 @@ class Disulfide:
 
     def __eq__(self, other):
         if isinstance(other, Disulfide):
-            return self.energy == other.energy
+            return (
+                math.isclose(self.torsion_length, other.torsion_length, rel_tol=1e-1)
+                and self.proximal == other.proximal
+                and self.distal == other.distal
+            )
+        return False
 
     def __ne__(self, other):
         if isinstance(other, Disulfide):
-            return self.energy != other.energy
+            return self.proximal != other.proximal or self.distal != other.distal
 
     def __repr__(self):
         """
@@ -2489,6 +2494,14 @@ def Download_Disulfides(
     return
 
 
+def remove_duplicate_ss(sslist: DisulfideList) -> DisulfideList:
+    pruned = []
+    for ss in sslist:
+        if ss not in pruned:
+            pruned.append(ss)
+    return pruned
+
+
 # Function extracts the disulfide bonds from the PDB files and creates the .pkl files
 # needed for the proteusPy.DisulfideLoader.DisulfideLoader class.
 
@@ -2498,6 +2511,7 @@ def Extract_Disulfides(
     verbose=False,
     quiet=True,
     pdbdir=PDB_DIR,
+    baddir=PDB_DIR + "/bad/",
     datadir=MODEL_DIR,
     picklefile=SS_PICKLE_FILE,
     torsionfile=SS_TORSIONS_FILE,
@@ -2541,7 +2555,7 @@ def Extract_Disulfides(
 
     from proteusPy import DisulfideList, load_disulfides_from_id
 
-    bad_dir = pdbdir + "/bad"
+    bad_dir = baddir
 
     entrylist = []
     problem_ids = []
@@ -2600,8 +2614,13 @@ def Extract_Disulfides(
         _sslist = load_disulfides_from_id(
             entry, model_numb=0, verbose=verbose, quiet=quiet, pdb_dir=pdbdir
         )
-        sslist, xchain = prune_extra_ss(_sslist)
 
+        if entry == "4wym":
+            print(f"Entry: {entry}. SSList: {_sslist}")
+
+        # !!! sslist, xchain = prune_extra_ss(_sslist)
+        # sslist = _sslist
+        sslist = remove_duplicate_ss(_sslist)
         if len(sslist) > 0:
             sslist2 = []  # list to hold indices for ss_dict2
             for ss in sslist:
@@ -2648,7 +2667,10 @@ def Extract_Disulfides(
             # at this point I really shouldn't have any bad non-parsible file
             bad += 1
             problem_ids.append(entry)
-            shutil.move(f"pdb{entry}.ent", bad_dir)
+            shutil.copy(f"pdb{entry}.ent", bad_dir)
+
+            # Delete the original file
+            os.remove(f"pdb{entry}.ent")
 
     if bad > 0:
         prob_cols = ["id"]
@@ -2757,9 +2779,7 @@ def Extract_Disulfide(
                 "Filename does not follow the expected format 'pdb{id}.ent'"
             )
 
-    bad_dir = pdbdir + "/bad"
     cwd = os.getcwd()
-    bad = 0
 
     # Build a list of PDB files in PDB_DIR that are readable. These files were downloaded
     # via the RCSB web query interface for structures containing >= 1 SS Bond.
@@ -2772,12 +2792,11 @@ def Extract_Disulfide(
     _sslist = load_disulfides_from_id(
         id, model_numb=0, verbose=verbose, quiet=quiet, pdb_dir=pdbdir
     )
-    sslist, xchain = prune_extra_ss(_sslist)
+    # sslist, xchain = prune_extra_ss(_sslist)
+    sslist = _sslist
 
     if len(sslist) == 0:
         print(f"--> Can't parse: {pdbid}")
-        bad += 1
-        # shutil.move(f"pdb{pdbid}.ent", bad_dir)
 
     # return to original directory
     os.chdir(cwd)

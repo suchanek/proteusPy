@@ -10,16 +10,20 @@ Last Modification: 2/9/23
 
 # Cα Cβ Sγ
 
+import datetime
+import pickle
+import time
+
 import pandas as pd
 import pyvista as pv
 from Bio.PDB import *
 from pyvista import set_plot_theme
 
 # for using from the repo we
-import proteusPy
-from proteusPy import *
-from proteusPy.data import *
-from proteusPy.Disulfide import *
+from tqdm import tqdm
+
+from proteusPy import DisulfideList, Load_PDB_SS
+from proteusPy.Disulfide import Torsion_DF_Cols
 from proteusPy.utility import extract_firstchain_ss, prune_extra_ss
 
 # override the default location for the stored disulfides, which defaults to DATA_DIR
@@ -37,12 +41,20 @@ removed_tot = 0
 
 start = time.time()
 
-PDB_SS = DisulfideLoader(verbose=True, subset=False, datadir=datadir)
+PDB_SS = Load_PDB_SS(verbose=True, subset=True)
 
 ssdict = PDB_SS.SSDict
 tot = len(ssdict)
 
 # make a dict with an initial bogus value, but properly initialized with an SS list
+
+
+def remove_duplicate_ss(sslist: DisulfideList) -> DisulfideList:
+    pruned = []
+    for ss in sslist:
+        if ss not in pruned:
+            pruned.append(ss)
+    return pruned
 
 
 # walk the dict, prune the SS list. This takes > 8 minutes on my Macbook Pro
@@ -60,10 +72,9 @@ for _, pdbid_tuple in zip(pbar, enumerate(ssdict)):
         {"ID": pdbid, "Rem": removed_tot, "XC": xchain_tot}
     )  # update the progress bar
     sslist = PDB_SS[pdbid]
-    pruned, xchain = prune_extra_ss(sslist)
+    pruned = remove_duplicate_ss(sslist)
     removed = len(sslist) - len(pruned)
     removed_tot += removed
-    xchain_tot += xchain
     pruned_dict[pdbid] = pruned
 
 print(f"Pruned {removed_tot}, Xchain: {xchain_tot}")

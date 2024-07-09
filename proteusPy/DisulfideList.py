@@ -1176,15 +1176,13 @@ def load_disulfides_from_id(
             # initialize SS bond from the proximal, distal coordinates
 
             if _chaina[proximal].is_disordered() or _chainb[distal].is_disordered():
-                mess = f" -> load_disulfides_from_id(): Disordered chain(s): {struct_name}: {proximal} {chain1_id}\
-                - {distal} {chain2_id}, ignoring!"
+                mess = f" -> load_disulfides_from_id(): Disordered chain(s): {struct_name}: {proximal} {chain1_id} - {distal} {chain2_id}, ignoring!"
                 warnings.warn(mess, DisulfideConstructionWarning)
                 continue
             else:
                 if verbose:
                     print(
-                        f" -> load_disulfides_from_id(): SSBond: {i}: {struct_name}: {proximal} {chain1_id}\
-                    - {distal} {chain2_id}"
+                        f" -> load_disulfides_from_id(): SSBond: {i}: {struct_name}: {proximal} |{chain1_id}| - {distal} |{chain2_id}|"
                     )
                 ssbond_name = f"{struct_name}_{proximal}{chain1_id}_{distal}{chain2_id}"
                 new_ss = Disulfide(ssbond_name)
