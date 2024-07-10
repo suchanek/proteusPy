@@ -3,7 +3,7 @@
 # Based on the original work in the program Proteus.
 # This implementation utilises the Vector class from the Biopython module: BIO.PDB
 # Author: Eric G. Suchanek PhD
-# Last Modification: 11/22/2022
+# Last Modification: 07/10/2024
 #
 
 import numpy  # type: ignore
@@ -67,7 +67,7 @@ def get_backbone_from_chain(chain, resnumb):
 
 def to_alpha(turtle: Turtle3D, phi):
     """
-    Moves the Turtle3D from backbone nitrogen to alpha carbon.  Turtle
+    Move the Turtle3D from backbone nitrogen to alpha carbon.  Turtle
     begins at nitrogen, headed towards alpha carbon,
     with carbonyl carbon of previous residue on left side and ends in
         orientation #2 (at alpha carbon, headed towards carbonyl carbon, with
@@ -85,7 +85,7 @@ def to_alpha(turtle: Turtle3D, phi):
 
 def to_carbonyl(turtle: Turtle3D, psi):
     """
-    Moves turtle from alpha carbon to carbonyl carbon. Turtle begins in
+    Move turtle from alpha carbon to carbonyl carbon. Turtle begins in
     orientation #2 (at alpha carbon, headed towards carbonyl carbon, with
     nitrogen on left) and ends at carbonyl carbon, headed towards nitrogen of
     next residue, with alpha carbon of current residue on left side.
@@ -122,7 +122,7 @@ def to_nitrogen(turtle: Turtle3D, omega):
 
 def add_oxygen(turtle: Turtle3D):
     """
-    Returns the position of the carbonyl oxygen assuming the Turtle3D
+    Return the position of the carbonyl oxygen assuming the Turtle3D
     begins at carbonyl carbon, headed towards nitrogen of
     second residue, with alpha carbon of first residue on left side.
 
@@ -137,7 +137,7 @@ def add_oxygen(turtle: Turtle3D):
 
 def to_oxygen(turtle: Turtle3D):
     """
-    Returns the position of the carbonyl oxygen assuming the Turtle3D
+    Return the position of the carbonyl oxygen assuming the Turtle3D
     begins at carbonyl carbon, headed towards nitrogen of
     second residue, with alpha carbon of first residue on left side.
 
