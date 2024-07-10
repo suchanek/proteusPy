@@ -2355,7 +2355,7 @@ class Disulfide:
 
         >>> tot = low_energy_neighbors.length
         >>> print(f'Neighbors: {tot}')
-        Neighbors: 2
+        Neighbors: 4
         >>> low_energy_neighbors.display_overlay()
 
         """
@@ -2520,6 +2520,7 @@ def Extract_Disulfides(
     problemfile=PROBLEM_ID_FILE,
     dictfile=SS_DICT_PICKLE_FILE,
     dist_cutoff=-1.0,
+    prune=True,
 ) -> None:
     """
     Read the PDB files contained in ``pdbdir`` and create the .pkl files needed for the
@@ -2530,16 +2531,17 @@ def Extract_Disulfides(
     ```dist_cutoff``` allows for removal of Disufides whose Cα-Cα distance is >
     than the cutoff value. If it's -1.0 then the function keeps all Disulfides.
 
-    :param numb:           number of entries to process, defaults to all
-    :param verbose:        more messages
-    :param quiet:          turns off DisulfideConstruction warnings
-    :param pdbdir:         path to PDB files
-    :param datadir:        path to resulting .pkl files
-    :param picklefile:     name of the disulfide .pkl file
-    :param torsionfile:    name of the disulfide torsion file .csv created
-    :param problemfile:    name of the .csv file containing problem ids
-    :param dictfile:       name of the .pkl file
+    :param numb:           Number of entries to process, defaults to all
+    :param verbose:        More messages
+    :param quiet:          Turn off DisulfideConstruction warnings
+    :param pdbdir:         Path to PDB files
+    :param datadir:        Path to resulting .pkl files
+    :param picklefile:     Name of the disulfide .pkl file
+    :param torsionfile:    Name of the disulfide torsion file .csv created
+    :param problemfile:    Name of the .csv file containing problem ids
+    :param dictfile:       Name of the .pkl file
     :param dist_cutoff:    Ca distance cutoff to reject a Disulfide.
+    :param prune:          Move bad files to bad directory, defaults to True
     """
 
     def name_to_id(fname: str) -> str:
@@ -2665,10 +2667,10 @@ def Extract_Disulfides(
             # at this point I really shouldn't have any bad non-parsible file
             bad += 1
             problem_ids.append(entry)
-            shutil.copy(f"pdb{entry}.ent", bad_dir)
-
-            # Delete the original file
-            os.remove(f"pdb{entry}.ent")
+            if prune:
+                shutil.copy(f"pdb{entry}.ent", bad_dir)
+                # Delete the original file
+                os.remove(f"pdb{entry}.ent")
 
     if bad > 0:
         prob_cols = ["id"]
@@ -2735,10 +2737,7 @@ from proteusPy import DisulfideList
 
 # !!!
 def Extract_Disulfide(
-    pdbid: str,
-    verbose=False,
-    quiet=True,
-    pdbdir=PDB_DIR,
+    pdbid: str, verbose=False, quiet=True, pdbdir=PDB_DIR, xtra=True
 ) -> DisulfideList:
     """
     Read the PDB files contained in ``pdbdir`` and create the .pkl files needed for the
@@ -2749,8 +2748,10 @@ def Extract_Disulfide(
     ```dist_cutoff``` allows for removal of Disufides whose Cα-Cα distance is >
     than the cutoff value. If it's -1.0 then the function keeps all Disulfides.
 
-    :param verbose:        more messages
-    :param quiet:          turns off DisulfideConstruction warnings
+    :param verbose:        Display more messages
+    :param quiet:          Turn off DisulfideConstruction warnings
+    :param pdbdir:         path to PDB files
+    :param xtra:           Prune duplicate disulfides
     """
 
     import os
