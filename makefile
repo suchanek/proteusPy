@@ -70,8 +70,6 @@ install:
 	@echo "Installing Biopython..."
 	@pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	@echo "Installing jupyter..."
-	#@jupyter contrib nbextension install --sys-prefix
-	#@jupyter nbextension enable --py --sys-prefix widgetsnbextension
 	@python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Installation finished!"
 

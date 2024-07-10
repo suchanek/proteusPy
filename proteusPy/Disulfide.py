@@ -2616,10 +2616,6 @@ def Extract_Disulfides(
         _sslist = load_disulfides_from_id(
             entry, model_numb=0, verbose=verbose, quiet=quiet, pdb_dir=pdbdir
         )
-
-        if entry == "4wym":
-            print(f"Entry: {entry}. SSList: {_sslist}")
-
         # !!! sslist, xchain = prune_extra_ss(_sslist)
         # sslist = _sslist
         sslist = remove_duplicate_ss(_sslist)
@@ -2630,7 +2626,7 @@ def Extract_Disulfides(
                 dist = ss.ca_distance
                 if dist >= dist_cutoff and dist_cutoff != -1.0:
                     bad_dist += 1
-                    break  ## was continue
+                    continue  ## was continue
 
                 All_ss_list.append(ss)
                 new_row = [
