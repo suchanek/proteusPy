@@ -26,22 +26,27 @@ import Bio
 import matplotlib
 import numpy
 import plotly
+
+from Bio.PDB import Vector
+from Bio.PDB.vectors import calc_dihedral
+
+try:
+    # Check if running in Jupyter
+    shell = get_ipython().__class__.__name__
+    if shell == "ZMQInteractiveShell":
+        from tqdm.notebook import tqdm
+    else:
+        from tqdm import tqdm
+except NameError:
+    from tqdm import tqdm
+
 from Bio.PDB import Select, Vector
 from Bio.PDB.vectors import calc_angle, calc_dihedral
 
 from .angle_annotation import *
 from .atoms import *
 from .data import *
-from .Disulfide import (
-    Disulfide,
-    Disulfide_Energy_Function,
-    Download_Disulfides,
-    Extract_Disulfide,
-    Extract_Disulfides,
-    check_header_from_file,
-    check_header_from_id,
-    parse_ssbond_header_rec,
-)
+from .Disulfide import Disulfide, Disulfide_Energy_Function, Minimize
 from .DisulfideClass_Constructor import DisulfideClass_Constructor
 from .DisulfideClasses import (
     create_classes,
@@ -90,14 +95,27 @@ from .Residue import (
 from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN, Turtle3D
 from .utility import (
     Check_chains,
+    Download_Disulfides,
+    Extract_Disulfide,
+    Extract_Disulfides,
+    check_header_from_file,
+    check_header_from_id,
     display_ss_pymol,
     distance3d,
     distance_squared,
+    extract_firstchain_ss,
     generate_vector_dataframe,
     get_jet_colormap,
+    get_memory_usage,
+    grid_dimensions,
     image_to_ascii_art,
+    parse_ssbond_header_rec,
+    plot_class_chart,
     print_memory_used,
+    prune_extra_ss,
+    remove_duplicate_ss,
     retrieve_git_lfs_files,
+    sort_by_column,
 )
 from .version import __version__
 
