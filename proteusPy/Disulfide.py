@@ -28,13 +28,20 @@ pv.global_theme.color = "white"
 from Bio.PDB import Vector, calc_dihedral
 
 import proteusPy
-from proteusPy import ORIENT_SIDECHAIN, Turtle3D, build_residue, distance3d
+
+# tqdm progress bar width
+from proteusPy import (
+    _ANG_INIT,
+    _FLOAT_INIT,
+    ORIENT_SIDECHAIN,
+    WINSIZE,
+    Turtle3D,
+    build_residue,
+    distance3d,
+)
 from proteusPy.atoms import *
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideList import DisulfideList
-
-# tqdm progress bar width
-from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, WINSIZE
 
 # columns for the torsions file dataframe.
 Torsion_DF_Cols = [
