@@ -2732,10 +2732,6 @@ def Extract_Disulfides(
     return
 
 
-from proteusPy import DisulfideList
-
-
-# !!!
 def Extract_Disulfide(
     pdbid: str, verbose=False, quiet=True, pdbdir=PDB_DIR, xtra=True
 ) -> DisulfideList:
