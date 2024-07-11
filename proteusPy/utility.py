@@ -7,10 +7,15 @@ Copyright (c)2024 Eric G. Suchanek, PhD, all rights reserved
 
 # Last modification 3/5/24 -egs-
 
+
 import copy
+import datetime
+import glob
 import math
 import os
+import pickle
 import subprocess
+import time
 import warnings
 
 import matplotlib.pyplot as plt
@@ -22,6 +27,17 @@ from matplotlib import cm
 
 import proteusPy
 from proteusPy import DisulfideList, ProteusPyWarning
+
+try:
+    # Check if running in Jupyter
+    shell = get_ipython().__class__.__name__
+    if shell == "ZMQInteractiveShell":
+        from tqdm.notebook import tqdm
+    else:
+        from tqdm import tqdm
+except NameError:
+    from tqdm import tqdm
+
 
 """
 from proteusPy.data import (
@@ -38,9 +54,11 @@ SS_TORSIONS_FILE = "PDB_all_ss_torsions.csv"
 PROBLEM_ID_FILE = "PDB_all_SS_problems.csv"
 SS_ID_FILE = "ss_ids.txt"
 
+# Ignore PDBConstructionWarning
+import warnings
+
 from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, PDB_DIR
 
-# Ignore PDBConstructionWarning
 warnings.simplefilter("ignore", PDBConstructionWarning)
 
 
@@ -700,10 +718,8 @@ def Extract_Disulfides(
         ent = fname[3:-4]
         return ent
 
-    import os
-    import shutil
-
     from proteusPy import DisulfideList, load_disulfides_from_id
+    from proteusPy.Disulfide import Torsion_DF_Cols
 
     bad_dir = baddir
 
@@ -740,7 +756,7 @@ def Extract_Disulfides(
     # create a dataframe with the following columns for the disulfide conformations
     # extracted from the structure
 
-    SS_df = pandas.DataFrame(columns=Torsion_DF_Cols)
+    SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
 
     # define a tqdm progressbar using the fully loaded entrylist list.
     # If numb is passed then
@@ -891,9 +907,12 @@ def Extract_Disulfide(
     :param xtra:           Prune duplicate disulfides
     """
 
+    import glob
     import os
     import shutil
+    import time
 
+    import proteusPy
     from proteusPy import DisulfideList, load_disulfides_from_id
 
     def extract_id_from_filename(filename: str) -> str:

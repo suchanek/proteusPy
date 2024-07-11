@@ -12,17 +12,14 @@ build the DisulfideLoader object, and save it into the proteusPy module data dir
 * Subset: Only extract and process the first 1000 Disulfides found in the PDB directory.
 
 Author: Eric G. Suchanek, PhD.
-Last revision: 4/24/24 -egs-
+Last revision: 7/10/24 -egs-
 """
 
 import argparse
 import datetime
-
-# the locations below represent the actual location on the dev drive.
-# location for PDB repository
 import os
 import time
-from shutil import copy, copytree, ignore_patterns
+from shutil import copy
 
 from proteusPy import DisulfideLoader, Extract_Disulfides
 from proteusPy.data import (
@@ -222,10 +219,10 @@ parser.add_argument(
 parser.set_defaults(all=False)
 parser.set_defaults(update=False)
 parser.set_defaults(verbose=True)
-parser.set_defaults(extract=False)
+parser.set_defaults(extract=True)
 parser.set_defaults(subset=True)
 parser.set_defaults(build=True)
-parser.set_defaults(full=True)
+parser.set_defaults(full=False)
 parser.set_defaults(cutoff=8.0)
 
 args = parser.parse_args()
