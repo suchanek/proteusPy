@@ -7,6 +7,10 @@ Global declarations for the proteusPy package
 # Subject to the GNU public license.
 
 import os
+_abspath = os.path.dirname(os.path.abspath(__file__))
+
+DATA_DIR = f"{_abspath}/"
+print(f"DATA_DIR: {DATA_DIR}")
 
 HOME_DIR = os.path.expanduser("~")
 PDB_BASE = os.getenv("PDB")
@@ -17,7 +21,7 @@ if PDB_BASE is None:
 
 
 from .data import( 
-    DATA_DIR, SS_CLASS_DEFINITIONS, 
+    SS_CLASS_DEFINITIONS, 
     SS_CLASS_DICT_FILE, SS_CONSENSUS_FILE, SS_DICT_PICKLE_FILE,
     SS_DICT_PICKLE_FILE2, SS_ID_FILE, SS_PICKLE_FILE, SS_PROBLEM_SUBSET_ID_FILE,
     SS_SUBSET_DICT_PICKLE_FILE, SS_SUBSET_DICT_PICKLE_FILE_IND, SS_SUBSET_PICKLE_FILE, SS_SUBSET_TORSIONS_FILE, 
