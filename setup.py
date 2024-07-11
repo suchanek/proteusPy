@@ -129,6 +129,7 @@ setup(
     ],
     package_data={
         "proteusPy": [
+            "data/data.py",
             "data/pdb5rsa.ent",
             "data/*.txt",
             "data/*.json",
