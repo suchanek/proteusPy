@@ -1,11 +1,6 @@
 # absolute location for the disulfide .pkl files
 import os
 
-_abspath = os.path.dirname(os.path.abspath(__file__))
-
-DATA_DIR = f"{_abspath}/"
-print(f"DATA_DIR: {DATA_DIR}")
-
 SS_PICKLE_FILE = "PDB_all_ss.pkl"
 SS_DICT_PICKLE_FILE = "PDB_all_ss_dict.pkl"
 SS_DICT_PICKLE_FILE2 = "PDB_all_ss_dict_ind.pkl"
