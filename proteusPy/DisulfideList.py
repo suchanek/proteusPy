@@ -34,6 +34,7 @@ from plotly.subplots import make_subplots
 import proteusPy
 from proteusPy import Disulfide
 from proteusPy.atoms import *
+from proteusPy.data import DATA_DIR
 from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, WINSIZE
 from proteusPy.utility import get_jet_colormap, grid_dimensions
 
@@ -1086,7 +1087,7 @@ def load_disulfides_from_id(
 
     >>> from proteusPy import DisulfideList, load_disulfides_from_id
     >>> SSlist = DisulfideList([],'5rsa')
-    >>> SSlist = load_disulfides_from_id('5rsa', verbose=False)
+    >>> SSlist = load_disulfides_from_id('5rsa', pdb_dir=DATA_DIR, verbose=False)
     >>> SSlist
     [<Disulfide 5rsa_26A_84A, Source: 5rsa, Resolution: 2.0 Å>, <Disulfide 5rsa_40A_95A, Source: 5rsa, Resolution: 2.0 Å>, <Disulfide 5rsa_58A_110A, Source: 5rsa, Resolution: 2.0 Å>, <Disulfide 5rsa_65A_72A, Source: 5rsa, Resolution: 2.0 Å>]
     """

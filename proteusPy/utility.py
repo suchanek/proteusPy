@@ -22,6 +22,8 @@ from matplotlib import cm
 
 import proteusPy
 from proteusPy import DisulfideList, ProteusPyWarning
+
+"""
 from proteusPy.data import (
     PROBLEM_ID_FILE,
     SS_DICT_PICKLE_FILE,
@@ -29,6 +31,9 @@ from proteusPy.data import (
     SS_PICKLE_FILE,
     SS_TORSIONS_FILE,
 )
+"""
+
+from proteusPy.data import *
 from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, PDB_DIR
 
 # Ignore PDBConstructionWarning
