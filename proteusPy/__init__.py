@@ -18,15 +18,16 @@ import datetime
 import glob
 import math
 import os
+import pickle
+import subprocess
 import sys
 import time
 import warnings
 
 import Bio
-import matplotlib
+import matplotlib.pyplot as plt
 import numpy
 import plotly
-
 from Bio.PDB import Vector
 from Bio.PDB.vectors import calc_dihedral
 
