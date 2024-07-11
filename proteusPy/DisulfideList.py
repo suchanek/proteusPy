@@ -34,7 +34,7 @@ from plotly.subplots import make_subplots
 import proteusPy
 from proteusPy import Disulfide
 from proteusPy.atoms import *
-from proteusPy.data import DATA_DIR
+from proteusPy.data import *
 from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, WINSIZE
 from proteusPy.utility import get_jet_colormap, grid_dimensions
 
