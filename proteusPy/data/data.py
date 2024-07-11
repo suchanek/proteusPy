@@ -1,4 +1,4 @@
-# absolute location for the disulfide .pkl files
+# global names for the disulfide .pkl files
 import os
 
 SS_PICKLE_FILE = "PDB_all_ss.pkl"

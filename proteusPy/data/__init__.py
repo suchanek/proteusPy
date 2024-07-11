@@ -7,9 +7,14 @@ Global declarations for the proteusPy package
 # Subject to the GNU public license.
 
 import os
+
 _abspath = os.path.dirname(os.path.abspath(__file__))
 
-DATA_DIR = f"{_abspath}/"
+# DATA_DIR = f"{_abspath}/"
+
+DATA_DIR = os.path.join(
+    _abspath, ""
+)  # os.path.join automatically adds the correct path separator
 print(f"DATA_DIR: {DATA_DIR}")
 
 HOME_DIR = os.path.expanduser("~")
@@ -20,13 +25,26 @@ if PDB_BASE is None:
     PDB_BASE = HOME_DIR
 
 
-from .data import( 
-    SS_CLASS_DEFINITIONS, 
-    SS_CLASS_DICT_FILE, SS_CONSENSUS_FILE, SS_DICT_PICKLE_FILE,
-    SS_DICT_PICKLE_FILE2, SS_ID_FILE, SS_PICKLE_FILE, SS_PROBLEM_SUBSET_ID_FILE,
-    SS_SUBSET_DICT_PICKLE_FILE, SS_SUBSET_DICT_PICKLE_FILE_IND, SS_SUBSET_PICKLE_FILE, SS_SUBSET_TORSIONS_FILE, 
-    SS_TORSIONS_FILE, PROBLEM_ID_FILE, LOADER_FNAME_URL, LOADER_SUBSET_FNAME_URL, LOADER_ALL_URL, LOADER_SUBSET_URL, LOADER_FNAME,
-    LOADER_SUBSET_FNAME, CLASSOBJ_FNAME)
-
-
-
+from .data import (
+    CLASSOBJ_FNAME,
+    LOADER_ALL_URL,
+    LOADER_FNAME,
+    LOADER_FNAME_URL,
+    LOADER_SUBSET_FNAME,
+    LOADER_SUBSET_FNAME_URL,
+    LOADER_SUBSET_URL,
+    PROBLEM_ID_FILE,
+    SS_CLASS_DEFINITIONS,
+    SS_CLASS_DICT_FILE,
+    SS_CONSENSUS_FILE,
+    SS_DICT_PICKLE_FILE,
+    SS_DICT_PICKLE_FILE2,
+    SS_ID_FILE,
+    SS_PICKLE_FILE,
+    SS_PROBLEM_SUBSET_ID_FILE,
+    SS_SUBSET_DICT_PICKLE_FILE,
+    SS_SUBSET_DICT_PICKLE_FILE_IND,
+    SS_SUBSET_PICKLE_FILE,
+    SS_SUBSET_TORSIONS_FILE,
+    SS_TORSIONS_FILE,
+)
