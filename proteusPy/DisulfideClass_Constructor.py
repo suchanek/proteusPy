@@ -16,17 +16,10 @@ import pickle
 from io import StringIO
 
 import pandas as pd
-import tqdm
 from Bio.PDB import *
 
-import proteusPy
-from proteusPy.data import (
-    CLASSOBJ_FNAME,
-    DATA_DIR,
-    SS_CLASS_DEFINITIONS,
-    SS_CLASS_DICT_FILE,
-    SS_CONSENSUS_FILE,
-)
+from proteusPy.data import DATA_DIR
+from proteusPy.data import SS_CLASS_DICT_FILE, SS_CLASS_DEFINITIONS, SS_CONSENSUS_FILE
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.ProteusGlobals import DPI
 
