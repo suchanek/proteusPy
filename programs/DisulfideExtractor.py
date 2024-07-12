@@ -22,7 +22,7 @@ import time
 from shutil import copy
 
 from proteusPy import DisulfideLoader, Extract_Disulfides
-from proteusPy.data import (
+from proteusPy.ProteusGlobals import (
     DATA_DIR,
     LOADER_FNAME,
     LOADER_SUBSET_FNAME,

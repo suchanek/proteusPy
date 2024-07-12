@@ -9,7 +9,6 @@ from proteusPy import (
     load_disulfides_from_id,
     Load_PDB_SS,
 )
-from proteusPy.data import SS_DICT_PICKLE_FILE
 from proteusPy.ProteusGlobals import _FLOAT_INIT, _INT_INIT
 from proteusPy.utility import distance_squared, distance3d
 

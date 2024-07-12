@@ -15,7 +15,9 @@ endif
 
 CONDA = mamba
 
-MESS = $(VERS)
+#MESS = $(VERS)
+MESS = "$(VERS) stable release"
+
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
 
@@ -80,9 +82,6 @@ install_dev:
 	pip install -e .
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	pip install pdoc twine black pytest build
-
-	#jupyter contrib nbextension install --sys-prefix
-	#jupyter nbextension enable --py --sys-prefix widgetsnbextension
 	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
 	@echo "Installation finished!"
 
@@ -104,7 +103,7 @@ format: .
 bld:  format  docs sdist
 
 sdist: .
-	python -m build
+	python setup.py sdist
 	@echo $(VERS) > sdist.out
 
 docs: .

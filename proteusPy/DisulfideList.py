@@ -7,7 +7,7 @@ The module provides the implmentation and interface for the [DisulfideList](#Dis
 object, used extensively by Disulfide class.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 3/18/2024 -egs-
+Last revision: 7/12/2024 -egs-
 """
 
 try:
@@ -34,7 +34,6 @@ from plotly.subplots import make_subplots
 import proteusPy
 from proteusPy import Disulfide
 from proteusPy.atoms import *
-from proteusPy.data import *
 from proteusPy.ProteusGlobals import DATA_DIR, MODEL_DIR, PBAR_COLS, WINSIZE
 from proteusPy.utility import get_jet_colormap, grid_dimensions
 

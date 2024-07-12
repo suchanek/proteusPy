@@ -5,7 +5,7 @@ License: BSD\n
 Copyright (c)2024 Eric G. Suchanek, PhD, all rights reserved
 """
 
-# Last modification 3/5/24 -egs-
+# Last modification 7/13/24 -egs-
 
 
 import copy
