@@ -16,12 +16,12 @@ import pandas as pd
 
 # import proteusPy
 from proteusPy.atoms import *
-from proteusPy.data import DATA_DIR
 from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideClass_Constructor import DisulfideClass_Constructor
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.ProteusGlobals import (
+    DATA_DIR,
     LOADER_ALL_URL,
     LOADER_FNAME,
     LOADER_SUBSET_FNAME,
