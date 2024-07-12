@@ -18,9 +18,9 @@ from io import StringIO
 import pandas as pd
 from Bio.PDB import *
 
-from proteusPy.data import DATA_DIR
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.ProteusGlobals import (
+    DATA_DIR,
     DPI,
     SS_CLASS_DEFINITIONS,
     SS_CLASS_DICT_FILE,

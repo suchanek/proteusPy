@@ -20,6 +20,7 @@ if PDB_DIR is None:
     PDB_DIR = HOME_DIR
 
 
+DATA_DIR = os.path.join(_this_dir, "data", "")
 REPO_DATA_DIR = os.path.join(_this_dir, "data", "")
 MODEL_DIR = os.path.join(PDB_DIR, "good", "")
 

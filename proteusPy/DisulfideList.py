@@ -35,7 +35,7 @@ import proteusPy
 from proteusPy import Disulfide
 from proteusPy.atoms import *
 from proteusPy.data import *
-from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, WINSIZE
+from proteusPy.ProteusGlobals import DATA_DIR, MODEL_DIR, PBAR_COLS, WINSIZE
 from proteusPy.utility import get_jet_colormap, grid_dimensions
 
 # Set the figure sizes and axis limits.
@@ -1086,6 +1086,7 @@ def load_disulfides_from_id(
     To load the Disulfides from the PDB ID 5rsa we'd use the following:
 
     >>> from proteusPy import DisulfideList, load_disulfides_from_id
+    >>> from proteusPy.ProteusGlobals import DATA_DIR
     >>> SSlist = DisulfideList([],'5rsa')
     >>> SSlist = load_disulfides_from_id('5rsa', pdb_dir=DATA_DIR, verbose=False)
     >>> SSlist
