@@ -38,8 +38,6 @@ try:
 except NameError:
     from tqdm import tqdm
 
-
-"""
 from proteusPy.data import (
     PROBLEM_ID_FILE,
     SS_DICT_PICKLE_FILE,
@@ -47,12 +45,14 @@ from proteusPy.data import (
     SS_PICKLE_FILE,
     SS_TORSIONS_FILE,
 )
+
 """
 SS_PICKLE_FILE = "PDB_all_ss.pkl"
 SS_DICT_PICKLE_FILE = "PDB_all_ss_dict.pkl"
 SS_TORSIONS_FILE = "PDB_all_ss_torsions.csv"
 PROBLEM_ID_FILE = "PDB_all_SS_problems.csv"
 SS_ID_FILE = "ss_ids.txt"
+"""
 
 # Ignore PDBConstructionWarning
 import warnings

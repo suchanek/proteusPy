@@ -36,7 +36,7 @@ HOME_DIR = os.path.expanduser("~")
 PDB_BASE = os.getenv("PDB")
 
 # location of cleaned PDB files, created with DisulfideDownloader.py
-PDB_DIR = os.path.join(PDB_BASE, "good/")
+PDB_DIR = os.path.join(PDB_BASE, "good", "")
 
 # this is specific to having a directory structure of ~/repos/proteusPy
 
