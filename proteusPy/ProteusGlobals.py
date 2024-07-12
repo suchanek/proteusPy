@@ -3,7 +3,7 @@ This file contains global declarations for the *proteusPy* package, a Python pac
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 3/12/24 -egs-
+Last revision: 7/12/24 -egs-
 """
 
 import math
