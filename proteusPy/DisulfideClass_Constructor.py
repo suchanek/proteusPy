@@ -19,9 +19,13 @@ import pandas as pd
 from Bio.PDB import *
 
 from proteusPy.data import DATA_DIR
-from proteusPy.data import SS_CLASS_DICT_FILE, SS_CLASS_DEFINITIONS, SS_CONSENSUS_FILE
 from proteusPy.DisulfideList import DisulfideList
-from proteusPy.ProteusGlobals import DPI
+from proteusPy.ProteusGlobals import (
+    DPI,
+    SS_CLASS_DEFINITIONS,
+    SS_CLASS_DICT_FILE,
+    SS_CONSENSUS_FILE,
+)
 
 merge_cols = [
     "chi1_s",

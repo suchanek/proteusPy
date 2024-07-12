@@ -19,12 +19,6 @@ import pandas
 
 import proteusPy
 from proteusPy.angle_annotation import AngleAnnotation
-from proteusPy.data import (
-    CLASSOBJ_FNAME,
-    DATA_DIR,
-    SS_CLASS_DEFINITIONS,
-    SS_CLASS_DICT_FILE,
-)
 from proteusPy.DisulfideLoader import DisulfideLoader
 from proteusPy.ProteusGlobals import DPI
 
