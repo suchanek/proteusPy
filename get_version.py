@@ -1,4 +1,4 @@
 # get_version.py
-with open('proteusPy/version.py') as f:
+with open("proteusPy/_version.py") as f:
     exec(f.read())
-print(__version__)
+print(__version__) # type: ignore

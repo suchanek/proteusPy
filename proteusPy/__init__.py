@@ -24,29 +24,15 @@ import sys
 import time
 import warnings
 
-# import Bio
 import matplotlib.pyplot as plt
 import numpy
 import plotly
-from Bio.PDB import Vector
-from Bio.PDB.vectors import calc_dihedral
-
-try:
-    # Check if running in Jupyter
-    shell = get_ipython().__class__.__name__
-    if shell == "ZMQInteractiveShell":
-        from tqdm.notebook import tqdm
-    else:
-        from tqdm import tqdm
-except NameError:
-    from tqdm import tqdm
-
 from Bio.PDB import Select, Vector
 from Bio.PDB.vectors import calc_angle, calc_dihedral
 
+from ._version import __version__
 from .angle_annotation import *
 from .atoms import *
-from .data import *
 from .Disulfide import Disulfide, Disulfide_Energy_Function, Minimize
 from .DisulfideClass_Constructor import DisulfideClass_Constructor
 from .DisulfideClasses import (
@@ -118,6 +104,5 @@ from .utility import (
     retrieve_git_lfs_files,
     sort_by_column,
 )
-from .version import __version__
 
 # end of file

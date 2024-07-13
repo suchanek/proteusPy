@@ -5,7 +5,7 @@
 
 # assumes file VERSION contains only the version number
 ifeq ($(OS),Windows_NT) 
-    VERS := $(shell python -c "exec(open('proteusPy/version.py').read()); print(__version__)")
+    VERS := $(shell python -c "exec(open('proteusPy/_version.py').read()); print(__version__)")
 	RM = del
 else 
 	VERS = $(shell python get_version.py)

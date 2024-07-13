@@ -57,7 +57,7 @@ long_description = (this_directory / "README.md").read_text()
 
 # Get the version from the version file
 version = {}
-with open("proteusPy/version.py") as fp:
+with open("proteusPy/_version.py") as fp:
     exec(fp.read(), version)
 
 
@@ -78,7 +78,7 @@ setup(
     test_suite="tests",
     setup_requires=["pytest-runner", "wheel"],
     install_requires=[
-        "numpy",
+        "numpy==1.26.4",
         "matplotlib",
         "pandas==2.2.1",
         "pyvista[all,trame]",

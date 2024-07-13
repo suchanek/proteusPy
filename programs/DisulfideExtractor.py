@@ -116,10 +116,10 @@ def do_build(verbose, full, subset, cutoff):
 
 
 def do_stuff(
-    all=True,
+    all=False,
     extract=True,
     build=True,
-    full=True,
+    full=False,
     update=True,
     subset=True,
     verbose=True,

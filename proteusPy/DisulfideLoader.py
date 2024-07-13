@@ -14,7 +14,7 @@ import time
 
 import pandas as pd
 
-# import proteusPy
+from proteusPy import __version__
 from proteusPy.atoms import *
 from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideClass_Constructor import DisulfideClass_Constructor
@@ -27,14 +27,18 @@ from proteusPy.ProteusGlobals import (
     LOADER_SUBSET_FNAME,
     LOADER_SUBSET_URL,
     REPO_DATA_DIR,
+    SS_CLASS_DICT_FILE,
     SS_DICT_PICKLE_FILE,
     SS_PICKLE_FILE,
+    SS_SUBSET_DICT_PICKLE_FILE,
+    SS_SUBSET_PICKLE_FILE,
+    SS_SUBSET_TORSIONS_FILE,
     SS_TORSIONS_FILE,
 )
 
 try:
     # Check if running in Jupyter
-    shell = get_ipython().__class__.__name__
+    shell = get_ipython().__class__.__name__  # type: ignore
     if shell == "ZMQInteractiveShell":
         from tqdm.notebook import tqdm
     else:
@@ -106,7 +110,7 @@ class DisulfideLoader:
         self.cutoff = cutoff  # distance cutoff used to bulid the database
         self.verbose = verbose
         self.timestamp = time.time()
-        self.version = proteusPy.__version__
+        self.version = __version__
 
         idlist = []
 
@@ -546,7 +550,7 @@ class DisulfideLoader:
         :param verbose: Verbosity, defaults to False
         :param cutoff: Distance cutoff used to build the database, -1 means no cutoff.
         """
-        self.version = proteusPy.__version__
+        self.version = __version__
         self.cutoff = cutoff
 
         if subset:
