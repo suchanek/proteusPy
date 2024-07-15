@@ -1193,7 +1193,7 @@ def load_disulfides_from_id(
                 )
                 if res:
                     SSList.append(new_ss)
-        i += 1
+            i += 1
     return copy.deepcopy(SSList)
 
 
