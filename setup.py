@@ -130,9 +130,9 @@ setup(
     package_data={
         "proteusPy": [
             "data/pdb5rsa.ent",
-            "data/*.txt",
-            "data/*.json",
-            "data/*.csv",
+            "data/ss_completed.txt",
+            "data/ss_query.json",
+            "data/ss_ids.txt",
             "data/SS_consensus_class_sext.pkl",
         ]
     },
