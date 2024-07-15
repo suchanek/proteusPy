@@ -42,41 +42,59 @@ def extract_pdb_id(filename: str) -> str:
 pdblist = PDBList(verbose=False)
 parser = PDBParser(PERMISSIVE=True)
 
-os.chdir(PDB_DIR)
-all_pdb_files = glob("*.ent")
+def check_files(pdb_dir: str, good_dir: str, bad_dir: str):
+    """
+    Checks all PDB files in the directory `pdb_dir` for SS bond consistency.
 
-print(f"Found: {len(all_pdb_files)} PDB files")
-badcount = 0
-count = 0
+    Parameters:
+    - pdb_dir (str): The directory containing the PDB files to check.
+    - good_dir (str): The directory to move good files to.
+    - bad_dir (str): The directory to move bad files to.
+    """
+    os.makedirs(good_dir, exist_ok=True)
+    os.makedirs(bad_dir, exist_ok=True)
 
-# Loop over all entries,
-pbar = tqdm(all_pdb_files, ncols=100)
-for entry in pbar:
-    # Assuming entry is a filename or a relative path
-    entry_path = os.path.abspath(entry)  # Ensure entry_path is an absolute path
+    all_pdb_files = glob(os.path.join(pdb_dir, "*.ent"))
+    print(f"Found: {len(all_pdb_files)} PDB files")
 
-    pbar.set_postfix({"Entry": entry, "Bad": badcount})
-    if not check_header_from_file(entry):
-        badcount += 1
-        shutil.copy2(entry, BAD_DIR)
-        os.remove(entry)
-    else:
-        # next attempt to parse the file
-        sslist = Extract_Disulfide(entry)
-        if sslist is None:
+    badcount = 0
+    count = 0
+
+    pbar = tqdm(all_pdb_files, ncols=100)
+    for entry in pbar:
+        pbar.set_postfix({"Entry": entry, "Bad": badcount})
+
+        if not check_header_from_file(entry):
             badcount += 1
-            destination_path = os.path.join(BAD_DIR, os.path.basename(entry))
-
-            if not os.path.exists(destination_path):
-                shutil.move(entry_path, destination_path)
+            print(f"Bad file: {entry}")
+            #shutil.copy2(entry, bad_dir)
+            #os.remove(entry)
         else:
-            destination_path = os.path.join(GOOD_DIR, os.path.basename(entry))
+            sslist = Extract_Disulfide(entry)
+            if sslist is None:
+                badcount += 1
+                destination_path = os.path.join(bad_dir, os.path.basename(entry))
 
-            if not os.path.exists(destination_path):
-                shutil.move(entry_path, destination_path)
+                if not os.path.exists(destination_path):
+                    shutil.move(entry, destination_path)
+            else:
+                destination_path = os.path.join(good_dir, os.path.basename(entry))
 
-    count += 1
+                if not os.path.exists(destination_path):
+                    shutil.move(entry, destination_path)
+                print(f"Good file: {entry} moved to {good_dir}")
+                
 
-print(f"Overall count processed in {PDB_DIR}: {count}")
-print(f"Bad files found and removed: {badcount}")
-print(f"Good files moved to good directory: {count - badcount}")
+        count += 1
+
+    print(f"Overall count processed in {pdb_dir}: {count}")
+    print(f"Bad files found and removed: {badcount}")
+    print(f"Good files moved to good directory: {count - badcount}")
+
+    return count, badcount
+
+if __name__ == "__main__":
+    check_files(BAD_DIR, GOOD_DIR, BAD_DIR)
+    s
+
+

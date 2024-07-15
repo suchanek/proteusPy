@@ -799,7 +799,7 @@ def Extract_Disulfides(
                 if dist >= dist_cutoff and dist_cutoff != -1.0:
                     print(f"\nBad Distance: {entry}, SS: {ss}")
                     bad_dist += 1
-                    break  ## was continue
+                    continue  ## we are not going to deal with Ca distance atm. 
 
                 All_ss_list.append(ss)
                 new_row = [
@@ -938,14 +938,14 @@ def Extract_Disulfide(
         Returns:
         - str: The extracted ID.
         """
+        basename = os.path.basename(filename)
         # Check if the filename follows the expected format
-        if filename.startswith("pdb") and filename.endswith(".ent"):
+        if basename.startswith("pdb") and filename.endswith(".ent"):
             # Extract the ID part of the filename
             return filename[3:-4]
         else:
-            raise ValueError(
-                "Filename does not follow the expected format 'pdb{id}.ent'"
-            )
+            mess = f"Filename {filename} does not follow the expected format 'pdbid .ent'"
+            raise ValueError(mess)
 
     # Build a list of PDB files in PDB_DIR that are readable. These files were downloaded
     # via the RCSB web query interface for structures containing >= 1 SS Bond.

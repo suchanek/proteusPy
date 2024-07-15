@@ -89,8 +89,9 @@ def find_difference(ids, entries):
 # Paths
 PDB_DIR = "/Users/egs/PDB"
 
-ids_file_path = PDB_DIR + "/ss_ids.txt"
-input_directory_path = PDB_DIR + "/good/"
+ids_file_path = os.path.join(PDB_DIR, "ss_ids.txt")
+input_directory_path = os.path.join(PDB_DIR, "good", "")
+# input_directory_path = PDB_DIR + "/good/"
 
 
 def DisulfideLoader(idfilename="./ss_ids.txt"):
