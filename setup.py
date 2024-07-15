@@ -109,6 +109,7 @@ setup(
         "jupyter_contrib_nbextensions",
         "ipywidgets",
         "imageio[ffmpeg]",
+        "pymolpy3"
     ],
     source="https://github.com/suchanek/proteusPy/",
     project_urls={
