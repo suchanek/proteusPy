@@ -31,8 +31,19 @@ from Bio.PDB import Select, Vector
 from Bio.PDB.vectors import calc_angle, calc_dihedral
 
 from ._version import __version__
-from .angle_annotation import *
-from .atoms import *
+from .angle_annotation import AngleAnnotation, plot_angle
+from .atoms import (
+    ATOM_COLORS,
+    ATOM_RADII_COVALENT,
+    ATOM_RADII_CPK,
+    BOND_COLOR,
+    BOND_RADIUS,
+    BS_SCALE,
+    CAMERA_SCALE,
+    FONTSIZE,
+    SPEC_POWER,
+    SPECULARITY,
+)
 from .Disulfide import Disulfide, Disulfide_Energy_Function, Minimize
 from .DisulfideClass_Constructor import DisulfideClass_Constructor
 from .DisulfideClasses import (
@@ -104,5 +115,7 @@ from .utility import (
     retrieve_git_lfs_files,
     sort_by_column,
 )
+
+print(f"ProteusPy Version {__version__}")
 
 # end of file

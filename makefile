@@ -77,7 +77,6 @@ install:
 
 install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	@pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	$(CONDA) install vtk==9.2.6 -y
 	pip install -e .
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython

@@ -42,6 +42,7 @@ except NameError:
 import warnings
 
 from proteusPy.ProteusGlobals import (
+    DATA_DIR,
     MODEL_DIR,
     PBAR_COLS,
     PDB_DIR,
@@ -653,7 +654,10 @@ def Download_Disulfides(
     return
 
 
-def remove_duplicate_ss(sslist: DisulfideList) -> DisulfideList:
+from proteusPy import Disulfide
+
+
+def remove_duplicate_ss(sslist: DisulfideList) -> list[Disulfide]:
     pruned = []
     for ss in sslist:
         if ss not in pruned:
@@ -711,12 +715,15 @@ def Extract_Disulfides(
         ent = fname[3:-4]
         return ent
 
+    import shutil
+
     from proteusPy import DisulfideList, load_disulfides_from_id
     from proteusPy.Disulfide import Torsion_DF_Cols
 
     bad_dir = baddir
 
     entrylist = []
+    sslist = []
     problem_ids = []
     bad = bad_dist = 0
 
@@ -764,6 +771,9 @@ def Extract_Disulfides(
     cnt = 0
     # loop over ss_filelist, create disulfides and initialize them
     for entry in pbar:
+        if entry == "4wym":
+            print(f"\nEntry: {entry}, SSList: {sslist}")
+
         pbar.set_postfix(
             {"ID": entry, "Bad": bad, "Ca": bad_dist, "Cnt": tot}
         )  # update the progress bar
@@ -773,17 +783,23 @@ def Extract_Disulfides(
         _sslist = load_disulfides_from_id(
             entry, model_numb=0, verbose=verbose, quiet=quiet, pdb_dir=pdbdir
         )
-        # !!! sslist, xchain = prune_extra_ss(_sslist)
+
+        # sslist, xchain = prune_extra_ss(_sslist)
         # sslist = _sslist
+
         sslist = remove_duplicate_ss(_sslist)
+
         if len(sslist) > 0:
+            if entry == "4wym":
+                print(f"\nEntry2: {entry}, SSList: {sslist}")
             sslist2 = []  # list to hold indices for ss_dict2
             for ss in sslist:
                 # Ca distance cutoff
                 dist = ss.ca_distance
                 if dist >= dist_cutoff and dist_cutoff != -1.0:
+                    print(f"\nBad Distance: {entry}, SS: {ss}")
                     bad_dist += 1
-                    continue  ## was continue
+                    break  ## was continue
 
                 All_ss_list.append(ss)
                 new_row = [
@@ -826,10 +842,11 @@ def Extract_Disulfides(
                 shutil.copy(f"pdb{entry}.ent", bad_dir)
                 # Delete the original file
                 os.remove(f"pdb{entry}.ent")
+            break  ## this entry has no SS bonds, so we break the loop and move on to the next entry
 
     if bad > 0:
         prob_cols = ["id"]
-        problem_df = pandas.DataFrame(columns=prob_cols)
+        problem_df = pd.DataFrame(columns=prob_cols)
         problem_df["id"] = problem_ids
 
         print(
@@ -851,7 +868,8 @@ def Extract_Disulfides(
             print("No problems found.")
 
     # dump the all_ss list of disulfides to a .pkl file. ~520 MB.
-    fname = f"{datadir}{picklefile}"
+    fname = os.path.join(datadir, picklefile)
+
     print(
         f"-> Extract_Disulfides(): Saving {len(All_ss_list)} Disulfides to file: {fname}"
     )
@@ -861,7 +879,8 @@ def Extract_Disulfides(
 
     # dump the dict2 disulfides to a .pkl file. ~520 MB.
     dict_len = len(All_ss_dict2)
-    fname = f"{datadir}{dictfile}"
+    fname = os.path.join(datadir, dictfile)
+
     print(
         f"-> Extract_Disulfides(): Saving indices of {dict_len} Disulfide-containing PDB IDs to file: {fname}"
     )
@@ -870,7 +889,8 @@ def Extract_Disulfides(
         pickle.dump(All_ss_dict2, f)
 
     # save the torsions
-    fname = f"{datadir}{torsionfile}"
+
+    fname = os.path.join(datadir, torsionfile)
     print(f"-> Extract_Disulfides(): Saving torsions to file: {fname}")
     SS_df.to_csv(fname)
 
@@ -927,12 +947,9 @@ def Extract_Disulfide(
                 "Filename does not follow the expected format 'pdb{id}.ent'"
             )
 
-    cwd = os.getcwd()
-
     # Build a list of PDB files in PDB_DIR that are readable. These files were downloaded
     # via the RCSB web query interface for structures containing >= 1 SS Bond.
 
-    os.chdir(pdbdir)
     id = extract_id_from_filename(pdbid)
 
     # returns an empty list if none are found.
@@ -940,15 +957,12 @@ def Extract_Disulfide(
     _sslist = load_disulfides_from_id(
         id, model_numb=0, verbose=verbose, quiet=quiet, pdb_dir=pdbdir
     )
-    # sslist, xchain = prune_extra_ss(_sslist)
-    sslist = _sslist
 
-    if len(sslist) == 0:
+    if len(_sslist) == 0:
         print(f"--> Can't parse: {pdbid}")
 
     # return to original directory
-    os.chdir(cwd)
-    return sslist
+    return _sslist
 
 
 def check_header_from_file(
@@ -968,7 +982,8 @@ def check_header_from_file(
       Assuming ```DATA_DIR``` has the pdb5rsa.ent file (it should!), we can load the disulfides
       with the following:
 
-    >>> from proteusPy import check_header_from_file, DATA_DIR
+    >>> from proteusPy import check_header_from_file
+    >>> from proteusPy.ProteusGlobals import DATA_DIR
     >>> OK = False
     >>> OK = check_header_from_file(f'{DATA_DIR}pdb5rsa.ent', verbose=False)
     >>> OK
@@ -1084,7 +1099,8 @@ def check_header_from_id(
       (assumes the PDB environment variable is set to the PDB directory.)
 
     >>> import os
-    >>> from proteusPy import Disulfide, check_header_from_id, DATA_DIR
+    >>> from proteusPy import Disulfide, check_header_from_id
+    >>> from proteusPy.ProteusGlobals import DATA_DIR
     >>> OK = False
     >>> OK = check_header_from_id('5rsa', pdb_dir=DATA_DIR, verbose=True)
      -> SSBond: 1: 5rsa: 26A - 84A

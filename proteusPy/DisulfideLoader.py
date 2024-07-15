@@ -82,7 +82,7 @@ class DisulfideLoader:
         torsion_file: str = SS_TORSIONS_FILE,
         quiet: bool = True,
         subset: bool = False,
-        cutoff: float = -1.0,
+        cutoff: float = 8.0,
     ) -> None:
         """
         Initializing the class initiates loading either the entire Disulfide dataset,
@@ -126,7 +126,6 @@ class DisulfideLoader:
             )
 
         with open(self.PickleFile, "rb") as f:
-            # sslist = pd.compat.pickle_compat.load(f)
             sslist = pickle.load(f)
             self.SSList = sslist
             self.TotalDisulfides = len(self.SSList)
@@ -143,14 +142,8 @@ class DisulfideLoader:
             )
 
         with open(self.PickleDictFile, "rb") as f:
-
             self.SSDict = pickle.load(f)
-            # self.SSDict = pd.compat.pickle_compat.load(f)
-
-            for key in self.SSDict:
-                idlist.append(key)
-            self.IDList = idlist.copy()
-            totalSS_dict = len(self.IDList)
+            self.IDList = list(self.SSDict.keys())
 
         if self.verbose:
             print(f"done.")
