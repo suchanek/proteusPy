@@ -78,9 +78,9 @@ setup(
     test_suite="tests",
     setup_requires=["pytest-runner", "wheel"],
     install_requires=[
-        "numpy==1.26.4",
+        "numpy",
         "matplotlib",
-        "pandas==2.2.1",
+        "pandas",
         "pyvista[all,trame]",
         "traitlets==5.9.0",
         "jupyter",
@@ -109,7 +109,6 @@ setup(
         "jupyter_contrib_nbextensions",
         "ipywidgets",
         "imageio[ffmpeg]",
-        "pymolpy3"
     ],
     source="https://github.com/suchanek/proteusPy/",
     project_urls={

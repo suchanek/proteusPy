@@ -19,7 +19,6 @@ import time
 from math import cos
 
 import numpy as np
-import pandas
 import pyvista as pv
 
 np.set_printoptions(suppress=True)
@@ -2365,7 +2364,7 @@ def Disulfide_Energy_Function(x: list) -> float:
     >>> from proteusPy import Disulfide_Energy_Function
     >>> dihed = [-60.0, -60.0, -90.0, -60.0, -90.0]
     >>> res = Disulfide_Energy_Function(dihed)
-    >>> res
+    >>> float(res)
     2.5999999999999996
     """
     import numpy as np

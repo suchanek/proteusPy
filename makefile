@@ -1,6 +1,6 @@
 # Makefile for proteusPy
 # Author: Eric G. Suchanek, PhD
-# Last revision: 3/16/24 -egs-
+# Last revision: 7/16/24 -egs-
 
 
 # assumes file VERSION contains only the version number
@@ -34,8 +34,6 @@ newvers: .
 	@echo "Enter a new message: "
 	@read MESS
 
-
-
 nuke: clean devclean
 	-@$(RM) $(OUTFILES)
 	-@$(RM) dist/*
@@ -64,8 +62,9 @@ devclean: .
 # activate the package before running!
 install: 
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	@echo "Installing VTK..."
+	@echo "Installing additional..."
 	@$(CONDA) install vtk==9.2.6 -y
+	@$(CONDA) install pymol-open-source -y
 	@echo "Installing proteusPy..."
 
 	@pip install .
@@ -77,7 +76,9 @@ install:
 
 install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	$(CONDA) install vtk==9.2.6 -y
+	@$(CONDA) install vtk==9.2.6 -y
+	@$(CONDA) install pymol-open-source -y
+
 	pip install -e .
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	pip install pdoc twine black pytest build

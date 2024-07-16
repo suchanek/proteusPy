@@ -42,6 +42,7 @@ def extract_pdb_id(filename: str) -> str:
 pdblist = PDBList(verbose=False)
 parser = PDBParser(PERMISSIVE=True)
 
+
 def check_files(pdb_dir: str, good_dir: str, bad_dir: str):
     """
     Checks all PDB files in the directory `pdb_dir` for SS bond consistency.
@@ -51,10 +52,10 @@ def check_files(pdb_dir: str, good_dir: str, bad_dir: str):
     - good_dir (str): The directory to move good files to.
     - bad_dir (str): The directory to move bad files to.
     """
-    os.makedirs(good_dir, exist_ok=True)
-    os.makedirs(bad_dir, exist_ok=True)
 
-    all_pdb_files = glob(os.path.join(pdb_dir, "*.ent"))
+    os.chdir(pdb_dir)
+    all_pdb_files = glob("*.ent")
+    print(f"{all_pdb_files}")
     print(f"Found: {len(all_pdb_files)} PDB files")
 
     badcount = 0
@@ -67,9 +68,10 @@ def check_files(pdb_dir: str, good_dir: str, bad_dir: str):
         if not check_header_from_file(entry):
             badcount += 1
             print(f"Bad file: {entry}")
-            #shutil.copy2(entry, bad_dir)
-            #os.remove(entry)
+            shutil.copy2(entry, bad_dir)
+            os.remove(entry)
         else:
+
             sslist = Extract_Disulfide(entry)
             if sslist is None:
                 badcount += 1
@@ -83,7 +85,6 @@ def check_files(pdb_dir: str, good_dir: str, bad_dir: str):
                 if not os.path.exists(destination_path):
                     shutil.move(entry, destination_path)
                 print(f"Good file: {entry} moved to {good_dir}")
-                
 
         count += 1
 
@@ -93,8 +94,6 @@ def check_files(pdb_dir: str, good_dir: str, bad_dir: str):
 
     return count, badcount
 
+
 if __name__ == "__main__":
-    check_files(BAD_DIR, GOOD_DIR, BAD_DIR)
-    s
-
-
+    check_files(PDB_DIR, GOOD_DIR, BAD_DIR)
