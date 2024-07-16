@@ -15,11 +15,8 @@ import os
 
 import numpy
 from Bio.PDB import PDBList
-from pymol import cmd, finish_launching
 from tqdm import tqdm
 
-# Initialize PyMOL in command-line mode (no GUI)
-finish_launching(["pymol", "-cq"])  # '-cq' for command line quiet mode
 
 
 def fetch_and_save_pdb(pdbid, save_path=".", verbose=True):
@@ -31,6 +28,12 @@ def fetch_and_save_pdb(pdbid, save_path=".", verbose=True):
     save_path (str): The full path where the PDB file will be saved.
     """
     # Ensure the save_path ends with '.pdb'
+    from pymol import cmd, finish_launching
+    
+    # Initialize PyMOL in command-line mode (no GUI)
+    finish_launching(["pymol", "-cq"])  # '-cq' for command line quiet mode
+
+
     filename = f"pdb{pdbid}.ent"
     save_filename = os.path.join(save_path, filename)
 
@@ -114,8 +117,8 @@ def DisulfideLoader(idfilename="./ss_ids.txt"):
         pbar.set_postfix({"Ent": entry, "Bad": bad_cnt})
         if entry not in completed:
             try:
-                if fetch_and_save_pdb(entry, save_path=PDB_DIR):
-                    # if pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=PDB_DIR):
+                #if fetch_and_save_pdb(entry, save_path=PDB_DIR):
+                if pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=PDB_DIR):
                     completed.add(entry)
                     count += 1
                 else:

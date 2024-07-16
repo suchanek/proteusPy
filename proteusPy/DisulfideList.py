@@ -1144,9 +1144,8 @@ def load_disulfides_from_id(
 
             if proximal == distal:
                 mess = f" -> load_disulfides_from_id(): Cannot parse SSBond record (proximal == distal):\
-                {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring."
+                {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
                 warnings.warn(mess, DisulfideConstructionWarning)
-                continue
 
             _chaina = model[chain1_id]
             _chainb = model[chain2_id]

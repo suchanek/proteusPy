@@ -21,7 +21,7 @@ import warnings
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from Bio.PDB import PDBParser, Vector
+from Bio.PDB import PDBList, PDBParser, Vector
 from Bio.PDB.PDBExceptions import PDBConstructionWarning
 from matplotlib import cm
 
@@ -799,7 +799,7 @@ def Extract_Disulfides(
                 if dist >= dist_cutoff and dist_cutoff != -1.0:
                     print(f"\nBad Distance: {entry}, SS: {ss}")
                     bad_dist += 1
-                    continue  ## we are not going to deal with Ca distance atm. 
+                    continue  ## we are not going to deal with Ca distance atm.
 
                 All_ss_list.append(ss)
                 new_row = [
@@ -842,7 +842,7 @@ def Extract_Disulfides(
                 shutil.copy(f"pdb{entry}.ent", bad_dir)
                 # Delete the original file
                 os.remove(f"pdb{entry}.ent")
-            break  ## this entry has no SS bonds, so we break the loop and move on to the next entry
+            continue  ## this entry has no SS bonds, so we break the loop and move on to the next entry
 
     if bad > 0:
         prob_cols = ["id"]
@@ -944,7 +944,9 @@ def Extract_Disulfide(
             # Extract the ID part of the filename
             return filename[3:-4]
         else:
-            mess = f"Filename {filename} does not follow the expected format 'pdbid .ent'"
+            mess = (
+                f"Filename {filename} does not follow the expected format 'pdbid .ent'"
+            )
             raise ValueError(mess)
 
     # Build a list of PDB files in PDB_DIR that are readable. These files were downloaded
