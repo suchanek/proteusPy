@@ -63,8 +63,8 @@ devclean: .
 install: 
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	@echo "Installing additional..."
-	@$(CONDA) install vtk==9.2.6 -y
-	@$(CONDA) install pymol-open-source -y
+	#@$(CONDA) install vtk==9.2.6 -y
+	#@$(CONDA) install pymol-open-source -c conda-forge -y
 	@echo "Installing proteusPy..."
 
 	@pip install .
@@ -76,8 +76,8 @@ install:
 
 install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	@$(CONDA) install vtk==9.2.6 -y
-	@$(CONDA) install pymol-open-source -y
+	#@$(CONDA) install vtk==9.2.6 -y
+	#@$(CONDA) install pymol-open-source -c conda-forge -y
 
 	pip install -e .
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
@@ -102,19 +102,17 @@ format: .
 
 bld:  format  docs sdist
 
-sdist: .
+sdist: proteusPy/_version.py
 	python setup.py sdist
-	@echo $(VERS) > sdist.out
 
-docs: .
+docs: proteusPy/_version.py
 	pdoc -o docs --math --logo "./logo.png" ./proteusPy
-	@echo $(VERS) > docs.out
 
 # normally i push to PyPi via github action
-upload: sdist
+upload: dist/proteusPy-$(VERS)*
 	twine upload -r proteusPy dist/proteusPy-$(VERS)*
 
-tag: .
+tag:
 	git tag -a $(VERS) -m $(MESS)
 	@echo $(VERS) > tag.out
 
