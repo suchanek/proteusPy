@@ -108,6 +108,7 @@ setup(
         "trame-jupyter-extension",
         "jupyter_contrib_nbextensions",
         "ipywidgets",
+        "pymolpy3",
         "imageio[ffmpeg]",
     ],
     source="https://github.com/suchanek/proteusPy/",
