@@ -116,6 +116,6 @@ from .utility import (
     sort_by_column,
 )
 
-print(f"ProteusPy Version {__version__}")
+print(f"ProteusPy V{__version__}")
 
 # end of file
