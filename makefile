@@ -63,8 +63,7 @@ devclean: .
 install: 
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	@echo "Installing additional..."
-	#@$(CONDA) install vtk==9.2.6 -y
-	#@$(CONDA) install pymol-open-source -c conda-forge -y
+	@$(CONDA) install vtk==9.2.6 -y
 	@echo "Installing proteusPy..."
 
 	@pip install .
@@ -76,9 +75,8 @@ install:
 
 install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	#@$(CONDA) install vtk==9.2.6 -y
-	#@$(CONDA) install pymol-open-source -c conda-forge -y
-
+	@$(CONDA) install vtk==9.2.6 -y
+	
 	pip install -e .
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	pip install pdoc twine black pytest build
