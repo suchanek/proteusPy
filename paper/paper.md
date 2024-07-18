@@ -12,7 +12,7 @@ authors:
     equal-contrib: true
     affiliation: 1
 affiliations:
- - name: Flux-Frontiers
+ - name: Flux-Frontiers, Cincinnati OH, United States of America
    index: 1
 date: 8 July, 2024
 header-includes:
@@ -48,55 +48,6 @@ Disulfide bonds, formed when two Cysteine residues are oxidized resulting in a s
 
 Accordingly, I have developed the **proteusPy** package to delve into the RCSB Protein Data Bank, furnishing tools for visualizing and analyzing the disulfide bonds contained therein. This endeavor necessitated the creation of a python-based package containing data structures and algorithms capable loading, manipulating and analyzing these entities. Consequently, an object-oriented database has been crafted, facilitating introspection, analysis, and display. The package's API is accessible online at: [proteusPy API](https://suchanek.github.io/proteusPy/proteusPy.html), offering comprehensive details and numerous illustrative examples.
 
-# Requirements
-
-1. PC running MacOS, Linux, Windows with git, git-lfs and make installed
-2. 8 GB RAM
-3. 1 GB disk space
-
-# Installation
-
-It's simplest to clone the repo via GitHub since it contains all of the notebooks, data and test programs. Installation includes installing my Biopython fork. This is required to rebuild the database. I highly recommend using Miniforge since it includes mamba. The installation instructions below assume a clean install with no package manager or compiler installed.
-
-## MacOS/Linux
-- Install Miniforge: <https://github.com/conda-forge/miniforge> (existing Anaconda installations are fine but please install mamba)
-- Install git-lfs:
-  - <https://help.github.com/en/github/managing-large-files/installing-git-large-file-storage>
-- Install `make` on your system.
-- From a shell prompt while sitting in your repo dir:
-  
-  ```console
-  $ git clone https://github.com/suchanek/proteusPy.git
-  $ cd proteusPy
-  $ make pkg
-  $ mamba activate proteusPy
-  $ mamba install vtk
-  $ make install
-  ```
-
-## Windows
-- Install Miniforge: <https://github.com/conda-forge/miniforge> (existing Anaconda installations are fine but please install mamba)
-- Install git for Windows and configure for Bash:
-  - https://git-scm.com/download/win
-- Install git-lfs:
-  - https://git-lfs.github.com/
-- Install GNU make:
-  - https://gnuwin32.sourceforge.net/packages/make.htm
-- Open a Miniforge prompt and cd into your repo dir:
-  ```console
-  (base) C:\Users\egs\repos> git clone https://github.com/suchanek/proteusPy.git
-  (base) C:\Users\egs\repos> cd proteusPy
-  (base) C:\Users\egs\repos\proteuspy> make pkg
-  (base) C:\Users\egs\repos>\proteuspy> conda activate proteusPy
-  (proteusPy) C:\Users\egs\repos> make install
-  ```
-
-# Testing
-I currently have ``pytest`` and docstring testing for the modules in place. To run them cd into the repository and run:
-```console
-$ make tests
-```
-The modules will 1) run pytest for the main modules and 2) perform docstring tests. This will result in a number of disulfide visualization windows to open. Simply close them. If all goes normally there will be no errors. (you may need to install ``pytest`` via ``pip install pytest``.
 
 # Usage
 
@@ -324,49 +275,6 @@ The package includes the [DisulfideClassConstructer](https://suchanek.github.io/
 
 **proteusPy** is a python-based package capable of visualization and analysis of over 120,000 Disulfide bonds contained in the RCSB structural database. This work provides a strong foundation to not only analyze these important structural elements but also provides flexible tools for modeling proteins from dihedral angle input. 
 
-# Appendix
-
-## Database Creation Workflow
-
-The following steps were performed to create the RCSB disulfide database:
-
-1. Identify disulfide containing proteins in the [RCSB](https://www.rcsb.org): I generated a query using the web-based query tool for all proteins containing one or more disulfide bond. The resulting file consisted of 35,819 IDs. The file containing these is: [ss_ids.txt](https://github.com/suchanek/proteusPy/blob/master/data/ss_ids.txt).
-2. Download the structure files to disk. This resulted in the program [DisulfideDownloader.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py). The download took approximately twelve hours.
-3. Extract the disulfides from the downloaded structures and build the **DisulfideLoader** object. The program [DisulfideExtractor.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor.py) was created and used to do this against the individual structure files. This seemingly simple task was complicated by several factors including:
-
-   1. The PDB file parser contained in Bio.PDB described in [@Hamelyrck_2003] lacked the ability to parse the **SSBOND** records in PDB files. As a result I forked the Biopython repository and updated the **parse_pdb_header.py** file. My fork is available at: [https://github.com/suchanek/biopython]("https://github.com/suchanek/biopython")
-   2. Duplicate disulfides contained within a multi-chain protein file.
-   3. Physically impossible disulfides, where the $C_\alpha - C_\alpha$ distance is > 8 $\AA$ .
-   4. Structures with disordered CYS atoms.
-  
-The disulfide extraction process is time consuming, and is only needed if the underlying **Disulfide** class is changed.
-
-I ultimately elected to only use a single example of a given disulfide from a multi-chain entry, and removed any disulfides with a $C_\alpha - C_\alpha$ distance > 8 $\AA$. This resulted in the current database consisting of 35,808 structures and 120,494 disulfide bonds. While there are many structure visualization and analysis packages available (PyMol, Chimera, RCSB) this is the only centralized, locally available Disulfide database available. 
-
-## The Future
-
-- I am writing up the first analysis paper which will provide an overall survey of the RCSB disulfide database in terms of structural statistics. This represents the outcome from my initial desire for building the system in the first place.
-- I am exploring disulfide structural classes using the sextant class approach as time permits. This offers much higher class resolution than the binary approach and reveals subgroups within the binary structural classes. I'd also like to explore the catalytic and allosteric classes within the subgroups to look for common structural features at a higher level.
-
-- I am working to deploy a Disulfide Database browser for further exploration and analysis. There are several iterations of the viewer in the **programs** directory. The issue is I am unable to refresh a **panel** **pyvista.plotter** object correctly into a single pane. 
-
- 
-## Miscellaneous
-
-### Performance
-- Manipulating and searching through long lists of disulfides can take time. I've added progress bars for many of these operations. 
-- Rendering many disulfides in **pyvista** can also take time to load and may be slow to display in real time, depending on your hardware. I added optimization to reduce cylinder complexity as a function of total cylinders rendered, but it can still be less than perfect. The faster your GPU the better! 
-
-### Visualizing Disulfides with pyVista
-PyVista is an excellent 3D visualization framework and I've used it for the Disulfide visualization engine. It uses the VTK library on the back end and provides high-level access to 3d rendering. The menu strip provided in the Disulfide visualization windows allows the user to turn borders, rulers, bounding boxes on and off and reset the orientations. Please try them out! There is also a button for *local* vs *server* rendering. *Local* rendering is usually much smoother. To manipulate:
-- Click and drag your mouse to rotate
-- Use the mouse wheel to zoom (3 finger zoom on trackpad)
-
-## Developer's Notes:
-The .pkl files needed to instantiate this class and save it into its final .pkl file are
-defined in the [proteusPy.data]("https://suchanek.github.io/proteusPy/proteusPy/data.html") class and should not be changed. Upon initialization the class will load them and initialize itself.
-
-*NB:* disulfide database creaton relies on my [fork](https://github.com/suchanek/biopython) of the [Biopython](https://biopython.org) Python package to download and build the database, (<https://github.com/suchanek/biopython>). This fork is installed automatically.
 
 ## Contributing/Reporting
 
