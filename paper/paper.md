@@ -14,7 +14,7 @@ authors:
 affiliations:
  - name: Flux-Frontiers, Cincinnati OH, United States of America
    index: 1
-date: 8 July, 2024
+date: 18 July, 2024
 header-includes:
   - \let\oldAA\AA
   - \renewcommand{\AA}{\text{\normalfont\oldAA}}
