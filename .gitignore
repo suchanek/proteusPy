@@ -13,9 +13,7 @@ data/Oclasses/*
 programs/chatbot.py
 proteusPy.egg-info/*
 proteusPy/proteusPy.egg-info/*
-subset.png
-cleaned.py
-subset.png
 proteus_logo_sb.png
 *.mp4
 *.out
+
