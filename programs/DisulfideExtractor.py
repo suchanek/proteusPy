@@ -120,7 +120,7 @@ def do_stuff(
     extract=True,
     build=True,
     full=False,
-    update=True,
+    update=False,
     subset=True,
     verbose=True,
     cutoff=8.0,
