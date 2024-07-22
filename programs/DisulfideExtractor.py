@@ -120,7 +120,7 @@ def do_stuff(
     extract=True,
     build=True,
     full=False,
-    update=True,
+    update=False,
     subset=True,
     verbose=True,
     cutoff=8.0,
@@ -217,7 +217,7 @@ parser.add_argument(
 )
 
 parser.set_defaults(all=False)
-parser.set_defaults(update=True)
+parser.set_defaults(update=False)
 parser.set_defaults(verbose=True)
 parser.set_defaults(extract=True)
 parser.set_defaults(subset=False)
