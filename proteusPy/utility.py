@@ -754,6 +754,8 @@ def Extract_Disulfides(
     for entry in ss_filelist:
         entrylist.append(name_to_id(entry))
 
+    print(f"Entrylist: {entrylist}, len: {len(entrylist)}")
+
     # create a dataframe with the following columns for the disulfide conformations
     # extracted from the structure
 
@@ -840,10 +842,13 @@ def Extract_Disulfides(
             bad += 1
             problem_ids.append(entry)
             if prune:
+                print(f"\n--> No SS parsed for: {entry}")
+                fname = f"pdb{entry}.ent"
                 # Construct the full path for the new destination file
-                destination_file_path = os.path.join(bad_dir, f"pdb{entry}.ent")
+                destination_file_path = os.path.join(bad_dir, fname)
                 # Copy the file to the new destination with the correct filename
-                os.rename(f"pdb{entry}.ent", destination_file_path)
+                print(f"\n---> Moving: {fname} to {destination_file_path}")
+                os.rename(fname, destination_file_path)
             continue  ## this entry has no SS bonds, so we break the loop and move on to the next entry
 
     if bad > 0:
