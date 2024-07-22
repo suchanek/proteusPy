@@ -572,13 +572,14 @@ def Download_Disulfides(
     Read a comma separated list of PDB IDs and download them
     to the pdb_home path.
 
-    This utility function is used to download proteins containing at least
-    one SS bond with the ID list generated from: http://www.rcsb.org/.
-
-    This is the primary data loader for the proteusPy Disulfide
-    analysis package. The list of IDs represents files in the
-    RCSB containing > 1 disulfide bond, and it contains
-    over 39000 structures. The total download takes about 12 hours. The
+    This utility function is used to download proteins containing at            if prune:
+                # Construct the full path for the new destination file
+                destination_file_path = os.path.join(bad_dir, f"pdb{entry}.ent")
+                # Copy the file to the new destination with the correct filename
+                shutil.copy(f"pdb{entry}.ent", destination_file_path)
+                # Delete the original file
+                os.remove(f"pdb{entry}.ent")
+                continue  # this entry has no SS bonds, so we break the loop and move on to the next entry 39000 structures. The total download takes about 12 hours. The
     function keeps track of downloaded files so it's possible to interrupt and
     restart the download without duplicating effort.
 
@@ -839,9 +840,10 @@ def Extract_Disulfides(
             bad += 1
             problem_ids.append(entry)
             if prune:
-                shutil.copy(f"pdb{entry}.ent", bad_dir)
-                # Delete the original file
-                os.remove(f"pdb{entry}.ent")
+                # Construct the full path for the new destination file
+                destination_file_path = os.path.join(bad_dir, f"pdb{entry}.ent")
+                # Copy the file to the new destination with the correct filename
+                os.rename(f"pdb{entry}.ent", destination_file_path)
             continue  ## this entry has no SS bonds, so we break the loop and move on to the next entry
 
     if bad > 0:
