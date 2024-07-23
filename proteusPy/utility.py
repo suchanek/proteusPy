@@ -750,7 +750,7 @@ def Extract_Disulfides(
     tot = len(ss_filelist)
 
     if verbose:
-        print(f"PDB Directory {pdbdir} contains: {tot} files")
+        print(f"--> Extract_Disulfides(): PDB Directory {pdbdir} contains: {tot} files")
 
     # the filenames are in the form pdb{entry}.ent, I loop through them and extract
     # the PDB ID, with Disulfide.name_to_id(), then add to entrylist.
@@ -758,7 +758,8 @@ def Extract_Disulfides(
     for entry in ss_filelist:
         entrylist.append(name_to_id(entry))
 
-    print(f"Entrylist: {entrylist}, len: {len(entrylist)}")
+    if verbose:
+        print(f"--> Extract_Disulfides(): PDB Ids: {entrylist}, len: {len(entrylist)}")
 
     # create a dataframe with the following columns for the disulfide conformations
     # extracted from the structure
@@ -796,9 +797,6 @@ def Extract_Disulfides(
 
         if len(_sslist) > 0 or _sslist is None:
             sslist = remove_duplicate_ss(_sslist)
-
-            if entry == "4wym":
-                print(f"\nEntry2: {entry}, SSList: {sslist}")
             sslist2 = []  # list to hold indices for ss_dict2
             for ss in sslist:
                 # Ca distance cutoff
@@ -882,9 +880,10 @@ def Extract_Disulfides(
     # dump the all_ss list of disulfides to a .pkl file. ~520 MB.
     fname = os.path.join(datadir, picklefile)
 
-    print(
-        f"-> Extract_Disulfides(): Saving {len(All_ss_list)} Disulfides to file: {fname}"
-    )
+    if verbose:
+        print(
+            f"-> Extract_Disulfides(): Saving {len(All_ss_list)} Disulfides to file: {fname}"
+        )
 
     with open(fname, "wb+") as f:
         pickle.dump(All_ss_list, f)
@@ -893,9 +892,10 @@ def Extract_Disulfides(
     dict_len = len(All_ss_dict2)
     fname = os.path.join(datadir, dictfile)
 
-    print(
-        f"-> Extract_Disulfides(): Saving indices of {dict_len} Disulfide-containing PDB IDs to file: {fname}"
-    )
+    if verbose:
+        print(
+            f"-> Extract_Disulfides(): Saving indices of {dict_len} Disulfide-containing PDB IDs to file: {fname}"
+        )
 
     with open(fname, "wb+") as f:
         pickle.dump(All_ss_dict2, f)
@@ -903,7 +903,9 @@ def Extract_Disulfides(
     # save the torsions
 
     fname = os.path.join(datadir, torsionfile)
-    print(f"-> Extract_Disulfides(): Saving torsions to file: {fname}")
+    if verbose:
+        print(f"-> Extract_Disulfides(): Saving torsions to file: {fname}")
+
     SS_df.to_csv(fname)
 
     end = time.time()
@@ -999,12 +1001,33 @@ def check_header_from_file(
 
     >>> from proteusPy import check_header_from_file
     >>> from proteusPy.ProteusGlobals import DATA_DIR
-    >>> OK = False
-    >>> OK = check_header_from_file(f'{DATA_DIR}pdb5rsa.ent', verbose=False)
-    >>> OK
-    True
+    >>> errors = 0
+    >>> errors = check_header_from_file(f'{DATA_DIR}pdb5rsa.ent', verbose=False)
+    >>> errors
+    0
     """
     import os
+
+    def extract_id_from_filename(filename: str) -> str:
+        """
+        Extract the ID from a filename formatted as 'pdb{id}.ent'.
+
+        Parameters:
+        - filename (str): The filename to extract the ID from.
+
+        Returns:
+        - str: The extracted ID.
+        """
+        basename = os.path.basename(filename)
+        # Check if the filename follows the expected format
+        if basename.startswith("pdb") and filename.endswith(".ent"):
+            # Extract the ID part of the filename
+            return filename[3:-4]
+        else:
+            mess = (
+                f"Filename {filename} does not follow the expected format 'pdbid .ent'"
+            )
+            raise ValueError(mess)
 
     i = 1
     proximal = distal = -1
@@ -1016,8 +1039,9 @@ def check_header_from_file(
     # Biopython uses the Structure -> Model -> Chain hierarchy to organize
     # structures. All are iterable.
 
+    pdbid = extract_id_from_filename(filename)
     try:
-        structure = parser.get_structure("tmp", file=filename)
+        structure = parser.get_structure(pdbid, file=filename)
         struct_name = structure.get_id()
         model = structure[model_numb]
     except FileNotFoundError:
@@ -1128,16 +1152,11 @@ def check_header_from_id(
     >>> import os
     >>> from proteusPy import Disulfide, check_header_from_id
     >>> from proteusPy.ProteusGlobals import DATA_DIR
-    >>> OK = False
-    >>> OK = check_header_from_id('5rsa', pdb_dir=DATA_DIR, verbose=True)
-     -> SSBond: 1: 5rsa: 26A - 84A
-     -> SSBond: 2: 5rsa: 40A - 95A
-     -> SSBond: 3: 5rsa: 58A - 110A
-     -> SSBond: 4: 5rsa: 65A - 72A
-    >>> OK
-    True
+    >>> errors = 0
+    >>> errors = check_header_from_id('5rsa', pdb_dir=DATA_DIR, verbose=False)
+    >>> errors
+    0
     """
-    parser = PDBParser(PERMISSIVE=True, QUIET=True)
 
     fname = os.path.join(pdb_dir, f"pdb{struct_name}.ent")
     return check_header_from_file(fname, verbose=verbose, dbg=dbg)
