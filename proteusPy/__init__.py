@@ -62,7 +62,9 @@ from .DisulfideClasses import (
 from .DisulfideExceptions import (
     DisulfideConstructionException,
     DisulfideConstructionWarning,
+    DisulfideException,
     DisulfideIOException,
+    DisulfideParseWarning,
 )
 from .DisulfideList import DisulfideList, load_disulfides_from_id
 from .DisulfideLoader import (

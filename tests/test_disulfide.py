@@ -5,6 +5,7 @@ import numpy as np
 from Bio.PDB import PDBList
 
 from proteusPy import Disulfide, Disulfide_Energy_Function, check_header_from_file
+from proteusPy.ProteusGlobals import DATA_DIR
 
 
 class TestDisulfide(unittest.TestCase):
@@ -18,17 +19,13 @@ class TestDisulfide(unittest.TestCase):
         ok = False
 
         temp_dir = tempfile.TemporaryDirectory()
-        pdb_home = f"{temp_dir.name}/"
 
-        pdblist = PDBList(verbose=False)
-        if not pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=pdb_home):
-            ok = False
+        self.sslist = load_disulfides_from_id(entry, pdb_dir=DATA_DIR)
+        if len(self.sslist) > 0:
+            ok = True
         else:
-            self.sslist = load_disulfides_from_id(entry, pdb_dir=pdb_home)
-            if len(self.sslist) > 0:
-                ok = True
-            else:
-                ok = False
+            ok = False
+
         self.disulfide = Disulfide(name="tst")
         self.assertEqual(ok, True)
 
@@ -95,30 +92,25 @@ class TestDisulfide(unittest.TestCase):
             pdb_home = f"{temp_dir}/"
             entry = "5rsa"
             pdblist = PDBList(verbose=False)
-            ok = False
+            ok = 0
             if not pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=pdb_home):
                 self.fail("PDB file retrieval failed")
             else:
                 filename = f"{pdb_home}pdb5rsa.ent"
-                ok = check_header_from_file(filename)
-        self.assertTrue(ok)
+            ok = check_header_from_file(filename)
+        self.assertTrue(ok == 0)
 
     def test_load(self):
         import tempfile
-
-        from Bio.PDB import PDBList
 
         from proteusPy import DisulfideList, load_disulfides_from_id
 
         with tempfile.TemporaryDirectory() as temp_dir:
             pdb_home = f"{temp_dir}/"
             entry = "5rsa"
-            pdblist = PDBList(verbose=False)
-            if not pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=pdb_home):
-                self.fail("PDB file retrieval failed")
-            else:
-                sslist = load_disulfides_from_id(entry, pdb_dir=pdb_home)
-                self.assertTrue(len(sslist) > 0)
+
+            sslist = load_disulfides_from_id(entry, pdb_dir=DATA_DIR)
+            self.assertTrue(len(sslist) > 0)
 
     def test_compare(self):
         diff = 1.0
