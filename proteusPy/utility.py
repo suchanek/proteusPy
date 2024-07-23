@@ -25,8 +25,10 @@ from Bio.PDB import PDBList, PDBParser, Vector
 from Bio.PDB.PDBExceptions import PDBConstructionWarning
 from matplotlib import cm
 
-import proteusPy
-from proteusPy import DisulfideList, ProteusPyWarning
+# import proteusPy
+from proteusPy import DisulfideList
+from proteusPy.DisulfideExceptions import DisulfideParseWarning
+from proteusPy.ProteusPyWarning import ProteusPyWarning
 
 try:
     # Check if running in Jupyter
@@ -69,8 +71,9 @@ def distance_squared(p1: np.array, p2: np.array) -> np.array:
     >>> from proteusPy.utility import distance_squared
     >>> p1 = np.array([1.0, 0.0, 0.0])
     >>> p2 = np.array([0, 1.0, 0])
-    >>> distance_squared(p1, p2)
-    2.0
+    >>> d = distance_squared(p1, p2)
+    >>> d == float(2)
+    np.True_
     """
     return np.sum(np.square(np.subtract(p1, p2)))
 
@@ -579,8 +582,9 @@ def Download_Disulfides(
                 shutil.copy(f"pdb{entry}.ent", destination_file_path)
                 # Delete the original file
                 os.remove(f"pdb{entry}.ent")
-                continue  # this entry has no SS bonds, so we break the loop and move on to the next entry 39000 structures. The total download takes about 12 hours. The
-    function keeps track of downloaded files so it's possible to interrupt and
+                continue  # this entry has no SS bonds, so we break the loop and move on to the next entry 39000 structures. The tot    import os
+
+    fname = os.path.join(pdb_dir, f"pdb{struct_name}.ent")nction keeps track of downloaded files so it's possible to interrupt and
     restart the download without duplicating effort.
 
     :param pdb_home: Path for downloaded files, defaults to PDB_DIR
@@ -790,9 +794,9 @@ def Extract_Disulfides(
         # sslist, xchain = prune_extra_ss(_sslist)
         # sslist = _sslist
 
-        sslist = remove_duplicate_ss(_sslist)
+        if len(_sslist) > 0 or _sslist is None:
+            sslist = remove_duplicate_ss(_sslist)
 
-        if len(sslist) > 0:
             if entry == "4wym":
                 print(f"\nEntry2: {entry}, SSList: {sslist}")
             sslist2 = []  # list to hold indices for ss_dict2
@@ -842,6 +846,7 @@ def Extract_Disulfides(
             bad += 1
             problem_ids.append(entry)
             if prune:
+
                 print(f"\n--> No SS parsed for: {entry}")
                 fname = f"pdb{entry}.ent"
                 # Construct the full path for the new destination file
@@ -967,8 +972,9 @@ def Extract_Disulfide(
         id, model_numb=0, verbose=verbose, quiet=quiet, pdb_dir=pdbdir
     )
 
-    if len(_sslist) == 0:
-        print(f"--> Can't parse: {pdbid}")
+    if len(_sslist) == 0 or _sslist is None:
+        print(f"--> Can't find SSBonds: {pdbid}")
+        return DisulfideList([], id)
 
     # return to original directory
     return _sslist
@@ -976,7 +982,7 @@ def Extract_Disulfide(
 
 def check_header_from_file(
     filename: str, model_numb=0, verbose=False, dbg=False
-) -> bool:
+) -> int:
     """
     Parse the Disulfides contained in the PDB file.
 
@@ -1036,10 +1042,22 @@ def check_header_from_file(
 
     for pair in ssbonds:
         # in the form (proximal, distal, chain)
+        errors = 0
         proximal = pair[0]
         distal = pair[1]
+        chain1_id = pair[2]
+        chain2_id = pair[3]
+
+        if chain1_id is None or chain2_id is None:
+            errors += 1
+            if verbose:
+                mess = f" ! Cannot parse SSBond record (NULL chain):\
+                 {struct_name} Prox:  {proximal} Dist: {distal}"
+                warnings.warn(mess, DisulfideParseWarning)
+            continue
 
         if not proximal.isnumeric() or not distal.isnumeric():
+            errors += 1
             if verbose:
                 mess = f" ! Cannot parse SSBond record (non-numeric IDs):\
                  {struct_name} Prox:  {proximal} {chain1_id} Dist: {distal} {chain2_id}"
@@ -1048,9 +1066,6 @@ def check_header_from_file(
         else:
             proximal = int(proximal)
             distal = int(distal)
-
-        chain1_id = pair[2]
-        chain2_id = pair[3]
 
         _chaina = model[chain1_id]
         _chainb = model[chain2_id]
@@ -1065,6 +1080,7 @@ def check_header_from_file(
             prox_res = _chaina[proximal]
             dist_res = _chainb[distal]
         except KeyError:
+            errors += 1
             print(
                 f" ! Cannot parse SSBond record (KeyError): {struct_name} Prox: <{proximal}> {chain1_id} Dist: <{distal}> {chain2_id}"
             )
@@ -1072,6 +1088,7 @@ def check_header_from_file(
 
         if (_chaina is not None) and (_chainb is not None):
             if _chaina[proximal].is_disordered() or _chainb[distal].is_disordered():
+                errors += 1
                 continue
             else:
                 if verbose:
@@ -1079,17 +1096,18 @@ def check_header_from_file(
                         f" -> SSBond: {i}: {struct_name}: {proximal}{chain1_id} - {distal}{chain2_id}"
                     )
         else:
+            errors += 1
             if dbg:
                 print(
                     f" -> NULL chain(s): {struct_name}: {proximal}{chain1_id} - {distal}{chain2_id}"
                 )
         i += 1
-    return True
+    return errors
 
 
 def check_header_from_id(
     struct_name: str, pdb_dir=".", model_numb=0, verbose=False, dbg=False
-) -> bool:
+) -> int:
     """
     Check parsability PDB ID and initializes the Disulfide objects.
     Assumes the file is downloaded in ```MODEL_DIR``` path.
@@ -1101,7 +1119,7 @@ def check_header_from_id(
     :param model_numb: model number to use, defaults to 0 for single structure files.
     :param verbose: print info while parsing
     :param dbg: Debugging Flag
-    :return: True if OK, False otherwise
+    :return: number of errors found.
 
     Example:
       Assuming the DATA_DIR has the pdb5rsa.ent file we can check the file thusly:
@@ -1120,64 +1138,9 @@ def check_header_from_id(
     True
     """
     parser = PDBParser(PERMISSIVE=True, QUIET=True)
-    structure = parser.get_structure(struct_name, file=f"{pdb_dir}pdb{struct_name}.ent")
-    model = structure[0]
 
-    ssbond_dict = structure.header["ssbond"]  # NB: this requires the modified code
-
-    bondlist = []
-    i = 0
-
-    # get a list of tuples containing the proximal, distal residue IDs for
-    # all SSBonds in the chain.
-    bondlist = parse_ssbond_header_rec(ssbond_dict)
-
-    if len(bondlist) == 0:
-        if verbose:
-            print("-> check_header_from_id(): no bonds found in bondlist.")
-        return False
-
-    for pair in bondlist:
-        # in the form (proximal, distal, chain)
-        proximal = pair[0]
-        distal = pair[1]
-        chain1 = pair[2]
-        chain2 = pair[3]
-
-        chaina = model[chain1]
-        chainb = model[chain2]
-
-        try:
-            prox_residue = chaina[proximal]
-            dist_residue = chainb[distal]
-
-            prox_residue.disordered_select("CYS")
-            dist_residue.disordered_select("CYS")
-
-            if (
-                prox_residue.get_resname() != "CYS"
-                or dist_residue.get_resname() != "CYS"
-            ):
-                if verbose:
-                    print(
-                        f"build_disulfide() requires CYS at both residues:\
-                     {prox_residue.get_resname()} {dist_residue.get_resname()}"
-                    )
-                return False
-        except KeyError:
-            if dbg:
-                print(
-                    f"Keyerror: {struct_name}: {proximal} {chain1} - {distal} {chain2}"
-                )
-                return False
-
-        if verbose:
-            print(
-                f" -> SSBond: {i+1}: {struct_name}: {proximal}{chain1} - {distal}{chain2}"
-            )
-
-        i += 1
-    return True
+    fname = os.path.join(pdb_dir, f"pdb{struct_name}.ent")
+    return check_header_from_file(fname, verbose=verbose, dbg=dbg)
 
 
 if __name__ == "__main__":
