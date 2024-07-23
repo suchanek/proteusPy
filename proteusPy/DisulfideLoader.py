@@ -82,7 +82,7 @@ class DisulfideLoader:
         torsion_file: str = SS_TORSIONS_FILE,
         quiet: bool = True,
         subset: bool = False,
-        cutoff: float = 8.0,
+        cutoff: float = -1.0,
     ) -> None:
         """
         Initializing the class initiates loading either the entire Disulfide dataset,
