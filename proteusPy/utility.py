@@ -1115,7 +1115,7 @@ def check_header_from_file(
                 errors += 1
                 continue
             else:
-                if verbose:
+                if dbg:
                     print(
                         f" -> SSBond: {i}: {struct_name}: {proximal}{chain1_id} - {distal}{chain2_id}"
                     )

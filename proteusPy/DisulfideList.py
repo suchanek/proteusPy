@@ -1112,7 +1112,7 @@ def load_disulfides_from_id(
     structure = parser.get_structure(struct_name, file=structure_fname)
     model = structure[model_numb]
 
-    if verbose:
+    if dbg:
         print(f"-> load_disulfide_from_id() - Parsing structure: {struct_name}:")
 
     ssbond_dict = structure.header["ssbond"]  # NB: this requires the modified code
@@ -1181,7 +1181,7 @@ def load_disulfides_from_id(
                 warnings.warn(mess, DisulfideConstructionWarning)
                 continue
             else:
-                if verbose:
+                if dbg:
                     print(
                         f" -> load_disulfides_from_id(): SSBond: {i}: {struct_name}: {proximal} |{chain1_id}| - {distal} |{chain2_id}|"
                     )
