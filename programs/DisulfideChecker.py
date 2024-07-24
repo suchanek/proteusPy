@@ -80,7 +80,7 @@ def check_files(
     for fname in pbar:
         entry = name_to_id(fname)
 
-        if not check_header_from_file(fname, verbose=verbose):
+        if check_header_from_file(fname, verbose=verbose) > 0:
             badcount += 1
             destination_path = os.path.join(bad_dir, os.path.basename(fname))
 

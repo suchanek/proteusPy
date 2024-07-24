@@ -47,6 +47,28 @@ REPO_DATA = os.path.join(HOME_DIR, "repos/proteusPy/data/")
 DATA_DIR = os.path.join(PDB_BASE, "data/")
 
 
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Disulfide Extractor")
+    parser.add_argument("--all", action="store_true", help="Process all files")
+    parser.add_argument("--extract", action="store_true", help="Extract data")
+    parser.add_argument("--build", action="store_true", help="Build data")
+    parser.add_argument("--update", action="store_true", help="Update data")
+    parser.add_argument("--full", action="store_true", help="Full processing")
+    parser.add_argument("--subset", type=str, help="Subset to process")
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
+    parser.add_argument("--cutoff", type=float, help="Cutoff value")
+    parser.add_argument("pdb_dir", type=str, help="Directory containing PDB files")
+    parser.set_defaults(all=False)
+    parser.set_defaults(update=False)
+    parser.set_defaults(verbose=True)
+    parser.set_defaults(extract=True)
+    parser.set_defaults(subset=True)
+    parser.set_defaults(build=True)
+    parser.set_defaults(full=False)
+    parser.set_defaults(cutoff=-1.0)
+    return parser.parse_args()
+
+
 def do_extract(verbose, full, subset, cutoff, homedir):
     if subset:
         if verbose:
@@ -164,97 +186,28 @@ def do_stuff(
     return
 
 
-parser = argparse.ArgumentParser()
+def main():
+    args = parse_arguments()
 
-parser.add_argument(
-    "-a",
-    "--all",
-    help="do everything. Extract, build and save both datasets",
-    action=argparse.BooleanOptionalAction,
-)
-parser.add_argument(
-    "-c",
-    "--cutoff",
-    help="distance cutoff for disulfide distance pruning",
-    type=float,
-    required=False,
-)
-parser.add_argument(
-    "-u",
-    "--update",
-    help="update the repo package",
-    action=argparse.BooleanOptionalAction,
-)
-parser.add_argument(
-    "-v",
-    "--verbose",
-    help="level of verbosity",
-    action=argparse.BooleanOptionalAction,
-)
-parser.add_argument(
-    "-e",
-    "--extract",
-    help="extract disulfides from the PDB structure files",
-    action=argparse.BooleanOptionalAction,
-)
-parser.add_argument(
-    "-f",
-    "--full",
-    help="extract all disulfides from the PDB structure files",
-    action=argparse.BooleanOptionalAction,
-)
-parser.add_argument(
-    "-b",
-    "--build",
-    help="rebuild the loader",
-    action=argparse.BooleanOptionalAction,
-)
-parser.add_argument(
-    "-s",
-    "--subset",
-    help="rebuild the subset only",
-    action=argparse.BooleanOptionalAction,
-)
+    print(f"DisulfideExtractor parsing {args.pdb_dir}: {datetime.datetime.now()}")
+    start = time.time()
 
-parser.set_defaults(all=False)
-parser.set_defaults(update=False)
-parser.set_defaults(verbose=True)
-parser.set_defaults(extract=True)
-parser.set_defaults(subset=True)
-parser.set_defaults(build=True)
-parser.set_defaults(full=False)
-parser.set_defaults(cutoff=-1.0)
+    do_stuff(
+        all=args.all,
+        extract=args.extract,
+        build=args.build,
+        update=args.update,
+        full=args.full,
+        subset=args.subset,
+        verbose=args.verbose,
+        cutoff=args.cutoff,
+    )
 
-args = parser.parse_args()
+    end = time.time()
+    print(f"Processing completed in {end - start:.2f} seconds")
 
-all = args.all
-extract = args.extract
-build = args.build
-update = args.update
-full = args.full
-subset = args.subset
-verbose = args.verbose
-cutoff = args.cutoff
 
-print(f"DisulfideExtractor parsing {PDB_DIR}: {datetime.datetime.now()}")
-start = time.time()
-
-do_stuff(
-    all=all,
-    extract=extract,
-    build=build,
-    full=full,
-    update=update,
-    subset=subset,
-    verbose=verbose,
-    cutoff=cutoff,
-)
-
-end = time.time()
-elapsed = end - start
-
-print(
-    f"DisulfideExtractor Complete!\nElapsed time: {datetime.timedelta(seconds=elapsed)} (h:m:s)"
-)
+if __name__ == "__main__":
+    main()
 
 # End of file
