@@ -3,7 +3,7 @@
 # consistency, and moves good files to the PDB_DIR/good directory,
 # moves them to PDB_DIR/bad otherwise.
 # Author: Eric G. Suchanek, PhD
-# Last modification 7/4/2024
+# Last modification 7/24/2024
 
 
 import os
@@ -14,11 +14,12 @@ import numpy
 from Bio.PDB import PDBList, PDBParser
 from tqdm import tqdm
 
-from proteusPy import Extract_Disulfide, check_header_from_file
+from proteusPy import check_header_from_file
 
 PDB_DIR = "/Users/egs/PDB"
-GOOD_DIR = PDB_DIR + "/good"
-BAD_DIR = PDB_DIR + "/bad"
+
+GOOD_DIR = os.path.join(PDB_DIR, "good")
+BAD_DIR = os.path.join(PDB_DIR, "bad")
 
 
 def extract_pdb_id(filename: str) -> str:
@@ -76,7 +77,7 @@ def check_files(
     badcount = 0
     count = 0
 
-    pbar = tqdm(all_pdb_files, ncols=100)
+    pbar = tqdm(all_pdb_files, ncols=80)
     for fname in pbar:
         entry = name_to_id(fname)
 

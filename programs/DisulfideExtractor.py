@@ -12,16 +12,17 @@ build the DisulfideLoader object, and save it into the proteusPy module data dir
 * Subset: Only extract and process the first 1000 Disulfides found in the PDB directory.
 
 Author: Eric G. Suchanek, PhD.
-Last revision: 7/10/24 -egs-
+Last revision: 7/23/24 -egs-
 """
 
 import argparse
 import datetime
 import os
+import sys
 import time
 from shutil import copy
 
-from proteusPy import DisulfideLoader, Extract_Disulfides
+from proteusPy import Extract_Disulfides, __version__
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
     LOADER_FNAME,
@@ -34,30 +35,62 @@ from proteusPy.ProteusGlobals import (
 
 HOME_DIR = os.path.expanduser("~")
 PDB_BASE = os.getenv("PDB")
+PDB_DIR = MODULE_DATA = REPO_DATA = DATA_DIR = ""
 
-# location of cleaned PDB files, created with DisulfideDownloader.py
+
+if not os.path.isdir(PDB_BASE):
+    print(f"Error: The directory {PDB_BASE} does not exist.")
+    sys.exit(1)
+else:
+    print(f"Found PDB directory at: {PDB_BASE}  ")
+
 PDB_DIR = os.path.join(PDB_BASE, "good/")
-
-# this is specific to having a directory structure of ~/repos/proteusPy
+if not os.path.isdir(PDB_DIR):
+    print(f"Error: The directory {PDB_DIR} does not exist.")
+    sys.exit(1)
 
 MODULE_DATA = os.path.join(HOME_DIR, "repos/proteusPy/proteusPy/data/")
-REPO_DATA = os.path.join(HOME_DIR, "repos/proteusPy/data/")
+if not os.path.isdir(MODULE_DATA):
+    print(f"Error: The directory {MODULE_DATA} does not exist.")
+    sys.exit(1)
 
-# location of the compressed Disulfide .pkl files
+REPO_DATA = os.path.join(HOME_DIR, "repos/proteusPy/data/")
+if not os.path.isdir(REPO_DATA):
+    print(f"Error: The directory {REPO_DATA} does not exist.")
+    sys.exit(1)
+
 DATA_DIR = os.path.join(PDB_BASE, "data/")
+if not os.path.isdir(DATA_DIR):
+    print(f"Error: The directory {DATA_DIR} does not exist.")
+    sys.exit(1)
+
+print(
+    f"Using PDB models at: {PDB_DIR}\nData directory: {DATA_DIR}\nModule data directory: {MODULE_DATA}\nRepo data directory: {REPO_DATA}"
+)
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description="Disulfide Extractor")
-    parser.add_argument("--all", action="store_true", help="Process all files")
+    parser = argparse.ArgumentParser(
+        description=f"""proteusPy v{__version__} Disulfide Bond Extractor. 
+        This program extracts disulfide bonds from PDB files and builds a DisulfideLoader object.
+        The program expects the environment variable PDB to be set to the base location of the PDB files.
+        The PDB files are expected to be in the PDB/good directory. Relevant output files, (SS_*LOADER*.pkl) are stored in PDB/data."""
+    )
+    parser.add_argument(
+        "--all",
+        action="store_true",
+        help="Process full and subset, create loaders, and update repo",
+    )
     parser.add_argument("--extract", action="store_true", help="Extract data")
-    parser.add_argument("--build", action="store_true", help="Build data")
-    parser.add_argument("--update", action="store_true", help="Update data")
-    parser.add_argument("--full", action="store_true", help="Full processing")
-    parser.add_argument("--subset", type=str, help="Subset to process")
+    parser.add_argument("--build", action="store_true", help="Build loader")
+    parser.add_argument("--update", action="store_true", help="Update repo")
+    parser.add_argument("--full", action="store_true", help="Process full SS database")
+    parser.add_argument("--subset", action="store_true", help="Process SS subset")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
-    parser.add_argument("--cutoff", type=float, help="Cutoff value")
-    parser.add_argument("pdb_dir", type=str, help="Directory containing PDB files")
+    parser.add_argument(
+        "--cutoff", type=float, help="Disulfide Distance Cutoff, (Angstrom)"
+    )
+
     parser.set_defaults(all=False)
     parser.set_defaults(update=False)
     parser.set_defaults(verbose=True)
@@ -189,7 +222,7 @@ def do_stuff(
 def main():
     args = parse_arguments()
 
-    print(f"DisulfideExtractor parsing {args.pdb_dir}: {datetime.datetime.now()}")
+    print(f"DisulfideExtractor parsing {PDB_DIR}: {datetime.datetime.now()}")
     start = time.time()
 
     do_stuff(
