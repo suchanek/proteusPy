@@ -11,10 +11,9 @@ import os
 import shutil
 import sys
 import time
+from datetime import timedelta
 from glob import glob
 
-import numpy
-from Bio.PDB import PDBList, PDBParser
 from tqdm import tqdm
 
 from proteusPy import check_header_from_file
@@ -40,7 +39,7 @@ if not os.path.isdir(GOOD_DIR):
     sys.exit(1)
 
 
-BAD_DIR = os.path.join(PDB_BASE, "bad")
+BAD_DIR = os.path.join(PDB_BASE, "bad/")
 if not os.path.isdir(BAD_DIR):
     logging.error(f"Error: The directory {BAD_DIR} does not exist.")
     sys.exit(1)
@@ -64,12 +63,8 @@ def extract_pdb_id(filename: str) -> str:
         )
 
 
-pdblist = PDBList(verbose=False)
-parser = PDBParser(PERMISSIVE=True)
-
-
 def check_files(
-    pdb_dir: str, good_dir: str, bad_dir: str, verbose=True, quiet=True
+    pdb_dir: str, good_dir: str, bad_dir: str, verbose=False, quiet=True
 ) -> None:
     """
     Checks all PDB files in the directory `pdb_dir` for SS bond consistency.
@@ -93,7 +88,7 @@ def check_files(
 
     os.chdir(pdb_dir)
     all_pdb_files = glob("*.ent")
-    # print(f"{all_pdb_files}")
+
     if len(all_pdb_files) == 0:
         print(f"No PDB files! Exiting...")
         return None
@@ -128,7 +123,8 @@ def check_files(
                     os.remove(destination_path)
 
                 shutil.move(fname, destination_path)
-                print(f"Bad file: {fname} moved to {bad_dir}")
+                if verbose:
+                    logging.info(f"Bad file: {fname} moved to {bad_dir}")
             else:
                 destination_path = os.path.join(good_dir, os.path.basename(fname))
 
@@ -136,7 +132,8 @@ def check_files(
                     os.remove(destination_path)
 
                 shutil.move(fname, destination_path)
-                print(f"Good file: {fname} moved to {good_dir}")
+                if verbose:
+                    logging.info(f"Good file: {fname} moved to {good_dir}")
 
         count += 1
         pbar.set_postfix({"ID": entry, "Bad": badcount})
@@ -150,12 +147,13 @@ def check_files(
 
 if __name__ == "__main__":
     start_time = time.time()
-    check_files(PDB_BASE, GOOD_DIR, BAD_DIR)
-    end_time = time.time()
-    # Calculate the elapsed time
-    elapsed_time = end_time - start_time
 
-    # Print the elapsed time
-    print(f"Elapsed time: {elapsed_time} seconds")
+    check_files(PDB_BASE, GOOD_DIR, BAD_DIR)
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    elapsed_timedelta = timedelta(seconds=elapsed_time)
+
+    print(f"Elapsed time: {elapsed_timedelta} seconds")
 
 # end of file
