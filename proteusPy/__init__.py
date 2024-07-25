@@ -16,6 +16,7 @@ __pdoc__ = {
 import copy
 import datetime
 import glob
+import logging
 import math
 import os
 import pickle
@@ -23,6 +24,14 @@ import subprocess
 import sys
 import time
 import warnings
+
+# Configure logging
+logging.basicConfig(
+    level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+# Suppress findfont debug messages
+logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
 
 import matplotlib.pyplot as plt
 import numpy
