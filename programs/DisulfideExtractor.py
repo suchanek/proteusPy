@@ -71,7 +71,7 @@ print(
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description=f"""proteusPy v{__version__} Disulfide Bond Extractor. 
+        description=f"""proteusPy v{__version__} Disulfide Bond Extractor.\n 
         This program extracts disulfide bonds from PDB files and builds a DisulfideLoader object.
         The program expects the environment variable PDB to be set to the base location of the PDB files.
         The PDB files are expected to be in the PDB/good directory. Relevant output files, (SS_*LOADER*.pkl) are stored in PDB/data."""
@@ -121,7 +121,7 @@ def do_extract(verbose, full, subset, cutoff, homedir):
         )
 
     # total extraction uses numb=-1 and takes about 1.5 hours on
-    # my 2021 MacbookPro M1 Pro computer.
+    # a 2021 MacbookPro M1 Pro computer, ~50 minutes on a 2023 M3 Max MacbookPro
 
     if full:
         if verbose:
@@ -140,7 +140,7 @@ def do_extract(verbose, full, subset, cutoff, homedir):
 
 def do_build(verbose, full, subset, cutoff):
     """
-    Loads and saves a ```proteusPy.DisulfideLoader``` object
+    Load and save a ```proteusPy.DisulfideLoader``` object
     to a .pkl file.
 
     :param verbose: Verbosity, boolean
@@ -222,7 +222,7 @@ def do_stuff(
 def main():
     args = parse_arguments()
 
-    print(f"DisulfideExtractor parsing {PDB_DIR}: {datetime.datetime.now()}")
+    print(f"DisulfideExtractor parsing {PDB_DIR} at: {datetime.datetime.now()}")
     start = time.time()
 
     do_stuff(

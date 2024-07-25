@@ -20,6 +20,7 @@ try:
 except NameError:
     from tqdm import tqdm
 
+import logging
 from collections import UserList
 from pathlib import Path
 
@@ -30,6 +31,19 @@ import plotly.graph_objects as go
 import pyvista as pv
 from Bio.PDB import PDBParser
 from plotly.subplots import make_subplots
+
+# Configure logging
+logging.basicConfig(
+    level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+# create a module logger and set the level to WARNING
+_logger = logging.getLogger(__name__)
+_logger.setLevel(logging.WARNING)
+_handler = logging.StreamHandler()
+_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+_handler.setFormatter(_formatter)
+_logger.addHandler(_handler)
 
 import proteusPy
 from proteusPy import Disulfide
@@ -1063,7 +1077,7 @@ def load_disulfides_from_id(
     pdb_dir=MODEL_DIR,
     model_numb=0,
     verbose=False,
-    quiet=False,
+    quiet=True,
     dbg=False,
 ) -> DisulfideList:
     """
@@ -1123,76 +1137,79 @@ def load_disulfides_from_id(
     # list of tuples with (proximal distal chaina chainb)
     ssbonds = parse_ssbond_header_rec(ssbond_dict)
 
-    with warnings.catch_warnings():
-        if quiet:
-            warnings.filterwarnings("ignore")
-        for pair in ssbonds:
-            # in the form (proximal, distal, chain)
-            proximal = pair[0]
-            distal = pair[1]
-            chain1_id = pair[2]
-            chain2_id = pair[3]
+    # with warnings.catch_warnings():
+    if quiet:
+        _logger.setLevel(logging.ERROR)
 
-            if not proximal.isnumeric() or not distal.isnumeric():
-                mess = f" -> load_disulfides_from_id(): Cannot parse SSBond record (non-numeric IDs):\
-                {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring."
-                warnings.warn(mess, DisulfideConstructionWarning)
-                continue
-            else:
-                proximal = int(proximal)
-                distal = int(distal)
+    for pair in ssbonds:
+        # in the form (proximal, distal, chain)
+        proximal = pair[0]
+        distal = pair[1]
+        chain1_id = pair[2]
+        chain2_id = pair[3]
 
-            if proximal == distal:
-                mess = f" -> load_disulfides_from_id(): Cannot parse SSBond record (proximal == distal):\
-                {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
-                warnings.warn(mess, DisulfideConstructionWarning)
+        if not proximal.isnumeric() or not distal.isnumeric():
+            mess = f" -> load_disulfides_from_id(): Cannot parse SSBond record (non-numeric IDs):\
+            {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring."
+            _logger.warn(mess)
+            continue
+        else:
+            proximal = int(proximal)
+            distal = int(distal)
 
-            _chaina = model[chain1_id]
-            _chainb = model[chain2_id]
+        if proximal == distal:
+            mess = f" -> load_disulfides_from_id(): SSBond record has (proximal == distal):\
+            {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
+            _logger.warn(mess)
 
-            if (_chaina is None) or (_chainb is None):
-                mess = f" -> load_disulfides_from_id(): NULL chain(s): {struct_name}: {proximal} {chain1_id}\
-                - {distal} {chain2_id}, ignoring!"
-                warnings.warn(mess, DisulfideConstructionWarning)
-                continue
+        _chaina = model[chain1_id]
+        _chainb = model[chain2_id]
 
-            if chain1_id != chain2_id:
-                if verbose:
-                    mess = f" -> load_disulfides_from_id(): Cross Chain SS for: Prox: {proximal} {chain1_id}\
-                    Dist: {distal} {chain2_id}"
-                    warnings.warn(mess, DisulfideConstructionWarning)
-                pass  # was break
+        if (_chaina is None) or (_chainb is None):
+            mess = f" -> load_disulfides_from_id(): NULL chain(s): {struct_name}: {proximal} {chain1_id}\
+            - {distal} {chain2_id}, ignoring!"
+            _logger.warn(mess)
+            continue
 
-            try:
-                prox_res = _chaina[proximal]
-                dist_res = _chainb[distal]
+        if chain1_id != chain2_id:
+            if verbose:
+                mess = f" -> load_disulfides_from_id(): Cross Chain SS for: Prox: {proximal} {chain1_id}\
+                Dist: {distal} {chain2_id}"
+                _logger.info(mess)
+            pass  # was break
 
-            except KeyError:
-                mess = f"Cannot parse SSBond record (KeyError): {struct_name} Prox:\
-                {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring!"
-                warnings.warn(mess, DisulfideConstructionWarning)
-                continue
+        try:
+            prox_res = _chaina[proximal]
+            dist_res = _chainb[distal]
 
-            # make a new Disulfide object, name them based on proximal and distal
-            # initialize SS bond from the proximal, distal coordinates
+        except KeyError:
+            mess = f"Cannot parse SSBond record (KeyError): {struct_name} Prox:\
+            {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring!"
+            _logger.warn(mess)
+            continue
 
-            if _chaina[proximal].is_disordered() or _chainb[distal].is_disordered():
-                mess = f" -> load_disulfides_from_id(): Disordered chain(s): {struct_name}: {proximal} {chain1_id} - {distal} {chain2_id}, ignoring!"
-                warnings.warn(mess, DisulfideConstructionWarning)
-                continue
-            else:
-                if dbg:
-                    print(
-                        f" -> load_disulfides_from_id(): SSBond: {i}: {struct_name}: {proximal} |{chain1_id}| - {distal} |{chain2_id}|"
-                    )
-                ssbond_name = f"{struct_name}_{proximal}{chain1_id}_{distal}{chain2_id}"
-                new_ss = Disulfide(ssbond_name)
-                res = new_ss.initialize_disulfide_from_chain(
-                    _chaina, _chainb, proximal, distal, resolution, quiet=quiet
-                )
-                if res:
-                    SSList.append(new_ss)
-            i += 1
+        # make a new Disulfide object, name them based on proximal and distal
+        # initialize SS bond from the proximal, distal coordinates
+
+        if _chaina[proximal].is_disordered() or _chainb[distal].is_disordered():
+            mess = f" -> load_disulfides_from_id(): Disordered chain(s): {struct_name}: {proximal} {chain1_id} - {distal} {chain2_id}, ignoring!"
+            _logger.warn(mess)
+            continue
+        else:
+            _logger.info(
+                f"SSBond: {i}: {struct_name}: {proximal} |{chain1_id}| - {distal} |{chain2_id}|"
+            )
+            ssbond_name = f"{struct_name}_{proximal}{chain1_id}_{distal}{chain2_id}"
+            new_ss = Disulfide(ssbond_name)
+            res = new_ss.initialize_disulfide_from_chain(
+                _chaina, _chainb, proximal, distal, resolution, quiet=quiet
+            )
+            if res:
+                SSList.append(new_ss)
+        i += 1
+
+    _logger.setLevel(logging.WARNING)
+
     return copy.deepcopy(SSList)
 
 

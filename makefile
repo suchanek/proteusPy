@@ -77,7 +77,7 @@ install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	@$(CONDA) install vtk==9.2.6 -y
 	
-	pip install -e .
+	pip install -e . -q
 	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	pip install pdoc twine black pytest build
 	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"

@@ -21,6 +21,23 @@ import pyvista as pv
 np.set_printoptions(suppress=True)
 pv.global_theme.color = "white"
 
+# Configure logging
+logging.basicConfig(
+    level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+# create a module logger and set the level to WARNING
+_logger = logging.getLogger(__name__)
+_logger.setLevel(logging.WARNING)
+_handler = logging.StreamHandler()
+_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+_handler.setFormatter(_formatter)
+_logger.addHandler(_handler)
+
+# Suppress findfont debug messages
+logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
+
+
 from Bio.PDB import Vector, calc_dihedral
 
 import proteusPy
@@ -1527,6 +1544,8 @@ class Disulfide:
         """
         id = chain1.get_full_id()[0]
         self.pdb_id = id
+        if quiet:
+            _logger.setLevel(logging.ERROR)
 
         chi1 = chi2 = chi3 = chi4 = chi5 = _ANG_INIT
 
@@ -1554,14 +1573,17 @@ class Disulfide:
         self.distal_residue_fullid = dist_residue.get_full_id()
 
         if quiet:
-            warnings.filterwarnings("ignore", category=DisulfideConstructionWarning)
-        else:
-            warnings.simplefilter("always")
+            _logger.setLevel(logging.ERROR)
+
+        # if quiet:
+        #    warnings.filterwarnings("ignore", category=DisulfideConstructionWarning)
+        # else:
+        #    warnings.simplefilter("always")
 
         # grab the coordinates for the proximal and distal residues as vectors
         # so we can do math on them later
-        # proximal residue
 
+        # proximal residue
         try:
             n1 = prox_residue["N"].get_vector()
             ca1 = prox_residue["CA"].get_vector()
@@ -1571,9 +1593,7 @@ class Disulfide:
             sg1 = prox_residue["SG"].get_vector()
 
         except Exception:
-            logging.warn(
-                f"Invalid or missing coordinates for proximal residue {proximal}"
-            )
+            _logger.warn(f"Invalid/missing coordinates for: {id}, proximal: {prox}")
             return False
 
         # distal residue
@@ -1586,7 +1606,7 @@ class Disulfide:
             sg2 = dist_residue["SG"].get_vector()
 
         except Exception:
-            print(f"Invalid or missing coordinates for distal residue {distal}")
+            _logger.error(f"Invalid/missing coordinates for: {id}, distal: {dist}")
             return False
 
         # previous residue and next residue - optional, used for phi, psi calculations
@@ -1610,10 +1630,11 @@ class Disulfide:
             self.psidist = np.degrees(calc_dihedral(n2, ca2, c2, nnext_dist))
 
         except Exception:
-            mess = f"Missing coords for: {id} {prox-1} or {dist+1} for SS {proximal}-{distal}"
+            _logger.warning(
+                f"Missing coords for: {id} {prox-1} or {dist+1}, SS {prox}-{dist}, phi/psi not computed."
+            )
             cprev_prox = nnext_prox = cprev_dist = nnext_dist = Vector(-1.0, -1.0, -1.0)
             self.missing_atoms = True
-            # print(f"{mess}")
 
         # update the positions and conformation
         self.set_positions(
@@ -1655,6 +1676,8 @@ class Disulfide:
 
         # compute and set the local coordinates
         self.compute_local_coords()
+        if quiet:
+            _logger.setLevel(logging.WARNING)
         return True
 
     def internal_coords(self) -> np.array:

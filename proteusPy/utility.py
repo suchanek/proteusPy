@@ -5,7 +5,7 @@ License: BSD\n
 Copyright (c)2024 Eric G. Suchanek, PhD, all rights reserved
 """
 
-# Last modification 7/13/24 -egs-
+# Last modification 7/25/24 -egs-
 
 
 import copy
@@ -23,6 +23,14 @@ import warnings
 logging.basicConfig(
     level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s"
 )
+
+# create a module logger and set the level to WARNING
+_logger = logging.getLogger(__name__)
+_logger.setLevel(logging.WARNING)
+_handler = logging.StreamHandler()
+_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+_handler.setFormatter(_formatter)
+_logger.addHandler(_handler)
 
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
@@ -47,6 +55,8 @@ try:
         from tqdm import tqdm
 except NameError:
     from tqdm import tqdm
+
+from tqdm.contrib.logging import logging_redirect_tqdm
 
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
@@ -185,17 +195,17 @@ def Check_chains(pdbid, pdbdir, verbose=True):
             chain_length = len(chain.get_list())
             chain_id = chain.get_id()
             if verbose:
-                logging.warn(f"Chain: {chain_id}, length: {chain_length}")
+                _logger.warn(f"Chain: {chain_id}, length: {chain_length}")
             chain_lens.append(chain_length)
 
         if np.min(chain_lens) != np.max(chain_lens):
             same = False
             if verbose:
-                logging.warn(f"chain lengths are unequal: {chain_lens}")
+                _logger.warn(f"chain lengths are unequal: {chain_lens}")
         else:
             same = True
             if verbose:
-                logging.warn(
+                _logger.warn(
                     f"Chains are equal length, assuming the same. {chain_lens}"
                 )
     return same
@@ -276,7 +286,7 @@ def download_file(url, directory, verbose=False):
 
     if not os.path.exists(file_path):
         if verbose:
-            logging.info(f"Downloading {file_name}...")
+            _logger.info(f"Downloading {file_name}...")
         command = ["wget", "-P", directory, url]
         subprocess.run(command, check=True)
         print("Download complete.")
@@ -569,31 +579,19 @@ def parse_ssbond_header_rec(ssbond_dict: dict) -> list:
     return disulfide_list
 
 
-#
-# Function reads a comma separated list of PDB IDs and download the corresponding
-# .ent files to the PDB_DIR global.
-# Used to download the list of proteins containing at least one SS bond
-# with the ID list generated from: http://www.rcsb.org/
-#
-
-
 def Download_Disulfides(
     pdb_home=PDB_DIR, model_home=MODEL_DIR, verbose=False, reset=False
 ) -> None:
     """
-    Read a comma separated list of PDB IDs and download them
-    to the pdb_home path.
+    Read a comma separated list of PDB IDs and download them to the ``pdb_home`` path.
 
-    This utility function is used to download proteins containing at            if prune:
-                # Construct the full path for the new destination file
-                destination_file_path = os.path.join(bad_dir, f"pdb{entry}.ent")
-                # Copy the file to the new destination with the correct filename
-                shutil.copy(f"pdb{entry}.ent", destination_file_path)
-                # Delete the original file
-                os.remove(f"pdb{entry}.ent")
-                continue  # this entry has no SS bonds, so we break the loop and move on to the next entry 39000 structures. The tot    import os
+    This utility function is used to download proteins containing at least one
+    SS bond with the ID list generated from: http://www.rcsb.org/.
 
-    fname = os.path.join(pdb_dir, f"pdb{struct_name}.ent")nction keeps track of downloaded files so it's possible to interrupt and
+    This is the primary data loader for the proteusPy Disulfide analysis package.
+    The list of IDs represents files in the RCSB containing > 1 disulfide bond,
+    and it contains over 39000 structures. The total download takes about 12 hours.
+    The function keeps track of downloaded files so it's possible to interrupt and
     restart the download without duplicating effort.
 
     :param pdb_home: Path for downloaded files, defaults to PDB_DIR
@@ -734,6 +732,9 @@ def Extract_Disulfides(
     from proteusPy import DisulfideList, load_disulfides_from_id
     from proteusPy.Disulfide import Torsion_DF_Cols
 
+    if quiet:
+        _logger.setLevel(logging.ERROR)
+
     bad_dir = baddir
 
     entrylist = []
@@ -768,7 +769,9 @@ def Extract_Disulfides(
         entrylist.append(name_to_id(entry))
 
     if verbose:
-        print(f"--> Extract_Disulfides(): PDB Ids: {entrylist}, len: {len(entrylist)}")
+        _logger.info(
+            f"--> Extract_Disulfides(): PDB Ids: {entrylist}, len: {len(entrylist)}"
+        )
 
     # create a dataframe with the following columns for the disulfide conformations
     # extracted from the structure
@@ -787,81 +790,81 @@ def Extract_Disulfides(
     tot = 0
     cnt = 0
     # loop over ss_filelist, create disulfides and initialize them
-    for entry in pbar:
-        if entry == "4wym":
-            print(f"\nEntry: {entry}, SSList: {sslist}")
+    # the logging_redirect_tqdm() context manager will redirect the logging output
+    # to the tqdm progress bar.
 
-        pbar.set_postfix(
-            {"ID": entry, "Bad": bad, "Ca": bad_dist, "Cnt": tot}
-        )  # update the progress bar
+    with logging_redirect_tqdm():
+        for entry in pbar:
+            pbar.set_postfix(
+                {"ID": entry, "Bad": bad, "Ca": bad_dist, "Cnt": tot}
+            )  # update the progress bar
 
-        # returns an empty list if none are found.
-        _sslist = DisulfideList([], entry)
-        _sslist = load_disulfides_from_id(
-            entry, model_numb=0, verbose=verbose, quiet=quiet, pdb_dir=pdbdir
-        )
+            # returns an empty list if none are found.
+            _sslist = DisulfideList([], entry)
+            _sslist = load_disulfides_from_id(
+                entry, model_numb=0, verbose=verbose, quiet=quiet, pdb_dir=pdbdir
+            )
 
-        # sslist, xchain = prune_extra_ss(_sslist)
-        # sslist = _sslist
+            # sslist, xchain = prune_extra_ss(_sslist)
+            # sslist = _sslist
 
-        if len(_sslist) > 0 or _sslist is None:
-            sslist = remove_duplicate_ss(_sslist)
-            sslist2 = []  # list to hold indices for ss_dict2
-            for ss in sslist:
-                # Ca distance cutoff
-                dist = ss.ca_distance
-                if dist >= dist_cutoff and dist_cutoff != -1.0:
-                    print(f"\nBad Distance: {entry}, SS: {ss}")
-                    bad_dist += 1
-                    continue  ## we are not going to deal with Ca distance atm.
+            if len(_sslist) > 0 or _sslist is None:
+                sslist = remove_duplicate_ss(_sslist)
+                sslist2 = []  # list to hold indices for ss_dict2
+                for ss in sslist:
+                    # Ca distance cutoff
+                    dist = ss.ca_distance
+                    if dist >= dist_cutoff and dist_cutoff != -1.0:
+                        _logger.error(f"Bad Distance: {entry}, SS: {ss}")
+                        bad_dist += 1
+                        continue  ## we are not going to deal with Ca distance atm.
 
-                All_ss_list.append(ss)
-                new_row = [
-                    ss.pdb_id,
-                    ss.name,
-                    ss.proximal,
-                    ss.distal,
-                    ss.chi1,
-                    ss.chi2,
-                    ss.chi3,
-                    ss.chi4,
-                    ss.chi5,
-                    ss.energy,
-                    ss.ca_distance,
-                    ss.cb_distance,
-                    ss.phiprox,
-                    ss.psiprox,
-                    ss.phidist,
-                    ss.psidist,
-                    ss.torsion_length,
-                    ss.rho,
-                ]
+                    All_ss_list.append(ss)
+                    new_row = [
+                        ss.pdb_id,
+                        ss.name,
+                        ss.proximal,
+                        ss.distal,
+                        ss.chi1,
+                        ss.chi2,
+                        ss.chi3,
+                        ss.chi4,
+                        ss.chi5,
+                        ss.energy,
+                        ss.ca_distance,
+                        ss.cb_distance,
+                        ss.phiprox,
+                        ss.psiprox,
+                        ss.phidist,
+                        ss.psidist,
+                        ss.torsion_length,
+                        ss.rho,
+                    ]
 
-                # add the row to the end of the dataframe
-                SS_df.loc[len(SS_df.index)] = new_row.copy()  # deep copy
-                sslist2.append(cnt)
-                cnt += 1
-                tot += 1
+                    # add the row to the end of the dataframe
+                    SS_df.loc[len(SS_df.index)] = new_row.copy()  # deep copy
+                    sslist2.append(cnt)
+                    cnt += 1
+                    tot += 1
 
-            # All_ss_dict[entry] = sslist
-            # print(f'Entry: {entry}. Dict indices: {sslist2}')
-            All_ss_dict2[entry] = sslist2
-            # print(f'{entry} ss dict adding: {sslist2}')
+                # All_ss_dict[entry] = sslist
+                # print(f'Entry: {entry}. Dict indices: {sslist2}')
+                All_ss_dict2[entry] = sslist2
+                # print(f'{entry} ss dict adding: {sslist2}')
 
-        else:
-            # at this point I really shouldn't have any bad non-parsible file
-            bad += 1
-            problem_ids.append(entry)
-            if prune:
-
-                print(f"\n--> No SS parsed for: {entry}")
-                fname = f"pdb{entry}.ent"
-                # Construct the full path for the new destination file
-                destination_file_path = os.path.join(bad_dir, fname)
-                # Copy the file to the new destination with the correct filename
-                print(f"\n---> Moving: {fname} to {destination_file_path}")
-                os.rename(fname, destination_file_path)
-            continue  ## this entry has no SS bonds, so we break the loop and move on to the next entry
+            else:
+                # at this point I really shouldn't have any bad non-parsible file
+                bad += 1
+                problem_ids.append(entry)
+                if prune:
+                    _logger.info(f"--> No SS parsed for: {entry}")
+                    fname = f"pdb{entry}.ent"
+                    # Construct the full path for the new destination file
+                    destination_file_path = os.path.join(bad_dir, fname)
+                    # Copy the file to the new destination with the correct filename
+                    _logger.info(f"---> Moving: {fname} to {destination_file_path}")
+                    shutil.move(fname, destination_file_path)
+                continue  ## this entry has no SS bonds, so we break the loop and move on to the next entry
 
     if bad > 0:
         prob_cols = ["id"]
@@ -927,6 +930,10 @@ def Extract_Disulfides(
 
     # return to original directory
     os.chdir(cwd)
+
+    # restore the logger level
+    if quiet:
+        _logger.setLevel(logging.WARNING)
     return
 
 
@@ -1062,19 +1069,19 @@ def check_header_from_file(
         raise DisulfideParseWarning(mess)
 
     if verbose:
-        logging.info(f"-> check_header_from_file() - Parsing file: {filename}:")
+        _logger.info(f"-> check_header_from_file() - Parsing file: {filename}:")
 
     ssbond_dict = structure.header["ssbond"]  # NB: this requires the modified code
 
     # list of tuples with (proximal distal chaina chainb)
     ssbonds = parse_ssbond_header_rec(ssbond_dict)
     if dbg:
-        logging.info(
+        _logger.info(
             f"-> check_header_from_file(): Found {len(ssbonds)} SSBonds in {struct_name} {ssbonds}"
         )
     if len(ssbonds) == 0:
         if verbose:
-            logging.error("-> check_header_from_file(): no bonds found in bondlist.")
+            _logger.error("-> check_header_from_file(): no bonds found in bondlist.")
         return 1  # return non-zero if error
 
     for pair in ssbonds:
@@ -1090,7 +1097,7 @@ def check_header_from_file(
             if verbose:
                 mess = f" ! Cannot parse SSBond record (NULL chain):\
                  {struct_name} Prox:  {proximal} Dist: {distal}"
-                warnings.warn(mess, DisulfideParseWarning)
+                _logger.warn(mess)
             continue
 
         if not proximal.isnumeric() or not distal.isnumeric():
@@ -1098,7 +1105,7 @@ def check_header_from_file(
             if verbose:
                 mess = f" ! Cannot parse SSBond record (non-numeric IDs):\
                  {struct_name} Prox:  {proximal} {chain1_id} Dist: {distal} {chain2_id}"
-                warnings.warn(mess, DisulfideParseWarning)
+                _logger.error(mess)
             continue  # was pass
         else:
             proximal = int(proximal)
@@ -1110,7 +1117,7 @@ def check_header_from_file(
         if chain1_id != chain2_id:
             if verbose:
                 mess = f" -> Cross Chain SS for: Prox: {proximal}{chain1_id} Dist: {distal}{chain2_id}"
-                warnings.warn(mess, DisulfideParseWarning)
+                _logger.warn(mess)
                 pass  # was break
 
         try:
@@ -1118,7 +1125,7 @@ def check_header_from_file(
             dist_res = _chainb[distal]
         except KeyError:
             errors += 1
-            logging.error(
+            _logger.error(
                 f" ! Cannot parse SSBond record (KeyError): {struct_name} Prox: <{proximal}> {chain1_id} Dist: <{distal}> {chain2_id}"
             )
             return 1  # non-zero if error
@@ -1129,13 +1136,13 @@ def check_header_from_file(
                 continue
             else:
                 if dbg:
-                    logging.info(
+                    _logger.info(
                         f" -> SSBond: {i}: {struct_name}: {proximal}{chain1_id} - {distal}{chain2_id}"
                     )
         else:
             errors += 1
             if dbg:
-                logging.error(
+                _logger.error(
                     f" -> NULL chain(s): {struct_name}: {proximal}{chain1_id} - {distal}{chain2_id}"
                 )
         i += 1
