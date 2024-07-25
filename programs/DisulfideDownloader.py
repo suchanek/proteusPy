@@ -1,18 +1,18 @@
-#
-# Program reads a comma separated list of PDB IDs and download them
-# to the PDB_DIR global.
-# Used to download the list of proteins containing at least one SS bond
-# with the ID list generated from: http://www.rcsb.org/
-#
-#
-# Author: Eric G. Suchanek, PhD
-# Last modification 7/24/24 -egs
-#
-#
+"""
+Program reads a comma separated list of PDB IDs and download them
+to the PDB_DIR global.
+Used to download the list of proteins containing at least one SS bond
+with the ID list generated from: http://www.rcsb.org/
+
+Author: Eric G. Suchanek, PhD
+Last modification 7/24/24 -egs-
+"""
 
 import logging
 import os
 import sys
+import time
+from datetime import timedelta
 
 from Bio.PDB import PDBList
 from tqdm import tqdm
@@ -177,8 +177,8 @@ def DisulfideLoader(idfilename="./ss_ids.txt"):
                 bad.add(entry)
                 bad_cnt += 1
 
-    print(f"Overall count processed: {count}")
-    print(f"Bad entries: {bad_cnt}")
+    print(f"Overall files processed: {count}")
+    print(f"Non-parsabe files: {bad_cnt}")
 
     # Write the completed and bad sets to files
     with open(PDB_DIR + "/completed_entries.txt", "w") as comp_file:
@@ -190,5 +190,13 @@ def DisulfideLoader(idfilename="./ss_ids.txt"):
             bad_file.write(f"{entry}\n")
 
 
+start_time = time.time()
+
 os.chdir(PDB_DIR)
 DisulfideLoader(idfilename="data/pdb_ids_240709.txt")
+
+end_time = time.time()
+elapsed_time = end_time - start_time
+elapsed_timedelta = timedelta(seconds=elapsed_time)
+
+print(f"Elapsed time: {elapsed_timedelta} seconds")

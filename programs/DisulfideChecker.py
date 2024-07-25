@@ -14,7 +14,24 @@ import time
 from datetime import timedelta
 from glob import glob
 
+# Configure logging
+logging.basicConfig(
+    level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+# create a module logger and set the level to WARNING
+_logger = logging.getLogger(__name__)
+_logger.setLevel(logging.WARNING)
+_handler = logging.StreamHandler()
+_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+_handler.setFormatter(_formatter)
+_logger.addHandler(_handler)
+
+# Suppress findfont debug messages
+logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
+
 from tqdm import tqdm
+from tqdm.contrib.logging import logging_redirect_tqdm
 
 from proteusPy import check_header_from_file
 
@@ -28,20 +45,20 @@ HOME_DIR = os.path.expanduser("~")
 PDB_BASE = os.getenv("PDB")
 
 if not os.path.isdir(PDB_BASE):
-    logging.error(f"Error: The directory {PDB_BASE} does not exist.")
+    _logger.error(f"Error: The directory {PDB_BASE} does not exist.")
     sys.exit(1)
 else:
     print(f"Found PDB directory at: {PDB_BASE}  ")
 
 GOOD_DIR = os.path.join(PDB_BASE, "good/")
 if not os.path.isdir(GOOD_DIR):
-    logging.error(f"Error: The directory {GOOD_DIR} does not exist.")
+    _logger.error(f"Error: The directory {GOOD_DIR} does not exist.")
     sys.exit(1)
 
 
 BAD_DIR = os.path.join(PDB_BASE, "bad/")
 if not os.path.isdir(BAD_DIR):
-    logging.error(f"Error: The directory {BAD_DIR} does not exist.")
+    _logger.error(f"Error: The directory {BAD_DIR} does not exist.")
     sys.exit(1)
 
 
@@ -97,46 +114,48 @@ def check_files(
     count = 0
 
     pbar = tqdm(all_pdb_files, ncols=80)
-    for fname in pbar:
-        entry = name_to_id(fname)
 
-        if check_header_from_file(fname, verbose=verbose) > 0:
-            badcount += 1
-            destination_path = os.path.join(bad_dir, os.path.basename(fname))
+    with logging_redirect_tqdm():
+        for fname in pbar:
+            entry = name_to_id(fname)
 
-            if os.path.exists(destination_path):
-                os.remove(destination_path)
-
-            shutil.move(fname, destination_path)
-            print(f"Bad file: {fname} moved to {bad_dir}")
-        else:
-            sslist = load_disulfides_from_id(
-                entry, verbose=verbose, quiet=quiet, pdb_dir=pdb_dir
-            )
-            # sslist = Extract_Disulfide(entry)
-            if sslist is None or len(sslist) == 0:
+            if check_header_from_file(fname, verbose=verbose) > 0:
                 badcount += 1
                 destination_path = os.path.join(bad_dir, os.path.basename(fname))
 
-                # Check if the destination file exists and remove it if it does
-                if os.path.exists(destination_path):
-                    os.remove(destination_path)
+                # if os.path.exists(destination_path):
+                #    os.remove(destination_path)
 
                 shutil.move(fname, destination_path)
-                if verbose:
-                    logging.info(f"Bad file: {fname} moved to {bad_dir}")
+                _logger.warning(f"Bad file: {fname} moved to {bad_dir}")
             else:
-                destination_path = os.path.join(good_dir, os.path.basename(fname))
+                sslist = load_disulfides_from_id(
+                    entry, verbose=verbose, quiet=quiet, pdb_dir=pdb_dir
+                )
+                # sslist = Extract_Disulfide(entry)
+                if sslist is None or len(sslist) == 0:
+                    badcount += 1
+                    destination_path = os.path.join(bad_dir, os.path.basename(fname))
 
-                if os.path.exists(destination_path):
-                    os.remove(destination_path)
+                    # Check if the destination file exists and remove it if it does
+                    # if os.path.exists(destination_path):
+                    #    os.remove(destination_path)
 
-                shutil.move(fname, destination_path)
-                if verbose:
-                    logging.info(f"Good file: {fname} moved to {good_dir}")
+                    shutil.move(fname, destination_path)
+                    if verbose:
+                        _logger.warning(f"Bad file: {fname} moved to {bad_dir}")
+                else:
+                    destination_path = os.path.join(good_dir, os.path.basename(fname))
 
-        count += 1
-        pbar.set_postfix({"ID": entry, "Bad": badcount})
+                    # if os.path.exists(destination_path):
+                    #    os.remove(destination_path)
+
+                    shutil.move(fname, destination_path)
+                    if verbose:
+                        _logger.info(f"Good file: {fname} moved to {good_dir}")
+
+            count += 1
+            pbar.set_postfix({"ID": entry, "Bad": badcount})
 
     print(f"Overall count processed in {pdb_dir}: {count}")
     print(f"Bad files found and removed: {badcount}")
