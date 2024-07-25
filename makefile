@@ -66,9 +66,9 @@ install:
 	@$(CONDA) install vtk==9.2.6 -y
 	@echo "Installing proteusPy..."
 
-	@pip install .
+	@pip install . -q
 	@echo "Installing Biopython..."
-	@pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
+	@pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython -q
 	@echo "Installing jupyter..."
 	@python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Installation finished!"

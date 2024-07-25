@@ -11,11 +11,8 @@ Last revision: 2/17/2024
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
 
 import copy
-import datetime
-import glob
+import logging
 import math
-import pickle
-import time
 from math import cos
 
 import numpy as np
@@ -1574,7 +1571,9 @@ class Disulfide:
             sg1 = prox_residue["SG"].get_vector()
 
         except Exception:
-            print(f"Invalid or missing coordinates for proximal residue {proximal}")
+            logging.warn(
+                f"Invalid or missing coordinates for proximal residue {proximal}"
+            )
             return False
 
         # distal residue
