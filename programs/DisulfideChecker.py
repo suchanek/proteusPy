@@ -6,8 +6,11 @@
 # Last modification 7/24/2024
 
 
+import logging
 import os
 import shutil
+import sys
+import time
 from glob import glob
 
 import numpy
@@ -16,10 +19,31 @@ from tqdm import tqdm
 
 from proteusPy import check_header_from_file
 
-PDB_DIR = "/Users/egs/PDB"
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
-GOOD_DIR = os.path.join(PDB_DIR, "good")
-BAD_DIR = os.path.join(PDB_DIR, "bad")
+# Paths
+HOME_DIR = os.path.expanduser("~")
+PDB_BASE = os.getenv("PDB")
+
+if not os.path.isdir(PDB_BASE):
+    logging.error(f"Error: The directory {PDB_BASE} does not exist.")
+    sys.exit(1)
+else:
+    print(f"Found PDB directory at: {PDB_BASE}  ")
+
+GOOD_DIR = os.path.join(PDB_BASE, "good/")
+if not os.path.isdir(GOOD_DIR):
+    logging.error(f"Error: The directory {GOOD_DIR} does not exist.")
+    sys.exit(1)
+
+
+BAD_DIR = os.path.join(PDB_BASE, "bad")
+if not os.path.isdir(BAD_DIR):
+    logging.error(f"Error: The directory {BAD_DIR} does not exist.")
+    sys.exit(1)
 
 
 def extract_pdb_id(filename: str) -> str:
@@ -85,9 +109,11 @@ def check_files(
             badcount += 1
             destination_path = os.path.join(bad_dir, os.path.basename(fname))
 
-            if not os.path.exists(destination_path):
-                shutil.move(fname, destination_path)
-                print(f"Bad file: {fname} moved to {bad_dir}")
+            if os.path.exists(destination_path):
+                os.remove(destination_path)
+
+            shutil.move(fname, destination_path)
+            print(f"Bad file: {fname} moved to {bad_dir}")
         else:
             sslist = load_disulfides_from_id(
                 entry, verbose=verbose, quiet=quiet, pdb_dir=pdb_dir
@@ -97,15 +123,19 @@ def check_files(
                 badcount += 1
                 destination_path = os.path.join(bad_dir, os.path.basename(fname))
 
-                if not os.path.exists(destination_path):
-                    shutil.move(fname, destination_path)
-                print(f"Bad file: {fname} moved to {bad_dir}")
+                # Check if the destination file exists and remove it if it does
+                if os.path.exists(destination_path):
+                    os.remove(destination_path)
 
+                shutil.move(fname, destination_path)
+                print(f"Bad file: {fname} moved to {bad_dir}")
             else:
                 destination_path = os.path.join(good_dir, os.path.basename(fname))
 
-                if not os.path.exists(destination_path):
-                    shutil.move(fname, destination_path)
+                if os.path.exists(destination_path):
+                    os.remove(destination_path)
+
+                shutil.move(fname, destination_path)
                 print(f"Good file: {fname} moved to {good_dir}")
 
         count += 1
@@ -119,4 +149,13 @@ def check_files(
 
 
 if __name__ == "__main__":
-    check_files(PDB_DIR, GOOD_DIR, BAD_DIR)
+    start_time = time.time()
+    check_files(PDB_BASE, GOOD_DIR, BAD_DIR)
+    end_time = time.time()
+    # Calculate the elapsed time
+    elapsed_time = end_time - start_time
+
+    # Print the elapsed time
+    print(f"Elapsed time: {elapsed_time} seconds")
+
+# end of file

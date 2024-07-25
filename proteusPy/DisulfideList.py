@@ -1202,4 +1202,3 @@ if __name__ == "__main__":
     doctest.testmod()
 
 # end of file
-# end of file

@@ -11,12 +11,21 @@ Copyright (c)2024 Eric G. Suchanek, PhD, all rights reserved
 import copy
 import datetime
 import glob
+import logging
 import math
 import os
 import pickle
 import subprocess
 import time
 import warnings
+
+# Configure logging
+logging.basicConfig(
+    level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+# Suppress findfont debug messages
+logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -25,23 +34,19 @@ from Bio.PDB import PDBList, PDBParser, Vector
 from Bio.PDB.PDBExceptions import PDBConstructionWarning
 from matplotlib import cm
 
-# import proteusPy
-from proteusPy import DisulfideList
-from proteusPy.DisulfideExceptions import DisulfideParseWarning
+from proteusPy import DisulfideList, __version__
+from proteusPy.DisulfideExceptions import DisulfideIOException, DisulfideParseWarning
 from proteusPy.ProteusPyWarning import ProteusPyWarning
 
 try:
     # Check if running in Jupyter
-    shell = get_ipython().__class__.__name__
+    shell = get_ipython().__class__.__name__  # type: ignore
     if shell == "ZMQInteractiveShell":
         from tqdm.notebook import tqdm
     else:
         from tqdm import tqdm
 except NameError:
     from tqdm import tqdm
-
-# Ignore PDBConstructionWarning
-import warnings
 
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
@@ -180,17 +185,19 @@ def Check_chains(pdbid, pdbdir, verbose=True):
             chain_length = len(chain.get_list())
             chain_id = chain.get_id()
             if verbose:
-                print(f"Chain: {chain_id}, length: {chain_length}")
+                logging.warn(f"Chain: {chain_id}, length: {chain_length}")
             chain_lens.append(chain_length)
 
         if np.min(chain_lens) != np.max(chain_lens):
             same = False
             if verbose:
-                print(f"chain lengths are unequal: {chain_lens}")
+                logging.warn(f"chain lengths are unequal: {chain_lens}")
         else:
             same = True
             if verbose:
-                print(f"Chains are equal length, assuming the same. {chain_lens}")
+                logging.warn(
+                    f"Chains are equal length, assuming the same. {chain_lens}"
+                )
     return same
 
 
@@ -256,18 +263,20 @@ def prune_extra_ss(sslist):
     return copy.deepcopy(pruned_list), xchain
 
 
-def download_file(url, directory):
+def download_file(url, directory, verbose=False):
     """
     Download the given URL to the input directory
 
     :param url: File URL
-    :param directory: Directory path for saving.
+    :param directory: Directory path for saving the file
+    :param verbose: Verbosity, defaults to False
     """
     file_name = url.split("/")[-1]
     file_path = os.path.join(directory, file_name)
 
     if not os.path.exists(file_path):
-        print(f"Downloading {file_name}...")
+        if verbose:
+            logging.info(f"Downloading {file_name}...")
         command = ["wget", "-P", directory, url]
         subprocess.run(command, check=True)
         print("Download complete.")
@@ -289,7 +298,7 @@ def print_memory_used():
     """
     mem = get_memory_usage() / (1024**3)  # to GB
 
-    print(f"proteusPy {proteusPy.__version__}: Memory Used: {mem:.2f} GB")
+    print(f"proteusPy {__version__}: Memory Used: {mem:.2f} GB")
 
 
 def image_to_ascii_art(fname, nwidth):
@@ -1053,16 +1062,20 @@ def check_header_from_file(
         raise DisulfideParseWarning(mess)
 
     if verbose:
-        print(f"-> check_header_from_file() - Parsing file: {filename}:")
+        logging.info(f"-> check_header_from_file() - Parsing file: {filename}:")
 
     ssbond_dict = structure.header["ssbond"]  # NB: this requires the modified code
 
     # list of tuples with (proximal distal chaina chainb)
     ssbonds = parse_ssbond_header_rec(ssbond_dict)
+    if dbg:
+        logging.info(
+            f"-> check_header_from_file(): Found {len(ssbonds)} SSBonds in {struct_name} {ssbonds}"
+        )
     if len(ssbonds) == 0:
         if verbose:
-            print("-> check_header_from_file(): no bonds found in bondlist.")
-        return False
+            logging.error("-> check_header_from_file(): no bonds found in bondlist.")
+        return 1  # return non-zero if error
 
     for pair in ssbonds:
         # in the form (proximal, distal, chain)
@@ -1105,10 +1118,10 @@ def check_header_from_file(
             dist_res = _chainb[distal]
         except KeyError:
             errors += 1
-            print(
+            logging.error(
                 f" ! Cannot parse SSBond record (KeyError): {struct_name} Prox: <{proximal}> {chain1_id} Dist: <{distal}> {chain2_id}"
             )
-            return False
+            return 1  # non-zero if error
 
         if (_chaina is not None) and (_chainb is not None):
             if _chaina[proximal].is_disordered() or _chainb[distal].is_disordered():
@@ -1116,13 +1129,13 @@ def check_header_from_file(
                 continue
             else:
                 if dbg:
-                    print(
+                    logging.info(
                         f" -> SSBond: {i}: {struct_name}: {proximal}{chain1_id} - {distal}{chain2_id}"
                     )
         else:
             errors += 1
             if dbg:
-                print(
+                logging.error(
                     f" -> NULL chain(s): {struct_name}: {proximal}{chain1_id} - {distal}{chain2_id}"
                 )
         i += 1
