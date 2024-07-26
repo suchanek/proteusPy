@@ -803,6 +803,23 @@ class DisulfideList(UserList):
         else:
             self.data.extend(self.validate_ss(item) for item in other)
 
+    def filter_by_distance(self, distance: float):
+        """
+        Return a DisulfideList filtered by the given distance.
+
+        :param distance: Distance in Å
+        :return: DisulfideList containing disulfides with the given distance.
+        """
+
+        reslist = DisulfideList([], "filtered")
+        sslist = self.data
+
+        for ss in sslist:
+            if ss.ca_distance < distance and distance != -1.0:
+                reslist.append(ss)
+
+        return reslist
+
     def get_by_name(self, name):
         """
         Returns the Disulfide with the given name from the list.
@@ -900,6 +917,23 @@ class DisulfideList(UserList):
     def TorsionGraph(
         self, display=True, save=False, fname="ss_torsions.png", light=True
     ):
+        """
+        Generate and optionally display or save a torsion graph.
+
+        This method generates a torsion graph based on the torsion statistics
+        of disulfide bonds. It can display the graph, save it to a file, or both.
+
+        :param display: If True, the torsion graph will be displayed. Default is True.
+        :type display: bool
+        :param save: If True, the torsion graph will be saved to a file. Default is False.
+        :type save: bool
+        :param fname: The filename to save the torsion graph. Default is "ss_torsions.png".
+        :type fname: str
+        :param light: If True, a light theme will be used for the graph. Default is True.
+        :type light: bool
+
+        :return: None
+        """
         # tor_stats, dist_stats = self.calculate_torsion_statistics()
         self.display_torsion_statistics(
             display=display, save=save, fname=fname, light=light
@@ -1073,12 +1107,13 @@ from proteusPy.DisulfideExceptions import DisulfideConstructionWarning
 
 
 def load_disulfides_from_id(
-    struct_name: str,
+    pdb_id: str,
     pdb_dir=MODEL_DIR,
     model_numb=0,
     verbose=False,
     quiet=True,
     dbg=False,
+    cutoff=-1.0,
 ) -> DisulfideList:
     """
     Loads the Disulfides by PDB ID and returns a ```DisulfideList``` of Disulfide objects.
@@ -1086,7 +1121,7 @@ def load_disulfides_from_id(
 
     *NB:* Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython
 
-    :param struct_name: the name of the PDB entry.
+    :param pdb_id: the name of the PDB entry.
     :param pdb_dir: path to the PDB files, defaults to MODEL_DIR - this is: PDB_DIR/good and are
     the pre-parsed PDB files that have been scanned by the DisulfideDownloader program.
     :param model_numb: model number to use, defaults to 0 for single structure files.
@@ -1109,6 +1144,8 @@ def load_disulfides_from_id(
     import os
     import warnings
 
+    from Bio import BiopythonWarning
+
     from proteusPy import Disulfide, parse_ssbond_header_rec
 
     i = 1
@@ -1122,17 +1159,17 @@ def load_disulfides_from_id(
 
     # Biopython uses the Structure -> Model -> Chain hierarchy to organize
     # structures. All are iterable.
-    structure_fname = os.path.join(pdb_dir, f"pdb{struct_name}.ent")
-    structure = parser.get_structure(struct_name, file=structure_fname)
+    structure_fname = os.path.join(pdb_dir, f"pdb{pdb_id}.ent")
+    structure = parser.get_structure(pdb_id, file=structure_fname)
     model = structure[model_numb]
 
     if dbg:
-        print(f"-> load_disulfide_from_id() - Parsing structure: {struct_name}:")
+        print(f"-> load_disulfide_from_id() - Parsing structure: {pdb_id}:")
 
     ssbond_dict = structure.header["ssbond"]  # NB: this requires the modified code
     resolution = structure.header["resolution"]
 
-    SSList = DisulfideList([], struct_name, resolution)
+    SSList = DisulfideList([], pdb_id, resolution)
 
     # list of tuples with (proximal distal chaina chainb)
     ssbonds = parse_ssbond_header_rec(ssbond_dict)
@@ -1140,9 +1177,10 @@ def load_disulfides_from_id(
     # with warnings.catch_warnings():
     if quiet:
         _logger.setLevel(logging.ERROR)
+        warnings.filterwarnings("ignore", category=BiopythonWarning)
 
     for pair in ssbonds:
-        # in the form (proximal, distal, chain)
+        # in the form (proximal, distal, chain1 chain2)
         proximal = pair[0]
         distal = pair[1]
         chain1_id = pair[2]
@@ -1150,8 +1188,8 @@ def load_disulfides_from_id(
 
         if not proximal.isnumeric() or not distal.isnumeric():
             mess = f" -> load_disulfides_from_id(): Cannot parse SSBond record (non-numeric IDs):\
-            {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring."
-            _logger.warn(mess)
+            {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring."
+            _logger.warning(mess)
             continue
         else:
             proximal = int(proximal)
@@ -1159,16 +1197,16 @@ def load_disulfides_from_id(
 
         if proximal == distal:
             mess = f" -> load_disulfides_from_id(): SSBond record has (proximal == distal):\
-            {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
-            _logger.warn(mess)
+            {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
+            _logger.info(mess)
 
         _chaina = model[chain1_id]
         _chainb = model[chain2_id]
 
         if (_chaina is None) or (_chainb is None):
-            mess = f" -> load_disulfides_from_id(): NULL chain(s): {struct_name}: {proximal} {chain1_id}\
+            mess = f" -> load_disulfides_from_id(): NULL chain(s): {pdb_id}: {proximal} {chain1_id}\
             - {distal} {chain2_id}, ignoring!"
-            _logger.warn(mess)
+            _logger.error(mess)
             continue
 
         if chain1_id != chain2_id:
@@ -1183,23 +1221,25 @@ def load_disulfides_from_id(
             dist_res = _chainb[distal]
 
         except KeyError:
-            mess = f"Cannot parse SSBond record (KeyError): {struct_name} Prox:\
-            {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring!"
-            _logger.warn(mess)
+            mess = (
+                f"Cannot parse SSBond record (KeyError): {pdb_id} Prox: "
+                f"{proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring!"
+            )
+            _logger.error(mess)
             continue
 
         # make a new Disulfide object, name them based on proximal and distal
         # initialize SS bond from the proximal, distal coordinates
 
         if _chaina[proximal].is_disordered() or _chainb[distal].is_disordered():
-            mess = f" -> load_disulfides_from_id(): Disordered chain(s): {struct_name}: {proximal} {chain1_id} - {distal} {chain2_id}, ignoring!"
-            _logger.warn(mess)
+            mess = f" -> load_disulfides_from_id(): Disordered chain(s): {pdb_id}: {proximal} {chain1_id} - {distal} {chain2_id}, ignoring!"
+            _logger.warning(mess)
             continue
         else:
             _logger.info(
-                f"SSBond: {i}: {struct_name}: {proximal} |{chain1_id}| - {distal} |{chain2_id}|"
+                f"SSBond: {i}: {pdb_id}: {proximal} |{chain1_id}| - {distal} |{chain2_id}|"
             )
-            ssbond_name = f"{struct_name}_{proximal}{chain1_id}_{distal}{chain2_id}"
+            ssbond_name = f"{pdb_id}_{proximal}{chain1_id}_{distal}{chain2_id}"
             new_ss = Disulfide(ssbond_name)
             res = new_ss.initialize_disulfide_from_chain(
                 _chaina, _chainb, proximal, distal, resolution, quiet=quiet
@@ -1208,7 +1248,12 @@ def load_disulfides_from_id(
                 SSList.append(new_ss)
         i += 1
 
-    _logger.setLevel(logging.WARNING)
+    if quiet:
+        _logger.setLevel(logging.WARNING)
+        warnings.filterwarnings("ignore", category=BiopythonWarning)
+
+    if cutoff > 0:
+        SSList = SSList.filter_by_distance(cutoff)
 
     return copy.deepcopy(SSList)
 

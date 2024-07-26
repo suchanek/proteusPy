@@ -94,10 +94,10 @@ def parse_arguments():
     parser.set_defaults(all=False)
     parser.set_defaults(update=False)
     parser.set_defaults(verbose=True)
-    parser.set_defaults(extract=True)
-    parser.set_defaults(subset=True)
+    parser.set_defaults(extract=False)
+    parser.set_defaults(subset=False)
     parser.set_defaults(build=True)
-    parser.set_defaults(full=True)
+    parser.set_defaults(full=False)
     parser.set_defaults(cutoff=-1.0)
     return parser.parse_args()
 

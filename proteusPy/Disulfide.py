@@ -23,7 +23,8 @@ pv.global_theme.color = "white"
 
 # Configure logging
 logging.basicConfig(
-    level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.WARNING,
+    format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
 # create a module logger and set the level to WARNING
@@ -36,7 +37,6 @@ _logger.addHandler(_handler)
 
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
-
 
 from Bio.PDB import Vector, calc_dihedral
 
@@ -1546,8 +1546,8 @@ class Disulfide:
         self.pdb_id = id
         if quiet:
             _logger.setLevel(logging.ERROR)
-
-        chi1 = chi2 = chi3 = chi4 = chi5 = _ANG_INIT
+            # Suppress all warnings from Biopython
+            warnings.filterwarnings("ignore", module="Bio")
 
         prox = int(proximal)
         dist = int(distal)
@@ -1572,16 +1572,14 @@ class Disulfide:
         self.proximal_residue_fullid = prox_residue.get_full_id()
         self.distal_residue_fullid = dist_residue.get_full_id()
 
+        # turn off warnings, only report errors
         if quiet:
             _logger.setLevel(logging.ERROR)
+            warnings.filterwarnings("ignore", module="Bio")
 
-        # if quiet:
-        #    warnings.filterwarnings("ignore", category=DisulfideConstructionWarning)
-        # else:
-        #    warnings.simplefilter("always")
-
-        # grab the coordinates for the proximal and distal residues as vectors
-        # so we can do math on them later
+        # Get the coordinates for the proximal and distal residues as vectors
+        # so we can do math on them later. Trap errors here to avoid problems
+        # with missing residues or atoms.
 
         # proximal residue
         try:
@@ -1593,7 +1591,9 @@ class Disulfide:
             sg1 = prox_residue["SG"].get_vector()
 
         except Exception:
-            _logger.warn(f"Invalid/missing coordinates for: {id}, proximal: {prox}")
+            # i'm torn on this. there are a lot of missing coordinates, so is
+            # it worth the trouble to note them? I think so.
+            _logger.error(f"Invalid/missing coordinates for: {id}, proximal: {prox}")
             return False
 
         # distal residue
@@ -1676,8 +1676,11 @@ class Disulfide:
 
         # compute and set the local coordinates
         self.compute_local_coords()
+
+        # turn warnings back on
         if quiet:
             _logger.setLevel(logging.WARNING)
+            warnings.filterwarnings("default", module="Bio")
         return True
 
     def internal_coords(self) -> np.array:
