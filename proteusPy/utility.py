@@ -190,22 +190,22 @@ def Check_chains(pdbid, pdbdir, verbose=True):
     if len(chainlist) > 1:
         chain_lens = []
         if verbose:
-            print(f"multiple chains. {chainlist}")
+            _logger.info(f"multiple chains. {chainlist}")
         for chain in chainlist:
             chain_length = len(chain.get_list())
             chain_id = chain.get_id()
             if verbose:
-                _logger.warn(f"Chain: {chain_id}, length: {chain_length}")
+                _logger.info(f"Chain: {chain_id}, length: {chain_length}")
             chain_lens.append(chain_length)
 
         if np.min(chain_lens) != np.max(chain_lens):
             same = False
             if verbose:
-                _logger.warn(f"chain lengths are unequal: {chain_lens}")
+                _logger.warning(f"chain lengths are unequal: {chain_lens}")
         else:
             same = True
             if verbose:
-                _logger.warn(
+                _logger.info(
                     f"Chains are equal length, assuming the same. {chain_lens}"
                 )
     return same
@@ -240,12 +240,12 @@ def extract_firstchain_ss(sslist, verbose=False):
         if pc != dc:
             xchain += 1
             if verbose:
-                print(f"--> extract_firstchain_ss(): Cross chain ss: {ss}")
+                _logger.info(f"extract_firstchain_ss(): Cross chain ss: {ss}")
         chainlist.append(pc)
     try:
         chain = chainlist[0]
     except IndexError:
-        print(f"--> extract_firstchain_ss(): No chains found in SS list: {chain}")
+        _logger.warning(f"extract_firstchain_ss(): No chains found in SS list: {chain}")
         return res, xchain
 
     for ss in sslist:
@@ -770,7 +770,7 @@ def Extract_Disulfides(
 
     if verbose:
         _logger.info(
-            f"--> Extract_Disulfides(): PDB Ids: {entrylist}, len: {len(entrylist)}"
+            f"Extract_Disulfides(): PDB Ids: {entrylist}, len: {len(entrylist)}"
         )
 
     # create a dataframe with the following columns for the disulfide conformations
@@ -802,13 +802,18 @@ def Extract_Disulfides(
             # returns an empty list if none are found.
             _sslist = DisulfideList([], entry)
             _sslist = load_disulfides_from_id(
-                entry, model_numb=0, verbose=verbose, quiet=quiet, pdb_dir=pdbdir
+                entry,
+                model_numb=0,
+                verbose=verbose,
+                quiet=quiet,
+                pdb_dir=pdbdir,
+                cutoff=dist_cutoff,
             )
 
             # sslist, xchain = prune_extra_ss(_sslist)
             # sslist = _sslist
 
-            if len(_sslist) > 0 or _sslist is None:
+            if len(_sslist) > 0:
                 sslist = remove_duplicate_ss(_sslist)
                 sslist2 = []  # list to hold indices for ss_dict2
                 for ss in sslist:
@@ -852,17 +857,18 @@ def Extract_Disulfides(
                 All_ss_dict2[entry] = sslist2
                 # print(f'{entry} ss dict adding: {sslist2}')
 
-            else:
-                # at this point I really shouldn't have any bad non-parsible file
+            else:  ## _sslist is empty!
                 bad += 1
                 problem_ids.append(entry)
+                _logger.error(f"Extract_Disulfides(): No SS parsed for: {entry}!")
                 if prune:
-                    _logger.info(f"--> No SS parsed for: {entry}")
                     fname = f"pdb{entry}.ent"
                     # Construct the full path for the new destination file
                     destination_file_path = os.path.join(bad_dir, fname)
                     # Copy the file to the new destination with the correct filename
-                    _logger.info(f"---> Moving: {fname} to {destination_file_path}")
+                    _logger.info(
+                        f"Extract_Disulfides(): Moving {fname} to {destination_file_path}"
+                    )
                     shutil.move(fname, destination_file_path)
                 continue  ## this entry has no SS bonds, so we break the loop and move on to the next entry
 
@@ -871,23 +877,27 @@ def Extract_Disulfides(
         problem_df = pd.DataFrame(columns=prob_cols)
         problem_df["id"] = problem_ids
 
-        print(
-            f"-> Extract_Disulfides(): Found and moved: {len(problem_ids)} non-parsable structures."
-        )
-        print(
-            f"-> Extract_Disulfides(): Saving problem IDs to file: {datadir}{problemfile}"
+        _logger.warning(
+            (
+                f"-> Extract_Disulfides(): Found and moved: {len(problem_ids)} non-parsable structures."
+                f"-> Extract_Disulfides(): Saving problem IDs to file: {datadir}{problemfile}"
+            )
         )
 
         problem_df.to_csv(f"{datadir}{problemfile}")
-    else:
+    else:  ## no bad files found
         if verbose:
-            print("-> Extract_Disulfides(): No non-parsable structures found.")
+            _logger.info("Extract_Disulfides(): No non-parsable structures found.")
 
     if bad_dist > 0:
-        print(f"-> Extract_Disulfides(): Found and ignored: {bad_dist} long SS bonds.")
+        if verbose:
+            _logger.warning(
+                f"-> Extract_Disulfides(): Found and ignored: {bad_dist} long SS bonds."
+            )
+
     else:
         if verbose:
-            print("No problems found.")
+            print("Extract_Disulfides(): No problems found.")
 
     # dump the all_ss list of disulfides to a .pkl file. ~520 MB.
     fname = os.path.join(datadir, picklefile)
@@ -1009,7 +1019,7 @@ def check_header_from_file(
     :param filename: Filename for the entry.
     :param model_numb: Model number to use, defaults to 0 for single structure files.
     :param verbose: Print info while parsing
-    :return: True if parseable
+    :return: Number of errors encountered while parsing the file.
 
     Example:
       Assuming ```DATA_DIR``` has the pdb5rsa.ent file (it should!), we can load the disulfides
@@ -1097,7 +1107,7 @@ def check_header_from_file(
             if verbose:
                 mess = f" ! Cannot parse SSBond record (NULL chain):\
                  {struct_name} Prox:  {proximal} Dist: {distal}"
-                _logger.warn(mess)
+                _logger.warning(mess)
             continue
 
         if not proximal.isnumeric() or not distal.isnumeric():
@@ -1117,7 +1127,7 @@ def check_header_from_file(
         if chain1_id != chain2_id:
             if verbose:
                 mess = f" -> Cross Chain SS for: Prox: {proximal}{chain1_id} Dist: {distal}{chain2_id}"
-                _logger.warn(mess)
+                _logger.warning(mess)
                 pass  # was break
 
         try:

@@ -84,13 +84,26 @@ def check_files(
     pdb_dir: str, good_dir: str, bad_dir: str, verbose=False, quiet=True
 ) -> None:
     """
-    Checks all PDB files in the directory `pdb_dir` for SS bond consistency.
+    Check all PDB files in the directory `pdb_dir` for SS bond consistency.
 
-    Parameters:
-    - pdb_dir (str): The directory containing the PDB files to check.
-    - good_dir (str): The directory to move good files to.
-    - bad_dir (str): The directory to move bad files to.
+    This function processes each PDB file in the specified directory, checking for
+    disulfide bond consistency. Files that pass the check are moved to `good_dir`,
+    while files that fail are moved to `bad_dir`.
+
+    :param pdb_dir: The directory containing the PDB files to check.
+    :type pdb_dir: str
+    :param good_dir: The directory to move good files to.
+    :type good_dir: str
+    :param bad_dir: The directory to move bad files to.
+    :type bad_dir: str
+    :param verbose: If True, enables verbose logging. Default is False.
+    :type verbose: bool
+    :param quiet: If True, suppresses non-critical output. Default is True.
+    :type quiet: bool
+
+    :return: None
     """
+
     from proteusPy import load_disulfides_from_id
 
     def name_to_id(fname: str) -> str:
@@ -115,16 +128,15 @@ def check_files(
 
     pbar = tqdm(all_pdb_files, ncols=80)
 
+    # Using logging_redirect_tqdm to prevent tqdm from interfering with logging
     with logging_redirect_tqdm():
         for fname in pbar:
             entry = name_to_id(fname)
 
+            # Returns > 0 if we can't parse the SSBOND header
             if check_header_from_file(fname, verbose=verbose) > 0:
                 badcount += 1
                 destination_path = os.path.join(bad_dir, os.path.basename(fname))
-
-                # if os.path.exists(destination_path):
-                #    os.remove(destination_path)
 
                 shutil.move(fname, destination_path)
                 _logger.warning(f"Bad file: {fname} moved to {bad_dir}")
@@ -137,18 +149,11 @@ def check_files(
                     badcount += 1
                     destination_path = os.path.join(bad_dir, os.path.basename(fname))
 
-                    # Check if the destination file exists and remove it if it does
-                    # if os.path.exists(destination_path):
-                    #    os.remove(destination_path)
-
                     shutil.move(fname, destination_path)
                     if verbose:
                         _logger.warning(f"Bad file: {fname} moved to {bad_dir}")
                 else:
                     destination_path = os.path.join(good_dir, os.path.basename(fname))
-
-                    # if os.path.exists(destination_path):
-                    #    os.remove(destination_path)
 
                     shutil.move(fname, destination_path)
                     if verbose:
