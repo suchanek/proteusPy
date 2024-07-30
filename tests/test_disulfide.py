@@ -92,13 +92,14 @@ class TestDisulfide(unittest.TestCase):
             pdb_home = f"{temp_dir}/"
             entry = "5rsa"
             pdblist = PDBList(verbose=False)
-            ok = 0
+            found = 0
             if not pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=pdb_home):
                 self.fail("PDB file retrieval failed")
             else:
                 filename = f"{pdb_home}pdb5rsa.ent"
-            ok = check_header_from_file(filename)
-        self.assertTrue(ok == 0)
+            found, errors = check_header_from_file(filename)
+        self.assertTrue(found == 4)
+        self.assertTrue(errors == 0)
 
     def test_load(self):
         import tempfile

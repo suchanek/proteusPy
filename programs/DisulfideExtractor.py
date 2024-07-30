@@ -102,7 +102,7 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def do_extract(verbose, full, subset, cutoff, homedir):
+def do_extract(verbose, full, subset, cutoff, prune):
     if subset:
         if verbose:
             print("--> Extracting the SS subset...")
@@ -118,6 +118,7 @@ def do_extract(verbose, full, subset, cutoff, homedir):
             verbose=False,
             quiet=True,
             dist_cutoff=cutoff,
+            prune=prune,
         )
 
     # total extraction uses numb=-1 and takes about 1.5 hours on
@@ -134,6 +135,7 @@ def do_extract(verbose, full, subset, cutoff, homedir):
             pdbdir=PDB_DIR,
             datadir=DATA_DIR,
             dist_cutoff=cutoff,
+            prune=prune,
         )
     return
 
@@ -179,6 +181,7 @@ def do_stuff(
     subset=True,
     verbose=True,
     cutoff=-1.0,
+    prune=True,
 ):
     """
     Main entrypoint for the proteusPy Disulfide database extraction and creation workflow.
@@ -204,7 +207,7 @@ def do_stuff(
 
     if _extract == True:
         print(f"Extracting with cutoff: {cutoff}")
-        do_extract(_verbose, _full, _subset, cutoff, PDB_DIR)
+        do_extract(_verbose, _full, _subset, cutoff, prune)
 
     if _build == True:
         print(f"Building:")

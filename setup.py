@@ -81,7 +81,7 @@ setup(
         "numpy",
         "matplotlib",
         "pandas",
-        "pyvista[all,trame]",
+        "pyvista[all]",
         "traitlets==5.9.0",
         "jupyter",
         "jupyter_server",
