@@ -19,18 +19,9 @@ import subprocess
 import time
 import warnings
 
-# Configure logging
-logging.basicConfig(
-    level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+from proteusPy.logger_config import get_logger
 
-# create a module logger and set the level to WARNING
-_logger = logging.getLogger(__name__)
-_logger.setLevel(logging.WARNING)
-_handler = logging.StreamHandler()
-_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-_handler.setFormatter(_formatter)
-_logger.addHandler(_handler)
+_logger = get_logger("utility")
 
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
@@ -561,7 +552,7 @@ def display_ss_pymol(
     return None
 
 
-def parse_ssbond_header_rec(ssbond_dict: dict) -> list:
+def parse_ssbond_header_rec(ssbond_dict: dict, verbose=True) -> list:
     """
     Parse the SSBOND dict returned by parse_pdb_header.
     NB: Requires EGS-Modified BIO.parse_pdb_header.py.
@@ -572,6 +563,9 @@ def parse_ssbond_header_rec(ssbond_dict: dict) -> list:
         distal residue ids for the Disulfide.
 
     """
+    if verbose:
+        print(f"parse_ssbond_header_rec(): {ssbond_dict}")
+
     disulfide_list = []
     for ssb in ssbond_dict.items():
         disulfide_list.append(ssb[1])
@@ -795,12 +789,9 @@ def Extract_Disulfides(
 
     with logging_redirect_tqdm():
         for entry in pbar:
-            pbar.set_postfix(
-                {"ID": entry, "Bad": bad, "Ca": bad_dist, "Cnt": tot}
-            )  # update the progress bar
+            _sslist = DisulfideList([], entry)
 
             # returns an empty list if none are found.
-            _sslist = DisulfideList([], entry)
             _sslist = load_disulfides_from_id(
                 entry,
                 model_numb=0,
@@ -817,12 +808,12 @@ def Extract_Disulfides(
                 sslist = remove_duplicate_ss(_sslist)
                 sslist2 = []  # list to hold indices for ss_dict2
                 for ss in sslist:
-                    # Ca distance cutoff
-                    dist = ss.ca_distance
-                    if dist >= dist_cutoff and dist_cutoff != -1.0:
-                        _logger.error(f"Bad Distance: {entry}, SS: {ss}")
-                        bad_dist += 1
-                        continue  ## we are not going to deal with Ca distance atm.
+                    # Ca distance cutoff - now handled in load_disulfides_from_id()
+                    # dist = ss.ca_distance
+                    # if dist >= dist_cutoff and dist_cutoff != -1.0:
+                    #    _logger.error(f"Bad Distance: {entry}, SS: {ss}")
+                    #    bad_dist += 1
+                    #    continue  ## we are not going to deal with Ca distance atm.
 
                     All_ss_list.append(ss)
                     new_row = [
@@ -855,6 +846,7 @@ def Extract_Disulfides(
                 # All_ss_dict[entry] = sslist
                 # print(f'Entry: {entry}. Dict indices: {sslist2}')
                 All_ss_dict2[entry] = sslist2
+
                 # print(f'{entry} ss dict adding: {sslist2}')
 
             else:  ## _sslist is empty!
@@ -867,10 +859,14 @@ def Extract_Disulfides(
                     destination_file_path = os.path.join(bad_dir, fname)
                     # Copy the file to the new destination with the correct filename
                     _logger.info(
-                        f"Extract_Disulfides(): Moving {fname} to {destination_file_path}"
+                        f"Extract_Disulfides(): Pruning {fname} to {destination_file_path}"
                     )
                     shutil.move(fname, destination_file_path)
                 continue  ## this entry has no SS bonds, so we break the loop and move on to the next entry
+
+            pbar.set_postfix(
+                {"ID": entry, "Bad": bad, "Ca": bad_dist, "Cnt": tot}
+            )  # update the progress bar
 
     if bad > 0:
         prob_cols = ["id"]
@@ -1008,9 +1004,7 @@ def Extract_Disulfide(
     return _sslist
 
 
-def check_header_from_file(
-    filename: str, model_numb=0, verbose=False, dbg=False
-) -> int:
+def check_header_from_file(filename: str, model_numb=0, verbose=False, dbg=True):
     """
     Parse the Disulfides contained in the PDB file.
 
@@ -1027,10 +1021,10 @@ def check_header_from_file(
 
     >>> from proteusPy import check_header_from_file
     >>> from proteusPy.ProteusGlobals import DATA_DIR
-    >>> errors = 0
-    >>> errors = check_header_from_file(f'{DATA_DIR}pdb5rsa.ent', verbose=False)
-    >>> errors
-    0
+    >>> found = errors = 0
+    >>> found, errors = check_header_from_file(f'{DATA_DIR}pdb5rsa.ent', verbose=False, dbg=False)
+    >>> found
+    4
     """
     import os
 
@@ -1055,10 +1049,10 @@ def check_header_from_file(
             )
             raise ValueError(mess)
 
-    i = 1
     proximal = distal = -1
     _chaina = None
     _chainb = None
+    structure = None
 
     parser = PDBParser(PERMISSIVE=True)
 
@@ -1072,14 +1066,19 @@ def check_header_from_file(
         model = structure[model_numb]
     except FileNotFoundError:
         mess = f"Error: The file {filename} does not exist."
-        raise DisulfideParseWarning(mess)
+        _logger.error(mess)
+        return 0, -1
 
     except Exception as e:
         mess = f"An error occurred: {e}"
-        raise DisulfideParseWarning(mess)
+        _logger.error(mess)
+        return 0, -1
 
-    if verbose:
+    ssbond_dict = structure.header["ssbond"]  # NB: this requires the modified code
+
+    if dbg:
         _logger.info(f"-> check_header_from_file() - Parsing file: {filename}:")
+        _logger.info(f"-> check_header_from_file() - Dict: {ssbond_dict}:")
 
     ssbond_dict = structure.header["ssbond"]  # NB: this requires the modified code
 
@@ -1090,13 +1089,17 @@ def check_header_from_file(
             f"-> check_header_from_file(): Found {len(ssbonds)} SSBonds in {struct_name} {ssbonds}"
         )
     if len(ssbonds) == 0:
-        if verbose:
+        if dbg:
             _logger.error("-> check_header_from_file(): no bonds found in bondlist.")
-        return 1  # return non-zero if error
+        return 0, -1  # return -1 if no bonds found
+
+    i = 0
+    errors = 0
+    found = 0
 
     for pair in ssbonds:
         # in the form (proximal, distal, chain)
-        errors = 0
+
         proximal = pair[0]
         distal = pair[1]
         chain1_id = pair[2]
@@ -1107,12 +1110,12 @@ def check_header_from_file(
             if verbose:
                 mess = f" ! Cannot parse SSBond record (NULL chain):\
                  {struct_name} Prox:  {proximal} Dist: {distal}"
-                _logger.warning(mess)
+                _logger.error(mess)
             continue
 
         if not proximal.isnumeric() or not distal.isnumeric():
             errors += 1
-            if verbose:
+            if dbg:
                 mess = f" ! Cannot parse SSBond record (non-numeric IDs):\
                  {struct_name} Prox:  {proximal} {chain1_id} Dist: {distal} {chain2_id}"
                 _logger.error(mess)
@@ -1125,28 +1128,42 @@ def check_header_from_file(
         _chainb = model[chain2_id]
 
         if chain1_id != chain2_id:
-            if verbose:
+            if dbg:
                 mess = f" -> Cross Chain SS for: Prox: {proximal}{chain1_id} Dist: {distal}{chain2_id}"
                 _logger.warning(mess)
                 pass  # was break
 
         try:
             prox_res = _chaina[proximal]
+        except KeyError:
+            errors += 1
+            _logger.error(
+                f" ! Cannot parse proximal SSBond record (KeyError): {struct_name} Prox: <{proximal}> {chain1_id}"
+            )
+            continue  ## bad proximal residue
+
+        try:
             dist_res = _chainb[distal]
         except KeyError:
             errors += 1
             _logger.error(
-                f" ! Cannot parse SSBond record (KeyError): {struct_name} Prox: <{proximal}> {chain1_id} Dist: <{distal}> {chain2_id}"
+                f" ! Cannot parse Distal SSBond record (KeyError): {struct_name} Distal: <{distal}> {chain2_id}"
             )
-            return 1  # non-zero if error
+            continue  ## bad distal residue
 
         if (_chaina is not None) and (_chainb is not None):
             if _chaina[proximal].is_disordered() or _chainb[distal].is_disordered():
+                if verbose:
+                    _logger.warning(
+                        f" -> Disordered residue(s): {struct_name}: {proximal}{chain1_id} - {distal}{chain2_id}"
+                    )
                 errors += 1
                 continue
             else:
+                found += 1
+                i += 1
                 if dbg:
-                    _logger.info(
+                    _logger.warning(
                         f" -> SSBond: {i}: {struct_name}: {proximal}{chain1_id} - {distal}{chain2_id}"
                     )
         else:
@@ -1155,8 +1172,7 @@ def check_header_from_file(
                 _logger.error(
                     f" -> NULL chain(s): {struct_name}: {proximal}{chain1_id} - {distal}{chain2_id}"
                 )
-        i += 1
-    return errors
+    return found, errors
 
 
 def check_header_from_id(
@@ -1182,14 +1198,15 @@ def check_header_from_id(
     >>> import os
     >>> from proteusPy import Disulfide, check_header_from_id
     >>> from proteusPy.ProteusGlobals import DATA_DIR
-    >>> errors = 0
-    >>> errors = check_header_from_id('5rsa', pdb_dir=DATA_DIR, verbose=False)
-    >>> errors
-    0
+    >>> found = errors = 0
+    >>> found, errors = check_header_from_id('5rsa', pdb_dir=DATA_DIR, verbose=False)
+    >>> found
+    4
     """
 
     fname = os.path.join(pdb_dir, f"pdb{struct_name}.ent")
     return check_header_from_file(fname, verbose=verbose, dbg=dbg)
+
 
 
 if __name__ == "__main__":

@@ -13,10 +13,12 @@ __pdoc__ = {
     "__all__": False,
 }
 
+import logging
+
+"""
 import copy
 import datetime
 import glob
-import logging
 import math
 import os
 import pickle
@@ -24,18 +26,13 @@ import subprocess
 import sys
 import time
 import warnings
+"""
 
-# Configure logging
-logging.basicConfig(
-    level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s"
-)
 
 # Suppress findfont debug messages
-logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
+logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
 
 import matplotlib.pyplot as plt
-import numpy
-import plotly
 from Bio.PDB import Select, Vector
 from Bio.PDB.vectors import calc_angle, calc_dihedral
 
@@ -82,6 +79,7 @@ from .DisulfideLoader import (
     Download_PDB_SS_GitHub,
     Load_PDB_SS,
 )
+from .logger_config import get_logger
 from .ProteusGlobals import (
     _ANG_INIT,
     _FLOAT_INIT,
@@ -100,6 +98,13 @@ from .Residue import (
     to_carbonyl,
     to_nitrogen,
     to_oxygen,
+)
+from .ssparser import (
+    extract_and_write_ssbonds_and_atoms,
+    extract_ssbonds_and_atoms,
+    get_atom_coordinates,
+    get_residue_atoms_coordinates,
+    print_disulfide_bond_info_dict,
 )
 from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN, Turtle3D
 from .utility import (
@@ -126,6 +131,10 @@ from .utility import (
     retrieve_git_lfs_files,
     sort_by_column,
 )
+
+# import numpy
+# import plotly
+
 
 print(f"ProteusPy V{__version__}")
 

@@ -16,16 +16,9 @@ from glob import glob
 
 # Configure logging
 logging.basicConfig(
-    level=logging.WARNING, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.ERROR, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-# create a module logger and set the level to WARNING
-_logger = logging.getLogger(__name__)
-_logger.setLevel(logging.WARNING)
-_handler = logging.StreamHandler()
-_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-_handler.setFormatter(_formatter)
-_logger.addHandler(_handler)
 
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
@@ -33,12 +26,9 @@ logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
 from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from proteusPy import check_header_from_file
+from proteusPy import check_header_from_file, get_logger
 
-# Configure logging
-logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+_logger = get_logger("DisulfideChecker")
 
 # Paths
 HOME_DIR = os.path.expanduser("~")
@@ -81,8 +71,8 @@ def extract_pdb_id(filename: str) -> str:
 
 
 def check_files(
-    pdb_dir: str, good_dir: str, bad_dir: str, verbose=False, quiet=True
-) -> None:
+    pdb_dir: str, good_dir: str, bad_dir: str, verbose=False, quiet=True, cutoff=-1.0
+) -> tuple:
     """
     Check all PDB files in the directory `pdb_dir` for SS bond consistency.
 
@@ -124,6 +114,7 @@ def check_files(
         return None
 
     badcount = 0
+    bad_entries = []
     count = 0
 
     pbar = tqdm(all_pdb_files, ncols=80)
@@ -134,24 +125,27 @@ def check_files(
             entry = name_to_id(fname)
 
             # Returns > 0 if we can't parse the SSBOND header
-            if check_header_from_file(fname, verbose=verbose) > 0:
+            found, errors = check_header_from_file(fname, verbose=verbose)
+            if found < 0:
                 badcount += 1
+                bad_entries.append(entry)
                 destination_path = os.path.join(bad_dir, os.path.basename(fname))
 
                 shutil.move(fname, destination_path)
-                _logger.warning(f"Bad file: {fname} moved to {bad_dir}")
+                if verbose:
+                    _logger.warning(f"Non-parseable file: {fname} moved to {bad_dir}")
             else:
                 sslist = load_disulfides_from_id(
-                    entry, verbose=verbose, quiet=quiet, pdb_dir=pdb_dir
+                    entry, verbose=verbose, quiet=quiet, pdb_dir=pdb_dir, cutoff=cutoff
                 )
-                # sslist = Extract_Disulfide(entry)
+
                 if sslist is None or len(sslist) == 0:
                     badcount += 1
                     destination_path = os.path.join(bad_dir, os.path.basename(fname))
 
                     shutil.move(fname, destination_path)
                     if verbose:
-                        _logger.warning(f"Bad file: {fname} moved to {bad_dir}")
+                        _logger.warning(f"No SSBonds found: {fname} moved to {bad_dir}")
                 else:
                     destination_path = os.path.join(good_dir, os.path.basename(fname))
 
@@ -171,8 +165,11 @@ def check_files(
 
 if __name__ == "__main__":
     start_time = time.time()
+    count = 0
+    badcount = 0
+    bad_entries = []
 
-    check_files(PDB_BASE, GOOD_DIR, BAD_DIR)
+    check_files(PDB_BASE, GOOD_DIR, BAD_DIR, cutoff=8.0, verbose=True)
 
     end_time = time.time()
     elapsed_time = end_time - start_time
