@@ -1137,8 +1137,6 @@ def Nload_disulfides_from_id(
     import os
     import warnings
 
-    from Bio import BiopythonWarning
-
     from proteusPy import Disulfide, extract_ssbonds_and_atoms, parse_ssbond_header_rec
 
     i = 1
@@ -1148,40 +1146,35 @@ def Nload_disulfides_from_id(
     _chaina = None
     _chainb = None
 
-    parser = PDBParser(PERMISSIVE=True)
-
-    # Biopython uses the Structure -> Model -> Chain hierarchy to organize
-    # structures. All are iterable.
     structure_fname = os.path.join(pdb_dir, f"pdb{pdb_id}.ent")
-    structure = parser.get_structure(pdb_id, file=structure_fname)
-    model = structure[model_numb]
+
+    if not os.path.exists(structure_fname):
+        mess = f" -> load_disulfides_from_id(): File not found: {structure_fname}, skipping."
+        _logger.error(mess)
+        return None
 
     if dbg:
         print(f"-> load_disulfide_from_id() - Parsing structure: {pdb_id}:")
 
-    # ssbond_dict = structure.header["ssbond"]  # NB: this requires the modified code
-    # resolution = structure.header["resolution"]
-
     SSList = DisulfideList([], pdb_id, resolution)
 
-    # list of tuples with (proximal distal chaina chainb)
-    ssbonds = parse_ssbond_header_rec(ssbond_dict)
-
-    # ssbond_atom_list, num_ssbonds, errors = extract_ssbonds_and_atoms(
-    #    "/Users/egs/PDB/pdb2qpn.ent"
-    # )
+    ssbond_atom_dict, num_ssbonds, errors = extract_ssbonds_and_atoms(structure_fname)
 
     # with warnings.catch_warnings():
     if quiet:
         # _logger.setLevel(logging.ERROR)
         warnings.filterwarnings("ignore", category=BiopythonWarning)
 
-    for pair in ssbonds:
-        # in the form (proximal, distal, chain1 chain2)
-        proximal = pair[0]
-        distal = pair[1]
-        chain1_id = pair[2]
-        chain2_id = pair[3]
+    atoms = ssbond_atom_dict.get("atoms", {})
+    pairs = ssbond_atom_dict.get("pairs", [])
+
+    for pair in pairs:
+        proximal = pair["proximal"][1]
+        distal = pair["distal"][1]
+
+        chains = pair["chains"]
+        chain1_id = chains[0]
+        chain2_id = chains[1]
 
         if not proximal.isnumeric() or not distal.isnumeric():
             mess = f" -> load_disulfides_from_id(): Cannot parse SSBond record (non-numeric IDs):\
@@ -1198,15 +1191,6 @@ def Nload_disulfides_from_id(
                 {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
                 _logger.info(mess)
 
-        _chaina = model[chain1_id]
-        _chainb = model[chain2_id]
-
-        if (_chaina is None) or (_chainb is None):
-            mess = f" -> load_disulfides_from_id(): NULL chain(s): {pdb_id}: {proximal} {chain1_id}\
-            - {distal} {chain2_id}, ignoring!"
-            _logger.error(mess)
-            continue
-
         if chain1_id != chain2_id:
             if verbose:
                 mess = f" -> load_disulfides_from_id(): Cross Chain SS for: Prox: {proximal} {chain1_id}\
@@ -1214,37 +1198,34 @@ def Nload_disulfides_from_id(
                 _logger.info(mess)
             pass  # was break
 
-        try:
-            prox_res = _chaina[proximal]
-            dist_res = _chainb[distal]
-
-        except KeyError:
-            mess = (
-                f"Cannot parse SSBond record (KeyError): {pdb_id} Prox: "
-                f"{proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring!"
-            )
-            _logger.error(mess)
-            continue
-
         # make a new Disulfide object, name them based on proximal and distal
         # initialize SS bond from the proximal, distal coordinates
-
+        """
         if _chaina[proximal].is_disordered() or _chainb[distal].is_disordered():
             mess = f" -> load_disulfides_from_id(): Disordered chain(s): {pdb_id}: {proximal} {chain1_id} - {distal} {chain2_id}, ignoring!"
             _logger.warning(mess)
             continue
         else:
-            if verbose:
-                _logger.info(
-                    f"SSBond: {i}: {pdb_id}: {proximal} {chain1_id} - {distal} {chain2_id}"
-                )
-            ssbond_name = f"{pdb_id}_{proximal}{chain1_id}_{distal}{chain2_id}"
-            new_ss = Disulfide(ssbond_name)
-            res = new_ss.initialize_disulfide_from_chain(
-                _chaina, _chainb, proximal, distal, resolution, quiet=quiet
+        """
+        if verbose:
+            _logger.info(
+                f"SSBond: {i}: {pdb_id}: {proximal} {chain1_id} - {distal} {chain2_id}"
             )
-            if res:
-                SSList.append(new_ss)
+        ssbond_name = f"{pdb_id}_{proximal}{chain1_id}_{distal}{chain2_id}"
+        new_ss = Disulfide(ssbond_name)
+        res = new_ss.initialize_disulfide_from_coords(
+            ssbond_atom_dict,
+            pdb_id,
+            chain1_id,
+            chain2_id,
+            proximal,
+            distal,
+            resolution,
+            quiet=quiet,
+        )
+
+        if res:
+            SSList.append(new_ss)
         i += 1
 
     if quiet:
@@ -1257,6 +1238,7 @@ def Nload_disulfides_from_id(
     return copy.deepcopy(SSList)
 
 
+########################################################################################
 def load_disulfides_from_id(
     pdb_id: str,
     pdb_dir=MODEL_DIR,
@@ -1405,8 +1387,10 @@ def load_disulfides_from_id(
         # _logger.setLevel(logging.WARNING)
         warnings.filterwarnings("ignore", category=BiopythonWarning)
 
+    """
     if cutoff > 0:
         SSList = SSList.filter_by_distance(cutoff)
+    """
 
     return copy.deepcopy(SSList)
 

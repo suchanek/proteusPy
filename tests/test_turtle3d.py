@@ -1,10 +1,10 @@
 import unittest
 
 import numpy as np
-from Bio.PDB.vectors import Vector
 from numpy.testing import assert_array_equal
 
 from proteusPy.turtle3D import Turtle3D
+from proteusPy.vector3D import Vector3D as Vector
 
 # Define a _tolerance threshold
 _tolerance = 1e-8
