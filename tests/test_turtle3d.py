@@ -13,7 +13,7 @@ _tolerance = 1e-8
 def cmp_vec(v1: Vector, v2: Vector, tol: float) -> bool:
     "Return true if the length of the difference between the two vectors is less than a tolerance."
     _diff = v2 - v1
-    _len = _diff.norm()
+    _len = _diff.normalize()
     return _len < tol
 
 
