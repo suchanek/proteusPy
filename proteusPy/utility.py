@@ -552,7 +552,7 @@ def display_ss_pymol(
     return None
 
 
-def parse_ssbond_header_rec(ssbond_dict: dict, verbose=True) -> list:
+def parse_ssbond_header_rec(ssbond_dict: dict, verbose=False) -> list:
     """
     Parse the SSBOND dict returned by parse_pdb_header.
     NB: Requires EGS-Modified BIO.parse_pdb_header.py.
@@ -1206,7 +1206,6 @@ def check_header_from_id(
 
     fname = os.path.join(pdb_dir, f"pdb{struct_name}.ent")
     return check_header_from_file(fname, verbose=verbose, dbg=dbg)
-
 
 
 if __name__ == "__main__":

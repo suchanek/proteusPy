@@ -120,6 +120,8 @@ class Vector3D:
         norm = self.magnitude()
         if norm != 0:
             self._coords /= norm
+        else:
+            return None
 
     def normalized(self):
         """Return a normalized copy of the vector."""
