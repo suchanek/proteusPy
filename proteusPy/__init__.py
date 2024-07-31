@@ -15,20 +15,6 @@ __pdoc__ = {
 
 import logging
 
-"""
-import copy
-import datetime
-import glob
-import math
-import os
-import pickle
-import subprocess
-import sys
-import time
-import warnings
-"""
-
-
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
 
@@ -131,10 +117,7 @@ from .utility import (
     retrieve_git_lfs_files,
     sort_by_column,
 )
-
-# import numpy
-# import plotly
-
+from .vector3D import Vector3D, calc_angle, calc_dihedral
 
 print(f"ProteusPy V{__version__}")
 

@@ -21,7 +21,7 @@ import warnings
 
 from proteusPy.logger_config import get_logger
 
-_logger = get_logger("utility")
+_logger = get_logger("__name__")
 
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
