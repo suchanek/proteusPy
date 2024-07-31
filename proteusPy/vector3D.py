@@ -22,7 +22,29 @@ _logger = get_logger(__name__)  ## vector3d
 
 
 class Vector3D:
-    """Class representing a 3D vector."""
+    """
+    A class to represent a three-dimensional vector.
+
+    Attributes:
+    -----------
+    x : float
+        The x-coordinate of the vector.
+    y : float
+        The y-coordinate of the vector.
+    z : float
+        The z-coordinate of the vector.
+
+    Methods:
+    --------
+    __sub__(other):
+        Subtracts another Vector3D from this vector and returns the result.
+    dot(other):
+        Computes the dot product of this vector and another Vector3D.
+    magnitude():
+        Computes the magnitude (length) of the vector.
+    angle_with(other):
+        Computes the angle between this vector and another Vector3D in degrees.
+    """
 
     def __init__(self, x, y=None, z=None):
         """Initialize the vector with either a list/tuple/array of 3 elements or three separate values."""
@@ -156,49 +178,6 @@ def calc_angle(v1: Vector3D, v2: Vector3D, v3: Vector3D) -> float:
     vec1 = v1 - v2
     vec3 = v3 - v2
     return vec1.angle_with(vec3)
-
-
-def Ocalc_dihedral(v1: Vector3D, v2: Vector3D, v3: Vector3D, v4: Vector3D) -> float:
-    """Calculate the dihedral angle between vectors v1-v2 and v4-v3.
-
-    The dihedral angle is the angle between the planes formed by the vectors
-    (v1-v2) and (v4-v3). The angle is in the range ]-pi, pi].
-
-    :param v1: The first vector.
-    :param v2: The second vector.
-    :param v3: The third vector.
-    :param v4: The fourth vector.
-    :type v1: Vector3D
-    :type v2: Vector3D
-    :type v3: Vector3D
-    :type v4: Vector3Dxk
-
-    :return: The dihedral angle in radians.
-    :rtype: float
-
-    Example:
-    >>> v1 = Vector3D(1.0, 0.0, 0.0)
-    >>> v2 = Vector3D(0.0, 0.0, 0.0)
-    >>> v3 = Vector3D(0.0, 1.0, 0.0)
-    >>> v4 = Vector3D(0.0, 1.0, 1.0)
-    >>> angle = float(calc_dihedral(v1, v2, v3, v4))
-    >>> print(angle)
-    90.0
-    """
-    ab = v1 - v2
-    cb = v3 - v2
-    db = v4 - v3
-    u = ab**cb
-    v = db**cb
-    w = u**v
-    angle = u.angle_with(v)
-    # Determine sign of angle
-    try:
-        if cb.angle_with(w) > 0.001:
-            angle = -angle
-    except ZeroDivisionError:
-        pass
-    return angle
 
 
 def calc_dihedral(v1, v2, v3, v4):
