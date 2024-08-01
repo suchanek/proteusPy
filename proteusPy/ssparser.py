@@ -24,6 +24,7 @@ import os
 import pickle
 
 from proteusPy.logger_config import get_logger
+from proteusPy.vector3D import Vector3D, calc_angle, calc_dihedral, distance3d
 
 _logger = get_logger("ssparser")
 
@@ -54,7 +55,7 @@ def extract_id_from_filename(filename: str) -> str:
 # containing the relevant info as shown below.
 
 
-def extract_ssbonds_and_atoms(input_pdb_file, verbose=False) -> tuple:
+def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple:
     """
     Extracts SSBOND and ATOM records from a PDB file.
 
@@ -123,8 +124,8 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False) -> tuple:
             z = float(line[46:54].strip())
             key = (chain_id, res_seq_num, atom_name)
             atom_list[key] = {"line": line, "coords": [x, y, z]}
-            if verbose:
-                print(
+            if dbg:
+                _logger.info(
                     f"Found ATOM record for chain {chain_id}, residue {res_seq_num}, atom {atom_name}"
                 )
 
@@ -225,7 +226,9 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False) -> tuple:
 # print(result)
 
 
-def extract_and_write_ssbonds_and_atoms(input_pdb_file, output_pkl_file, verbose=False):
+def extract_and_write_ssbonds_and_atoms(
+    input_pdb_file, output_pkl_file, verbose=False, dbg=False
+) -> None:
     """
     Extracts disulfide bonds and atom information from a PDB file and writes it to a .pkl file.
 
@@ -241,7 +244,9 @@ def extract_and_write_ssbonds_and_atoms(input_pdb_file, output_pkl_file, verbose
     if verbose:
         _logger.info(f"Loading disulfides from {input_pdb_file}")
 
-    ssbond_atom_list, _, _ = extract_ssbonds_and_atoms(input_pdb_file)
+    ssbond_atom_list, _, _ = extract_ssbonds_and_atoms(
+        input_pdb_file, verbose=verbose, dbg=dbg
+    )
 
     if verbose:
         _logger.info(
@@ -261,7 +266,7 @@ def extract_and_write_ssbonds_and_atoms(input_pdb_file, output_pkl_file, verbose
 # extract_and_write_ssbonds_and_atoms("path_to_pdb_file.pdb", "output_file.pkl", verbos
 
 
-def print_disulfide_bond_info_dict(ssbond_atom_data):
+def print_disulfide_bond_info_dict(ssbond_atom_data) -> None:
     """
     Prints the disulfide bond information in a pretty format.
 
@@ -352,10 +357,7 @@ def print_disulfide_bond_info_dict(ssbond_atom_data):
         print("-" * 50)
 
 
-from Bio.PDB import Vector
-
-
-def get_atom_coordinates(ssbond_dict, chain_id, res_seq_num, atom_name) -> Vector:
+def get_atom_coordinates(ssbond_dict, chain_id, res_seq_num, atom_name) -> Vector3D:
     """
     Accessor function to get the coordinates of a specific atom in a residue.
 
@@ -368,13 +370,13 @@ def get_atom_coordinates(ssbond_dict, chain_id, res_seq_num, atom_name) -> Vecto
     Returns:
     - list: A list containing the x, y, z coordinates of the atom if found, otherwise None.
     """
-    key = (chain_id, res_seq_num, atom_name)
+    key = (chain_id, str(res_seq_num), atom_name)
     if key in ssbond_dict["atoms"]:
         atom_record = ssbond_dict["atoms"][key]
-        # return Vector([atom_record["x"], atom_record["y"], atom_record["z"]])
-        return Vector(atom_record["coords"])
+        # return Vector3D([atom_record["x"], atom_record["y"], atom_record["z"]])
+        return Vector3D(atom_record["coords"])
     else:
-        return Vector([])
+        return Vector3D([])
 
 
 def get_residue_atoms_coordinates(ssbond_dict, chain_id, res_seq_num):
@@ -390,23 +392,19 @@ def get_residue_atoms_coordinates(ssbond_dict, chain_id, res_seq_num):
     - list: A list of vectors, where each vector is a list containing the x, y, z coordinates of the atom.
             If an atom is not found, None is placed in its position.
     """
-    from Bio.PDB import Vector
 
     atom_names = ["N", "CA", "C", "O", "CB", "SG"]
     coordinates = []
+    atoms = ssbond_dict.get("atoms", {})
 
     for atom_name in atom_names:
-        key = (chain_id, res_seq_num, atom_name)
-        if key in ssbond_dict["atoms"]:
-            atom_record = ssbond_dict["atoms"][key]
-            coordinates.append(
-                # Vector([atom_record["x"], atom_record["y"], atom_record["z"]])
-                Vector(atom_record["coords"])
-            )
+        atom_record = atoms.get((chain_id, str(res_seq_num), atom_name))
+        if atom_record:
+            coordinates.append(Vector3D(atom_record["coords"]))
         else:
-            coordinates.append(Vector(0, 0, 0))
+            coordinates.append(Vector3D(0, 0, 0))
             _logger.error(
-                f"Atom {atom_name} in residue {chain_id} {res_seq_num} not found."
+                f"--> get_residue_coordinates: Atom {atom_name} in residue {chain_id} {res_seq_num} not found."
             )
 
     return coordinates
@@ -420,7 +418,7 @@ def get_residue_atoms_coordinates(ssbond_dict, chain_id, res_seq_num):
 # print("Coordinates:", coordinates)
 
 
-def get_phipsi_atoms(data_dict, chain_id, key):
+def get_phipsi_atoms_coordinates(data_dict, chain_id, key):
     """
     Retrieve the phi/psi atoms based on the input dictionary, chain ID, and key.
 
@@ -429,7 +427,6 @@ def get_phipsi_atoms(data_dict, chain_id, key):
     :param key: Key in the form "proximal+1", "distal-1", etc.
     :return: List of Vectors representing the N and C atoms with their coordinates.
     """
-    from Bio.PDB import Vector
 
     from proteusPy.ssparser import (
         extract_ssbonds_and_atoms,
@@ -443,7 +440,7 @@ def get_phipsi_atoms(data_dict, chain_id, key):
                 n_coords = phipsi_data[key].get("N")
                 c_coords = phipsi_data[key].get("C")
                 if n_coords and c_coords:
-                    return [Vector(*n_coords), Vector(*c_coords)]
+                    return [Vector3D(*n_coords), Vector3D(*c_coords)]
     return []
 
 
@@ -451,205 +448,6 @@ def get_phipsi_atoms(data_dict, chain_id, key):
 # ssbond_dict, num_ssbonds, errors = extract_ssbonds_and_atoms(
 #    "/Users/egs/PDB/good/pdb6f99.ent"
 # )
-
-from proteusPy.Disulfide import Disulfide
-
-
-def initialize_disulfide_from_coords(
-    ssbond_atom_data,
-    pdb_id,
-    proximal_chain_id,
-    distal_chain_id,
-    proximal,
-    distal,
-    resolution,
-    verbose=False,
-    quiet=True,
-) -> Disulfide:
-    """
-    Initialize a new Disulfide object with atomic coordinates from
-    the proximal and distal coordinates, typically taken from a PDB file.
-    This routine is primarily used internally when building the compressed
-    database.
-
-    :param resolution: structure resolution
-    :param quiet: Quiet or noisy parsing, defaults to True
-    :raises DisulfideConstructionWarning: Raised when not parsed correctly
-    """
-    import logging
-    import warnings
-
-    import numpy as np
-    from Bio.PDB import Vector, calc_dihedral, distance3d
-
-    from proteusPy.ssparser import (
-        get_phipsi_atom_coordinates,
-        get_residue_atom_coordinates,
-    )
-
-    ssbond_name = f"{pdb_id}_{proximal}{proximal_chain_id}_{distal}{distal_chain_id}"
-    new_ss = Disulfide(ssbond_name)
-
-    new_ss.pdb_id = pdb_id
-    new_ss.resolution = resolution
-    prox_atom_list = []
-    dist_atom_list = []
-
-    if quiet:
-        _logger.setLevel(logging.ERROR)
-        logging.getLogger().setLevel(logging.CRITICAL)
-
-    # set the objects proximal and distal values
-    new_ss.set_resnum(proximal, distal)
-
-    if resolution is not None:
-        new_ss.resolution = resolution
-    else:
-        new_ss.resolution = -1.0
-
-    new_ss.proximal_chain = proximal_chain_id
-    new_ss.distal_chain = distal_chain_id
-
-    new_ss.proximal_residue_fullid = proximal
-    new_ss.distal_residue_fullid = distal
-
-    # restore loggins
-    if quiet:
-        _logger.setLevel(logging.ERROR)
-        logging.getLogger().setLevel(logging.ERROR)  ## may want to be CRITICAL
-
-    # Get the coordinates for the proximal and distal residues as vectors
-    # so we can do math on them later. Trap errors here to avoid problems
-    # with missing residues or atoms.
-
-    # proximal residue
-
-    try:
-        prox_atom_list = get_residue_atom_coordinates(
-            ssbond_atom_data, proximal_chain_id, proximal
-        )
-
-        n1 = prox_atom_list[0]
-        ca1 = prox_atom_list[1]
-        c1 = prox_atom_list[2]
-        o1 = prox_atom_list[3]
-        cb1 = prox_atom_list[4]
-        sg1 = prox_atom_list[5]
-
-    except Exception:
-        # i'm torn on this. there are a lot of missing coordinates, so is
-        # it worth the trouble to note them? I think so.
-        _logger.error(f"Invalid/missing coordinates for: {id}, proximal: {proximal}")
-        return False
-
-    # distal residue
-    try:
-        dist_atom_list = get_residue_atom_coordinates(
-            ssbond_atom_data, distal_chain_id, distal
-        )
-        n2 = dist_atom_list[0]
-        ca2 = dist_atom_list[1]
-        c2 = dist_atom_list[2]
-        o2 = dist_atom_list[3]
-        cb2 = dist_atom_list[4]
-        sg2 = dist_atom_list[5]
-
-    except Exception:
-        _logger.error(f"Invalid/missing coordinates for: {id}, distal: {distal}")
-        return False
-
-    # previous residue and next residue - optional, used for phi, psi calculations
-    prevprox_atom_list = get_phipsi_atom_coordinates(
-        ssbond_atom_data, proximal_chain_id, "proximal-1"
-    )
-
-    nextprox_atom_list = get_phipsi_atom_coordinates(
-        ssbond_atom_data, proximal_chain_id, "proximal+1"
-    )
-
-    prevdist_atom_list = get_phipsi_atom_coordinates(
-        ssbond_atom_data, distal_chain_id, "distal-1"
-    )
-
-    nextdist_atom_list = get_phipsi_atom_coordinates(
-        ssbond_atom_data, distal_chain_id, "distal+1"
-    )
-
-    if len(prevprox_atom_list) != 0 and len(nextprox_atom_list) != 0:
-        # list is N, C
-        cprev_prox = prevprox_atom_list["C"]
-        nnext_prox = nextprox_atom_list["N"]
-        new_ss.phiprox = np.degrees(calc_dihedral(cprev_prox, n1, ca1, c1))
-        new_ss.psiprox = np.degrees(calc_dihedral(n1, ca1, c1, nnext_prox))
-    else:
-        cprev_prox = nnext_prox = Vector(-1.0, -1.0, -1.0)
-        new_ss.missing_atoms = True
-        if verbose:
-            _logger.warning(
-                f"Missing Proximal coords for: {id} {proximal-1} or {proximal+1}, SS {proximal}-{distal}, phi/psi not computed."
-            )
-
-    if len(prevdist_atom_list) != 0 and len(nextdist_atom_list) != 0:
-        # list is N, C
-        cprev_dist = prevdist_atom_list[1]
-        nnext_dist = nextdist_atom_list[0]
-        new_ss.phidist = np.degrees(calc_dihedral(cprev_dist, n2, ca2, c2))
-        new_ss.psidist = np.degrees(calc_dihedral(n2, ca2, c2, nnext_dist))
-    else:
-        cprev_dist = nnext_dist = Vector(-1.0, -1.0, -1.0)
-        new_ss.missing_atoms = True
-        if verbose:
-            _logger.warning(
-                f"Missing Distal coords for: {id} {distal-1} or {distal+1} SS {proximal}-{distal}, phi/psi not computed."
-            )
-
-    # update the positions and conformation
-    new_ss.set_positions(
-        n1,
-        ca1,
-        c1,
-        o1,
-        cb1,
-        sg1,
-        n2,
-        ca2,
-        c2,
-        o2,
-        cb2,
-        sg2,
-        cprev_prox,
-        nnext_prox,
-        cprev_dist,
-        nnext_dist,
-    )
-
-    # calculate and set the disulfide dihedral angles
-    new_ss.chi1 = np.degrees(calc_dihedral(n1, ca1, cb1, sg1))
-    new_ss.chi2 = np.degrees(calc_dihedral(ca1, cb1, sg1, sg2))
-    new_ss.chi3 = np.degrees(calc_dihedral(cb1, sg1, sg2, cb2))
-    new_ss.chi4 = np.degrees(calc_dihedral(sg1, sg2, cb2, ca2))
-    new_ss.chi5 = np.degrees(calc_dihedral(sg2, cb2, ca2, n2))
-    new_ss.rho = np.degrees(calc_dihedral(n1, ca1, ca2, n2))
-
-    new_ss.ca_distance = distance3d(new_ss.ca_prox, new_ss.ca_dist)
-    new_ss.cb_distance = distance3d(new_ss.cb_prox, new_ss.cb_dist)
-    new_ss.torsion_array = np.array(
-        (new_ss.chi1, new_ss.chi2, new_ss.chi3, new_ss.chi4, new_ss.chi5)
-    )
-    new_ss.compute_torsion_length()
-
-    # calculate and set the SS bond torsional energy
-    new_ss.compute_torsional_energy()
-
-    # compute and set the local coordinates
-    new_ss.compute_local_coords()
-
-    # turn warnings back on
-    if quiet:
-        _logger.setLevel(logging.ERROR)
-        logging.getLogger().setLevel(logging.ERROR)
-
-    return new_ss
 
 
 if __name__ == "__main__":

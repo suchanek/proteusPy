@@ -29,13 +29,12 @@ logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from Bio.PDB import PDBList, PDBParser, Vector
-from Bio.PDB.PDBExceptions import PDBConstructionWarning
 from matplotlib import cm
 
 from proteusPy import DisulfideList, __version__
 from proteusPy.DisulfideExceptions import DisulfideIOException, DisulfideParseWarning
 from proteusPy.ProteusPyWarning import ProteusPyWarning
+from proteusPy.vector3D import Vector3D
 
 try:
     # Check if running in Jupyter
@@ -61,8 +60,6 @@ from proteusPy.ProteusGlobals import (
     SS_TORSIONS_FILE,
 )
 
-warnings.simplefilter("ignore", PDBConstructionWarning)
-
 
 def distance_squared(p1: np.array, p2: np.array) -> np.array:
     """
@@ -74,7 +71,7 @@ def distance_squared(p1: np.array, p2: np.array) -> np.array:
     :return: np.array N-dimensional distance squared Å^2
 
     Example
-    >>> from proteusPy.utility import distance_squared
+    >>> from proteusPy import distance_squared
     >>> p1 = np.array([1.0, 0.0, 0.0])
     >>> p2 = np.array([0, 1.0, 0])
     >>> d = distance_squared(p1, p2)
@@ -82,30 +79,6 @@ def distance_squared(p1: np.array, p2: np.array) -> np.array:
     np.True_
     """
     return np.sum(np.square(np.subtract(p1, p2)))
-
-
-def distance3d(p1: Vector, p2: Vector) -> float:
-    """
-    Calculate the 3D Euclidean distance for 2 Vector objects
-
-    :param Vector p1: Point1
-    :param Vector p2: Point2
-    :return float distance: Distance between two points, Å
-
-    Example:
-    >>> from proteusPy.utility import distance3d
-    >>> p1 = Vector(1, 0, 0)
-    >>> p2 = Vector(0, 1, 0)
-    >>> distance3d(p1,p2)
-    1.4142135623730951
-    """
-
-    _p1 = p1.get_array()
-    _p2 = p2.get_array()
-    if len(_p1) != 3 or len(_p2) != 3:
-        raise ProteusPyWarning("distance3d() requires vectors of length 3!")
-    d = math.dist(_p1, _p2)
-    return d
 
 
 def get_jet_colormap(steps):
@@ -156,7 +129,7 @@ def grid_dimensions(n: int) -> tuple:
         return rows, cols
 
 
-def Check_chains(pdbid, pdbdir, verbose=True):
+def Check_chains(pdbid, pdbdir, verbose=True) -> bool:
     """
     Return True if structure has multiple chains of identical length,
     False otherwise. Primarily internal use.
@@ -291,6 +264,15 @@ def get_memory_usage():
     process = psutil.Process()
     mem_info = process.memory_info()
     return mem_info.rss
+
+
+from pympler import asizeof
+
+
+def get_object_size_mb(obj):
+    size_bytes = asizeof.asizeof(obj)
+    size_mb = size_bytes / (1024**2)
+    return size_mb
 
 
 def print_memory_used():
