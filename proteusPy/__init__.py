@@ -19,8 +19,7 @@ import logging
 logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
 
 import matplotlib.pyplot as plt
-from Bio.PDB import Select, Vector
-from Bio.PDB.vectors import calc_angle, calc_dihedral
+import numpy as np
 
 from ._version import __version__
 from .angle_annotation import AngleAnnotation, plot_angle
@@ -36,7 +35,12 @@ from .atoms import (
     SPEC_POWER,
     SPECULARITY,
 )
-from .Disulfide import Disulfide, Disulfide_Energy_Function, Minimize
+from .Disulfide import (
+    Disulfide,
+    Disulfide_Energy_Function,
+    Initialize_Disulfide_From_Coords,
+    Minimize,
+)
 from .DisulfideClass_Constructor import DisulfideClass_Constructor
 from .DisulfideClasses import (
     create_classes,
@@ -89,6 +93,7 @@ from .ssparser import (
     extract_and_write_ssbonds_and_atoms,
     extract_ssbonds_and_atoms,
     get_atom_coordinates,
+    get_phipsi_atoms_coordinates,
     get_residue_atoms_coordinates,
     print_disulfide_bond_info_dict,
 )
@@ -101,7 +106,6 @@ from .utility import (
     check_header_from_file,
     check_header_from_id,
     display_ss_pymol,
-    distance3d,
     distance_squared,
     extract_firstchain_ss,
     generate_vector_dataframe,
@@ -117,7 +121,7 @@ from .utility import (
     retrieve_git_lfs_files,
     sort_by_column,
 )
-from .vector3D import Vector3D, calc_angle, calc_dihedral
+from .vector3D import Vector3D, calc_angle, calc_dihedral, distance3d
 
 print(f"ProteusPy V{__version__}")
 

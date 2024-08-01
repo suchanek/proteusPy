@@ -38,7 +38,7 @@ _logger.addHandler(_handler)
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
 
-from Bio.PDB import Vector, calc_dihedral
+# from Bio.PDB import Vector3D, calc_dihedral
 
 import proteusPy
 from proteusPy.atoms import *
@@ -47,7 +47,7 @@ from proteusPy.DisulfideList import DisulfideList
 from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, WINSIZE
 from proteusPy.Residue import build_residue
 from proteusPy.turtle3D import ORIENT_SIDECHAIN, Turtle3D
-from proteusPy.utility import distance3d
+from proteusPy.vector3D import Vector3D, calc_dihedral, distance3d
 
 # columns for the torsions file dataframe.
 Torsion_DF_Cols = [
@@ -70,6 +70,8 @@ Torsion_DF_Cols = [
     "torsion_length",
     "rho",
 ]
+
+ORIGIN = Vector3D(0.0, 0.0, 0.0)
 
 
 # class for the Disulfide bond
@@ -170,18 +172,18 @@ class Disulfide:
         # global coordinates for the Disulfide, typically as
         # returned from the PDB file
 
-        self.n_prox = Vector(0, 0, 0)
-        self.ca_prox = Vector(0, 0, 0)
-        self.c_prox = Vector(0, 0, 0)
-        self.o_prox = Vector(0, 0, 0)
-        self.cb_prox = Vector(0, 0, 0)
-        self.sg_prox = Vector(0, 0, 0)
-        self.sg_dist = Vector(0, 0, 0)
-        self.cb_dist = Vector(0, 0, 0)
-        self.ca_dist = Vector(0, 0, 0)
-        self.n_dist = Vector(0, 0, 0)
-        self.c_dist = Vector(0, 0, 0)
-        self.o_dist = Vector(0, 0, 0)
+        self.n_prox = ORIGIN
+        self.ca_prox = ORIGIN
+        self.c_prox = ORIGIN
+        self.o_prox = ORIGIN
+        self.cb_prox = ORIGIN
+        self.sg_prox = ORIGIN
+        self.sg_dist = ORIGIN
+        self.cb_dist = ORIGIN
+        self.ca_dist = ORIGIN
+        self.n_dist = ORIGIN
+        self.c_dist = ORIGIN
+        self.o_dist = ORIGIN
 
         # set when we can't find previous or next prox or distal
         # C' or N atoms.
@@ -190,32 +192,32 @@ class Disulfide:
         self.resolution = -1.0
 
         # need these to calculate backbone dihedral angles
-        self.c_prev_prox = Vector(0, 0, 0)
-        self.n_next_prox = Vector(0, 0, 0)
-        self.c_prev_dist = Vector(0, 0, 0)
-        self.n_next_dist = Vector(0, 0, 0)
+        self.c_prev_prox = ORIGIN
+        self.n_next_prox = ORIGIN
+        self.c_prev_dist = ORIGIN
+        self.n_next_dist = ORIGIN
 
         # local coordinates for the Disulfide, computed using the Turtle3D in
         # Orientation #1. these are generally private.
 
-        self._n_prox = Vector(0, 0, 0)
-        self._ca_prox = Vector(0, 0, 0)
-        self._c_prox = Vector(0, 0, 0)
-        self._o_prox = Vector(0, 0, 0)
-        self._cb_prox = Vector(0, 0, 0)
-        self._sg_prox = Vector(0, 0, 0)
-        self._sg_dist = Vector(0, 0, 0)
-        self._cb_dist = Vector(0, 0, 0)
-        self._ca_dist = Vector(0, 0, 0)
-        self._n_dist = Vector(0, 0, 0)
-        self._c_dist = Vector(0, 0, 0)
-        self._o_dist = Vector(0, 0, 0)
+        self._n_prox = ORIGIN
+        self._ca_prox = ORIGIN
+        self._c_prox = ORIGIN
+        self._o_prox = ORIGIN
+        self._cb_prox = ORIGIN
+        self._sg_prox = ORIGIN
+        self._sg_dist = ORIGIN
+        self._cb_dist = ORIGIN
+        self._ca_dist = ORIGIN
+        self._n_dist = ORIGIN
+        self._c_dist = ORIGIN
+        self._o_dist = ORIGIN
 
         # need these to calculate backbone dihedral angles
-        self._c_prev_prox = Vector(0, 0, 0)
-        self._n_next_prox = Vector(0, 0, 0)
-        self._c_prev_dist = Vector(0, 0, 0)
-        self._n_next_dist = Vector(0, 0, 0)
+        self._c_prev_prox = ORIGIN
+        self._n_next_prox = ORIGIN
+        self._c_prev_dist = ORIGIN
+        self._n_next_dist = ORIGIN
 
         # Dihedral angles for the disulfide bond itself, set to _ANG_INIT
         self.chi1 = _ANG_INIT
@@ -1057,10 +1059,10 @@ class Disulfide:
         tmp = Turtle3D("tmp")
         tmp.Orientation = 1
 
-        n = Vector(0, 0, 0)
-        ca = Vector(0, 0, 0)
-        cb = Vector(0, 0, 0)
-        c = Vector(0, 0, 0)
+        n = ORIGIN
+        ca = ORIGIN
+        cb = ORIGIN
+        c = ORIGIN
 
         self.ca_prox = tmp._position
         tmp.schain_to_bbone()
@@ -1075,22 +1077,22 @@ class Disulfide:
         tmp.move(1.53)
         tmp.roll(self.chi1)
         tmp.yaw(112.8)
-        self.cb_prox = Vector(tmp._position)
+        self.cb_prox = Vector3D(tmp._position)
 
         tmp.move(1.86)
         tmp.roll(self.chi2)
         tmp.yaw(103.8)
-        self.sg_prox = Vector(tmp._position)
+        self.sg_prox = Vector3D(tmp._position)
 
         tmp.move(2.044)
         tmp.roll(self.chi3)
         tmp.yaw(103.8)
-        self.sg_dist = Vector(tmp._position)
+        self.sg_dist = Vector3D(tmp._position)
 
         tmp.move(1.86)
         tmp.roll(self.chi4)
         tmp.yaw(112.8)
-        self.cb_dist = Vector(tmp._position)
+        self.cb_dist = Vector3D(tmp._position)
 
         tmp.move(1.53)
         tmp.roll(self.chi5)
@@ -1192,24 +1194,24 @@ class Disulfide:
         # internal (local) coordinates, stored as Vector objects
         # to_local returns np.array objects
 
-        self._n_prox = Vector(turt.to_local(n))
-        self._ca_prox = Vector(turt.to_local(ca))
-        self._c_prox = Vector(turt.to_local(c))
-        self._o_prox = Vector(turt.to_local(o))
-        self._cb_prox = Vector(turt.to_local(cb))
-        self._sg_prox = Vector(turt.to_local(sg))
+        self._n_prox = Vector3D(turt.to_local(n))
+        self._ca_prox = Vector3D(turt.to_local(ca))
+        self._c_prox = Vector3D(turt.to_local(c))
+        self._o_prox = Vector3D(turt.to_local(o))
+        self._cb_prox = Vector3D(turt.to_local(cb))
+        self._sg_prox = Vector3D(turt.to_local(sg))
 
-        self._c_prev_prox = Vector(turt.to_local(cpp))
-        self._n_next_prox = Vector(turt.to_local(nnp))
-        self._c_prev_dist = Vector(turt.to_local(cpd))
-        self._n_next_dist = Vector(turt.to_local(nnd))
+        self._c_prev_prox = Vector3D(turt.to_local(cpp))
+        self._n_next_prox = Vector3D(turt.to_local(nnp))
+        self._c_prev_dist = Vector3D(turt.to_local(cpd))
+        self._n_next_dist = Vector3D(turt.to_local(nnd))
 
-        self._n_dist = Vector(turt.to_local(n2))
-        self._ca_dist = Vector(turt.to_local(ca2))
-        self._c_dist = Vector(turt.to_local(c2))
-        self._o_dist = Vector(turt.to_local(o2))
-        self._cb_dist = Vector(turt.to_local(cb2))
-        self._sg_dist = Vector(turt.to_local(sg2))
+        self._n_dist = Vector3D(turt.to_local(n2))
+        self._ca_dist = Vector3D(turt.to_local(ca2))
+        self._c_dist = Vector3D(turt.to_local(c2))
+        self._o_dist = Vector3D(turt.to_local(o2))
+        self._cb_dist = Vector3D(turt.to_local(cb2))
+        self._sg_dist = Vector3D(turt.to_local(sg2))
 
     def compute_torsional_energy(self) -> float:
         """
@@ -1633,7 +1635,9 @@ class Disulfide:
             _logger.warning(
                 f"Missing coords for: {id} {prox-1} or {dist+1}, SS {prox}-{dist}, phi/psi not computed."
             )
-            cprev_prox = nnext_prox = cprev_dist = nnext_dist = Vector(-1.0, -1.0, -1.0)
+            cprev_prox = nnext_prox = cprev_dist = nnext_dist = Vector3D(
+                -1.0, -1.0, -1.0
+            )
             self.missing_atoms = True
 
         # update the positions and conformation
@@ -2173,22 +2177,22 @@ class Disulfide:
 
     def set_positions(
         self,
-        n_prox: Vector,
-        ca_prox: Vector,
-        c_prox: Vector,
-        o_prox: Vector,
-        cb_prox: Vector,
-        sg_prox: Vector,
-        n_dist: Vector,
-        ca_dist: Vector,
-        c_dist: Vector,
-        o_dist: Vector,
-        cb_dist: Vector,
-        sg_dist: Vector,
-        c_prev_prox: Vector,
-        n_next_prox: Vector,
-        c_prev_dist: Vector,
-        n_next_dist: Vector,
+        n_prox: Vector3D,
+        ca_prox: Vector3D,
+        c_prox: Vector3D,
+        o_prox: Vector3D,
+        cb_prox: Vector3D,
+        sg_prox: Vector3D,
+        n_dist: Vector3D,
+        ca_dist: Vector3D,
+        c_dist: Vector3D,
+        o_dist: Vector3D,
+        cb_dist: Vector3D,
+        sg_dist: Vector3D,
+        c_prev_prox: Vector3D,
+        n_next_prox: Vector3D,
+        c_prev_dist: Vector3D,
+        n_next_dist: Vector3D,
     ) -> None:
         """
         Set the atomic coordinates for all atoms in the Disulfide object.
@@ -2427,6 +2431,264 @@ def Minimize(inputSS: Disulfide) -> Disulfide:
     modelled_min.dihedrals = minimum_conformation
     modelled_min.build_yourself()
     return modelled_min
+
+
+def Initialize_Disulfide_From_Coords(
+    ssbond_atom_data,
+    pdb_id,
+    proximal_chain_id,
+    distal_chain_id,
+    proximal,
+    distal,
+    resolution,
+    verbose=False,
+    quiet=True,
+    dbg=False,
+) -> Disulfide:
+    """
+    Initialize a new Disulfide object with atomic coordinates from
+    the proximal and distal coordinates, typically taken from a PDB file.
+    This routine is primarily used internally when building the compressed
+    database.
+
+    :param ssbond_atom_data: Dictionary containing atomic data for the disulfide bond.
+    :type ssbond_atom_data: dict
+    :param pdb_id: PDB identifier for the structure.
+    :type pdb_id: str
+    :param proximal_chain_id: Chain identifier for the proximal residue.
+    :type proximal_chain_id: str
+    :param distal_chain_id: Chain identifier for the distal residue.
+    :type distal_chain_id: str
+    :param proximal: Residue number for the proximal residue.
+    :type proximal: int
+    :param distal: Residue number for the distal residue.
+    :type distal: int
+    :param resolution: Structure resolution.
+    :type resolution: float
+    :param verbose: If True, enables verbose logging. Defaults to False.
+    :type verbose: bool, optional
+    :param quiet: If True, suppresses logging output. Defaults to True.
+    :type quiet: bool, optional
+    :param dbg: If True, enables debug mode. Defaults to False.
+    :type dbg: bool, optional
+    :return: An instance of the Disulfide class initialized with the provided coordinates.
+    :rtype: Disulfide
+    :raises DisulfideConstructionWarning: Raised when the disulfide bond is not parsed correctly.
+
+    :example:
+    >>> from proteusPy import Initialize_Disulfide_From_Coords
+    >>> ssbond_atom_data = {
+    ...     'proximal': [(1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.0)],
+    ...     'distal': [(10.0, 11.0, 12.0), (13.0, 14.0, 15.0), (16.0, 17.0, 18.0)]
+    ... }
+    >>> pdb_id = "1ABC"
+    >>> proximal_chain_id = "A"
+    >>> distal_chain_id = "B"
+    >>> proximal = 10
+    >>> distal = 20
+    >>> resolution = 2.0
+    >>> ssbond = None
+    >>> sssbond = Initialize_Disulfide_From_Coords(
+    ...     ssbond_atom_data, pdb_id, proximal_chain_id, distal_chain_id, proximal, distal, resolution
+    ... )
+    >>> isinstance(ssbond, Disulfide)
+    True
+    """
+    import logging
+    import warnings
+
+    import numpy as np
+
+    from proteusPy.ssparser import (
+        get_phipsi_atoms_coordinates,
+        get_residue_atoms_coordinates,
+    )
+
+    # from Bio.PDB import Vector3D, calc_dihedral, distance3d
+    from proteusPy.vector3D import Vector3D as Vector
+    from proteusPy.vector3D import calc_dihedral, distance3d
+
+    ssbond_name = f"{pdb_id}_{proximal}{proximal_chain_id}_{distal}{distal_chain_id}"
+    new_ss = Disulfide(ssbond_name)
+
+    new_ss.pdb_id = pdb_id
+    new_ss.resolution = resolution
+    prox_atom_list = []
+    dist_atom_list = []
+
+    if quiet:
+        _logger.setLevel(logging.ERROR)
+        logging.getLogger().setLevel(logging.CRITICAL)
+
+    # set the objects proximal and distal values
+    new_ss.set_resnum(proximal, distal)
+
+    if resolution is not None:
+        new_ss.resolution = resolution
+    else:
+        new_ss.resolution = -1.0
+
+    new_ss.proximal_chain = proximal_chain_id
+    new_ss.distal_chain = distal_chain_id
+
+    new_ss.proximal_residue_fullid = proximal
+    new_ss.distal_residue_fullid = distal
+
+    # restore loggins
+    if quiet:
+        _logger.setLevel(logging.ERROR)
+        logging.getLogger().setLevel(logging.CRITICAL)  ## may want to be CRITICAL
+
+    # Get the coordinates for the proximal and distal residues as vectors
+    # so we can do math on them later. Trap errors here to avoid problems
+    # with missing residues or atoms.
+
+    # proximal residue
+
+    try:
+        prox_atom_list = get_residue_atoms_coordinates(
+            ssbond_atom_data, proximal_chain_id, proximal
+        )
+
+        n1 = prox_atom_list[0]
+        ca1 = prox_atom_list[1]
+        c1 = prox_atom_list[2]
+        o1 = prox_atom_list[3]
+        cb1 = prox_atom_list[4]
+        sg1 = prox_atom_list[5]
+
+    except Exception:
+        # i'm torn on this. there are a lot of missing coordinates, so is
+        # it worth the trouble to note them? I think so.
+        _logger.error(f"Invalid/missing coordinates for: {id}, proximal: {proximal}")
+        return False
+
+    # distal residue
+    try:
+        dist_atom_list = get_residue_atoms_coordinates(
+            ssbond_atom_data, distal_chain_id, distal
+        )
+        n2 = dist_atom_list[0]
+        ca2 = dist_atom_list[1]
+        c2 = dist_atom_list[2]
+        o2 = dist_atom_list[3]
+        cb2 = dist_atom_list[4]
+        sg2 = dist_atom_list[5]
+
+    except Exception:
+        _logger.error(f"Invalid/missing coordinates for: {id}, distal: {distal}")
+        return False
+
+    # previous residue and next residue - optional, used for phi, psi calculations
+    prevprox_atom_list = get_phipsi_atoms_coordinates(
+        ssbond_atom_data, proximal_chain_id, "proximal-1"
+    )
+
+    nextprox_atom_list = get_phipsi_atoms_coordinates(
+        ssbond_atom_data, proximal_chain_id, "proximal+1"
+    )
+
+    prevdist_atom_list = get_phipsi_atoms_coordinates(
+        ssbond_atom_data, distal_chain_id, "distal-1"
+    )
+
+    nextdist_atom_list = get_phipsi_atoms_coordinates(
+        ssbond_atom_data, distal_chain_id, "distal+1"
+    )
+
+    if len(prevprox_atom_list) != 0:
+        cprev_prox = prevprox_atom_list[1]
+    else:
+        cprev_prox = Vector3D(-1.0, -1.0, -1.0)
+        new_ss.missing_atoms = True
+        if verbose:
+            _logger.warning(
+                f"Missing Proximal coords for: {id} {proximal}-1. SS: {proximal}-{distal}, phi/psi not computed."
+            )
+
+    if len(prevdist_atom_list) != 0:
+        # list is N, C
+        cprev_dist = prevdist_atom_list[1]
+    else:
+        cprev_dist = nnext_dist = Vector3D(-1.0, -1.0, -1.0)
+        new_ss.missing_atoms = True
+        if verbose:
+            _logger.warning(
+                f"Missing Distal coords for: {id} {distal}-1). S:S {proximal}-{distal}, phi/psi not computed."
+            )
+
+    if len(nextprox_atom_list) != 0:
+        nnext_prox = nextprox_atom_list[0]
+        new_ss.phiprox = calc_dihedral(cprev_prox, n1, ca1, c1)
+        new_ss.psiprox = calc_dihedral(n1, ca1, c1, nnext_prox)
+    else:
+        nnext_prox = Vector3D(-1.0, -1.0, -1.0)
+        new_ss.missing_atoms = True
+        _logger.warning(
+            f"Missing Proximal coords for: {id} {proximal}+1). S:S {proximal}-{distal}, phi/psi not computed."
+        )
+
+    if len(nextdist_atom_list) != 0:
+        nnext_dist = nextdist_atom_list[0]
+        new_ss.phidist = calc_dihedral(cprev_dist, n2, ca2, c2)
+        new_ss.psidist = calc_dihedral(n2, ca2, c2, nnext_dist)
+    else:
+        nnext_dist = Vector3D(-1.0, -1.0, -1.0)
+        new_ss.missing_atoms = True
+        _logger.warning(
+            f"Missing Distal coords for: {id} {distal}+1). S:S {proximal}-{distal}, phi/psi not computed."
+        )
+
+    # update the positions and conformation
+    new_ss.set_positions(
+        n1,
+        ca1,
+        c1,
+        o1,
+        cb1,
+        sg1,
+        n2,
+        ca2,
+        c2,
+        o2,
+        cb2,
+        sg2,
+        cprev_prox,
+        nnext_prox,
+        cprev_dist,
+        nnext_dist,
+    )
+
+    # calculate and set the disulfide dihedral angles
+    new_ss.chi1 = calc_dihedral(n1, ca1, cb1, sg1)
+    new_ss.chi2 = calc_dihedral(ca1, cb1, sg1, sg2)
+    new_ss.chi3 = calc_dihedral(cb1, sg1, sg2, cb2)
+    new_ss.chi4 = calc_dihedral(sg1, sg2, cb2, ca2)
+    new_ss.chi5 = calc_dihedral(sg2, cb2, ca2, n2)
+    new_ss.rho = calc_dihedral(n1, ca1, ca2, n2)
+
+    new_ss.ca_distance = distance3d(new_ss.ca_prox, new_ss.ca_dist)
+    new_ss.cb_distance = distance3d(new_ss.cb_prox, new_ss.cb_dist)
+    new_ss.torsion_array = np.array(
+        (new_ss.chi1, new_ss.chi2, new_ss.chi3, new_ss.chi4, new_ss.chi5)
+    )
+    new_ss.compute_torsion_length()
+
+    # calculate and set the SS bond torsional energy
+    new_ss.compute_torsional_energy()
+
+    # compute and set the local coordinates
+    new_ss.compute_local_coords()
+
+    # turn warnings back on
+    if quiet:
+        _logger.setLevel(logging.ERROR)
+        logging.getLogger().setLevel(logging.ERROR)
+
+    if verbose:
+        _logger.info(f"Disulfide {ssbond_name} initialized.")
+
+    return new_ss
 
 
 if __name__ == "__main__":

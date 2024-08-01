@@ -36,14 +36,60 @@ class Vector3D:
 
     Methods:
     --------
+    __init__(x, y, z):
+        Initializes the vector with x, y, and z coordinates.
+    __add__(other):
+        Adds another Vector3D to this vector and returns the result.
     __sub__(other):
         Subtracts another Vector3D from this vector and returns the result.
+    __truediv__(scalar):
+        Divides the vector by a scalar and returns the result.
     dot(other):
         Computes the dot product of this vector and another Vector3D.
     magnitude():
         Computes the magnitude (length) of the vector.
+    normalize():
+        Normalizes the vector (makes it unit length).
+    normalized():
+        Returns a normalized copy of the vector.
     angle_with(other):
         Computes the angle between this vector and another Vector3D in degrees.
+    cross(other):
+        Computes the cross product of this vector and another Vector3D.
+    __repr__():
+        Returns a string representation of the vector.
+
+    Examples:
+    ---------
+    >>> v1 = Vector3D(1, 2, 3)
+    >>> v2 = Vector3D(4, 5, 6)
+    >>> v3 = v1 + v2
+    >>> v3
+    <Vector3D (5.00, 7.00, 9.00)>
+
+    >>> v4 = v1 - v2
+    >>> v4
+    <Vector3D (-3.00, -3.00, -3.00)>
+
+    >>> v5 = v1 / 2
+    >>> v5
+    <Vector3D (0.50, 1.00, 1.50)>
+
+    >>> dot_product = v1 * v2
+    >>> float(dot_product)
+    32.0
+
+    >>> magnitude = v1.magnitude()
+    >>> float(round(magnitude, 2))
+    3.74
+
+    >>> angle = v1.angle_with(v2)
+    >>> round(angle, 2)
+    12.93
+
+    >>> v6 = v1 ** v2
+    >>> v6
+    <Vector3D (-3.00, 6.00, -3.00)>
     """
 
     def __init__(self, x, y=None, z=None):
@@ -60,7 +106,7 @@ class Vector3D:
     def __repr__(self):
         """Return a string representation of the vector."""
         x, y, z = self._coords
-        return f"<Vector3D {x:.2f}, {y:.2f}, {z:.2f}>"
+        return f"<Vector3D ({x:.2f}, {y:.2f}, {z:.2f})>"
 
     def __neg__(self):
         """Return the negation of the vector."""
@@ -115,22 +161,49 @@ class Vector3D:
         """Return the squared magnitude of the vector."""
         return np.dot(self._coords, self._coords)
 
+    def normalized(self):
+        """Return a normalized copy of the Vector.
+
+        To avoid allocating new objects use the ``normalize`` method.
+        """
+        v = self.copy()
+        v.normalize()
+        return v
+
     def normalize(self):
         """Normalize the vector in place."""
         norm = self.magnitude()
         if norm != 0:
-            self._coords /= norm
+            self._coords = self._coords / norm
         else:
-            return None
+            _logger.error("Vector3D: Cannot normalize a zero vector")
 
     def normalized(self):
         """Return a normalized copy of the vector."""
-        norm = self.magnitude()
-        if norm == 0:
-            return Vector3D(self._coords)
-        return Vector3D(self._coords / norm)
+        res = self.copy()
+        res.normalize()
+        return res
 
     def angle_with(self, other):
+        """
+        Calculate the angle between this vector and another vector in degrees.
+
+        This method computes the angle between the current vector and another vector
+        using the dot product and magnitudes of the vectors. The result is returned
+        in degrees.
+
+        Parameters:
+        other (Vector3D): The other vector to calculate the angle with.
+
+        Returns:
+        float: The angle between the two vectors in degrees.
+
+        Example:
+        >>> v1 = Vector3D(1, 0, 0)
+        >>> v2 = Vector3D(0, 1, 0)
+        >>> v1.angle_with(v2)
+        90.0
+        """
         dot_product = self * other
         magnitudes = self.magnitude() * other.magnitude()
         cos_angle = dot_product / magnitudes
@@ -177,9 +250,37 @@ def calc_angle(v1: Vector3D, v2: Vector3D, v3: Vector3D) -> float:
     >>> print(float(round(angle, 2)))
     60.0
     """
+
     vec1 = v1 - v2
     vec3 = v3 - v2
     return vec1.angle_with(vec3)
+
+
+def Ocalc_dihedral(v1, v2, v3, v4):
+    """Calculate dihedral angle method.
+
+    Calculate the dihedral angle between 4 vectors
+    representing 4 connected points. The angle is in
+    ]-pi, pi].
+
+    :param v1, v2, v3, v4: the four points that define the dihedral angle
+    :type v1, v2, v3, v4: L{Vector}
+    """
+    ab = v1 - v2
+    cb = v3 - v2
+    db = v4 - v3
+    u = ab**cb
+    v = db**cb
+    w = u**v
+    angle = u.angle_with(v)
+    # Determine sign of angle
+    try:
+        if cb.angle_with(w) > 0.001:
+            angle = -angle
+    except ZeroDivisionError:
+        # dihedral=pi
+        pass
+    return angle
 
 
 def calc_dihedral(v1, v2, v3, v4):
@@ -189,15 +290,14 @@ def calc_dihedral(v1, v2, v3, v4):
     The dihedral angle is the angle between two planes formed by four points in space.
     This function calculates the angle in degrees.
 
-    Parameters:
-    v1, v2, v3, v4 (Vector3D): Four points in space, where:
-        - v1, v2, v3 define the first plane.
-        - v2, v3, v4 define the second plane.
+    :param Vector3D v1: The first point in space, part of the first plane.
+    :param Vector3D v2: The second point in space, common to both planes.
+    :param Vector3D v3: The third point in space, common to both planes.
+    :param Vector3D v4: The fourth point in space, part of the second plane.
+    :return: The dihedral angle in degrees.
+    :rtype: float
 
-    Returns:
-    float: The dihedral angle in degrees.
-
-    Example:
+    :example:
     >>> v1 = Vector3D(1.0, 1.0, 1.0)
     >>> v2 = Vector3D(1.0, 2.0, 1.0)
     >>> v3 = Vector3D(2.0, 2.0, 1.0)
@@ -224,6 +324,30 @@ def calc_dihedral(v1, v2, v3, v4):
     angle = np.arctan2(y, x)
 
     return np.degrees(angle)
+
+
+def distance3d(p1: Vector3D, p2: Vector3D) -> float:
+    """
+    Calculate the 3D Euclidean distance for 2 Vector3D objects
+
+    :param Vector p1: Point1
+    :param Vector p2: Point2
+    :return float distance: Distance between two points, Å
+
+    Example:
+    >>> from proteusPy import distance3d, Vector3D
+    >>> p1 = Vector3D(1, 0, 0)
+    >>> p2 = Vector3D(0, 1, 0)
+    >>> distance3d(p1,p2)
+    1.4142135623730951
+    """
+
+    _p1 = p1.get_array()
+    _p2 = p2.get_array()
+    if len(_p1) != 3 or len(_p2) != 3:
+        _logger.error("distance3d() requires vectors of length 3!")
+    d = math.dist(_p1, _p2)
+    return d
 
 
 if __name__ == "__main__":

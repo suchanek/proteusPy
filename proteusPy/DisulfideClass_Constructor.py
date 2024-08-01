@@ -16,7 +16,6 @@ import pickle
 from io import StringIO
 
 import pandas as pd
-from Bio.PDB import *
 
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.ProteusGlobals import (
