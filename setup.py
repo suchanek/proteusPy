@@ -111,6 +111,7 @@ setup(
         "pymolpy3",
         "pympler",
         "imageio[ffmpeg]",
+        "biopython",
     ],
     source="https://github.com/suchanek/proteusPy/",
     project_urls={

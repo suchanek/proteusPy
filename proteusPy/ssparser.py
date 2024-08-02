@@ -57,19 +57,20 @@ def extract_id_from_filename(filename: str) -> str:
 
 def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple:
     """
-    Extracts SSBOND and ATOM records from a PDB file.
+    Extracts SSBOND, ATOM records, and RESOLUTION from a PDB file.
 
-    This function reads a PDB file to collect SSBOND records and ATOM records for cysteine residues.
-    It then extracts the ATOM records corresponding to the SSBOND records and returns the collected
-    data as a dictionary, along with the number of SSBOND records found and any errors encountered.
+    This function reads a PDB file to collect SSBOND records, ATOM records for cysteine residues,
+    and the RESOLUTION line. It then extracts the ATOM records corresponding to the SSBOND records
+    and returns the collected data as a dictionary, along with the number of SSBOND records found
+    and any errors encountered.
 
     Args:
     - input_pdb_file (str): The path to the input PDB file.
 
     Returns:
     - tuple: A tuple containing:
-        - dict: A dictionary containing the SSBOND records and the corresponding ATOM records. The dictionary
-          has the following structure:
+        - dict: A dictionary containing the SSBOND records, the corresponding ATOM records, and the resolution.
+          The dictionary has the following structure:
             {
                 "pdbid": The PDB ID (str),
                 "ssbonds": list of SSBOND records (str),
@@ -93,7 +94,8 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                         }
                     },
                     ...
-                ]
+                ],
+                "resolution": The resolution value (float)
             }
         - int: The number of SSBOND records found.
         - list: A list of error messages encountered during processing.
@@ -105,9 +107,10 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
     atom_list = {}
     errors = []
     pairs = []
+    resolution = None
     pdbid = extract_id_from_filename(input_pdb_file)
 
-    # Read the PDB file and collect SSBOND and ATOM records
+    # Read the PDB file and collect SSBOND, ATOM records, and RESOLUTION
     with open(input_pdb_file, "r") as file:
         lines = file.readlines()
 
@@ -128,9 +131,20 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                 _logger.info(
                     f"Found ATOM record for chain {chain_id}, residue {res_seq_num}, atom {atom_name}"
                 )
+        elif line.startswith("REMARK   2 RESOLUTION"):
+            parts = line.split()
+            resolution = float(parts[3])
+            if dbg:
+                _logger.info(f"Found RESOLUTION record: {resolution} Å")
 
     # Extract the ATOM records corresponding to SSBOND
-    ssbond_atom_list = {"pdbid": pdbid, "ssbonds": ssbonds, "atoms": {}, "pairs": pairs}
+    ssbond_atom_list = {
+        "pdbid": pdbid,
+        "ssbonds": ssbonds,
+        "atoms": {},
+        "pairs": pairs,
+        "resolution": resolution,
+    }
     for ssbond in ssbonds:
         parts = ssbond.split()
         chain_id1 = parts[3]
@@ -296,17 +310,22 @@ def print_disulfide_bond_info_dict(ssbond_atom_data) -> None:
                         }
                     },
                     ...
-                ]
+                ],
+                "resolution": The resolution value (float)
             }
     """
     if ssbond_atom_data is None:
         print("No disulfide bonds found.")
         return
 
+    i = 1
     ssbonds = ssbond_atom_data.get("ssbonds", [])
     atoms = ssbond_atom_data.get("atoms", {})
     pairs = ssbond_atom_data.get("pairs", [])
+    resolution = ssbond_atom_data.get("resolution", -1.0)
+    pdb_id = ssbond_atom_data.get("pdbid", "Unknown")
 
+    print(f"Disulfides in {pdb_id} with resolution {resolution} Å:")
     for pair in pairs:
         proximal = pair["proximal"][1]
         distal = pair["distal"][1]
@@ -317,7 +336,7 @@ def print_disulfide_bond_info_dict(ssbond_atom_data) -> None:
         chain_id2 = chains[1]
 
         print(
-            f"Disulfide Bond between Chain {chain_id1} Residue {res_seq_num1} and Chain {chain_id2} Residue {res_seq_num2}"
+            f"SS {i}: Chain {chain_id1} Residue {res_seq_num1} and Chain {chain_id2} Residue {res_seq_num2}"
         )
         print(f"Proximal Residue (Chain {chain_id1}, Residue {res_seq_num1}):")
         for atom_name in ["N", "CA", "C", "O", "CB", "SG"]:
@@ -353,7 +372,7 @@ def print_disulfide_bond_info_dict(ssbond_atom_data) -> None:
                     )
                 )
                 print(f"    Atom {atom_name} (Residue {res_seq_num}): {coords}")
-
+        i += 1
         print("-" * 50)
 
 

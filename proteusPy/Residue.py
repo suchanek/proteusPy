@@ -8,8 +8,8 @@
 
 import numpy  # type: ignore
 
-from proteusPy.ssparser import Vector3D
 from proteusPy.turtle3D import Turtle3D
+from proteusPy.vector3D import Vector3D
 
 
 def build_residue(turtle: Turtle3D):
