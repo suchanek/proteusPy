@@ -17,12 +17,13 @@ Last revision: 7/23/24 -egs-
 
 import argparse
 import datetime
+import logging
 import os
 import sys
 import time
 from shutil import copy
 
-from proteusPy import Extract_Disulfides, __version__
+from proteusPy import Extract_Disulfides, __version__, get_logger
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
     LOADER_FNAME,
@@ -36,7 +37,12 @@ from proteusPy.ProteusGlobals import (
 HOME_DIR = os.path.expanduser("~")
 PDB_BASE = os.getenv("PDB")
 PDB_DIR = MODULE_DATA = REPO_DATA = DATA_DIR = ""
+# Configure logging
 
+import proteusPy.logger_config
+from proteusPy.logger_config import get_logger
+
+_logger = get_logger("DisulfideChecker")
 
 if not os.path.isdir(PDB_BASE):
     print(f"Error: The directory {PDB_BASE} does not exist.")

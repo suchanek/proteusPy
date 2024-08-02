@@ -15,6 +15,10 @@ __pdoc__ = {
 
 import logging
 
+# Set the default logger level to CRITICAL
+logging.basicConfig(level=logging.CRITICAL)
+
+
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
 
@@ -69,7 +73,7 @@ from .DisulfideLoader import (
     Download_PDB_SS_GitHub,
     Load_PDB_SS,
 )
-from .logger_config import get_logger
+from .logger_config import get_logger, set_logger_level
 from .ProteusGlobals import (
     _ANG_INIT,
     _FLOAT_INIT,
@@ -90,6 +94,7 @@ from .Residue import (
     to_oxygen,
 )
 from .ssparser import (
+    check_file,
     extract_and_write_ssbonds_and_atoms,
     extract_ssbonds_and_atoms,
     get_atom_coordinates,

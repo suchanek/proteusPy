@@ -12,7 +12,7 @@ Last revision: 7/12/2024 -egs-
 
 try:
     # Check if running in Jupyter
-    shell = get_ipython().__class__.__name__
+    shell = get_ipython().__class__.__name__ # type: ignore
     if shell == "ZMQInteractiveShell":
         from tqdm.notebook import tqdm
     else:
@@ -29,7 +29,6 @@ import pandas
 import plotly.express as px
 import plotly.graph_objects as go
 import pyvista as pv
-
 from plotly.subplots import make_subplots
 
 import proteusPy
@@ -1138,7 +1137,9 @@ def load_disulfides_from_id(
     i = 1
     proximal = distal = -1
     chain1_id = chain2_id = ""
-
+    ssbond_atom_list = {}
+    num_ssbonds = 0
+    errors = 0
     resolution = -1.0
 
     structure_fname = os.path.join(pdb_dir, f"pdb{pdb_id}.ent")
@@ -1156,6 +1157,12 @@ def load_disulfides_from_id(
         structure_fname, verbose=verbose
     )
 
+    if num_ssbonds == 0:
+        if verbose:
+            print(f"-> load_disulfides_from_id(): {pdb_id} has no SSBonds.")
+        _logger.warning(f"-> load_disulfides_from_id(): {pdb_id} has no SSBonds.")
+        return None
+
     if verbose:
         print(
             f"-> load_disulfides_from_id(): {pdb_id} has {num_ssbonds} SSBonds, found: {errors} errors"
@@ -1165,6 +1172,7 @@ def load_disulfides_from_id(
     if quiet:
         _logger.setLevel(logging.ERROR)
 
+    resolution = ssbond_atom_list["resolution"]
     for pair in ssbond_atom_list["pairs"]:
         proximal = pair["proximal"][1]
         chain1_id = pair["proximal"][0]
@@ -1174,8 +1182,8 @@ def load_disulfides_from_id(
         if dbg:
             print(f"Proximal: {proximal} {chain1_id} Distal: {distal} {chain2_id}")
 
-        proximal = int(proximal)
-        distal = int(distal)
+        proximal_int = int(proximal)
+        distal_int = int(distal)
 
         if proximal == distal:
             if verbose:
@@ -1193,8 +1201,8 @@ def load_disulfides_from_id(
             pdb_id,
             chain1_id,
             chain2_id,
-            proximal,
-            distal,
+            proximal_int,
+            distal_int,
             resolution,
             verbose=verbose,
             quiet=quiet,
