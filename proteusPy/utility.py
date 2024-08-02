@@ -128,7 +128,7 @@ def grid_dimensions(n: int) -> tuple:
         rows = cols - 1 if cols * (cols - 1) >= n else cols
         return rows, cols
 
-
+# This function will be deprecated in the future.
 def Check_chains(pdbid, pdbdir, verbose=True) -> bool:
     """
     Return True if structure has multiple chains of identical length,
@@ -138,6 +138,8 @@ def Check_chains(pdbid, pdbdir, verbose=True) -> bool:
     :param pdbdir: PDB directory containing structures
     :param verbose: Verbosity, defaults to True
     """
+    from Bio.PDB import PDBParser
+
     parser = PDBParser(PERMISSIVE=True)
     structure = parser.get_structure(pdbid, file=f"{pdbdir}pdb{pdbid}.ent")
 
@@ -181,6 +183,7 @@ def Check_chains(pdbid, pdbdir, verbose=True) -> bool:
 
 
 def extract_firstchain_ss(sslist, verbose=False):
+
     """
     Extract disulfides from the first chain found in
     the SSdict, returns them as a DisulfideList along with the
@@ -259,17 +262,21 @@ def download_file(url, directory, verbose=False):
 
 
 def get_memory_usage():
-    import psutil
+    """
+    Returns the memory usage of the current process in megabytes (MB).
+
+    Returns:
+        float: The memory usage of the current process in megabytes (MB).
+    """
 
     process = psutil.Process()
     mem_info = process.memory_info()
-    return mem_info.rss
-
-
-from pympler import asizeof
+    return mem_info.rss / (1024 ** 2)
 
 
 def get_object_size_mb(obj):
+    from pympler import asizeof
+
     size_bytes = asizeof.asizeof(obj)
     size_mb = size_bytes / (1024**2)
     return size_mb
@@ -578,6 +585,8 @@ def Download_Disulfides(
     """
     import os
     import time
+
+    from Bio.PDB import PDBList
 
     start = time.time()
     donelines = []
@@ -1035,6 +1044,8 @@ def check_header_from_file(filename: str, model_numb=0, verbose=False, dbg=True)
     _chaina = None
     _chainb = None
     structure = None
+
+    from Bio.PDB import PDBParser
 
     parser = PDBParser(PERMISSIVE=True)
 

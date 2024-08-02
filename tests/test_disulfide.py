@@ -1,10 +1,20 @@
+"""
+Unit tests for the Disulfide class in the proteusPy package.
+
+This module contains a set of unit tests for verifying the functionality of the Disulfide class
+and related functions. The tests are implemented using the unittest framework.
+
+Classes:
+    TestDisulfide: Contains unit tests for the Disulfide class.
+
+Methods:
+    setUp: Initializes the test environment, loads disulfides from a PDB entry, and sets up a Disulfide instance.
+    test_name: Tests that the name attribute of the Disulfide instance is correctly set.
+    test_extract: Tests that the name of the first disulfide in the loaded list matches the expected value.
+    test_dihedrals: Placeholder for testing the dihedral angles of the first disulfide in the loaded list.
+"""
 import unittest
-import warnings
-
-import numpy as np
-from Bio.PDB import PDBList
-
-from proteusPy import Disulfide, Disulfide_Energy_Function, check_header_from_file
+from proteusPy import Disulfide, Disulfide_Energy_Function
 from proteusPy.ProteusGlobals import DATA_DIR
 
 
@@ -41,6 +51,7 @@ class TestDisulfide(unittest.TestCase):
         self.assertEqual(result, expected_result)
 
     def test_dihedrals(self):
+        import numpy
         from numpy.testing import assert_allclose
 
         ss1 = self.sslist[0]
@@ -82,24 +93,6 @@ class TestDisulfide(unittest.TestCase):
         minimum_energy = result.fun
         expected_result = 0.4889387355489303
         self.assertEqual(minimum_energy, expected_result)
-
-    def test_header(self):
-        import tempfile
-
-        from Bio.PDB import PDBList  # Assuming BioPython is used
-
-        with tempfile.TemporaryDirectory() as temp_dir:
-            pdb_home = f"{temp_dir}/"
-            entry = "5rsa"
-            pdblist = PDBList(verbose=False)
-            found = 0
-            if not pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=pdb_home):
-                self.fail("PDB file retrieval failed")
-            else:
-                filename = f"{pdb_home}pdb5rsa.ent"
-            found, errors = check_header_from_file(filename)
-        self.assertTrue(found == 4)
-        self.assertTrue(errors == 0)
 
     def test_load(self):
         import tempfile

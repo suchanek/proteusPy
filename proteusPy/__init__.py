@@ -111,6 +111,7 @@ from .utility import (
     generate_vector_dataframe,
     get_jet_colormap,
     get_memory_usage,
+    get_object_size_mb,
     grid_dimensions,
     image_to_ascii_art,
     parse_ssbond_header_rec,

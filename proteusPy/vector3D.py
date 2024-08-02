@@ -183,7 +183,7 @@ class Vector3D:
         res = self.copy()
         res.normalize()
         return res
-
+    
     def angle_with(self, other):
         """
         Calculate the angle between this vector and another vector in degrees.
@@ -207,6 +207,8 @@ class Vector3D:
         dot_product = self * other
         magnitudes = self.magnitude() * other.magnitude()
         cos_angle = dot_product / magnitudes
+        cos_angle = min(cos_angle, 1)
+        cos_angle = max(-1, cos_angle) # Avoid invalid values due to roundoff errors
         angle_radians = math.acos(cos_angle)
         return math.degrees(angle_radians)  # Convert radians to degrees
 
@@ -255,16 +257,28 @@ def calc_angle(v1: Vector3D, v2: Vector3D, v3: Vector3D) -> float:
     vec3 = v3 - v2
     return vec1.angle_with(vec3)
 
+def calc_dihedral(v1: Vector3D, v2: Vector3D, v3: Vector3D, v4: Vector3D) -> float:
+    """
+    Return the dihedral angle between four vectors, (-180-180 degrees).
 
-def Ocalc_dihedral(v1, v2, v3, v4):
-    """Calculate dihedral angle method.
+    :param v1: The first vector.
+    :type v1: Vector3D
+    :param v2: The second vector.
+    :type v2: Vector3D
+    :param v3: The third vector.
+    :type v3: Vector3D
+    :param v4: The fourth vector.
+    :type v4: Vector3D
+    :return: The dihedral angle in degrees.
+    :rtype: float
 
-    Calculate the dihedral angle between 4 vectors
-    representing 4 connected points. The angle is in
-    ]-pi, pi].
-
-    :param v1, v2, v3, v4: the four points that define the dihedral angle
-    :type v1, v2, v3, v4: L{Vector}
+    :example:
+    >>> v1 = Vector3D(0.0, 0.0, 0.0)
+    >>> v2 = Vector3D(1.0, 0.0, 0.0)
+    >>> v3 = Vector3D(1.0, 1.0, 1.0)
+    >>> v4 = Vector3D(1.0, 1.0, 2.0)
+    >>> float(round(calc_dihedral(v1, v2, v3, v4), 2))
+    90.0
     """
     ab = v1 - v2
     cb = v3 - v2
@@ -278,52 +292,9 @@ def Ocalc_dihedral(v1, v2, v3, v4):
         if cb.angle_with(w) > 0.001:
             angle = -angle
     except ZeroDivisionError:
-        # dihedral=pi
         pass
     return angle
 
-
-def calc_dihedral(v1, v2, v3, v4):
-    """
-    Calculate the dihedral angle between four Vector3D objects.
-
-    The dihedral angle is the angle between two planes formed by four points in space.
-    This function calculates the angle in degrees.
-
-    :param Vector3D v1: The first point in space, part of the first plane.
-    :param Vector3D v2: The second point in space, common to both planes.
-    :param Vector3D v3: The third point in space, common to both planes.
-    :param Vector3D v4: The fourth point in space, part of the second plane.
-    :return: The dihedral angle in degrees.
-    :rtype: float
-
-    :example:
-    >>> v1 = Vector3D(1.0, 1.0, 1.0)
-    >>> v2 = Vector3D(1.0, 2.0, 1.0)
-    >>> v3 = Vector3D(2.0, 2.0, 1.0)
-    >>> v4 = Vector3D(2.0, 3.0, 1.0)
-    >>> float(round(calc_dihedral(v1, v2, v3, v4), 2))
-    0.0
-    """
-    p0 = v1.get_array()
-    p1 = v2.get_array()
-    p2 = v3.get_array()
-    p3 = v4.get_array()
-
-    b0 = p1 - p0
-    b1 = p2 - p1
-    b2 = p3 - p2
-
-    b1 /= np.linalg.norm(b1)
-
-    v = b0 - np.dot(b0, b1) * b1
-    w = b2 - np.dot(b2, b1) * b1
-
-    x = np.dot(v, w)
-    y = np.dot(np.cross(b1, v), w)
-    angle = np.arctan2(y, x)
-
-    return np.degrees(angle)
 
 
 def distance3d(p1: Vector3D, p2: Vector3D) -> float:

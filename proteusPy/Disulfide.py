@@ -38,8 +38,6 @@ _logger.addHandler(_handler)
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
 
-# from Bio.PDB import Vector3D, calc_dihedral
-
 import proteusPy
 from proteusPy.atoms import *
 from proteusPy.DisulfideExceptions import *
@@ -2504,7 +2502,6 @@ def Initialize_Disulfide_From_Coords(
         get_residue_atoms_coordinates,
     )
 
-    # from Bio.PDB import Vector3D, calc_dihedral, distance3d
     from proteusPy.vector3D import Vector3D as Vector
     from proteusPy.vector3D import calc_dihedral, distance3d
 

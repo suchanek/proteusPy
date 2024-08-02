@@ -30,7 +30,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pyvista as pv
 
-# from Bio.PDB import PDBParser
 from plotly.subplots import make_subplots
 
 import proteusPy
