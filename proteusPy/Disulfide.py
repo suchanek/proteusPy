@@ -1893,11 +1893,11 @@ class Disulfide:
         stot = f"{s2i}{s3i}"
         return stot
 
-    def repr_ss_chain_ids(self) -> str:
+    def repr_ss_residue_ids(self) -> str:
         """
         Representation for Disulfide chain IDs
         """
-        return f"Proximal Chain fullID: <{self.proximal_residue_fullid}> Distal Chain fullID: <{self.distal_residue_fullid}>"
+        return f"Proximal Residue fullID: <{self.proximal_residue_fullid}> Distal Residue fullID: <{self.distal_residue_fullid}>"
 
     def repr_ss_ca_dist(self) -> str:
         """
@@ -1971,7 +1971,7 @@ class Disulfide:
         Return a string representation of the Disulfide object's chain ids.
         :return: string
         """
-        return f"{self.repr_ss_chain_ids()}"
+        return f"{self.repr_ss_residue_ids()}"
 
     def compute_rho(self) -> float:
         self.rho = calc_dihedral(self.n_prox, self.ca_prox, self.ca_dist, self.n_dist)

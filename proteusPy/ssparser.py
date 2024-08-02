@@ -24,9 +24,9 @@ import os
 import pickle
 
 from proteusPy.logger_config import get_logger
-from proteusPy.vector3D import Vector3D, calc_angle, calc_dihedral, distance3d
+from proteusPy.vector3D import Vector3D
 
-_logger = get_logger("ssparser")
+_logger = get_logger(__name__)
 
 
 def extract_id_from_filename(filename: str) -> str:
@@ -101,7 +101,8 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
         - list: A list of error messages encountered during processing.
     """
     if not os.path.exists(input_pdb_file):
-        return None
+        _logger.error(f"Input PDB file {input_pdb_file} does not exist.")
+        return {}, 0, 0
 
     ssbonds = []
     atom_list = {}
@@ -117,7 +118,11 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
     for line in lines:
         if line.startswith("SSBOND"):
             ssbonds.append(line)
-        elif line.startswith("ATOM"):
+            if verbose:
+                _logger.info(f"Found SSBOND record for {pdbid}: {line.strip()}")
+        elif line.startswith("ATOM") or line.startswith(
+            "HETATM"
+        ):  # Added HETATM to include non-standard residues like CSS
             # Create a map to quickly find ATOM records by residue sequence number, chain ID, and atom name
             chain_id = line[21].strip()
             res_seq_num = line[22:26].strip()
@@ -131,10 +136,18 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                 _logger.info(
                     f"Found ATOM record for chain {chain_id}, residue {res_seq_num}, atom {atom_name}"
                 )
+                pass
         elif line.startswith("REMARK   2 RESOLUTION"):
-            parts = line.split()
-            resolution = float(parts[3])
-            if dbg:
+            # Extract the resolution value using fixed-width columns
+            resolution_str = line[22:27].strip()
+            try:
+                resolution = float(resolution_str)
+            except ValueError:
+                if verbose:
+                    _logger.error(
+                        f"Error parsing resolution value from line: {line.strip()}. Found: {resolution_str}"
+                    )
+            if verbose:
                 _logger.info(f"Found RESOLUTION record: {resolution} Å")
 
     # Extract the ATOM records corresponding to SSBOND
@@ -145,13 +158,20 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
         "pairs": pairs,
         "resolution": resolution,
     }
+    """
     for ssbond in ssbonds:
         parts = ssbond.split()
         chain_id1 = parts[3]
         res_seq_num1 = parts[4]
         chain_id2 = parts[6]
         res_seq_num2 = parts[7]
-
+    """
+    for ssbond in ssbonds:
+        # Extract fields based on fixed-width columns
+        chain_id1 = ssbond[15:16].strip()
+        res_seq_num1 = ssbond[17:21].strip()
+        chain_id2 = ssbond[29:30].strip()
+        res_seq_num2 = ssbond[31:35].strip()
         # Add the corresponding ATOM records to the ssbond_atom_list
         for atom_name in ["N", "CA", "C", "O", "CB", "SG"]:
             atom_record1 = atom_list.get((chain_id1, res_seq_num1, atom_name))
@@ -186,6 +206,14 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
         def get_phipsi_atoms(chain_id, res_seq_num):
             phipsi_atoms = {}
             for offset in [-1, 1]:
+                try:
+                    int(res_seq_num) + offset
+                except ValueError:
+                    _logger.error(
+                        "get_phiipsi_atoms: ValueError: {res_seq_num} + {offset}"
+                    )
+                    continue
+
                 for atom_name in ["N", "C"]:
                     key = (chain_id, str(int(res_seq_num) + offset), atom_name)
                     atom_record = atom_list.get(key)
@@ -334,9 +362,10 @@ def print_disulfide_bond_info_dict(ssbond_atom_data) -> None:
         chains = pair["chains"]
         chain_id1 = chains[0]
         chain_id2 = chains[1]
+        pdb_id = ssbond_atom_data.get("pdbid", "Unknown")
 
         print(
-            f"SS {i}: Chain {chain_id1} Residue {res_seq_num1} and Chain {chain_id2} Residue {res_seq_num2}"
+            f"PDB: {pdb_id} SS {i}: Chain {chain_id1} Residue {res_seq_num1} and Chain {chain_id2} Residue {res_seq_num2}"
         )
         print(f"Proximal Residue (Chain {chain_id1}, Residue {res_seq_num1}):")
         for atom_name in ["N", "CA", "C", "O", "CB", "SG"]:
@@ -376,29 +405,39 @@ def print_disulfide_bond_info_dict(ssbond_atom_data) -> None:
         print("-" * 50)
 
 
-def get_atom_coordinates(ssbond_dict, chain_id, res_seq_num, atom_name) -> Vector3D:
+def get_atom_coordinates(
+    ssbond_dict, chain_id, res_seq_num, atom_name, verbose=False
+) -> Vector3D:
     """
     Accessor function to get the coordinates of a specific atom in a residue.
 
-    Args:
-    - ssbond_dict (dict): The dictionary containing SSBOND and ATOM records.
-    - chain_id (str): The chain identifier.
-    - res_seq_num (str): The residue sequence number.
-    - atom_name (str): The name of the atom.
+    :param ssbond_dict: The dictionary containing SSBOND and ATOM records.
+    :type ssbond_dict: dict
+    :param chain_id: The chain identifier.
+    :type chain_id: str
+    :param res_seq_num: The residue sequence number.
+    :type res_seq_num: str
+    :param atom_name: The name of the atom.
+    :type atom_name: str
+    :param verbose: Flag to enable verbose logging.
+    :type verbose: bool
 
-    Returns:
-    - list: A list containing the x, y, z coordinates of the atom if found, otherwise None.
+    :return: A Vector3D object containing the x, y, z coordinates of the atom if found, otherwise an empty Vector3D.
+    :rtype: Vector3D
     """
     key = (chain_id, str(res_seq_num), atom_name)
     if key in ssbond_dict["atoms"]:
         atom_record = ssbond_dict["atoms"][key]
-        # return Vector3D([atom_record["x"], atom_record["y"], atom_record["z"]])
         return Vector3D(atom_record["coords"])
     else:
+        if verbose:
+            _logger.error(
+                f"--> get_atom_coordinates: PDB: {ssbond_dict['pdbid']}: Atom {atom_name} in residue {chain_id} {res_seq_num} not found."
+            )
         return Vector3D([])
 
 
-def get_residue_atoms_coordinates(ssbond_dict, chain_id, res_seq_num):
+def get_residue_atoms_coordinates(ssbond_dict, chain_id, res_seq_num, verbose=False):
     """
     Accessor function to get the coordinates of specific atoms in a residue in the order N, CA, C, O, CB, SG.
 
@@ -415,16 +454,18 @@ def get_residue_atoms_coordinates(ssbond_dict, chain_id, res_seq_num):
     atom_names = ["N", "CA", "C", "O", "CB", "SG"]
     coordinates = []
     atoms = ssbond_dict.get("atoms", {})
+    pdb_id = ssbond_dict.get("pdbid", "Unknown")
 
     for atom_name in atom_names:
         atom_record = atoms.get((chain_id, str(res_seq_num), atom_name))
         if atom_record:
             coordinates.append(Vector3D(atom_record["coords"]))
         else:
-            coordinates.append(Vector3D(0, 0, 0))
-            _logger.error(
-                f"--> get_residue_coordinates: Atom {atom_name} in residue {chain_id} {res_seq_num} not found."
-            )
+            coordinates.append(Vector3D(0.01, 0.01, 0.01))
+            if verbose:
+                _logger.error(
+                    f"--> get_residue_coordinates: PDB: {pdb_id} Atom {atom_name} in residue {chain_id} {res_seq_num} not found."
+                )
 
     return coordinates
 
@@ -467,6 +508,52 @@ def get_phipsi_atoms_coordinates(data_dict, chain_id, key):
 # ssbond_dict, num_ssbonds, errors = extract_ssbonds_and_atoms(
 #    "/Users/egs/PDB/good/pdb6f99.ent"
 # )
+
+
+def check_file(
+    fname: str,
+    verbose=False,
+    quiet=True,
+    dbg=False,
+    cutoff=-1.0,
+) -> tuple:
+    """
+    Check all PDB files in the directory `pdb_dir` for SS bond consistency.
+
+    This function processes each PDB file in the specified directory, checking for
+    disulfide bond consistency. Files that pass the check are moved to `good_dir`,
+    while files that fail are moved to `bad_dir`.
+
+    :param pdb_dir: The directory containing the PDB files to check.
+    :type pdb_dir: str
+    :param good_dir: The directory to move good files to.
+    :type good_dir: str
+    :param bad_dir: The directory to move bad files to.
+    :type bad_dir: str
+    :param verbose: If True, enables verbose logging. Default is False.
+    :type verbose: bool
+    :param quiet: If True, suppresses non-critical output. Default is True.
+    :type quiet: bool
+
+    :return: None
+    """
+
+    from proteusPy import extract_ssbonds_and_atoms, print_disulfide_bond_info_dict
+
+    if os.path.exists(fname) is False:
+        print(f"File {fname} does not exist! Exiting...")
+        return None
+
+    # Returns > 0 if we can't parse the SSBOND header
+    ssbond_dict, found, errors = extract_ssbonds_and_atoms(
+        fname, verbose=verbose, dbg=dbg
+    )
+
+    if verbose:
+        _logger.info(f"Found: {found} errors: {errors}")
+        print_disulfide_bond_info_dict(ssbond_dict)
+
+    return found, errors
 
 
 if __name__ == "__main__":

@@ -12,6 +12,7 @@ Functions:
         Calculate the dihedral angle between four vectors representing four connected points.
 """
 
+import logging
 import math
 
 import numpy as np
@@ -183,7 +184,7 @@ class Vector3D:
         res = self.copy()
         res.normalize()
         return res
-    
+
     def angle_with(self, other):
         """
         Calculate the angle between this vector and another vector in degrees.
@@ -206,9 +207,14 @@ class Vector3D:
         """
         dot_product = self * other
         magnitudes = self.magnitude() * other.magnitude()
-        cos_angle = dot_product / magnitudes
+        if magnitudes == 0:
+            _logger.error("Vector3D: Cannot calculate angle with zero vector")
+            cos_angle = dot_product
+        else:
+            cos_angle = dot_product / magnitudes
+
         cos_angle = min(cos_angle, 1)
-        cos_angle = max(-1, cos_angle) # Avoid invalid values due to roundoff errors
+        cos_angle = max(-1, cos_angle)  # Avoid invalid values due to roundoff errors
         angle_radians = math.acos(cos_angle)
         return math.degrees(angle_radians)  # Convert radians to degrees
 
@@ -257,17 +263,18 @@ def calc_angle(v1: Vector3D, v2: Vector3D, v3: Vector3D) -> float:
     vec3 = v3 - v2
     return vec1.angle_with(vec3)
 
+
 def calc_dihedral(v1: Vector3D, v2: Vector3D, v3: Vector3D, v4: Vector3D) -> float:
     """
-    Return the dihedral angle between four vectors, (-180-180 degrees).
+    Return the dihedral angle between four 3D points, (-180-180 degrees).
 
-    :param v1: The first vector.
+    :param v1: The first point.
     :type v1: Vector3D
-    :param v2: The second vector.
+    :param v2: The second point.
     :type v2: Vector3D
-    :param v3: The third vector.
+    :param v3: The third point.
     :type v3: Vector3D
-    :param v4: The fourth vector.
+    :param v4: The fourth point.
     :type v4: Vector3D
     :return: The dihedral angle in degrees.
     :rtype: float
@@ -294,7 +301,6 @@ def calc_dihedral(v1: Vector3D, v2: Vector3D, v3: Vector3D, v4: Vector3D) -> flo
     except ZeroDivisionError:
         pass
     return angle
-
 
 
 def distance3d(p1: Vector3D, p2: Vector3D) -> float:

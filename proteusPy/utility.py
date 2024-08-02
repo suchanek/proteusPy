@@ -17,7 +17,8 @@ import os
 import pickle
 import subprocess
 import time
-import warnings
+
+import psutil
 
 from proteusPy.logger_config import get_logger
 
@@ -128,6 +129,7 @@ def grid_dimensions(n: int) -> tuple:
         rows = cols - 1 if cols * (cols - 1) >= n else cols
         return rows, cols
 
+
 # This function will be deprecated in the future.
 def Check_chains(pdbid, pdbdir, verbose=True) -> bool:
     """
@@ -183,7 +185,6 @@ def Check_chains(pdbid, pdbdir, verbose=True) -> bool:
 
 
 def extract_firstchain_ss(sslist, verbose=False):
-
     """
     Extract disulfides from the first chain found in
     the SSdict, returns them as a DisulfideList along with the
@@ -271,7 +272,7 @@ def get_memory_usage():
 
     process = psutil.Process()
     mem_info = process.memory_info()
-    return mem_info.rss / (1024 ** 2)
+    return mem_info.rss / (1024**2)
 
 
 def get_object_size_mb(obj):
@@ -767,18 +768,18 @@ def Extract_Disulfides(
     # If numb is passed then
     # only do the last numb entries.
 
-    if numb > 0:
-        pbar = tqdm(entrylist[:numb], ncols=PBAR_COLS)
-    else:
-        pbar = tqdm(entrylist, ncols=PBAR_COLS)
-
     tot = 0
     cnt = 0
     # loop over ss_filelist, create disulfides and initialize them
     # the logging_redirect_tqdm() context manager will redirect the logging output
     # to the tqdm progress bar.
 
-    with logging_redirect_tqdm():
+    with logging_redirect_tqdm(loggers=[_logger]):
+        if numb > 0:
+            pbar = tqdm(entrylist[:numb], ncols=PBAR_COLS)
+        else:
+            pbar = tqdm(entrylist, ncols=PBAR_COLS)
+
         for entry in pbar:
             _sslist = DisulfideList([], entry)
 
