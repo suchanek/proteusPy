@@ -30,12 +30,12 @@ def get_logger(name):
     :rtype: logging.Logger
     """
     _logger = logging.getLogger(name)
-    _logger.setLevel(logging.INFO)  # Set the logger level to INFO by default
+    _logger.setLevel(logging.ERROR)  # Set the logger level to INFO by default
     # Check if the logger already has handlers to avoid adding multiple handlers
     if not _logger.hasHandlers():
         handler = logging.StreamHandler()
         formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+            "proteusPy: %(asctime)s - %(name)s - %(levelname)s - %(message)s"
         )
         handler.setFormatter(formatter)
         _logger.addHandler(handler)

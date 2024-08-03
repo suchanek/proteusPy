@@ -20,6 +20,7 @@ import time
 
 import psutil
 
+from proteusPy import Disulfide
 from proteusPy.logger_config import get_logger
 
 _logger = get_logger("__name__")
@@ -652,9 +653,6 @@ def Download_Disulfides(
     return
 
 
-from proteusPy import Disulfide
-
-
 def remove_duplicate_ss(sslist: DisulfideList) -> list[Disulfide]:
     pruned = []
     for ss in sslist:
@@ -744,9 +742,6 @@ def Extract_Disulfides(
 
     ss_filelist = glob.glob("*.ent")
     tot = len(ss_filelist)
-
-    if verbose:
-        print(f"--> Extract_Disulfides(): PDB Directory {pdbdir} contains: {tot} files")
 
     # the filenames are in the form pdb{entry}.ent, I loop through them and extract
     # the PDB ID, with Disulfide.name_to_id(), then add to entrylist.
@@ -885,13 +880,13 @@ def Extract_Disulfides(
 
     else:
         if verbose:
-            print("Extract_Disulfides(): No problems found.")
+            _logger.info("Extract_Disulfides(): No problems found.")
 
     # dump the all_ss list of disulfides to a .pkl file. ~520 MB.
     fname = os.path.join(datadir, picklefile)
 
     if verbose:
-        print(
+        _logger.info(
             f"-> Extract_Disulfides(): Saving {len(All_ss_list)} Disulfides to file: {fname}"
         )
 
@@ -903,7 +898,7 @@ def Extract_Disulfides(
     fname = os.path.join(datadir, dictfile)
 
     if verbose:
-        print(
+        _logger.info(
             f"-> Extract_Disulfides(): Saving indices of {dict_len} Disulfide-containing PDB IDs to file: {fname}"
         )
 
@@ -914,17 +909,18 @@ def Extract_Disulfides(
 
     fname = os.path.join(datadir, torsionfile)
     if verbose:
-        print(f"-> Extract_Disulfides(): Saving torsions to file: {fname}")
+        _logger.info(f"-> Extract_Disulfides(): Saving torsions to file: {fname}")
 
     SS_df.to_csv(fname)
 
     end = time.time()
     elapsed = end - start
 
-    print(
-        f"-> Extract_Disulfides(): Disulfide Extraction complete! Elapsed time:\
-    	 {datetime.timedelta(seconds=elapsed)} (h:m:s)"
-    )
+    if verbose:
+        _logger.info(
+            f"-> Extract_Disulfides(): Disulfide Extraction complete! Elapsed time:\
+    	    {datetime.timedelta(seconds=elapsed)} (h:m:s)"
+        )
 
     # return to original directory
     os.chdir(cwd)
@@ -996,6 +992,7 @@ def Extract_Disulfide(
     return _sslist
 
 
+# This function will be deprecated.
 def check_header_from_file(filename: str, model_numb=0, verbose=False, dbg=True):
     """
     Parse the Disulfides contained in the PDB file.
@@ -1011,14 +1008,18 @@ def check_header_from_file(filename: str, model_numb=0, verbose=False, dbg=True)
       Assuming ```DATA_DIR``` has the pdb5rsa.ent file (it should!), we can load the disulfides
       with the following:
 
-    >>> from proteusPy import check_header_from_file
-    >>> from proteusPy.ProteusGlobals import DATA_DIR
-    >>> found = errors = 0
-    >>> found, errors = check_header_from_file(f'{DATA_DIR}pdb5rsa.ent', verbose=False, dbg=False)
-    >>> found
-    4
     """
     import os
+
+    from Bio.PDB import PDBParser
+
+    parser = PDBParser(PERMISSIVE=True)
+
+    proximal = distal = -1
+    _chaina = None
+    _chainb = None
+    structure = None
+    pdbid = ""
 
     def extract_id_from_filename(filename: str) -> str:
         """
@@ -1040,15 +1041,6 @@ def check_header_from_file(filename: str, model_numb=0, verbose=False, dbg=True)
                 f"Filename {filename} does not follow the expected format 'pdbid .ent'"
             )
             raise ValueError(mess)
-
-    proximal = distal = -1
-    _chaina = None
-    _chainb = None
-    structure = None
-
-    from Bio.PDB import PDBParser
-
-    parser = PDBParser(PERMISSIVE=True)
 
     # Biopython uses the Structure -> Model -> Chain hierarchy to organize
     # structures. All are iterable.
