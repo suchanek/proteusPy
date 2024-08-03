@@ -12,18 +12,18 @@ build the DisulfideLoader object, and save it into the proteusPy module data dir
 * Subset: Only extract and process the first 1000 Disulfides found in the PDB directory.
 
 Author: Eric G. Suchanek, PhD.
-Last revision: 7/23/24 -egs-
+Last revision: 8/2/24 -egs-
 """
 
 import argparse
 import datetime
-import logging
+import glob
 import os
 import sys
 import time
 from shutil import copy
 
-from proteusPy import Extract_Disulfides, __version__, get_logger
+from proteusPy import Extract_Disulfides
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
     LOADER_FNAME,
@@ -37,18 +37,11 @@ from proteusPy.ProteusGlobals import (
 HOME_DIR = os.path.expanduser("~")
 PDB_BASE = os.getenv("PDB")
 PDB_DIR = MODULE_DATA = REPO_DATA = DATA_DIR = ""
-# Configure logging
 
-import proteusPy.logger_config
-from proteusPy.logger_config import get_logger
-
-_logger = get_logger("DisulfideChecker")
 
 if not os.path.isdir(PDB_BASE):
     print(f"Error: The directory {PDB_BASE} does not exist.")
     sys.exit(1)
-else:
-    print(f"Found PDB directory at: {PDB_BASE}  ")
 
 PDB_DIR = os.path.join(PDB_BASE, "good/")
 if not os.path.isdir(PDB_DIR):
@@ -70,9 +63,9 @@ if not os.path.isdir(DATA_DIR):
     print(f"Error: The directory {DATA_DIR} does not exist.")
     sys.exit(1)
 
-print(
-    f"Using PDB models at: {PDB_DIR}\nData directory: {DATA_DIR}\nModule data directory: {MODULE_DATA}\nRepo data directory: {REPO_DATA}"
-)
+ent_files = glob.glob(os.path.join(PDB_DIR, "*.ent"))
+num_ent_files = len(ent_files)
+__version__ = "1.0.0"
 
 
 def parse_arguments():
@@ -99,7 +92,7 @@ def parse_arguments():
 
     parser.set_defaults(all=False)
     parser.set_defaults(update=False)
-    parser.set_defaults(verbose=True)
+    parser.set_defaults(verbose=False)
     parser.set_defaults(extract=False)
     parser.set_defaults(subset=False)
     parser.set_defaults(build=True)
@@ -180,14 +173,14 @@ def do_build(verbose, full, subset, cutoff):
 
 def do_stuff(
     all=False,
-    extract=True,
-    build=True,
+    extract=False,
+    build=False,
     full=False,
     update=False,
-    subset=True,
-    verbose=True,
+    subset=False,
+    verbose=False,
     cutoff=-1.0,
-    prune=True,
+    prune=False,
 ):
     """
     Main entrypoint for the proteusPy Disulfide database extraction and creation workflow.
@@ -212,15 +205,18 @@ def do_stuff(
         _extract = _build = _update = _subset = _full = True
 
     if _extract == True:
-        print(f"Extracting with cutoff: {cutoff}")
+        if verbose:
+            print(f"Extracting with cutoff: {cutoff}")
         do_extract(_verbose, _full, _subset, cutoff, prune)
 
     if _build == True:
-        print(f"Building:")
+        if verbose:
+            print(f"Building:")
         do_build(_verbose, _full, _subset, cutoff)
 
     if _update == True:
-        print(f"Copying: {DATA_DIR} to {REPO_DATA}")
+        if verbose:
+            print(f"Copying: {DATA_DIR} to {REPO_DATA}")
         # copy(f"{DATA_DIR}{LOADER_FNAME}", f"{MODULE_DATA}")
         # copy(f"{DATA_DIR}{LOADER_SUBSET_FNAME}", f"{MODULE_DATA}")
         copy(f"{DATA_DIR}{LOADER_FNAME}", f"{REPO_DATA}")
@@ -229,10 +225,20 @@ def do_stuff(
 
 
 def main():
+    start = time.time()
     args = parse_arguments()
 
-    print(f"DisulfideExtractor parsing {PDB_DIR} at: {datetime.datetime.now()}")
-    start = time.time()
+    print(
+        f""
+        f"proteusPy DisulfideExtractor v{__version__}\n"
+        f"PDB model directory:       {PDB_DIR}\n"
+        f"Data directory:            {DATA_DIR}\n"
+        f"Module data directory:     {MODULE_DATA}\n"
+        f"Repo data directory:       {REPO_DATA}\n"
+        f"Number of .ent files:      {num_ent_files}\n"
+        f"Using cutoff:              {args.cutoff}\n"
+        f"Starting at:               {datetime.datetime.now()}\n\n"
+    )
 
     do_stuff(
         all=args.all,

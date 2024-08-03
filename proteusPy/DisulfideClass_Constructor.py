@@ -18,6 +18,7 @@ from io import StringIO
 import pandas as pd
 
 from proteusPy.DisulfideList import DisulfideList
+from proteusPy.logger_config import get_logger
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
     DPI,
@@ -25,6 +26,8 @@ from proteusPy.ProteusGlobals import (
     SS_CLASS_DICT_FILE,
     SS_CONSENSUS_FILE,
 )
+
+_logger = get_logger(__name__)
 
 merge_cols = [
     "chi1_s",
@@ -106,7 +109,7 @@ class DisulfideClass_Constructor:
         self.sixclass_df = None
 
         if self.verbose:
-            print(f"-> DisulfideClass_Constructor(): Building SS classes...")
+            _logger.info(f"-> DisulfideClass_Constructor(): Building SS classes...")
         self.build_yourself(loader)
 
     def load_class_dict(self, fname=f"{DATA_DIR}{SS_CLASS_DICT_FILE}") -> dict:
@@ -137,7 +140,7 @@ class DisulfideClass_Constructor:
         """
         try:
             # Check if running in Jupyter
-            shell = get_ipython().__class__.__name__
+            shell = get_ipython().__class__.__name__  # type: ignore
             if shell == "ZMQInteractiveShell":
                 from tqdm.notebook import tqdm
             else:
@@ -159,8 +162,7 @@ class DisulfideClass_Constructor:
             else:
                 return DisulfideList([self[ssid] for ssid in sslist], classid)
         except KeyError:
-
-            print(f"No class: {classid}")
+            _logger.error(f"No class: {classid}")
         return
 
     def concat_dataframes(self, df1, df2):
@@ -227,7 +229,9 @@ class DisulfideClass_Constructor:
         tors_df = loader.getTorsions()
 
         if self.verbose:
-            print(f"-> DisulfideClass_Constructor(): creating binary SS classes...")
+            _logger.info(
+                f"-> DisulfideClass_Constructor(): creating binary SS classes..."
+            )
 
         grouped = self.create_binary_classes(tors_df)
 
@@ -244,7 +248,7 @@ class DisulfideClass_Constructor:
         class_df["class_id"].str.strip()
 
         if self.verbose:
-            print(f"-> DisulfideClass_Constructor(): merging...")
+            _logger.info(f"-> DisulfideClass_Constructor(): merging...")
 
         merged = self.concat_dataframes(class_df, grouped)
         merged.drop(
@@ -257,14 +261,16 @@ class DisulfideClass_Constructor:
         self.classdf = merged.copy()
 
         if self.verbose:
-            print(f"-> DisulfideClass_Constructor(): creating sixfold SS classes...")
+            _logger.info(
+                f"-> DisulfideClass_Constructor(): creating sixfold SS classes..."
+            )
 
         grouped_sixclass = self.create_six_classes(tors_df)
 
         self.sixclass_df = grouped_sixclass.copy()
 
         if self.verbose:
-            print(f"-> DisulfideClass_Constructor(): initialization complete.")
+            _logger.info(f"-> DisulfideClass_Constructor(): initialization complete.")
 
         return
 

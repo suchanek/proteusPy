@@ -208,7 +208,7 @@ class Vector3D:
         dot_product = self * other
         magnitudes = self.magnitude() * other.magnitude()
         if magnitudes == 0:
-            _logger.error("Vector3D: Cannot calculate angle with zero vector")
+            _logger.warning("Vector3D: Cannot calculate angle with zero vector")
             cos_angle = dot_product
         else:
             cos_angle = dot_product / magnitudes
