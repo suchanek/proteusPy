@@ -100,6 +100,90 @@ SAVE_DIR = "/Users/egs/Documents/proteusPy/"
 
 from collections import deque
 
+import pandas as pd
+
+
+def task(
+    loader: DisulfideLoader,
+    six_or_bin: pd.DataFrame,
+    start_idx: int,
+    end_idx: int,
+    result_list: DisulfideList,
+    pbar: tqdm,
+    total_ss: int,
+    cutoff: float,
+    do_graph: bool,
+    do_consensus: bool,
+    save_dir: str,
+    prefix: str,
+    position: int,
+    tasknum: int,
+):
+    """
+    Processes a range of disulfide classes and updates the progress bar.
+
+    :param loader: DisulfideLoader instance to load disulfides.
+    :param six_or_bin: DataFrame containing class and disulfide IDs.
+    :param start_idx: Starting index for processing.
+    :param end_idx: Ending index for processing.
+    :param result_list: List to store the resulting disulfides.
+    :param pbar: tqdm progress bar for overall progress.
+    :param total_ss: Total number of disulfides.
+    :param cutoff: Cutoff percentage to filter classes.
+    :param do_graph: Boolean flag to generate and save graphs.
+    :param do_consensus: Boolean flag to generate consensus conformations.
+    :param save_dir: Directory to save the output files.
+    :param prefix: Prefix for the output file names.
+    :param position: Vertical position of the progress bar.
+    :param tasknum: Task number for identification.
+    """
+    task_pbar = tqdm(
+        total=end_idx - start_idx,
+        desc=f"--> task {tasknum+1:2}...",
+        position=position + 1,
+        leave=False,
+        ncols=80,
+    )
+
+    for idx in range(start_idx, end_idx):
+        row = six_or_bin.iloc[idx]
+        cls = row["class_id"]
+        ss_list = row["ss_id"]
+        tot = len(ss_list)
+        if 100 * tot / total_ss < cutoff:
+            continue
+
+        fname = os.path.join(save_dir, "classes", f"{prefix}_{cls}.png")
+
+        class_disulfides_deque = deque()
+
+        for ssid in ss_list:
+            _ss = loader[ssid]
+            class_disulfides_deque.append(_ss)
+            task_pbar.update(1)
+
+        class_disulfides = DisulfideList(list(class_disulfides_deque), cls, quiet=True)
+        if do_graph:
+            class_disulfides.display_torsion_statistics(
+                display=False, save=True, fname=fname, light=True, stats=False
+            )
+
+        if do_consensus:
+            avg_conformation = class_disulfides.Average_Conformation
+
+            ssname = f"{cls}_avg"
+            exemplar = Disulfide(ssname)
+            exemplar.build_model(
+                avg_conformation[0],
+                avg_conformation[1],
+                avg_conformation[2],
+                avg_conformation[3],
+                avg_conformation[4],
+            )
+            result_list.append(exemplar)
+
+        pbar.update(1)
+
 
 def analyze_six_classes(
     loader: DisulfideLoader,
@@ -219,59 +303,38 @@ def analyze_six_classes_threaded(
     res_list = DisulfideList([], "SS_6class_Avg_SS")
     total_ss = len(loader.SSList)
 
-    def task(start_idx, end_idx, result_list, pbar):
-        for idx in range(start_idx, end_idx):
-            row = six.iloc[idx]
-            cls = row["class_id"]
-            ss_list = row["ss_id"]
-            tot = len(ss_list)
-            if 100 * tot / total_ss < cutoff:
-                continue
-
-            fname = os.path.join(SAVE_DIR, "classes", f"ss_class_sext_{cls}.png")
-
-            class_disulfides_deque = deque()
-
-            for ssid in ss_list:
-                _ss = loader[ssid]
-                class_disulfides_deque.append(_ss)
-
-            class_disulfides = DisulfideList(
-                list(class_disulfides_deque), cls, quiet=True
-            )
-            if do_graph:
-                class_disulfides.display_torsion_statistics(
-                    display=False, save=True, fname=fname, light=True, stats=False
-                )
-
-            if do_consensus:
-                avg_conformation = class_disulfides.Average_Conformation
-
-                ssname = f"{cls}_avg"
-                exemplar = Disulfide(ssname)
-                exemplar.build_model(
-                    avg_conformation[0],
-                    avg_conformation[1],
-                    avg_conformation[2],
-                    avg_conformation[3],
-                    avg_conformation[4],
-                )
-                result_list.append(exemplar)
-            pbar.update(1)
-
     threads = []
     chunk_size = tot_classes // num_threads
     result_lists = [[] for _ in range(num_threads)]
 
     for i in range(num_threads):
-        # print(f"--> analyze_sextant_classes(): Starting thread {i}")
         start_idx = i * chunk_size
         end_idx = (i + 1) * chunk_size if i != num_threads - 1 else tot_classes
+        pbar_index = 2 * i + 1  # so the task pbar is displayed in the correct position
         pbar = tqdm(
-            total=end_idx - start_idx, desc=f"Thread {i+1:2}", position=i, leave=False
+            total=end_idx - start_idx,
+            desc=f"Thread {i+1:2}",
+            position=pbar_index,
+            leave=False,
         )
         thread = threading.Thread(
-            target=task, args=(start_idx, end_idx, result_lists[i], pbar)
+            target=task,
+            args=(
+                loader,
+                six,
+                start_idx,
+                end_idx,
+                result_lists[i],
+                pbar,
+                total_ss,
+                cutoff,
+                do_graph,
+                do_consensus,
+                SAVE_DIR,
+                "ss_class_sext",
+                pbar_index,
+                i,
+            ),
         )
         threads.append(thread)
         thread.start()
@@ -285,6 +348,86 @@ def analyze_six_classes_threaded(
     if do_consensus:
         print(
             f"--> analyze_six_classes(): Writing consensus structures to: {class_filename}"
+        )
+        with open(class_filename, "wb+") as f:
+            pickle.dump(res_list, f)
+
+    return res_list
+
+
+def analyze_binary_classes_threaded(
+    loader: DisulfideLoader,
+    do_graph=False,
+    do_consensus=False,
+    cutoff=0.1,
+    num_threads=4,
+) -> DisulfideList:
+    """
+    Analyze the binary classes of disulfide bonds.
+
+    :param loader: The ``proteusPy.DisulfideLoader`` object.
+    :param do_graph: Whether or not to display torsion statistics graphs. Default is True.
+    :param do_consensus: Whether or not to compute average conformations for each class. Default is True. The program writes the
+                        consensus structures to a .pkl file in the packages ``data`` directory.
+    :param cutoff: The cutoff percentage for each class. If the percentage of disulfides for a class is below
+                   this value, the class will be skipped. Default is 0.1.
+    :param num_threads: Number of threads to use for processing. Default is 4.
+
+    :return: A list of disulfide bonds, where each disulfide bond represents the average conformation for a class.
+    """
+
+    _PBAR_COLS = 85
+
+    class_filename = os.path.join(DATA_DIR, "SS_consensus_class32.pkl")
+
+    bin = loader.tclass.classdf
+    tot_classes = bin.shape[0]
+    res_list = DisulfideList([], "SS_32class_Avg_SS")
+    total_ss = len(loader.SSList)
+
+    chunk_size = tot_classes // num_threads
+    threads = []
+    result_lists = [[] for _ in range(num_threads)]
+
+    for i in range(num_threads):
+        start_idx = i * chunk_size
+        end_idx = (i + 1) * chunk_size if i != num_threads - 1 else tot_classes
+        pbar_index = 2 * i + 1  # so the task pbar is displayed in the correct position
+
+        pbar = tqdm(
+            total=end_idx - start_idx, desc=f"Thread {i+1:2}", position=i, leave=False
+        )
+        thread = threading.Thread(
+            target=task,
+            args=(
+                loader,
+                bin,
+                start_idx,
+                end_idx,
+                result_lists[i],
+                pbar,
+                total_ss,
+                cutoff,
+                do_graph,
+                do_consensus,
+                SAVE_DIR,
+                "ss_class_bin",
+                pbar_index,
+                i,
+            ),
+        )
+        threads.append(thread)
+        thread.start()
+
+    for thread in threads:
+        thread.join()
+
+    for result_list in result_lists:
+        res_list.extend(result_list)
+
+    if do_consensus:
+        print(
+            f"--> analyze_binary_classes(): Writing consensus structures to: {class_filename}"
         )
         with open(class_filename, "wb+") as f:
             pickle.dump(res_list, f)
@@ -370,105 +513,6 @@ def analyze_binary_classes(
                 avg_conformation[4],
             )
             res_list.append(exemplar)
-
-    if do_consensus:
-        print(
-            f"--> analyze_binary_classes(): Writing consensus structures to: {class_filename}"
-        )
-        with open(class_filename, "wb+") as f:
-            pickle.dump(res_list, f)
-
-    return res_list
-
-
-def analyze_binary_classes_threaded(
-    loader: DisulfideLoader,
-    do_graph=False,
-    do_consensus=False,
-    cutoff=0.1,
-    num_threads=4,
-) -> DisulfideList:
-    """
-    Analyze the binary classes of disulfide bonds.
-
-    :param loader: The ``proteusPy.DisulfideLoader`` object.
-    :param do_graph: Whether or not to display torsion statistics graphs. Default is True.
-    :param do_consensus: Whether or not to compute average conformations for each class. Default is True. The program writes the
-                        consensus structures to a .pkl file in the packages ``data`` directory.
-    :param cutoff: The cutoff percentage for each class. If the percentage of disulfides for a class is below
-                   this value, the class will be skipped. Default is 0.1.
-    :param num_threads: Number of threads to use for processing. Default is 4.
-
-    :return: A list of disulfide bonds, where each disulfide bond represents the average conformation for a class.
-    """
-
-    _PBAR_COLS = 85
-
-    class_filename = os.path.join(DATA_DIR, "SS_consensus_class32.pkl")
-
-    bin = loader.tclass.classdf
-    tot_classes = bin.shape[0]
-    res_list = DisulfideList([], "SS_32class_Avg_SS")
-    total_ss = len(loader.SSList)
-
-    def task(start_idx, end_idx, result_list, pbar):
-        for idx in range(start_idx, end_idx):
-            row = bin.iloc[idx]
-            cls = row["class_id"]
-            ss_list = row["ss_id"]
-            tot = len(ss_list)
-            if 100 * tot / total_ss < cutoff:
-                continue
-
-            fname = os.path.join(SAVE_DIR, "classes", f"ss_class_bin_{cls}.png")
-
-            class_disulfides_deque = deque()
-
-            for ssid in ss_list:
-                _ss = loader[ssid]
-                class_disulfides_deque.append(_ss)
-
-            class_disulfides = list(class_disulfides_deque)
-            if do_graph:
-                class_disulfides.display_torsion_statistics(
-                    display=False, save=True, fname=fname, light=True, stats=False
-                )
-
-            if do_consensus:
-                avg_conformation = np.zeros(5)
-                avg_conformation = class_disulfides.Average_Conformation
-
-                ssname = f"{cls}_avg"
-                exemplar = Disulfide(ssname)
-                exemplar.build_model(
-                    avg_conformation[0],
-                    avg_conformation[1],
-                    avg_conformation[2],
-                    avg_conformation[3],
-                    avg_conformation[4],
-                )
-                result_list.append(exemplar)
-            pbar.update(1)
-
-    # Define the range of indices for each thread
-    chunk_size = tot_classes // num_threads
-    threads = []
-
-    for i in range(num_threads):
-        start_idx = i * chunk_size
-        end_idx = (i + 1) * chunk_size if i != num_threads - 1 else tot_classes
-        pbar = tqdm(
-            total=end_idx - start_idx, desc=f"Thread {i+1:2}", position=i, leave=False
-        )
-        thread = threading.Thread(
-            target=task, args=(start_idx, end_idx, res_list, pbar)
-        )
-        threads.append(thread)
-        thread.start()
-
-    # Wait for all threads to complete
-    for thread in threads:
-        thread.join()
 
     if do_consensus:
         print(
