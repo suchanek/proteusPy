@@ -96,6 +96,7 @@ from proteusPy import Disulfide, DisulfideList, DisulfideLoader, Load_PDB_SS
 from proteusPy.data import DATA_DIR
 
 SAVE_DIR = "/Users/egs/Documents/proteusPy/"
+_PBAR_COLS = 100
 
 
 from collections import deque
@@ -137,13 +138,6 @@ def task(
     :param position: Vertical position of the progress bar.
     :param tasknum: Task number for identification.
     """
-    task_pbar = tqdm(
-        total=end_idx - start_idx,
-        desc=f"--> task {tasknum+1:2}...",
-        position=position + 1,
-        leave=False,
-        ncols=80,
-    )
 
     for idx in range(start_idx, end_idx):
         row = six_or_bin.iloc[idx]
@@ -153,6 +147,14 @@ def task(
         if 100 * tot / total_ss < cutoff:
             continue
 
+        task_pbar = tqdm(
+            total=len(ss_list),
+            desc=f"--> subtask {tasknum+1:2}...",
+            position=position + 1,
+            leave=False,
+            ncols=_PBAR_COLS,
+        )
+
         fname = os.path.join(save_dir, "classes", f"{prefix}_{cls}.png")
 
         class_disulfides_deque = deque()
@@ -160,6 +162,7 @@ def task(
         for ssid in ss_list:
             _ss = loader[ssid]
             class_disulfides_deque.append(_ss)
+            task_pbar.set_postfix({"ID": ssid})  #
             task_pbar.update(1)
 
         class_disulfides = DisulfideList(list(class_disulfides_deque), cls, quiet=True)
@@ -185,95 +188,6 @@ def task(
         pbar.update(1)
 
 
-def analyze_six_classes(
-    loader: DisulfideLoader,
-    do_graph=False,
-    do_consensus=True,
-    cutoff=0.1,
-    verbose=False,
-) -> DisulfideList:
-    """
-    Analyze the six classes of disulfide bonds.
-
-    :param loader: The disulfide loader object.
-    :param do_graph: Whether or not to display torsion statistics graphs. Default is True.
-    :param do_consensus: Whether or not to compute average conformations for each class. Default is True.
-    :param cutoff: The cutoff percentage for each class. If the percentage of disulfides for a class is below
-                   this value, the class will be skipped. Default is 0.1.
-
-    :return: A list of disulfide bonds, where each disulfide bond represents the average conformation for a class.
-    """
-
-    _PBAR_COLS = 85
-
-    class_filename = os.path.join(DATA_DIR, "SS_consensus_class_sext.pkl")
-    six = loader.tclass.sixclass_df
-    tot_classes = six.shape[0]
-    res_list = DisulfideList([], "SS_6class_Avg_SS")
-    total_ss = len(loader.SSList)
-
-    pbar = tqdm(range(tot_classes), ncols=_PBAR_COLS)
-
-    # loop over all rows
-    for idx in pbar:
-        row = six.iloc[idx]
-        cls = row["class_id"]
-        ss_list = row["ss_id"]
-        tot = len(ss_list)
-        if 100 * tot / total_ss < cutoff:
-            continue
-
-        fname = os.path.join(SAVE_DIR, "classes", f"ss_class_sext_{cls}.png")
-        pbar.set_postfix({"CLS": cls, "Cnt": tot})  # update the progress bar
-
-        class_disulfides_deque = deque()
-
-        pbar2 = tqdm(ss_list, ncols=_PBAR_COLS, leave=False)
-        for ssid in pbar2:
-            _ss = loader[ssid]
-            class_disulfides_deque.append(_ss)
-
-        class_disulfides = list(class_disulfides_deque)
-        sslist = DisulfideList(class_disulfides, cls, quiet=True)
-
-        if do_graph:
-            sslist.display_torsion_statistics(
-                display=False, save=True, fname=fname, light=True, stats=False
-            )
-
-        if do_consensus:
-            # get the average conformation - array of dihedrals
-            avg_conformation = np.zeros(5)
-
-            if verbose:
-                print(
-                    f"--> analyze_six_classes(): Computing avg conformation for: {cls}"
-                )
-
-            avg_conformation = sslist.Average_Conformation
-
-            # build the average disulfide for the class
-            ssname = f"{cls}_avg"
-            exemplar = Disulfide(ssname)
-            exemplar.build_model(
-                avg_conformation[0],
-                avg_conformation[1],
-                avg_conformation[2],
-                avg_conformation[3],
-                avg_conformation[4],
-            )
-            res_list.append(exemplar)
-
-    if do_consensus:
-        print(
-            f"--> analyze_six_classes(): Writing consensus structures to: {class_filename}"
-        )
-        with open(class_filename, "wb+") as f:
-            pickle.dump(res_list, f)
-
-    return res_list
-
-
 def analyze_six_classes_threaded(
     loader: DisulfideLoader,
     do_graph=False,
@@ -294,8 +208,6 @@ def analyze_six_classes_threaded(
 
     :return: A list of disulfide bonds, where each disulfide bond represents the average conformation for a class.
     """
-
-    _PBAR_COLS = 85
 
     class_filename = os.path.join(DATA_DIR, "SS_consensus_class_sext.pkl")
     six = loader.tclass.sixclass_df
@@ -436,6 +348,91 @@ def analyze_binary_classes_threaded(
 
 
 # with 172,000 disulfides, this takes about 32 minutes, M3 Max Macbook Pro
+def analyze_six_classes(
+    loader: DisulfideLoader,
+    do_graph=False,
+    do_consensus=True,
+    cutoff=0.1,
+    verbose=False,
+) -> DisulfideList:
+    """
+    Analyze the six classes of disulfide bonds.
+
+    :param loader: The disulfide loader object.
+    :param do_graph: Whether or not to display torsion statistics graphs. Default is True.
+    :param do_consensus: Whether or not to compute average conformations for each class. Default is True.
+    :param cutoff: The cutoff percentage for each class. If the percentage of disulfides for a class is below
+                   this value, the class will be skipped. Default is 0.1.
+
+    :return: A list of disulfide bonds, where each disulfide bond represents the average conformation for a class.
+    """
+
+    class_filename = os.path.join(DATA_DIR, "SS_consensus_class_sext.pkl")
+    six = loader.tclass.sixclass_df
+    tot_classes = six.shape[0]
+    res_list = DisulfideList([], "SS_6class_Avg_SS")
+    total_ss = len(loader.SSList)
+
+    pbar = tqdm(range(tot_classes), ncols=_PBAR_COLS)
+
+    # loop over all rows
+    for idx in pbar:
+        row = six.iloc[idx]
+        cls = row["class_id"]
+        ss_list = row["ss_id"]
+        tot = len(ss_list)
+        if 100 * tot / total_ss < cutoff:
+            continue
+
+        fname = os.path.join(SAVE_DIR, "classes", f"ss_class_sext_{cls}.png")
+        pbar.set_postfix({"CLS": cls, "Cnt": tot})  # update the progress bar
+
+        class_disulfides_deque = deque()
+
+        pbar2 = tqdm(ss_list, ncols=_PBAR_COLS, leave=False)
+        for ssid in pbar2:
+            _ss = loader[ssid]
+            class_disulfides_deque.append(_ss)
+
+        class_disulfides = list(class_disulfides_deque)
+        sslist = DisulfideList(class_disulfides, cls, quiet=True)
+
+        if do_graph:
+            sslist.display_torsion_statistics(
+                display=False, save=True, fname=fname, light=True, stats=False
+            )
+
+        if do_consensus:
+            # get the average conformation - array of dihedrals
+            avg_conformation = np.zeros(5)
+
+            if verbose:
+                print(
+                    f"--> analyze_six_classes(): Computing avg conformation for: {cls}"
+                )
+
+            avg_conformation = sslist.Average_Conformation
+
+            # build the average disulfide for the class
+            ssname = f"{cls}_avg"
+            exemplar = Disulfide(ssname)
+            exemplar.build_model(
+                avg_conformation[0],
+                avg_conformation[1],
+                avg_conformation[2],
+                avg_conformation[3],
+                avg_conformation[4],
+            )
+            res_list.append(exemplar)
+
+    if do_consensus:
+        print(
+            f"--> analyze_six_classes(): Writing consensus structures to: {class_filename}"
+        )
+        with open(class_filename, "wb+") as f:
+            pickle.dump(res_list, f)
+
+    return res_list
 
 
 def analyze_binary_classes(
@@ -560,6 +557,7 @@ def plot_classes_vs_cutoff(PDB_SS: DisulfideLoader, cutoff, steps):
 
 
 def analyze_classes(
+    loader: DisulfideLoader,
     binary: bool,
     sextant: bool,
     all: bool,
@@ -571,7 +569,7 @@ def analyze_classes(
     # main program begins
     if all:
         analyze_six_classes_threaded(
-            PDB_SS,
+            loader,
             do_graph=do_graph,
             do_consensus=True,
             cutoff=cutoff,
@@ -580,7 +578,7 @@ def analyze_classes(
         )
 
         analyze_binary_classes(
-            PDB_SS, do_graph=do_graph, do_consensus=True, cutoff=cutoff, verbose=verbose
+            loader, do_graph=do_graph, do_consensus=True, cutoff=cutoff, verbose=verbose
         )
 
         return
@@ -588,7 +586,7 @@ def analyze_classes(
     if sextant:
         print("Analyzing sextant classes.")
         ss_classlist = analyze_six_classes_threaded(
-            PDB_SS,
+            loader,
             do_graph=do_graph,
             do_consensus=True,
             cutoff=0.1,
@@ -597,76 +595,86 @@ def analyze_classes(
 
     if binary:
         ss_classlist = analyze_binary_classes(
-            PDB_SS, do_graph=do_graph, do_consensus=True, cutoff=0.1, verbose=verbose
+            loader, do_graph=do_graph, do_consensus=True, cutoff=0.1, verbose=verbose
         )
 
     return
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "-b",
-    "--binary",
-    help="Analyze binary classes.",
-    action=argparse.BooleanOptionalAction,
-)
-parser.add_argument(
-    "-s",
-    "--sextant",
-    help="Analyze sextant classes.",
-    action=argparse.BooleanOptionalAction,
-)
-parser.add_argument(
-    "-t",
-    "--threads",
-    type=int,
-    help="Number of threads to use. NOT IMPLEMENTED YET.",
-)
-parser.add_argument(
-    "-a",
-    "--all",
-    help="Both binary and sextant classes.",
-    action=argparse.BooleanOptionalAction,
-)
-parser.add_argument(
-    "-g",
-    "--graph",
-    help="Create class graphs.",
-    action=argparse.BooleanOptionalAction,
-)
+def get_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-b",
+        "--binary",
+        help="Analyze binary classes.",
+        action=argparse.BooleanOptionalAction,
+    )
+    parser.add_argument(
+        "-s",
+        "--sextant",
+        help="Analyze sextant classes.",
+        action=argparse.BooleanOptionalAction,
+    )
+    parser.add_argument(
+        "-t",
+        "--threads",
+        type=int,
+        help="Number of threads to use. NOT IMPLEMENTED YET.",
+    )
+    parser.add_argument(
+        "-a",
+        "--all",
+        help="Both binary and sextant classes.",
+        action=argparse.BooleanOptionalAction,
+    )
+    parser.add_argument(
+        "-g",
+        "--graph",
+        help="Create class graphs.",
+        action=argparse.BooleanOptionalAction,
+    )
 
-parser.set_defaults(binary=False)
-parser.set_defaults(sextant=False)
-parser.set_defaults(all=False)
-parser.set_defaults(graph=False)
-parser.set_defaults(threads=4)
-parser.set_defaults(cutoff=0.1)
+    parser.set_defaults(binary=False)
+    parser.set_defaults(sextant=False)
+    parser.set_defaults(all=False)
+    parser.set_defaults(graph=False)
+    parser.set_defaults(threads=4)
+    parser.set_defaults(cutoff=0.1)
+
+    args = parser.parse_args()
+    return args
 
 
-args = parser.parse_args()
-sextant = args.sextant
-binary = args.binary
-all = args.all
-threads = args.threads
-do_graph = args.graph
-cutoff = args.cutoff
+def main():
+    args = get_args()
+    sextant = args.sextant
+    binary = args.binary
+    all = args.all
+    threads = args.threads
+    do_graph = args.graph
+    cutoff = args.cutoff
 
-print(f"Starting extraction with arguments: {args}")
-print(
-    f"Binary: {binary}, Sextant: {sextant}, All: {all}, Threads: {threads}, Cutoff: {cutoff}, Graph: {do_graph}"
-)
+    print(f"Starting extraction with arguments: {args}")
+    print(
+        f"Binary: {binary}, Sextant: {sextant}, All: {all}, Threads: {threads}, Cutoff: {cutoff}, Graph: {do_graph}"
+    )
 
-start = time.time()
-PDB_SS = Load_PDB_SS(verbose=True, subset=False)
+    PDB_SS = Load_PDB_SS(verbose=True, subset=False)
+    analyze_classes(
+        PDB_SS, binary, sextant, all, threads=threads, do_graph=do_graph, cutoff=cutoff
+    )
 
-analyze_classes(binary, sextant, all, threads=threads, do_graph=do_graph, cutoff=cutoff)
 
-end = time.time()
+if __name__ == "__main__":
+    start = time.time()
 
-elapsed = end - start
+    main()
 
-print(
-    f"Disulfide Class Analysis Complete! \nElapsed time: {timedelta(seconds=elapsed)} (h:m:s)"
-)
+    end = time.time()
+    elapsed = end - start
+
+    print(
+        f"Disulfide Class Analysis Complete! \nElapsed time: {timedelta(seconds=elapsed)} (h:m:s)"
+    )
 
 # end of file
