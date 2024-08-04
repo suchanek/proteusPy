@@ -12,7 +12,7 @@ Last revision: 7/12/2024 -egs-
 
 try:
     # Check if running in Jupyter
-    shell = get_ipython().__class__.__name__ # type: ignore
+    shell = get_ipython().__class__.__name__  # type: ignore
     if shell == "ZMQInteractiveShell":
         from tqdm.notebook import tqdm
     else:
@@ -1034,7 +1034,7 @@ class DisulfideList(UserList):
 
         modelss.build_model(chi1, chi2, chi3, chi4, chi5)
         res = DisulfideList([], "neighbors")
-        res = modelss.Torsion_neighbors(sslist, cutoff)
+        res = modelss.Torsion_Neighbors(sslist, cutoff)
 
         return res
 
@@ -1060,7 +1060,7 @@ class DisulfideList(UserList):
 
         modelss.build_model(chi1, chi2, chi3, chi4, chi5)
         res = DisulfideList([], "neighbors")
-        res = modelss.Torsion_neighbors(sslist, cutoff)
+        res = modelss.Torsion_Neighbors(sslist, cutoff)
 
         return res
 
@@ -1180,20 +1180,20 @@ def load_disulfides_from_id(
         chain2_id = pair["distal"][0]
 
         if dbg:
-            print(f"Proximal: {proximal} {chain1_id} Distal: {distal} {chain2_id}")
+            _logger.info(f"Proximal: {proximal} {chain1_id} Distal: {distal} {chain2_id}")
 
         proximal_int = int(proximal)
         distal_int = int(distal)
 
         if proximal == distal:
             if verbose:
-                mess = f" -> load_disulfides_from_id(): SSBond record has (proximal == distal):\
+                mess = f"-> load_disulfides_from_id(): SSBond record has (proximal == distal):\
                 {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
                 _logger.info(mess)
 
         if verbose:
             _logger.info(
-                f"SSBond: {i}: {pdb_id}: {proximal} {chain1_id} - {distal} {chain2_id}"
+                f"-> load_disulfides_from_id(): SSBond: {i}: {pdb_id}: {proximal} {chain1_id} - {distal} {chain2_id}"
             )
 
         new_ss = Initialize_Disulfide_From_Coords(
@@ -1214,10 +1214,10 @@ def load_disulfides_from_id(
         if new_ss is not None:
             SSList.append(new_ss)
             if verbose:
-                mess = f" -> load_disulfides_from_id(): Initialized Disulfide: {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
+                mess = f"-> load_disulfides_from_id(): Initialized Disulfide: {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
                 _logger.info(mess)
         else:
-            mess = f" -> load_disulfides_from_id(): Cannot initialize Disulfide: {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
+            mess = f"-> load_disulfides_from_id(): Cannot initialize Disulfide: {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
             _logger.ERROR(mess)
 
         i += 1

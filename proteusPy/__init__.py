@@ -127,7 +127,15 @@ from .utility import (
     retrieve_git_lfs_files,
     sort_by_column,
 )
-from .vector3D import Vector3D, calc_angle, calc_dihedral, distance3d
+from .vector3D import (
+    Vector3D,
+    calc_angle,
+    calc_dihedral,
+    calculate_bond_angle,
+    compare_bond_angles,
+    distance3d,
+    rms_difference,
+)
 
 print(f"ProteusPy V{__version__}")
 

@@ -80,12 +80,22 @@ def parse_arguments():
         action="store_true",
         help="Process full and subset, create loaders, and update repo",
     )
-    parser.add_argument("--extract", action="store_true", help="Extract data")
-    parser.add_argument("--build", action="store_true", help="Build loader")
-    parser.add_argument("--update", action="store_true", help="Update repo")
-    parser.add_argument("--full", action="store_true", help="Process full SS database")
-    parser.add_argument("--subset", action="store_true", help="Process SS subset")
-    parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
+    parser.add_argument(
+        "--extract", "-e", action="store_true", help="Extract Disulfide data"
+    )
+    parser.add_argument(
+        "--build", "-b", action="store_true", help="Build Disulfide loader"
+    )
+    parser.add_argument(
+        "--update", "-u", action="store_true", help="Update repository data directory"
+    )
+    parser.add_argument(
+        "--full", "-f", action="store_true", help="Process full SS database"
+    )
+    parser.add_argument("--subset", "-s", action="store_true", help="Process SS subset")
+    parser.add_argument(
+        "--verbose", "-v", action="store_true", help="Enable verbose output"
+    )
     parser.add_argument(
         "--cutoff", type=float, help="Disulfide Distance Cutoff, (Angstrom)"
     )
@@ -121,7 +131,9 @@ def do_extract(verbose, full, subset, cutoff, prune):
         )
 
     # total extraction uses numb=-1 and takes about 1.5 hours on
-    # a 2021 MacbookPro M1 Pro computer, ~50 minutes on a 2023 M3 Max MacbookPro
+    # a 2021 MacbookPro M1 Pro computer, ~50 minutes on a 2023 M3 Max MacbookPro.
+    # Using the parser with ssparser.py reduces time to approximately 19 minutes on the
+    # M3 Max.
 
     if full:
         if verbose:

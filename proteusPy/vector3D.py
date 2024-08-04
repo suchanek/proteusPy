@@ -213,8 +213,7 @@ class Vector3D:
         else:
             cos_angle = dot_product / magnitudes
 
-        cos_angle = min(cos_angle, 1)
-        cos_angle = max(-1, cos_angle)  # Avoid invalid values due to roundoff errors
+        cos_theta = np.clip(cos_theta, -1.0, 1.0)
         angle_radians = math.acos(cos_angle)
         return math.degrees(angle_radians)  # Convert radians to degrees
 
@@ -325,6 +324,127 @@ def distance3d(p1: Vector3D, p2: Vector3D) -> float:
         _logger.error("distance3d() requires vectors of length 3!")
     d = math.dist(_p1, _p2)
     return d
+
+
+def rms_difference(
+    calculated_angles: np.ndarray, idealized_angles: np.ndarray
+) -> float:
+    """
+    Calculate the Root Mean Square (RMS) difference between calculated angles and idealized angles.
+
+    Parameters:
+    calculated_angles (np.ndarray): An array of calculated angles.
+    idealized_angles (np.ndarray): An array of idealized angles.
+
+    Returns:
+    float: The RMS difference between the calculated and idealized angles.
+
+    Raises:
+    ValueError: If the input arrays do not have the same shape or are empty.
+    """
+    if calculated_angles.shape != idealized_angles.shape:
+        raise ValueError("Input arrays must have the same shape")
+
+    if calculated_angles.size == 0 or idealized_angles.size == 0:
+        raise ValueError("Input arrays must not be empty")
+
+    differences = np.subtract(calculated_angles, idealized_angles)
+    squared_differences = np.square(differences)
+    mean_squared_difference = np.mean(squared_differences)
+    rms_diff = np.sqrt(mean_squared_difference)
+    return rms_diff
+
+def calculate_bond_angle(a, b, c):
+    """Calculate the bond angle between three points a, b, and c (in 3D space)."""
+    ab = np.subtract(b, a)
+    bc = np.subtract(c, b)
+    
+    ab_norm = np.linalg.norm(ab)
+    bc_norm = np.linalg.norm(bc)
+    
+    # Check for zero-length vectors to avoid division by zero
+    if ab_norm == 0 or bc_norm == 0:
+        raise ValueError("One of the vectors has zero length, cannot calculate angle.")
+    
+    ab_unit = ab / ab_norm
+    bc_unit = bc / bc_norm
+    cos_theta = np.dot(ab_unit, bc_unit)
+    
+    # Ensure the value is within the valid range for arccos due to floating-point precision issues
+    cos_theta = np.clip(cos_theta, -1.0, 1.0)
+    angle = np.arccos(cos_theta)
+    
+    return np.degrees(angle)
+
+def compare_bond_angles(atom_coordinates):
+    """
+    Calculate all bond angles for a disulfide bond and compare them to idealized angles.
+
+    Parameters:
+    atom_coordinates (np.array): Array containing coordinates of atoms in the order:
+                                 N1, CA1, C1, CB1, SG1, N2, CA2, C2, CB2, SG2
+
+    Returns:
+    float: RMS difference between calculated bond angles and idealized bond angles.
+    """
+    idealized_angles = {
+        ("N1", "CA1", "C1"): 111,
+        ("CA1", "C1", "CB1"): 109,
+        ("C1", "CB1", "SG1"): 114,
+        ("CB1", "SG1", "SG2"): 102,  # This angle is for the disulfide bond itself
+        ("SG1", "SG2", "CB2"): 102,  # This angle is for the disulfide bond itself
+        ("CB2", "C2", "CA2"): 114,
+        ("C2", "CA2", "N2"): 109,
+        ("CA2", "N2", "N1"): 111,
+    }
+
+    # List of triplets for which we need to calculate bond angles
+    angle_triplets = [
+        ("N1", "CA1", "C1"),
+        ("CA1", "C1", "CB1"),
+        ("C1", "CB1", "SG1"),
+        (
+            "CB1",
+            "SG1",
+            "SG2",
+        ),  # Note: we need to handle the disulfide bond case separately
+        ("SG1", "SG2", "CB2"),
+        ("CB2", "C2", "CA2"),
+        ("C2", "CA2", "N2"),
+        ("CA2", "N2", "N1"),
+    ]
+
+    atom_indices = {
+        "N1": 0,
+        "CA1": 1,
+        "C1": 2,
+        "CB1": 3,
+        "SG1": 4,
+        "SG2": 9,
+        "CB2": 8,
+        "C2": 7,
+        "CA2": 6,
+        "N2": 5,
+    }
+
+    calculated_angles = []
+    for triplet in angle_triplets:
+        a = atom_coordinates[atom_indices[triplet[0]]]
+        b = atom_coordinates[atom_indices[triplet[1]]]
+        c = atom_coordinates[atom_indices[triplet[2]]]
+        try:
+            angle = calculate_bond_angle(a, b, c)
+        except ValueError as e:
+            print(f"Error calculating angle for atoms {triplet}: {e}")
+            return None
+        calculated_angles.append(angle)
+
+    # Convert idealized angles to a list
+    idealized_angles_list = [idealized_angles[triplet] for triplet in angle_triplets]
+
+    # Calculate RMS difference
+    rms_diff = rms_difference(calculated_angles, idealized_angles_list)
+    return rms_diff
 
 
 if __name__ == "__main__":
