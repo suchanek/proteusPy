@@ -2316,7 +2316,7 @@ class Disulfide:
 
         return dist
 
-    def Torsion_neighbors(self, others, cutoff) -> DisulfideList:
+    def Torsion_Neighbors(self, others, cutoff) -> DisulfideList:
         """
         Return a list of Disulfides within the angular cutoff in the others list.
         This routine is used to find Disulfides having the same torsion length
@@ -2501,7 +2501,6 @@ def Initialize_Disulfide_From_Coords(
         get_phipsi_atoms_coordinates,
         get_residue_atoms_coordinates,
     )
-
     from proteusPy.vector3D import Vector3D as Vector
     from proteusPy.vector3D import calc_dihedral, distance3d
 
@@ -2622,7 +2621,7 @@ def Initialize_Disulfide_From_Coords(
         nnext_prox = Vector3D(-1.0, -1.0, -1.0)
         new_ss.missing_atoms = True
         _logger.warning(
-            f"Missing Proximal coords for: {id} {proximal}+1). S:S {proximal}-{distal}, phi/psi not computed."
+            f"Missing Proximal coords for: {id} {proximal}+1). SS: {proximal}-{distal}, phi/psi not computed."
         )
 
     if len(nextdist_atom_list) != 0:
@@ -2633,7 +2632,7 @@ def Initialize_Disulfide_From_Coords(
         nnext_dist = Vector3D(-1.0, -1.0, -1.0)
         new_ss.missing_atoms = True
         _logger.warning(
-            f"Missing Distal coords for: {id} {distal}+1). S:S {proximal}-{distal}, phi/psi not computed."
+            f"Missing Distal coords for: {id} {distal}+1). SS: {proximal}-{distal}, phi/psi not computed."
         )
 
     # update the positions and conformation
@@ -2662,6 +2661,7 @@ def Initialize_Disulfide_From_Coords(
     new_ss.chi3 = calc_dihedral(cb1, sg1, sg2, cb2)
     new_ss.chi4 = calc_dihedral(sg1, sg2, cb2, ca2)
     new_ss.chi5 = calc_dihedral(sg2, cb2, ca2, n2)
+
     new_ss.rho = calc_dihedral(n1, ca1, ca2, n2)
 
     new_ss.ca_distance = distance3d(new_ss.ca_prox, new_ss.ca_dist)
@@ -2680,7 +2680,6 @@ def Initialize_Disulfide_From_Coords(
     # turn warnings back on
     if quiet:
         _logger.setLevel(logging.ERROR)
-        logging.getLogger().setLevel(logging.ERROR)
 
     if verbose:
         _logger.info(f"Disulfide {ssbond_name} initialized.")
