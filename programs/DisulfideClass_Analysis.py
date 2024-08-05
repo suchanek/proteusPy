@@ -88,9 +88,9 @@ import threading
 import time
 from collections import deque
 from datetime import timedelta
-from typing import List
 
 import numpy as np
+import pandas as pd
 from colorama import Fore, Style, init
 from tqdm import tqdm
 
@@ -103,11 +103,6 @@ from proteusPy.data import DATA_DIR
 
 SAVE_DIR = "/Users/egs/Documents/proteusPy/"
 PBAR_COLS = 120
-
-
-from collections import deque
-
-import pandas as pd
 
 
 def task(
@@ -169,18 +164,18 @@ def task(
 
         class_disulfides_deque = deque()
         counter = 0
-        update_freq = 10
+        update_freq = 20
 
         for ssid in ss_list:
             _ss = loader[ssid]
             class_disulfides_deque.append(_ss)
             counter += 1
-            if counter % update_freq == 0:
-                task_pbar.set_postfix({"SKIP": ssid})
+            formatted_ssid = ssid.ljust(20)
+            if counter % update_freq == 0 or counter == len(ss_list) - 1:
+                task_pbar.set_postfix({"SKIP": formatted_ssid})
                 task_pbar.update(update_freq)
             else:
-                task_pbar.set_postfix({"SSID": ssid})
-                # task_pbar.update(1)
+                task_pbar.set_postfix({"SSID": formatted_ssid})
 
         task_pbar.close()
         class_disulfides = DisulfideList(list(class_disulfides_deque), cls, quiet=True)
@@ -202,15 +197,17 @@ def task(
                 avg_conformation[4],
             )
             result_list.append(exemplar)
+    return
 
 
-def analyze_six_classes_threaded(
+def analyze_classes_threaded(
     loader: DisulfideLoader,
     do_graph=False,
     do_consensus=False,
     cutoff=0.0,
     num_threads=6,
     verbose=False,
+    do_sextant=True,
 ) -> DisulfideList:
     """
     Analyze the six classes of disulfide bonds.
@@ -225,10 +222,21 @@ def analyze_six_classes_threaded(
     :return: A list of disulfide bonds, where each disulfide bond represents the average conformation for a class.
     """
 
-    class_filename = os.path.join(DATA_DIR, "SS_consensus_class_sext.pkl")
-    six = loader.tclass.sixclass_df
-    tot_classes = six.shape[0]
-    res_list = DisulfideList([], "SS_6class_Avg_SS")
+    if do_sextant:
+        class_filename = os.path.join(DATA_DIR, "SS_consensus_class_sext.pkl")
+        six = loader.tclass.sixclass_df
+        tot_classes = six.shape[0]
+        res_list = DisulfideList([], "SS_6class_Avg_SS")
+        pix = sextant_classes_vs_cutoff(loader, cutoff)
+        print(
+            f"--> analyze_six_classes(): Expecting {pix} graphs for the sextant classes."
+        )
+    else:
+        class_filename = os.path.join(DATA_DIR, "SS_consensus_class32.pkl")
+        bin = loader.tclass.classdf
+        tot_classes = bin.shape[0]
+        res_list = DisulfideList([], "SS_32class_Avg_SS")
+
     total_ss = len(loader.SSList)
 
     threads = []
@@ -284,90 +292,69 @@ def analyze_six_classes_threaded(
     return res_list
 
 
-def analyze_binary_classes_threaded(
+def analyze_classes(
     loader: DisulfideLoader,
-    do_graph=False,
-    do_consensus=False,
-    cutoff=0.0,
-    num_threads=6,
-) -> DisulfideList:
-    """
-    Analyze the binary classes of disulfide bonds.
-
-    :param loader: The ``proteusPy.DisulfideLoader`` object.
-    :param do_graph: Whether or not to display torsion statistics graphs. Default is True.
-    :param do_consensus: Whether or not to compute average conformations for each class. Default is True. The program writes the
-                        consensus structures to a .pkl file in the packages ``data`` directory.
-    :param cutoff: The cutoff percentage for each class. If the percentage of disulfides for a class is below
-                   this value, the class will be skipped. Default is 0.1.
-    :param num_threads: Number of threads to use for processing. Default is 4.
-
-    :return: A list of disulfide bonds, where each disulfide bond represents the average conformation for a class.
-    """
-
-    class_filename = os.path.join(DATA_DIR, "SS_consensus_class32.pkl")
-
-    bin = loader.tclass.classdf
-    tot_classes = bin.shape[0]
-    res_list = DisulfideList([], "SS_32class_Avg_SS")
-    total_ss = len(loader.SSList)
-
-    chunk_size = tot_classes // num_threads
-    threads = []
-    result_lists = [[] for _ in range(num_threads)]
-
-    for i in range(num_threads):
-        start_idx = i * chunk_size
-        end_idx = (i + 1) * chunk_size if i != num_threads - 1 else tot_classes
-        pbar_index = 2 * i + 1  # so the task pbar is displayed in the correct position
-
-        pbar = tqdm(
-            total=end_idx - start_idx,
-            desc=f"{Fore.BLUE}Thread {i+1:2}{Style.RESET_ALL}".ljust(10),
-            position=i,
-            leave=False,
-            ncols=PBAR_COLS,
-            # bar_format="{l_bar}{bar}| {n_fmt:>5}/{total_fmt:<5} [{elapsed}<{remaining}]",
+    binary: bool,
+    sextant: bool,
+    all: bool,
+    threads: int = 6,
+    do_graph: bool = False,
+    cutoff: float = 0.0,
+    verbose: bool = False,
+):
+    # main program begins
+    if all:
+        analyze_classes_threaded(
+            loader,
+            do_graph=do_graph,
+            do_consensus=True,
+            cutoff=cutoff,
+            verbose=verbose,
+            num_threads=threads,
+            do_sextant=True,
         )
-        thread = threading.Thread(
-            target=task,
-            args=(
-                loader,
-                bin,
-                start_idx,
-                end_idx,
-                result_lists[i],
-                pbar,
-                total_ss,
-                cutoff,
-                do_graph,
-                do_consensus,
-                SAVE_DIR,
-                "ss_class_bin",
-                pbar_index,
-                i,
-            ),
+
+        analyze_classes_threaded(
+            loader,
+            do_graph=do_graph,
+            do_consensus=True,
+            cutoff=cutoff,
+            verbose=verbose,
+            num_threads=threads,
+            do_sextant=False,
         )
-        threads.append(thread)
-        thread.start()
 
-    for thread in threads:
-        thread.join()
+        return
 
-    for result_list in result_lists:
-        res_list.extend(result_list)
+    if sextant:
+        print("Analyzing sextant classes.")
+        # plot_classes_vs_cutoff(loader, cutoff + 0.25 * cutoff, 50)
 
-    if do_consensus:
-        print(
-            f"--> analyze_binary_classes(): Writing consensus structures to: {class_filename}"
+        analyze_classes_threaded(
+            loader,
+            do_graph=do_graph,
+            do_consensus=True,
+            cutoff=cutoff,
+            verbose=verbose,
+            num_threads=threads,
+            do_sextant=True,
         )
-        with open(class_filename, "wb+") as f:
-            pickle.dump(res_list, f)
 
-    return res_list
+    if binary:
+        analyze_classes_threaded(
+            loader,
+            do_graph=do_graph,
+            do_consensus=True,
+            cutoff=cutoff,
+            verbose=verbose,
+            num_threads=threads,
+            do_sextant=False,
+        )
+
+    return
 
 
-def plot_classes_vs_cutoff(PDB_SS: DisulfideLoader, cutoff, steps):
+def plot_classes_vs_cutoff(PDB_SS: DisulfideLoader, cutoff, steps, verbose=False):
     """
     Plot the total percentage and number of members for each class against the cutoff value.
 
@@ -385,9 +372,10 @@ def plot_classes_vs_cutoff(PDB_SS: DisulfideLoader, cutoff, steps):
         tot = class_df["percentage"].sum()
         tot_list.append(tot)
         members_list.append(class_df.shape[0])
-        print(
-            f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
-        )
+        if verbose:
+            print(
+                f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
+            )
 
     fig, ax1 = plt.subplots()
 
@@ -402,60 +390,17 @@ def plot_classes_vs_cutoff(PDB_SS: DisulfideLoader, cutoff, steps):
     plt.show()
 
 
-def analyze_classes(
-    loader: DisulfideLoader,
-    binary: bool,
-    sextant: bool,
-    all: bool,
-    threads: int = 6,
-    do_graph: bool = False,
-    cutoff: float = 0.0,
-    verbose: bool = False,
-):
-    # main program begins
-    if all:
-        analyze_six_classes_threaded(
-            loader,
-            do_graph=do_graph,
-            do_consensus=True,
-            cutoff=cutoff,
-            verbose=verbose,
-            num_threads=threads,
-        )
+def sextant_classes_vs_cutoff(loader: DisulfideLoader, cutoff):
+    """
+    Return number of members for the sextant class for a given cutoff value.
 
-        analyze_binary_classes_threaded(
-            loader,
-            do_graph=do_graph,
-            do_consensus=True,
-            cutoff=cutoff,
-            verbose=verbose,
-            num_threads=threads,
-        )
+    :param cutoff: Percent cutoff value for filtering the classes.
+    :return: None
+    """
+    import matplotlib.pyplot as plt
 
-        return
-
-    if sextant:
-        print("Analyzing sextant classes.")
-        ss_classlist = analyze_six_classes_threaded(
-            loader,
-            do_graph=do_graph,
-            do_consensus=True,
-            cutoff=cutoff,
-            verbose=verbose,
-            num_threads=threads,
-        )
-
-    if binary:
-        ss_classlist = analyze_binary_classes_threaded(
-            loader,
-            do_graph=do_graph,
-            do_consensus=True,
-            cutoff=cutoff,
-            verbose=verbose,
-            num_threads=threads,
-        )
-
-    return
+    class_df = loader.tclass.filter_sixclass_by_percentage(cutoff)
+    return class_df.shape[0]
 
 
 def get_args():
@@ -539,7 +484,7 @@ if __name__ == "__main__":
     elapsed = end - start
 
     print(
-        f"Disulfide Class Analysis Complete! \nElapsed time: {timedelta(seconds=elapsed)} (h:m:s)"
+        f"\n\nDisulfide Class Analysis Complete! \nElapsed time: {timedelta(seconds=elapsed)} (h:m:s)"
     )
 
 # end of file
