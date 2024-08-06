@@ -12,7 +12,7 @@ Last revision: 7/12/2024 -egs-
 
 try:
     # Check if running in Jupyter
-    shell = get_ipython().__class__.__name__
+    shell = get_ipython().__class__.__name__ # type: ignore
     if shell == "ZMQInteractiveShell":
         from tqdm.notebook import tqdm
     else:
