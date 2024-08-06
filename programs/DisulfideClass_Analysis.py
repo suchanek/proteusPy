@@ -76,9 +76,12 @@ is divided into 6 quadrants, and a dihedral angle five-dimensional vector define
 angle into one of these six quadrants. This yields $6^{5}$ or 7776 possible classes. This program analyzes the RCSB database 
 and creates graphs illustrating the membership across the binary and sextant classes. The graphs are stored in the 
 global SAVE_DIR location. Binary analysis takes approximately 28 minutes with Sextant analysis taking about
-75 minutes on a 2023 M3 Max Macbook Pro.
+75 minutes on a 2023 M3 Max Macbook Pro. (single-threaded).
 
-Author: Eric G. Suchanek, PhD. Last Modified: 8/2/2024
+Update 8/5/2024 - multithreading is implemented and runs well up to around 6 threads on a 2023 M3 Max Macbook Pro.
+Sextant analysis takes around 22 minutes with 6 threads. Binary analysis takes around 8 minutes with 6 threads.
+
+Author: Eric G. Suchanek, PhD. Last Modified: 8/5/2024 - RIP NJS
 """
 
 import argparse
@@ -101,7 +104,7 @@ init(autoreset=True)
 from proteusPy import Disulfide, DisulfideList, DisulfideLoader, Load_PDB_SS
 from proteusPy.data import DATA_DIR
 
-SAVE_DIR = "/Users/egs/Documents/proteusPy/"
+SAVE_DIR = "/Users/egs/Documents/proteusPyDocs/"
 PBAR_COLS = 120
 
 
@@ -122,7 +125,8 @@ def task(
     tasknum: int,
 ):
     """
-    Processes a range of disulfide classes and updates the progress bar.
+    Processes a range of lines in the disulfide class dict for the binary or sextant
+    disulfide classes and updates the progress bar.
 
     :param loader: DisulfideLoader instance to load disulfides.
     :param six_or_bin: DataFrame containing class and disulfide IDs.
@@ -164,18 +168,14 @@ def task(
 
         class_disulfides_deque = deque()
         counter = 0
-        update_freq = 20
+        update_freq = 100
 
         for ssid in ss_list:
             _ss = loader[ssid]
             class_disulfides_deque.append(_ss)
             counter += 1
-            formatted_ssid = ssid.ljust(20)
             if counter % update_freq == 0 or counter == len(ss_list) - 1:
-                task_pbar.set_postfix({"SKIP": formatted_ssid})
                 task_pbar.update(update_freq)
-            else:
-                task_pbar.set_postfix({"SSID": formatted_ssid})
 
         task_pbar.close()
         class_disulfides = DisulfideList(list(class_disulfides_deque), cls, quiet=True)
@@ -208,6 +208,7 @@ def analyze_classes_threaded(
     num_threads=6,
     verbose=False,
     do_sextant=True,
+    prefix="ss_class",
 ) -> DisulfideList:
     """
     Analyze the six classes of disulfide bonds.
@@ -224,8 +225,8 @@ def analyze_classes_threaded(
 
     if do_sextant:
         class_filename = os.path.join(DATA_DIR, "SS_consensus_class_sext.pkl")
-        six = loader.tclass.sixclass_df
-        tot_classes = six.shape[0]
+        six_or_bin = loader.tclass.sixclass_df
+        tot_classes = six_or_bin.shape[0]
         res_list = DisulfideList([], "SS_6class_Avg_SS")
         pix = sextant_classes_vs_cutoff(loader, cutoff)
         print(
@@ -233,8 +234,8 @@ def analyze_classes_threaded(
         )
     else:
         class_filename = os.path.join(DATA_DIR, "SS_consensus_class32.pkl")
-        bin = loader.tclass.classdf
-        tot_classes = bin.shape[0]
+        six_or_bin = loader.tclass.classdf
+        tot_classes = six_or_bin.shape[0]
         res_list = DisulfideList([], "SS_32class_Avg_SS")
 
     total_ss = len(loader.SSList)
@@ -258,7 +259,7 @@ def analyze_classes_threaded(
             target=task,
             args=(
                 loader,
-                six,
+                six_or_bin,
                 start_idx,
                 end_idx,
                 result_lists[i],
@@ -268,7 +269,7 @@ def analyze_classes_threaded(
                 do_graph,
                 do_consensus,
                 SAVE_DIR,
-                "ss_class_sext",
+                prefix,
                 pbar_index,
                 i,
             ),
@@ -318,7 +319,7 @@ def analyze_classes(
             loader,
             do_graph=do_graph,
             do_consensus=True,
-            cutoff=cutoff,
+            cutoff=0,
             verbose=verbose,
             num_threads=threads,
             do_sextant=False,
@@ -338,17 +339,20 @@ def analyze_classes(
             verbose=verbose,
             num_threads=threads,
             do_sextant=True,
+            prefix="ss_class_sext",
         )
 
     if binary:
+
         analyze_classes_threaded(
             loader,
             do_graph=do_graph,
             do_consensus=True,
-            cutoff=cutoff,
+            cutoff=0.0,
             verbose=verbose,
             num_threads=threads,
             do_sextant=False,
+            prefix="ss_class_bin",
         )
 
     return
@@ -462,13 +466,16 @@ def main():
     do_graph = args.graph
     cutoff = args.cutoff
 
-    print(f"Starting extraction with arguments: {args}")
+    # Clear the terminal window
+    print("\033c", end="")
+
+    print(f"Starting Disulfide Class analysis with arguments: {args}")
     print(
         f"Binary: {binary}, Sextant: {sextant}, All: {all}, Threads: {threads}, Cutoff: {cutoff}, Graph: {do_graph}"
     )
 
     PDB_SS = Load_PDB_SS(verbose=True, subset=False)
-    PDB_SS.describe()
+    # PDB_SS.describe()
 
     analyze_classes(
         PDB_SS, binary, sextant, all, threads=threads, do_graph=do_graph, cutoff=cutoff
@@ -484,7 +491,7 @@ if __name__ == "__main__":
     elapsed = end - start
 
     print(
-        f"\n\nDisulfide Class Analysis Complete! \nElapsed time: {timedelta(seconds=elapsed)} (h:m:s)"
+        f"\n----------------------\nDisulfide Class Analysis Complete! \nElapsed time: {timedelta(seconds=elapsed)} (h:m:s)"
     )
 
 # end of file
