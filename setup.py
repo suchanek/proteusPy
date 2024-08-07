@@ -15,7 +15,7 @@ the PyPI archive with::
 For more in-depth instructions, see the installation section of the
 proteusPy documentation, linked to from:
 
-http://suchanek.github.io/proteusPy/
+http://suchanek.github.io/proteusPy/proteusPy.html  
 
 This code is in beta.
 
@@ -137,6 +137,7 @@ setup(
             "data/ss_query.json",
             "data/ss_ids.txt",
             "data/SS_consensus_class_sext.pkl",
+            "data/SS_consensus_class_32.pkl",
         ]
     },
     exclude_package_data={

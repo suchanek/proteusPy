@@ -80,7 +80,7 @@ proteusPy = ["data/PDB_all_ss.pkl", "data/PDB_SS_ALL_LOADER.pkl", "data/PDB_all_
 
 [tool.setuptools-git-versioning]
 enabled = false
-version_file = "proteusPy/version.py"
+version_file = "proteusPy/_version.py"
 count_commits_from_version_file = true
 template = "{tag}" # default setting
 dev_template = "{tag}+{branch}.{ccount}"

@@ -1,6 +1,6 @@
 # Makefile for proteusPy
 # Author: Eric G. Suchanek, PhD
-# Last revision: 7/16/24 -egs-
+# Last revision: 8/6/24 -egs-
 
 
 # assumes file VERSION contains only the version number
@@ -67,8 +67,6 @@ install:
 	@echo "Installing proteusPy..."
 
 	@pip install . -q
-	#@echo "Installing Biopython..."
-	#@pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython -q
 	@echo "Installing jupyter..."
 	@python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Installation finished!"
@@ -78,7 +76,6 @@ install_dev:
 	@$(CONDA) install vtk==9.2.6 -y
 	
 	pip install .
-	#pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	pip install pdoc twine black pytest build -q
 	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
 	@echo "Installation finished!"
@@ -108,7 +105,7 @@ docs: proteusPy/_version.py
 
 # normally i push to PyPi via github action
 upload: dist/proteusPy-$(VERS)*
-	twine upload -r proteusPy dist/proteusPy-$(VERS)*
+	twine upload -r proteusPy dist/proteusPy-$(VERS).tar.gz
 
 tag:
 	git tag -a $(VERS) -m $(MESS)
