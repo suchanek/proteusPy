@@ -102,9 +102,16 @@ init(autoreset=True)
 
 
 from proteusPy import Disulfide, DisulfideList, DisulfideLoader, Load_PDB_SS
-from proteusPy.data import DATA_DIR
 
-SAVE_DIR = "/Users/egs/Documents/proteusPyDocs/"
+HOME = os.getenv("HOME")
+PDB = os.getenv("PDB")
+if PDB is None:
+    PDB = os.path.join(HOME, "pdb")
+
+DATA_DIR = os.path.join(PDB, "data")
+SAVE_DIR = os.path.join(HOME, "Documents", "proteusPyDocs", "classes")
+REPO_DIR = os.path.join(HOME, "repos", "proteusPy", "data")
+
 PBAR_COLS = 120
 
 
@@ -158,10 +165,11 @@ def task(
 
         task_pbar = tqdm(
             total=len(ss_list),
-            desc=f"{Fore.RED}-> tsk {tasknum+1:2}{Style.RESET_ALL}".ljust(10),
+            desc=f"{Fore.YELLOW}->Task {tasknum+1:2}{Style.RESET_ALL}".ljust(10),
             position=position + 1,
             leave=False,
             ncols=PBAR_COLS,
+            bar_format="{l_bar}%s{bar}{r_bar}%s" % (Fore.YELLOW, Style.RESET_ALL),
         )
 
         fname = os.path.join(save_dir, "classes", f"{prefix}_{cls}.png")
@@ -233,7 +241,7 @@ def analyze_classes_threaded(
             f"--> analyze_six_classes(): Expecting {pix} graphs for the sextant classes."
         )
     else:
-        class_filename = os.path.join(DATA_DIR, "SS_consensus_class32.pkl")
+        class_filename = os.path.join(DATA_DIR, "SS_consensus_class_32.pkl")
         six_or_bin = loader.tclass.classdf
         tot_classes = six_or_bin.shape[0]
         res_list = DisulfideList([], "SS_32class_Avg_SS")
@@ -254,6 +262,7 @@ def analyze_classes_threaded(
             position=pbar_index,
             leave=False,
             ncols=PBAR_COLS,
+            bar_format="{l_bar}%s{bar}{r_bar}%s" % (Fore.BLUE, Style.RESET_ALL),
         )
         thread = threading.Thread(
             target=task,
@@ -285,7 +294,7 @@ def analyze_classes_threaded(
 
     if do_consensus:
         print(
-            f"--> analyze_six_classes(): Writing consensus structures to: {class_filename}"
+            f"--> analyze_classes(): Writing consensus structures to: {class_filename}"
         )
         with open(class_filename, "wb+") as f:
             pickle.dump(res_list, f)
@@ -452,9 +461,38 @@ def get_args():
         type=float,
         default=0.0,
     )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        help="Verbose output.",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+    )
+    parser.add_argument(
+        "-u",
+        "--update",
+        help="Update repository with the consensus classes.",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
 
     args = parser.parse_args()
     return args
+
+
+def Update_Repository(source_dir, repo_dir):
+    """Copy the consensus classes to the repository."""
+    import shutil
+
+    source = os.path.join(source_dir, "SS_consensus_class_32.pkl")
+    dest = os.path.join(repo_dir, "data", "SS_consensus_class_32.pkl")
+    shutil.copy(source, dest)
+
+    source = os.path.join(source_dir, "SS_consensus_class_sext.pkl")
+    dest = os.path.join(repo_dir, "data", "SS_consensus_class_sext.pkl")
+    shutil.copy(source, dest)
+
+    return
 
 
 def main():
@@ -465,21 +503,35 @@ def main():
     threads = args.threads
     do_graph = args.graph
     cutoff = args.cutoff
+    do_update = args.update
 
     # Clear the terminal window
     print("\033c", end="")
 
-    print(f"Starting Disulfide Class analysis with arguments: {args}")
+    print(f"Starting Disulfide Class analysis with arguments:")
     print(
-        f"Binary: {binary}, Sextant: {sextant}, All: {all}, Threads: {threads}, Cutoff: {cutoff}, Graph: {do_graph}"
+        f"Binary: {binary}, Sextant: {sextant}, All: {all}, Threads: {threads}, Cutoff: {cutoff}, Graph: {do_graph}\n"
+        f"Update: {do_update}\n"
+        f"Data directory: {DATA_DIR}\n"
+        f"Save directory: {SAVE_DIR}\n"
+        f"Repository directory: {REPO_DIR}\n"
+        f"Home directory: {HOME}\n"
+        f"PDB directory: {PDB}\n"
+        f"Verbose: {args.verbose}\n"
+        f"Loading PDB SS data...\n"
     )
 
-    PDB_SS = Load_PDB_SS(verbose=True, subset=False)
+    PDB_SS = Load_PDB_SS(verbose=False, subset=False)
+
     # PDB_SS.describe()
 
     analyze_classes(
         PDB_SS, binary, sextant, all, threads=threads, do_graph=do_graph, cutoff=cutoff
     )
+
+    if do_update:
+        print("Updating repository with consensus classes.")
+        Update_Repository(DATA_DIR, REPO_DIR)
 
 
 if __name__ == "__main__":
