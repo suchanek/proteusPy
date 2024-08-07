@@ -81,7 +81,7 @@ global SAVE_DIR location. Binary analysis takes approximately 28 minutes with Se
 Update 8/5/2024 - multithreading is implemented and runs well up to around 6 threads on a 2023 M3 Max Macbook Pro.
 Sextant analysis takes around 22 minutes with 6 threads. Binary analysis takes around 8 minutes with 6 threads.
 
-Author: Eric G. Suchanek, PhD. Last Modified: 8/5/2024 - RIP NJS
+Author: Eric G. Suchanek, PhD. Last Modified: 8/5/2024 - RIP NJS - 
 """
 
 import argparse
@@ -112,11 +112,12 @@ DATA_DIR = os.path.join(PDB, "data")
 SAVE_DIR = os.path.join(HOME, "Documents", "proteusPyDocs", "classes")
 REPO_DIR = os.path.join(HOME, "repos", "proteusPy", "data")
 
-PBAR_COLS = 120
+PBAR_COLS = 78
 
 
 def task(
     loader: DisulfideLoader,
+    overall_pbar: tqdm,
     six_or_bin: pd.DataFrame,
     start_idx: int,
     end_idx: int,
@@ -172,11 +173,11 @@ def task(
             bar_format="{l_bar}%s{bar}{r_bar}%s" % (Fore.YELLOW, Style.RESET_ALL),
         )
 
-        fname = os.path.join(save_dir, "classes", f"{prefix}_{cls}.png")
+        fname = os.path.join(save_dir, f"{prefix}_{cls}.png")
 
         class_disulfides_deque = deque()
         counter = 0
-        update_freq = 100
+        update_freq = 50
 
         for ssid in ss_list:
             _ss = loader[ssid]
@@ -205,6 +206,8 @@ def task(
                 avg_conformation[4],
             )
             result_list.append(exemplar)
+            overall_pbar.update(1)
+
     return
 
 
@@ -252,10 +255,20 @@ def analyze_classes_threaded(
     chunk_size = tot_classes // num_threads
     result_lists = [[] for _ in range(num_threads)]
 
+    # Create the overall progress bar
+    overall_pbar = tqdm(
+        total=tot_classes,
+        desc=f"{Fore.GREEN}Overall Progress{Style.RESET_ALL}".ljust(20),
+        position=0,
+        leave=True,
+        ncols=PBAR_COLS,
+        bar_format="{l_bar}%s{bar}{r_bar}%s" % (Fore.GREEN, Style.RESET_ALL),
+    )
+
     for i in range(num_threads):
         start_idx = i * chunk_size
         end_idx = (i + 1) * chunk_size if i != num_threads - 1 else tot_classes
-        pbar_index = 2 * i + 1  # so the task pbar is displayed in the correct position
+        pbar_index = 2 * i + 2  # so the task pbar is displayed in the correct position
         pbar = tqdm(
             total=end_idx - start_idx,
             desc=f"{Fore.BLUE}Thread {i+1:2}{Style.RESET_ALL}".ljust(10),
@@ -268,6 +281,7 @@ def analyze_classes_threaded(
             target=task,
             args=(
                 loader,
+                overall_pbar,
                 six_or_bin,
                 start_idx,
                 end_idx,
@@ -485,11 +499,11 @@ def Update_Repository(source_dir, repo_dir):
     import shutil
 
     source = os.path.join(source_dir, "SS_consensus_class_32.pkl")
-    dest = os.path.join(repo_dir, "data", "SS_consensus_class_32.pkl")
+    dest = os.path.join(repo_dir, "SS_consensus_class_32.pkl")
     shutil.copy(source, dest)
 
     source = os.path.join(source_dir, "SS_consensus_class_sext.pkl")
-    dest = os.path.join(repo_dir, "data", "SS_consensus_class_sext.pkl")
+    dest = os.path.join(repo_dir, "SS_consensus_class_sext.pkl")
     shutil.copy(source, dest)
 
     return
@@ -508,16 +522,21 @@ def main():
     # Clear the terminal window
     print("\033c", end="")
 
-    print(f"Starting Disulfide Class analysis with arguments:")
+    print("Starting Disulfide Class analysis with arguments:")
     print(
-        f"Binary: {binary}, Sextant: {sextant}, All: {all}, Threads: {threads}, Cutoff: {cutoff}, Graph: {do_graph}\n"
-        f"Update: {do_update}\n"
-        f"Data directory: {DATA_DIR}\n"
-        f"Save directory: {SAVE_DIR}\n"
-        f"Repository directory: {REPO_DIR}\n"
-        f"Home directory: {HOME}\n"
-        f"PDB directory: {PDB}\n"
-        f"Verbose: {args.verbose}\n"
+        f"Binary:                {binary}\n"
+        f"Sextant:               {sextant}\n"
+        f"All:                   {all}\n"
+        f"Threads:               {threads}\n"
+        f"Cutoff:                {cutoff}\n"
+        f"Graph:                 {do_graph}\n"
+        f"Update:                {do_update}\n"
+        f"Data directory:        {DATA_DIR}\n"
+        f"Save directory:        {SAVE_DIR}\n"
+        f"Repository directory:  {REPO_DIR}\n"
+        f"Home directory:        {HOME}\n"
+        f"PDB directory:         {PDB}\n"
+        f"Verbose:               {args.verbose}\n"
         f"Loading PDB SS data...\n"
     )
 
