@@ -213,7 +213,7 @@ class Vector3D:
         else:
             cos_angle = dot_product / magnitudes
 
-        cos_theta = np.clip(cos_theta, -1.0, 1.0)
+        cos_angle = np.clip(cos_angle, -1.0, 1.0)
         angle_radians = math.acos(cos_angle)
         return math.degrees(angle_radians)  # Convert radians to degrees
 
@@ -354,27 +354,29 @@ def rms_difference(
     rms_diff = np.sqrt(mean_squared_difference)
     return rms_diff
 
+
 def calculate_bond_angle(a, b, c):
     """Calculate the bond angle between three points a, b, and c (in 3D space)."""
     ab = np.subtract(b, a)
     bc = np.subtract(c, b)
-    
+
     ab_norm = np.linalg.norm(ab)
     bc_norm = np.linalg.norm(bc)
-    
+
     # Check for zero-length vectors to avoid division by zero
     if ab_norm == 0 or bc_norm == 0:
         raise ValueError("One of the vectors has zero length, cannot calculate angle.")
-    
+
     ab_unit = ab / ab_norm
     bc_unit = bc / bc_norm
     cos_theta = np.dot(ab_unit, bc_unit)
-    
+
     # Ensure the value is within the valid range for arccos due to floating-point precision issues
     cos_theta = np.clip(cos_theta, -1.0, 1.0)
     angle = np.arccos(cos_theta)
-    
+
     return np.degrees(angle)
+
 
 def compare_bond_angles(atom_coordinates):
     """
