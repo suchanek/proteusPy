@@ -1034,7 +1034,7 @@ class DisulfideList(UserList):
 
         modelss.build_model(chi1, chi2, chi3, chi4, chi5)
         res = DisulfideList([], "neighbors")
-        res = modelss.Torsion_Neighbors(sslist, cutoff)
+        res = modelss.Torsion_neighbors(sslist, cutoff)
 
         return res
 
@@ -1060,7 +1060,7 @@ class DisulfideList(UserList):
 
         modelss.build_model(chi1, chi2, chi3, chi4, chi5)
         res = DisulfideList([], "neighbors")
-        res = modelss.Torsion_Neighbors(sslist, cutoff)
+        res = modelss.Torsion_neighbors(sslist, cutoff)
 
         return res
 
@@ -1180,7 +1180,9 @@ def load_disulfides_from_id(
         chain2_id = pair["distal"][0]
 
         if dbg:
-            _logger.info(f"Proximal: {proximal} {chain1_id} Distal: {distal} {chain2_id}")
+            _logger.info(
+                f"Proximal: {proximal} {chain1_id} Distal: {distal} {chain2_id}"
+            )
 
         proximal_int = int(proximal)
         distal_int = int(distal)

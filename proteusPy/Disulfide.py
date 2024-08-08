@@ -2316,7 +2316,7 @@ class Disulfide:
 
         return dist
 
-    def Torsion_Neighbors(self, others, cutoff) -> DisulfideList:
+    def Torsion_neighbors(self, others, cutoff) -> DisulfideList:
         """
         Return a list of Disulfides within the angular cutoff in the others list.
         This routine is used to find Disulfides having the same torsion length
