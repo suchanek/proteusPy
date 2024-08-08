@@ -233,9 +233,11 @@ def analyze_classes_threaded(
 
     :return: A list of disulfide bonds, where each disulfide bond represents the average conformation for a class.
     """
-
+    global SAVE_DIR
+    
     if do_sextant:
         class_filename = os.path.join(DATA_DIR, "SS_consensus_class_sext.pkl")
+        SAVE_DIR = os.path.join(SAVE_DIR, "sextant")
         six_or_bin = loader.tclass.sixclass_df
         tot_classes = six_or_bin.shape[0]
         res_list = DisulfideList([], "SS_6class_Avg_SS")
@@ -245,6 +247,7 @@ def analyze_classes_threaded(
         )
     else:
         class_filename = os.path.join(DATA_DIR, "SS_consensus_class_32.pkl")
+        SAVE_DIR = os.path.join(SAVE_DIR, "binary")
         six_or_bin = loader.tclass.classdf
         tot_classes = six_or_bin.shape[0]
         res_list = DisulfideList([], "SS_32class_Avg_SS")
