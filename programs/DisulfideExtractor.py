@@ -97,7 +97,7 @@ def parse_arguments():
         "--verbose", "-v", action="store_true", help="Enable verbose output"
     )
     parser.add_argument(
-        "--cutoff", type=float, help="Disulfide Distance Cutoff, (Angstrom)"
+        "--cutoff", "-c", type=float, help="Disulfide Distance Cutoff, (Angstrom)"
     )
 
     parser.set_defaults(all=False)
@@ -192,7 +192,7 @@ def do_stuff(
     subset=False,
     verbose=False,
     cutoff=-1.0,
-    prune=False,
+    prune=True,
 ):
     """
     Main entrypoint for the proteusPy Disulfide database extraction and creation workflow.

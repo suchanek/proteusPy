@@ -728,7 +728,6 @@ def Extract_Disulfides(
 
     # we use the specialized list class DisulfideList to contain our disulfides
     # we'll use a dict to store DisulfideList objects, indexed by the structure ID
-    All_ss_dict = {}
     All_ss_list = DisulfideList([], "PDB_SS")
     All_ss_dict2 = {}  # new dict of pointers to indices
 
@@ -839,20 +838,21 @@ def Extract_Disulfides(
             else:  ## _sslist is empty!
                 bad += 1
                 problem_ids.append(entry)
-                _logger.error(f"Extract_Disulfides(): No SS parsed for: {entry}!")
+                if verbose:
+                    _logger.warning(f"Extract_Disulfides(): No SS parsed for: {entry}!")
                 if prune:
                     fname = f"pdb{entry}.ent"
                     # Construct the full path for the new destination file
                     destination_file_path = os.path.join(bad_dir, fname)
                     # Copy the file to the new destination with the correct filename
-                    _logger.info(
-                        f"Extract_Disulfides(): Pruning {fname} to {destination_file_path}"
+                    _logger.warning(
+                        f"Extract_Disulfides(): Moving {fname} to {destination_file_path}"
                     )
                     shutil.move(fname, destination_file_path)
                 continue  ## this entry has no SS bonds, so we break the loop and move on to the next entry
 
             pbar.set_postfix(
-                {"ID": entry, "Bad": bad, "Ca": bad_dist, "Cnt": tot}
+                {"ID": entry, "NoSS": bad, "Cnt": tot}
             )  # update the progress bar
 
     if bad > 0:
