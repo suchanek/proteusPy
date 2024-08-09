@@ -76,7 +76,6 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                 "ssbonds": list of SSBOND records (str),
                 "atoms": {
                     (chain_id, res_seq_num, atom_name): {
-                        "line": ATOM record line (str),
                         "coords": [x, y, z]
                     },
                     ...
@@ -131,7 +130,7 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
             y = float(line[38:46].strip())
             z = float(line[46:54].strip())
             key = (chain_id, res_seq_num, atom_name)
-            atom_list[key] = {"line": line, "coords": [x, y, z]}
+            atom_list[key] = {"coords": [x, y, z]}
             if dbg:
                 _logger.info(
                     f"Found ATOM record for chain {chain_id}, residue {res_seq_num}, atom {atom_name}"
@@ -320,7 +319,6 @@ def print_disulfide_bond_info_dict(ssbond_atom_data) -> None:
                 "ssbonds": list of SSBOND records (str),
                 "atoms": {
                     (chain_id, res_seq_num, atom_name): {
-                        "line": ATOM record line (str),
                         "coords": [x, y, z]
                     },
                     ...

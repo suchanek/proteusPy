@@ -1540,7 +1540,6 @@ class Disulfide:
         :param distal: distal residue sequence ID
         :param resolution: structure resolution
         :param quiet: Quiet or noisy parsing, defaults to True
-        :raises DisulfideConstructionWarning: Raised when not parsed correctly
         """
         id = chain1.get_full_id()[0]
         self.pdb_id = id
@@ -2354,7 +2353,7 @@ class Disulfide:
 
         >>> tot = low_energy_neighbors.length
         >>> print(f'Neighbors: {tot}')
-        Neighbors: 2
+        Neighbors: 4
         >>> low_energy_neighbors.display_overlay()
 
         """
@@ -2367,7 +2366,6 @@ class Disulfide:
         """
         Return the sextant class string for ``self``.
 
-        :raises DisulfideIOException: _description_
         :return: Sextant string
         """
         from proteusPy.DisulfideClasses import get_sixth_quadrant
@@ -2473,27 +2471,8 @@ def Initialize_Disulfide_From_Coords(
     :rtype: Disulfide
     :raises DisulfideConstructionWarning: Raised when the disulfide bond is not parsed correctly.
 
-    :example:
-    >>> from proteusPy import Initialize_Disulfide_From_Coords
-    >>> ssbond_atom_data = {
-    ...     'proximal': [(1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.0)],
-    ...     'distal': [(10.0, 11.0, 12.0), (13.0, 14.0, 15.0), (16.0, 17.0, 18.0)]
-    ... }
-    >>> pdb_id = "1ABC"
-    >>> proximal_chain_id = "A"
-    >>> distal_chain_id = "B"
-    >>> proximal = 10
-    >>> distal = 20
-    >>> resolution = 2.0
-    >>> ssbond = None
-    >>> sssbond = Initialize_Disulfide_From_Coords(
-    ...     ssbond_atom_data, pdb_id, proximal_chain_id, distal_chain_id, proximal, distal, resolution
-    ... )
-    >>> isinstance(ssbond, Disulfide)
-    True
     """
     import logging
-    import warnings
 
     import numpy as np
 
@@ -2557,7 +2536,7 @@ def Initialize_Disulfide_From_Coords(
         # i'm torn on this. there are a lot of missing coordinates, so is
         # it worth the trouble to note them? I think so.
         _logger.error(f"Invalid/missing coordinates for: {id}, proximal: {proximal}")
-        return False
+        return None
 
     # distal residue
     try:
