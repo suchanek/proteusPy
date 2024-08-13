@@ -428,7 +428,10 @@ class DisulfideClass_Constructor:
 
         :param savepath: Path to save the file, defaults to DATA_DIR
         """
-        self.version = proteusPy.__version__
+        import proteusPy.__version__ as version
+        from proteusPy.ProteusGlobals import CLASSOBJ_FNAME
+
+        self.version = version
 
         fname = CLASSOBJ_FNAME
 

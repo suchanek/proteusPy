@@ -97,6 +97,12 @@ import pandas as pd
 from colorama import Fore, Style, init
 from tqdm import tqdm
 
+from proteusPy.ProteusGlobals import (
+    SS_CONSENSUS_BIN_FILE,
+    SS_CONSENSUS_FILE,
+    SS_CONSENSUS_TEN_FILE,
+)
+
 # Initialize colorama
 init(autoreset=True)
 
@@ -234,9 +240,9 @@ def analyze_classes_threaded(
     :return: A list of disulfide bonds, where each disulfide bond represents the average conformation for a class.
     """
     global SAVE_DIR
-    
+
     if do_sextant:
-        class_filename = os.path.join(DATA_DIR, "SS_consensus_class_sext.pkl")
+        class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_FILE)
         SAVE_DIR = os.path.join(SAVE_DIR, "sextant")
         six_or_bin = loader.tclass.sixclass_df
         tot_classes = six_or_bin.shape[0]
@@ -310,9 +316,7 @@ def analyze_classes_threaded(
         res_list.extend(result_list)
 
     if do_consensus:
-        print(
-            f"--> analyze_classes(): Writing consensus structures to: {class_filename}"
-        )
+        print(f"Writing consensus structures to: {class_filename}")
         with open(class_filename, "wb+") as f:
             pickle.dump(res_list, f)
 
@@ -497,16 +501,22 @@ def get_args():
     return args
 
 
-def Update_Repository(source_dir, repo_dir):
+def Update_Repository(source_dir, repo_dir, verbose=True):
     """Copy the consensus classes to the repository."""
     import shutil
 
-    source = os.path.join(source_dir, "SS_consensus_class_32.pkl")
-    dest = os.path.join(repo_dir, "SS_consensus_class_32.pkl")
+    source = os.path.join(source_dir, SS_CONSENSUS_BIN_FILE)
+    dest = os.path.join(repo_dir, SS_CONSENSUS_BIN_FILE)
+    if verbose:
+        print(f"Copying {source} to {dest}")
+
     shutil.copy(source, dest)
 
-    source = os.path.join(source_dir, "SS_consensus_class_sext.pkl")
-    dest = os.path.join(repo_dir, "SS_consensus_class_sext.pkl")
+    source = os.path.join(source_dir, SS_CONSENSUS_FILE)
+    dest = os.path.join(repo_dir, SS_CONSENSUS_FILE)
+    if verbose:
+        print(f"Copying {source} to {dest}")
+
     shutil.copy(source, dest)
 
     return
