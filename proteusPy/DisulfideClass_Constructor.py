@@ -28,6 +28,7 @@ from proteusPy.ProteusGlobals import (
 )
 
 _logger = get_logger(__name__)
+_logger.setLevel("INFO")
 
 merge_cols = [
     "chi1_s",
@@ -109,7 +110,8 @@ class DisulfideClass_Constructor:
         self.sixclass_df = None
 
         if self.verbose:
-            _logger.info(f"-> DisulfideClass_Constructor(): Building SS classes...")
+            _logger.info(f"Building SS classes...")
+
         self.build_yourself(loader)
 
     def load_class_dict(self, fname=f"{DATA_DIR}{SS_CLASS_DICT_FILE}") -> dict:
@@ -222,16 +224,15 @@ class DisulfideClass_Constructor:
         -------
         None
         """
-        import proteusPy
+        # import proteusPy
+        from proteusPy import __version__ as version
 
-        self.version = proteusPy.__version__
+        self.version = version
 
         tors_df = loader.getTorsions()
 
         if self.verbose:
-            _logger.info(
-                f"-> DisulfideClass_Constructor(): creating binary SS classes..."
-            )
+            _logger.info(f"Creating binary SS classes...")
 
         grouped = self.create_binary_classes(tors_df)
 
@@ -247,9 +248,6 @@ class DisulfideClass_Constructor:
         class_df["SS_Classname"].str.strip()
         class_df["class_id"].str.strip()
 
-        if self.verbose:
-            _logger.info(f"-> DisulfideClass_Constructor(): merging...")
-
         merged = self.concat_dataframes(class_df, grouped)
         merged.drop(
             columns=["Idx", "chi1_s", "chi2_s", "chi3_s", "chi4_s", "chi5_s"],
@@ -261,16 +259,14 @@ class DisulfideClass_Constructor:
         self.classdf = merged.copy()
 
         if self.verbose:
-            _logger.info(
-                f"-> DisulfideClass_Constructor(): creating sixfold SS classes..."
-            )
+            _logger.info(f"Creating sixfold SS classes...")
 
         grouped_sixclass = self.create_six_classes(tors_df)
 
         self.sixclass_df = grouped_sixclass.copy()
 
         if self.verbose:
-            _logger.info(f"-> DisulfideClass_Constructor(): initialization complete.")
+            _logger.info(f"Initialization complete.")
 
         return
 

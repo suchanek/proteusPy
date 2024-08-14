@@ -172,7 +172,7 @@ def task(
 
         task_pbar = tqdm(
             total=len(ss_list),
-            desc=f"{Fore.YELLOW}->Task {tasknum+1:2}{Style.RESET_ALL}".ljust(10),
+            desc=f"{Fore.YELLOW}  Task {tasknum+1:2}{Style.RESET_ALL}".ljust(10),
             position=position + 1,
             leave=False,
             ncols=PBAR_COLS,
@@ -214,6 +214,7 @@ def task(
             result_list.append(exemplar)
             overall_pbar.update(1)
 
+    pbar.close()
     return
 
 
@@ -252,7 +253,7 @@ def analyze_classes_threaded(
             f"--> analyze_six_classes(): Expecting {pix} graphs for the sextant classes."
         )
     else:
-        class_filename = os.path.join(DATA_DIR, "SS_consensus_class_32.pkl")
+        class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_BIN_FILE)
         SAVE_DIR = os.path.join(SAVE_DIR, "binary")
         six_or_bin = loader.tclass.classdf
         tot_classes = six_or_bin.shape[0]
@@ -315,6 +316,8 @@ def analyze_classes_threaded(
     for result_list in result_lists:
         res_list.extend(result_list)
 
+    overall_pbar.close()
+
     if do_consensus:
         print(f"Writing consensus structures to: {class_filename}")
         with open(class_filename, "wb+") as f:
@@ -328,7 +331,7 @@ def analyze_classes(
     binary: bool,
     sextant: bool,
     all: bool,
-    threads: int = 6,
+    threads: int = 4,
     do_graph: bool = False,
     cutoff: float = 0.0,
     verbose: bool = False,
@@ -388,7 +391,7 @@ def analyze_classes(
     return
 
 
-def plot_classes_vs_cutoff(PDB_SS: DisulfideLoader, cutoff, steps, verbose=False):
+def plot_sixclass_vs_cutoff(PDB_SS: DisulfideLoader, cutoff, steps, verbose=False):
     """
     Plot the total percentage and number of members for each class against the cutoff value.
 
@@ -501,23 +504,27 @@ def get_args():
     return args
 
 
-def Update_Repository(source_dir, repo_dir, verbose=True):
+def Update_Repository(source_dir, repo_dir, verbose=True, binary=False, sextant=False):
     """Copy the consensus classes to the repository."""
     import shutil
 
-    source = os.path.join(source_dir, SS_CONSENSUS_BIN_FILE)
-    dest = os.path.join(repo_dir, SS_CONSENSUS_BIN_FILE)
-    if verbose:
-        print(f"Copying {source} to {dest}")
+    if binary:
+        source = os.path.join(source_dir, SS_CONSENSUS_BIN_FILE)
+        dest = os.path.join(repo_dir, SS_CONSENSUS_BIN_FILE)
 
-    shutil.copy(source, dest)
+        if verbose:
+            print(f"Copying {source} to {dest}")
 
-    source = os.path.join(source_dir, SS_CONSENSUS_FILE)
-    dest = os.path.join(repo_dir, SS_CONSENSUS_FILE)
-    if verbose:
-        print(f"Copying {source} to {dest}")
+        shutil.copy(source, dest)
 
-    shutil.copy(source, dest)
+    if sextant:
+        source = os.path.join(source_dir, SS_CONSENSUS_FILE)
+        dest = os.path.join(repo_dir, SS_CONSENSUS_FILE)
+
+        if verbose:
+            print(f"Copying {source} to {dest}")
+
+        shutil.copy(source, dest)
 
     return
 
@@ -543,19 +550,19 @@ def main():
         f"Threads:               {threads}\n"
         f"Cutoff:                {cutoff}\n"
         f"Graph:                 {do_graph}\n"
+        f"Consensus:             True \n"
         f"Update:                {do_update}\n"
+        f"Verbose:               {args.verbose}\n"
         f"Data directory:        {DATA_DIR}\n"
         f"Save directory:        {SAVE_DIR}\n"
         f"Repository directory:  {REPO_DIR}\n"
         f"Home directory:        {HOME}\n"
         f"PDB directory:         {PDB}\n"
-        f"Verbose:               {args.verbose}\n"
         f"Loading PDB SS data...\n"
     )
 
     PDB_SS = Load_PDB_SS(verbose=False, subset=False)
-
-    # PDB_SS.describe()
+    PDB_SS.describe()
 
     analyze_classes(
         PDB_SS, binary, sextant, all, threads=threads, do_graph=do_graph, cutoff=cutoff
@@ -563,7 +570,7 @@ def main():
 
     if do_update:
         print("Updating repository with consensus classes.")
-        Update_Repository(DATA_DIR, REPO_DIR)
+        Update_Repository(DATA_DIR, REPO_DIR, binary=binary, sextant=sextant)
 
 
 if __name__ == "__main__":

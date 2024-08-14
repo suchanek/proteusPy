@@ -115,6 +115,7 @@ from .utility import (
     extract_firstchain_ss,
     generate_vector_dataframe,
     get_jet_colormap,
+    get_macos_theme,
     get_memory_usage,
     get_object_size_mb,
     grid_dimensions,

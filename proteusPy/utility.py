@@ -992,6 +992,53 @@ def Extract_Disulfide(
     return _sslist
 
 
+import subprocess
+
+def get_macos_theme():
+    """
+    Determine the display theme for a macOS computer using AppleScript.
+
+    Returns:
+    :return str: 'light', 'dark', or 'none' based on the current display theme.
+
+    Example:
+    >>> get_macos_theme()
+    'dark'
+    """
+    try:
+        # AppleScript to get the appearance setting
+        script = '''
+        tell application "System Events"
+            tell appearance preferences
+                if (dark mode) then
+                    return "dark"
+                else
+                    return "light"
+                end if
+            end tell
+        end tell
+        '''
+        # Run the AppleScript
+        result = subprocess.run(
+            ['osascript', '-e', script],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+
+        # Check the output
+        if result.returncode == 0:
+            theme = result.stdout.strip().lower()
+            if theme in ['dark', 'light']:
+                return theme
+            else:
+                return 'none'
+        else:
+            return 'none'
+    except Exception as e:
+        # In case of any exception, return 'none'
+        return 'none'
+
 # This function will be deprecated.
 def check_header_from_file(filename: str, model_numb=0, verbose=False, dbg=True):
     """
