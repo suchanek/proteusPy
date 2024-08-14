@@ -537,7 +537,7 @@ def enumerate_sixclass_fromlist(loader: DisulfideLoader, sslist):
     return sslist_df
 
 
-def plot_classes_vs_cutoff(cutoff, steps):
+def plot_classes_vs_cutoff(cutoff, steps, loader):
     """
     Plot the total percentage and number of members for each class against the cutoff value.
 
@@ -551,7 +551,7 @@ def plot_classes_vs_cutoff(cutoff, steps):
     members_list = []
 
     for c in _cutoff:
-        class_df = PDB_SS.tclass.filter_sixclass_by_percentage(c)
+        class_df = loader.tclass.filter_sixclass_by_percentage(c)
         tot = class_df["percentage"].sum()
         tot_list.append(tot)
         members_list.append(class_df.shape[0])
