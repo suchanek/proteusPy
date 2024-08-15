@@ -974,6 +974,64 @@ class Disulfide:
             raise DisulfideConstructionException(message) from None
 
     @property
+    def internal_coords_array(self):
+        """
+        Return an array of internal coordinates for the disulfide bond.
+
+        This function collects the coordinates of the backbone atoms involved in the
+        disulfide bond and returns them as a numpy array.
+
+        :param self: The instance of the Disulfide class.
+        :type self: Disulfide
+        :return: A numpy array containing the coordinates of the atoms.
+        :rtype: np.ndarray
+        """
+        coords = []
+        coords.append(self._n_prox.get_array())
+        coords.append(self._ca_prox.get_array())
+        coords.append(self._c_prox.get_array())
+        coords.append(self._o_prox.get_array())
+        coords.append(self._cb_prox.get_array())
+        coords.append(self._sg_prox.get_array())
+        coords.append(self._n_dist.get_array())
+        coords.append(self._ca_dist.get_array())
+        coords.append(self._c_dist.get_array())
+        coords.append(self._o_dist.get_array())
+        coords.append(self._cb_dist.get_array())
+        coords.append(self._sg_dist.get_array())
+
+        return np.array(coords)
+
+    @property
+    def coords_array(self):
+        """
+        Return an array of coordinates for the disulfide bond.
+
+        This function collects the coordinates of backbone atoms involved in the
+        disulfide bond and returns them as a numpy array.
+
+        :param self: The instance of the Disulfide class.
+        :type self: Disulfide
+        :return: A numpy array containing the coordinates of the atoms.
+        :rtype: np.ndarray
+        """
+        coords = []
+        coords.append(self.n_prox.get_array())
+        coords.append(self.ca_prox.get_array())
+        coords.append(self.c_prox.get_array())
+        coords.append(self.o_prox.get_array())
+        coords.append(self.cb_prox.get_array())
+        coords.append(self.sg_prox.get_array())
+        coords.append(self.n_dist.get_array())
+        coords.append(self.ca_dist.get_array())
+        coords.append(self.c_dist.get_array())
+        coords.append(self.o_dist.get_array())
+        coords.append(self.cb_dist.get_array())
+        coords.append(self.sg_dist.get_array())
+
+        return np.array(coords)
+
+    @property
     def dihedrals(self) -> list:
         """
         Return a list containing the dihedral angles for the disulfide.
@@ -993,6 +1051,7 @@ class Disulfide:
         self.chi3 = dihedrals[2]
         self.chi4 = dihedrals[3]
         self.chi5 = dihedrals[4]
+        self.torsion_array = np.array(dihedrals)
         self.compute_torsional_energy()
         self.compute_torsion_length()
 
@@ -1050,7 +1109,8 @@ class Disulfide:
         >>> modss.display(style='sb')
         """
 
-        self.set_dihedrals(chi1, chi2, chi3, chi4, chi5)
+        self.dihedrals = [chi1, chi2, chi3, chi4, chi5]
+        # self.set_dihedrals(chi1, chi2, chi3, chi4, chi5)
         self.proximal = 1
         self.distal = 2
 
