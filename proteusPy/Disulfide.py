@@ -5,7 +5,6 @@ It represents the core of the current implementation of *proteusPy*.
 
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 Author: Eric G. Suchanek, PhD
-Last revision: 2/17/2024
 """
 
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
@@ -45,7 +44,13 @@ from proteusPy.DisulfideList import DisulfideList
 from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, WINSIZE
 from proteusPy.Residue import build_residue
 from proteusPy.turtle3D import ORIENT_SIDECHAIN, Turtle3D
-from proteusPy.vector3D import Vector3D, calc_dihedral, distance3d
+from proteusPy.vector3D import (
+    Vector3D,
+    calc_dihedral,
+    calculate_bond_angle,
+    distance3d,
+    rms_difference,
+)
 
 # columns for the torsions file dataframe.
 Torsion_DF_Cols = [
@@ -972,6 +977,82 @@ class Disulfide:
         else:
             # exceptions are fatal - raise again with new message (including line nr)
             raise DisulfideConstructionException(message) from None
+
+    @property
+    def bond_angle_ideality(self):
+        """
+        Calculate all bond angles for a disulfide bond and compare them to idealized angles.
+
+        :param np.ndarray atom_coordinates: Array containing coordinates of atoms in the order:
+            N1, CA1, C1, O1, CB1, SG1, N2, CA2, C2, O2, CB2, SG2
+        :return: RMS difference between calculated bond angles and idealized bond angles.
+        :rtype: float
+        """
+
+        atom_coordinates = self.coords_array
+
+        idealized_angles = {
+            ("N1", "CA1", "C1"): 111.0,
+            ("N1", "CA1", "CB1"): 108.5,
+            ("CA1", "CB1", "SG1"): 112.8,
+            ("CB1", "SG1", "SG2"): 103.8,  # This angle is for the disulfide bond itself
+            ("SG1", "SG2", "CB2"): 103.8,  # This angle is for the disulfide bond itself
+            ("SG2", "CB2", "CA2"): 112.8,
+            ("CB2", "CA2", "N2"): 108.5,
+            ("N2", "CA2", "C2"): 111.0,
+        }
+
+        # List of triplets for which we need to calculate bond angles
+        # I am omitting the proximal and distal backbone angle N, Ca, C
+        # to focus on the disulfide bond angles themselves.
+        angle_triplets = [
+            # ("N1", "CA1", "C1"),
+            ("N1", "CA1", "CB1"),
+            ("CA1", "CB1", "SG1"),
+            ("CB1", "SG1", "SG2"),
+            ("SG1", "SG2", "CB2"),
+            ("SG2", "CB2", "CA2"),
+            ("CB2", "CA2", "N2"),
+            # ("N2", "CA2", "C2"),
+        ]
+
+        atom_indices = {
+            "N1": 0,
+            "CA1": 1,
+            "C1": 2,
+            "CB1": 4,
+            "SG1": 5,
+            "SG2": 11,
+            "CB2": 10,
+            "CA2": 7,
+            "N2": 6,
+            "C2": 8,
+        }
+
+        calculated_angles = []
+        for triplet in angle_triplets:
+            a = atom_coordinates[atom_indices[triplet[0]]]
+            b = atom_coordinates[atom_indices[triplet[1]]]
+            c = atom_coordinates[atom_indices[triplet[2]]]
+            ideal = idealized_angles[triplet]
+            try:
+                angle = calculate_bond_angle(a, b, c)
+            except ValueError as e:
+                print(f"Error calculating angle for atoms {triplet}: {e}")
+                return None
+            calculated_angles.append(angle)
+
+        # Convert idealized angles to a list
+        idealized_angles_list = [
+            idealized_angles[triplet] for triplet in angle_triplets
+        ]
+
+        # Calculate RMS difference
+        rms_diff = rms_difference(
+            np.array(calculated_angles), np.array(idealized_angles_list)
+        )
+
+        return rms_diff
 
     @property
     def internal_coords_array(self):

@@ -133,7 +133,6 @@ from .vector3D import (
     calc_angle,
     calc_dihedral,
     calculate_bond_angle,
-    compare_bond_angles,
     distance3d,
     rms_difference,
 )
