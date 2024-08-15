@@ -675,7 +675,7 @@ Last Modification: 2/19/24 -egs-</p>
 </span><span id="L-537"><a href="#L-537"><span class="linenos">537</span></a>    <span class="k">return</span> <span class="n">sslist_df</span>
 </span><span id="L-538"><a href="#L-538"><span class="linenos">538</span></a>
 </span><span id="L-539"><a href="#L-539"><span class="linenos">539</span></a>
-</span><span id="L-540"><a href="#L-540"><span class="linenos">540</span></a><span class="k">def</span> <span class="nf">plot_classes_vs_cutoff</span><span class="p">(</span><span class="n">cutoff</span><span class="p">,</span> <span class="n">steps</span><span class="p">):</span>
+</span><span id="L-540"><a href="#L-540"><span class="linenos">540</span></a><span class="k">def</span> <span class="nf">plot_classes_vs_cutoff</span><span class="p">(</span><span class="n">cutoff</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
 </span><span id="L-541"><a href="#L-541"><span class="linenos">541</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-542"><a href="#L-542"><span class="linenos">542</span></a><span class="sd">    Plot the total percentage and number of members for each class against the cutoff value.</span>
 </span><span id="L-543"><a href="#L-543"><span class="linenos">543</span></a>
@@ -689,7 +689,7 @@ Last Modification: 2/19/24 -egs-</p>
 </span><span id="L-551"><a href="#L-551"><span class="linenos">551</span></a>    <span class="n">members_list</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="L-552"><a href="#L-552"><span class="linenos">552</span></a>
 </span><span id="L-553"><a href="#L-553"><span class="linenos">553</span></a>    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">_cutoff</span><span class="p">:</span>
-</span><span id="L-554"><a href="#L-554"><span class="linenos">554</span></a>        <span class="n">class_df</span> <span class="o">=</span> <span class="n">PDB_SS</span><span class="o">.</span><span class="n">tclass</span><span class="o">.</span><span class="n">filter_sixclass_by_percentage</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</span><span id="L-554"><a href="#L-554"><span class="linenos">554</span></a>        <span class="n">class_df</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">tclass</span><span class="o">.</span><span class="n">filter_sixclass_by_percentage</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
 </span><span id="L-555"><a href="#L-555"><span class="linenos">555</span></a>        <span class="n">tot</span> <span class="o">=</span> <span class="n">class_df</span><span class="p">[</span><span class="s2">&quot;percentage&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 </span><span id="L-556"><a href="#L-556"><span class="linenos">556</span></a>        <span class="n">tot_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tot</span><span class="p">)</span>
 </span><span id="L-557"><a href="#L-557"><span class="linenos">557</span></a>        <span class="n">members_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">class_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -1700,13 +1700,13 @@ input 'cls' string.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">plot_classes_vs_cutoff</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">cutoff</span>, </span><span class="param"><span class="n">steps</span></span><span class="return-annotation">):</span></span>
+        <span class="name">plot_classes_vs_cutoff</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">cutoff</span>, </span><span class="param"><span class="n">steps</span>, </span><span class="param"><span class="n">loader</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="plot_classes_vs_cutoff-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#plot_classes_vs_cutoff"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="plot_classes_vs_cutoff-541"><a href="#plot_classes_vs_cutoff-541"><span class="linenos">541</span></a><span class="k">def</span> <span class="nf">plot_classes_vs_cutoff</span><span class="p">(</span><span class="n">cutoff</span><span class="p">,</span> <span class="n">steps</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="plot_classes_vs_cutoff-541"><a href="#plot_classes_vs_cutoff-541"><span class="linenos">541</span></a><span class="k">def</span> <span class="nf">plot_classes_vs_cutoff</span><span class="p">(</span><span class="n">cutoff</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
 </span><span id="plot_classes_vs_cutoff-542"><a href="#plot_classes_vs_cutoff-542"><span class="linenos">542</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="plot_classes_vs_cutoff-543"><a href="#plot_classes_vs_cutoff-543"><span class="linenos">543</span></a><span class="sd">    Plot the total percentage and number of members for each class against the cutoff value.</span>
 </span><span id="plot_classes_vs_cutoff-544"><a href="#plot_classes_vs_cutoff-544"><span class="linenos">544</span></a>
@@ -1720,7 +1720,7 @@ input 'cls' string.</p>
 </span><span id="plot_classes_vs_cutoff-552"><a href="#plot_classes_vs_cutoff-552"><span class="linenos">552</span></a>    <span class="n">members_list</span> <span class="o">=</span> <span class="p">[]</span>
 </span><span id="plot_classes_vs_cutoff-553"><a href="#plot_classes_vs_cutoff-553"><span class="linenos">553</span></a>
 </span><span id="plot_classes_vs_cutoff-554"><a href="#plot_classes_vs_cutoff-554"><span class="linenos">554</span></a>    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">_cutoff</span><span class="p">:</span>
-</span><span id="plot_classes_vs_cutoff-555"><a href="#plot_classes_vs_cutoff-555"><span class="linenos">555</span></a>        <span class="n">class_df</span> <span class="o">=</span> <span class="n">PDB_SS</span><span class="o">.</span><span class="n">tclass</span><span class="o">.</span><span class="n">filter_sixclass_by_percentage</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</span><span id="plot_classes_vs_cutoff-555"><a href="#plot_classes_vs_cutoff-555"><span class="linenos">555</span></a>        <span class="n">class_df</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">tclass</span><span class="o">.</span><span class="n">filter_sixclass_by_percentage</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
 </span><span id="plot_classes_vs_cutoff-556"><a href="#plot_classes_vs_cutoff-556"><span class="linenos">556</span></a>        <span class="n">tot</span> <span class="o">=</span> <span class="n">class_df</span><span class="p">[</span><span class="s2">&quot;percentage&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 </span><span id="plot_classes_vs_cutoff-557"><a href="#plot_classes_vs_cutoff-557"><span class="linenos">557</span></a>        <span class="n">tot_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tot</span><span class="p">)</span>
 </span><span id="plot_classes_vs_cutoff-558"><a href="#plot_classes_vs_cutoff-558"><span class="linenos">558</span></a>        <span class="n">members_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">class_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>

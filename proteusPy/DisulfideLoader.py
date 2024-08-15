@@ -20,6 +20,7 @@ from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideClass_Constructor import DisulfideClass_Constructor
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideList import DisulfideList
+from proteusPy.logger_config import get_logger
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
     LOADER_ALL_URL,
@@ -35,6 +36,8 @@ from proteusPy.ProteusGlobals import (
     SS_SUBSET_TORSIONS_FILE,
     SS_TORSIONS_FILE,
 )
+
+_logger = get_logger("__name__")
 
 try:
     # Check if running in Jupyter
@@ -75,14 +78,14 @@ class DisulfideLoader:
 
     def __init__(
         self,
-        verbose: bool = True,
+        verbose: bool = False,
         datadir: str = REPO_DATA_DIR,
         picklefile: str = SS_PICKLE_FILE,
         pickle_dict_file: str = SS_DICT_PICKLE_FILE,
         torsion_file: str = SS_TORSIONS_FILE,
         quiet: bool = True,
         subset: bool = False,
-        cutoff: float = 8.0,
+        cutoff: float = -1.0,
     ) -> None:
         """
         Initializing the class initiates loading either the entire Disulfide dataset,
@@ -120,9 +123,8 @@ class DisulfideLoader:
             self.TorsionFile = f"{datadir}{SS_SUBSET_TORSIONS_FILE}"
 
         if self.verbose:
-            print(
+            _logger.info(
                 f"-> DisulfideLoader(): Reading disulfides from: {self.PickleFile}... ",
-                end="",
             )
 
         with open(self.PickleFile, "rb") as f:
@@ -131,14 +133,8 @@ class DisulfideLoader:
             self.TotalDisulfides = len(self.SSList)
 
         if self.verbose:
-            print(
-                f"done.",
-            )
-
-        if self.verbose:
-            print(
+            _logger.info(
                 f"-> DisulfideLoader(): Reading disulfide dict from: {self.PickleDictFile}...",
-                end="",
             )
 
         with open(self.PickleDictFile, "rb") as f:
@@ -146,12 +142,8 @@ class DisulfideLoader:
             self.IDList = list(self.SSDict.keys())
 
         if self.verbose:
-            print(f"done.")
-
-        if self.verbose:
-            print(
+            _logger.info(
                 f"-> DisulfideLoader(): Reading Torsion DF from: {self.TorsionFile}...",
-                end="",
             )
 
         tmpDF = pd.read_csv(self.TorsionFile)
@@ -160,14 +152,12 @@ class DisulfideLoader:
         self.TorsionDF = tmpDF.copy()
         self.TotalDisulfides = len(self.SSList)
 
-        if self.verbose:
-            print(f" done.")
-
         self.tclass = DisulfideClass_Constructor(self, self.verbose)
 
         if self.verbose:
-            print(f"-> DisulfideLoader(): Loading complete.")
-            self.describe()
+            _logger.info(f"-> DisulfideLoader(): Loading complete.")
+
+        self.describe()
         return
 
     # overload __getitem__ to handle slicing and indexing, and access by name
@@ -683,7 +673,6 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
 
     with open(_fname, "rb") as f:
         res = pickle.load(f)
-        # res = pd.compat.pickle_compat.load(f)
 
     if verbose:
         print(f"-> load_PDB_SS(): Done reading {_fname}... ")

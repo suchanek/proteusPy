@@ -13,22 +13,17 @@ __pdoc__ = {
     "__all__": False,
 }
 
-import copy
-import datetime
-import glob
-import math
-import os
-import pickle
-import subprocess
-import sys
-import time
-import warnings
+import logging
+
+# Set the default logger level to CRITICAL
+logging.basicConfig(level=logging.CRITICAL)
+
+
+# Suppress findfont debug messages
+logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
 
 import matplotlib.pyplot as plt
-import numpy
-import plotly
-from Bio.PDB import Select, Vector
-from Bio.PDB.vectors import calc_angle, calc_dihedral
+import numpy as np
 
 from ._version import __version__
 from .angle_annotation import AngleAnnotation, plot_angle
@@ -44,7 +39,12 @@ from .atoms import (
     SPEC_POWER,
     SPECULARITY,
 )
-from .Disulfide import Disulfide, Disulfide_Energy_Function, Minimize
+from .Disulfide import (
+    Disulfide,
+    Disulfide_Energy_Function,
+    Initialize_Disulfide_From_Coords,
+    Minimize,
+)
 from .DisulfideClass_Constructor import DisulfideClass_Constructor
 from .DisulfideClasses import (
     create_classes,
@@ -62,7 +62,9 @@ from .DisulfideClasses import (
 from .DisulfideExceptions import (
     DisulfideConstructionException,
     DisulfideConstructionWarning,
+    DisulfideException,
     DisulfideIOException,
+    DisulfideParseWarning,
 )
 from .DisulfideList import DisulfideList, load_disulfides_from_id
 from .DisulfideLoader import (
@@ -71,6 +73,7 @@ from .DisulfideLoader import (
     Download_PDB_SS_GitHub,
     Load_PDB_SS,
 )
+from .logger_config import get_logger, set_logger_level
 from .ProteusGlobals import (
     _ANG_INIT,
     _FLOAT_INIT,
@@ -90,6 +93,15 @@ from .Residue import (
     to_nitrogen,
     to_oxygen,
 )
+from .ssparser import (
+    check_file,
+    extract_and_write_ssbonds_and_atoms,
+    extract_ssbonds_and_atoms,
+    get_atom_coordinates,
+    get_phipsi_atoms_coordinates,
+    get_residue_atoms_coordinates,
+    print_disulfide_bond_info_dict,
+)
 from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN, Turtle3D
 from .utility import (
     Check_chains,
@@ -99,12 +111,13 @@ from .utility import (
     check_header_from_file,
     check_header_from_id,
     display_ss_pymol,
-    distance3d,
     distance_squared,
     extract_firstchain_ss,
     generate_vector_dataframe,
     get_jet_colormap,
+    get_macos_theme,
     get_memory_usage,
+    get_object_size_mb,
     grid_dimensions,
     image_to_ascii_art,
     parse_ssbond_header_rec,
@@ -114,6 +127,14 @@ from .utility import (
     remove_duplicate_ss,
     retrieve_git_lfs_files,
     sort_by_column,
+)
+from .vector3D import (
+    Vector3D,
+    calc_angle,
+    calc_dihedral,
+    calculate_bond_angle,
+    distance3d,
+    rms_difference,
 )
 
 print(f"ProteusPy V{__version__}")

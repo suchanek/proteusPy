@@ -66,9 +66,9 @@ install:
 	@$(CONDA) install vtk==9.2.6 -y
 	@echo "Installing proteusPy..."
 
-	@pip install .
-	@echo "Installing Biopython..."
-	@pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
+	@pip install . -q
+	#@echo "Installing Biopython..."
+	#@pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython -q
 	@echo "Installing jupyter..."
 	@python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Installation finished!"
@@ -77,9 +77,9 @@ install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	@$(CONDA) install vtk==9.2.6 -y
 	
-	pip install -e .
-	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
-	pip install pdoc twine black pytest build
+	pip install .
+	#pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
+	pip install pdoc twine black pytest build -q
 	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
 	@echo "Installation finished!"
 
