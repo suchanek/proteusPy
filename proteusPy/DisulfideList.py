@@ -38,7 +38,7 @@ from proteusPy.logger_config import get_logger
 from proteusPy.ProteusGlobals import DATA_DIR, MODEL_DIR, PBAR_COLS, WINSIZE
 from proteusPy.utility import get_jet_colormap, grid_dimensions
 
-_logger = get_logger("DisulfideList")
+_logger = get_logger(__name__)
 
 
 # Set the figure sizes and axis limits.
