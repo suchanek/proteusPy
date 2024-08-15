@@ -794,13 +794,6 @@ def Extract_Disulfides(
                 sslist = remove_duplicate_ss(_sslist)
                 sslist2 = []  # list to hold indices for ss_dict2
                 for ss in sslist:
-                    # Ca distance cutoff - now handled in load_disulfides_from_id()
-                    # dist = ss.ca_distance
-                    # if dist >= dist_cutoff and dist_cutoff != -1.0:
-                    #    _logger.error(f"Bad Distance: {entry}, SS: {ss}")
-                    #    bad_dist += 1
-                    #    continue  ## we are not going to deal with Ca distance atm.
-
                     All_ss_list.append(ss)
                     new_row = [
                         ss.pdb_id,
@@ -994,6 +987,7 @@ def Extract_Disulfide(
 
 import subprocess
 
+
 def get_macos_theme():
     """
     Determine the display theme for a macOS computer using AppleScript.
@@ -1007,7 +1001,7 @@ def get_macos_theme():
     """
     try:
         # AppleScript to get the appearance setting
-        script = '''
+        script = """
         tell application "System Events"
             tell appearance preferences
                 if (dark mode) then
@@ -1017,27 +1011,28 @@ def get_macos_theme():
                 end if
             end tell
         end tell
-        '''
+        """
         # Run the AppleScript
         result = subprocess.run(
-            ['osascript', '-e', script],
+            ["osascript", "-e", script],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True
+            text=True,
         )
 
         # Check the output
         if result.returncode == 0:
             theme = result.stdout.strip().lower()
-            if theme in ['dark', 'light']:
+            if theme in ["dark", "light"]:
                 return theme
             else:
-                return 'none'
+                return "none"
         else:
-            return 'none'
+            return "none"
     except Exception as e:
         # In case of any exception, return 'none'
-        return 'none'
+        return "none"
+
 
 # This function will be deprecated.
 def check_header_from_file(filename: str, model_numb=0, verbose=False, dbg=True):
