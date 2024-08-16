@@ -11,6 +11,8 @@ import numpy  # type: ignore
 from proteusPy.turtle3D import Turtle3D
 from proteusPy.vector3D import Vector3D
 
+# @todo investigate distal N atom position
+
 
 def build_residue(turtle: Turtle3D):
     """
