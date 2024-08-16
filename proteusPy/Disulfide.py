@@ -31,10 +31,10 @@ logging.basicConfig(
 logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
 
 import proteusPy
-from proteusPy.logger_config import get_logger
 from proteusPy.atoms import *
 from proteusPy.DisulfideExceptions import *
 from proteusPy.DisulfideList import DisulfideList
+from proteusPy.logger_config import get_logger
 from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, WINSIZE
 from proteusPy.Residue import build_residue
 from proteusPy.turtle3D import ORIENT_SIDECHAIN, Turtle3D
@@ -72,6 +72,7 @@ ORIGIN = Vector3D(0.0, 0.0, 0.0)
 
 _logger = get_logger(__name__)
 _logger.setLevel(logging.ERROR)
+
 
 # class for the Disulfide bond
 class Disulfide:
@@ -990,7 +991,6 @@ class Disulfide:
         if verbose:
             _logger.setLevel(logging.INFO)
 
-
         idealized_angles = {
             ("N1", "CA1", "C1"): 111.0,
             ("N1", "CA1", "CB1"): 108.5,
@@ -1006,14 +1006,14 @@ class Disulfide:
         # I am omitting the proximal and distal backbone angle N, Ca, C
         # to focus on the disulfide bond angles themselves.
         angle_triplets = [
-            # ("N1", "CA1", "C1"),
+            ("N1", "CA1", "C1"),
             ("N1", "CA1", "CB1"),
             ("CA1", "CB1", "SG1"),
             ("CB1", "SG1", "SG2"),
             ("SG1", "SG2", "CB2"),
             ("SG2", "CB2", "CA2"),
             ("CB2", "CA2", "N2"),
-            # ("N2", "CA2", "C2"),
+            ("N2", "CA2", "C2"),
         ]
 
         atom_indices = {
@@ -1057,16 +1057,14 @@ class Disulfide:
         )
 
         if verbose:
-            _logger.info(
-                f"Calculated angle for atoms {triplet}: {angle:.2f}, Ideal angle: {ideal:.2f}"
-            )
+            _logger.info(f"RMS bond angle deviation:, {rms_diff:.2f}")
 
         return rms_diff
 
     @property
     def bond_length_ideality(self):
         """
-        Calculate all bond angles for a disulfide bond and compare them to idealized angles.
+        Calculate bond lengths for a disulfide bond and compare them to idealized angles.
 
         :param np.ndarray atom_coordinates: Array containing coordinates of atoms in the order:
             N1, CA1, C1, O1, CB1, SG1, N2, CA2, C2, O2, CB2, SG2
@@ -1087,7 +1085,7 @@ class Disulfide:
             ("SG1", "SG2"): 2.044,  # This angle is for the disulfide bond itself
             ("SG2", "CB2"): 1.86,
             ("CB2", "CA2"): 1.52,
-            ("CB2", "C2"): 1.52,
+            ("CA2", "C2"): 1.52,
             ("N2", "CA2"): 1.46,
         }
 
@@ -1102,7 +1100,7 @@ class Disulfide:
             ("SG1", "SG2"),  # This angle is for the disulfide bond itself
             ("SG2", "CB2"),
             ("CB2", "CA2"),
-            ("CB2", "C2"),
+            ("CA2", "C2"),
             ("N2", "CA2"),
         ]
 
@@ -1125,28 +1123,31 @@ class Disulfide:
             b = atom_coordinates[atom_indices[pair[1]]]
             ideal = idealized_bonds[pair]
             try:
-                angle = math.dist(a, b)
+                distance = math.dist(a, b)
             except ValueError as e:
                 print(f"Error calculating angle for atoms {pair}: {e}")
                 return None
-            calculated_distances.append(angle)
+            calculated_distances.append(distance)
             if verbose:
                 _logger.info(
-                    f"Calculated distance for atoms {pair}: {angle:.2f}A, Ideal distance: {ideal:.2f}A"
+                    f"Calculated distance for atoms {pair}: {distance:.2f}A, Ideal distance: {ideal:.2f}A"
                 )
 
-        # Convert idealized angles to a list
-        idealized_angles_list = [idealized_bonds[pair] for pair in distance_pairs]
+        # Convert idealized distances to a list
+        idealized_distance_list = [idealized_bonds[pair] for pair in distance_pairs]
 
         # Calculate RMS difference
         rms_diff = rms_difference(
-            np.array(calculated_distances), np.array(idealized_angles_list)
+            np.array(calculated_distances), np.array(idealized_distance_list)
         )
 
         if verbose:
             _logger.info(
-                f"Calculated angle for atoms {pair}: {angle:.2f}, Ideal angle: {ideal:.2f}"
+                f"RMS distance deviation from ideality for SS atoms: {rms_diff:.2f}"
             )
+
+            # Reset logger level
+            _logger.setLevel(logging.WARNING)
 
         return rms_diff
 
