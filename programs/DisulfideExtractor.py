@@ -19,11 +19,12 @@ import argparse
 import datetime
 import glob
 import os
+import pickle
 import sys
 import time
 from shutil import copy
 
-from proteusPy import Extract_Disulfides
+from proteusPy import Extract_Disulfides, Extract_Disulfides_From_List
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
     LOADER_FNAME,
@@ -37,6 +38,7 @@ from proteusPy.ProteusGlobals import (
 HOME_DIR = os.path.expanduser("~")
 PDB_BASE = os.getenv("PDB")
 PDB_DIR = MODULE_DATA = REPO_DATA = DATA_DIR = ""
+GOOD_PDB_FILE = "good_pdb.pkl"
 
 
 if not os.path.isdir(PDB_BASE):
@@ -63,6 +65,7 @@ if not os.path.isdir(DATA_DIR):
     print(f"Error: The directory {DATA_DIR} does not exist.")
     sys.exit(1)
 
+good_pdb_fpath = os.path.join(DATA_DIR, GOOD_PDB_FILE)
 ent_files = glob.glob(os.path.join(PDB_DIR, "*.ent"))
 num_ent_files = len(ent_files)
 __version__ = "1.0.0"
@@ -112,6 +115,11 @@ def parse_arguments():
 
 
 def do_extract(verbose, full, subset, cutoff, prune):
+    from proteusPy import Extract_Disulfides, load_list_from_file
+
+    sslist = load_list_from_file(good_pdb_fpath)
+    print(f"len(sslist): {len(sslist)}")
+
     if subset:
         if verbose:
             print("--> Extracting the SS subset...")
@@ -139,7 +147,7 @@ def do_extract(verbose, full, subset, cutoff, prune):
         if verbose:
             print("--> Extracting the SS full dataset. This will take ~1.5 hours.")
 
-        Extract_Disulfides(
+        Extract_Disulfides_From_List(
             numb=-1,
             verbose=False,
             quiet=True,
@@ -147,6 +155,7 @@ def do_extract(verbose, full, subset, cutoff, prune):
             datadir=DATA_DIR,
             dist_cutoff=cutoff,
             prune=prune,
+            sslist=sslist,
         )
     return
 
