@@ -924,6 +924,248 @@ def Extract_Disulfides(
     return
 
 
+########
+
+
+def Extract_Disulfides_From_List(
+    numb=-1,
+    verbose=False,
+    quiet=True,
+    pdbdir=PDB_DIR,
+    baddir=PDB_DIR + "/bad/",
+    datadir=MODEL_DIR,
+    picklefile=SS_PICKLE_FILE,
+    torsionfile=SS_TORSIONS_FILE,
+    problemfile=PROBLEM_ID_FILE,
+    dictfile=SS_DICT_PICKLE_FILE,
+    dist_cutoff=-1.0,
+    prune=True,
+    sslist=[],
+) -> None:
+    """
+    Read the PDB files contained in ``pdbdir`` and create the .pkl files needed for the
+    proteusPy.DisulfideLoader.DisulfideLoader class.
+    The ```Disulfide``` objects are contained in a ```DisulfideList``` object and
+    ```Dict``` within these files. In addition, .csv files containing all of
+    the torsions for the disulfides and problem IDs are written. The optional
+    ```dist_cutoff``` allows for removal of Disufides whose Cα-Cα distance is >
+    than the cutoff value. If it's -1.0 then the function keeps all Disulfides.
+
+    :param numb:           Number of entries to process, defaults to all
+    :param verbose:        More messages
+    :param quiet:          Turn off DisulfideConstruction warnings
+    :param pdbdir:         Path to PDB files
+    :param datadir:        Path to resulting .pkl files
+    :param picklefile:     Name of the disulfide .pkl file
+    :param torsionfile:    Name of the disulfide torsion file .csv created
+    :param problemfile:    Name of the .csv file containing problem ids
+    :param dictfile:       Name of the .pkl file
+    :param dist_cutoff:    Ca distance cutoff to reject a Disulfide.
+    :param prune:          Move bad files to bad directory, defaults to True
+    """
+
+    import shutil
+
+    from proteusPy import DisulfideList, load_disulfides_from_id
+    from proteusPy.Disulfide import Torsion_DF_Cols
+
+    if quiet:
+        _logger.setLevel(logging.ERROR)
+
+    bad_dir = baddir
+
+    entrylist = []
+    problem_ids = []
+    bad = bad_dist = 0
+
+    # we use the specialized list class DisulfideList to contain our disulfides
+    # we'll use a dict to store DisulfideList objects, indexed by the structure ID
+    All_ss_list = DisulfideList([], "PDB_SS")
+    All_ss_dict2 = {}  # new dict of pointers to indices
+
+    start = time.time()
+    cwd = os.getcwd()
+
+    os.chdir(pdbdir)
+
+    entrylist = sslist
+    if verbose:
+        _logger.info(
+            f"Extract_Disulfides(): PDB Ids: {entrylist}, len: {len(entrylist)}"
+        )
+
+    # create a dataframe with the following columns for the disulfide conformations
+    # extracted from the structure
+
+    SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
+
+    # define a tqdm progressbar using the fully loaded entrylist list.
+    # If numb is passed then
+    # only do the last numb entries.
+
+    tot = 0
+    cnt = 0
+
+    # loop over ss_filelist, create disulfides and initialize them
+    # the logging_redirect_tqdm() context manager will redirect the logging output
+    # to the tqdm progress bar.
+
+    with logging_redirect_tqdm(loggers=[_logger]):
+        if numb > 0:
+            pbar = tqdm(entrylist[:numb], ncols=PBAR_COLS)
+        else:
+            pbar = tqdm(entrylist, ncols=PBAR_COLS)
+
+        for entry in pbar:
+            _sslist = DisulfideList([], entry)
+
+            # returns an empty list if none are found.
+            _sslist = load_disulfides_from_id(
+                entry,
+                model_numb=0,
+                verbose=verbose,
+                quiet=quiet,
+                pdb_dir=pdbdir,
+                cutoff=dist_cutoff,
+            )
+
+            # sslist, xchain = prune_extra_ss(_sslist)
+            # sslist = _sslist
+
+            if len(_sslist) > 0:
+                sslist = remove_duplicate_ss(_sslist)
+                sslist2 = []  # list to hold indices for ss_dict2
+                for ss in sslist:
+                    All_ss_list.append(ss)
+                    new_row = [
+                        ss.pdb_id,
+                        ss.name,
+                        ss.proximal,
+                        ss.distal,
+                        ss.chi1,
+                        ss.chi2,
+                        ss.chi3,
+                        ss.chi4,
+                        ss.chi5,
+                        ss.energy,
+                        ss.ca_distance,
+                        ss.cb_distance,
+                        ss.phiprox,
+                        ss.psiprox,
+                        ss.phidist,
+                        ss.psidist,
+                        ss.torsion_length,
+                        ss.rho,
+                    ]
+
+                    # add the row to the end of the dataframe
+                    SS_df.loc[len(SS_df.index)] = new_row.copy()  # deep copy
+                    sslist2.append(cnt)
+                    cnt += 1
+                    tot += 1
+
+                # All_ss_dict[entry] = sslist
+                # print(f'Entry: {entry}. Dict indices: {sslist2}')
+                All_ss_dict2[entry] = sslist2
+
+                # print(f'{entry} ss dict adding: {sslist2}')
+
+            else:  ## _sslist is empty!
+                bad += 1
+                problem_ids.append(entry)
+                if verbose:
+                    _logger.warning(f"Extract_Disulfides(): No SS parsed for: {entry}!")
+                if prune:
+                    fname = f"pdb{entry}.ent"
+                    # Construct the full path for the new destination file
+                    destination_file_path = os.path.join(bad_dir, fname)
+                    # Copy the file to the new destination with the correct filename
+                    _logger.warning(
+                        f"Extract_Disulfides(): Moving {fname} to {destination_file_path}"
+                    )
+                    shutil.move(fname, destination_file_path)
+                continue  ## this entry has no SS bonds, so we break the loop and move on to the next entry
+
+            pbar.set_postfix(
+                {"ID": entry, "NoSS": bad, "Cnt": tot}
+            )  # update the progress bar
+
+    if bad > 0:
+        prob_cols = ["id"]
+        problem_df = pd.DataFrame(columns=prob_cols)
+        problem_df["id"] = problem_ids
+
+        _logger.warning(
+            (
+                f"-> Extract_Disulfides(): Found and moved: {len(problem_ids)} non-parsable structures."
+                f"-> Extract_Disulfides(): Saving problem IDs to file: {datadir}{problemfile}"
+            )
+        )
+
+        problem_df.to_csv(f"{datadir}{problemfile}")
+    else:  ## no bad files found
+        if verbose:
+            _logger.info("Extract_Disulfides(): No non-parsable structures found.")
+
+    if bad_dist > 0:
+        if verbose:
+            _logger.warning(
+                f"-> Extract_Disulfides(): Found and ignored: {bad_dist} long SS bonds."
+            )
+
+    else:
+        if verbose:
+            _logger.info("Extract_Disulfides(): No problems found.")
+
+    # dump the all_ss list of disulfides to a .pkl file. ~520 MB.
+    fname = os.path.join(datadir, picklefile)
+
+    if verbose:
+        _logger.info(
+            f"-> Extract_Disulfides(): Saving {len(All_ss_list)} Disulfides to file: {fname}"
+        )
+
+    with open(fname, "wb+") as f:
+        pickle.dump(All_ss_list, f)
+
+    # dump the dict2 disulfides to a .pkl file. ~520 MB.
+    dict_len = len(All_ss_dict2)
+    fname = os.path.join(datadir, dictfile)
+
+    if verbose:
+        _logger.info(
+            f"-> Extract_Disulfides(): Saving indices of {dict_len} Disulfide-containing PDB IDs to file: {fname}"
+        )
+
+    with open(fname, "wb+") as f:
+        pickle.dump(All_ss_dict2, f)
+
+    # save the torsions
+
+    fname = os.path.join(datadir, torsionfile)
+    if verbose:
+        _logger.info(f"-> Extract_Disulfides(): Saving torsions to file: {fname}")
+
+    SS_df.to_csv(fname)
+
+    end = time.time()
+    elapsed = end - start
+
+    if verbose:
+        _logger.info(
+            f"-> Extract_Disulfides(): Disulfide Extraction complete! Elapsed time:\
+    	    {datetime.timedelta(seconds=elapsed)} (h:m:s)"
+        )
+
+    # return to original directory
+    os.chdir(cwd)
+
+    # restore the logger level
+    if quiet:
+        _logger.setLevel(logging.WARNING)
+    return
+
+
 def Extract_Disulfide(
     pdbid: str, verbose=False, quiet=True, pdbdir=PDB_DIR, xtra=True
 ) -> DisulfideList:
@@ -1203,6 +1445,165 @@ def check_header_from_file(filename: str, model_numb=0, verbose=False, dbg=True)
     return found, errors
 
 
+# functions to calculate statistics and filter disulfide lists via pandas
+
+
+def create_deviation_dataframe(disulfide_list):
+    """
+    Create a DataFrame with columns PDB_ID, SS_Name, Angle_Deviation, Distance_Deviation, Ca Distance
+    from a list of disulfides.
+
+    :param disulfide_list: List of disulfide objects.
+    :type proteusPy.DisulfideList: list
+    :return: DataFrame containing the disulfide information.
+    :rtype: pd.DataFrame
+    """
+    data = {
+        "PDB_ID": [],
+        "Resolution": [],
+        "SS_Name": [],
+        "Angle_Deviation": [],
+        "Bondlength_Deviation": [],
+        "Ca_Distance": [],
+    }
+
+    for ss in tqdm(disulfide_list, desc="Processing..."):
+        pdb_id = ss.pdb_id
+        resolution = ss.resolution
+        ca_distance = ss.ca_distance
+        angle_deviation = ss.bond_angle_ideality
+        distance_deviation = ss.bond_length_ideality
+
+        data["PDB_ID"].append(pdb_id)
+        data["Resolution"].append(resolution)
+        data["SS_Name"].append(ss.name)
+        data["Angle_Deviation"].append(angle_deviation)
+        data["Bondlength_Deviation"].append(distance_deviation)
+        data["Ca_Distance"].append(ca_distance)
+
+    df = pd.DataFrame(data)
+    return df
+
+
+def calculate_std_cutoff(df, column, num_std=2):
+    """
+    Calculate cutoff based on standard deviation.
+
+    :param df: DataFrame containing the deviations.
+    :type df: pd.DataFrame
+    :param column: Column name for which to calculate the cutoff.
+    :type column: str
+    :param num_std: Number of standard deviations to use for the cutoff.
+    :type num_std: int
+    :return: Cutoff value.
+    :rtype: float
+    """
+    mean = df[column].mean()
+    std = df[column].std()
+    cutoff = mean + num_std * std
+    return cutoff
+
+
+def calculate_percentile_cutoff(df, column, percentile=95):
+    """
+    Calculate cutoff based on percentile.
+
+    :param df: DataFrame containing the deviations.
+    :type df: pd.DataFrame
+    :param column: Column name for which to calculate the cutoff.
+    :type column: str
+    :param percentile: Percentile to use for the cutoff.
+    :type percentile: int
+    :return: Cutoff value.
+    :rtype: float
+    """
+    cutoff = np.percentile(df[column].dropna(), percentile)
+    return cutoff
+
+
+def filter_by_cutoffs(df, length_cutoff=1.0, angle_cutoff=1.0, ca_cutoff=8.0):
+    """
+    Filter the DataFrame based on distance, angle, and Ca distance cutoffs. Ca cutoff
+    dominates the filter and will override the distance and angle cutoffs. Note: The
+    filter is applied if the Ca distance is less than or equal to 2.0 Angstroms, since
+    this is physically impossible.
+
+    :param df: DataFrame containing the deviations.
+    :type df: pd.DataFrame
+    :param length_cutoff: Cutoff value for Bond Length Deviation.
+    :type distance_cutoff: float
+    :param angle_cutoff: Cutoff value for angle deviation.
+    :type angle_cutoff: float
+    :param ca_cutoff: Cutoff value for Ca distance.
+    :type ca_cutoff: float
+    :return: Filtered DataFrame.
+    :rtype: pd.DataFrame
+    """
+    filtered_df = df[
+        (df["Bondlength_Deviation"] <= length_cutoff)
+        & (df["Angle_Deviation"] <= angle_cutoff)
+        & (df["Ca_Distance"] > 2)
+        & (df["Ca_Distance"] <= ca_cutoff)
+    ]
+    return filtered_df
+
+
+def bad_filter_by_cutoffs(df, distance_cutoff=1.0, angle_cutoff=1.0, ca_cutoff=8.0):
+    """
+    Return the DataFrame objects that are GREATER than the cutoff based on distance,
+    angle, and Ca distance cutoffs. Used to get the bad structures. Ca cutoff
+    dominates the filter and will override the distance and angle cutoffs.
+
+    :param df: DataFrame containing the deviations.
+    :type df: pd.DataFrame
+    :param distance_cutoff: Cutoff value for Bond Length Deviation.
+    :type distance_cutoff: float
+    :param angle_cutoff: Cutoff value for angle deviation.
+    :type angle_cutoff: float
+    :param ca_cutoff: Cutoff value for Ca distance.
+    :type ca_cutoff: float
+    :return: Filtered DataFrame.
+    :rtype: pd.DataFrame
+    """
+    filtered_df = df[
+        (df["Bondlength_Deviation"] > distance_cutoff)
+        & (df["Angle_Deviation"] > angle_cutoff)
+        & (df["Ca_Distance"] > ca_cutoff)
+        & (df["Ca_Distance"] < 2)
+    ]
+    return filtered_df
+
+
+def save_list_to_file(input_list, filename):
+    """
+    Save the input list to a file using pickle.
+
+    :param input_list: List to be saved.
+    :type input_list: list
+    :param filename: Name of the file where the list will be saved.
+    :type filename: str
+    """
+    with open(filename, "wb") as file:
+        pickle.dump(input_list, file)
+
+
+def load_list_from_file(filename):
+    """
+    Load a list from a file using pickle.
+
+    This function reads a list from a file that was previously saved using the pickle module.
+
+    :param filename: Name of the file from which the list will be loaded.
+    :type filename: str
+    :return: The list that was loaded from the file.
+    :rtype: list
+    """
+    with open(filename, "rb") as file:
+        loaded_list = pickle.load(file)
+    return loaded_list
+
+
+# These will be deprecated.
 def check_header_from_id(
     struct_name: str, pdb_dir=".", model_numb=0, verbose=False, dbg=False
 ) -> int:
