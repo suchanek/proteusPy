@@ -25,7 +25,7 @@ from collections import UserList
 from pathlib import Path
 
 import numpy as np
-import pandas
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import pyvista as pv
@@ -272,6 +272,8 @@ class DisulfideList(UserList):
         """
         sslist = self.data
         tot = len(sslist)
+        if tot == 0:
+            return 0.0
 
         total = 0.0
         for ss1 in sslist:
@@ -347,19 +349,58 @@ class DisulfideList(UserList):
 
         return total / cnt
 
-    def build_distance_df(self) -> pandas.DataFrame:
+    def build_distance_df(self) -> pd.DataFrame:
         """
         Create a dataframe containing the input DisulfideList Cα-Cα distance, energy.
         This can take several minutes for the entire database.
 
         :return: DataFrame containing Ca distances
-        :rtype: pandas.DataFrame
+        :rtype: pd.DataFrame
+        """
+        # create a list to collect rows as dictionaries
+        rows = []
+        i = 0
+        sslist = self.data
+        total_length = len(sslist)
+        update_interval = max(1, total_length // 20)  # 5% of the list length
+
+        pbar = tqdm(sslist, ncols=PBAR_COLS, leave=False)
+        for ss in pbar:
+            new_row = {
+                "source": ss.pdb_id,
+                "ss_id": ss.name,
+                "proximal": ss.proximal,
+                "distal": ss.distal,
+                "energy": ss.energy,
+                "ca_distance": ss.ca_distance,
+                "cb_distance": ss.cb_distance,
+            }
+            rows.append(new_row)
+            i += 1
+
+            if i % update_interval == 0 or i == total_length - 1:
+                pbar.update(update_interval)
+
+        pbar.close()
+
+        # create the dataframe from the list of dictionaries
+        SS_df = pd.DataFrame(rows, columns=Distance_DF_Cols)
+
+        return SS_df
+
+    def Obuild_distance_df(self) -> pd.DataFrame:
+        """
+        Create a dataframe containing the input DisulfideList Cα-Cα distance, energy.
+        This can take several minutes for the entire database.
+
+        :return: DataFrame containing Ca distances
+        :rtype: pd.DataFrame
         """
 
         # create a dataframe with the following columns for the disulfide
         # conformations extracted from the structure
 
-        SS_df = pandas.DataFrame(columns=Distance_DF_Cols)
+        SS_df = pd.DataFrame(columns=Distance_DF_Cols)
         sslist = self.data
 
         pbar = tqdm(sslist, ncols=PBAR_COLS)
@@ -377,19 +418,20 @@ class DisulfideList(UserList):
 
         return SS_df
 
-    def build_torsion_df(self) -> pandas.DataFrame:
+    # here we build a dataframe containing the torsional parameters
+
+    def build_torsion_df(self) -> pd.DataFrame:
         """
         Create a dataframe containing the input DisulfideList torsional parameters,
         Cα-Cα distance, energy, and phi-psi angles. This can take several minutes for the
         entire database.
 
-        :param SSList: DisulfideList - input list of Disulfides
-        :return: pandas.Dataframe containing the torsions
+        :return: pd.DataFrame containing the torsions
         """
-        # create a dataframe with the following columns for the disulfide
-        # conformations extracted from the structure
+        # create a list to collect rows as dictionaries
+        rows = []
+        i = 0
 
-        SS_df = pandas.DataFrame(columns=Torsion_DF_Cols)
         sslist = self.data
         if self.quiet or len(sslist) < 100:
             pbar = sslist
@@ -397,28 +439,36 @@ class DisulfideList(UserList):
             pbar = tqdm(sslist, ncols=PBAR_COLS, leave=False)
 
         for ss in pbar:
-            new_row = [
-                ss.pdb_id,
-                ss.name,
-                ss.proximal,
-                ss.distal,
-                ss.chi1,
-                ss.chi2,
-                ss.chi3,
-                ss.chi4,
-                ss.chi5,
-                ss.energy,
-                ss.ca_distance,
-                ss.cb_distance,
-                ss.psiprox,
-                ss.psiprox,
-                ss.phidist,
-                ss.psidist,
-                ss.torsion_length,
-                ss.rho,
-            ]
-            # add the row to the end of the dataframe
-            SS_df.loc[len(SS_df.index)] = new_row
+            new_row = {
+                "source": ss.pdb_id,
+                "ss_id": ss.name,
+                "proximal": ss.proximal,
+                "distal": ss.distal,
+                "chi1": ss.chi1,
+                "chi2": ss.chi2,
+                "chi3": ss.chi3,
+                "chi4": ss.chi4,
+                "chi5": ss.chi5,
+                "energy": ss.energy,
+                "ca_distance": ss.ca_distance,
+                "cb_distance": ss.cb_distance,
+                "psiprox": ss.psiprox,
+                "phiprox": ss.phiprox,
+                "phidist": ss.phidist,
+                "psidist": ss.psidist,
+                "torsion_length": ss.torsion_length,
+                "rho": ss.rho,
+            }
+            rows.append(new_row)
+            i += 1
+
+            if i % update_interval == 0 or i == total_length - 1:
+                pbar.update(update_interval)
+
+        pbar.close()
+
+        # create the dataframe from the list of dictionaries
+        SS_df = pd.DataFrame(rows, columns=Torsion_DF_Cols)
 
         return SS_df
 
@@ -465,8 +515,8 @@ class DisulfideList(UserList):
         for col in dist_cols:
             dist_stats[col] = {"mean": df[col].mean(), "std": df[col].std()}
 
-        tor_stats = pandas.DataFrame(tor_stats, columns=tor_cols)
-        dist_stats = pandas.DataFrame(dist_stats, columns=dist_cols)
+        tor_stats = pd.DataFrame(tor_stats, columns=tor_cols)
+        dist_stats = pd.DataFrame(dist_stats, columns=dist_cols)
 
         return tor_stats, dist_stats
 
@@ -666,7 +716,7 @@ class DisulfideList(UserList):
         return
 
     @property
-    def distance_df(self) -> pandas.DataFrame:
+    def distance_df(self) -> pd.DataFrame:
         """
         Build and return the distance dataframe for the input list.
         This can take considerable time for the entire list.
@@ -793,11 +843,13 @@ class DisulfideList(UserList):
         else:
             self.data.extend(self.validate_ss(item) for item in other)
 
-    def filter_by_distance(self, distance: float):
+    def filter_by_distance(self, distance: float, minimum: float = 2.0):
         """
-        Return a DisulfideList filtered by the given distance.
+        Return a DisulfideList filtered by to between the maxium Ca distance and
+        the minimum, which defaults to 2.0A.
 
         :param distance: Distance in Å
+        :param minimum: Distance in Å
         :return: DisulfideList containing disulfides with the given distance.
         """
 
@@ -808,7 +860,11 @@ class DisulfideList(UserList):
         if distance == -1.0:
             return sslist.copy()
 
-        reslist = [ss for ss in sslist if ss.ca_distance < distance]
+        reslist = [
+            ss
+            for ss in sslist
+            if ss.ca_distance < distance and ss.ca_distance > minimum
+        ]
 
         return reslist
 
