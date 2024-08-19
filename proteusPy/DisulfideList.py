@@ -401,9 +401,11 @@ class DisulfideList(UserList):
         # create a list to collect rows as dictionaries
         rows = []
         i = 0
+        total_length = len(self.data)
+        update_interval = max(1, total_length // 20)  # 5% of the list length
 
         sslist = self.data
-        if self.quiet or len(sslist) < 100:
+        if self.quiet:
             pbar = sslist
         else:
             pbar = tqdm(sslist, ncols=PBAR_COLS, leave=False)
@@ -432,10 +434,12 @@ class DisulfideList(UserList):
             rows.append(new_row)
             i += 1
 
-            if i % update_interval == 0 or i == total_length - 1:
-                pbar.update(update_interval)
+            if not self.quiet:
+                if i % update_interval == 0 or i == total_length - 1:
+                    pbar.update(update_interval)
 
-        pbar.close()
+        if not self.quiet:
+            pbar.close()
 
         # create the dataframe from the list of dictionaries
         SS_df = pd.DataFrame(rows, columns=Torsion_DF_Cols)

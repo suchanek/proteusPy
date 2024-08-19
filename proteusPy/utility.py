@@ -757,7 +757,7 @@ def Extract_Disulfides(
     # create a dataframe with the following columns for the disulfide conformations
     # extracted from the structure
 
-    SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
+    # SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
 
     # define a tqdm progressbar using the fully loaded entrylist list.
     # If numb is passed then
@@ -818,7 +818,7 @@ def Extract_Disulfides(
                     ]
 
                     # add the row to the end of the dataframe
-                    SS_df.loc[len(SS_df.index)] = new_row.copy()  # deep copy
+                    # SS_df.loc[len(SS_df.index)] = new_row.copy()  # deep copy
                     sslist2.append(cnt)
                     cnt += 1
                     tot += 1
@@ -908,7 +908,7 @@ def Extract_Disulfides(
     if verbose:
         _logger.info(f"Saving torsions to file: {fname}")
 
-    SS_df.to_csv(fname)
+    # SS_df.to_csv(fname)
 
     end = time.time()
     elapsed = end - start
@@ -1001,7 +1001,7 @@ def Extract_Disulfides_From_List(
     # create a dataframe with the following columns for the disulfide conformations
     # extracted from the structure
 
-    SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
+    # SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
 
     # define a tqdm progressbar using the fully loaded entrylist list.
     # If numb is passed then
@@ -1063,7 +1063,7 @@ def Extract_Disulfides_From_List(
                     ]
 
                     # add the row to the end of the dataframe
-                    SS_df.loc[len(SS_df.index)] = new_row.copy()  # deep copy
+                    # SS_df.loc[len(SS_df.index)] = new_row.copy()  # deep copy
                     sslist2.append(cnt)
                     cnt += 1
                     tot += 1
@@ -1150,7 +1150,7 @@ def Extract_Disulfides_From_List(
     if verbose:
         _logger.info(f"Saving torsions to file: {fname}")
 
-    SS_df.to_csv(fname)
+    #SS_df.to_csv(fname)
 
     end = time.time()
     elapsed = end - start
