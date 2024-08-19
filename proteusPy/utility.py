@@ -17,13 +17,14 @@ import os
 import pickle
 import subprocess
 import time
+from pathlib import Path
 
 import psutil
 
 from proteusPy import Disulfide
 from proteusPy.logger_config import get_logger
 
-_logger = get_logger("__name__")
+_logger = get_logger(__name__)
 
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
@@ -251,7 +252,7 @@ def download_file(url, directory, verbose=False):
     :param verbose: Verbosity, defaults to False
     """
     file_name = url.split("/")[-1]
-    file_path = os.path.join(directory, file_name)
+    file_path = Path(directory) / file_name
 
     if not os.path.exists(file_path):
         if verbose:
@@ -836,7 +837,10 @@ def Extract_Disulfides(
                 if prune:
                     fname = f"pdb{entry}.ent"
                     # Construct the full path for the new destination file
-                    destination_file_path = os.path.join(bad_dir, fname)
+                    # destination_file_path = os.path.join(bad_dir, fname)
+
+                    destination_file_path = Path(bad_dir) / fname
+
                     # Copy the file to the new destination with the correct filename
                     _logger.warning(
                         f"Extract_Disulfides(): Moving {fname} to {destination_file_path}"
@@ -876,7 +880,7 @@ def Extract_Disulfides(
             _logger.info("Extract_Disulfides(): No problems found.")
 
     # dump the all_ss list of disulfides to a .pkl file. ~520 MB.
-    fname = os.path.join(datadir, picklefile)
+    fname = Path(datadir) / picklefile
 
     if verbose:
         _logger.info(
@@ -888,7 +892,7 @@ def Extract_Disulfides(
 
     # dump the dict2 disulfides to a .pkl file. ~520 MB.
     dict_len = len(All_ss_dict2)
-    fname = os.path.join(datadir, dictfile)
+    fname = Path(datadir) / dictfile
 
     if verbose:
         _logger.info(
@@ -900,7 +904,7 @@ def Extract_Disulfides(
 
     # save the torsions
 
-    fname = os.path.join(datadir, torsionfile)
+    fname = Path(datadir) / torsionfile
     if verbose:
         _logger.info(f"-> Extract_Disulfides(): Saving torsions to file: {fname}")
 
@@ -1078,7 +1082,7 @@ def Extract_Disulfides_From_List(
                 if prune:
                     fname = f"pdb{entry}.ent"
                     # Construct the full path for the new destination file
-                    destination_file_path = os.path.join(bad_dir, fname)
+                    destination_file_path = Path(bad_dir) / fname
                     # Copy the file to the new destination with the correct filename
                     _logger.warning(
                         f"Extract_Disulfides(): Moving {fname} to {destination_file_path}"
@@ -1118,7 +1122,7 @@ def Extract_Disulfides_From_List(
             _logger.info("Extract_Disulfides(): No problems found.")
 
     # dump the all_ss list of disulfides to a .pkl file. ~520 MB.
-    fname = os.path.join(datadir, picklefile)
+    fname = Path(datadir) / picklefile
 
     if verbose:
         _logger.info(
@@ -1130,7 +1134,7 @@ def Extract_Disulfides_From_List(
 
     # dump the dict2 disulfides to a .pkl file. ~520 MB.
     dict_len = len(All_ss_dict2)
-    fname = os.path.join(datadir, dictfile)
+    fname = Path(datadir) / dictfile
 
     if verbose:
         _logger.info(
@@ -1142,7 +1146,7 @@ def Extract_Disulfides_From_List(
 
     # save the torsions
 
-    fname = os.path.join(datadir, torsionfile)
+    fname = Path(datadir) / torsionfile
     if verbose:
         _logger.info(f"-> Extract_Disulfides(): Saving torsions to file: {fname}")
 
@@ -1225,9 +1229,6 @@ def Extract_Disulfide(
 
     # return to original directory
     return _sslist
-
-
-import subprocess
 
 
 def get_macos_theme():
@@ -1521,7 +1522,9 @@ def calculate_percentile_cutoff(df, column, percentile=95):
     return cutoff
 
 
-def filter_by_cutoffs(df, length_cutoff=1.0, angle_cutoff=1.0, ca_cutoff=8.0):
+def filter_by_cutoffs(
+    df, length_cutoff=1.0, angle_cutoff=1.0, ca_cutoff=8.0, minimum_distance=2.0
+):
     """
     Filter the DataFrame based on distance, angle, and Ca distance cutoffs. Ca cutoff
     dominates the filter and will override the distance and angle cutoffs. Note: The
@@ -1542,13 +1545,15 @@ def filter_by_cutoffs(df, length_cutoff=1.0, angle_cutoff=1.0, ca_cutoff=8.0):
     filtered_df = df[
         (df["Bondlength_Deviation"] <= length_cutoff)
         & (df["Angle_Deviation"] <= angle_cutoff)
-        & (df["Ca_Distance"] > 2)
-        & (df["Ca_Distance"] <= ca_cutoff)
+        & (df["Ca_Distance"] > minimum_distance)
+        & (df["Ca_Distance"] < ca_cutoff)
     ]
     return filtered_df
 
 
-def bad_filter_by_cutoffs(df, distance_cutoff=1.0, angle_cutoff=1.0, ca_cutoff=8.0):
+def bad_filter_by_cutoffs(
+    df, distance_cutoff=1.0, angle_cutoff=1.0, ca_cutoff=8.0, minimum_distance=2.0
+):
     """
     Return the DataFrame objects that are GREATER than the cutoff based on distance,
     angle, and Ca distance cutoffs. Used to get the bad structures. Ca cutoff
@@ -1569,7 +1574,7 @@ def bad_filter_by_cutoffs(df, distance_cutoff=1.0, angle_cutoff=1.0, ca_cutoff=8
         (df["Bondlength_Deviation"] > distance_cutoff)
         & (df["Angle_Deviation"] > angle_cutoff)
         & (df["Ca_Distance"] > ca_cutoff)
-        & (df["Ca_Distance"] < 2)
+        & (df["Ca_Distance"] < minimum_distance)
     ]
     return filtered_df
 
@@ -1619,22 +1624,39 @@ def check_header_from_id(
     :param verbose: print info while parsing
     :param dbg: Debugging Flag
     :return: number of errors found.
-
-    Example:
-      Assuming the DATA_DIR has the pdb5rsa.ent file we can check the file thusly:
-      (assumes the PDB environment variable is set to the PDB directory.)
-
-    >>> import os
-    >>> from proteusPy import Disulfide, check_header_from_id
-    >>> from proteusPy.ProteusGlobals import DATA_DIR
-    >>> found = errors = 0
-    >>> found, errors = check_header_from_id('5rsa', pdb_dir=DATA_DIR, verbose=False)
-    >>> found
-    4
     """
 
-    fname = os.path.join(pdb_dir, f"pdb{struct_name}.ent")
+    fname = Path(pdb_dir) / f"pdb{struct_name}.ent"
     return check_header_from_file(fname, verbose=verbose, dbg=dbg)
+
+
+def set_logger_level_for_module(pkg_name, level=""):
+    """
+    Set the logging level for all loggers within a specified package.
+
+    This function iterates through all registered loggers and sets the logging
+    level for those that belong to the specified package.
+
+    :param pkg_name: The name of the package for which to set the logging level.
+    :type pkg_name: str
+    :param level: The logging level to set (e.g., 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL').
+                  If not specified, the logging level will not be changed.
+    :type level: str, optional
+    :return: A list of logger names that were found and had their levels set.
+    :rtype: list
+    """
+    logger_dict = logging.Logger.manager.loggerDict
+    registered_loggers = [
+        name
+        for name in logger_dict
+        if isinstance(logger_dict[name], logging.Logger) and name.startswith(pkg_name)
+    ]
+    for logger_name in registered_loggers:
+        logger = logging.getLogger(logger_name)
+        if level:
+            logger.setLevel(level)
+
+    return registered_loggers
 
 
 if __name__ == "__main__":
