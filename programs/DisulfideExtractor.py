@@ -151,8 +151,8 @@ def parse_arguments():
 def do_extract(verbose, full, subset, cutoff, prune):
     from proteusPy import Extract_Disulfides, load_list_from_file
 
-    sslist = load_list_from_file(good_pdb_fpath)
-    print(f"len(sslist): {len(sslist)}")
+    # sslist = load_list_from_file(good_pdb_fpath)
+    # print(f"len(sslist): {len(sslist)}")
 
     if subset:
         if verbose:
@@ -179,7 +179,7 @@ def do_extract(verbose, full, subset, cutoff, prune):
 
     if full:
         if verbose:
-            print("--> Extracting the SS full dataset. This will take ~1.5 hours.")
+            print("--> Extracting the SS full dataset. This will take a while...")
 
         Extract_Disulfides(
             numb=-1,
