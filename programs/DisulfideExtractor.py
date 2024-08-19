@@ -35,10 +35,13 @@ from proteusPy.ProteusGlobals import (
     DATA_DIR,
     LOADER_FNAME,
     LOADER_SUBSET_FNAME,
+    SS_DICT_PICKLE_FILE,
+    SS_PICKLE_FILE,
     SS_PROBLEM_SUBSET_ID_FILE,
     SS_SUBSET_DICT_PICKLE_FILE,
     SS_SUBSET_PICKLE_FILE,
     SS_SUBSET_TORSIONS_FILE,
+    SS_TORSIONS_FILE,
 )
 
 _logger = logging.getLogger("DisulfideExtractor")
@@ -273,8 +276,15 @@ def do_stuff(
             print(f"Copying: {DATA_DIR} to {REPO_DATA}")
         # copy(f"{DATA_DIR}{LOADER_FNAME}", f"{MODULE_DATA}")
         # copy(f"{DATA_DIR}{LOADER_SUBSET_FNAME}", f"{MODULE_DATA}")
-        copy(f"{DATA_DIR}{LOADER_FNAME}", f"{REPO_DATA}")
-        copy(f"{DATA_DIR}{LOADER_SUBSET_FNAME}", f"{REPO_DATA}")
+        copy(Path(DATA_DIR) / LOADER_FNAME, Path(REPO_DATA))
+        copy(Path(DATA_DIR) / LOADER_SUBSET_FNAME, Path(REPO_DATA))
+        copy(Path(DATA_DIR) / SS_DICT_PICKLE_FILE, Path(REPO_DATA))
+        copy(Path(DATA_DIR) / SS_PICKLE_FILE, Path(REPO_DATA))
+        copy(Path(DATA_DIR) / SS_TORSIONS_FILE, Path(REPO_DATA))
+        copy(Path(DATA_DIR) / SS_SUBSET_DICT_PICKLE_FILE, Path(REPO_DATA))
+        copy(Path(DATA_DIR) / SS_SUBSET_PICKLE_FILE, Path(REPO_DATA))
+        copy(Path(DATA_DIR) / SS_SUBSET_TORSIONS_FILE, Path(REPO_DATA))
+
     return
 
 
