@@ -143,7 +143,7 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                 resolution = float(resolution_str)
             except ValueError:
                 if verbose:
-                    _logger.error(
+                    _logger.warning(
                         f"Error parsing resolution value from line: {line.strip()}. Found: {resolution_str}"
                     )
             if verbose:
@@ -184,7 +184,7 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                     f"Atom record not found for chain {chain_id1}, residue {res_seq_num1}, atom {atom_name}"
                 )
                 if verbose:
-                    _logger.error(
+                    _logger.warning(
                         f"Atom record not found for chain {chain_id1}, residue {res_seq_num1}, atom {atom_name}"
                     )
 
@@ -197,7 +197,7 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                     f"Atom record not found for chain {chain_id2}, residue {res_seq_num2}, atom {atom_name}"
                 )
                 if verbose:
-                    _logger.error(
+                    _logger.warning(
                         f"Atom record not found for chain {chain_id2}, residue {res_seq_num2}, atom {atom_name}"
                     )
 
@@ -228,7 +228,7 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                             f"Atom record not found for chain {chain_id}, residue {str(int(res_seq_num) + offset)}, atom {atom_name}"
                         )
                         if verbose:
-                            _logger.error(
+                            _logger.warning(
                                 f"Atom record not found for chain {chain_id}, residue {str(int(res_seq_num) + offset)}, atom {atom_name}"
                             )
             return phipsi_atoms
@@ -429,7 +429,7 @@ def get_atom_coordinates(
         return Vector3D(atom_record["coords"])
     else:
         if verbose:
-            _logger.error(
+            _logger.warning(
                 f"--> get_atom_coordinates: PDB: {ssbond_dict['pdbid']}: Atom {atom_name} in residue {chain_id} {res_seq_num} not found."
             )
         return Vector3D([])
@@ -461,7 +461,7 @@ def get_residue_atoms_coordinates(ssbond_dict, chain_id, res_seq_num, verbose=Fa
         else:
             coordinates.append(Vector3D(0.01, 0.01, 0.01))
             if verbose:
-                _logger.error(
+                _logger.warning(
                     f"--> get_residue_coordinates: PDB: {pdb_id} Atom {atom_name} in residue {chain_id} {res_seq_num} not found."
                 )
 

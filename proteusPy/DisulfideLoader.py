@@ -11,6 +11,7 @@ import copy
 import pickle
 import sys
 import time
+from pathlib import Path
 
 import pandas as pd
 
@@ -37,7 +38,7 @@ from proteusPy.ProteusGlobals import (
     SS_TORSIONS_FILE,
 )
 
-_logger = get_logger("__name__")
+_logger = get_logger(__name__)
 
 try:
     # Check if running in Jupyter
@@ -79,7 +80,7 @@ class DisulfideLoader:
     def __init__(
         self,
         verbose: bool = False,
-        datadir: str = REPO_DATA_DIR,
+        datadir: Path = REPO_DATA_DIR,
         picklefile: str = SS_PICKLE_FILE,
         pickle_dict_file: str = SS_DICT_PICKLE_FILE,
         torsion_file: str = SS_TORSIONS_FILE,
@@ -98,10 +99,10 @@ class DisulfideLoader:
         """
 
         self.ModelDir = datadir
-        self.PickleFile = f"{datadir}{picklefile}"
-        self.PickleDictFile = f"{datadir}{pickle_dict_file}"
-        self.PickleClassFile = f"{datadir}{SS_CLASS_DICT_FILE}"
-        self.TorsionFile = f"{datadir}{torsion_file}"
+        self.PickleFile = Path(datadir) / picklefile
+        self.PickleDictFile = Path(datadir) / pickle_dict_file
+        self.PickleClassFile = Path(datadir) / SS_CLASS_DICT_FILE
+        self.TorsionFile = Path(datadir) / torsion_file
         self.SSList = DisulfideList([], "ALL_PDB_SS")
         self.SSDict = {}
         self.TorsionDF = pd.DataFrame()
@@ -118,9 +119,9 @@ class DisulfideLoader:
         idlist = []
 
         if subset:
-            self.PickleFile = f"{datadir}{SS_SUBSET_PICKLE_FILE}"
-            self.PickleDictFile = f"{datadir}{SS_SUBSET_DICT_PICKLE_FILE}"
-            self.TorsionFile = f"{datadir}{SS_SUBSET_TORSIONS_FILE}"
+            self.PickleFile = Path(datadir) / SS_SUBSET_PICKLE_FILE
+            self.PickleDictFile = Path(datadir) / SS_SUBSET_DICT_PICKLE_FILE
+            self.TorsionFile = Path(datadir) / SS_SUBSET_TORSIONS_FILE
 
         if self.verbose:
             _logger.info(
@@ -541,7 +542,7 @@ class DisulfideLoader:
         else:
             fname = LOADER_FNAME
 
-        _fname = f"{savepath}{fname}"
+        _fname = Path(savepath) / fname
 
         if self.verbose:
             print(f"-> DisulfideLoader.save(): Writing {_fname}... ")
@@ -566,8 +567,8 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False):
 
     import gdown
 
-    _fname_sub = f"{loadpath}{LOADER_SUBSET_FNAME}"
-    _fname_all = f"{loadpath}{LOADER_FNAME}"
+    _fname_sub = Path(loadpath) / LOADER_SUBSET_FNAME
+    _fname_all = Path(loadpath) / LOADER_FNAME
 
     if verbose:
         print(f"--> DisulfideLoader: Downloading Disulfide Database from Drive...")
@@ -653,18 +654,18 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
     _good1 = False  # all data
     _good2 = False  # subset data
 
-    _fname_sub = f"{loadpath}{LOADER_SUBSET_FNAME}"
-    _fname_all = f"{loadpath}{LOADER_FNAME}"
+    _fname_sub = Path(loadpath) / LOADER_SUBSET_FNAME
+    _fname_all = Path(loadpath) / LOADER_FNAME
 
     if subset:
         _fname = _fname_sub
     else:
         _fname = _fname_all
 
-    if not os.path.exists(_fname_sub):
+    if not Path(_fname_sub).exists():
         res2 = Download_PDB_SS(loadpath=loadpath, verbose=verbose, subset=True)
 
-    if not os.path.exists(_fname_all):
+    if not Path(_fname_all).exists():
         res2 = Download_PDB_SS(loadpath=loadpath, verbose=verbose, subset=False)
 
     # first attempt to read the local copy of the loader

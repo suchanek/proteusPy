@@ -18,13 +18,19 @@ Last revision: 8/2/24 -egs-
 import argparse
 import datetime
 import glob
+import logging
 import os
 import pickle
 import sys
 import time
+from pathlib import Path
 from shutil import copy
 
-from proteusPy import Extract_Disulfides, Extract_Disulfides_From_List
+from proteusPy import (
+    Extract_Disulfides,
+    Extract_Disulfides_From_List,
+    set_logger_level_for_module,
+)
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
     LOADER_FNAME,
@@ -35,40 +41,49 @@ from proteusPy.ProteusGlobals import (
     SS_SUBSET_TORSIONS_FILE,
 )
 
-HOME_DIR = os.path.expanduser("~")
-PDB_BASE = os.getenv("PDB")
+_logger = logging.getLogger("DisulfideExtractor")
+_logger.setLevel(logging.INFO)
+
+set_logger_level_for_module("proteusPy", logging.CRITICAL)
+
+PDB = os.getenv("PDB")
+PDB_BASE = Path(PDB)
+
 PDB_DIR = MODULE_DATA = REPO_DATA = DATA_DIR = ""
 GOOD_PDB_FILE = "good_pdb.pkl"
 
+PDB_BASE = Path(PDB)
+HOME_DIR = Path.home()
 
-if not os.path.isdir(PDB_BASE):
+if not PDB_BASE.is_dir():
     print(f"Error: The directory {PDB_BASE} does not exist.")
     sys.exit(1)
 
-PDB_DIR = os.path.join(PDB_BASE, "good/")
-if not os.path.isdir(PDB_DIR):
+PDB_DIR = PDB_BASE / "good"
+if not PDB_DIR.is_dir():
     print(f"Error: The directory {PDB_DIR} does not exist.")
     sys.exit(1)
 
-MODULE_DATA = os.path.join(HOME_DIR, "repos/proteusPy/proteusPy/data/")
-if not os.path.isdir(MODULE_DATA):
+MODULE_DATA = HOME_DIR / "repos" / "proteusPy" / "proteusPy" / "data"
+if not MODULE_DATA.is_dir():
     print(f"Error: The directory {MODULE_DATA} does not exist.")
     sys.exit(1)
 
-REPO_DATA = os.path.join(HOME_DIR, "repos/proteusPy/data/")
-if not os.path.isdir(REPO_DATA):
+REPO_DATA = HOME_DIR / "repos/proteusPy/data"
+if not REPO_DATA.is_dir():
     print(f"Error: The directory {REPO_DATA} does not exist.")
     sys.exit(1)
 
-DATA_DIR = os.path.join(PDB_BASE, "data/")
-if not os.path.isdir(DATA_DIR):
+DATA_DIR = PDB_BASE / "data"
+if not DATA_DIR.is_dir():
     print(f"Error: The directory {DATA_DIR} does not exist.")
     sys.exit(1)
 
-good_pdb_fpath = os.path.join(DATA_DIR, GOOD_PDB_FILE)
-ent_files = glob.glob(os.path.join(PDB_DIR, "*.ent"))
+good_pdb_fpath = DATA_DIR / GOOD_PDB_FILE
+ent_files = glob.glob(str(PDB_DIR / "*.ent"))
+
 num_ent_files = len(ent_files)
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 
 def parse_arguments():
@@ -82,35 +97,54 @@ def parse_arguments():
         "--all",
         action="store_true",
         help="Process full and subset, create loaders, and update repo",
+        default=False,
     )
     parser.add_argument(
-        "--extract", "-e", action="store_true", help="Extract Disulfide data"
+        "--extract",
+        "-e",
+        action="store_true",
+        help="Extract Disulfide data",
+        default=False,
     )
     parser.add_argument(
-        "--build", "-b", action="store_true", help="Build Disulfide loader"
+        "--build",
+        "-b",
+        action="store_true",
+        help="Build Disulfide loader",
+        default=True,
     )
     parser.add_argument(
-        "--update", "-u", action="store_true", help="Update repository data directory"
+        "--update",
+        "-u",
+        action="store_true",
+        help="Update repository data directory",
+        default=False,
     )
     parser.add_argument(
-        "--full", "-f", action="store_true", help="Process full SS database"
+        "--full",
+        "-f",
+        action="store_true",
+        help="Process full SS database",
+        default=False,
     )
-    parser.add_argument("--subset", "-s", action="store_true", help="Process SS subset")
     parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable verbose output"
+        "--subset", "-s", action="store_true", help="Process SS subset", default=False
     )
     parser.add_argument(
-        "--cutoff", "-c", type=float, help="Disulfide Distance Cutoff, (Angstrom)"
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Enable verbose output",
+        default=False,
+    )
+    parser.add_argument(
+        "--cutoff",
+        "-c",
+        type=float,
+        help="Disulfide Distance Cutoff, (Angstrom)",
+        default=-1.0,
     )
 
-    parser.set_defaults(all=False)
-    parser.set_defaults(update=False)
-    parser.set_defaults(verbose=False)
-    parser.set_defaults(extract=False)
-    parser.set_defaults(subset=False)
-    parser.set_defaults(build=True)
-    parser.set_defaults(full=False)
-    parser.set_defaults(cutoff=-1.0)
     return parser.parse_args()
 
 
@@ -132,7 +166,7 @@ def do_extract(verbose, full, subset, cutoff, prune):
             picklefile=SS_SUBSET_PICKLE_FILE,
             torsionfile=SS_SUBSET_TORSIONS_FILE,
             problemfile=SS_PROBLEM_SUBSET_ID_FILE,
-            verbose=False,
+            verbose=verbose,
             quiet=True,
             dist_cutoff=cutoff,
             prune=prune,
@@ -147,15 +181,14 @@ def do_extract(verbose, full, subset, cutoff, prune):
         if verbose:
             print("--> Extracting the SS full dataset. This will take ~1.5 hours.")
 
-        Extract_Disulfides_From_List(
+        Extract_Disulfides(
             numb=-1,
-            verbose=False,
+            verbose=verbose,
             quiet=True,
             pdbdir=PDB_DIR,
             datadir=DATA_DIR,
             dist_cutoff=cutoff,
             prune=prune,
-            sslist=sslist,
         )
     return
 
@@ -176,7 +209,7 @@ def do_build(verbose, full, subset, cutoff):
             print(
                 f"--> Building the packed loader for the full dataset with cutoff: {cutoff}..."
             )
-        PDB_SS = DisulfideLoader(datadir=DATA_DIR, subset=False)
+        PDB_SS = DisulfideLoader(datadir=DATA_DIR, subset=False, verbose=verbose)
         PDB_SS.cutoff = cutoff
         PDB_SS.save(savepath=DATA_DIR, subset=False, cutoff=cutoff)
 
@@ -185,7 +218,7 @@ def do_build(verbose, full, subset, cutoff):
             print(
                 f"--> Building the packed loader for the Disulfide subset with cutoff: {cutoff}..."
             )
-        PDB_SS = DisulfideLoader(datadir=DATA_DIR, subset=True)
+        PDB_SS = DisulfideLoader(datadir=DATA_DIR, subset=True, verbose=verbose)
         PDB_SS.cutoff = cutoff
         PDB_SS.save(savepath=DATA_DIR, subset=True, cutoff=cutoff)
 
@@ -248,6 +281,7 @@ def do_stuff(
 def main():
     start = time.time()
     args = parse_arguments()
+    set_logger_level_for_module("proteusPy", logging.ERROR)
 
     print(
         f""

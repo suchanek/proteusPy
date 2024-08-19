@@ -388,36 +388,6 @@ class DisulfideList(UserList):
 
         return SS_df
 
-    def Obuild_distance_df(self) -> pd.DataFrame:
-        """
-        Create a dataframe containing the input DisulfideList Cα-Cα distance, energy.
-        This can take several minutes for the entire database.
-
-        :return: DataFrame containing Ca distances
-        :rtype: pd.DataFrame
-        """
-
-        # create a dataframe with the following columns for the disulfide
-        # conformations extracted from the structure
-
-        SS_df = pd.DataFrame(columns=Distance_DF_Cols)
-        sslist = self.data
-
-        pbar = tqdm(sslist, ncols=PBAR_COLS)
-        for ss in pbar:
-            new_row = [
-                ss.pdb_id,
-                ss.name,
-                ss.proximal,
-                ss.distal,
-                ss.energy,
-                ss.ca_distance,
-            ]
-            # add the row to the end of the dataframe
-            SS_df.loc[len(SS_df.index)] = new_row
-
-        return SS_df
-
     # here we build a dataframe containing the torsional parameters
 
     def build_torsion_df(self) -> pd.DataFrame:
@@ -1202,7 +1172,7 @@ def load_disulfides_from_id(
     # model = structure[model_numb]
 
     if verbose:
-        print(f"-> load_disulfide_from_id() - Parsing structure: {pdb_id}:")
+        _logger.info(f"-> load_disulfide_from_id() - Parsing structure: {pdb_id}:")
 
     SSList = DisulfideList([], pdb_id, resolution)
 
@@ -1220,7 +1190,7 @@ def load_disulfides_from_id(
         return None
 
     if verbose:
-        print(
+        _logger.info(
             f"-> load_disulfides_from_id(): {pdb_id} has {num_ssbonds} SSBonds, found: {errors} errors"
         )
 
