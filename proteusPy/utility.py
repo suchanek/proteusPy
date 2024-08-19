@@ -751,7 +751,7 @@ def Extract_Disulfides(
 
     if verbose:
         _logger.info(
-            f"Extract_Disulfides(): PDB Ids: {entrylist}, len: {len(entrylist)}"
+            f"PDB Ids: {entrylist}, len: {len(entrylist)}"
         )
 
     # create a dataframe with the following columns for the disulfide conformations
@@ -859,20 +859,20 @@ def Extract_Disulfides(
 
         _logger.warning(
             (
-                f"-> Extract_Disulfides(): Found and moved: {len(problem_ids)} non-parsable structures."
-                f"-> Extract_Disulfides(): Saving problem IDs to file: {datadir}{problemfile}"
+                f"Found and moved: {len(problem_ids)} non-parsable structures."
+                f"Saving problem IDs to file: {datadir}{problemfile}"
             )
         )
 
         problem_df.to_csv(f"{datadir}{problemfile}")
     else:  ## no bad files found
         if verbose:
-            _logger.info("Extract_Disulfides(): No non-parsable structures found.")
+            _logger.info("No non-parsable structures found.")
 
     if bad_dist > 0:
         if verbose:
             _logger.warning(
-                f"-> Extract_Disulfides(): Found and ignored: {bad_dist} long SS bonds."
+                f"Found and ignored: {bad_dist} long SS bonds."
             )
 
     else:
@@ -884,7 +884,7 @@ def Extract_Disulfides(
 
     if verbose:
         _logger.info(
-            f"-> Extract_Disulfides(): Saving {len(All_ss_list)} Disulfides to file: {fname}"
+            f"Saving {len(All_ss_list)} Disulfides to file: {fname}"
         )
 
     with open(fname, "wb+") as f:
@@ -896,7 +896,7 @@ def Extract_Disulfides(
 
     if verbose:
         _logger.info(
-            f"-> Extract_Disulfides(): Saving indices of {dict_len} Disulfide-containing PDB IDs to file: {fname}"
+            f"Saving indices of {dict_len} Disulfide-containing PDB IDs to file: {fname}"
         )
 
     with open(fname, "wb+") as f:
@@ -906,7 +906,7 @@ def Extract_Disulfides(
 
     fname = Path(datadir) / torsionfile
     if verbose:
-        _logger.info(f"-> Extract_Disulfides(): Saving torsions to file: {fname}")
+        _logger.info(f"Saving torsions to file: {fname}")
 
     SS_df.to_csv(fname)
 
@@ -915,7 +915,7 @@ def Extract_Disulfides(
 
     if verbose:
         _logger.info(
-            f"-> Extract_Disulfides(): Disulfide Extraction complete! Elapsed time:\
+            f"Disulfide Extraction complete! Elapsed time:\
     	    {datetime.timedelta(seconds=elapsed)} (h:m:s)"
         )
 
@@ -1101,8 +1101,8 @@ def Extract_Disulfides_From_List(
 
         _logger.warning(
             (
-                f"-> Extract_Disulfides(): Found and moved: {len(problem_ids)} non-parsable structures."
-                f"-> Extract_Disulfides(): Saving problem IDs to file: {datadir}{problemfile}"
+                f"Found and moved: {len(problem_ids)} non-parsable structures."
+                f"Saving problem IDs to file: {datadir}{problemfile}"
             )
         )
 
@@ -1114,19 +1114,19 @@ def Extract_Disulfides_From_List(
     if bad_dist > 0:
         if verbose:
             _logger.warning(
-                f"-> Extract_Disulfides(): Found and ignored: {bad_dist} long SS bonds."
+                f"Found and ignored: {bad_dist} long SS bonds."
             )
 
     else:
         if verbose:
-            _logger.info("Extract_Disulfides(): No problems found.")
+            _logger.info("No problems found.")
 
     # dump the all_ss list of disulfides to a .pkl file. ~520 MB.
     fname = Path(datadir) / picklefile
 
     if verbose:
         _logger.info(
-            f"-> Extract_Disulfides(): Saving {len(All_ss_list)} Disulfides to file: {fname}"
+            f"Saving {len(All_ss_list)} Disulfides to file: {fname}"
         )
 
     with open(fname, "wb+") as f:
@@ -1138,7 +1138,7 @@ def Extract_Disulfides_From_List(
 
     if verbose:
         _logger.info(
-            f"-> Extract_Disulfides(): Saving indices of {dict_len} Disulfide-containing PDB IDs to file: {fname}"
+            f"Saving indices of {dict_len} Disulfide-containing PDB IDs to file: {fname}"
         )
 
     with open(fname, "wb+") as f:
@@ -1148,7 +1148,7 @@ def Extract_Disulfides_From_List(
 
     fname = Path(datadir) / torsionfile
     if verbose:
-        _logger.info(f"-> Extract_Disulfides(): Saving torsions to file: {fname}")
+        _logger.info(f"Saving torsions to file: {fname}")
 
     SS_df.to_csv(fname)
 
@@ -1157,7 +1157,7 @@ def Extract_Disulfides_From_List(
 
     if verbose:
         _logger.info(
-            f"-> Extract_Disulfides(): Disulfide Extraction complete! Elapsed time:\
+            f"Disulfide Extraction complete! Elapsed time:\
     	    {datetime.timedelta(seconds=elapsed)} (h:m:s)"
         )
 
