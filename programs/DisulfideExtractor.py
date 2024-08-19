@@ -47,7 +47,7 @@ from proteusPy.ProteusGlobals import (
 _logger = logging.getLogger("DisulfideExtractor")
 _logger.setLevel(logging.INFO)
 
-set_logger_level_for_module("proteusPy", logging.CRITICAL)
+set_logger_level_for_module("proteusPy", logging.ERROR)
 
 PDB = os.getenv("PDB")
 PDB_BASE = Path(PDB)
@@ -228,6 +228,16 @@ def do_build(verbose, full, subset, cutoff):
     return
 
 
+def update_repo(datadir):
+    copy(Path(DATA_DIR) / LOADER_FNAME, Path(REPO_DATA))
+    copy(Path(DATA_DIR) / LOADER_SUBSET_FNAME, Path(REPO_DATA))
+    copy(Path(DATA_DIR) / SS_DICT_PICKLE_FILE, Path(REPO_DATA))
+    copy(Path(DATA_DIR) / SS_PICKLE_FILE, Path(REPO_DATA))
+    copy(Path(DATA_DIR) / SS_SUBSET_DICT_PICKLE_FILE, Path(REPO_DATA))
+    copy(Path(DATA_DIR) / SS_SUBSET_PICKLE_FILE, Path(REPO_DATA))
+    return
+
+
 def do_stuff(
     all=False,
     extract=False,
@@ -274,16 +284,6 @@ def do_stuff(
     if _update == True:
         if verbose:
             print(f"Copying: {DATA_DIR} to {REPO_DATA}")
-        # copy(f"{DATA_DIR}{LOADER_FNAME}", f"{MODULE_DATA}")
-        # copy(f"{DATA_DIR}{LOADER_SUBSET_FNAME}", f"{MODULE_DATA}")
-        copy(Path(DATA_DIR) / LOADER_FNAME, Path(REPO_DATA))
-        copy(Path(DATA_DIR) / LOADER_SUBSET_FNAME, Path(REPO_DATA))
-        copy(Path(DATA_DIR) / SS_DICT_PICKLE_FILE, Path(REPO_DATA))
-        copy(Path(DATA_DIR) / SS_PICKLE_FILE, Path(REPO_DATA))
-        copy(Path(DATA_DIR) / SS_TORSIONS_FILE, Path(REPO_DATA))
-        copy(Path(DATA_DIR) / SS_SUBSET_DICT_PICKLE_FILE, Path(REPO_DATA))
-        copy(Path(DATA_DIR) / SS_SUBSET_PICKLE_FILE, Path(REPO_DATA))
-        copy(Path(DATA_DIR) / SS_SUBSET_TORSIONS_FILE, Path(REPO_DATA))
 
     return
 

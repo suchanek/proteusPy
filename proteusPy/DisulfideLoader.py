@@ -147,10 +147,11 @@ class DisulfideLoader:
                 f"-> DisulfideLoader(): Reading Torsion DF from: {self.TorsionFile}...",
             )
 
-        tmpDF = pd.read_csv(self.TorsionFile)
-        tmpDF.drop(tmpDF.columns[[0]], axis=1, inplace=True)
+        # tmpDF = pd.read_csv(self.TorsionFile)
+        # tmpDF.drop(tmpDF.columns[[0]], axis=1, inplace=True)
+        # self.TorsionDF = tmpDF.copy()
 
-        self.TorsionDF = tmpDF.copy()
+        self.TorsionDF = sslist.build_torsion_df()
         self.TotalDisulfides = len(self.SSList)
 
         self.tclass = DisulfideClass_Constructor(self, self.verbose)
