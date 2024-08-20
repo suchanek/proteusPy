@@ -229,12 +229,12 @@ def do_build(verbose, full, subset, cutoff):
 
 
 def update_repo(datadir):
-    copy(Path(DATA_DIR) / LOADER_FNAME, Path(REPO_DATA))
-    copy(Path(DATA_DIR) / LOADER_SUBSET_FNAME, Path(REPO_DATA))
-    copy(Path(DATA_DIR) / SS_DICT_PICKLE_FILE, Path(REPO_DATA))
-    copy(Path(DATA_DIR) / SS_PICKLE_FILE, Path(REPO_DATA))
-    copy(Path(DATA_DIR) / SS_SUBSET_DICT_PICKLE_FILE, Path(REPO_DATA))
-    copy(Path(DATA_DIR) / SS_SUBSET_PICKLE_FILE, Path(REPO_DATA))
+    copy(Path(datadir) / LOADER_FNAME, Path(REPO_DATA))
+    copy(Path(datadir) / LOADER_SUBSET_FNAME, Path(REPO_DATA))
+    copy(Path(datadir) / SS_DICT_PICKLE_FILE, Path(REPO_DATA))
+    copy(Path(datadir) / SS_PICKLE_FILE, Path(REPO_DATA))
+    copy(Path(datadir) / SS_SUBSET_DICT_PICKLE_FILE, Path(REPO_DATA))
+    copy(Path(datadir) / SS_SUBSET_PICKLE_FILE, Path(REPO_DATA))
     return
 
 
@@ -284,6 +284,8 @@ def do_stuff(
     if _update == True:
         if verbose:
             print(f"Copying: {DATA_DIR} to {REPO_DATA}")
+
+        update_repo(DATA_DIR)
 
     return
 
