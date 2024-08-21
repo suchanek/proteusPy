@@ -133,6 +133,7 @@ class DisulfideLoader:
             self.SSList = sslist
             self.TotalDisulfides = len(self.SSList)
 
+        '''
         if self.verbose:
             _logger.info(
                 f"-> DisulfideLoader(): Reading disulfide dict from: {self.PickleDictFile}...",
@@ -146,6 +147,10 @@ class DisulfideLoader:
             _logger.info(
                 f"-> DisulfideLoader(): Reading Torsion DF from: {self.TorsionFile}...",
             )
+        '''
+
+        self.SSDict = self.create_disulfide_dict()
+        self.IDList = list(self.SSDict.keys())
 
         # tmpDF = pd.read_csv(self.TorsionFile)
         # tmpDF.drop(tmpDF.columns[[0]], axis=1, inplace=True)
@@ -259,6 +264,26 @@ class DisulfideLoader:
         :return: Copy of self
         """
         return copy.deepcopy(self)
+
+    def create_disulfide_dict(self):
+        """
+        Create a dictionary from a list of disulfide objects where the key is the pdb_id
+        and the value is a list of indices of the disulfide objects in the list.
+
+        Parameters:
+        disulfide_list (list): List of disulfide objects.
+
+        Returns:
+        dict: Dictionary with pdb_id as keys and lists of indices as values.
+        """
+        disulfide_list = self.SSList
+
+        disulfide_dict = {}
+        for index, disulfide in enumerate(disulfide_list):
+            if disulfide.pdb_id not in disulfide_dict:
+                disulfide_dict[disulfide.pdb_id] = []
+            disulfide_dict[disulfide.pdb_id].append(index)
+        return disulfide_dict
 
     def extract_class(self, clsid) -> DisulfideList:
         """

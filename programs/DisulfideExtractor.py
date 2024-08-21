@@ -231,9 +231,9 @@ def do_build(verbose, full, subset, cutoff):
 def update_repo(datadir):
     copy(Path(datadir) / LOADER_FNAME, Path(REPO_DATA))
     copy(Path(datadir) / LOADER_SUBSET_FNAME, Path(REPO_DATA))
-    copy(Path(datadir) / SS_DICT_PICKLE_FILE, Path(REPO_DATA))
+    # copy(Path(datadir) / SS_DICT_PICKLE_FILE, Path(REPO_DATA))
     copy(Path(datadir) / SS_PICKLE_FILE, Path(REPO_DATA))
-    copy(Path(datadir) / SS_SUBSET_DICT_PICKLE_FILE, Path(REPO_DATA))
+    # copy(Path(datadir) / SS_SUBSET_DICT_PICKLE_FILE, Path(REPO_DATA))
     copy(Path(datadir) / SS_SUBSET_PICKLE_FILE, Path(REPO_DATA))
     return
 
