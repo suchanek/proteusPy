@@ -725,7 +725,7 @@ def Extract_Disulfides(
     entrylist = []
     sslist = []
     problem_ids = []
-    bad = bad_dist = 0
+    bad = bad_dist = tot = cnt = 0
 
     # we use the specialized list class DisulfideList to contain our disulfides
     # we'll use a dict to store DisulfideList objects, indexed by the structure ID
@@ -741,7 +741,6 @@ def Extract_Disulfides(
     os.chdir(pdbdir)
 
     ss_filelist = glob.glob("*.ent")
-    tot = len(ss_filelist)
 
     # the filenames are in the form pdb{entry}.ent, I loop through them and extract
     # the PDB ID, with Disulfide.name_to_id(), then add to entrylist.
@@ -750,9 +749,12 @@ def Extract_Disulfides(
         entrylist.append(name_to_id(entry))
 
     if verbose:
-        _logger.info(
-            f"PDB Ids: {entrylist}, len: {len(entrylist)}"
-        )
+        _logger.info(f"PDB Ids: {entrylist}, len: {len(entrylist)}")
+
+    if numb < 0:
+        tot = len(entrylist)
+    else:
+        tot = numb
 
     # create a dataframe with the following columns for the disulfide conformations
     # extracted from the structure
@@ -763,8 +765,6 @@ def Extract_Disulfides(
     # If numb is passed then
     # only do the last numb entries.
 
-    tot = 0
-    cnt = 0
     # loop over ss_filelist, create disulfides and initialize them
     # the logging_redirect_tqdm() context manager will redirect the logging output
     # to the tqdm progress bar.
@@ -848,9 +848,9 @@ def Extract_Disulfides(
                     shutil.move(fname, destination_file_path)
                 continue  ## this entry has no SS bonds, so we break the loop and move on to the next entry
 
-            pbar.set_postfix(
-                {"ID": entry, "NoSS": bad, "Cnt": tot}
-            )  # update the progress bar
+            pbar.set_postfix({"ID": entry, "NoSS": bad, "Cnt": cnt})
+
+    pbar.close()
 
     if bad > 0:
         prob_cols = ["id"]
@@ -860,20 +860,18 @@ def Extract_Disulfides(
         _logger.warning(
             (
                 f"Found and moved: {len(problem_ids)} non-parsable structures."
-                f"Saving problem IDs to file: {datadir}{problemfile}"
+                f"Saving problem IDs to file: {Path(datadir) / problemfile}"
             )
         )
 
-        problem_df.to_csv(f"{datadir}{problemfile}")
+        problem_df.to_csv(Path(datadir) / problemfile)
     else:  ## no bad files found
         if verbose:
             _logger.info("No non-parsable structures found.")
 
     if bad_dist > 0:
         if verbose:
-            _logger.warning(
-                f"Found and ignored: {bad_dist} long SS bonds."
-            )
+            _logger.warning(f"Found and ignored: {bad_dist} long SS bonds.")
 
     else:
         if verbose:
@@ -883,9 +881,7 @@ def Extract_Disulfides(
     fname = Path(datadir) / picklefile
 
     if verbose:
-        _logger.info(
-            f"Saving {len(All_ss_list)} Disulfides to file: {fname}"
-        )
+        _logger.info(f"Saving {len(All_ss_list)} Disulfides to file: {fname}")
 
     with open(fname, "wb+") as f:
         pickle.dump(All_ss_list, f)
@@ -905,9 +901,9 @@ def Extract_Disulfides(
     # save the torsions
 
     fname = Path(datadir) / torsionfile
-    if verbose:
-        _logger.info(f"Saving torsions to file: {fname}")
 
+    # if verbose:
+    #    _logger.info(f"Saving torsions to file: {fname}")
     # SS_df.to_csv(fname)
 
     end = time.time()
@@ -926,9 +922,6 @@ def Extract_Disulfides(
     if quiet:
         _logger.setLevel(logging.WARNING)
     return
-
-
-########
 
 
 def Extract_Disulfides_From_List(
@@ -980,7 +973,7 @@ def Extract_Disulfides_From_List(
 
     entrylist = []
     problem_ids = []
-    bad = bad_dist = 0
+    bad = bad_dist = tot = cnt = 0
 
     # we use the specialized list class DisulfideList to contain our disulfides
     # we'll use a dict to store DisulfideList objects, indexed by the structure ID
@@ -1006,9 +999,6 @@ def Extract_Disulfides_From_List(
     # define a tqdm progressbar using the fully loaded entrylist list.
     # If numb is passed then
     # only do the last numb entries.
-
-    tot = 0
-    cnt = 0
 
     # loop over ss_filelist, create disulfides and initialize them
     # the logging_redirect_tqdm() context manager will redirect the logging output
@@ -1106,16 +1096,15 @@ def Extract_Disulfides_From_List(
             )
         )
 
-        problem_df.to_csv(f"{datadir}{problemfile}")
+        problem_df.to_csv(Path(datadir / problemfile))
+
     else:  ## no bad files found
         if verbose:
             _logger.info("Extract_Disulfides(): No non-parsable structures found.")
 
     if bad_dist > 0:
         if verbose:
-            _logger.warning(
-                f"Found and ignored: {bad_dist} long SS bonds."
-            )
+            _logger.warning(f"Found and ignored: {bad_dist} long SS bonds.")
 
     else:
         if verbose:
@@ -1125,9 +1114,7 @@ def Extract_Disulfides_From_List(
     fname = Path(datadir) / picklefile
 
     if verbose:
-        _logger.info(
-            f"Saving {len(All_ss_list)} Disulfides to file: {fname}"
-        )
+        _logger.info(f"Saving {len(All_ss_list)} Disulfides to file: {fname}")
 
     with open(fname, "wb+") as f:
         pickle.dump(All_ss_list, f)
@@ -1146,11 +1133,10 @@ def Extract_Disulfides_From_List(
 
     # save the torsions
 
-    fname = Path(datadir) / torsionfile
-    if verbose:
-        _logger.info(f"Saving torsions to file: {fname}")
-
-    #SS_df.to_csv(fname)
+    # fname = Path(datadir) / torsionfile
+    # if verbose:
+    #    _logger.info(f"Saving torsions to file: {fname}")
+    # SS_df.to_csv(fname)
 
     end = time.time()
     elapsed = end - start

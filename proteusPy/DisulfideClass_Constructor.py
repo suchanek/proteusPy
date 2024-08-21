@@ -14,6 +14,7 @@ across all 32 possible classes. Classes are named per Hogg's convention.
 
 import pickle
 from io import StringIO
+from pathlib import Path
 
 import pandas as pd
 
@@ -114,14 +115,14 @@ class DisulfideClass_Constructor:
 
         self.build_yourself(loader)
 
-    def load_class_dict(self, fname=f"{DATA_DIR}{SS_CLASS_DICT_FILE}") -> dict:
+    def load_class_dict(self, fname=Path(DATA_DIR) / SS_CLASS_DICT_FILE) -> dict:
         with open(fname, "rb") as f:
             self.classdict = pickle.load(f)
 
-    def load_consensus_file(self, fname=f"{DATA_DIR}{SS_CONSENSUS_FILE}"):
+    def load_consensus_file(self, fname=Path(DATA_DIR) / SS_CONSENSUS_FILE):
         with open(fname, "rb") as f:
             res = pickle.load(f)
-            return res
+        return res
 
     def build_class_df(self, class_df, group_df):
         ss_id_col = group_df["ss_id"]
@@ -377,7 +378,7 @@ class DisulfideClass_Constructor:
                 "Invalid angle value: angle must be in the range [-360, 360)."
             )
 
-    def sslist_from_classid(self, cls: str) -> DisulfideList:
+    def sslist_from_classid(self, cls: str):
         """
         Return the list of Disulfides from the classID string.
 

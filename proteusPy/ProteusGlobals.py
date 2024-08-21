@@ -61,6 +61,10 @@ SS_CONSENSUS_BIN_FILE = "SS_consensus_class_32.pkl"
 LOADER_FNAME = "PDB_SS_ALL_LOADER.pkl"
 LOADER_SUBSET_FNAME = "PDB_SS_SUBSET_LOADER.pkl"
 
+# the unfiltered master loaders
+LOADER_MASTER_FNAME = "PDB_SS_ALL_LOADER_MASTER.pkl"
+LOADER_MASTER_SUBSET_FNAME = "PDB_SS_SUBSET_LOADER_MASTER.pkl"
+
 LOADER_FNAME_URL = "https://raw.githubusercontent.com/suchanek/proteusPy/master/proteusPy/data/PDB_SS_ALL_LOADER.pkl"
 LOADER_SUBSET_FNAME_URL = "https://raw.githubusercontent.com/suchanek/proteusPy/blob/master/proteusPy/data/PDB_SS_SUBSET_LOADER.pkl"
 
