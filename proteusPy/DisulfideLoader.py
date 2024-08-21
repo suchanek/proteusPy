@@ -4,7 +4,7 @@ the analysis and modeling of protein structures, with an emphasis on disulfide b
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2/9/2024
+Last revision: 8/21/2024
 """
 
 import copy
@@ -132,22 +132,6 @@ class DisulfideLoader:
             sslist = pickle.load(f)
             self.SSList = sslist
             self.TotalDisulfides = len(self.SSList)
-
-        '''
-        if self.verbose:
-            _logger.info(
-                f"-> DisulfideLoader(): Reading disulfide dict from: {self.PickleDictFile}...",
-            )
-
-        with open(self.PickleDictFile, "rb") as f:
-            self.SSDict = pickle.load(f)
-            self.IDList = list(self.SSDict.keys())
-
-        if self.verbose:
-            _logger.info(
-                f"-> DisulfideLoader(): Reading Torsion DF from: {self.TorsionFile}...",
-            )
-        '''
 
         self.SSDict = self.create_disulfide_dict()
         self.IDList = list(self.SSDict.keys())
