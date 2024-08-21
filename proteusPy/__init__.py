@@ -11,6 +11,7 @@ from pathlib import Path
 __pdoc__ = {
     "version": None,
     "__all__": False,
+    "_version": False,
 }
 
 import logging

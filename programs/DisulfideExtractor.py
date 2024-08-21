@@ -12,7 +12,7 @@ build the DisulfideLoader object, and save it into the proteusPy module data dir
 * Subset: Only extract and process the first 1000 Disulfides found in the PDB directory.
 
 Author: Eric G. Suchanek, PhD.
-Last revision: 8/2/24 -egs-
+Last revision: 8/21/24 -egs-
 """
 
 import argparse
@@ -23,6 +23,7 @@ import os
 import pickle
 import sys
 import time
+from datetime import timedelta
 from pathlib import Path
 from shutil import copy
 
@@ -35,6 +36,7 @@ from proteusPy.ProteusGlobals import (
     DATA_DIR,
     LOADER_FNAME,
     LOADER_SUBSET_FNAME,
+    PROBLEM_ID_FILE,
     SS_PICKLE_FILE,
     SS_PROBLEM_SUBSET_ID_FILE,
     SS_SUBSET_DICT_PICKLE_FILE,
@@ -80,15 +82,16 @@ if not DATA_DIR.is_dir():
     sys.exit(1)
 
 good_pdb_fpath = DATA_DIR / GOOD_PDB_FILE
-ent_files = glob.glob(str(PDB_DIR / "*.ent"))
 
+ent_files = glob.glob(str(PDB_DIR / "*.ent"))
 num_ent_files = len(ent_files)
+
 __version__ = "1.0.2"
 
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description=f"""proteusPy v{__version__} Disulfide Bond Extractor.\n 
+        description=f"""\nproteusPy Disulfide Bond Extractor v{__version__}\n 
         This program extracts disulfide bonds from PDB files and builds a DisulfideLoader object.
         The program expects the environment variable PDB to be set to the base location of the PDB files.
         The PDB files are expected to be in the PDB/good directory. Relevant output files, (SS_*LOADER*.pkl) are stored in PDB/data."""
@@ -183,8 +186,10 @@ def do_extract(verbose, full, subset, cutoff, prune):
             numb=-1,
             verbose=verbose,
             quiet=True,
-            pdbdir=PDB_DIR,
             datadir=DATA_DIR,
+            pdbdir=PDB_DIR,
+            picklefile=SS_PICKLE_FILE,
+            problemfile=PROBLEM_ID_FILE,
             dist_cutoff=cutoff,
             prune=prune,
         )
@@ -207,8 +212,9 @@ def do_build(verbose, full, subset, cutoff):
             print(
                 f"--> Building the packed loader for the full dataset with cutoff: {cutoff}..."
             )
-        PDB_SS = DisulfideLoader(datadir=DATA_DIR, subset=False, verbose=verbose)
-        PDB_SS.cutoff = cutoff
+        PDB_SS = DisulfideLoader(
+            datadir=DATA_DIR, subset=False, verbose=verbose, cutoff=cutoff
+        )
         PDB_SS.save(savepath=DATA_DIR, subset=False, cutoff=cutoff)
 
     if subset:
@@ -216,8 +222,9 @@ def do_build(verbose, full, subset, cutoff):
             print(
                 f"--> Building the packed loader for the Disulfide subset with cutoff: {cutoff}..."
             )
-        PDB_SS = DisulfideLoader(datadir=DATA_DIR, subset=True, verbose=verbose)
-        PDB_SS.cutoff = cutoff
+        PDB_SS = DisulfideLoader(
+            datadir=DATA_DIR, subset=True, verbose=verbose, cutoff=cutoff
+        )
         PDB_SS.save(savepath=DATA_DIR, subset=True, cutoff=cutoff)
 
     return
@@ -276,7 +283,7 @@ def do_stuff(
 
     if _update == True:
         if verbose:
-            print(f"Copying: {DATA_DIR} to {REPO_DATA}")
+            print(f"Copying SS files from: {DATA_DIR} to {REPO_DATA}")
 
         update_repo(DATA_DIR)
 
@@ -317,7 +324,12 @@ def main():
     )
 
     end = time.time()
-    print(f"Processing completed in {end - start:.2f} seconds")
+
+    elapsed_time = timedelta(seconds=end - start)
+
+    hours, remainder = divmod(elapsed_time.total_seconds(), 3600)
+    minutes, seconds = divmod(remainder, 60)
+    print(f"Processing completed in {int(hours)}:{int(minutes)}:{int(seconds)}")
 
 
 if __name__ == "__main__":
