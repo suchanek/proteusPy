@@ -52,6 +52,10 @@ except NameError:
 
 # Now use tqdm as normal, depending on your environment
 
+# torsion_file and pickle_dict_file will be deprecated in the future.
+# this will cause a change in database structure, necessitating an upload of the new database.
+#
+
 
 class DisulfideLoader:
     """

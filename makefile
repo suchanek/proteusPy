@@ -13,11 +13,15 @@ else
 
 endif
 
+# mamba is better than conda. Install it with 'conda install mamba -n base -c conda-forge'
+# or use conda instead of mamba.
+
 CONDA = mamba
 
-MESS = $(VERS)
+#MESS = $(VERS)
 #MESS = "proteusPy: A Python Package for Protein Structure and Disulfide Bond Modeling and Analysis"
 
+MESS = f"{VERS}: Biopython removal"
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
 
@@ -67,8 +71,6 @@ install:
 	@echo "Installing proteusPy..."
 
 	@pip install . -q
-	#@echo "Installing Biopython..."
-	#@pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython -q
 	@echo "Installing jupyter..."
 	@python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Installation finished!"
@@ -78,7 +80,6 @@ install_dev:
 	@$(CONDA) install vtk==9.2.6 -y
 	
 	pip install .
-	#pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
 	pip install pdoc twine black pytest build -q
 	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
 	@echo "Installation finished!"

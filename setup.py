@@ -111,7 +111,6 @@ setup(
         "pymolpy3",
         "pympler",
         "imageio[ffmpeg]",
-        "biopython",
         "colorama",
     ],
     source="https://github.com/suchanek/proteusPy/",
@@ -138,6 +137,7 @@ setup(
             "data/ss_query.json",
             "data/ss_ids.txt",
             "data/SS_consensus_class_sext.pkl",
+            "data/SS_consensus_class_32.pkl",
         ]
     },
     exclude_package_data={
