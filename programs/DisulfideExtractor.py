@@ -35,13 +35,10 @@ from proteusPy.ProteusGlobals import (
     DATA_DIR,
     LOADER_FNAME,
     LOADER_SUBSET_FNAME,
-    SS_DICT_PICKLE_FILE,
     SS_PICKLE_FILE,
     SS_PROBLEM_SUBSET_ID_FILE,
     SS_SUBSET_DICT_PICKLE_FILE,
     SS_SUBSET_PICKLE_FILE,
-    SS_SUBSET_TORSIONS_FILE,
-    SS_TORSIONS_FILE,
 )
 
 _logger = logging.getLogger("DisulfideExtractor")
@@ -72,7 +69,7 @@ if not MODULE_DATA.is_dir():
     print(f"Error: The directory {MODULE_DATA} does not exist.")
     sys.exit(1)
 
-REPO_DATA = HOME_DIR / "repos/proteusPy/data"
+REPO_DATA = HOME_DIR / "repos" / "proteusPy" / "data"
 if not REPO_DATA.is_dir():
     print(f"Error: The directory {REPO_DATA} does not exist.")
     sys.exit(1)
@@ -86,7 +83,7 @@ good_pdb_fpath = DATA_DIR / GOOD_PDB_FILE
 ent_files = glob.glob(str(PDB_DIR / "*.ent"))
 
 num_ent_files = len(ent_files)
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 
 def parse_arguments():
@@ -165,9 +162,7 @@ def do_extract(verbose, full, subset, cutoff, prune):
             numb=1000,
             pdbdir=PDB_DIR,
             datadir=DATA_DIR,
-            dictfile=SS_SUBSET_DICT_PICKLE_FILE,
             picklefile=SS_SUBSET_PICKLE_FILE,
-            torsionfile=SS_SUBSET_TORSIONS_FILE,
             problemfile=SS_PROBLEM_SUBSET_ID_FILE,
             verbose=verbose,
             quiet=True,
@@ -231,9 +226,7 @@ def do_build(verbose, full, subset, cutoff):
 def update_repo(datadir):
     copy(Path(datadir) / LOADER_FNAME, Path(REPO_DATA))
     copy(Path(datadir) / LOADER_SUBSET_FNAME, Path(REPO_DATA))
-    # copy(Path(datadir) / SS_DICT_PICKLE_FILE, Path(REPO_DATA))
     copy(Path(datadir) / SS_PICKLE_FILE, Path(REPO_DATA))
-    # copy(Path(datadir) / SS_SUBSET_DICT_PICKLE_FILE, Path(REPO_DATA))
     copy(Path(datadir) / SS_SUBSET_PICKLE_FILE, Path(REPO_DATA))
     return
 
@@ -296,7 +289,6 @@ def main():
     set_logger_level_for_module("proteusPy", logging.ERROR)
 
     print(
-        f""
         f"proteusPy DisulfideExtractor v{__version__}\n"
         f"PDB model directory:       {PDB_DIR}\n"
         f"Data directory:            {DATA_DIR}\n"
@@ -304,7 +296,13 @@ def main():
         f"Repo data directory:       {REPO_DATA}\n"
         f"Number of .ent files:      {num_ent_files}\n"
         f"Using cutoff:              {args.cutoff}\n"
-        f"Starting at:               {datetime.datetime.now()}\n\n"
+        f"Extract:                   {args.extract}\n"
+        f"Build:                     {args.build}\n"
+        f"Update:                    {args.update}\n"
+        f"Full:                      {args.full}\n"
+        f"Subset:                    {args.subset}\n"
+        f"Verbose:                   {args.verbose}\n"
+        f"Starting at:               {datetime.datetime.now()}\n"
     )
 
     do_stuff(

@@ -54,14 +54,13 @@ from tqdm.contrib.logging import logging_redirect_tqdm
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
     MODEL_DIR,
-    PBAR_COLS,
     PDB_DIR,
     PROBLEM_ID_FILE,
-    SS_DICT_PICKLE_FILE,
     SS_ID_FILE,
     SS_PICKLE_FILE,
-    SS_TORSIONS_FILE,
 )
+
+PBAR_COLS = 80
 
 
 def distance_squared(p1: np.array, p2: np.array) -> np.array:
@@ -671,12 +670,10 @@ def Extract_Disulfides(
     verbose=False,
     quiet=True,
     pdbdir=PDB_DIR,
-    baddir=PDB_DIR + "/bad/",
+    baddir=Path(PDB_DIR) / "bad",
     datadir=MODEL_DIR,
     picklefile=SS_PICKLE_FILE,
-    torsionfile=SS_TORSIONS_FILE,
     problemfile=PROBLEM_ID_FILE,
-    dictfile=SS_DICT_PICKLE_FILE,
     dist_cutoff=-1.0,
     prune=True,
 ) -> None:
@@ -695,9 +692,7 @@ def Extract_Disulfides(
     :param pdbdir:         Path to PDB files
     :param datadir:        Path to resulting .pkl files
     :param picklefile:     Name of the disulfide .pkl file
-    :param torsionfile:    Name of the disulfide torsion file .csv created
     :param problemfile:    Name of the .csv file containing problem ids
-    :param dictfile:       Name of the .pkl file
     :param dist_cutoff:    Ca distance cutoff to reject a Disulfide.
     :param prune:          Move bad files to bad directory, defaults to True
     """
@@ -834,11 +829,10 @@ def Extract_Disulfides(
                 problem_ids.append(entry)
                 if verbose:
                     _logger.warning(f"Extract_Disulfides(): No SS parsed for: {entry}!")
+
                 if prune:
                     fname = f"pdb{entry}.ent"
                     # Construct the full path for the new destination file
-                    # destination_file_path = os.path.join(bad_dir, fname)
-
                     destination_file_path = Path(bad_dir) / fname
 
                     # Copy the file to the new destination with the correct filename
@@ -886,26 +880,6 @@ def Extract_Disulfides(
     with open(fname, "wb+") as f:
         pickle.dump(All_ss_list, f)
 
-    # dump the dict2 disulfides to a .pkl file. ~520 MB.
-    dict_len = len(All_ss_dict2)
-    fname = Path(datadir) / dictfile
-
-    if verbose:
-        _logger.info(
-            f"Saving indices of {dict_len} Disulfide-containing PDB IDs to file: {fname}"
-        )
-
-    with open(fname, "wb+") as f:
-        pickle.dump(All_ss_dict2, f)
-
-    # save the torsions
-
-    fname = Path(datadir) / torsionfile
-
-    # if verbose:
-    #    _logger.info(f"Saving torsions to file: {fname}")
-    # SS_df.to_csv(fname)
-
     end = time.time()
     elapsed = end - start
 
@@ -932,9 +906,7 @@ def Extract_Disulfides_From_List(
     baddir=PDB_DIR + "/bad/",
     datadir=MODEL_DIR,
     picklefile=SS_PICKLE_FILE,
-    torsionfile=SS_TORSIONS_FILE,
     problemfile=PROBLEM_ID_FILE,
-    dictfile=SS_DICT_PICKLE_FILE,
     dist_cutoff=-1.0,
     prune=True,
     sslist=[],
@@ -956,7 +928,6 @@ def Extract_Disulfides_From_List(
     :param picklefile:     Name of the disulfide .pkl file
     :param torsionfile:    Name of the disulfide torsion file .csv created
     :param problemfile:    Name of the .csv file containing problem ids
-    :param dictfile:       Name of the .pkl file
     :param dist_cutoff:    Ca distance cutoff to reject a Disulfide.
     :param prune:          Move bad files to bad directory, defaults to True
     """
@@ -1118,25 +1089,6 @@ def Extract_Disulfides_From_List(
 
     with open(fname, "wb+") as f:
         pickle.dump(All_ss_list, f)
-
-    # dump the dict2 disulfides to a .pkl file. ~520 MB.
-    dict_len = len(All_ss_dict2)
-    fname = Path(datadir) / dictfile
-
-    if verbose:
-        _logger.info(
-            f"Saving indices of {dict_len} Disulfide-containing PDB IDs to file: {fname}"
-        )
-
-    with open(fname, "wb+") as f:
-        pickle.dump(All_ss_dict2, f)
-
-    # save the torsions
-
-    # fname = Path(datadir) / torsionfile
-    # if verbose:
-    #    _logger.info(f"Saving torsions to file: {fname}")
-    # SS_df.to_csv(fname)
 
     end = time.time()
     elapsed = end - start
