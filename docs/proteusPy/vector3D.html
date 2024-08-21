@@ -104,9 +104,6 @@
             <li>
                     <a class="function" href="#calculate_bond_angle">calculate_bond_angle</a>
             </li>
-            <li>
-                    <a class="function" href="#compare_bond_angles">compare_bond_angles</a>
-            </li>
     </ul>
 
 
@@ -532,91 +529,13 @@ class, which supports various vector operations.</p>
 </span><span id="L-389"><a href="#L-389"><span class="linenos">389</span></a>    <span class="k">return</span> <span class="n">angle_degrees</span>
 </span><span id="L-390"><a href="#L-390"><span class="linenos">390</span></a>
 </span><span id="L-391"><a href="#L-391"><span class="linenos">391</span></a>
-</span><span id="L-392"><a href="#L-392"><span class="linenos">392</span></a><span class="k">def</span> <span class="nf">compare_bond_angles</span><span class="p">(</span><span class="n">atom_coordinates</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-</span><span id="L-393"><a href="#L-393"><span class="linenos">393</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-394"><a href="#L-394"><span class="linenos">394</span></a><span class="sd">    Calculate all bond angles for a disulfide bond and compare them to idealized angles.</span>
-</span><span id="L-395"><a href="#L-395"><span class="linenos">395</span></a>
-</span><span id="L-396"><a href="#L-396"><span class="linenos">396</span></a><span class="sd">    :param np.ndarray atom_coordinates: Array containing coordinates of atoms in the order:</span>
-</span><span id="L-397"><a href="#L-397"><span class="linenos">397</span></a><span class="sd">        N1, CA1, C1, O1, CB1, SG1, N2, CA2, C2, O2, CB2, SG2</span>
-</span><span id="L-398"><a href="#L-398"><span class="linenos">398</span></a><span class="sd">    :return: RMS difference between calculated bond angles and idealized bond angles.</span>
-</span><span id="L-399"><a href="#L-399"><span class="linenos">399</span></a><span class="sd">    :rtype: float</span>
-</span><span id="L-400"><a href="#L-400"><span class="linenos">400</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-401"><a href="#L-401"><span class="linenos">401</span></a>
-</span><span id="L-402"><a href="#L-402"><span class="linenos">402</span></a>    <span class="n">idealized_angles</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="L-403"><a href="#L-403"><span class="linenos">403</span></a>        <span class="p">(</span><span class="s2">&quot;N1&quot;</span><span class="p">,</span> <span class="s2">&quot;CA1&quot;</span><span class="p">,</span> <span class="s2">&quot;C1&quot;</span><span class="p">):</span> <span class="mf">111.0</span><span class="p">,</span>
-</span><span id="L-404"><a href="#L-404"><span class="linenos">404</span></a>        <span class="p">(</span><span class="s2">&quot;N1&quot;</span><span class="p">,</span> <span class="s2">&quot;CA1&quot;</span><span class="p">,</span> <span class="s2">&quot;CB1&quot;</span><span class="p">):</span> <span class="mf">108.5</span><span class="p">,</span>
-</span><span id="L-405"><a href="#L-405"><span class="linenos">405</span></a>        <span class="p">(</span><span class="s2">&quot;CA1&quot;</span><span class="p">,</span> <span class="s2">&quot;CB1&quot;</span><span class="p">,</span> <span class="s2">&quot;SG1&quot;</span><span class="p">):</span> <span class="mf">112.8</span><span class="p">,</span>
-</span><span id="L-406"><a href="#L-406"><span class="linenos">406</span></a>        <span class="p">(</span><span class="s2">&quot;CB1&quot;</span><span class="p">,</span> <span class="s2">&quot;SG1&quot;</span><span class="p">,</span> <span class="s2">&quot;SG2&quot;</span><span class="p">):</span> <span class="mf">103.8</span><span class="p">,</span>  <span class="c1"># This angle is for the disulfide bond itself</span>
-</span><span id="L-407"><a href="#L-407"><span class="linenos">407</span></a>        <span class="p">(</span><span class="s2">&quot;SG1&quot;</span><span class="p">,</span> <span class="s2">&quot;SG2&quot;</span><span class="p">,</span> <span class="s2">&quot;CB2&quot;</span><span class="p">):</span> <span class="mf">103.8</span><span class="p">,</span>
-</span><span id="L-408"><a href="#L-408"><span class="linenos">408</span></a>        <span class="p">(</span><span class="s2">&quot;SG2&quot;</span><span class="p">,</span> <span class="s2">&quot;CB2&quot;</span><span class="p">,</span> <span class="s2">&quot;CA2&quot;</span><span class="p">):</span> <span class="mf">112.8</span><span class="p">,</span>
-</span><span id="L-409"><a href="#L-409"><span class="linenos">409</span></a>        <span class="p">(</span><span class="s2">&quot;CB2&quot;</span><span class="p">,</span> <span class="s2">&quot;CA2&quot;</span><span class="p">,</span> <span class="s2">&quot;N2&quot;</span><span class="p">):</span> <span class="mf">108.5</span><span class="p">,</span>
-</span><span id="L-410"><a href="#L-410"><span class="linenos">410</span></a>        <span class="p">(</span><span class="s2">&quot;N2&quot;</span><span class="p">,</span> <span class="s2">&quot;CA2&quot;</span><span class="p">,</span> <span class="s2">&quot;C2&quot;</span><span class="p">):</span> <span class="mf">111.0</span><span class="p">,</span>
-</span><span id="L-411"><a href="#L-411"><span class="linenos">411</span></a>    <span class="p">}</span>
-</span><span id="L-412"><a href="#L-412"><span class="linenos">412</span></a>
-</span><span id="L-413"><a href="#L-413"><span class="linenos">413</span></a>    <span class="c1"># List of triplets for which we need to calculate bond angles</span>
-</span><span id="L-414"><a href="#L-414"><span class="linenos">414</span></a>    <span class="c1"># I am omitting the proximal and distal backbone angle N, Ca, C</span>
-</span><span id="L-415"><a href="#L-415"><span class="linenos">415</span></a>    <span class="c1"># to focus on the disulfide bond angles themselves.</span>
-</span><span id="L-416"><a href="#L-416"><span class="linenos">416</span></a>    <span class="n">angle_triplets</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="L-417"><a href="#L-417"><span class="linenos">417</span></a>        <span class="c1"># (&quot;N1&quot;, &quot;CA1&quot;, &quot;C1&quot;),</span>
-</span><span id="L-418"><a href="#L-418"><span class="linenos">418</span></a>        <span class="p">(</span><span class="s2">&quot;N1&quot;</span><span class="p">,</span> <span class="s2">&quot;CA1&quot;</span><span class="p">,</span> <span class="s2">&quot;CB1&quot;</span><span class="p">),</span>
-</span><span id="L-419"><a href="#L-419"><span class="linenos">419</span></a>        <span class="p">(</span><span class="s2">&quot;CA1&quot;</span><span class="p">,</span> <span class="s2">&quot;CB1&quot;</span><span class="p">,</span> <span class="s2">&quot;SG1&quot;</span><span class="p">),</span>
-</span><span id="L-420"><a href="#L-420"><span class="linenos">420</span></a>        <span class="p">(</span><span class="s2">&quot;CB1&quot;</span><span class="p">,</span> <span class="s2">&quot;SG1&quot;</span><span class="p">,</span> <span class="s2">&quot;SG2&quot;</span><span class="p">),</span>
-</span><span id="L-421"><a href="#L-421"><span class="linenos">421</span></a>        <span class="p">(</span><span class="s2">&quot;SG1&quot;</span><span class="p">,</span> <span class="s2">&quot;SG2&quot;</span><span class="p">,</span> <span class="s2">&quot;CB2&quot;</span><span class="p">),</span>
-</span><span id="L-422"><a href="#L-422"><span class="linenos">422</span></a>        <span class="p">(</span><span class="s2">&quot;SG2&quot;</span><span class="p">,</span> <span class="s2">&quot;CB2&quot;</span><span class="p">,</span> <span class="s2">&quot;CA2&quot;</span><span class="p">),</span>
-</span><span id="L-423"><a href="#L-423"><span class="linenos">423</span></a>        <span class="p">(</span><span class="s2">&quot;CB2&quot;</span><span class="p">,</span> <span class="s2">&quot;CA2&quot;</span><span class="p">,</span> <span class="s2">&quot;N2&quot;</span><span class="p">),</span>
-</span><span id="L-424"><a href="#L-424"><span class="linenos">424</span></a>        <span class="c1"># (&quot;N2&quot;, &quot;CA2&quot;, &quot;C2&quot;),</span>
-</span><span id="L-425"><a href="#L-425"><span class="linenos">425</span></a>    <span class="p">]</span>
-</span><span id="L-426"><a href="#L-426"><span class="linenos">426</span></a>
-</span><span id="L-427"><a href="#L-427"><span class="linenos">427</span></a>    <span class="n">atom_indices</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="L-428"><a href="#L-428"><span class="linenos">428</span></a>        <span class="s2">&quot;N1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-</span><span id="L-429"><a href="#L-429"><span class="linenos">429</span></a>        <span class="s2">&quot;CA1&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="L-430"><a href="#L-430"><span class="linenos">430</span></a>        <span class="s2">&quot;C1&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-</span><span id="L-431"><a href="#L-431"><span class="linenos">431</span></a>        <span class="s2">&quot;CB1&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-</span><span id="L-432"><a href="#L-432"><span class="linenos">432</span></a>        <span class="s2">&quot;SG1&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-</span><span id="L-433"><a href="#L-433"><span class="linenos">433</span></a>        <span class="s2">&quot;SG2&quot;</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span>
-</span><span id="L-434"><a href="#L-434"><span class="linenos">434</span></a>        <span class="s2">&quot;CB2&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
-</span><span id="L-435"><a href="#L-435"><span class="linenos">435</span></a>        <span class="s2">&quot;CA2&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
-</span><span id="L-436"><a href="#L-436"><span class="linenos">436</span></a>        <span class="s2">&quot;N2&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
-</span><span id="L-437"><a href="#L-437"><span class="linenos">437</span></a>        <span class="s2">&quot;C2&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
-</span><span id="L-438"><a href="#L-438"><span class="linenos">438</span></a>    <span class="p">}</span>
-</span><span id="L-439"><a href="#L-439"><span class="linenos">439</span></a>
-</span><span id="L-440"><a href="#L-440"><span class="linenos">440</span></a>    <span class="n">calculated_angles</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-441"><a href="#L-441"><span class="linenos">441</span></a>    <span class="k">for</span> <span class="n">triplet</span> <span class="ow">in</span> <span class="n">angle_triplets</span><span class="p">:</span>
-</span><span id="L-442"><a href="#L-442"><span class="linenos">442</span></a>        <span class="n">a</span> <span class="o">=</span> <span class="n">atom_coordinates</span><span class="p">[</span><span class="n">atom_indices</span><span class="p">[</span><span class="n">triplet</span><span class="p">[</span><span class="mi">0</span><span class="p">]]]</span>
-</span><span id="L-443"><a href="#L-443"><span class="linenos">443</span></a>        <span class="n">b</span> <span class="o">=</span> <span class="n">atom_coordinates</span><span class="p">[</span><span class="n">atom_indices</span><span class="p">[</span><span class="n">triplet</span><span class="p">[</span><span class="mi">1</span><span class="p">]]]</span>
-</span><span id="L-444"><a href="#L-444"><span class="linenos">444</span></a>        <span class="n">c</span> <span class="o">=</span> <span class="n">atom_coordinates</span><span class="p">[</span><span class="n">atom_indices</span><span class="p">[</span><span class="n">triplet</span><span class="p">[</span><span class="mi">2</span><span class="p">]]]</span>
-</span><span id="L-445"><a href="#L-445"><span class="linenos">445</span></a>        <span class="n">ideal</span> <span class="o">=</span> <span class="n">idealized_angles</span><span class="p">[</span><span class="n">triplet</span><span class="p">]</span>
-</span><span id="L-446"><a href="#L-446"><span class="linenos">446</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="L-447"><a href="#L-447"><span class="linenos">447</span></a>            <span class="n">angle</span> <span class="o">=</span> <span class="n">calculate_bond_angle</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
-</span><span id="L-448"><a href="#L-448"><span class="linenos">448</span></a>        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="L-449"><a href="#L-449"><span class="linenos">449</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error calculating angle for atoms </span><span class="si">{</span><span class="n">triplet</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="L-450"><a href="#L-450"><span class="linenos">450</span></a>            <span class="k">return</span> <span class="kc">None</span>
-</span><span id="L-451"><a href="#L-451"><span class="linenos">451</span></a>        <span class="n">calculated_angles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
-</span><span id="L-452"><a href="#L-452"><span class="linenos">452</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-453"><a href="#L-453"><span class="linenos">453</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-</span><span id="L-454"><a href="#L-454"><span class="linenos">454</span></a>                <span class="sa">f</span><span class="s2">&quot;Calculated bond angle for </span><span class="si">{</span><span class="n">triplet</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">angle</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">ideal</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> degrees&quot;</span>
-</span><span id="L-455"><a href="#L-455"><span class="linenos">455</span></a>            <span class="p">)</span>
-</span><span id="L-456"><a href="#L-456"><span class="linenos">456</span></a>
-</span><span id="L-457"><a href="#L-457"><span class="linenos">457</span></a>    <span class="c1"># Convert idealized angles to a list</span>
-</span><span id="L-458"><a href="#L-458"><span class="linenos">458</span></a>    <span class="n">idealized_angles_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">idealized_angles</span><span class="p">[</span><span class="n">triplet</span><span class="p">]</span> <span class="k">for</span> <span class="n">triplet</span> <span class="ow">in</span> <span class="n">angle_triplets</span><span class="p">]</span>
-</span><span id="L-459"><a href="#L-459"><span class="linenos">459</span></a>
-</span><span id="L-460"><a href="#L-460"><span class="linenos">460</span></a>    <span class="c1"># Calculate RMS difference</span>
-</span><span id="L-461"><a href="#L-461"><span class="linenos">461</span></a>    <span class="n">rms_diff</span> <span class="o">=</span> <span class="n">rms_difference</span><span class="p">(</span>
-</span><span id="L-462"><a href="#L-462"><span class="linenos">462</span></a>        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">calculated_angles</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">idealized_angles_list</span><span class="p">)</span>
-</span><span id="L-463"><a href="#L-463"><span class="linenos">463</span></a>    <span class="p">)</span>
-</span><span id="L-464"><a href="#L-464"><span class="linenos">464</span></a>
-</span><span id="L-465"><a href="#L-465"><span class="linenos">465</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-466"><a href="#L-466"><span class="linenos">466</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Calculated RMS difference: </span><span class="si">{</span><span class="n">rms_diff</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> degrees&quot;</span><span class="p">)</span>
-</span><span id="L-467"><a href="#L-467"><span class="linenos">467</span></a>    <span class="k">return</span> <span class="n">rms_diff</span>
-</span><span id="L-468"><a href="#L-468"><span class="linenos">468</span></a>
-</span><span id="L-469"><a href="#L-469"><span class="linenos">469</span></a>
-</span><span id="L-470"><a href="#L-470"><span class="linenos">470</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="L-471"><a href="#L-471"><span class="linenos">471</span></a>    <span class="kn">import</span> <span class="nn">doctest</span>
-</span><span id="L-472"><a href="#L-472"><span class="linenos">472</span></a>
-</span><span id="L-473"><a href="#L-473"><span class="linenos">473</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
-</span><span id="L-474"><a href="#L-474"><span class="linenos">474</span></a>
-</span><span id="L-475"><a href="#L-475"><span class="linenos">475</span></a>
-</span><span id="L-476"><a href="#L-476"><span class="linenos">476</span></a><span class="c1"># end of file</span>
+</span><span id="L-392"><a href="#L-392"><span class="linenos">392</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="L-393"><a href="#L-393"><span class="linenos">393</span></a>    <span class="kn">import</span> <span class="nn">doctest</span>
+</span><span id="L-394"><a href="#L-394"><span class="linenos">394</span></a>
+</span><span id="L-395"><a href="#L-395"><span class="linenos">395</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</span><span id="L-396"><a href="#L-396"><span class="linenos">396</span></a>
+</span><span id="L-397"><a href="#L-397"><span class="linenos">397</span></a>
+</span><span id="L-398"><a href="#L-398"><span class="linenos">398</span></a><span class="c1"># end of file</span>
 </span></pre></div>
 
 
@@ -1565,114 +1484,6 @@ backbones.</p>
 
 <blockquote>
   <p>Bond angle in degrees.</p>
-</blockquote>
-</div>
-
-
-                </section>
-                <section id="compare_bond_angles">
-                            <input id="compare_bond_angles-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">compare_bond_angles</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">atom_coordinates</span>, </span><span class="param"><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="compare_bond_angles-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#compare_bond_angles"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="compare_bond_angles-393"><a href="#compare_bond_angles-393"><span class="linenos">393</span></a><span class="k">def</span> <span class="nf">compare_bond_angles</span><span class="p">(</span><span class="n">atom_coordinates</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-</span><span id="compare_bond_angles-394"><a href="#compare_bond_angles-394"><span class="linenos">394</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="compare_bond_angles-395"><a href="#compare_bond_angles-395"><span class="linenos">395</span></a><span class="sd">    Calculate all bond angles for a disulfide bond and compare them to idealized angles.</span>
-</span><span id="compare_bond_angles-396"><a href="#compare_bond_angles-396"><span class="linenos">396</span></a>
-</span><span id="compare_bond_angles-397"><a href="#compare_bond_angles-397"><span class="linenos">397</span></a><span class="sd">    :param np.ndarray atom_coordinates: Array containing coordinates of atoms in the order:</span>
-</span><span id="compare_bond_angles-398"><a href="#compare_bond_angles-398"><span class="linenos">398</span></a><span class="sd">        N1, CA1, C1, O1, CB1, SG1, N2, CA2, C2, O2, CB2, SG2</span>
-</span><span id="compare_bond_angles-399"><a href="#compare_bond_angles-399"><span class="linenos">399</span></a><span class="sd">    :return: RMS difference between calculated bond angles and idealized bond angles.</span>
-</span><span id="compare_bond_angles-400"><a href="#compare_bond_angles-400"><span class="linenos">400</span></a><span class="sd">    :rtype: float</span>
-</span><span id="compare_bond_angles-401"><a href="#compare_bond_angles-401"><span class="linenos">401</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="compare_bond_angles-402"><a href="#compare_bond_angles-402"><span class="linenos">402</span></a>
-</span><span id="compare_bond_angles-403"><a href="#compare_bond_angles-403"><span class="linenos">403</span></a>    <span class="n">idealized_angles</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="compare_bond_angles-404"><a href="#compare_bond_angles-404"><span class="linenos">404</span></a>        <span class="p">(</span><span class="s2">&quot;N1&quot;</span><span class="p">,</span> <span class="s2">&quot;CA1&quot;</span><span class="p">,</span> <span class="s2">&quot;C1&quot;</span><span class="p">):</span> <span class="mf">111.0</span><span class="p">,</span>
-</span><span id="compare_bond_angles-405"><a href="#compare_bond_angles-405"><span class="linenos">405</span></a>        <span class="p">(</span><span class="s2">&quot;N1&quot;</span><span class="p">,</span> <span class="s2">&quot;CA1&quot;</span><span class="p">,</span> <span class="s2">&quot;CB1&quot;</span><span class="p">):</span> <span class="mf">108.5</span><span class="p">,</span>
-</span><span id="compare_bond_angles-406"><a href="#compare_bond_angles-406"><span class="linenos">406</span></a>        <span class="p">(</span><span class="s2">&quot;CA1&quot;</span><span class="p">,</span> <span class="s2">&quot;CB1&quot;</span><span class="p">,</span> <span class="s2">&quot;SG1&quot;</span><span class="p">):</span> <span class="mf">112.8</span><span class="p">,</span>
-</span><span id="compare_bond_angles-407"><a href="#compare_bond_angles-407"><span class="linenos">407</span></a>        <span class="p">(</span><span class="s2">&quot;CB1&quot;</span><span class="p">,</span> <span class="s2">&quot;SG1&quot;</span><span class="p">,</span> <span class="s2">&quot;SG2&quot;</span><span class="p">):</span> <span class="mf">103.8</span><span class="p">,</span>  <span class="c1"># This angle is for the disulfide bond itself</span>
-</span><span id="compare_bond_angles-408"><a href="#compare_bond_angles-408"><span class="linenos">408</span></a>        <span class="p">(</span><span class="s2">&quot;SG1&quot;</span><span class="p">,</span> <span class="s2">&quot;SG2&quot;</span><span class="p">,</span> <span class="s2">&quot;CB2&quot;</span><span class="p">):</span> <span class="mf">103.8</span><span class="p">,</span>
-</span><span id="compare_bond_angles-409"><a href="#compare_bond_angles-409"><span class="linenos">409</span></a>        <span class="p">(</span><span class="s2">&quot;SG2&quot;</span><span class="p">,</span> <span class="s2">&quot;CB2&quot;</span><span class="p">,</span> <span class="s2">&quot;CA2&quot;</span><span class="p">):</span> <span class="mf">112.8</span><span class="p">,</span>
-</span><span id="compare_bond_angles-410"><a href="#compare_bond_angles-410"><span class="linenos">410</span></a>        <span class="p">(</span><span class="s2">&quot;CB2&quot;</span><span class="p">,</span> <span class="s2">&quot;CA2&quot;</span><span class="p">,</span> <span class="s2">&quot;N2&quot;</span><span class="p">):</span> <span class="mf">108.5</span><span class="p">,</span>
-</span><span id="compare_bond_angles-411"><a href="#compare_bond_angles-411"><span class="linenos">411</span></a>        <span class="p">(</span><span class="s2">&quot;N2&quot;</span><span class="p">,</span> <span class="s2">&quot;CA2&quot;</span><span class="p">,</span> <span class="s2">&quot;C2&quot;</span><span class="p">):</span> <span class="mf">111.0</span><span class="p">,</span>
-</span><span id="compare_bond_angles-412"><a href="#compare_bond_angles-412"><span class="linenos">412</span></a>    <span class="p">}</span>
-</span><span id="compare_bond_angles-413"><a href="#compare_bond_angles-413"><span class="linenos">413</span></a>
-</span><span id="compare_bond_angles-414"><a href="#compare_bond_angles-414"><span class="linenos">414</span></a>    <span class="c1"># List of triplets for which we need to calculate bond angles</span>
-</span><span id="compare_bond_angles-415"><a href="#compare_bond_angles-415"><span class="linenos">415</span></a>    <span class="c1"># I am omitting the proximal and distal backbone angle N, Ca, C</span>
-</span><span id="compare_bond_angles-416"><a href="#compare_bond_angles-416"><span class="linenos">416</span></a>    <span class="c1"># to focus on the disulfide bond angles themselves.</span>
-</span><span id="compare_bond_angles-417"><a href="#compare_bond_angles-417"><span class="linenos">417</span></a>    <span class="n">angle_triplets</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="compare_bond_angles-418"><a href="#compare_bond_angles-418"><span class="linenos">418</span></a>        <span class="c1"># (&quot;N1&quot;, &quot;CA1&quot;, &quot;C1&quot;),</span>
-</span><span id="compare_bond_angles-419"><a href="#compare_bond_angles-419"><span class="linenos">419</span></a>        <span class="p">(</span><span class="s2">&quot;N1&quot;</span><span class="p">,</span> <span class="s2">&quot;CA1&quot;</span><span class="p">,</span> <span class="s2">&quot;CB1&quot;</span><span class="p">),</span>
-</span><span id="compare_bond_angles-420"><a href="#compare_bond_angles-420"><span class="linenos">420</span></a>        <span class="p">(</span><span class="s2">&quot;CA1&quot;</span><span class="p">,</span> <span class="s2">&quot;CB1&quot;</span><span class="p">,</span> <span class="s2">&quot;SG1&quot;</span><span class="p">),</span>
-</span><span id="compare_bond_angles-421"><a href="#compare_bond_angles-421"><span class="linenos">421</span></a>        <span class="p">(</span><span class="s2">&quot;CB1&quot;</span><span class="p">,</span> <span class="s2">&quot;SG1&quot;</span><span class="p">,</span> <span class="s2">&quot;SG2&quot;</span><span class="p">),</span>
-</span><span id="compare_bond_angles-422"><a href="#compare_bond_angles-422"><span class="linenos">422</span></a>        <span class="p">(</span><span class="s2">&quot;SG1&quot;</span><span class="p">,</span> <span class="s2">&quot;SG2&quot;</span><span class="p">,</span> <span class="s2">&quot;CB2&quot;</span><span class="p">),</span>
-</span><span id="compare_bond_angles-423"><a href="#compare_bond_angles-423"><span class="linenos">423</span></a>        <span class="p">(</span><span class="s2">&quot;SG2&quot;</span><span class="p">,</span> <span class="s2">&quot;CB2&quot;</span><span class="p">,</span> <span class="s2">&quot;CA2&quot;</span><span class="p">),</span>
-</span><span id="compare_bond_angles-424"><a href="#compare_bond_angles-424"><span class="linenos">424</span></a>        <span class="p">(</span><span class="s2">&quot;CB2&quot;</span><span class="p">,</span> <span class="s2">&quot;CA2&quot;</span><span class="p">,</span> <span class="s2">&quot;N2&quot;</span><span class="p">),</span>
-</span><span id="compare_bond_angles-425"><a href="#compare_bond_angles-425"><span class="linenos">425</span></a>        <span class="c1"># (&quot;N2&quot;, &quot;CA2&quot;, &quot;C2&quot;),</span>
-</span><span id="compare_bond_angles-426"><a href="#compare_bond_angles-426"><span class="linenos">426</span></a>    <span class="p">]</span>
-</span><span id="compare_bond_angles-427"><a href="#compare_bond_angles-427"><span class="linenos">427</span></a>
-</span><span id="compare_bond_angles-428"><a href="#compare_bond_angles-428"><span class="linenos">428</span></a>    <span class="n">atom_indices</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="compare_bond_angles-429"><a href="#compare_bond_angles-429"><span class="linenos">429</span></a>        <span class="s2">&quot;N1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-</span><span id="compare_bond_angles-430"><a href="#compare_bond_angles-430"><span class="linenos">430</span></a>        <span class="s2">&quot;CA1&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="compare_bond_angles-431"><a href="#compare_bond_angles-431"><span class="linenos">431</span></a>        <span class="s2">&quot;C1&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-</span><span id="compare_bond_angles-432"><a href="#compare_bond_angles-432"><span class="linenos">432</span></a>        <span class="s2">&quot;CB1&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-</span><span id="compare_bond_angles-433"><a href="#compare_bond_angles-433"><span class="linenos">433</span></a>        <span class="s2">&quot;SG1&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-</span><span id="compare_bond_angles-434"><a href="#compare_bond_angles-434"><span class="linenos">434</span></a>        <span class="s2">&quot;SG2&quot;</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span>
-</span><span id="compare_bond_angles-435"><a href="#compare_bond_angles-435"><span class="linenos">435</span></a>        <span class="s2">&quot;CB2&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
-</span><span id="compare_bond_angles-436"><a href="#compare_bond_angles-436"><span class="linenos">436</span></a>        <span class="s2">&quot;CA2&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
-</span><span id="compare_bond_angles-437"><a href="#compare_bond_angles-437"><span class="linenos">437</span></a>        <span class="s2">&quot;N2&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
-</span><span id="compare_bond_angles-438"><a href="#compare_bond_angles-438"><span class="linenos">438</span></a>        <span class="s2">&quot;C2&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
-</span><span id="compare_bond_angles-439"><a href="#compare_bond_angles-439"><span class="linenos">439</span></a>    <span class="p">}</span>
-</span><span id="compare_bond_angles-440"><a href="#compare_bond_angles-440"><span class="linenos">440</span></a>
-</span><span id="compare_bond_angles-441"><a href="#compare_bond_angles-441"><span class="linenos">441</span></a>    <span class="n">calculated_angles</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="compare_bond_angles-442"><a href="#compare_bond_angles-442"><span class="linenos">442</span></a>    <span class="k">for</span> <span class="n">triplet</span> <span class="ow">in</span> <span class="n">angle_triplets</span><span class="p">:</span>
-</span><span id="compare_bond_angles-443"><a href="#compare_bond_angles-443"><span class="linenos">443</span></a>        <span class="n">a</span> <span class="o">=</span> <span class="n">atom_coordinates</span><span class="p">[</span><span class="n">atom_indices</span><span class="p">[</span><span class="n">triplet</span><span class="p">[</span><span class="mi">0</span><span class="p">]]]</span>
-</span><span id="compare_bond_angles-444"><a href="#compare_bond_angles-444"><span class="linenos">444</span></a>        <span class="n">b</span> <span class="o">=</span> <span class="n">atom_coordinates</span><span class="p">[</span><span class="n">atom_indices</span><span class="p">[</span><span class="n">triplet</span><span class="p">[</span><span class="mi">1</span><span class="p">]]]</span>
-</span><span id="compare_bond_angles-445"><a href="#compare_bond_angles-445"><span class="linenos">445</span></a>        <span class="n">c</span> <span class="o">=</span> <span class="n">atom_coordinates</span><span class="p">[</span><span class="n">atom_indices</span><span class="p">[</span><span class="n">triplet</span><span class="p">[</span><span class="mi">2</span><span class="p">]]]</span>
-</span><span id="compare_bond_angles-446"><a href="#compare_bond_angles-446"><span class="linenos">446</span></a>        <span class="n">ideal</span> <span class="o">=</span> <span class="n">idealized_angles</span><span class="p">[</span><span class="n">triplet</span><span class="p">]</span>
-</span><span id="compare_bond_angles-447"><a href="#compare_bond_angles-447"><span class="linenos">447</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="compare_bond_angles-448"><a href="#compare_bond_angles-448"><span class="linenos">448</span></a>            <span class="n">angle</span> <span class="o">=</span> <span class="n">calculate_bond_angle</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
-</span><span id="compare_bond_angles-449"><a href="#compare_bond_angles-449"><span class="linenos">449</span></a>        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="compare_bond_angles-450"><a href="#compare_bond_angles-450"><span class="linenos">450</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error calculating angle for atoms </span><span class="si">{</span><span class="n">triplet</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="compare_bond_angles-451"><a href="#compare_bond_angles-451"><span class="linenos">451</span></a>            <span class="k">return</span> <span class="kc">None</span>
-</span><span id="compare_bond_angles-452"><a href="#compare_bond_angles-452"><span class="linenos">452</span></a>        <span class="n">calculated_angles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
-</span><span id="compare_bond_angles-453"><a href="#compare_bond_angles-453"><span class="linenos">453</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="compare_bond_angles-454"><a href="#compare_bond_angles-454"><span class="linenos">454</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-</span><span id="compare_bond_angles-455"><a href="#compare_bond_angles-455"><span class="linenos">455</span></a>                <span class="sa">f</span><span class="s2">&quot;Calculated bond angle for </span><span class="si">{</span><span class="n">triplet</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">angle</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">ideal</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> degrees&quot;</span>
-</span><span id="compare_bond_angles-456"><a href="#compare_bond_angles-456"><span class="linenos">456</span></a>            <span class="p">)</span>
-</span><span id="compare_bond_angles-457"><a href="#compare_bond_angles-457"><span class="linenos">457</span></a>
-</span><span id="compare_bond_angles-458"><a href="#compare_bond_angles-458"><span class="linenos">458</span></a>    <span class="c1"># Convert idealized angles to a list</span>
-</span><span id="compare_bond_angles-459"><a href="#compare_bond_angles-459"><span class="linenos">459</span></a>    <span class="n">idealized_angles_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">idealized_angles</span><span class="p">[</span><span class="n">triplet</span><span class="p">]</span> <span class="k">for</span> <span class="n">triplet</span> <span class="ow">in</span> <span class="n">angle_triplets</span><span class="p">]</span>
-</span><span id="compare_bond_angles-460"><a href="#compare_bond_angles-460"><span class="linenos">460</span></a>
-</span><span id="compare_bond_angles-461"><a href="#compare_bond_angles-461"><span class="linenos">461</span></a>    <span class="c1"># Calculate RMS difference</span>
-</span><span id="compare_bond_angles-462"><a href="#compare_bond_angles-462"><span class="linenos">462</span></a>    <span class="n">rms_diff</span> <span class="o">=</span> <span class="n">rms_difference</span><span class="p">(</span>
-</span><span id="compare_bond_angles-463"><a href="#compare_bond_angles-463"><span class="linenos">463</span></a>        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">calculated_angles</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">idealized_angles_list</span><span class="p">)</span>
-</span><span id="compare_bond_angles-464"><a href="#compare_bond_angles-464"><span class="linenos">464</span></a>    <span class="p">)</span>
-</span><span id="compare_bond_angles-465"><a href="#compare_bond_angles-465"><span class="linenos">465</span></a>
-</span><span id="compare_bond_angles-466"><a href="#compare_bond_angles-466"><span class="linenos">466</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="compare_bond_angles-467"><a href="#compare_bond_angles-467"><span class="linenos">467</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Calculated RMS difference: </span><span class="si">{</span><span class="n">rms_diff</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> degrees&quot;</span><span class="p">)</span>
-</span><span id="compare_bond_angles-468"><a href="#compare_bond_angles-468"><span class="linenos">468</span></a>    <span class="k">return</span> <span class="n">rms_diff</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Calculate all bond angles for a disulfide bond and compare them to idealized angles.</p>
-
-<h6 id="parameters">Parameters</h6>
-
-<ul>
-<li><strong>np.ndarray atom_coordinates: Array containing coordinates of atoms in the order</strong>: 
-N1, CA1, C1, O1, CB1, SG1, N2, CA2, C2, O2, CB2, SG2</li>
-</ul>
-
-<h6 id="returns">Returns</h6>
-
-<blockquote>
-  <p>RMS difference between calculated bond angles and idealized bond angles.</p>
 </blockquote>
 </div>
 
