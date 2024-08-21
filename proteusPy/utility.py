@@ -131,6 +131,7 @@ def grid_dimensions(n: int) -> tuple:
         return rows, cols
 
 
+'''
 # This function will be deprecated in the future.
 def Check_chains(pdbid, pdbdir, verbose=True) -> bool:
     """
@@ -179,6 +180,7 @@ def Check_chains(pdbid, pdbdir, verbose=True) -> bool:
                 )
     return same
 
+'''
 
 # given the full dictionary, walk through all the keys (PDB ID)
 # for each PDB_ID SS list, find and extract the SS for the first chain
@@ -1215,175 +1217,6 @@ def get_macos_theme():
         return "none"
 
 
-# This function will be deprecated.
-def check_header_from_file(filename: str, model_numb=0, verbose=False, dbg=True):
-    """
-    Parse the Disulfides contained in the PDB file.
-
-    NB: Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython/
-
-    :param filename: Filename for the entry.
-    :param model_numb: Model number to use, defaults to 0 for single structure files.
-    :param verbose: Print info while parsing
-    :return: Number of errors encountered while parsing the file.
-
-    Example:
-      Assuming ```DATA_DIR``` has the pdb5rsa.ent file (it should!), we can load the disulfides
-      with the following:
-
-    """
-    import os
-
-    from Bio.PDB import PDBParser
-
-    parser = PDBParser(PERMISSIVE=True)
-
-    proximal = distal = -1
-    _chaina = None
-    _chainb = None
-    structure = None
-    pdbid = ""
-
-    def extract_id_from_filename(filename: str) -> str:
-        """
-        Extract the ID from a filename formatted as 'pdb{id}.ent'.
-
-        Parameters:
-        - filename (str): The filename to extract the ID from.
-
-        Returns:
-        - str: The extracted ID.
-        """
-        basename = os.path.basename(filename)
-        # Check if the filename follows the expected format
-        if basename.startswith("pdb") and filename.endswith(".ent"):
-            # Extract the ID part of the filename
-            return filename[3:-4]
-        else:
-            mess = (
-                f"Filename {filename} does not follow the expected format 'pdbid .ent'"
-            )
-            raise ValueError(mess)
-
-    # Biopython uses the Structure -> Model -> Chain hierarchy to organize
-    # structures. All are iterable.
-
-    pdbid = extract_id_from_filename(filename)
-    try:
-        structure = parser.get_structure(pdbid, file=filename)
-        struct_name = structure.get_id()
-        model = structure[model_numb]
-    except FileNotFoundError:
-        mess = f"Error: The file {filename} does not exist."
-        _logger.error(mess)
-        return 0, -1
-
-    except Exception as e:
-        mess = f"An error occurred: {e}"
-        _logger.error(mess)
-        return 0, -1
-
-    ssbond_dict = structure.header["ssbond"]  # NB: this requires the modified code
-
-    if dbg:
-        _logger.info(f"-> check_header_from_file() - Parsing file: {filename}:")
-        _logger.info(f"-> check_header_from_file() - Dict: {ssbond_dict}:")
-
-    ssbond_dict = structure.header["ssbond"]  # NB: this requires the modified code
-
-    # list of tuples with (proximal distal chaina chainb)
-    ssbonds = parse_ssbond_header_rec(ssbond_dict)
-    if dbg:
-        _logger.info(
-            f"-> check_header_from_file(): Found {len(ssbonds)} SSBonds in {struct_name} {ssbonds}"
-        )
-    if len(ssbonds) == 0:
-        if dbg:
-            _logger.error("-> check_header_from_file(): no bonds found in bondlist.")
-        return 0, -1  # return -1 if no bonds found
-
-    i = 0
-    errors = 0
-    found = 0
-
-    for pair in ssbonds:
-        # in the form (proximal, distal, chain)
-
-        proximal = pair[0]
-        distal = pair[1]
-        chain1_id = pair[2]
-        chain2_id = pair[3]
-
-        if chain1_id is None or chain2_id is None:
-            errors += 1
-            if verbose:
-                mess = f" ! Cannot parse SSBond record (NULL chain):\
-                 {struct_name} Prox:  {proximal} Dist: {distal}"
-                _logger.error(mess)
-            continue
-
-        if not proximal.isnumeric() or not distal.isnumeric():
-            errors += 1
-            if dbg:
-                mess = f" ! Cannot parse SSBond record (non-numeric IDs):\
-                 {struct_name} Prox:  {proximal} {chain1_id} Dist: {distal} {chain2_id}"
-                _logger.error(mess)
-            continue  # was pass
-        else:
-            proximal = int(proximal)
-            distal = int(distal)
-
-        _chaina = model[chain1_id]
-        _chainb = model[chain2_id]
-
-        if chain1_id != chain2_id:
-            if dbg:
-                mess = f" -> Cross Chain SS for: Prox: {proximal}{chain1_id} Dist: {distal}{chain2_id}"
-                _logger.warning(mess)
-                pass  # was break
-
-        try:
-            prox_res = _chaina[proximal]
-        except KeyError:
-            errors += 1
-            _logger.error(
-                f" ! Cannot parse proximal SSBond record (KeyError): {struct_name} Prox: <{proximal}> {chain1_id}"
-            )
-            continue  ## bad proximal residue
-
-        try:
-            dist_res = _chainb[distal]
-        except KeyError:
-            errors += 1
-            _logger.error(
-                f" ! Cannot parse Distal SSBond record (KeyError): {struct_name} Distal: <{distal}> {chain2_id}"
-            )
-            continue  ## bad distal residue
-
-        if (_chaina is not None) and (_chainb is not None):
-            if _chaina[proximal].is_disordered() or _chainb[distal].is_disordered():
-                if verbose:
-                    _logger.warning(
-                        f" -> Disordered residue(s): {struct_name}: {proximal}{chain1_id} - {distal}{chain2_id}"
-                    )
-                errors += 1
-                continue
-            else:
-                found += 1
-                i += 1
-                if dbg:
-                    _logger.warning(
-                        f" -> SSBond: {i}: {struct_name}: {proximal}{chain1_id} - {distal}{chain2_id}"
-                    )
-        else:
-            errors += 1
-            if dbg:
-                _logger.error(
-                    f" -> NULL chain(s): {struct_name}: {proximal}{chain1_id} - {distal}{chain2_id}"
-                )
-    return found, errors
-
-
 # functions to calculate statistics and filter disulfide lists via pandas
 
 
@@ -1544,28 +1377,6 @@ def load_list_from_file(filename):
     with open(filename, "rb") as file:
         loaded_list = pickle.load(file)
     return loaded_list
-
-
-# These will be deprecated.
-def check_header_from_id(
-    struct_name: str, pdb_dir=".", model_numb=0, verbose=False, dbg=False
-) -> int:
-    """
-    Check parsability PDB ID and initializes the Disulfide objects.
-    Assumes the file is downloaded in ```MODEL_DIR``` path.
-
-    NB: Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython/
-
-    :param struct_name: the name of the PDB entry.
-    :param pdb_dir: path to the PDB files, defaults to PDB_DIR
-    :param model_numb: model number to use, defaults to 0 for single structure files.
-    :param verbose: print info while parsing
-    :param dbg: Debugging Flag
-    :return: number of errors found.
-    """
-
-    fname = Path(pdb_dir) / f"pdb{struct_name}.ent"
-    return check_header_from_file(fname, verbose=verbose, dbg=dbg)
 
 
 def set_logger_level_for_module(pkg_name, level=""):

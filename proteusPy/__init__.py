@@ -105,15 +105,12 @@ from .ssparser import (
 )
 from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN, Turtle3D
 from .utility import (
-    Check_chains,
     Download_Disulfides,
     Extract_Disulfide,
     Extract_Disulfides,
     Extract_Disulfides_From_List,
     calculate_percentile_cutoff,
     calculate_std_cutoff,
-    check_header_from_file,
-    check_header_from_id,
     create_deviation_dataframe,
     display_ss_pymol,
     distance_squared,
