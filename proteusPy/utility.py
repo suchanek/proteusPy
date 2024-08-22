@@ -131,57 +131,6 @@ def grid_dimensions(n: int) -> tuple:
         return rows, cols
 
 
-'''
-# This function will be deprecated in the future.
-def Check_chains(pdbid, pdbdir, verbose=True) -> bool:
-    """
-    Return True if structure has multiple chains of identical length,
-    False otherwise. Primarily internal use.
-
-    :param pdbid: PDBID identifier
-    :param pdbdir: PDB directory containing structures
-    :param verbose: Verbosity, defaults to True
-    """
-    from Bio.PDB import PDBParser
-
-    parser = PDBParser(PERMISSIVE=True)
-    structure = parser.get_structure(pdbid, file=f"{pdbdir}pdb{pdbid}.ent")
-
-    # dictionary of tuples with SSBond prox and distal
-    ssbond_dict = structure.header["ssbond"]
-
-    if verbose:
-        print(f"ssbond dict: {ssbond_dict}")
-
-    same = False
-    model = structure[0]
-    chainlist = model.get_list()
-
-    if len(chainlist) > 1:
-        chain_lens = []
-        if verbose:
-            _logger.info(f"multiple chains. {chainlist}")
-        for chain in chainlist:
-            chain_length = len(chain.get_list())
-            chain_id = chain.get_id()
-            if verbose:
-                _logger.info(f"Chain: {chain_id}, length: {chain_length}")
-            chain_lens.append(chain_length)
-
-        if np.min(chain_lens) != np.max(chain_lens):
-            same = False
-            if verbose:
-                _logger.warning(f"chain lengths are unequal: {chain_lens}")
-        else:
-            same = True
-            if verbose:
-                _logger.info(
-                    f"Chains are equal length, assuming the same. {chain_lens}"
-                )
-    return same
-
-'''
-
 # given the full dictionary, walk through all the keys (PDB ID)
 # for each PDB_ID SS list, find and extract the SS for the first chain
 # update the 'pruned' dict with the now shorter SS list
@@ -722,7 +671,7 @@ def Extract_Disulfides(
     entrylist = []
     sslist = []
     problem_ids = []
-    bad = bad_dist = tot = cnt = 0
+    bad = bad_dist = tot = cnt = i = 0
 
     # we use the specialized list class DisulfideList to contain our disulfides
     # we'll use a dict to store DisulfideList objects, indexed by the structure ID
@@ -768,9 +717,9 @@ def Extract_Disulfides(
 
     with logging_redirect_tqdm(loggers=[_logger]):
         if numb > 0:
-            pbar = tqdm(entrylist[:numb], ncols=PBAR_COLS)
+            pbar = tqdm(entrylist[:numb], ncols=PBAR_COLS, mininterval=0.5)
         else:
-            pbar = tqdm(entrylist, ncols=PBAR_COLS)
+            pbar = tqdm(entrylist, ncols=PBAR_COLS, mininterval=0.5)
 
         for entry in pbar:
             _sslist = DisulfideList([], entry)
@@ -844,7 +793,9 @@ def Extract_Disulfides(
                     shutil.move(fname, destination_file_path)
                 continue  ## this entry has no SS bonds, so we break the loop and move on to the next entry
 
-            pbar.set_postfix({"ID": entry, "NoSS": bad, "Cnt": cnt})
+            i += 1
+            if i % 100 == 0:
+                pbar.set_postfix({"ID": entry, "NoSS": bad, "Cnt": cnt})
 
     pbar.close()
 
