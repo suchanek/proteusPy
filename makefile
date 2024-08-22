@@ -1,6 +1,6 @@
 # Makefile for proteusPy
 # Author: Eric G. Suchanek, PhD
-# Last revision: 7/16/24 -egs-
+# Last revision: 8/23/24 -egs-
 
 
 # assumes file VERSION contains only the version number
@@ -18,10 +18,10 @@ endif
 
 CONDA = mamba
 
-#MESS = $(VERS)
+MESS = $(VERS)
 #MESS = "proteusPy: A Python Package for Protein Structure and Disulfide Bond Modeling and Analysis"
 
-MESS = f"{VERS}: Biopython removal"
+# MESS = f"{$VERS}: Biopython removal"
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
 
