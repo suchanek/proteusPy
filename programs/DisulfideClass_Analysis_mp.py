@@ -30,25 +30,25 @@ REPO_DIR = os.path.join(HOME, "repos", "proteusPy", "data")
 PBAR_COLS = 78
 
 
-def task(
-    loader: DisulfideLoader,
-    six_or_bin: pd.DataFrame,
-    start_idx: int,
-    end_idx: int,
-    total_ss: int,
-    cutoff: float,
-    do_graph: bool,
-    do_consensus: bool,
-    save_dir: str,
-    prefix: str,
-    position: int,
-    tasknum: int,
-    result_queue: multiprocessing.Queue,
-):
+def task(args):
+    (
+        loader,
+        six_or_bin,
+        start_idx,
+        end_idx,
+        total_ss,
+        cutoff,
+        do_graph,
+        do_consensus,
+        save_dir,
+        prefix,
+        position,
+        tasknum,
+    ) = args
+
     result_list = []
 
     for idx in range(start_idx, end_idx):
-
         row = six_or_bin.iloc[idx]
         cls = row["class_id"]
         ss_list = row["ss_id"]
@@ -58,18 +58,17 @@ def task(
 
         task_pbar = tqdm(
             total=len(ss_list),
-            desc=f"{Fore.YELLOW}  Task {tasknum+1:2}{Style.RESET_ALL}".ljust(10),
-            position=position + 1,
+            desc=f"  Task {tasknum+1:2}".ljust(10),
+            position=position,
             leave=False,
             ncols=PBAR_COLS,
-            bar_format="{l_bar}%s{bar}{r_bar}%s" % (Fore.YELLOW, Style.RESET_ALL),
         )
 
         fname = os.path.join(save_dir, f"{prefix}_{cls}.png")
 
         class_disulfides_deque = deque()
         counter = 0
-        update_freq = 50
+        update_freq = 10
 
         for ssid in ss_list:
             _ss = loader[ssid]
@@ -99,8 +98,7 @@ def task(
             )
             result_list.append(exemplar)
 
-    result_queue.put(result_list)
-    return
+    return result_list
 
 
 def analyze_classes_multiprocess(
@@ -113,6 +111,7 @@ def analyze_classes_multiprocess(
     do_sextant=True,
     prefix="ss_class",
 ) -> DisulfideList:
+
     global SAVE_DIR
 
     if do_sextant:
@@ -135,57 +134,31 @@ def analyze_classes_multiprocess(
     total_ss = len(loader.SSList)
 
     chunk_size = tot_classes // num_processes
-    result_queue = multiprocessing.Queue()
 
-    # Create the overall progress bar
-    overall_pbar = tqdm(
-        total=tot_classes,
-        desc=f"{Fore.GREEN}Overall Progress{Style.RESET_ALL}".ljust(20),
-        position=0,
-        leave=True,
-        ncols=PBAR_COLS,
-        bar_format="{l_bar}%s{bar}{r_bar}%s" % (Fore.GREEN, Style.RESET_ALL),
-    )
-
-    processes = []
-    for i in range(num_processes):
-        start_idx = i * chunk_size
-        end_idx = (i + 1) * chunk_size if i != num_processes - 1 else tot_classes
-        pbar_index = 2 * i + 2
-
-        process = multiprocessing.Process(
-            target=task,
-            args=(
-                loader,
-                six_or_bin,
-                start_idx,
-                end_idx,
-                total_ss,
-                cutoff,
-                do_graph,
-                do_consensus,
-                SAVE_DIR,
-                prefix,
-                pbar_index,
-                i,
-                result_queue,
-            ),
+    pool_args = [
+        (
+            loader,
+            six_or_bin,
+            i * chunk_size,
+            (i + 1) * chunk_size if i != num_processes - 1 else tot_classes,
+            total_ss,
+            cutoff,
+            do_graph,
+            do_consensus,
+            SAVE_DIR,
+            prefix,
+            i + 1,
+            i,
         )
-        processes.append(process)
-        process.start()
+        for i in range(num_processes)
+    ]
+
+    with multiprocessing.Pool(processes=num_processes) as pool:
+        results = pool.map(task, pool_args)
 
     res_list = DisulfideList([], "SS_Avg_SS")
-
-    # Collect the results from each process
-    for _ in range(num_processes):
-        result_list = result_queue.get()
-        res_list.extend(result_list)
-
-    # Ensure all processes have finished
-    for process in processes:
-        process.join()
-
-    # overall_pbar.close()
+    for result in results:
+        res_list.extend(result)
 
     if do_consensus:
         print(f"Writing consensus structures to: {class_filename}")
