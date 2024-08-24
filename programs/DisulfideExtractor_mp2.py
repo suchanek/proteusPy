@@ -28,8 +28,8 @@ from datetime import timedelta
 from pathlib import Path
 from shutil import copy
 
+from alive_progress import alive_bar
 from colorama import Fore, Style, init
-from tqdm import tqdm
 
 from proteusPy import (
     Disulfide,
@@ -55,8 +55,6 @@ _logger = logging.getLogger("DisulfideExtractor")
 _logger.setLevel(logging.INFO)
 
 set_logger_level_for_module("proteusPy", logging.ERROR)
-
-PBAR_COLS = 100
 
 PDB = os.getenv("PDB")
 PDB_BASE = Path(PDB)
@@ -102,46 +100,46 @@ __version__ = "2.0.1"
 
 
 def extract_disulfides_chunk(args):
-    (start_idx, end_idx, sslist, pdbdir, dist_cutoff, verbose, quiet, pbar_index) = args
+    (
+        start_idx,
+        end_idx,
+        sslist,
+        pdbdir,
+        dist_cutoff,
+        verbose,
+        quiet,
+        total,
+        pbar_queue,
+    ) = args
 
     from proteusPy import DisulfideList, load_disulfides_from_id
 
     result_list = []
-    global overall_pbar
 
     if quiet:
         _logger.setLevel(logging.ERROR)
 
     entrylist = sslist[start_idx:end_idx]
 
-    task_pbar = tqdm(
-        total=len(entrylist),
-        desc=f"{Fore.BLUE}  Task {pbar_index+1:2}{Style.RESET_ALL}".ljust(10),
-        position=pbar_index + 1,
-        leave=False,
-        ncols=PBAR_COLS,
-        bar_format="{l_bar}%s{bar}{r_bar}%s" % (Fore.YELLOW, Style.RESET_ALL),
-        mininterval=1.0,
-    )
+    # Create a local progress bar for this chunk
+    with alive_bar(total, title=f"Task {start_idx//total+1}", bar="smooth") as bar:
+        for entry in entrylist:
+            _sslist = load_disulfides_from_id(
+                entry,
+                model_numb=0,
+                verbose=verbose,
+                quiet=quiet,
+                pdb_dir=pdbdir,
+                cutoff=dist_cutoff,
+            )
 
-    for entry in entrylist:
-        _sslist = load_disulfides_from_id(
-            entry,
-            model_numb=0,
-            verbose=verbose,
-            quiet=quiet,
-            pdb_dir=pdbdir,
-            cutoff=dist_cutoff,
-        )
+            if len(_sslist) > 0:
+                sslist = remove_duplicate_ss(_sslist)
+                result_list.extend(sslist)
 
-        if len(_sslist) > 0:
-            sslist = remove_duplicate_ss(_sslist)
-            result_list.extend(sslist)
+            bar()  # Update the progress bar
+            pbar_queue.put(1)  # Update the overall progress bar
 
-        task_pbar.update(1)
-        # overall_pbar.update(1)
-
-    task_pbar.close()
     return result_list
 
 
@@ -218,13 +216,12 @@ def do_extract(verbose, full, subset, cutoff, prune, nthreads=6):
     ent_files = glob.glob(str(PDB_DIR / "*.ent"))
     num_ent_files = len(ent_files)
     sslist = [Path(f).stem[3:7] for f in ent_files]
+    res_list = DisulfideList([], "PDB_ALL_SS")
 
     if full:
         chunk_size = num_ent_files // nthreads
     else:
         chunk_size = 1000 // nthreads
-
-    res_list = DisulfideList([], "PDB_ALL_SS")
 
     pool_args = [
         (
@@ -235,18 +232,31 @@ def do_extract(verbose, full, subset, cutoff, prune, nthreads=6):
             cutoff,
             verbose,
             True,
-            i,
+            len(ent_files),  # Total entries per chunk
+            multiprocessing.Queue(),  # Queue for progress reporting
         )
         for i in range(nthreads)
     ]
 
-    with multiprocessing.Pool(nthreads) as pool:
-        results = pool.map(extract_disulfides_chunk, pool_args)
+    with multiprocessing.Manager() as manager:
+        pbar_queue = manager.Queue()
+        overall_total = len(ent_files)
 
-    for result in results:
-        res_list.extend(result)
+        with alive_bar(
+            overall_total, title="Overall Progress", bar="smooth"
+        ) as overall_bar:
+            with multiprocessing.Pool(nthreads) as pool:
+                results = pool.map_async(extract_disulfides_chunk, pool_args)
 
-    # save the disulfides to a pickle file
+                while not results.ready():
+                    # Update overall progress bar with items from the queue
+                    while not pbar_queue.empty():
+                        pbar_queue.get()
+                        overall_bar()
+
+                res_list = [ss for result in results.get() for ss in result]
+
+    # Save the disulfides to a pickle file
     if full:
         if verbose:
             print(f"Saving SS list to: {DATA_DIR / SS_PICKLE_FILE}")
@@ -302,6 +312,8 @@ def update_repo(datadir):
     copy(Path(datadir) / LOADER_FNAME, Path(REPO_DATA))
     copy(Path(datadir) / LOADER_SUBSET_FNAME, Path(REPO_DATA))
     copy(Path(datadir) / SS_PICKLE_FILE, Path(REPO_DATA))
+    copy(Path(datadir) / SS_SUBSET_PICKLE_FILE, Path(REPO_DATA))
+    return
 
 
 def do_stuff(
