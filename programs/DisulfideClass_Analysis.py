@@ -165,6 +165,8 @@ def task(
         ss_list = row["ss_id"]
         tot = len(ss_list)
         if 100 * tot / total_ss < cutoff:
+            pbar.set_postfix({"SKP": cls})
+            pbar.update(1)
             continue
 
         pbar.set_postfix({"CLS": cls})

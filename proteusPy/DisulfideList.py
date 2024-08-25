@@ -1074,7 +1074,6 @@ class DisulfideList(UserList):
         the list of Disulfides within the cutoff
 
         :param ss: Disulfide to compare to
-        :param chi5: Chi5 (degrees)
         :param cutoff: Distance cutoff, degrees
         :return: DisulfideList of neighbors
         """

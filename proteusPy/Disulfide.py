@@ -140,7 +140,6 @@ class Disulfide:
         distal_chain: str = "A",
         pdb_id: str = "1egs",
         quiet: bool = True,
-        permissive: bool = True,
     ) -> None:
         """
         __init__ Initialize the class to defined internal values.
@@ -157,7 +156,6 @@ class Disulfide:
         self.pdb_id = pdb_id
         self.proximal_residue_fullid = str("")
         self.distal_residue_fullid = str("")
-        self.PERMISSIVE = permissive
         self.QUIET = quiet
         self.ca_distance = _FLOAT_INIT
         self.cb_distance = _FLOAT_INIT
@@ -233,18 +231,26 @@ class Disulfide:
     def __lt__(self, other):
         if isinstance(other, Disulfide):
             return self.energy < other.energy
+        else:
+            return NotImplemented
 
     def __le__(self, other):
         if isinstance(other, Disulfide):
             return self.energy <= other.energy
+        else:
+            return NotImplemented
 
     def __gt__(self, other):
         if isinstance(other, Disulfide):
             return self.energy > other.energy
+        else:
+            return NotImplemented
 
     def __ge__(self, other):
         if isinstance(other, Disulfide):
             return self.energy >= other.energy
+        else:
+            return NotImplemented
 
     def __eq__(self, other):
         if isinstance(other, Disulfide):
@@ -258,6 +264,8 @@ class Disulfide:
     def __ne__(self, other):
         if isinstance(other, Disulfide):
             return self.proximal != other.proximal or self.distal != other.distal
+        else:
+            return NotImplemented
 
     def __repr__(self):
         """
@@ -319,7 +327,7 @@ class Disulfide:
         """
 
         _bradius = bond_radius
-        coords = self.internal_coords()
+        coords = self._internal_coords()
         missing_atoms = self.missing_atoms
         clen = coords.shape[0]
 
@@ -330,7 +338,7 @@ class Disulfide:
             all_atoms = True
 
         if translate:
-            cofmass = self.cofmass()
+            cofmass = self.cofmass
             for i in range(clen):
                 coords[i] = coords[i] - cofmass
 
@@ -355,7 +363,7 @@ class Disulfide:
         pvp = pvplot
 
         # bond connection table with atoms in the specific order shown above:
-        # returned by ss.get_internal_coords()
+        # returned by ss.get__internal_coords()
 
         def draw_bonds(
             pvp,
@@ -667,7 +675,7 @@ class Disulfide:
             """
 
         _bradius = bond_radius
-        coords = self.internal_coords()
+        coords = self._internal_coords()
         missing_atoms = self.missing_atoms
         clen = coords.shape[0]
 
@@ -678,7 +686,7 @@ class Disulfide:
             all_atoms = True
 
         if translate:
-            cofmass = self.cofmass()
+            cofmass = self.cofmass
             for i in range(clen):
                 coords[i] = coords[i] - cofmass
 
@@ -953,7 +961,7 @@ class Disulfide:
     def _handle_SS_exception(self, message: str):
         """
         This method catches an exception that occurs in the Disulfide
-        object (if PERMISSIVE), or raises it again, this time adding the
+        object (if QUIET), or raises it again, this time adding the
         PDB line number to the error message. (private).
 
         :param message: Error message
@@ -963,7 +971,7 @@ class Disulfide:
         # message = "%s at line %i." % (message)
         message = f"{message}"
 
-        if self.PERMISSIVE:
+        if self.QUIET:
             # just print a warning - some residues/atoms may be missing
             warnings.warn(
                 "DisulfideConstructionException: %s\n"
@@ -1220,7 +1228,8 @@ class Disulfide:
     @dihedrals.setter
     def dihedrals(self, dihedrals: list) -> None:
         """
-        Sets the disulfide dihedral angles to the inputs specified in the list.
+        Sets the disulfide dihedral angles to the inputs specified in the list and
+        computes the torsional energy and length of the disulfide bond.
 
         :param dihedrals: list of dihedral angles.
         """
@@ -1230,8 +1239,9 @@ class Disulfide:
         self.chi4 = dihedrals[3]
         self.chi5 = dihedrals[4]
         self.torsion_array = np.array(dihedrals)
-        self.compute_torsional_energy()
-        self.compute_torsion_length()
+        self._compute_torsional_energy()
+        self._compute_torsion_length()
+        self._compute_rho()
 
     def bounding_box(self) -> np.array:
         """
@@ -1288,7 +1298,6 @@ class Disulfide:
         """
 
         self.dihedrals = [chi1, chi2, chi3, chi4, chi5]
-        # self.set_dihedrals(chi1, chi2, chi3, chi4, chi5)
         self.proximal = 1
         self.distal = 2
 
@@ -1341,18 +1350,17 @@ class Disulfide:
         self.n_dist = n
         self.ca_dist = ca
         self.c_dist = c
-        self.compute_torsional_energy()
-        self.compute_local_coords()
+        self._compute_torsional_energy()
+        self._compute_local_coords()
+        self._compute_torsion_length()
+        self._compute_rho()
         self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
         self.cb_distance = distance3d(self.cb_prox, self.cb_dist)
-        self.torsion_array = np.array(
-            (self.chi1, self.chi2, self.chi3, self.chi4, self.chi5)
-        )
-        self.compute_torsion_length()
-        self.compute_rho()
+        self.torsion_array = np.array([chi1, chi2, chi3, chi4, chi5])
         self.missing_atoms = True
         self.modelled = True
 
+    @property
     def cofmass(self) -> np.array:
         """
         Return the geometric center of mass for the internal coordinates of
@@ -1361,7 +1369,7 @@ class Disulfide:
         :return: 3D array for the geometric center of mass
         """
 
-        res = self.internal_coords()
+        res = self._internal_coords()
         return res.mean(axis=0)
 
     def copy(self):
@@ -1380,7 +1388,7 @@ class Disulfide:
         :return: min, max
         """
 
-        ic = self.internal_coords()
+        ic = self._internal_coords()
         # set default index to 'z'
         idx = 2
 
@@ -1395,7 +1403,7 @@ class Disulfide:
         _max = ic[:, idx].max()
         return _min, _max
 
-    def compute_local_coords(self) -> None:
+    def _compute_local_coords(self) -> None:
         """
         Compute the internal coordinates for a properly initialized Disulfide Object.
 
@@ -1449,7 +1457,7 @@ class Disulfide:
         self._cb_dist = Vector3D(turt.to_local(cb2))
         self._sg_dist = Vector3D(turt.to_local(sg2))
 
-    def compute_torsional_energy(self) -> float:
+    def _compute_torsional_energy(self) -> float:
         """
         Compute the approximate torsional energy for the Disulfide's
         conformation and sets its internal state.
@@ -1586,6 +1594,13 @@ class Disulfide:
             pl.show()
         return
 
+    @property
+    def TorsionEnergy(self) -> float:
+        """
+        Return the energy of the Disulfide bond.
+        """
+        return self._compute_torsional_energy()
+
     def plot(
         self, pl, single=True, style="sb", light=True, shadows=False
     ) -> pv.Plotter:
@@ -1705,8 +1720,8 @@ class Disulfide:
         """
 
         # Get internal coordinates of both objects
-        ic1 = self.internal_coords()
-        ic2 = other.internal_coords()
+        ic1 = self._internal_coords()
+        ic2 = other._internal_coords()
 
         # Compute the sum of squared differences between corresponding internal coordinates
         totsq = sum(math.dist(p1, p2) ** 2 for p1, p2 in zip(ic1, ic2))
@@ -1747,14 +1762,6 @@ class Disulfide:
         dist = self.distal_chain
         return tuple(prox, dist)
 
-    def get_permissive(self) -> bool:
-        """
-        Return the Permissive flag state. (Used in PDB parsing)
-
-        :return: Permissive state
-        """
-        return self.PERMISIVE
-
     def get_full_id(self) -> tuple:
         """
         Return the Disulfide full IDs (Used with BIO.PDB)
@@ -1763,166 +1770,16 @@ class Disulfide:
         """
         return (self.proximal_residue_fullid, self.distal_residue_fullid)
 
-    def initialize_disulfide_from_chain(
-        self, chain1, chain2, proximal, distal, resolution, quiet=True
-    ) -> bool:
-        """
-        Initialize a new Disulfide object with atomic coordinates from
-        the proximal and distal coordinates, typically taken from a PDB file.
-        This routine is primarily used internally when building the compressed
-        database.
-
-        :param chain1: list of Residues in the model, eg: chain = model['A']
-        :param chain2: list of Residues in the model, eg: chain = model['A']
-        :param proximal: proximal residue sequence ID
-        :param distal: distal residue sequence ID
-        :param resolution: structure resolution
-        :param quiet: Quiet or noisy parsing, defaults to True
-        """
-        id = chain1.get_full_id()[0]
-        self.pdb_id = id
-        if quiet:
-            _logger.setLevel(logging.ERROR)
-            # Suppress all warnings from Biopython
-            warnings.filterwarnings("ignore", module="Bio")
-
-        prox = int(proximal)
-        dist = int(distal)
-
-        prox_residue = chain1[prox]
-        dist_residue = chain2[dist]
-
-        if prox_residue.get_resname() != "CYS" or dist_residue.get_resname() != "CYS":
-            print(
-                f"build_disulfide() requires CYS at both residues: {prox} {prox_residue.get_resname()} {dist} {dist_residue.get_resname()} Chain: {prox_residue.get_segid()}"
-            )
-
-        # set the objects proximal and distal values
-        self.set_resnum(proximal, distal)
-
-        if resolution is not None:
-            self.resolution = resolution
-
-        self.proximal_chain = chain1.get_id()
-        self.distal_chain = chain2.get_id()
-
-        self.proximal_residue_fullid = prox_residue.get_full_id()
-        self.distal_residue_fullid = dist_residue.get_full_id()
-
-        # turn off warnings, only report errors
-        if quiet:
-            _logger.setLevel(logging.ERROR)
-            warnings.filterwarnings("ignore", module="Bio")
-
-        # Get the coordinates for the proximal and distal residues as vectors
-        # so we can do math on them later. Trap errors here to avoid problems
-        # with missing residues or atoms.
-
-        # proximal residue
-        try:
-            n1 = prox_residue["N"].get_vector()
-            ca1 = prox_residue["CA"].get_vector()
-            c1 = prox_residue["C"].get_vector()
-            o1 = prox_residue["O"].get_vector()
-            cb1 = prox_residue["CB"].get_vector()
-            sg1 = prox_residue["SG"].get_vector()
-
-        except Exception:
-            # i'm torn on this. there are a lot of missing coordinates, so is
-            # it worth the trouble to note them? I think so.
-            _logger.error(f"Invalid/missing coordinates for: {id}, proximal: {prox}")
-            return False
-
-        # distal residue
-        try:
-            n2 = dist_residue["N"].get_vector()
-            ca2 = dist_residue["CA"].get_vector()
-            c2 = dist_residue["C"].get_vector()
-            o2 = dist_residue["O"].get_vector()
-            cb2 = dist_residue["CB"].get_vector()
-            sg2 = dist_residue["SG"].get_vector()
-
-        except Exception:
-            _logger.error(f"Invalid/missing coordinates for: {id}, distal: {dist}")
-            return False
-
-        # previous residue and next residue - optional, used for phi, psi calculations
-        try:
-            prevprox = chain1[prox - 1]
-            nextprox = chain1[prox + 1]
-
-            prevdist = chain2[dist - 1]
-            nextdist = chain2[dist + 1]
-
-            cprev_prox = prevprox["C"].get_vector()
-            nnext_prox = nextprox["N"].get_vector()
-
-            cprev_dist = prevdist["C"].get_vector()
-            nnext_dist = nextdist["N"].get_vector()
-
-            # compute phi, psi for prox and distal
-            self.phiprox = np.degrees(calc_dihedral(cprev_prox, n1, ca1, c1))
-            self.psiprox = np.degrees(calc_dihedral(n1, ca1, c1, nnext_prox))
-            self.phidist = np.degrees(calc_dihedral(cprev_dist, n2, ca2, c2))
-            self.psidist = np.degrees(calc_dihedral(n2, ca2, c2, nnext_dist))
-
-        except Exception:
-            _logger.warning(
-                f"Missing coords for: {id} {prox-1} or {dist+1}, SS {prox}-{dist}, phi/psi not computed."
-            )
-            cprev_prox = nnext_prox = cprev_dist = nnext_dist = Vector3D(
-                -1.0, -1.0, -1.0
-            )
-            self.missing_atoms = True
-
-        # update the positions and conformation
-        self.set_positions(
-            n1,
-            ca1,
-            c1,
-            o1,
-            cb1,
-            sg1,
-            n2,
-            ca2,
-            c2,
-            o2,
-            cb2,
-            sg2,
-            cprev_prox,
-            nnext_prox,
-            cprev_dist,
-            nnext_dist,
-        )
-
-        # calculate and set the disulfide dihedral angles
-        self.chi1 = np.degrees(calc_dihedral(n1, ca1, cb1, sg1))
-        self.chi2 = np.degrees(calc_dihedral(ca1, cb1, sg1, sg2))
-        self.chi3 = np.degrees(calc_dihedral(cb1, sg1, sg2, cb2))
-        self.chi4 = np.degrees(calc_dihedral(sg1, sg2, cb2, ca2))
-        self.chi5 = np.degrees(calc_dihedral(sg2, cb2, ca2, n2))
-        self.rho = np.degrees(calc_dihedral(n1, ca1, ca2, n2))
-
-        self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
-        self.cb_distance = distance3d(self.cb_prox, self.cb_dist)
-        self.torsion_array = np.array(
-            (self.chi1, self.chi2, self.chi3, self.chi4, self.chi5)
-        )
-        self.compute_torsion_length()
-
-        # calculate and set the SS bond torsional energy
-        self.compute_torsional_energy()
-
-        # compute and set the local coordinates
-        self.compute_local_coords()
-
-        # turn warnings back on
-        if quiet:
-            _logger.setLevel(logging.WARNING)
-            warnings.filterwarnings("default", module="Bio")
-        return True
-
+    @property
     def internal_coords(self) -> np.array:
+        """
+        Return the internal coordinates for the Disulfide.
+
+        :return: Array containing the coordinates, [16][3].
+        """
+        return self._internal_coords()
+
+    def _internal_coords(self) -> np.array:
         """
         Return the internal coordinates for the Disulfide.
         If there are missing atoms the extra atoms for the proximal
@@ -1978,7 +1835,16 @@ class Disulfide:
             )
         return res_array
 
-    def internal_coords_res(self, resnumb) -> np.array:
+    @property
+    def internal_coords_res(self) -> np.array:
+        """
+        Return the internal coordinates for the Disulfide. Missing atoms are not included.
+
+        :return: Array containing the coordinates, [12][3].
+        """
+        return self._internal_coords_res()
+
+    def _internal_coords_res(self, resnumb) -> np.array:
         """
         Return the internal coordinates for the internal coordinates of
         the given Disulfide. Missing atoms are not included.
@@ -2015,7 +1881,7 @@ class Disulfide:
             )
             return res_array
         else:
-            mess = f"-> Disulfide.internal_coords(): Invalid argument. \
+            mess = f"-> Disulfide._internal_coords(): Invalid argument. \
              Unable to find residue: {resnumb} "
             raise DisulfideConstructionWarning(mess)
 
@@ -2210,7 +2076,7 @@ class Disulfide:
         """
         return f"{self.repr_ss_residue_ids()}"
 
-    def compute_rho(self) -> float:
+    def _compute_rho(self) -> float:
         self.rho = calc_dihedral(self.n_prox, self.ca_prox, self.ca_dist, self.n_dist)
         return self.rho
 
@@ -2401,15 +2267,6 @@ class Disulfide:
 
         return
 
-    def set_permissive(self, perm: bool) -> None:
-        """
-        Set PERMISSIVE flag for Disulfide parsing.
-
-        :return: None
-        """
-
-        self.PERMISSIVE = perm
-
     def set_positions(
         self,
         n_prox: Vector3D,
@@ -2487,8 +2344,9 @@ class Disulfide:
         self.chi4 = chi4
         self.chi5 = chi5
         self.torsion_array = np.array([chi1, chi2, chi3, chi4, chi5])
-        self.compute_torsional_energy()
-        self.compute_torsion_length()
+        self._compute_torsional_energy()
+        self._compute_torsion_length()
+        self._compute_rho()
 
     def set_name(self, namestr="Disulfide") -> None:
         """
@@ -2508,7 +2366,7 @@ class Disulfide:
         self.proximal = proximal
         self.distal = distal
 
-    def compute_torsion_length(self) -> float:
+    def _compute_torsion_length(self) -> float:
         """
         Compute the 5D Euclidean length of the Disulfide object. Update the disulfide internal state.
 
@@ -2886,13 +2744,13 @@ def Initialize_Disulfide_From_Coords(
     new_ss.torsion_array = np.array(
         (new_ss.chi1, new_ss.chi2, new_ss.chi3, new_ss.chi4, new_ss.chi5)
     )
-    new_ss.compute_torsion_length()
+    new_ss._compute_torsion_length()
 
     # calculate and set the SS bond torsional energy
-    new_ss.compute_torsional_energy()
+    new_ss._compute_torsional_energy()
 
     # compute and set the local coordinates
-    new_ss.compute_local_coords()
+    new_ss._compute_local_coords()
 
     # turn warnings back on
     if quiet:
