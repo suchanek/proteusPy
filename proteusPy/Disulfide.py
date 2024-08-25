@@ -140,6 +140,7 @@ class Disulfide:
         distal_chain: str = "A",
         pdb_id: str = "1egs",
         quiet: bool = True,
+        torsions: list = None,
     ) -> None:
         """
         __init__ Initialize the class to defined internal values.
@@ -154,8 +155,6 @@ class Disulfide:
         self.proximal_chain = proximal_chain
         self.distal_chain = distal_chain
         self.pdb_id = pdb_id
-        self.proximal_residue_fullid = str("")
-        self.distal_residue_fullid = str("")
         self.QUIET = quiet
         self.ca_distance = _FLOAT_INIT
         self.cb_distance = _FLOAT_INIT
@@ -226,6 +225,11 @@ class Disulfide:
         self.rho = _ANG_INIT  # new dihedral angle: Nprox - Ca_prox - Ca_dist - N_dist
 
         self.torsion_length = _FLOAT_INIT
+
+        if torsions is not None and len(torsions) == 5:
+            # computes energy, torsion length and rho
+            self.dihedrals = torsions
+            self.build_yourself()
 
     # comparison operators, used for sorting. keyed to SS bond energy
     def __lt__(self, other):
@@ -1768,7 +1772,7 @@ class Disulfide:
 
         :return: Disulfide full IDs
         """
-        return (self.proximal_residue_fullid, self.distal_residue_fullid)
+        return (self.proximal, self.distal)
 
     @property
     def internal_coords(self) -> np.array:
@@ -2000,7 +2004,7 @@ class Disulfide:
         """
         Representation for Disulfide chain IDs
         """
-        return f"Proximal Residue fullID: <{self.proximal_residue_fullid}> Distal Residue fullID: <{self.distal_residue_fullid}>"
+        return f"Proximal Residue fullID: <{self.proximal}> Distal Residue fullID: <{self.distal}>"
 
     def repr_ss_ca_dist(self) -> str:
         """
@@ -2601,9 +2605,6 @@ def Initialize_Disulfide_From_Coords(
 
     new_ss.proximal_chain = proximal_chain_id
     new_ss.distal_chain = distal_chain_id
-
-    new_ss.proximal_residue_fullid = proximal
-    new_ss.distal_residue_fullid = distal
 
     # restore loggins
     if quiet:
