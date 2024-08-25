@@ -29,14 +29,22 @@ REPO_DIR = os.path.join(HOME, "repos", "proteusPy", "data")
 
 PBAR_COLS = 78
 
+# Step 1: Define a global variable for the loader
+global_loader = None
+
+
+# Step 2: Create an initializer function to initialize the global loader
+def init_worker(loader):
+    global global_loader
+    global_loader = loader
+    print(f"{Fore.GREEN}Worker initialized.{Style.RESET_ALL}")
+
 
 def task(args):
     (
-        loader,
-        six_or_bin,
+        six_or_bin_flag,
         start_idx,
         end_idx,
-        total_ss,
         cutoff,
         do_graph,
         do_consensus,
@@ -46,8 +54,19 @@ def task(args):
         tasknum,
     ) = args
 
+    loader = global_loader
     result_list = []
+    total_ss = len(loader.SSList)
+    six_or_bin = loader.tclass.sixclass_df if six_or_bin_flag else loader.tclass.classdf
+    tot_classes = six_or_bin.shape[0]
 
+    overall_pbar = tqdm(
+        total=end_idx - start_idx,
+        desc=f"Process {tasknum+1:2}".ljust(10),
+        position=position,
+        leave=False,
+        ncols=PBAR_COLS,
+    )
     for idx in range(start_idx, end_idx):
         row = six_or_bin.iloc[idx]
         cls = row["class_id"]
@@ -57,9 +76,9 @@ def task(args):
             continue
 
         task_pbar = tqdm(
-            total=len(ss_list),
-            desc=f"  Task {tasknum+1:2}".ljust(10),
-            position=position,
+            total=tot,
+            desc=f"  subtask {tasknum+1:2}".ljust(10),
+            position=position + 1,
             leave=False,
             ncols=PBAR_COLS,
         )
@@ -77,7 +96,6 @@ def task(args):
             if counter % update_freq == 0 or counter == len(ss_list) - 1:
                 task_pbar.update(update_freq)
 
-        task_pbar.close()
         class_disulfides = DisulfideList(list(class_disulfides_deque), cls, quiet=True)
         if do_graph:
             class_disulfides.display_torsion_statistics(
@@ -98,6 +116,12 @@ def task(args):
             )
             result_list.append(exemplar)
 
+        overall_pbar.set_postfix({"CLS": cls})
+        overall_pbar.update(1)
+
+    task_pbar.close()
+    overall_pbar.close()
+
     return result_list
 
 
@@ -114,11 +138,14 @@ def analyze_classes_multiprocess(
 
     global SAVE_DIR
 
+    six_or_bin = loader.tclass.sixclass_df if do_sextant else loader.tclass.classdf
+    tot_classes = six_or_bin.shape[0]
+    chunk_size = tot_classes // num_processes
+
     if do_sextant:
         class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_FILE)
         SAVE_DIR = os.path.join(SAVE_DIR, "sextant")
-        six_or_bin = loader.tclass.sixclass_df
-        tot_classes = six_or_bin.shape[0]
+        six_or_bin_flag = True
         res_list = DisulfideList([], "SS_6class_Avg_SS")
         pix = sextant_classes_vs_cutoff(loader, cutoff)
         print(
@@ -127,33 +154,28 @@ def analyze_classes_multiprocess(
     else:
         class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_BIN_FILE)
         SAVE_DIR = os.path.join(SAVE_DIR, "binary")
-        six_or_bin = loader.tclass.classdf
-        tot_classes = six_or_bin.shape[0]
+        six_or_bin = False
         res_list = DisulfideList([], "SS_32class_Avg_SS")
-
-    total_ss = len(loader.SSList)
-
-    chunk_size = tot_classes // num_processes
 
     pool_args = [
         (
-            loader,
-            six_or_bin,
+            do_sextant,
             i * chunk_size,
             (i + 1) * chunk_size if i != num_processes - 1 else tot_classes,
-            total_ss,
             cutoff,
             do_graph,
             do_consensus,
             SAVE_DIR,
             prefix,
-            i + 1,
+            2 * i,
             i,
         )
         for i in range(num_processes)
     ]
 
-    with multiprocessing.Pool(processes=num_processes) as pool:
+    with multiprocessing.Pool(
+        processes=num_processes, initializer=init_worker, initargs=(loader,)
+    ) as pool:
         results = pool.map(task, pool_args)
 
     res_list = DisulfideList([], "SS_Avg_SS")
@@ -272,7 +294,6 @@ def sextant_classes_vs_cutoff(loader: DisulfideLoader, cutoff):
     :param cutoff: Percent cutoff value for filtering the classes.
     :return: None
     """
-    import matplotlib.pyplot as plt
 
     class_df = loader.tclass.filter_sixclass_by_percentage(cutoff)
     return class_df.shape[0]
@@ -399,8 +420,7 @@ def main():
         f"Loading PDB SS data...\n"
     )
 
-    PDB_SS = Load_PDB_SS(verbose=False, subset=False)
-    PDB_SS.describe()
+    PDB_SS = Load_PDB_SS(verbose=True, subset=False)
 
     analyze_classes(
         PDB_SS,
