@@ -3,7 +3,8 @@
 
 # Purpose:
 This program encapsulates the steps needed to extract disulfides from the PDB file repository,
-build the DisulfideLoader object, and save it into the proteusPy module data directory.
+build the DisulfideLoader object, and save it into the proteusPy module data directory. This program
+utilizes multiprocessing to speed up the extraction process.
 
 # Processes:
 * Extract: Extract SS bonds from the PDB raw files, with a cutoff of `cutoff` A.
@@ -12,7 +13,7 @@ build the DisulfideLoader object, and save it into the proteusPy module data dir
 * Subset: Only extract and process the first 1000 Disulfides found in the PDB directory.
 
 Author: Eric G. Suchanek, PhD.
-Last revision: 8/21/24 -egs-
+Last revision: 8/24/24 -egs-
 """
 
 import argparse
@@ -98,51 +99,7 @@ pdb_id_list = [Path(f).stem[3:7] for f in ent_files]
 
 num_ent_files = len(ent_files)
 
-__version__ = "2.0.1"
-
-
-def extract_disulfides_chunk(args):
-    (start_idx, end_idx, sslist, pdbdir, dist_cutoff, verbose, quiet, pbar_index) = args
-
-    from proteusPy import DisulfideList, load_disulfides_from_id
-
-    result_list = []
-    global overall_pbar
-
-    if quiet:
-        _logger.setLevel(logging.ERROR)
-
-    entrylist = sslist[start_idx:end_idx]
-
-    task_pbar = tqdm(
-        total=len(entrylist),
-        desc=f"{Fore.BLUE}  Task {pbar_index+1:2}{Style.RESET_ALL}".ljust(10),
-        position=pbar_index + 1,
-        leave=False,
-        ncols=PBAR_COLS,
-        bar_format="{l_bar}%s{bar}{r_bar}%s" % (Fore.YELLOW, Style.RESET_ALL),
-        mininterval=1.0,
-    )
-
-    for entry in entrylist:
-        _sslist = load_disulfides_from_id(
-            entry,
-            model_numb=0,
-            verbose=verbose,
-            quiet=quiet,
-            pdb_dir=pdbdir,
-            cutoff=dist_cutoff,
-        )
-
-        if len(_sslist) > 0:
-            sslist = remove_duplicate_ss(_sslist)
-            result_list.extend(sslist)
-
-        task_pbar.update(1)
-        # overall_pbar.update(1)
-
-    task_pbar.close()
-    return result_list
+__version__ = "2.0.2"
 
 
 def parse_arguments():
@@ -212,6 +169,50 @@ def parse_arguments():
     )
 
     return parser.parse_args()
+
+
+def extract_disulfides_chunk(args):
+    (start_idx, end_idx, sslist, pdbdir, dist_cutoff, verbose, quiet, pbar_index) = args
+
+    from proteusPy import DisulfideList, load_disulfides_from_id
+
+    result_list = []
+    global overall_pbar
+
+    if quiet:
+        _logger.setLevel(logging.ERROR)
+
+    entrylist = sslist[start_idx:end_idx]
+
+    task_pbar = tqdm(
+        total=len(entrylist),
+        desc=f"{Fore.BLUE}  Task {pbar_index+1:2}{Style.RESET_ALL}".ljust(10),
+        position=pbar_index + 1,
+        leave=False,
+        ncols=PBAR_COLS,
+        bar_format="{l_bar}%s{bar}{r_bar}%s" % (Fore.YELLOW, Style.RESET_ALL),
+        mininterval=1.0,
+    )
+
+    for entry in entrylist:
+        _sslist = load_disulfides_from_id(
+            entry,
+            model_numb=0,
+            verbose=verbose,
+            quiet=quiet,
+            pdb_dir=pdbdir,
+            cutoff=dist_cutoff,
+        )
+
+        if len(_sslist) > 0:
+            sslist = remove_duplicate_ss(_sslist)
+            result_list.extend(sslist)
+
+        task_pbar.update(1)
+        # overall_pbar.update(1)
+
+    task_pbar.close()
+    return result_list
 
 
 def do_extract(verbose, full, subset, cutoff, prune, nthreads=6):
@@ -314,7 +315,7 @@ def do_stuff(
     verbose=False,
     cutoff=-1.0,
     prune=False,
-    threads=4,
+    threads=8,
 ):
     """
     Main entrypoint for the proteusPy Disulfide database extraction and creation workflow.
@@ -342,6 +343,7 @@ def do_stuff(
     if _extract == True:
         if verbose:
             print(f"Extracting with cutoff: {cutoff}")
+
         do_extract(
             verbose=_verbose,
             full=_full,
@@ -350,6 +352,7 @@ def do_stuff(
             prune=prune,
             nthreads=_threads,
         )
+        print("\n")
 
     if _build == True:
         if verbose:
