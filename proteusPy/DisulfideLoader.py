@@ -171,10 +171,12 @@ class DisulfideLoader:
         """
 
         res = DisulfideList([], "none")
+        ind_list = []
 
         if isinstance(item, slice):
             indices = range(*item.indices(len(self.SSList)))
-            name = self.SSList[0].pdb_id
+            ind_list = list(indices)
+            name = f"pdb_slice[{ind_list[0]}:{ind_list[-1]+1}]"
             resolution = self.SSList[0].resolution
             sublist = [self.SSList[i] for i in indices]
             return DisulfideList(sublist, name, resolution)
