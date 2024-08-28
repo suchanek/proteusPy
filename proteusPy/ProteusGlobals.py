@@ -33,7 +33,7 @@ _FLOAT_INIT = math.nan
 _INT_INIT = -1
 _ANG_INIT = -180.0
 
-PBAR_COLS = 105
+PBAR_COLS = 80
 # nominal macbook Pro screen resolution
 DPI = 220
 

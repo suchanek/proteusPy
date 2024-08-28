@@ -117,7 +117,7 @@ tag:
 
 commit:
 	git commit -a -m $(MESS)
-	git push --all origin
+	git push origin
 
 # run the tests
 

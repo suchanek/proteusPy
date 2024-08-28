@@ -536,6 +536,9 @@ class DisulfideLoader:
         :param loader: `proteusPy.DisulfideLoader` object
         """
 
+        if verbose:
+            _logger.setLevel("INFO")
+
         clslist = self.tclass.classdf["class_id"]
         for cls in clslist:
             sixcls = self.tclass.binary_to_six_class(cls)
@@ -549,6 +552,10 @@ class DisulfideLoader:
                 base=6,
                 verbose=verbose,
             )
+        if verbose:
+            _logger.info("Graph generation complete.")
+            _logger.setLevel("WARNING")
+
         return
 
     def plot_binary_to_eightclass_incidence(
@@ -607,21 +614,27 @@ class DisulfideLoader:
         import plotly_express as px
 
         _title = f"Binary Class: {title}"
+        _labels = {}
 
         if base == 8:
-            labels = {"class_id": "Octant Class ID", "count": "Count"}
-            prefix = "Octant"
+            _labels = {"class_id": "Octant Class ID", "count": "Count"}
+            _prefix = "Octant"
 
         elif base == 6:
-            labels = {"class_id": "Sextant Class ID", "count": "Count"}
-            prefix = "Sextant"
+            _labels = {"class_id": "Sextant Class ID", "count": "Count"}
+            _prefix = "Sextant"
+
+        elif base == 2:
+            _labels = {"class_id": "Binary Class ID", "count": "Count"}
+            _prefix = "Binary"
+            df = self.tclass.classdf
 
         fig = px.line(
             df,
             x="class_id",
             y="count",
             title=f"{_title}",
-            labels={"class_id": "Class ID", "count": "Count"},
+            labels=_labels,
         )
 
         if theme == "light":
@@ -639,7 +652,7 @@ class DisulfideLoader:
         fig.update_layout(autosize=True)
 
         if save:
-            fname = Path(savedir) / f"{title}_{prefix}.png"
+            fname = Path(savedir) / f"{title}_{_prefix}.png"
 
             if verbose:
                 _logger.info(f"Saving {title} plot to {fname}")
