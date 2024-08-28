@@ -231,7 +231,21 @@ class DisulfideLoader:
                 cnt += 1
         return res / cnt
 
-    def build_ss_from_idlist(self, idlist):
+    def build_ss_from_idlist(self, idlist) -> DisulfideList:
+        """
+        Return a DisulfideList of Disulfides for a given list of PDBIDs
+
+        :param idlist: List of PDBIDs, e.g. ['4yys', '2q7q']
+        :return: DisulfideList
+        """
+        res = DisulfideList([], "RCSB_list")
+        for k, v in self.SSDict.items():
+            if k in idlist:
+                for ss_index in range(len(v)):
+                    res.append(loader.SSList[v[ss_index]])
+        return res
+
+    def Obuild_ss_from_idlist(self, idlist):
         """
         Given a list of PDBid, return a DisulfideList of Disulfides
 
@@ -275,30 +289,48 @@ class DisulfideLoader:
             disulfide_dict[disulfide.pdb_id].append(index)
         return disulfide_dict
 
-    def extract_class(self, clsid) -> DisulfideList:
+    def extract_class(self, clsid, verbose=False) -> DisulfideList:
         """
         Return the list of disulfides corresponding to the input `clsid`.
 
         :param clsid: The class name to extract.
+        :param verbose: If True, display progress bars, by default False
         :return: The list of disulfide bonds from the class.
         """
 
-        # from tqdm import tqdm
-        six = self.tclass.sixclass_df
-        tot_classes = six.shape[0]
+        sixorbin = None
+
+        if "0" in clsid:
+            sixorbin = self.tclass.classdf
+        else:
+            sixorbin = self.tclass.eightclass_df
+
+        tot_classes = sixorbin.shape[0]
         class_disulfides = DisulfideList([], clsid, quiet=True)
-        _pbar = tqdm(six.iterrows(), total=tot_classes, leave=True)
+
+        if verbose:
+            _pbar = tqdm(sixorbin.iterrows(), total=tot_classes, leave=True)
+        else:
+            _pbar = sixorbin.iterrows()
+
         for idx, row in _pbar:
             _cls = row["class_id"]
             if _cls == clsid:
                 ss_list = row["ss_id"]
-                pbar = tqdm(ss_list, leave=True)
+                if verbose:
+                    pbar = tqdm(ss_list, leave=True)
+                else:
+                    pbar = ss_list
+
                 for ssid in pbar:
                     class_disulfides.append(self[ssid])
-                pbar.set_postfix({"Done": ""})
+
+                if verbose:
+                    pbar.set_postfix({"Done": ""})
                 break
 
-            _pbar.set_postfix({"Cnt": idx})
+            if verbose:
+                _pbar.set_postfix({"Cnt": idx})
 
         return class_disulfides
 
@@ -453,7 +485,7 @@ class DisulfideLoader:
 
     def plot_classes_vs_cutoff(self, cutoff, steps) -> None:
         """
-        Plot the total percentage and number of members for each class against the cutoff value.
+        Plot the total percentage and number of members for each octant class against the cutoff value.
 
         :param cutoff: Percent cutoff value for filtering the classes.
         :return: None
@@ -467,7 +499,7 @@ class DisulfideLoader:
         members_list = []
 
         for c in _cutoff:
-            class_df = self.tclass.filter_sixclass_by_percentage(c)
+            class_df = self.tclass.filter_eightclass_by_percentage(c)
             tot = class_df["percentage"].sum()
             tot_list.append(tot)
             members_list.append(class_df.shape[0])
@@ -496,15 +528,13 @@ class DisulfideLoader:
         :param loader: `proteusPy.DisulfideLoader` object
         """
 
-        from proteusPy.DisulfideClasses import plot_count_vs_class_df
-
         def _enumerate_sixclass_fromlist(sslist):
             x = []
             y = []
 
             for sixcls in sslist:
                 if sixcls is not None:
-                    _y = self.tclass.sslist_from_classid(sixcls)
+                    _y = self.tclass.sslist_from_classid(sixcls, base=6)
                     # it's possible to have 0 SS in a class
                     if _y is not None:
                         # only append if we have both.
@@ -520,16 +550,162 @@ class DisulfideLoader:
         for cls in clslist:
             sixcls = self.tclass.binary_to_six_class(cls)
             df = _enumerate_sixclass_fromlist(sixcls)
-            plot_count_vs_class_df(df, cls, theme="light", save=save, savedir=savedir)
+            self.plot_count_vs_class_df(
+                cls, theme="light", save=save, savedir=savedir, base=6
+            )
         return
 
+    def plot_binary_to_eightclass_incidence(
+        self, light=True, save=False, savedir="."
+    ) -> None:
+        """
+        Plot the incidence of all octant Disulfide classes for a given binary class.
+
+        :param loader: `proteusPy.DisulfideLoader` object
+        """
+
+        def _enumerate_eightclass_fromlist(sslist):
+            x = []
+            y = []
+
+            for eightcls in sslist:
+                if eightcls is not None:
+                    _y = self.tclass.sslist_from_classid(eightcls, base=8)
+                    # it's possible to have 0 SS in a class
+                    if _y is not None:
+                        # only append if we have both.
+                        x.append(eightcls)
+                        y.append(len(_y))
+
+            sslist_df = pd.DataFrame(columns=["class_id", "count"])
+            sslist_df["class_id"] = x
+            sslist_df["count"] = y
+            return sslist_df
+
+        clslist = self.tclass.classdf["class_id"]
+        for cls in clslist:
+            eightcls = self.tclass.binary_to_eight_class(cls)
+            df = _enumerate_eightclass_fromlist(eightcls)
+            self.plot_count_vs_class_df(
+                cls, theme="light", save=save, savedir=savedir, base=8
+            )
+        return
+
+    def plot_count_vs_class_df(
+        self, title="title", theme="light", save=False, savedir=".", base=8
+    ):
+        """
+        Plots a line graph of count vs class ID using Plotly for the given disulfide class. The
+        base selects the class type to plot: 2, 6, or 8, for binary, sextant, or octant classes.
+
+        :param df: A pandas DataFrame containing the data to be plotted.
+        :param title: A string representing the title of the plot (default is 'title').
+        :param theme: A string representing the name of the theme to use. Can be either 'notebook' or 'plotly_dark'. Default is 'plotly_dark'.
+        :return: None
+        """
+        import plotly_express as px
+
+        df = (
+            self.tclass.classdf
+            if base == 2
+            else self.tclass.sixclass_df if base == 6 else self.tclass.eightclass_df
+        )
+
+        fig = px.line(
+            df,
+            x="class_id",
+            y="count",
+            title=f"{title}",
+            labels={"class_id": "Class ID", "count": "Count"},
+        )
+
+        if theme == "light":
+            fig.update_layout(template="plotly_white")
+        else:
+            fig.update_layout(template="plotly_dark")
+
+        fig.update_layout(
+            showlegend=True,
+            title_x=0.5,
+            title_font=dict(size=20),
+            xaxis_showgrid=False,
+            yaxis_showgrid=False,
+        )
+        fig.update_layout(autosize=True)
+
+        if save:
+            fname = f"{savedir}/{title}.png"
+            fig.write_image(fname, "png")
+        else:
+            fig.show()
+        return fig
+
+    def plot_count_vs_classid(self, cls=None, title="title", theme="light", base=8):
+        """
+        Plots a line graph of count vs class ID using Plotly.
+
+        :param df: A pandas DataFrame containing the data to be plotted.
+        :param title: A string representing the title of the plot (default is 'title').
+        :param theme: A string representing the theme of the plot. Anything other than `light` is in `plotly_dark`.
+        :return: None
+        """
+
+        import plotly_express as px
+
+        df = (
+            self.tclass.classdf
+            if base == 2
+            else self.tclass.sixclass_df if base == 6 else self.tclass.eightclass_df
+        )
+
+        if cls is None:
+            fig = px.line(df, x="class_id", y="count", title=f"{title}")
+        else:
+            subset = df[df["class_id"] == cls]
+            fig = px.line(subset, x="class_id", y="count", title=f"{title}")
+
+        fig.update_layout(
+            xaxis_title="Class ID",
+            yaxis_title="Count",
+            showlegend=True,
+            title_x=0.5,
+        )
+        fig.layout.autosize = True
+
+        if theme == "light":
+            fig.update_layout(template="plotly_white")
+        else:
+            fig.update_layout(template="plotly_dark")
+
+        fig.update_layout(autosize=True)
+        return fig
+
+    ##
     def enumerate_sixclass_fromlist(self, sslist) -> pd.DataFrame:
         x = []
         y = []
 
         for sixcls in sslist:
             if sixcls is not None:
-                _y = self.tclass.sslist_from_classid(sixcls)
+                _y = self.tclass.sslist_from_classid(sixcls, base=6)
+                # it's possible to have 0 SS in a class
+                if _y is not None:
+                    # only append if we have both.
+                    x.append(sixcls)
+                    y.append(len(_y))
+
+        sslist_df = pd.DataFrame(columns=["class_id", "count"])
+        sslist_df["class_id"] = x
+        sslist_df["count"] = y
+        return sslist_df
+
+    def enumerate_eightclass_fromlist(self, sslist) -> pd.DataFrame:
+        x = []
+        y = []
+
+        for eightcls in sslist:
+            if eightcls is not None:
+                _y = self.tclass.sslist_from_classid(eightcls, base=8)
                 # it's possible to have 0 SS in a class
                 if _y is not None:
                     # only append if we have both.
