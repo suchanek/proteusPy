@@ -19,6 +19,9 @@ import logging
 logging.getLogger().disabled = True
 
 
+import logging
+
+
 def get_logger(name):
     """
     Returns a logger with the specified name, configured to use the shared StreamHandler
@@ -30,24 +33,25 @@ def get_logger(name):
     :rtype: logging.Logger
     """
     _logger = logging.getLogger(name)
-    _logger.setLevel(logging.ERROR)  # Set the logger level to INFO by default
-    # Check if the logger already has handlers to avoid adding multiple handlers
-    if not _logger.hasHandlers():
-        handler = logging.StreamHandler()
-        formatter = logging.Formatter(
-            "proteusPy: %(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        )
-        handler.setFormatter(formatter)
-        _logger.addHandler(handler)
+    _logger.setLevel(logging.INFO)  # Set the logger level to INFO by default
 
-    # Enable the specific logger
-    _logger.disabled = False
+    # Remove all existing handlers to avoid conflicts
+    _logger.handlers.clear()
+
+    # Create a handler with the custom formatter
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        "proteusPy: %(levelname)s %(asctime)s - %(name)s.%(funcName)s - %(message)s"
+    )
+    handler.setFormatter(formatter)
+    _logger.addHandler(handler)
+
+    # Disable propagation to avoid interference from root logger
+    _logger.propagate = False
+
     return _logger
 
 
-# example
-# logger = get_logger("example_logger")
-# logger.info("This is an info message")
 # set_logger_level("example_logger", "ERROR")
 # logger.info("This info message will not be shown")
 # logger.error("This is an error message")
