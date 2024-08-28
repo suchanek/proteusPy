@@ -57,7 +57,9 @@ def task(args):
     loader = global_loader
     result_list = []
     total_ss = len(loader.SSList)
-    six_or_bin = loader.tclass.sixclass_df if six_or_bin_flag else loader.tclass.classdf
+    six_or_bin = (
+        loader.tclass.eightclass_df if six_or_bin_flag else loader.tclass.classdf
+    )
     tot_classes = six_or_bin.shape[0]
 
     overall_pbar = tqdm(
@@ -287,6 +289,42 @@ def plot_sixclass_vs_cutoff(PDB_SS: DisulfideLoader, cutoff, steps, verbose=Fals
     plt.show()
 
 
+def plot_eightclass_vs_cutoff(PDB_SS: DisulfideLoader, cutoff, steps, verbose=False):
+    """
+    Plot the total percentage and number of members for each class against the cutoff value.
+
+    :param cutoff: Percent cutoff value for filtering the classes.
+    :return: None
+    """
+    import matplotlib.pyplot as plt
+
+    _cutoff = np.linspace(0, cutoff, steps)
+    tot_list = []
+    members_list = []
+
+    for c in _cutoff:
+        class_df = PDB_SS.tclass.filter_eightclass_by_percentage(c)
+        tot = class_df["percentage"].sum()
+        tot_list.append(tot)
+        members_list.append(class_df.shape[0])
+        if verbose:
+            print(
+                f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
+            )
+
+    fig, ax1 = plt.subplots()
+
+    ax2 = ax1.twinx()
+    ax1.plot(_cutoff, tot_list, label="Total percentage", color="blue")
+    ax2.plot(_cutoff, members_list, label="Number of members", color="red")
+
+    ax1.set_xlabel("Cutoff")
+    ax1.set_ylabel("Total percentage", color="blue")
+    ax2.set_ylabel("Number of members", color="red")
+
+    plt.show()
+
+
 def sextant_classes_vs_cutoff(loader: DisulfideLoader, cutoff):
     """
     Return number of members for the sextant class for a given cutoff value.
@@ -296,6 +334,18 @@ def sextant_classes_vs_cutoff(loader: DisulfideLoader, cutoff):
     """
 
     class_df = loader.tclass.filter_sixclass_by_percentage(cutoff)
+    return class_df.shape[0]
+
+
+def octant_classes_vs_cutoff(loader: DisulfideLoader, cutoff):
+    """
+    Return number of members for the sextant class for a given cutoff value.
+
+    :param cutoff: Percent cutoff value for filtering the classes.
+    :return: None
+    """
+
+    class_df = loader.tclass.filter_eightclass_by_percentage(cutoff)
     return class_df.shape[0]
 
 

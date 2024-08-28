@@ -135,6 +135,20 @@ def torsion_to_sixclass(tors):
     return "".join([str(r) for r in res])
 
 
+def torsion_to_eightclass(tors):
+    """
+    Return the sextant class string for the input array of torsions.
+
+    :param tors: Array of five torsions
+    :return: Sextant string
+    """
+
+    from proteusPy.DisulfideClasses import get_sixth_quadrant
+
+    res = [get_sixth_quadrant(x) for x in tors]
+    return "".join([str(r) for r in res])
+
+
 def get_sixth_quadrant(angle_deg):
     """
     Return the sextant in which an angle in degrees lies if the area is described by dividing a unit circle into 6 equal segments.
@@ -164,83 +178,43 @@ def get_sixth_quadrant(angle_deg):
         raise ValueError("Invalid angle value: angle must be in the range [-360, 360).")
 
 
-def get_half_quadrant(angle_deg):
+def get_eighth_quadrant(angle_deg):
     """
-    Returns the half-quadrant in which an angle in degrees lies.
+    Return the octant in which an angle in degrees lies if the area is described by dividing a unit circle into 8 equal segments.
 
-    Parameters:
-        angle_deg (float): The angle in degrees.
+    :param angle_deg (float): The angle in degrees.
 
     Returns:
-        int: The half-quadrant number (1-8) that the angle belongs to.
+    :return str: The octant (1-8) that the angle belongs to.
     """
+    # Normalize the angle to the range [0, 360)
+    angle_deg = angle_deg % 360
 
     if angle_deg >= 0 and angle_deg < 45:
-        return str(1)
-    elif angle_deg >= 45 and angle_deg < 90:
-        return str(2)
-    elif angle_deg >= 90 and angle_deg < 135:
-        return str(3)
-    elif angle_deg >= 135 and angle_deg < 180:
-        return str(4)
-    elif angle_deg >= -45 and angle_deg < 0:
-        return str(5)
-    elif angle_deg >= -90 and angle_deg < -45:
-        return str(6)
-    elif angle_deg >= -135 and angle_deg < -90:
-        return str(7)
-    elif angle_deg >= -180 and angle_deg < -135:
         return str(8)
+    elif angle_deg >= 45 and angle_deg < 90:
+        return str(7)
+    elif angle_deg >= 90 and angle_deg < 135:
+        return str(6)
+    elif angle_deg >= 135 and angle_deg < 180:
+        return str(5)
+    elif angle_deg >= 180 and angle_deg < 225:
+        return str(4)
+    elif angle_deg >= 225 and angle_deg < 270:
+        return str(3)
+    elif angle_deg >= 270 and angle_deg < 315:
+        return str(2)
+    elif angle_deg >= 315 and angle_deg < 360:
+        return str(1)
     else:
-        raise ValueError("Invalid angle value: angle must be in the range [-180, 180).")
-
-
-def create_quat_classes(df):
-    """
-    Add new columns to the input DataFrame with a 4-class encoding for input 'chi' values.
-
-    Takes a DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance',
-    'cb_distance', 'torsion_length', 'energy', and 'rho' and adds new columns based on the following rules:
-    1. The 'chi_t' column is set to the quadrant in which the dihedral angle is located.
-
-    A new column named `class_id` is also added, which is the concatenation of the `_t` columns. The DataFrame is then
-    grouped by the `class_id` column, and a new DataFrame is returned that shows the unique `ss_id` values for each group,
-    the count of unique `ss_id` values, the incidence of each group as a proportion of the total DataFrame, and the
-    percentage of incidence.
-
-    :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5',
-               'ca_distance', 'cb_distance', 'torsion_length', 'energy', and 'rho'
-    :return: The input DataFrame with the added columns
-    """
-
-    new_cols = []
-    for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
-        col = df[col_name]
-        new_col = []
-        for val in col:
-            new_col.append(get_quadrant(val))
-        new_col_name = col_name + "_t"
-        new_cols.append(new_col_name)
-        df[new_col_name] = new_col
-
-    class_id_column = "class_id"
-
-    df["class_id"] = df[new_cols].apply(lambda x: "".join(x), axis=1)
-
-    # Group the DataFrame by the class ID and return the grouped data
-    grouped = df.groupby(class_id_column)["ss_id"].unique().reset_index()
-    grouped["count"] = grouped["ss_id"].apply(lambda x: len(x))
-    grouped["incidence"] = grouped["ss_id"].apply(lambda x: len(x) / len(df))
-    grouped["percentage"] = grouped["incidence"].apply(lambda x: 100 * x)
-
-    return grouped
+        raise ValueError("Invalid angle value: angle must be in the range [-360, 360).")
 
 
 def filter_by_percentage(df: pandas.DataFrame, cutoff) -> pandas.DataFrame:
     """
-    Filter a pandas DataFrame by incidence
+    Filter a pandas DataFrame by percentage.
 
-    :param df: A Pandas DataFrame with an 'incidence' column to filter by
+    :param df: A Pandas DataFrame with an 'percentage' column to filter by
     :param cutoff: A numeric value specifying the minimum incidence required for a row to be included in the output
     :type df: pandas.DataFrame
     :type cutoff: float
@@ -485,6 +459,21 @@ def plot_count_vs_classid(df, cls=None, title="title", theme="light"):
     return fig
 
 
+def plot_binary_to_eightclass_incidence(loader: DisulfideLoader, theme="light"):
+    """
+    Plot the incidence of all sextant Disulfide classes for a given binary class.
+
+    :param loader: `proteusPy.DisulfideLoader` object
+    """
+
+    clslist = loader.tclass.classdf["class_id"]
+    for cls in clslist:
+        eightcls = loader.tclass.binary_to_eight_class(cls)
+        df = enumerate_class_fromlist(loader, eightcls, base=8)
+        plot_count_vs_class_df(df, cls, theme=theme)
+    return
+
+
 def plot_binary_to_sixclass_incidence(loader: DisulfideLoader, theme="light"):
     """
     Plot the incidence of all sextant Disulfide classes for a given binary class.
@@ -492,46 +481,36 @@ def plot_binary_to_sixclass_incidence(loader: DisulfideLoader, theme="light"):
     :param loader: `proteusPy.DisulfideLoader` object
     """
 
-    def _enumerate_sixclass_fromlist(sslist):
-        x = []
-        y = []
-
-        for sixcls in sslist:
-            if sixcls is not None:
-                _y = loader.tclass.sslist_from_classid(sixcls)
-                # it's possible to have 0 SS in a class
-                if _y is not None:
-                    # only append if we have both.
-                    x.append(sixcls)
-                    y.append(len(_y))
-
-        sslist_df = pandas.DataFrame(columns=["class_id", "count"])
-        sslist_df["class_id"] = x
-        sslist_df["count"] = y
-        return sslist_df
-
     clslist = loader.tclass.classdf["class_id"]
     for cls in clslist:
         sixcls = loader.tclass.binary_to_six_class(cls)
-        df = _enumerate_sixclass_fromlist(sixcls)
+        df = enumerate_class_fromlist(loader, sixcls, base=6)
         plot_count_vs_class_df(df, cls, theme=theme)
     return
 
 
-def enumerate_sixclass_fromlist(loader: DisulfideLoader, sslist):
+def enumerate_class_fromlist(loader: DisulfideLoader, sslist, base=8):
+    """
+    Enumerate the classes from a list of class IDs and return a DataFrame with class IDs and their corresponding counts.
+
+    :param loader: An instance of DisulfideLoader used to load the classes.
+    :param sslist: A list of class IDs to enumerate.
+    :param base: The base value for the enumeration, by default 8.
+    :return: A DataFrame with columns "class_id" and "count" representing the class IDs and their corresponding counts.
+    """
     x = []
     y = []
 
-    for sixcls in sslist:
-        if sixcls is not None:
-            _y = loader.tclass.sslist_from_classid(sixcls)
+    for cls in sslist:
+        if cls is not None:
+            _y = loader.tclass.sslist_from_classid(cls, base=base)
             # it's possible to have 0 SS in a class
             if _y is not None:
                 # only append if we have both.
-                x.append(sixcls)
+                x.append(cls)
                 y.append(len(_y))
 
-    sslist_df = pandas.DataFrame(columns=["class_id", "count"])
+    sslist_df = pd.DataFrame(columns=["class_id", "count"])
     sslist_df["class_id"] = x
     sslist_df["count"] = y
     return sslist_df

@@ -59,7 +59,7 @@ class DisulfideClass_Constructor:
     This Class manages structural classes for the disulfide bonds contained
     in the proteusPy disulfide database.
 
-    Build the internal dictionary mapping disulfides to class names.
+    Class builds the internal dictionary mapping disulfides to class names.
 
     Disulfide binary classes are defined using the ± formalism described by
     Schmidt et al. (Biochem, 2006, 45, 7429-7433), across all 32 (2^5), possible
@@ -109,6 +109,7 @@ class DisulfideClass_Constructor:
         self.classdict = {}
         self.classdf = None
         self.sixclass_df = None
+        self.eightclass_df = None
 
         if self.verbose:
             _logger.info(f"Building SS classes...")
@@ -135,7 +136,7 @@ class DisulfideClass_Constructor:
 
     def from_class(self, classid: str) -> DisulfideList:
         """
-        Return a list of disulfides corresponding to the input class ID
+        Return a list of disulfides corresponding to the input BINARY class ID
         string.
 
         :param classid: Class ID, e.g. '+RHStaple'
@@ -212,6 +213,27 @@ class DisulfideClass_Constructor:
         class_strings = ["".join(combination) for combination in class_combinations]
         return class_strings
 
+    def binary_to_eight_class(self, class_str):
+        """
+        Convert a binary input string to a list of possible eight-class strings.
+
+        Returns a list of all possible combinations of ordinal sections of a unit circle
+        divided into 6 equal segments, originating at 0 degrees, rotating counterclockwise,
+        based on the sign of each angle in the input string.
+
+        :param angle_str (str): A string of length 5, where each character represents the sign
+        of an angle in the range of -180-180 degrees.
+
+        :return list: A list of strings of length 5, representing all possible six-class strings.
+        """
+        import itertools
+
+        angle_maps = {"0": ["5", "6", "7", "8"], "2": ["1", "2", "3", "4"]}
+        class_lists = [angle_maps[char] for char in class_str]
+        class_combinations = itertools.product(*class_lists)
+        class_strings = ["".join(combination) for combination in class_combinations]
+        return class_strings
+
     def build_yourself(self, loader) -> None:
         """
         Build the internal structures needed for the binary and six-fold disulfide structural classes
@@ -263,8 +285,10 @@ class DisulfideClass_Constructor:
             _logger.info(f"Creating sixfold SS classes...")
 
         grouped_sixclass = self.create_six_classes(tors_df)
-
         self.sixclass_df = grouped_sixclass.copy()
+
+        grouped_eightclass = self.create_eight_classes(tors_df)
+        self.eightclass_df = grouped_eightclass.copy()
 
         if self.verbose:
             _logger.info(f"Initialization complete.")
@@ -336,6 +360,43 @@ class DisulfideClass_Constructor:
 
         return grouped
 
+    def create_eight_classes(self, df) -> pd.DataFrame:
+        """
+        Create a new DataFrame from the input with a 6-class encoding for input 'chi' values.
+
+        The function takes a pandas DataFrame containing the following columns:
+        'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'cb_distance',
+        'torsion_length', 'energy', and 'rho', and adds a class ID column based on the following rules:
+
+        1. A new column named `class_id` is added, which is the concatenation of the individual class IDs per Chi.
+        2. The DataFrame is grouped by the `class_id` column, and a new DataFrame is returned that shows the unique `ss_id` values for each group,
+        the count of unique `ss_id` values, the incidence of each group as a proportion of the total DataFrame, and the
+        percentage of incidence.
+
+        :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5',
+                'ca_distance', 'cb_distance', 'torsion_length', 'energy', and 'rho'
+        :return: The grouped DataFrame with the added class column.
+        """
+
+        _df = pd.DataFrame()
+        # create the chi_t columns for each chi column
+        for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
+            _df[col_name + "_t"] = df[col_name].apply(self.get_eighth_quadrant)
+
+        # create the class_id column
+        df["class_id"] = _df[["chi1_t", "chi2_t", "chi3_t", "chi4_t", "chi5_t"]].apply(
+            lambda x: "".join(x), axis=1
+        )
+
+        # group the DataFrame by class_id and return the grouped data
+        grouped = df.groupby("class_id").agg({"ss_id": "unique"})
+        grouped["count"] = grouped["ss_id"].apply(lambda x: len(x))
+        grouped["incidence"] = grouped["count"] / len(df)
+        grouped["percentage"] = grouped["incidence"] * 100
+        grouped.reset_index(inplace=True)
+
+        return grouped
+
     def filter_sixclass_by_percentage(self, cutoff) -> pd.DataFrame:
         """
         Filter the six-class definitions by percentage.
@@ -346,6 +407,19 @@ class DisulfideClass_Constructor:
         :rtype: pandas.DataFrame
         """
         df = self.sixclass_df
+
+        return df[df["percentage"] >= cutoff].copy()
+
+    def filter_eightclass_by_percentage(self, cutoff) -> pd.DataFrame:
+        """
+        Filter the six-class definitions by percentage.
+
+        :param df: A Pandas DataFrame with an 'percentage' column to filter by
+        :param cutoff: A numeric value specifying the minimum percentage required for a row to be included in the output
+        :return: A new Pandas DataFrame containing only rows where the percentage is greater than or equal to the cutoff
+        :rtype: pandas.DataFrame
+        """
+        df = self.eightclass_df
 
         return df[df["percentage"] >= cutoff].copy()
 
@@ -378,43 +452,54 @@ class DisulfideClass_Constructor:
                 "Invalid angle value: angle must be in the range [-360, 360)."
             )
 
-    def sslist_from_classid(self, cls: str):
+    def get_eighth_quadrant(self, angle_deg):
         """
-        Return the list of Disulfides from the classID string.
+        Return the octant in which an angle in degrees lies if the area is described by dividing a unit circle into 8 equal segments.
 
-        :param cls: ClassID string
+        :param angle_deg (float): The angle in degrees.
+
+        Returns:
+        :return str: The octant (1-8) that the angle belongs to.
         """
-        if "0" in cls:
-            return self._ss_from_binary_classid(cls)
+        # Normalize the angle to the range [0, 360)
+        angle_deg = angle_deg % 360
+
+        if angle_deg >= 0 and angle_deg < 45:
+            return str(8)
+        elif angle_deg >= 45 and angle_deg < 90:
+            return str(7)
+        elif angle_deg >= 90 and angle_deg < 135:
+            return str(6)
+        elif angle_deg >= 135 and angle_deg < 180:
+            return str(5)
+        elif angle_deg >= 180 and angle_deg < 225:
+            return str(4)
+        elif angle_deg >= 225 and angle_deg < 270:
+            return str(3)
+        elif angle_deg >= 270 and angle_deg < 315:
+            return str(2)
+        elif angle_deg >= 315 and angle_deg < 360:
+            return str(1)
         else:
-            return self._ss_from_sixclassid(cls)
+            raise ValueError(
+                "Invalid angle value: angle must be in the range [-360, 360)."
+            )
 
-    def _ss_from_sixclassid(self, cls: str) -> pd.DataFrame:
+    def sslist_from_classid(self, cls: str, base=8) -> pd.DataFrame:
         """
         Return the 'ss_id' value in the given DataFrame that corresponds to the
-        input 'cls' string in the sixfold class description.
+        input 'cls' string in the class description
         """
-
-        df = self.sixclass_df
+        if base == 2:
+            df = self.classdf
+        elif base == 6:
+            df = self.sixclass_df
+        elif base == 8:
+            df = self.eightclass_df
 
         filtered_df = df[df["class_id"] == cls]
         if len(filtered_df) == 0:
             return None
-        elif len(filtered_df) > 1:
-            raise ValueError(f"Multiple rows found for class_id '{cls}'")
-        return filtered_df.iloc[0]["ss_id"]
-
-    def _ss_from_binary_classid(self, cls: str) -> pd.DataFrame:
-        """
-        Return the 'ss_id' value in the given DataFrame that corresponds to the
-        input 'cls' string in the binary class description.
-        """
-
-        df = self.classdf
-
-        filtered_df = df[df["class_id"] == cls]
-        if len(filtered_df) == 0:
-            raise ValueError(f"No rows found for class_id '{cls}'")
         elif len(filtered_df) > 1:
             raise ValueError(f"Multiple rows found for class_id '{cls}'")
         return filtered_df.iloc[0]["ss_id"]
@@ -457,6 +542,23 @@ class DisulfideClass_Constructor:
             if char in ["1", "2", "3"]:
                 output_str += "2"
             elif char in ["4", "5", "6"]:
+                output_str += "0"
+        return output_str
+
+    def eight_class_to_binary(self, cls_str):
+        """
+        Transforms a string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees
+        into a string of 5 characters, where each character is either '1' if the corresponding input character represents a
+        negative angle or '2' if it represents a positive angle.
+
+        :param cls_str (str): A string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees.
+        :return str: A string of length 5, where each character is either '0' or '2', representing the sign of the corresponding input angle.
+        """
+        output_str = ""
+        for char in cls_str:
+            if char in ["1", "2", "3", "4"]:
+                output_str += "2"
+            elif char in ["5", "6", "7", "8"]:
                 output_str += "0"
         return output_str
 

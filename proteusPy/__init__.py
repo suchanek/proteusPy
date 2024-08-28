@@ -48,16 +48,17 @@ from .Disulfide import (
 )
 from .DisulfideClass_Constructor import DisulfideClass_Constructor
 from .DisulfideClasses import (
+    angle_within_range,
     create_classes,
-    create_quat_classes,
-    enumerate_sixclass_fromlist,
     filter_by_percentage,
-    get_half_quadrant,
+    get_eighth_quadrant,
     get_quadrant,
+    get_section,
     get_sixth_quadrant,
-    plot_binary_to_sixclass_incidence,
-    plot_count_vs_class_df,
-    plot_count_vs_classid,
+    get_ss_id,
+    is_between,
+    plot_class_chart,
+    torsion_to_eightclass,
     torsion_to_sixclass,
 )
 from .DisulfideExceptions import (

@@ -193,7 +193,13 @@ class DisulfideList(UserList):
         """
         if isinstance(item, slice):
             indices = range(*item.indices(len(self.data)))
-            name = self.data[0].pdb_id
+            ind_list = list(indices)
+            first_ind = ind_list[0]
+            last_ind = ind_list[-1]
+            name = (
+                self.data[first_ind].pdb_id
+                + f"_slice[{first_ind}:{last_ind+1}]_{self.data[last_ind].pdb_id}"
+            )
             sublist = [self.data[i] for i in indices]
             return DisulfideList(sublist, name)
         return UserList.__getitem__(self, item)

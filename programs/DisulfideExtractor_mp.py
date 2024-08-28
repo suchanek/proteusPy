@@ -120,14 +120,14 @@ def parse_arguments():
         "-e",
         action="store_true",
         help="Extract Disulfide data",
-        default=True,
+        default=False,
     )
     parser.add_argument(
         "--build",
         "-b",
         action="store_true",
         help="Build Disulfide loader",
-        default=False,
+        default=True,
     )
     parser.add_argument(
         "--update",
@@ -141,7 +141,7 @@ def parse_arguments():
         "-f",
         action="store_true",
         help="Process full SS database",
-        default=True,
+        default=False,
     )
     parser.add_argument(
         "--subset", "-s", action="store_true", help="Process SS subset", default=False
@@ -224,6 +224,7 @@ def do_extract(verbose, full, subset, cutoff, prune, nthreads=6):
         chunk_size = num_ent_files // nthreads
     else:
         chunk_size = 1000 // nthreads
+        num_ent_files = 1000
 
     res_list = DisulfideList([], "PDB_ALL_SS")
 

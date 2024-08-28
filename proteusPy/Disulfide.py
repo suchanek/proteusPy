@@ -143,10 +143,17 @@ class Disulfide:
         torsions: list = None,
     ) -> None:
         """
-        __init__ Initialize the class to defined internal values.
+        Initialize the class to defined internal values. If torsions are provided, the
+        Disulfide object is built using the torsions and initialized.
 
         :param name: Disulfide name, by default "SSBOND"
-
+        :param proximal: Proximal residue number, by default -1
+        :param distal: Distal residue number, by default -1
+        :param proximal_chain: Chain identifier for the proximal residue, by default "A"
+        :param distal_chain: Chain identifier for the distal residue, by default "A"
+        :param pdb_id: PDB identifier, by default "1egs"
+        :param quiet: If True, suppress output, by default True
+        :param torsions: List of torsion angles, by default None
         """
         self.name = name
         self.proximal = proximal
@@ -1137,7 +1144,7 @@ class Disulfide:
             try:
                 distance = math.dist(a, b)
             except ValueError as e:
-                print(f"Error calculating angle for atoms {pair}: {e}")
+                _logger.error(f"Error calculating bond length for atoms {pair}: {e}")
                 return None
             calculated_distances.append(distance)
             if verbose:
@@ -1923,7 +1930,6 @@ class Disulfide:
         #
         # pl.add_title(title=title, font_size=FONTSIZE)
         pl.enable_anti_aliasing("msaa")
-        # pl.add_camera_orientation_widget()
         pl = self._render(
             pl,
             style=style,
@@ -1962,7 +1968,7 @@ class Disulfide:
         s6 = self.repr_ss_ca_dist()
         s7 = self.repr_ss_torsion_length()
 
-        res = f"{s1} {s5} {s2} {s3} {s4}\n {s6}\n {s7}>"
+        res = f"{s1} {s2} {s5} {s3} {s4}\n {s6}\n {s7}>"
 
         print(res)
 
@@ -2042,7 +2048,7 @@ class Disulfide:
         s8 = self.repr_ss_cb_dist()
         s7 = self.repr_ss_torsion_length()
 
-        res = f"{s1} {s5} {s2} {s3} {s4} {s6} {s7} {s8}>"
+        res = f"{s1} {s2} {s5} {s3} {s4} {s6} {s7} {s8}>"
         return res
 
     def repr_compact(self) -> str:
@@ -2472,6 +2478,18 @@ class Disulfide:
 
         tors = self.torsion_array
         res = [get_sixth_quadrant(x) for x in tors]
+        return "".join([str(r) for r in res])
+
+    def torsion_to_eightclass(self) -> str:
+        """
+        Return the sextant class string for ``self``.
+
+        :return: Sextant string
+        """
+        from proteusPy.DisulfideClasses import get_eighth_quadrant
+
+        tors = self.torsion_array
+        res = [get_eigth_quadrant(x) for x in tors]
         return "".join([str(r) for r in res])
 
 
