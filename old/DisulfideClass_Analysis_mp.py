@@ -5,6 +5,7 @@ import pickle
 import time
 from collections import deque
 from datetime import timedelta
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -18,14 +19,21 @@ init(autoreset=True)
 
 from proteusPy import Disulfide, DisulfideList, DisulfideLoader, Load_PDB_SS
 
-HOME = os.getenv("HOME")
-PDB = os.getenv("PDB")
-if PDB is None:
-    PDB = os.path.join(HOME, "pdb")
+HOME = Path.home()
+PDB = Path(os.getenv("PDB", HOME / "pdb"))
 
-DATA_DIR = os.path.join(PDB, "data")
-SAVE_DIR = os.path.join(HOME, "Documents", "proteusPyDocs", "classes")
-REPO_DIR = os.path.join(HOME, "repos", "proteusPy", "data")
+DATA_DIR = PDB / "data"
+SAVE_DIR = HOME / "Documents" / "proteusPyDocs" / "classes"
+REPO_DIR = HOME / "repos" / "proteusPy" / "data"
+
+OCTANT = SAVE_DIR / "octant"
+OCTANT.mkdir(parents=True, exist_ok=True)
+
+SEXTANT = SAVE_DIR / "sextant"
+SEXTANT.mkdir(parents=True, exist_ok=True)
+
+BINARY = SAVE_DIR / "binary"
+BINARY.mkdir(parents=True, exist_ok=True)
 
 PBAR_COLS = 78
 
@@ -138,24 +146,28 @@ def analyze_classes_multiprocess(
     prefix="ss_class",
 ) -> DisulfideList:
 
-    global SAVE_DIR
+    global OCTANT, BINARY
 
-    six_or_bin = loader.tclass.sixclass_df if do_sextant else loader.tclass.classdf
+    six_or_bin = loader.tclass.eightclass_df if do_sextant else loader.tclass.classdf
     tot_classes = six_or_bin.shape[0]
     chunk_size = tot_classes // num_processes
 
     if do_sextant:
-        class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_FILE)
-        SAVE_DIR = os.path.join(SAVE_DIR, "sextant")
+        # class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_FILE)
+        class_filename = DATA_DIR / SS_CONSENSUS_FILE
+
+        # sextant is actually doing octant
+        _SAVE_DIR = OCTANT
         six_or_bin_flag = True
         res_list = DisulfideList([], "SS_6class_Avg_SS")
-        pix = sextant_classes_vs_cutoff(loader, cutoff)
+        pix = octant_classes_vs_cutoff(loader, cutoff)
         print(
             f"--> analyze_six_classes(): Expecting {pix} graphs for the sextant classes."
         )
     else:
-        class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_BIN_FILE)
-        SAVE_DIR = os.path.join(SAVE_DIR, "binary")
+        class_filename = DATA_DIR / SS_CONSENSUS_BIN_FILE
+
+        _SAVE_DIR = BINARY
         six_or_bin = False
         res_list = DisulfideList([], "SS_32class_Avg_SS")
 
@@ -167,7 +179,7 @@ def analyze_classes_multiprocess(
             cutoff,
             do_graph,
             do_consensus,
-            SAVE_DIR,
+            _SAVE_DIR,
             prefix,
             2 * i,
             i,

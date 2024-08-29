@@ -20,7 +20,7 @@ import numpy as np
 from proteusPy.logger_config import get_logger
 
 _logger = get_logger(__name__)
-_logger.setLevel("INFO")
+_logger.setLevel("ERROR")
 
 
 class Vector3D:

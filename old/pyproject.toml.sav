@@ -75,7 +75,7 @@ source = ["proteusPy"]
 where = ["proteusPy"]
 
 [tool.poetry.package-data]
-proteusPy = ["data/*.txt", "data/*.py", "data/*.json", "data/*.csv", "data/SS_consensus_class_sext.pkl"]
+proteusPy = ["data/*.txt", "data/*.py", "data/*.json", "data/SS_consensus_class_oct.pkl", "data/SS_consensus_class_32.pkl"]
 
 [tool.poetry.exclude-package-data]
 proteusPy = ["data/PDB_all_ss.pkl", "data/PDB_SS_ALL_LOADER.pkl", "data/PDB_all_ss_dict.pkl"]

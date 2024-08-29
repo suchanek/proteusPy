@@ -136,7 +136,7 @@ setup(
             "data/ss_completed.txt",
             "data/ss_query.json",
             "data/ss_ids.txt",
-            "data/SS_consensus_class_sext.pkl",
+            "data/SS_consensus_class_oct.pkl",
             "data/SS_consensus_class_32.pkl",
         ]
     },
