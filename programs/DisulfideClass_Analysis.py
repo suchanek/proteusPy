@@ -71,17 +71,17 @@ all 32 possible classes ($$2^5$$). Classes are named per the paper's convention.
 | 31 |        1 |        1 |        1 |        1 |        1 |      22222 | +RHSpiral      | UNK        |
 +----+----------+----------+----------+----------+----------+------------+----------------+------------+
 
-The sextant class approach is unique to ``proteusPy``, wherein the dihedral circle for the dihedral angles X1-X5 
-is divided into 6 quadrants, and a dihedral angle five-dimensional vector defined by characterizing each dihedral 
-angle into one of these six quadrants. This yields $6^{5}$ or 7776 possible classes. This program analyzes the RCSB database 
-and creates graphs illustrating the membership across the binary and sextant classes. The graphs are stored in the 
-global SAVE_DIR location. Binary analysis takes approximately 28 minutes with Sextant analysis taking about
+The octant class approach is unique to ``proteusPy``, wherein the dihedral circle for the dihedral angles X1-X5 
+is divided into 8 sections, and a dihedral angle five-dimensional string, (class id) defined by characterizing each dihedral 
+angle into one of these sections. This yields $8^{5}$ or 32,768 possible classes. This program analyzes the RCSB database 
+and creates graphs illustrating the membership across the binary and octant classes. The graphs are stored in the 
+global SAVE_DIR location. Binary analysis takes approximately 28 minutes with octant analysis taking about
 75 minutes on a 2023 M3 Max Macbook Pro. (single-threaded).
 
 Update 8/5/2024 - multithreading is implemented and runs well up to around 6 threads on a 2023 M3 Max Macbook Pro.
-Sextant analysis takes around 22 minutes with 6 threads. Binary analysis takes around 8 minutes with 6 threads.
+octant analysis takes around 22 minutes with 6 threads. Binary analysis takes around 8 minutes with 6 threads.
 
-Author: Eric G. Suchanek, PhD. Last Modified: 8/5/2024 - RIP NJS - 
+Author: Eric G. Suchanek, PhD. Last Modified: 8/27/2024
 """
 
 import argparse
@@ -91,17 +91,14 @@ import threading
 import time
 from collections import deque
 from datetime import timedelta
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from colorama import Fore, Style, init
 from tqdm import tqdm
 
-from proteusPy.ProteusGlobals import (
-    SS_CONSENSUS_BIN_FILE,
-    SS_CONSENSUS_FILE,
-    SS_CONSENSUS_TEN_FILE,
-)
+from proteusPy.ProteusGlobals import SS_CONSENSUS_BIN_FILE, SS_CONSENSUS_FILE
 
 # Initialize colorama
 init(autoreset=True)
@@ -109,14 +106,21 @@ init(autoreset=True)
 
 from proteusPy import Disulfide, DisulfideList, DisulfideLoader, Load_PDB_SS
 
-HOME = os.getenv("HOME")
-PDB = os.getenv("PDB")
-if PDB is None:
-    PDB = os.path.join(HOME, "pdb")
+HOME = Path.home()
+PDB = Path(os.getenv("PDB", HOME / "pdb"))
 
-DATA_DIR = os.path.join(PDB, "data")
-SAVE_DIR = os.path.join(HOME, "Documents", "proteusPyDocs", "classes")
-REPO_DIR = os.path.join(HOME, "repos", "proteusPy", "data")
+DATA_DIR = PDB / "data"
+SAVE_DIR = HOME / "Documents" / "proteusPyDocs" / "classes"
+REPO_DIR = HOME / "repos" / "proteusPy" / "data"
+
+OCTANT = SAVE_DIR / "octant"
+OCTANT.mkdir(parents=True, exist_ok=True)
+
+SEXTANT = SAVE_DIR / "sextant"
+SEXTANT.mkdir(parents=True, exist_ok=True)
+
+BINARY = SAVE_DIR / "binary"
+BINARY.mkdir(parents=True, exist_ok=True)
 
 PBAR_COLS = 78
 
@@ -139,7 +143,7 @@ def task(
     tasknum: int,
 ):
     """
-    Processes a range of lines in the disulfide class dict for the binary or sextant
+    Processes a range of lines in the disulfide class dict for the binary or octant
     disulfide classes and updates the progress bar.
 
     :param loader: DisulfideLoader instance to load disulfides.
@@ -227,7 +231,7 @@ def analyze_classes_threaded(
     cutoff=0.0,
     num_threads=6,
     verbose=False,
-    do_sextant=True,
+    do_octant=True,
     prefix="ss_class",
 ) -> DisulfideList:
     """
@@ -242,24 +246,27 @@ def analyze_classes_threaded(
 
     :return: A list of disulfide bonds, where each disulfide bond represents the average conformation for a class.
     """
-    global SAVE_DIR
+    global OCTANT, SEXTANT, BINARY
 
-    if do_sextant:
-        class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_FILE)
-        SAVE_DIR = os.path.join(SAVE_DIR, "sextant")
-        six_or_bin = loader.tclass.sixclass_df
+    if do_octant:
+        # class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_FILE)
+        class_filename = DATA_DIR / SS_CONSENSUS_FILE
+        SAVE_DIR = OCTANT
+        six_or_bin = loader.tclass.eightclass_df
         tot_classes = six_or_bin.shape[0]
-        res_list = DisulfideList([], "SS_6class_Avg_SS")
-        pix = sextant_classes_vs_cutoff(loader, cutoff)
-        print(
-            f"--> analyze_six_classes(): Expecting {pix} graphs for the sextant classes."
-        )
+        res_list = DisulfideList([], "SS_8class_Avg_SS")
+        pix = octant_classes_vs_cutoff(loader, cutoff)
+        if verbose:
+            print(
+                f"--> analyze_eight_classes(): Expecting {pix} graphs for the octant classes."
+            )
     else:
         class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_BIN_FILE)
-        SAVE_DIR = os.path.join(SAVE_DIR, "binary")
+        SAVE_DIR = BINARY
         six_or_bin = loader.tclass.classdf
         tot_classes = six_or_bin.shape[0]
         res_list = DisulfideList([], "SS_32class_Avg_SS")
+        pix = 32
 
     total_ss = len(loader.SSList)
 
@@ -269,7 +276,7 @@ def analyze_classes_threaded(
 
     # Create the overall progress bar
     overall_pbar = tqdm(
-        total=tot_classes,
+        total=pix,
         desc=f"{Fore.GREEN}Overall Progress{Style.RESET_ALL}".ljust(20),
         position=0,
         leave=True,
@@ -331,7 +338,7 @@ def analyze_classes_threaded(
 def analyze_classes(
     loader: DisulfideLoader,
     binary: bool,
-    sextant: bool,
+    octant: bool,
     all: bool,
     threads: int = 4,
     do_graph: bool = False,
@@ -347,7 +354,7 @@ def analyze_classes(
             cutoff=cutoff,
             verbose=verbose,
             num_threads=threads,
-            do_sextant=True,
+            do_octant=True,
         )
 
         analyze_classes_threaded(
@@ -357,13 +364,13 @@ def analyze_classes(
             cutoff=0,
             verbose=verbose,
             num_threads=threads,
-            do_sextant=False,
+            do_octant=False,
         )
 
         return
 
-    if sextant:
-        print("Analyzing sextant classes.")
+    if octant:
+        print("Analyzing octant classes.")
         # plot_classes_vs_cutoff(loader, cutoff + 0.25 * cutoff, 50)
 
         analyze_classes_threaded(
@@ -373,11 +380,12 @@ def analyze_classes(
             cutoff=cutoff,
             verbose=verbose,
             num_threads=threads,
-            do_sextant=True,
-            prefix="ss_class_sext",
+            do_octant=True,
+            prefix="ss_class_oct",
         )
 
     if binary:
+        print("Analyzing binary classes.")
 
         analyze_classes_threaded(
             loader,
@@ -386,7 +394,7 @@ def analyze_classes(
             cutoff=0.0,
             verbose=verbose,
             num_threads=threads,
-            do_sextant=False,
+            do_octant=False,
             prefix="ss_class_bin",
         )
 
@@ -429,17 +437,52 @@ def plot_sixclass_vs_cutoff(PDB_SS: DisulfideLoader, cutoff, steps, verbose=Fals
     plt.show()
 
 
-def sextant_classes_vs_cutoff(loader: DisulfideLoader, cutoff):
+def octant_classes_vs_cutoff(loader: DisulfideLoader, cutoff):
     """
-    Return number of members for the sextant class for a given cutoff value.
+    Return number of members for the octant class for a given cutoff value.
+
+    :param cutoff: Percent cutoff value for filtering the classes.
+    :return: None
+    """
+
+    class_df = loader.tclass.filter_eightclass_by_percentage(cutoff)
+    return class_df.shape[0]
+
+
+def plot_eightclass_vs_cutoff(PDB_SS: DisulfideLoader, cutoff, steps, verbose=False):
+    """
+    Plot the total percentage and number of members for each class against the cutoff value.
 
     :param cutoff: Percent cutoff value for filtering the classes.
     :return: None
     """
     import matplotlib.pyplot as plt
 
-    class_df = loader.tclass.filter_sixclass_by_percentage(cutoff)
-    return class_df.shape[0]
+    _cutoff = np.linspace(0, cutoff, steps)
+    tot_list = []
+    members_list = []
+
+    for c in _cutoff:
+        class_df = PDB_SS.tclass.filter_eightclass_by_percentage(c)
+        tot = class_df["percentage"].sum()
+        tot_list.append(tot)
+        members_list.append(class_df.shape[0])
+        if verbose:
+            print(
+                f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
+            )
+
+    fig, ax1 = plt.subplots()
+
+    ax2 = ax1.twinx()
+    ax1.plot(_cutoff, tot_list, label="Total percentage", color="blue")
+    ax2.plot(_cutoff, members_list, label="Number of members", color="red")
+
+    ax1.set_xlabel("Cutoff")
+    ax1.set_ylabel("Total percentage", color="blue")
+    ax2.set_ylabel("Number of members", color="red")
+
+    plt.show()
 
 
 def get_args():
@@ -452,9 +495,9 @@ def get_args():
         default=False,
     )
     parser.add_argument(
-        "-s",
-        "--sextant",
-        help="Analyze sextant classes.",
+        "-o",
+        "--octant",
+        help="Analyze octant classes.",
         action=argparse.BooleanOptionalAction,
         default=False,
     )
@@ -462,13 +505,13 @@ def get_args():
         "-t",
         "--threads",
         type=int,
-        help="Number of threads to use. NOT IMPLEMENTED YET.",
+        help="Number of threads to use.",
         default=8,
     )
     parser.add_argument(
         "-a",
         "--all",
-        help="Both binary and sextant classes.",
+        help="Both binary and octant classes.",
         action=argparse.BooleanOptionalAction,
         default=False,
     )
@@ -506,7 +549,7 @@ def get_args():
     return args
 
 
-def Update_Repository(source_dir, repo_dir, verbose=True, binary=False, sextant=False):
+def Update_Repository(source_dir, repo_dir, verbose=True, binary=False, octant=False):
     """Copy the consensus classes to the repository."""
     import shutil
 
@@ -519,7 +562,7 @@ def Update_Repository(source_dir, repo_dir, verbose=True, binary=False, sextant=
 
         shutil.copy(source, dest)
 
-    if sextant:
+    if octant:
         source = os.path.join(source_dir, SS_CONSENSUS_FILE)
         dest = os.path.join(repo_dir, SS_CONSENSUS_FILE)
 
@@ -533,7 +576,7 @@ def Update_Repository(source_dir, repo_dir, verbose=True, binary=False, sextant=
 
 def main():
     args = get_args()
-    sextant = args.sextant
+    octant = args.octant
     binary = args.binary
     all = args.all
     threads = args.threads
@@ -547,7 +590,7 @@ def main():
     print("Starting Disulfide Class analysis with arguments:")
     print(
         f"Binary:                {binary}\n"
-        f"Sextant:               {sextant}\n"
+        f"Octant:                {octant}\n"
         f"All:                   {all}\n"
         f"Threads:               {threads}\n"
         f"Cutoff:                {cutoff}\n"
@@ -567,12 +610,12 @@ def main():
     PDB_SS.describe()
 
     analyze_classes(
-        PDB_SS, binary, sextant, all, threads=threads, do_graph=do_graph, cutoff=cutoff
+        PDB_SS, binary, octant, all, threads=threads, do_graph=do_graph, cutoff=cutoff
     )
 
     if do_update:
         print("Updating repository with consensus classes.")
-        Update_Repository(DATA_DIR, REPO_DIR, binary=binary, sextant=sextant)
+        Update_Repository(DATA_DIR, REPO_DIR, binary=binary, octant=octant)
 
 
 if __name__ == "__main__":
