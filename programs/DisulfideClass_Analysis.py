@@ -1,6 +1,6 @@
 """
-Disulfide class analysis using `proteusPy.Disulfide` package. Disulfide binary families are defined
-using the +/- formalism of Schmidt et al. (Biochem, 2006, 45, 7429-7433), across
+Disulfide class consensus structure extraction using `proteusPy.Disulfide` package. Disulfide binary 
+families are defined using the +/- formalism of Schmidt et al. (Biochem, 2006, 45, 7429-7433), across
 all 32 possible classes ($$2^5$$). Classes are named per the paper's convention.
 
 +----+----------+----------+----------+----------+----------+------------+----------------+------------+
@@ -75,11 +75,11 @@ The octant class approach is unique to ``proteusPy``, wherein the dihedral circl
 is divided into 8 sections, and a dihedral angle five-dimensional string, (class id) defined by characterizing each dihedral 
 angle into one of these sections. This yields $8^{5}$ or 32,768 possible classes. This program analyzes the RCSB database 
 and creates graphs illustrating the membership across the binary and octant classes. The graphs are stored in the 
-global SAVE_DIR location. Binary analysis takes approximately 28 minutes with octant analysis taking about
+global SAVE_DIR location. Binary analysis takes approximately 20 minutes with octant analysis taking about
 75 minutes on a 2023 M3 Max Macbook Pro. (single-threaded).
 
-Update 8/5/2024 - multithreading is implemented and runs well up to around 6 threads on a 2023 M3 Max Macbook Pro.
-octant analysis takes around 22 minutes with 6 threads. Binary analysis takes around 8 minutes with 6 threads.
+Update 8/28/2024 - multithreading is implemented and runs well up to around 6 threads on a 2023 M3 Max Macbook Pro.
+octant analysis takes around 22 minutes with 6 threads. Binary analysis takes around 25 minutes with 6 threads.
 
 Author: Eric G. Suchanek, PhD. Last Modified: 8/27/2024
 """
@@ -125,10 +125,91 @@ BINARY.mkdir(parents=True, exist_ok=True)
 PBAR_COLS = 78
 
 
+def get_args():
+    """
+    Parses and returns command-line arguments for the DisulfideClass_Analysis script.
+
+    The following arguments are supported:
+    - `-b`, `--binary`: Analyze binary classes (default: False).
+    - `-o`, `--octant`: Analyze octant classes (default: False).
+    - `-t`, `--threads`: Number of threads to use (default: 8).
+    - `-a`, `--all`: Analyze both binary and octant classes (default: False).
+    - `-g`, `--graph`: Create class graphs (default: False).
+    - `-c`, `--cutoff`: Cutoff percentage for class filtering (default: 0.0).
+    - `-v`, `--verbose`: Enable verbose output (default: False).
+    - `-u`, `--update`: Update repository with the consensus classes (default: True).
+
+    Returns:
+        argparse.Namespace: An object containing the parsed command-line arguments.
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-b",
+        "--binary",
+        help="Analyze binary classes.",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+    )
+    parser.add_argument(
+        "-o",
+        "--octant",
+        help="Analyze octant classes.",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+    )
+    parser.add_argument(
+        "-t",
+        "--threads",
+        type=int,
+        help="Number of threads to use.",
+        default=8,
+    )
+    parser.add_argument(
+        "-a",
+        "--all",
+        help="Both binary and octant classes.",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+    )
+    parser.add_argument(
+        "-g",
+        "--graph",
+        help="Create class graphs.",
+        default=False,
+        action=argparse.BooleanOptionalAction,
+    )
+
+    parser.add_argument(
+        "-c",
+        "--cutoff",
+        help="Cutoff percentage for class filtering.",
+        type=float,
+        default=0.0,
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        help="Verbose output.",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+    )
+    parser.add_argument(
+        "-u",
+        "--update",
+        help="Update repository with the consensus classes.",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
+
+    args = parser.parse_args()
+    return args
+
+
+# task definition
 def task(
     loader: DisulfideLoader,
     overall_pbar: tqdm,
-    six_or_bin: pd.DataFrame,
+    eight_or_bin: pd.DataFrame,
     start_idx: int,
     end_idx: int,
     result_list: DisulfideList,
@@ -147,7 +228,7 @@ def task(
     disulfide classes and updates the progress bar.
 
     :param loader: DisulfideLoader instance to load disulfides.
-    :param six_or_bin: DataFrame containing class and disulfide IDs.
+    :param eight_or_bin: DataFrame containing class and disulfide IDs.
     :param start_idx: Starting index for processing.
     :param end_idx: Ending index for processing.
     :param result_list: List to store the resulting disulfides.
@@ -164,7 +245,7 @@ def task(
 
     for idx in range(start_idx, end_idx):
 
-        row = six_or_bin.iloc[idx]
+        row = eight_or_bin.iloc[idx]
         cls = row["class_id"]
         ss_list = row["ss_id"]
         tot = len(ss_list)
@@ -252,8 +333,8 @@ def analyze_classes_threaded(
         # class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_FILE)
         class_filename = DATA_DIR / SS_CONSENSUS_FILE
         SAVE_DIR = OCTANT
-        six_or_bin = loader.tclass.eightclass_df
-        tot_classes = six_or_bin.shape[0]
+        eight_or_bin = loader.tclass.eightclass_df
+        tot_classes = eight_or_bin.shape[0]
         res_list = DisulfideList([], "SS_8class_Avg_SS")
         pix = octant_classes_vs_cutoff(loader, cutoff)
         if verbose:
@@ -263,8 +344,8 @@ def analyze_classes_threaded(
     else:
         class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_BIN_FILE)
         SAVE_DIR = BINARY
-        six_or_bin = loader.tclass.classdf
-        tot_classes = six_or_bin.shape[0]
+        eight_or_bin = loader.tclass.classdf
+        tot_classes = eight_or_bin.shape[0]
         res_list = DisulfideList([], "SS_32class_Avg_SS")
         pix = 32
 
@@ -301,7 +382,7 @@ def analyze_classes_threaded(
             args=(
                 loader,
                 overall_pbar,
-                six_or_bin,
+                eight_or_bin,
                 start_idx,
                 end_idx,
                 result_lists[i],
@@ -345,7 +426,6 @@ def analyze_classes(
     cutoff: float = 0.0,
     verbose: bool = False,
 ):
-    # main program begins
     if all:
         analyze_classes_threaded(
             loader,
@@ -401,42 +481,6 @@ def analyze_classes(
     return
 
 
-def plot_sixclass_vs_cutoff(PDB_SS: DisulfideLoader, cutoff, steps, verbose=False):
-    """
-    Plot the total percentage and number of members for each class against the cutoff value.
-
-    :param cutoff: Percent cutoff value for filtering the classes.
-    :return: None
-    """
-    import matplotlib.pyplot as plt
-
-    _cutoff = np.linspace(0, cutoff, steps)
-    tot_list = []
-    members_list = []
-
-    for c in _cutoff:
-        class_df = PDB_SS.tclass.filter_sixclass_by_percentage(c)
-        tot = class_df["percentage"].sum()
-        tot_list.append(tot)
-        members_list.append(class_df.shape[0])
-        if verbose:
-            print(
-                f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
-            )
-
-    fig, ax1 = plt.subplots()
-
-    ax2 = ax1.twinx()
-    ax1.plot(_cutoff, tot_list, label="Total percentage", color="blue")
-    ax2.plot(_cutoff, members_list, label="Number of members", color="red")
-
-    ax1.set_xlabel("Cutoff")
-    ax1.set_ylabel("Total percentage", color="blue")
-    ax2.set_ylabel("Number of members", color="red")
-
-    plt.show()
-
-
 def octant_classes_vs_cutoff(loader: DisulfideLoader, cutoff):
     """
     Return number of members for the octant class for a given cutoff value.
@@ -485,77 +529,13 @@ def plot_eightclass_vs_cutoff(PDB_SS: DisulfideLoader, cutoff, steps, verbose=Fa
     plt.show()
 
 
-def get_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-b",
-        "--binary",
-        help="Analyze binary classes.",
-        action=argparse.BooleanOptionalAction,
-        default=False,
-    )
-    parser.add_argument(
-        "-o",
-        "--octant",
-        help="Analyze octant classes.",
-        action=argparse.BooleanOptionalAction,
-        default=False,
-    )
-    parser.add_argument(
-        "-t",
-        "--threads",
-        type=int,
-        help="Number of threads to use.",
-        default=8,
-    )
-    parser.add_argument(
-        "-a",
-        "--all",
-        help="Both binary and octant classes.",
-        action=argparse.BooleanOptionalAction,
-        default=False,
-    )
-    parser.add_argument(
-        "-g",
-        "--graph",
-        help="Create class graphs.",
-        default=False,
-        action=argparse.BooleanOptionalAction,
-    )
-
-    parser.add_argument(
-        "-c",
-        "--cutoff",
-        help="Cutoff percentage for class filtering.",
-        type=float,
-        default=0.0,
-    )
-    parser.add_argument(
-        "-v",
-        "--verbose",
-        help="Verbose output.",
-        action=argparse.BooleanOptionalAction,
-        default=False,
-    )
-    parser.add_argument(
-        "-u",
-        "--update",
-        help="Update repository with the consensus classes.",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-    )
-
-    args = parser.parse_args()
-    return args
-
-
 def Update_Repository(source_dir, repo_dir, verbose=True, binary=False, octant=False):
     """Copy the consensus classes to the repository."""
     import shutil
 
     if binary:
-        source = os.path.join(source_dir, SS_CONSENSUS_BIN_FILE)
-        dest = os.path.join(repo_dir, SS_CONSENSUS_BIN_FILE)
+        source = Path(source_dir) / SS_CONSENSUS_BIN_FILE
+        dest = Path(repo_dir) / SS_CONSENSUS_BIN_FILE
 
         if verbose:
             print(f"Copying {source} to {dest}")
@@ -563,11 +543,11 @@ def Update_Repository(source_dir, repo_dir, verbose=True, binary=False, octant=F
         shutil.copy(source, dest)
 
     if octant:
-        source = os.path.join(source_dir, SS_CONSENSUS_FILE)
-        dest = os.path.join(repo_dir, SS_CONSENSUS_FILE)
+        source = Path(source_dir) / SS_CONSENSUS_FILE
+        dest = Path(repo_dir) / SS_CONSENSUS_FILE
 
         if verbose:
-            print(f"Copying {source} to {dest}")
+            print(f"Copying consensus structures from {source} to {dest}")
 
         shutil.copy(source, dest)
 
