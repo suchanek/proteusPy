@@ -251,14 +251,14 @@ def do_extract(verbose, full, subset, cutoff, prune, nthreads=6):
     # save the disulfides to a pickle file
     if full:
         if verbose:
-            print(f"Saving SS list to: {DATA_DIR / SS_PICKLE_FILE}")
+            print(f"\nSaving SS list to: {DATA_DIR / SS_PICKLE_FILE}")
 
         with open(DATA_DIR / SS_PICKLE_FILE, "wb") as f:
             pickle.dump(res_list, f)
 
     if subset:
         if verbose:
-            print(f"Saving SS list to: {DATA_DIR / SS_SUBSET_PICKLE_FILE}")
+            print(f"\nSaving SS subset list to: {DATA_DIR / SS_SUBSET_PICKLE_FILE}")
 
         with open(DATA_DIR / SS_SUBSET_PICKLE_FILE, "wb") as f:
             pickle.dump(res_list, f)
