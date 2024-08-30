@@ -141,8 +141,8 @@ class DisulfideLoader:
                 f"-> DisulfideLoader(): Reading disulfides from: {self.PickleFile}... ",
             )
 
-        with open(self.PickleFile, "rb") as f:
-            sslist = pickle.load(str(f))
+        with open(str(self.PickleFile), "rb") as f:
+            sslist = pickle.load(f)
             self.SSList = sslist
             self.TotalDisulfides = len(self.SSList)
 
@@ -815,7 +815,7 @@ class DisulfideLoader:
         if self.verbose:
             print(f"-> DisulfideLoader.save(): Writing {_fname}... ")
 
-        with open(_fname, "wb+") as f:
+        with open(str(_fname), "wb+") as f:
             pickle.dump(self, f)
 
         if self.verbose:
@@ -936,7 +936,7 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
     if verbose:
         print(f"-> load_PDB_SS(): Reading {_fname}... ")
 
-    with open(_fname, "rb") as f:
+    with open(str(_fname), "rb") as f:
         res = pickle.load(f)
 
     if verbose:
