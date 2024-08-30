@@ -7,19 +7,29 @@ Author: Eric G. Suchanek, PhD
 Last revision: 8/21/2024
 """
 
+# pylint: disable=C0301
+# pylint: disable=W1203
+# pylint: disable=C0103
+
 import copy
 import pickle
 import sys
 import time
+import urllib
 from pathlib import Path
 
+import gdown
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
+import plotly_express as px
 
 from proteusPy import __version__
-from proteusPy.atoms import *
+
+# from proteusPy.atoms import *
 from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideClass_Constructor import DisulfideClass_Constructor
-from proteusPy.DisulfideExceptions import *
+from proteusPy.DisulfideExceptions import DisulfideException, DisulfideParseWarning
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.logger_config import get_logger
 from proteusPy.ProteusGlobals import (
@@ -64,10 +74,11 @@ class DisulfideLoader:
     proteusPy.DisulfideList, a ```Pandas``` .csv file, and a ```dict``` of
     indices mapping the PDB IDs into their respective list of disulfides. The datastructures allow
     simple, direct and flexible access to the disulfide structures contained herein.
-    This makes it possible to access the disulfides by array index, PDB structure ID or disulfide name.
+    This makes it possible to access the disulfides by array index, PDB structure ID or disulfide
+    name.
 
-    The class can also render Disulfides overlaid on a common coordinate system to a pyVista window using the
-    [display_overlay()](#DisulfideLoader.display_overlay) method. See below for examples.\n
+    The class can also render Disulfides overlaid on a common coordinate system to a pyVista
+    window using the [display_overlay()](#DisulfideLoader.display_overlay) method. See below for examples.\n
 
     Important note: For typical usage one will access the database via the `Load_PDB_SS()` function.
     The difference is that the latter function loads the compressed database from its single
@@ -120,8 +131,6 @@ class DisulfideLoader:
         self.timestamp = time.time()
         self.version = __version__
 
-        idlist = []
-
         if subset:
             self.PickleFile = Path(datadir) / SS_SUBSET_PICKLE_FILE
             self.PickleDictFile = Path(datadir) / SS_SUBSET_DICT_PICKLE_FILE
@@ -133,7 +142,7 @@ class DisulfideLoader:
             )
 
         with open(self.PickleFile, "rb") as f:
-            sslist = pickle.load(f)
+            sslist = pickle.load(str(f))
             self.SSList = sslist
             self.TotalDisulfides = len(self.SSList)
 
@@ -150,7 +159,7 @@ class DisulfideLoader:
         self.tclass = DisulfideClass_Constructor(self, self.verbose)
 
         if self.verbose:
-            _logger.info(f"-> DisulfideLoader(): Loading complete.")
+            _logger.info("-> DisulfideLoader(): Loading complete.")
 
         self.describe()
         return
@@ -242,7 +251,7 @@ class DisulfideLoader:
         for k, v in self.SSDict.items():
             if k in idlist:
                 for ss_index in range(len(v)):
-                    res.append(loader.SSList[v[ss_index]])
+                    res.append(self.SSList[v[ss_index]])
         return res
 
     def Obuild_ss_from_idlist(self, idlist):
@@ -254,9 +263,9 @@ class DisulfideLoader:
         """
         res = DisulfideList([], "tmp")
 
-        for id in idlist:
+        for sid in idlist:
             for ss in self.SSList:
-                if ss.pdb_id == id:
+                if ss.pdb_id == sid:
                     res.append(ss)
                     break
         return res
@@ -387,7 +396,7 @@ class DisulfideLoader:
         timestr = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.timestamp))
         ssMin, ssMax = self.SSList.minmax_energy
 
-        print(f"    =========== RCSB Disulfide Database Summary ==============")
+        print("    =========== RCSB Disulfide Database Summary ==============")
         print(f"       =========== Built: {timestr} ==============")
         print(f"PDB IDs present:                    {pdbs}")
         print(f"Disulfides loaded:                  {tot}")
@@ -460,7 +469,7 @@ class DisulfideLoader:
             return copy.deepcopy(self.TorsionDF)
 
     def list_binary_classes(self):
-        for k, v in enumerate(self.classdict):
+        for k, v in enumerate(self.tclass.classdict):
             print(f"Class: |{k}|, |{v}|")
 
     @property
@@ -493,9 +502,6 @@ class DisulfideLoader:
         :return: None
         """
 
-        import matplotlib.pyplot as plt
-        import numpy as np
-
         _cutoff = np.linspace(0, cutoff, steps)
         tot_list = []
         members_list = []
@@ -514,7 +520,7 @@ class DisulfideLoader:
                 f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
             )
 
-        fig, ax1 = plt.subplots()
+        _, ax1 = plt.subplots()
 
         ax2 = ax1.twinx()
         ax1.plot(_cutoff, tot_list, label="Total percentage", color="blue")
@@ -608,10 +614,10 @@ class DisulfideLoader:
 
         :param df: A pandas DataFrame containing the data to be plotted.
         :param title: A string representing the title of the plot (default is 'title').
-        :param theme: A string representing the name of the theme to use. Can be either 'notebook' or 'plotly_dark'. Default is 'plotly_dark'.
+        :param theme: A string representing the name of the theme to use. Can be either 'notebook'
+        or 'plotly_dark'. Default is 'plotly_dark'.
         :return: None
         """
-        import plotly_express as px
 
         _title = f"Binary Class: {title}"
         _labels = {}
@@ -670,8 +676,6 @@ class DisulfideLoader:
         :param theme: A string representing the theme of the plot. Anything other than `light` is in `plotly_dark`.
         :return: None
         """
-
-        import plotly_express as px
 
         if base == 8:
             _title = f"Octant Class: {title}"
@@ -751,6 +755,16 @@ class DisulfideLoader:
         return sslist_df
 
     def enumerate_eightclass_fromlist(self, sslist) -> pd.DataFrame:
+        """
+        Enumerates the eight-class disulfide bonds from a list of class IDs and
+        returns a DataFrame with class IDs and their corresponding counts.
+
+        :param sslist: A list of eight-class disulfide bond class IDs.
+        :type sslist: list
+        :return: A DataFrame with columns "class_id" and "count" representing the
+        class IDs and their corresponding counts.
+        :rtype: pd.DataFrame
+        """
         x = []
         y = []
 
@@ -760,7 +774,7 @@ class DisulfideLoader:
                 # it's possible to have 0 SS in a class
                 if _y is not None:
                     # only append if we have both.
-                    x.append(sixcls)
+                    x.append(eightcls)
                     y.append(len(_y))
 
         sslist_df = pd.DataFrame(columns=["class_id", "count"])
@@ -794,7 +808,7 @@ class DisulfideLoader:
             pickle.dump(self, f)
 
         if self.verbose:
-            print(f"-> DisulfideLoader.save(): Done.")
+            print("-> DisulfideLoader.save(): Done.")
 
 
 # class ends
@@ -808,23 +822,21 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False):
     :param verbose: Verbosity, defaults to False
     """
 
-    import gdown
-
     _fname_sub = Path(loadpath) / LOADER_SUBSET_FNAME
     _fname_all = Path(loadpath) / LOADER_FNAME
 
     if verbose:
-        print(f"--> DisulfideLoader: Downloading Disulfide Database from Drive...")
+        print("--> DisulfideLoader: Downloading Disulfide Database from Drive...")
 
-    gdown.download(LOADER_ALL_URL, _fname_all, quiet=False)
+    gdown.download(LOADER_ALL_URL, str(_fname_all), quiet=False)
 
     if subset:
         if verbose:
             print(
-                f"--> DisulfideLoader: Downloading Disulfide Subset Database from Drive..."
+                "--> DisulfideLoader: Downloading Disulfide Subset Database from Drive..."
             )
 
-        gdown.download(LOADER_SUBSET_URL, _fname_sub, quiet=False)
+        gdown.download(LOADER_SUBSET_URL, str(_fname_sub), quiet=False)
 
     return
 
@@ -838,21 +850,19 @@ def Download_PDB_SS_GitHub(loadpath=DATA_DIR, verbose=True, subset=False):
     :param verbose: Verbosity, defaults to True
     """
 
-    import urllib
-
     _good1 = 0  # all data
     _good2 = 0  # subset data
 
-    _fname_sub = f"{loadpath}{LOADER_SUBSET_FNAME}"
-    _fname_all = f"{loadpath}{LOADER_FNAME}"
+    _fname_sub = Path(loadpath) / LOADER_SUBSET_FNAME
+    _fname_all = Path(loadpath) / LOADER_FNAME
 
     _all_length = 340371775
     _subset_length = 9636086
 
     if verbose:
-        print(f"--> DisulfideLoader: Downloading Disulfide Database from GitHub...")
+        print("--> DisulfideLoader: Downloading Disulfide Database from GitHub...")
 
-    resp, headers = urllib.request.urlretrieve(
+    _, headers = urllib.request.urlretrieve(
         "https://github.com/suchanek/proteusPy/raw/master/data/PDB_SS_ALL_LOADER.pkl",
         _fname_all,
     )
@@ -865,10 +875,10 @@ def Download_PDB_SS_GitHub(loadpath=DATA_DIR, verbose=True, subset=False):
     if subset:
         if verbose:
             print(
-                f"--> DisulfideLoader: Downloading Disulfide Subset Database from GitHub..."
+                "--> DisulfideLoader: Downloading Disulfide Subset Database from GitHub..."
             )
 
-        resp, headers = urllib.request.urlretrieve(
+        _, headers = urllib.request.urlretrieve(
             "https://github.com/suchanek/proteusPy/raw/master/data/PDB_SS_SUBSET_LOADER.pkl",
             _fname_sub,
         )
@@ -906,10 +916,10 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
         _fname = _fname_all
 
     if not Path(_fname_sub).exists():
-        res2 = Download_PDB_SS(loadpath=loadpath, verbose=verbose, subset=True)
+        Download_PDB_SS(loadpath=loadpath, verbose=verbose, subset=True)
 
     if not Path(_fname_all).exists():
-        res2 = Download_PDB_SS(loadpath=loadpath, verbose=verbose, subset=False)
+        Download_PDB_SS(loadpath=loadpath, verbose=verbose, subset=False)
 
     # first attempt to read the local copy of the loader
     if verbose:
