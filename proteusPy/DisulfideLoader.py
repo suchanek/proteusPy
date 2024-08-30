@@ -469,6 +469,7 @@ class DisulfideLoader:
             return copy.deepcopy(self.TorsionDF)
 
     def list_binary_classes(self):
+        """Enumerate the binary classes"""
         for k, v in enumerate(self.tclass.classdict):
             print(f"Class: |{k}|, |{v}|")
 
@@ -737,6 +738,16 @@ class DisulfideLoader:
         return sslist_df
 
     def enumerate_sixclass_fromlist(self, sslist) -> pd.DataFrame:
+        """
+        Enumerates the six-class disulfide bonds from a list of class IDs and
+        returns a DataFrame with class IDs and their corresponding counts.
+
+        :param sslist: A list of eight-class disulfide bond class IDs.
+        :type sslist: list
+        :return: A DataFrame with columns "class_id" and "count" representing the
+        class IDs and their corresponding counts.
+        :rtype: pd.DataFrame
+        """
         x = []
         y = []
 

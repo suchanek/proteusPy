@@ -30,6 +30,9 @@ from pathlib import Path
 from shutil import copy
 
 from colorama import Fore, Style, init
+
+init()
+
 from tqdm import tqdm
 
 from proteusPy import (
@@ -213,7 +216,26 @@ def extract_disulfides_chunk(args):
 
 
 def do_extract(verbose, full, cutoff, prune, nthreads=6):
-    ent_files = glob.glob(str(PDB_DIR / "*.ent"))
+    """
+    Extracts the disulfides from the PDB files using multiprocessing.
+
+    This function processes PDB files to extract disulfide bonds. It uses multiprocessing
+    to parallelize the extraction process across multiple threads. The results are then
+    combined and saved to a pickle file.
+
+    :param verbose: If True, enables verbose output.
+    :type verbose: bool
+    :param full: If True, processes all PDB files; otherwise, processes a subset.
+    :type full: bool
+    :param cutoff: The cutoff value for filtering disulfides.
+    :type cutoff: float
+    :param prune: Not used in this function.
+    :type prune: bool
+    :param nthreads: The number of threads to use for multiprocessing. Default is 6.
+    :type nthreads: int
+    :return: None
+    """
+
     num_ent_files = len(ent_files)
     sslist = [Path(f).stem[3:7] for f in ent_files]
 
@@ -301,6 +323,10 @@ def do_build(verbose, full, subset, cutoff):
 
 
 def update_repo(datadir, destdir):
+    """
+    Updates the repository with the latest SS files.
+    """
+
     copy(Path(datadir) / LOADER_FNAME, Path(destdir))
     copy(Path(datadir) / LOADER_SUBSET_FNAME, Path(destdir))
     copy(Path(datadir) / SS_PICKLE_FILE, Path(destdir))
