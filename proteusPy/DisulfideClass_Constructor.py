@@ -4,13 +4,14 @@ Author: Eric G. Suchanek, PhD.
 License: BSD
 Last Modification: 2/19/24 -egs-
 
-Disulfide Class creation and manipulation using the +/- formalism of Hogg et al. (Biochem, 2006, 45, 7429-7433), 
-across all 32 possible classes. Classes are named per Hogg's convention.
+Disulfide Class creation and manipulation. Binary classes using the +/- formalism of Hogg et al. 
+(Biochem, 2006, 45, 7429-7433), are create for all 32 possible classes from the Disulfides extracted. 
+Classes are named per Hogg's convention. This approach is extended to create sixfold and eightfold classes
+based on the subdividing each dihedral angle chi1 - chi5 into 6 and 8 equal segments, respectively. This
+effectively quantizes the dihedral angles into 6 and 8 classes, respectively.
 """
 
-# this workflow reads in the torsion database, groups it by torsions
-# to create the classes merges with the master class spreadsheet, and saves the
-# resulting dict to {DATA_DIR}PDB_SS_merged.csv
+# pylint: disable=C0301
 
 import pickle
 from io import StringIO
@@ -21,6 +22,7 @@ import pandas as pd
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.logger_config import get_logger
 from proteusPy.ProteusGlobals import (
+    CLASSOBJ_FNAME,
     DATA_DIR,
     DPI,
     SS_CLASS_DEFINITIONS,
@@ -112,7 +114,7 @@ class DisulfideClass_Constructor:
         self.eightclass_df = None
 
         if self.verbose:
-            _logger.info(f"Building SS classes...")
+            _logger.info("Building SS classes...")
 
         self.build_yourself(loader)
 
@@ -134,7 +136,7 @@ class DisulfideClass_Constructor:
         for k, v in enumerate(self.classdict):
             print(f"Class: |{k}|, |{v}|")
 
-    def from_class(self, classid: str) -> DisulfideList:
+    def from_class(self, loader, classid: str) -> DisulfideList:
         """
         Return a list of disulfides corresponding to the input BINARY class ID
         string.
@@ -161,12 +163,12 @@ class DisulfideClass_Constructor:
             if self.verbose:
                 pbar = tqdm(sslist, ncols=PBAR_COLS)
                 for ssid in pbar:
-                    res.append(self[ssid])
+                    res.append(loader[ssid])
                 return res
             else:
-                return DisulfideList([self[ssid] for ssid in sslist], classid)
+                return DisulfideList([loader[ssid] for ssid in sslist], classid)
         except KeyError:
-            _logger.error(f"No class: {classid}")
+            _logger.error("No class: {classid}")
         return
 
     def concat_dataframes(self, df1, df2):
@@ -255,7 +257,7 @@ class DisulfideClass_Constructor:
         tors_df = loader.getTorsions()
 
         if self.verbose:
-            _logger.info(f"Creating binary SS classes...")
+            _logger.info("Creating binary SS classes...")
 
         grouped = self.create_binary_classes(tors_df)
 
@@ -282,7 +284,7 @@ class DisulfideClass_Constructor:
         self.classdf = merged.copy()
 
         if self.verbose:
-            _logger.info(f"Creating sixfold SS classes...")
+            _logger.info("Creating sixfold SS classes...")
 
         grouped_sixclass = self.create_six_classes(tors_df)
         self.sixclass_df = grouped_sixclass.copy()
@@ -291,7 +293,7 @@ class DisulfideClass_Constructor:
         self.eightclass_df = grouped_eightclass.copy()
 
         if self.verbose:
-            _logger.info(f"Initialization complete.")
+            _logger.info("Initialization complete.")
 
         return
 
@@ -301,8 +303,9 @@ class DisulfideClass_Constructor:
 
         :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance',
         'cb_distance', 'torsion_length', and 'energy'.
-        :return: A pandas DataFrame containing columns 'class_id', 'ss_id', and 'count', where 'class_id' is a unique identifier for each grouping of chi signs, 'ss_id' is a list of all 'ss_id' values in that grouping, and 'count'
-        is the number of rows in that grouping.
+        :return: A pandas DataFrame containing columns 'class_id', 'ss_id', and 'count', where 'class_id'
+         is a unique identifier for each grouping of chi signs, 'ss_id' is a list of all 'ss_id' values in that
+         grouping, and 'count' is the number of rows in that grouping.
         """
         # Create new columns with the sign of each chi column
         chi_columns = ["chi1", "chi2", "chi3", "chi4", "chi5"]
@@ -510,23 +513,21 @@ class DisulfideClass_Constructor:
 
         :param savepath: Path to save the file, defaults to DATA_DIR
         """
-        import proteusPy.__version__ as version
-        from proteusPy.ProteusGlobals import CLASSOBJ_FNAME
 
-        self.version = version
+        # self.version = version
 
         fname = CLASSOBJ_FNAME
 
         _fname = f"{savepath}{fname}"
 
         if self.verbose:
-            print(f"-> DisulfideLoader.save(): Writing {_fname}... ")
+            print(f"-> DisulfideClass_Constructor.save(): Writing {_fname}... ")
 
         with open(_fname, "wb+") as f:
             pickle.dump(self, f)
 
         if self.verbose:
-            print(f"-> DisulfideLoader.save(): Done.")
+            print("-> DisulfideLoader.save(): Done.")
 
     def six_class_to_binary(self, cls_str):
         """

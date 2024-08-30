@@ -33,10 +33,7 @@ from colorama import Fore, Style, init
 from tqdm import tqdm
 
 from proteusPy import (
-    Disulfide,
     DisulfideList,
-    Extract_Disulfides,
-    Extract_Disulfides_From_List,
     load_disulfides_from_id,
     remove_duplicate_ss,
     set_logger_level_for_module,
@@ -45,10 +42,7 @@ from proteusPy.ProteusGlobals import (
     DATA_DIR,
     LOADER_FNAME,
     LOADER_SUBSET_FNAME,
-    PROBLEM_ID_FILE,
     SS_PICKLE_FILE,
-    SS_PROBLEM_SUBSET_ID_FILE,
-    SS_SUBSET_DICT_PICKLE_FILE,
     SS_SUBSET_PICKLE_FILE,
 )
 
@@ -57,7 +51,9 @@ _logger.setLevel(logging.INFO)
 
 set_logger_level_for_module("proteusPy", logging.ERROR)
 
-PBAR_COLS = 100
+PBAR_COLS = 79
+
+HOME_DIR = Path.home()
 
 PDB = os.getenv("PDB")
 PDB_BASE = Path(PDB)
@@ -65,8 +61,11 @@ PDB_BASE = Path(PDB)
 PDB_DIR = MODULE_DATA = REPO_DATA = DATA_DIR = ""
 GOOD_PDB_FILE = "good_pdb.pkl"
 
+VENV_DIR = HOME_DIR / Path(
+    "miniforge3/envs/ppydev/lib/python3.11/site-packages/proteusPy/data/"
+)
+
 PDB_BASE = Path(PDB)
-HOME_DIR = Path.home()
 
 if not PDB_BASE.is_dir():
     print(f"Error: The directory {PDB_BASE} does not exist.")
@@ -111,6 +110,7 @@ def parse_arguments():
     )
     parser.add_argument(
         "--all",
+        "-a",
         action="store_true",
         help="Process full and subset, create loaders, and update repo",
         default=False,
@@ -174,10 +174,7 @@ def parse_arguments():
 def extract_disulfides_chunk(args):
     (start_idx, end_idx, sslist, pdbdir, dist_cutoff, verbose, quiet, pbar_index) = args
 
-    from proteusPy import DisulfideList, load_disulfides_from_id
-
     result_list = []
-    global overall_pbar
 
     if quiet:
         _logger.setLevel(logging.ERROR)
@@ -186,7 +183,7 @@ def extract_disulfides_chunk(args):
 
     task_pbar = tqdm(
         total=len(entrylist),
-        desc=f"{Fore.BLUE}  Task {pbar_index+1:2}{Style.RESET_ALL}".ljust(10),
+        desc=f"{Fore.BLUE}  Process {pbar_index+1:2}{Style.RESET_ALL}".ljust(10),
         position=pbar_index + 1,
         leave=False,
         ncols=PBAR_COLS,
@@ -215,7 +212,7 @@ def extract_disulfides_chunk(args):
     return result_list
 
 
-def do_extract(verbose, full, subset, cutoff, prune, nthreads=6):
+def do_extract(verbose, full, cutoff, prune, nthreads=6):
     ent_files = glob.glob(str(PDB_DIR / "*.ent"))
     num_ent_files = len(ent_files)
     sslist = [Path(f).stem[3:7] for f in ent_files]
@@ -245,20 +242,23 @@ def do_extract(verbose, full, subset, cutoff, prune, nthreads=6):
     with multiprocessing.Pool(nthreads) as pool:
         results = pool.map(extract_disulfides_chunk, pool_args)
 
+    if verbose:
+        print(f"\nProcessing results...")
+
     for result in results:
         res_list.extend(result)
 
     # save the disulfides to a pickle file
     if full:
         if verbose:
-            print(f"\nSaving SS list to: {DATA_DIR / SS_PICKLE_FILE}")
+            print(f"Saving SS list to: {DATA_DIR / SS_PICKLE_FILE}")
 
         with open(DATA_DIR / SS_PICKLE_FILE, "wb") as f:
             pickle.dump(res_list, f)
 
-    if subset:
+    else:
         if verbose:
-            print(f"\nSaving SS subset list to: {DATA_DIR / SS_SUBSET_PICKLE_FILE}")
+            print(f"Saving SS subset list to: {DATA_DIR / SS_SUBSET_PICKLE_FILE}")
 
         with open(DATA_DIR / SS_SUBSET_PICKLE_FILE, "wb") as f:
             pickle.dump(res_list, f)
@@ -280,7 +280,7 @@ def do_build(verbose, full, subset, cutoff):
     if full:
         if verbose:
             print(
-                f"--> Building the packed loader for the full dataset with cutoff: {cutoff}..."
+                f"Building the packed loader for the full dataset with cutoff: {cutoff}..."
             )
         PDB_SS = DisulfideLoader(
             datadir=DATA_DIR, subset=False, verbose=verbose, cutoff=cutoff
@@ -290,7 +290,7 @@ def do_build(verbose, full, subset, cutoff):
     if subset:
         if verbose:
             print(
-                f"--> Building the packed loader for the Disulfide subset with cutoff: {cutoff}..."
+                f"Building the packed loader for the Disulfide subset with cutoff: {cutoff}..."
             )
         PDB_SS = DisulfideLoader(
             datadir=DATA_DIR, subset=True, verbose=verbose, cutoff=cutoff
@@ -300,14 +300,13 @@ def do_build(verbose, full, subset, cutoff):
     return
 
 
-def update_repo(datadir):
-    copy(Path(datadir) / LOADER_FNAME, Path(REPO_DATA))
-    copy(Path(datadir) / LOADER_SUBSET_FNAME, Path(REPO_DATA))
-    copy(Path(datadir) / SS_PICKLE_FILE, Path(REPO_DATA))
+def update_repo(datadir, destdir):
+    copy(Path(datadir) / LOADER_FNAME, Path(destdir))
+    copy(Path(datadir) / LOADER_SUBSET_FNAME, Path(destdir))
+    copy(Path(datadir) / SS_PICKLE_FILE, Path(destdir))
 
 
 def do_stuff(
-    all=False,
     extract=False,
     build=False,
     full=False,
@@ -315,7 +314,7 @@ def do_stuff(
     subset=False,
     verbose=False,
     cutoff=-1.0,
-    prune=False,
+    prune=True,
     threads=8,
 ):
     """
@@ -338,9 +337,6 @@ def do_stuff(
     _verbose = verbose
     _threads = threads
 
-    if all:
-        _extract = _build = _update = _subset = _full = True
-
     if _extract == True:
         if verbose:
             print(f"Extracting with cutoff: {cutoff}")
@@ -348,7 +344,6 @@ def do_stuff(
         do_extract(
             verbose=_verbose,
             full=_full,
-            subset=_subset,
             cutoff=cutoff,
             prune=prune,
             nthreads=_threads,
@@ -364,18 +359,34 @@ def do_stuff(
         if verbose:
             print(f"Copying SS files from: {DATA_DIR} to {REPO_DATA}")
 
-        update_repo(DATA_DIR)
+        update_repo(DATA_DIR, REPO_DATA)
+
+        if verbose:
+            print(f"Copying SS files from: {DATA_DIR} to {VENV_DIR}")
+
+        update_repo(DATA_DIR, VENV_DIR)
 
     return
 
 
+def clear_screen():
+    """
+    Clears the terminal screen.
+    """
+    if os.name == "nt":  # For Windows
+        os.system("cls")
+    else:  # For macOS and Linux
+        os.system("clear")
+
+
 def main():
+    clear_screen()
     start = time.time()
     args = parse_arguments()
     set_logger_level_for_module("proteusPy", logging.ERROR)
 
     print(
-        f"\nproteusPy DisulfideExtractor v{__version__}\n"
+        f"proteusPy DisulfideExtractor v{__version__}\n"
         f"PDB model directory:       {PDB_DIR}\n"
         f"Data directory:            {DATA_DIR}\n"
         f"Module data directory:     {MODULE_DATA}\n"
@@ -393,7 +404,6 @@ def main():
     )
 
     do_stuff(
-        all=args.all,
         extract=args.extract,
         build=args.build,
         update=args.update,

@@ -112,6 +112,7 @@ setup(
         "pympler",
         "imageio[ffmpeg]",
         "colorama",
+        "Biopython",
     ],
     source="https://github.com/suchanek/proteusPy/",
     project_urls={
