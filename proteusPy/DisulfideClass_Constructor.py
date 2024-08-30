@@ -5,26 +5,32 @@ License: BSD
 Last Modification: 2/19/24 -egs-
 
 Disulfide Class creation and manipulation. Binary classes using the +/- formalism of Hogg et al. 
-(Biochem, 2006, 45, 7429-7433), are create for all 32 possible classes from the Disulfides extracted. 
-Classes are named per Hogg's convention. This approach is extended to create sixfold and eightfold classes
-based on the subdividing each dihedral angle chi1 - chi5 into 6 and 8 equal segments, respectively. This
-effectively quantizes the dihedral angles into 6 and 8 classes, respectively.
+(Biochem, 2006, 45, 7429-7433), are created for all 32 possible classes from the Disulfides 
+extracted. Classes are named per Hogg's convention. This approach is extended to create 
+sixfold and eightfold classes based on the subdividing each dihedral angle chi1 - chi5 into 
+6 and 8 equal segments, respectively.
 """
 
 # pylint: disable=C0301
+# pylint: disable=C0103
 
+import itertools
 import pickle
 from io import StringIO
 from pathlib import Path
 
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
+from proteusPy.angle_annotation import AngleAnnotation
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.logger_config import get_logger
 from proteusPy.ProteusGlobals import (
     CLASSOBJ_FNAME,
     DATA_DIR,
     DPI,
+    PBAR_COLS,
     SS_CLASS_DEFINITIONS,
     SS_CLASS_DICT_FILE,
     SS_CONSENSUS_FILE,
@@ -148,13 +154,11 @@ class DisulfideClass_Constructor:
             # Check if running in Jupyter
             shell = get_ipython().__class__.__name__  # type: ignore
             if shell == "ZMQInteractiveShell":
-                from tqdm.notebook import tqdm
+                from tqdm.notebook import tqdm  # type: ignore
             else:
                 from tqdm import tqdm
         except NameError:
             from tqdm import tqdm
-
-        from proteusPy.ProteusGlobals import PBAR_COLS
 
         res = DisulfideList([], classid)
 
@@ -207,7 +211,6 @@ class DisulfideClass_Constructor:
 
         :return list: A list of strings of length 5, representing all possible six-class strings.
         """
-        import itertools
 
         angle_maps = {"0": ["4", "5", "6"], "2": ["1", "2", "3"]}
         class_lists = [angle_maps[char] for char in class_str]
@@ -228,8 +231,6 @@ class DisulfideClass_Constructor:
 
         :return list: A list of strings of length 5, representing all possible six-class strings.
         """
-        import itertools
-
         angle_maps = {"0": ["5", "6", "7", "8"], "2": ["1", "2", "3", "4"]}
         class_lists = [angle_maps[char] for char in class_str]
         class_combinations = itertools.product(*class_lists)
@@ -581,10 +582,6 @@ class DisulfideClass_Constructor:
 
         This will create a pie chart with 4 equal segments.
         """
-        import matplotlib.pyplot as plt
-        import numpy as np
-
-        from proteusPy.angle_annotation import AngleAnnotation
 
         # Helper function to draw angle easily.
         def plot_angle(ax, pos, angle, length=0.95, acol="C0", **kwargs):
@@ -610,7 +607,7 @@ class DisulfideClass_Constructor:
         _text = f"${360/classes}°$"
         kw = dict(size=75, unit="points", text=_text)
 
-        am7 = plot_angle(ax1, (0, 0), 360 / classes, textposition="outside", **kw)
+        plot_angle(ax1, (0, 0), 360 / classes, textposition="outside", **kw)
 
         # Create a list of segment values
         # !!!
