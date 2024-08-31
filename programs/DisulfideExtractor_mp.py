@@ -1,3 +1,7 @@
+# pylint: disable=C0301
+# pylint: disable=C0413
+# pylint: disable=C0103
+
 """
 `DisulfideExtractor.py`
 
@@ -35,8 +39,10 @@ init()
 
 from tqdm import tqdm
 
+# ignore pyl
 from proteusPy import (
     DisulfideList,
+    DisulfideLoader,
     load_disulfides_from_id,
     remove_duplicate_ss,
     set_logger_level_for_module,
@@ -105,18 +111,16 @@ __version__ = "2.0.2"
 
 
 def parse_arguments():
+    """
+    Parse command line arguments.
+    """
+
     parser = argparse.ArgumentParser(
-        description=f"""\nproteusPy Disulfide Bond Extractor v{__version__}\n 
+        description=f"""\nproteusPy Disulfide Bond Extractor v{__version__}\n
         This program extracts disulfide bonds from PDB files and builds a DisulfideLoader object.
         The program expects the environment variable PDB to be set to the base location of the PDB files.
-        The PDB files are expected to be in the PDB/good directory. Relevant output files, (SS_*LOADER*.pkl) are stored in PDB/data."""
-    )
-    parser.add_argument(
-        "--all",
-        "-a",
-        action="store_true",
-        help="Process full and subset, create loaders, and update repo",
-        default=False,
+        The PDB files are expected to be in the PDB/good directory. Relevant output files, 
+        (SS_*LOADER*.pkl) are stored in PDB/data."""
     )
     parser.add_argument(
         "--extract",
@@ -175,6 +179,8 @@ def parse_arguments():
 
 
 def extract_disulfides_chunk(args):
+    "This is a single thread, processing one chunk of the multiprocessing extraction process."
+
     (start_idx, end_idx, sslist, pdbdir, dist_cutoff, verbose, quiet, pbar_index) = args
 
     result_list = []
@@ -236,21 +242,20 @@ def do_extract(verbose, full, cutoff, prune, nthreads=6):
     :return: None
     """
 
-    num_ent_files = len(ent_files)
     sslist = [Path(f).stem[3:7] for f in ent_files]
 
     if full:
-        chunk_size = num_ent_files // nthreads
+        _num_ent_files = num_ent_files
     else:
-        chunk_size = 1000 // nthreads
-        num_ent_files = 1000
+        _num_ent_files = 1000
 
+    chunk_size = _num_ent_files // nthreads
     res_list = DisulfideList([], "PDB_ALL_SS")
 
     pool_args = [
         (
             i * chunk_size,
-            (i + 1) * chunk_size if i != nthreads - 1 else num_ent_files,
+            (i + 1) * chunk_size if i != nthreads - 1 else _num_ent_files,
             sslist,
             PDB_DIR,
             cutoff,
@@ -265,7 +270,7 @@ def do_extract(verbose, full, cutoff, prune, nthreads=6):
         results = pool.map(extract_disulfides_chunk, pool_args)
 
     if verbose:
-        print(f"\nProcessing results...")
+        print("\nProcessing results...")
 
     for result in results:
         res_list.extend(result)
@@ -275,14 +280,14 @@ def do_extract(verbose, full, cutoff, prune, nthreads=6):
         if verbose:
             print(f"Saving SS list to: {DATA_DIR / SS_PICKLE_FILE}")
 
-        with open(DATA_DIR / SS_PICKLE_FILE, "wb") as f:
+        with open(str(DATA_DIR / SS_PICKLE_FILE), "wb+") as f:
             pickle.dump(res_list, f)
 
     else:
         if verbose:
             print(f"Saving SS subset list to: {DATA_DIR / SS_SUBSET_PICKLE_FILE}")
 
-        with open(DATA_DIR / SS_SUBSET_PICKLE_FILE, "wb") as f:
+        with open(str(DATA_DIR / SS_SUBSET_PICKLE_FILE), "wb+") as f:
             pickle.dump(res_list, f)
 
     return
@@ -297,7 +302,6 @@ def do_build(verbose, full, subset, cutoff):
     :param full: Whether to load and save the full dataset, boolean
     :param subset: Whether to load and save the subset database, boolean
     """
-    from proteusPy.DisulfideLoader import DisulfideLoader
 
     if full:
         if verbose:
@@ -363,7 +367,7 @@ def do_stuff(
     _verbose = verbose
     _threads = threads
 
-    if _extract == True:
+    if _extract is True:
         if verbose:
             print(f"Extracting with cutoff: {cutoff}")
 
@@ -376,12 +380,12 @@ def do_stuff(
         )
         print("\n")
 
-    if _build == True:
+    if _build is True:
         if verbose:
             print(f"Building with cutoff: {cutoff}")
         do_build(_verbose, _full, _subset, cutoff)
 
-    if _update == True:
+    if _update is True:
         if verbose:
             print(f"Copying SS files from: {DATA_DIR} to {REPO_DATA}")
 
@@ -406,6 +410,7 @@ def clear_screen():
 
 
 def main():
+    "Main entrypoint for the DisulfideExtractor program."
     clear_screen()
     start = time.time()
     args = parse_arguments()

@@ -1,15 +1,18 @@
+# pylint: disable=C0301
+
 """
 ssparser.py
 
-This module provides functionality to parse PDB files to extract disulfide bond (SSBOND) and atom (ATOM) records.
-It includes functions to read SSBOND records from the header section of PDB files, extract proximal and distal
-parameters, and collect relevant atom information. The extracted data is organized into a dictionary format
-for further processing or analysis.
+This module provides functionality to parse PDB files to extract disulfide bond (SSBOND)
+and atom (ATOM) records. It includes functions to read SSBOND records from the header section 
+of PDB files, extract proximal and distal parameters, and collect relevant atom information. 
+The extracted data is organized into a dictionary format for further processing or analysis.
 
 Functions:
-- extract_ssbonds_and_atoms(input_pdb_file, verbose=False): Extracts SSBOND and ATOM records from a PDB file.
-- extract_and_write_ssbonds_and_atoms(input_pdb_file, output_pkl_file, verbose=False): Extracts disulfide bonds
-  and atom information from a PDB file and writes it to a .pkl file.
+- extract_ssbonds_and_atoms(input_pdb_file, verbose=False): Extracts SSBOND and ATOM records 
+from a PDB file.
+- extract_and_write_ssbonds_and_atoms(input_pdb_file, output_pkl_file, verbose=False): Extracts 
+disulfide bonds and atom information from a PDB file and writes it to a .pkl file.
 
 Dependencies:
 - os
@@ -69,7 +72,8 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
 
     Returns:
     - tuple: A tuple containing:
-        - dict: A dictionary containing the SSBOND records, the corresponding ATOM records, and the resolution.
+        - dict: A dictionary containing the SSBOND records, the corresponding ATOM records,
+                and the resolution.
           The dictionary has the following structure:
             {
                 "pdbid": The PDB ID (str),
@@ -100,7 +104,7 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
         - list: A list of error messages encountered during processing.
     """
     if not os.path.exists(input_pdb_file):
-        _logger.error(f"Input PDB file {input_pdb_file} does not exist.")
+        _logger.error("Input PDB file {input_pdb_file} does not exist.")
         return {}, 0, 0
 
     ssbonds = []
@@ -118,11 +122,13 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
         if line.startswith("SSBOND"):
             ssbonds.append(line)
             if verbose:
-                _logger.info(f"Found SSBOND record for {pdbid}: {line.strip()}")
+                _logger.info(str(f"Found SSBOND record for {pdbid}: {line.strip()}"))
         elif line.startswith("ATOM") or line.startswith(
             "HETATM"
         ):  # Added HETATM to include non-standard residues like CSS
-            # Create a map to quickly find ATOM records by residue sequence number, chain ID, and atom name
+            # Create a map to quickly find ATOM records by residue sequence number,
+            # chain ID, and atom name
+
             chain_id = line[21].strip()
             res_seq_num = line[22:26].strip()
             atom_name = line[12:16].strip()
@@ -133,9 +139,10 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
             atom_list[key] = {"coords": [x, y, z]}
             if dbg:
                 _logger.info(
-                    f"Found ATOM record for chain {chain_id}, residue {res_seq_num}, atom {atom_name}"
+                    str(
+                        f"Found ATOM record for chain {chain_id}, residue {res_seq_num}, atom {atom_name}"
+                    )
                 )
-                pass
         elif line.startswith("REMARK   2 RESOLUTION"):
             # Extract the resolution value using fixed-width columns
             resolution_str = line[22:27].strip()
@@ -144,10 +151,12 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
             except ValueError:
                 if verbose:
                     _logger.warning(
-                        f"Error parsing resolution value from line: {line.strip()}. Found: {resolution_str}"
+                        str(
+                            f"Error parsing resolution value from line: {line.strip()}. Found: {resolution_str}"
+                        )
                     )
             if verbose:
-                _logger.info(f"Found RESOLUTION record: {resolution} Å")
+                _logger.info(str(f"Found RESOLUTION record: {resolution} Å"))
 
     # Extract the ATOM records corresponding to SSBOND
     ssbond_atom_list = {
@@ -157,14 +166,7 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
         "pairs": pairs,
         "resolution": resolution,
     }
-    """
-    for ssbond in ssbonds:
-        parts = ssbond.split()
-        chain_id1 = parts[3]
-        res_seq_num1 = parts[4]
-        chain_id2 = parts[6]
-        res_seq_num2 = parts[7]
-    """
+
     for ssbond in ssbonds:
         # Extract fields based on fixed-width columns
         chain_id1 = ssbond[15:16].strip()
@@ -185,7 +187,9 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                 )
                 if verbose:
                     _logger.warning(
-                        f"Atom record not found for chain {chain_id1}, residue {res_seq_num1}, atom {atom_name}"
+                        str(
+                            f"Atom record not found for chain {chain_id1}, residue {res_seq_num1}, atom {atom_name}"
+                        )
                     )
 
             if atom_record2:
@@ -198,7 +202,9 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                 )
                 if verbose:
                     _logger.warning(
-                        f"Atom record not found for chain {chain_id2}, residue {res_seq_num2}, atom {atom_name}"
+                        str(
+                            f"Atom record not found for chain {chain_id2}, residue {res_seq_num2}, atom {atom_name}"
+                        )
                     )
 
         # Collect phi/psi related atoms
@@ -229,7 +235,9 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                         )
                         if verbose:
                             _logger.warning(
-                                f"Atom record not found for chain {chain_id}, residue {str(int(res_seq_num) + offset)}, atom {atom_name}"
+                                str(
+                                    f"Atom record not found for chain {chain_id}, residue {str(int(res_seq_num) + offset)}, atom {atom_name}"
+                                )
                             )
             return phipsi_atoms
 
@@ -279,11 +287,11 @@ def extract_and_write_ssbonds_and_atoms(
     - verbose (bool): Flag to enable verbose logging.
     """
     if not os.path.exists(input_pdb_file):
-        _logger.error(f"Input PDB file {input_pdb_file} does not exist.")
+        _logger.error(str(f"Input PDB file {input_pdb_file} does not exist."))
         return None
 
     if verbose:
-        _logger.info(f"Loading disulfides from {input_pdb_file}")
+        _logger.info(str(f"Loading disulfides from {input_pdb_file}"))
 
     ssbond_atom_list, _, _ = extract_ssbonds_and_atoms(
         input_pdb_file, verbose=verbose, dbg=dbg
@@ -291,7 +299,7 @@ def extract_and_write_ssbonds_and_atoms(
 
     if verbose:
         _logger.info(
-            f"Writing disulfide bond and atom information to {output_pkl_file}"
+            str(f"Writing disulfide bond and atom information to {output_pkl_file}")
         )
 
     with open(output_pkl_file, "wb") as f:
@@ -299,7 +307,9 @@ def extract_and_write_ssbonds_and_atoms(
 
     if verbose:
         _logger.info(
-            f"Successfully wrote disulfide bond and atom information to {output_pkl_file}"
+            str(
+                f"Successfully wrote disulfide bond and atom information to {output_pkl_file}"
+            )
         )
 
 
@@ -345,7 +355,7 @@ def print_disulfide_bond_info_dict(ssbond_atom_data) -> None:
         return
 
     i = 1
-    ssbonds = ssbond_atom_data.get("ssbonds", [])
+    # ssbonds = ssbond_atom_data.get("ssbonds", [])
     atoms = ssbond_atom_data.get("atoms", {})
     pairs = ssbond_atom_data.get("pairs", [])
     resolution = ssbond_atom_data.get("resolution", -1.0)
@@ -420,7 +430,8 @@ def get_atom_coordinates(
     :param verbose: Flag to enable verbose logging.
     :type verbose: bool
 
-    :return: A Vector3D object containing the x, y, z coordinates of the atom if found, otherwise an empty Vector3D.
+    :return: A Vector3D object containing the x, y, z coordinates of the atom if
+    found, otherwise an empty Vector3D.
     :rtype: Vector3D
     """
     key = (chain_id, str(res_seq_num), atom_name)
@@ -430,7 +441,9 @@ def get_atom_coordinates(
     else:
         if verbose:
             _logger.warning(
-                f"--> get_atom_coordinates: PDB: {ssbond_dict['pdbid']}: Atom {atom_name} in residue {chain_id} {res_seq_num} not found."
+                str(
+                    f"--> get_atom_coordinates: PDB: {ssbond_dict['pdbid']}: Atom {atom_name} in residue {chain_id} {res_seq_num} not found."
+                )
             )
         return Vector3D([])
 
@@ -462,7 +475,9 @@ def get_residue_atoms_coordinates(ssbond_dict, chain_id, res_seq_num, verbose=Fa
             coordinates.append(Vector3D(0.01, 0.01, 0.01))
             if verbose:
                 _logger.warning(
-                    f"--> get_residue_coordinates: PDB: {pdb_id} Atom {atom_name} in residue {chain_id} {res_seq_num} not found."
+                    str(
+                        f"--> get_residue_coordinates: PDB: {pdb_id} Atom {atom_name} in residue {chain_id} {res_seq_num} not found."
+                    )
                 )
 
     return coordinates
@@ -486,10 +501,10 @@ def get_phipsi_atoms_coordinates(data_dict, chain_id, key):
     :return: List of Vectors representing the N and C atoms with their coordinates.
     """
 
-    from proteusPy.ssparser import (
-        extract_ssbonds_and_atoms,
-        print_disulfide_bond_info_dict,
-    )
+    # from proteusPy.ssparser import (
+    #    extract_ssbonds_and_atoms,
+    #    print_disulfide_bond_info_dict,
+    # )
 
     for pair in data_dict.get("pairs", []):
         if chain_id in pair.get("chains", []):
@@ -536,7 +551,7 @@ def check_file(
     :return: None
     """
 
-    from proteusPy import extract_ssbonds_and_atoms, print_disulfide_bond_info_dict
+    # from proteusPy import extract_ssbonds_and_atoms, print_disulfide_bond_info_dict
 
     if os.path.exists(fname) is False:
         print(f"File {fname} does not exist! Exiting...")
@@ -548,7 +563,7 @@ def check_file(
     )
 
     if verbose:
-        _logger.info(f"Found: {found} errors: {errors}")
+        _logger.info(str(f"Found: {found} errors: {errors}"))
         print_disulfide_bond_info_dict(ssbond_dict)
 
     return found, errors

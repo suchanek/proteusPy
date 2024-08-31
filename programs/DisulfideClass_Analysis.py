@@ -1,7 +1,9 @@
+# pylint: disable=C0301
+
 """
-Disulfide class consensus structure extraction using `proteusPy.Disulfide` package. Disulfide binary 
-families are defined using the +/- formalism of Schmidt et al. (Biochem, 2006, 45, 7429-7433), across
-all 32 possible classes ($$2^5$$). Classes are named per the paper's convention.
+Disulfide class consensus structure extraction using `proteusPy.Disulfide` package. Disulfide
+binary families are defined using the +/- formalism of Schmidt et al. (Biochem, 2006, 45, 
+7429-7433), across all 32 possible classes ($$2^5$$). Classes are named per the paper's convention.
 
 +----+----------+----------+----------+----------+----------+------------+----------------+------------+
 | IDX|   chi1_s |   chi2_s |   chi3_s |   chi4_s |   chi5_s |   class_id | SS_Classname   | FXN        |
@@ -87,24 +89,25 @@ Author: Eric G. Suchanek, PhD. Last Modified: 8/27/2024
 import argparse
 import os
 import pickle
+import shutil
 import threading
 import time
 from collections import deque
 from datetime import timedelta
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from colorama import Fore, Style, init
 from tqdm import tqdm
 
+from proteusPy import Disulfide, DisulfideList, DisulfideLoader, Load_PDB_SS
 from proteusPy.ProteusGlobals import SS_CONSENSUS_BIN_FILE, SS_CONSENSUS_FILE
 
 # Initialize colorama
 init(autoreset=True)
 
-
-from proteusPy import Disulfide, DisulfideList, DisulfideLoader, Load_PDB_SS
 
 HOME = Path.home()
 PDB = Path(os.getenv("PDB", HOME / "pdb"))
@@ -133,7 +136,7 @@ def get_args():
     - `-b`, `--binary`: Analyze binary classes (default: False).
     - `-o`, `--octant`: Analyze octant classes (default: False).
     - `-t`, `--threads`: Number of threads to use (default: 8).
-    - `-a`, `--all`: Analyze both binary and octant classes (default: False).
+    - `-l`, `--ll`: Analyze both binary and octant classes (default: False).
     - `-g`, `--graph`: Create class graphs (default: False).
     - `-c`, `--cutoff`: Cutoff percentage for class filtering (default: 0.0).
     - `-v`, `--verbose`: Enable verbose output (default: False).
@@ -165,8 +168,8 @@ def get_args():
         default=8,
     )
     parser.add_argument(
-        "-a",
-        "--all",
+        "-l",
+        "--ll",
         help="Both binary and octant classes.",
         action=argparse.BooleanOptionalAction,
         default=False,
@@ -184,7 +187,7 @@ def get_args():
         "--cutoff",
         help="Cutoff percentage for class filtering.",
         type=float,
-        default=0.0,
+        default=-1.0,
     )
     parser.add_argument(
         "-v",
@@ -327,12 +330,14 @@ def analyze_classes_threaded(
 
     :return: A list of disulfide bonds, where each disulfide bond represents the average conformation for a class.
     """
-    global OCTANT, SEXTANT, BINARY
+    # global OCTANT, BINARY
+
+    save_dir = None
 
     if do_octant:
         # class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_FILE)
         class_filename = DATA_DIR / SS_CONSENSUS_FILE
-        SAVE_DIR = OCTANT
+        save_dir = OCTANT
         eight_or_bin = loader.tclass.eightclass_df
         tot_classes = eight_or_bin.shape[0]
         res_list = DisulfideList([], "SS_8class_Avg_SS")
@@ -343,7 +348,7 @@ def analyze_classes_threaded(
             )
     else:
         class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_BIN_FILE)
-        SAVE_DIR = BINARY
+        save_dir = BINARY
         eight_or_bin = loader.tclass.classdf
         tot_classes = eight_or_bin.shape[0]
         res_list = DisulfideList([], "SS_32class_Avg_SS")
@@ -391,7 +396,7 @@ def analyze_classes_threaded(
                 cutoff,
                 do_graph,
                 do_consensus,
-                SAVE_DIR,
+                save_dir,
                 prefix,
                 pbar_index,
                 i,
@@ -420,13 +425,37 @@ def analyze_classes(
     loader: DisulfideLoader,
     binary: bool,
     octant: bool,
-    all: bool,
+    do_all: bool,
     threads: int = 4,
     do_graph: bool = False,
     cutoff: float = 0.0,
     verbose: bool = False,
 ):
-    if all:
+    """
+    Analyzes disulfide bond classes using the provided loader.
+
+    This function can analyze binary classes, octant classes, or both, depending on the parameters.
+    It uses threading to parallelize the analysis and can optionally generate graphs.
+
+    :param loader: The DisulfideLoader instance used to load and process disulfide bonds.
+    :type loader: DisulfideLoader
+    :param binary: If True, analyzes binary classes.
+    :type binary: bool
+    :param octant: If True, analyzes octant classes.
+    :type octant: bool
+    :param do_all: If True, analyzes both binary and octant classes.
+    :type do_all: bool
+    :param threads: The number of threads to use for analysis. Default is 4.
+    :type threads: int
+    :param do_graph: If True, generates graphs for the analysis. Default is False.
+    :type do_graph: bool
+    :param cutoff: The cutoff value for filtering disulfides. Default is 0.0.
+    :type cutoff: float
+    :param verbose: If True, enables verbose output. Default is False.
+    :type verbose: bool
+    :return: None
+    """
+    if do_all:
         analyze_classes_threaded(
             loader,
             do_graph=do_graph,
@@ -493,21 +522,20 @@ def octant_classes_vs_cutoff(loader: DisulfideLoader, cutoff):
     return class_df.shape[0]
 
 
-def plot_eightclass_vs_cutoff(PDB_SS: DisulfideLoader, cutoff, steps, verbose=False):
+def plot_eightclass_vs_cutoff(loader: DisulfideLoader, cutoff, steps, verbose=False):
     """
     Plot the total percentage and number of members for each class against the cutoff value.
 
     :param cutoff: Percent cutoff value for filtering the classes.
     :return: None
     """
-    import matplotlib.pyplot as plt
 
     _cutoff = np.linspace(0, cutoff, steps)
     tot_list = []
     members_list = []
 
     for c in _cutoff:
-        class_df = PDB_SS.tclass.filter_eightclass_by_percentage(c)
+        class_df = loader.tclass.filter_eightclass_by_percentage(c)
         tot = class_df["percentage"].sum()
         tot_list.append(tot)
         members_list.append(class_df.shape[0])
@@ -516,7 +544,7 @@ def plot_eightclass_vs_cutoff(PDB_SS: DisulfideLoader, cutoff, steps, verbose=Fa
                 f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
             )
 
-    fig, ax1 = plt.subplots()
+    _, ax1 = plt.subplots()
 
     ax2 = ax1.twinx()
     ax1.plot(_cutoff, tot_list, label="Total percentage", color="blue")
@@ -529,9 +557,8 @@ def plot_eightclass_vs_cutoff(PDB_SS: DisulfideLoader, cutoff, steps, verbose=Fa
     plt.show()
 
 
-def Update_Repository(source_dir, repo_dir, verbose=True, binary=False, octant=False):
+def update_repository(source_dir, repo_dir, verbose=True, binary=False, octant=False):
     """Copy the consensus classes to the repository."""
-    import shutil
 
     if binary:
         source = Path(source_dir) / SS_CONSENSUS_BIN_FILE
@@ -555,14 +582,24 @@ def Update_Repository(source_dir, repo_dir, verbose=True, binary=False, octant=F
 
 
 def main():
+    """
+    Main function to execute the disulfide class consensus class extraction.
+
+    This function parses command-line arguments and performs the analysis of disulfide bond classes.
+    It can analyze binary classes, octant classes, or both, depending on the arguments provided.
+    The function also supports generating graphs and updating consensus structures.
+
+    :return: None
+    """
     args = get_args()
     octant = args.octant
     binary = args.binary
-    all = args.all
+    do_all = args.ll
     threads = args.threads
     do_graph = args.graph
     cutoff = args.cutoff
     do_update = args.update
+    verbose = args.verbose
 
     # Clear the terminal window
     print("\033c", end="")
@@ -571,13 +608,13 @@ def main():
     print(
         f"Binary:                {binary}\n"
         f"Octant:                {octant}\n"
-        f"All:                   {all}\n"
+        f"All:                   {do_all}\n"
         f"Threads:               {threads}\n"
         f"Cutoff:                {cutoff}\n"
         f"Graph:                 {do_graph}\n"
         f"Consensus:             True \n"
         f"Update:                {do_update}\n"
-        f"Verbose:               {args.verbose}\n"
+        f"Verbose:               {verbose}\n"
         f"Data directory:        {DATA_DIR}\n"
         f"Save directory:        {SAVE_DIR}\n"
         f"Repository directory:  {REPO_DIR}\n"
@@ -590,12 +627,18 @@ def main():
     PDB_SS.describe()
 
     analyze_classes(
-        PDB_SS, binary, octant, all, threads=threads, do_graph=do_graph, cutoff=cutoff
+        PDB_SS,
+        binary,
+        octant,
+        do_all,
+        threads=threads,
+        do_graph=do_graph,
+        cutoff=cutoff,
     )
 
     if do_update:
         print("Updating repository with consensus classes.")
-        Update_Repository(DATA_DIR, REPO_DIR, binary=binary, octant=octant)
+        update_repository(DATA_DIR, REPO_DIR, binary=binary, octant=octant)
 
 
 if __name__ == "__main__":
@@ -607,7 +650,8 @@ if __name__ == "__main__":
     elapsed = end - start
 
     print(
-        f"\n----------------------\nDisulfide Class Analysis Complete! \nElapsed time: {timedelta(seconds=elapsed)} (h:m:s)"
+        f"\n----------------------\nDisulfide Class Analysis Complete!"
+        f"\nElapsed time: {timedelta(seconds=elapsed)} (h:m:s)"
     )
 
 # end of file
