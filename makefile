@@ -44,12 +44,12 @@ nuke: clean devclean
 
 pkg:
 	@echo "Starting installation step 1/2..."
-	$(CONDA) create --name proteusPy -y python=3.11.7
+	$(CONDA) create --name proteusPy -y python=3.11.7 numpy pandas matplotlib
 	@echo "Step 1 done. Now activate the environment with 'conda activate proteusPy' and run 'make install'"
 
 dev:
 	@echo "Building $(DEVNAME)..."
-	$(CONDA) create --name $(DEVNAME) -y python=3.11.7
+	$(CONDA) create --name $(DEVNAME) -y python=3.11.7 numpy pandas matplotlib
 	@echo "Step 1 done. Now activate the environment with 'conda activate $(DEVNAME)' and run 'make install_dev'"
 
 clean: .
