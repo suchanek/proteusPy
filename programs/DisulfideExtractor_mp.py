@@ -70,8 +70,9 @@ PDB_BASE = Path(PDB)
 PDB_DIR = MODULE_DATA = REPO_DATA = DATA_DIR = ""
 GOOD_PDB_FILE = "good_pdb.pkl"
 
-VENV_DIR = HOME_DIR / Path(
-    "miniforge3/envs/ppydev/lib/python3.11/site-packages/proteusPy/data/"
+FORGE_DIR = HOME_DIR / Path("mambaforge")
+VENV_DIR = FORGE_DIR / Path(
+    "envs/ppydev/lib/python3.11/site-packages/proteusPy/data/"
 )
 
 PDB_BASE = Path(PDB)
