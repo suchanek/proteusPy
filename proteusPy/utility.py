@@ -494,27 +494,6 @@ def display_ss_pymol(
     return None
 
 
-def parse_ssbond_header_rec(ssbond_dict: dict, verbose=False) -> list:
-    """
-    Parse the SSBOND dict returned by parse_pdb_header.
-    NB: Requires EGS-Modified BIO.parse_pdb_header.py.
-    This is used internally.
-
-    :param ssbond_dict: the input SSBOND dict
-    :return: A list of tuples representing the proximal,
-        distal residue ids for the Disulfide.
-
-    """
-    if verbose:
-        print(f"parse_ssbond_header_rec(): {ssbond_dict}")
-
-    disulfide_list = []
-    for ssb in ssbond_dict.items():
-        disulfide_list.append(ssb[1])
-
-    return disulfide_list
-
-
 def Download_Disulfides(
     pdb_home=PDB_DIR, model_home=MODEL_DIR, verbose=False, reset=False
 ) -> None:
