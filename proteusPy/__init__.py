@@ -124,7 +124,6 @@ from .utility import (
     grid_dimensions,
     image_to_ascii_art,
     load_list_from_file,
-    parse_ssbond_header_rec,
     plot_class_chart,
     print_memory_used,
     prune_extra_ss,
