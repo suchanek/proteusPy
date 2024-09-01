@@ -162,9 +162,9 @@ class Disulfide:
         self.proximal_chain = proximal_chain
         self.distal_chain = distal_chain
         self.pdb_id = pdb_id
-        self.QUIET = quiet
-        self.proximal_secondary = "Nosecondary",
-        self.distal_secondary = "Nosecondary",
+        self.quiet = quiet
+        self.proximal_secondary = ("Nosecondary",)
+        self.distal_secondary = ("Nosecondary",)
         self.ca_distance = _FLOAT_INIT
         self.cb_distance = _FLOAT_INIT
         self.torsion_array = np.array(
@@ -974,7 +974,7 @@ class Disulfide:
     def _handle_SS_exception(self, message: str):
         """
         This method catches an exception that occurs in the Disulfide
-        object (if QUIET), or raises it again, this time adding the
+        object (if quiet), or raises it again, this time adding the
         PDB line number to the error message. (private).
 
         :param message: Error message
@@ -984,7 +984,7 @@ class Disulfide:
         # message = "%s at line %i." % (message)
         message = f"{message}"
 
-        if self.QUIET:
+        if self.quiet:
             # just print a warning - some residues/atoms may be missing
             warnings.warn(
                 "DisulfideConstructionException: %s\n"
@@ -1008,7 +1008,7 @@ class Disulfide:
         """
 
         atom_coordinates = self.coords_array
-        verbose = not self.QUIET
+        verbose = not self.quiet
         if verbose:
             _logger.setLevel(logging.INFO)
 
@@ -1094,7 +1094,7 @@ class Disulfide:
         """
 
         atom_coordinates = self.coords_array
-        verbose = not self.QUIET
+        verbose = not self.quiet
         if verbose:
             _logger.setLevel(logging.INFO)
 

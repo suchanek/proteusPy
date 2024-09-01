@@ -123,7 +123,7 @@ class DisulfideLoader:
         self.TorsionDF = pd.DataFrame()
         self.TotalDisulfides = 0
         self.IDList = []
-        self.QUIET = quiet
+        self.quiet = quiet
 
         self.tclass = None  # disulfideClass_constructor to manage classes
         self.cutoff = cutoff  # distance cutoff used to bulid the database
@@ -481,7 +481,7 @@ class DisulfideLoader:
         :return: quiet parameter
         :rtype: bool
         """
-        return self.QUIET
+        return self.quiet
 
     @quiet.setter
     def quiet(self, perm: bool) -> None:
@@ -491,7 +491,7 @@ class DisulfideLoader:
         :param perm: True or False
         :type perm: bool
         """
-        self.QUIET = perm
+        self.quiet = perm
 
     def plot_classes_vs_cutoff(self, cutoff, steps, base=8) -> None:
         """
