@@ -116,55 +116,52 @@ def parse_turn_record(record):
 # containing the relevant info as shown below.
 
 
-pdb_dict = """
-{
-    "pdbid": (str),
-    "ssbonds": (str),
+pdb_dict_template = {
+    "pdbid": "str",  # Placeholder for a string
+    "ssbonds": "str",  # Placeholder for a string
     "atoms": {
-        (chain_id, res_seq_num, atom_name): {
-            "coords": [x, y, z]
+        ("chain_id", "res_seq_num", "atom_name"): {
+            "coords": ["x", "y", "z"]  # Placeholder for coordinates
         },
     },
     "pairs": [
         {
-            "proximal": (chain_id1, res_seq_num1),
-            "distal": (chain_id2, res_seq_num2),
-            "chains": (chain_id1, chain_id2),
+            "proximal": ("chain_id1", "res_seq_num1"),  # Placeholder for proximal chain and residue
+            "distal": ("chain_id2", "res_seq_num2"),  # Placeholder for distal chain and residue
+            "chains": ("chain_id1", "chain_id2"),  # Placeholder for chain IDs
             "phipsi": {
-                "proximal-1": {"N": [x, y, z], "C": [x, y, z]},
-                "proximal+1": {"N": [x, y, z], "C": [x, y, z]},
-                "distal-1": {"N": [x, y, z], "C": [x, y, z]},
-                "distal+1": {"N": [x, y, z], "C": [x, y, z]}
+                "proximal-1": {"N": ["x", "y", "z"], "C": ["x", "y", "z"]},  # Placeholder for phi/psi angles
+                "proximal+1": {"N": ["x", "y", "z"], "C": ["x", "y", "z"]},
+                "distal-1": {"N": ["x", "y", "z"], "C": ["x", "y", "z"]},
+                "distal+1": {"N": ["x", "y", "z"], "C": ["x", "y", "z"]}
             }
         },
-        ...
     ],
     "helices": [
         {
-        "strand_id": strand_id,
-        "sheet_id": sheet_id,
-        "start": (start_chain_id, start_res_seq),
-        "end": (end_chain_id, end_res_seq),
+            "strand_id": "strand_id",  # Placeholder for strand ID
+            "sheet_id": "sheet_id",  # Placeholder for sheet ID
+            "start": ("start_chain_id", "start_res_seq"),  # Placeholder for start chain and residue
+            "end": ("end_chain_id", "end_res_seq"),  # Placeholder for end chain and residue
         }
     ],
     "sheets": [
         {
-        "strand_id": strand_id,
-        "sheet_id": sheet_id,
-        "start": (start_chain_id, start_res_seq),
-        "end": (end_chain_id, end_res_seq),
+            "strand_id": "strand_id",  # Placeholder for strand ID
+            "sheet_id": "sheet_id",  # Placeholder for sheet ID
+            "start": ("start_chain_id", "start_res_seq"),  # Placeholder for start chain and residue
+            "end": ("end_chain_id", "end_res_seq"),  # Placeholder for end chain and residue
         }
     ],
     "turns": [
         {
-        "turn_id": turn_id,
-        "start": (start_chain_id, start_res_seq),
-        "end": (end_chain_id, end_res_seq),
+            "turn_id": "turn_id",  # Placeholder for turn ID
+            "start": ("start_chain_id", "start_res_seq"),  # Placeholder for start chain and residue
+            "end": ("end_chain_id", "end_res_seq"),  # Placeholder for end chain and residue
         }
     ],
-    "resolution": float
+    "resolution": "float"  # Placeholder for resolution
 }
-"""
 
 
 def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple:
@@ -288,7 +285,7 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
             turns.append(turn_info)
             if verbose:
                 _logger.info(str(f"Found TURN record: {turn_info}"))
-                
+
     # Extract the ATOM records corresponding to SSBOND
     ssbond_atom_list = {
         "pdbid": pdbid,
@@ -390,6 +387,10 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
             ),
         }
 
+
+        prox_secondary = get_secondary_structure(chain_id1, res_seq_num1, ssbond_atom_list)
+        dist_secondary = get_secondary_structure(chain_id2, res_seq_num2, ssbond_atom_list)
+
         # Add the pair information to the pairs list
         pairs.append(
             {
@@ -397,6 +398,8 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                 "distal": (chain_id2, res_seq_num2),
                 "chains": (chain_id1, chain_id2),
                 "phipsi": phipsi,
+                "prox_secondary": prox_secondary,
+                "dist_secondary": dist_secondary,
             }
         )
 
@@ -407,6 +410,37 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
 # input_pdb_file = "path/to/pdbfile.pdb"
 # result = extract_ssbonds_and_atoms(input_pdb_file, verbose=True)
 # print(result)
+
+def get_secondary_structure(chain_id, res_seq_num, pdb_data):
+    """
+    Determine the secondary structure type for a given chain_id and res_seq_num.
+
+    :param chain_id: The chain identifier.
+    :type chain_id: str
+    :param res_seq_num: The residue sequence number.
+    :type res_seq_num: int
+    :param pdb_data: The PDB data dictionary containing helices, sheets, and turns.
+    :type pdb_data: dict
+    :return: The secondary structure type ('helix', 'sheet', 'turn', 'nosecondary').
+    :rtype: str
+    """
+    # Check helices
+    for helix in pdb_data.get("helices", []):
+        if helix["start"][0] == chain_id and helix["start"][1] <= int(res_seq_num) <= helix["end"][1]:
+            return "helix"
+
+    # Check sheets
+    for sheet in pdb_data.get("sheets", []):
+        if sheet["start"][0] == chain_id and sheet["start"][1] <= int(res_seq_num) <= sheet["end"][1]:
+            return "sheet"
+
+    # Check turns
+    for turn in pdb_data.get("turns", []):
+        if turn["start"][0] == chain_id and turn["start"][1] <= int(res_seq_num) <= turn["end"][1]:
+            return "turn"
+
+    # If no secondary structure is found
+    return "nosecondary"
 
 
 def extract_and_write_ssbonds_and_atoms(

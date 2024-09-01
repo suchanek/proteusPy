@@ -79,7 +79,7 @@ install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	@$(CONDA) install vtk==9.2.6 -y
 	
-	pip install .
+	pip install . -q
 	pip install pdoc twine black pytest build -q
 	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
 	@echo "Installation finished!"
