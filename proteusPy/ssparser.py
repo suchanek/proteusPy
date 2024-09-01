@@ -52,10 +52,119 @@ def extract_id_from_filename(filename: str) -> str:
         raise ValueError(mess)
 
 
+def parse_helix_record(record):
+    helix_id = record[11:14].strip()
+    start_chain_id = record[19].strip()
+    start_res_seq = int(record[21:25].strip())
+    end_chain_id = record[31].strip()
+    end_res_seq = int(record[33:37].strip())
+    helix_class = int(record[38:40].strip())
+
+    return {
+        "helix_id": helix_id,
+        "start": (start_chain_id, start_res_seq),
+        "end": (end_chain_id, end_res_seq),
+        "helix_class": helix_class,
+    }
+
+
+def parse_sheet_record(record):
+    """
+    Parses a SHEET record from a PDB file to extract information about beta strands.
+
+    :Param record: The SHEET record as a string.
+    :Return: A dictionary containing strand ID, start and end residue information, and sheet ID.
+    """
+    strand_id = record[7:10].strip()
+    sheet_id = record[11:14].strip()
+    start_chain_id = record[21].strip()
+    start_res_seq = int(record[22:26].strip())
+    end_chain_id = record[32].strip()
+    end_res_seq = int(record[33:37].strip())
+
+    return {
+        "strand_id": strand_id,
+        "sheet_id": sheet_id,
+        "start": (start_chain_id, start_res_seq),
+        "end": (end_chain_id, end_res_seq),
+    }
+
+
+def parse_turn_record(record):
+    """
+    Parses a TURN record from a PDB file to extract information about turns in the protein structure.
+
+    :Param record: The TURN record as a string.
+    :Return: A dictionary containing turn ID, start and end residue information.
+    """
+    turn_id = record[7:10].strip()
+    start_chain_id = record[19].strip()
+    start_res_seq = int(record[20:24].strip())
+    end_chain_id = record[30].strip()
+    end_res_seq = int(record[31:35].strip())
+
+    return {
+        "turn_id": turn_id,
+        "start": (start_chain_id, start_res_seq),
+        "end": (end_chain_id, end_res_seq),
+    }
+
+
 # New function to extract the disulfide bonds from the PDB files by
 # directly reading the SSBOND records in the header section of the PDB file,
 # extracting the proximal, distal parameters and atoms. This creates a dict
 # containing the relevant info as shown below.
+
+
+pdb_dict = """
+{
+    "pdbid": (str),
+    "ssbonds": (str),
+    "atoms": {
+        (chain_id, res_seq_num, atom_name): {
+            "coords": [x, y, z]
+        },
+    },
+    "pairs": [
+        {
+            "proximal": (chain_id1, res_seq_num1),
+            "distal": (chain_id2, res_seq_num2),
+            "chains": (chain_id1, chain_id2),
+            "phipsi": {
+                "proximal-1": {"N": [x, y, z], "C": [x, y, z]},
+                "proximal+1": {"N": [x, y, z], "C": [x, y, z]},
+                "distal-1": {"N": [x, y, z], "C": [x, y, z]},
+                "distal+1": {"N": [x, y, z], "C": [x, y, z]}
+            }
+        },
+        ...
+    ],
+    "helices": [
+        {
+        "strand_id": strand_id,
+        "sheet_id": sheet_id,
+        "start": (start_chain_id, start_res_seq),
+        "end": (end_chain_id, end_res_seq),
+        }
+    ],
+    "sheets": [
+        {
+        "strand_id": strand_id,
+        "sheet_id": sheet_id,
+        "start": (start_chain_id, start_res_seq),
+        "end": (end_chain_id, end_res_seq),
+        }
+    ],
+    "turns": [
+        {
+        "turn_id": turn_id,
+        "start": (start_chain_id, start_res_seq),
+        "end": (end_chain_id, end_res_seq),
+        }
+    ],
+    "resolution": float
+}
+"""
 
 
 def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple:
@@ -111,6 +220,9 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
     atom_list = {}
     errors = []
     pairs = []
+    helices = []
+    sheets = []
+    turns = []
     resolution = None
     pdbid = extract_id_from_filename(input_pdb_file)
 
@@ -123,6 +235,7 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
             ssbonds.append(line)
             if verbose:
                 _logger.info(str(f"Found SSBOND record for {pdbid}: {line.strip()}"))
+
         elif line.startswith("ATOM") or line.startswith(
             "HETATM"
         ):  # Added HETATM to include non-standard residues like CSS
@@ -158,6 +271,24 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
             if verbose:
                 _logger.info(str(f"Found RESOLUTION record: {resolution} Å"))
 
+        elif line.startswith("HELIX"):
+            helix_info = parse_helix_record(line)
+            helices.append(helix_info)
+            if verbose:
+                _logger.info(str(f"Found HELIX record: {helix_info}"))
+
+        elif line.startswith("SHEET"):
+            sheet_info = parse_sheet_record(line)
+            sheets.append(sheet_info)
+            if verbose:
+                _logger.info(str(f"Found SHEET record: {sheet_info}"))
+
+        elif line.startswith("TURN"):
+            turn_info = parse_turn_record(line)
+            turns.append(turn_info)
+            if verbose:
+                _logger.info(str(f"Found TURN record: {turn_info}"))
+                
     # Extract the ATOM records corresponding to SSBOND
     ssbond_atom_list = {
         "pdbid": pdbid,
@@ -165,6 +296,9 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
         "atoms": {},
         "pairs": pairs,
         "resolution": resolution,
+        "helices": helices,
+        "sheets": sheets,
+        "turns": turns,
     }
 
     for ssbond in ssbonds:
