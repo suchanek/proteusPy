@@ -163,6 +163,8 @@ class Disulfide:
         self.distal_chain = distal_chain
         self.pdb_id = pdb_id
         self.QUIET = quiet
+        self.proximal_secondary = "Nosecondary",
+        self.distal_secondary = "Nosecondary",
         self.ca_distance = _FLOAT_INIT
         self.cb_distance = _FLOAT_INIT
         self.torsion_array = np.array(
@@ -2555,6 +2557,8 @@ def Initialize_Disulfide_From_Coords(
     proximal,
     distal,
     resolution,
+    proximal_secondary,
+    distal_secondary,
     verbose=False,
     quiet=True,
     dbg=False,
@@ -2606,6 +2610,8 @@ def Initialize_Disulfide_From_Coords(
 
     new_ss.pdb_id = pdb_id
     new_ss.resolution = resolution
+    new_ss.proximal_secondary = proximal_secondary
+    new_ss.distal_secondary = distal_secondary
     prox_atom_list = []
     dist_atom_list = []
 

@@ -1213,6 +1213,8 @@ def load_disulfides_from_id(
         chain1_id = pair["proximal"][0]
         distal = pair["distal"][1]
         chain2_id = pair["distal"][0]
+        proximal_secondary = pair['prox_secondary']
+        distal_secondary = pair['dist_secondary']
 
         if dbg:
             _logger.info(
@@ -1241,6 +1243,8 @@ def load_disulfides_from_id(
             proximal_int,
             distal_int,
             resolution,
+            proximal_secondary,
+            distal_secondary,
             verbose=verbose,
             quiet=quiet,
             dbg=dbg,
