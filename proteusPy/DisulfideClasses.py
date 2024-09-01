@@ -15,7 +15,7 @@ Last Modification: 2/19/24 -egs-
 from io import StringIO
 
 import numpy as np
-import pandas
+import pandas as pd
 
 import proteusPy
 from proteusPy.angle_annotation import AngleAnnotation
@@ -32,7 +32,7 @@ def create_classes(df):
 
     Example:
     >>> import pandas as pd
-    >>> df = pandas.DataFrame({
+    >>> df = pd.DataFrame({
     ...    'ss_id': [1, 2, 3, 4, 5],
     ...    'chi1': [1.0, -1.0, 1.0, 1.0, -1.0],
     ...    'chi2': [-1.0, -1.0, -1.0, 1.0, 1.0],
@@ -210,7 +210,7 @@ def get_eighth_quadrant(angle_deg):
         raise ValueError("Invalid angle value: angle must be in the range [-360, 360).")
 
 
-def filter_by_percentage(df: pandas.DataFrame, cutoff) -> pandas.DataFrame:
+def filter_by_percentage(df: pd.DataFrame, cutoff) -> pd.DataFrame:
     """
     Filter a pandas DataFrame by percentage.
 
@@ -224,7 +224,7 @@ def filter_by_percentage(df: pandas.DataFrame, cutoff) -> pandas.DataFrame:
     return df[df["percentage"] >= cutoff]
 
 
-def get_ss_id(df: pandas.DataFrame, cls: str) -> str:
+def get_ss_id(df: pd.DataFrame, cls: str) -> str:
     """
     Returns the 'ss_id' value in the given DataFrame that corresponds to the
     input 'cls' string.
@@ -422,7 +422,6 @@ def plot_count_vs_class_df(df, title="title", theme="light", save=False, savedir
     else:
         fig.show()
     return fig
-
 
 def plot_count_vs_classid(df, cls=None, title="title", theme="light"):
     """
