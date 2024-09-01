@@ -2491,7 +2491,7 @@ class Disulfide:
         from proteusPy.DisulfideClasses import get_eighth_quadrant
 
         tors = self.torsion_array
-        res = [get_eigth_quadrant(x) for x in tors]
+        res = [get_eighth_quadrant(x) for x in tors]
         return "".join([str(r) for r in res])
 
 
