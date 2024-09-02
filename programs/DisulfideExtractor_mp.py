@@ -17,7 +17,7 @@ utilizes multiprocessing to speed up the extraction process.
 * Subset: Only extract and process the first 1000 Disulfides found in the PDB directory.
 
 Author: Eric G. Suchanek, PhD.
-Last revision: 8/24/24 -egs-
+Last revision: 9/1/24 -egs-
 """
 
 import argparse
@@ -70,10 +70,10 @@ PDB_BASE = Path(PDB)
 PDB_DIR = MODULE_DATA = REPO_DATA = DATA_DIR = ""
 GOOD_PDB_FILE = "good_pdb.pkl"
 
-FORGE_DIR = HOME_DIR / Path("mambaforge")
-VENV_DIR = FORGE_DIR / Path(
-    "envs/ppydev/lib/python3.11/site-packages/proteusPy/data/"
-)
+MINIFORGE_DIR = HOME_DIR / Path("miniforge3/envs")
+MAMBAFORGE_DIR = HOME_DIR / Path("mambaforge/envs")
+
+VENV_DIR = Path("lib/python3.11/site-packages/proteusPy/data")
 
 PDB_BASE = Path(PDB)
 
@@ -108,7 +108,7 @@ pdb_id_list = [Path(f).stem[3:7] for f in ent_files]
 
 num_ent_files = len(ent_files)
 
-__version__ = "2.0.2"
+__version__ = "2.0.3"
 
 
 def parse_arguments():
@@ -135,7 +135,7 @@ def parse_arguments():
         "-b",
         action="store_true",
         help="Build Disulfide loader",
-        default=True,
+        default=False,
     )
     parser.add_argument(
         "--update",
@@ -174,6 +174,19 @@ def parse_arguments():
         type=int,
         help="Number of threads to use for extraction",
         default=8,
+    )
+    parser.add_argument(
+        "--forge",
+        "-r",
+        type=str,
+        help="miniforge3 or mambaforge",
+        default="miniforge3",
+    )
+    parser.add_argument(
+        "--env",
+        type=str,
+        help="ppydev or proteusPy",
+        default="ppydev",
     )
 
     return parser.parse_args()
@@ -222,7 +235,7 @@ def extract_disulfides_chunk(args):
     return result_list
 
 
-def do_extract(verbose, full, cutoff, prune, nthreads=6):
+def do_extract(verbose, full, cutoff, prune, nthreads=8):
     """
     Extracts the disulfides from the PDB files using multiprocessing.
 
@@ -347,6 +360,8 @@ def do_stuff(
     cutoff=-1.0,
     prune=True,
     threads=8,
+    forge="miniforge3",
+    env="ppydev",
 ):
     """
     Main entrypoint for the proteusPy Disulfide database extraction and creation workflow.
@@ -367,6 +382,8 @@ def do_stuff(
     _subset = subset
     _verbose = verbose
     _threads = threads
+    _forge = forge
+    _env = env
 
     if _extract is True:
         if verbose:
@@ -392,10 +409,15 @@ def do_stuff(
 
         update_repo(DATA_DIR, REPO_DATA)
 
-        if verbose:
-            print(f"Copying SS files from: {DATA_DIR} to {VENV_DIR}")
+        if _forge == "miniforge3":
+            venv_dir = MINIFORGE_DIR / _env / VENV_DIR
+        else:
+            venv_dir = MAMBAFORGE_DIR / _env / VENV_DIR
 
-        update_repo(DATA_DIR, VENV_DIR)
+        if verbose:
+            print(f"Copying SS files from: {DATA_DIR} to {venv_dir}")
+
+        update_repo(DATA_DIR, venv_dir)
 
     return
 
@@ -432,6 +454,8 @@ def main():
         f"Subset:                    {args.subset}\n"
         f"Verbose:                   {args.verbose}\n"
         f"Threads:                   {args.threads}\n"
+        f"Forge:                     {args.forge}\n"
+        f"Environment:               {args.env}\n"
         f"Starting at:               {datetime.datetime.now()}\n"
     )
 
@@ -444,6 +468,8 @@ def main():
         verbose=args.verbose,
         cutoff=args.cutoff,
         threads=args.threads,
+        forge=args.forge,
+        env=args.env,
     )
 
     end = time.time()
