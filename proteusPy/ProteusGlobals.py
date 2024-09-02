@@ -20,9 +20,10 @@ if PDB_DIR is None:
     PDB_DIR = HOME_DIR
 
 
-DATA_DIR = os.path.join(_this_dir, "data", "")
-REPO_DATA_DIR = os.path.join(_this_dir, "data", "")
-MODEL_DIR = os.path.join(PDB_DIR, "good", "")
+DATA_DIR = _this_dir / "data"
+REPO_DATA_DIR = Path(_this_dir).parent / "data"
+MODEL_DIR = Path(PDB_DIR) / "good"
+
 
 WINFRAME = 512  # single panel width
 WINSIZE = (1024, 1024)
