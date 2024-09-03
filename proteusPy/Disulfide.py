@@ -7,6 +7,10 @@ This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 Author: Eric G. Suchanek, PhD
 """
 
+# pylint: disable=W1203
+# pylint: disable=C0103
+# pylint: disable=C0301  # Corrected typo
+
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
 
 import copy
@@ -16,6 +20,27 @@ from math import cos
 
 import numpy as np
 import pyvista as pv
+from scipy.optimize import minimize
+
+# import proteusPy
+from proteusPy.atoms import *
+from proteusPy.DisulfideExceptions import *
+from proteusPy.DisulfideList import DisulfideList
+from proteusPy.logger_config import get_logger
+from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, WINSIZE
+from proteusPy.Residue import build_residue
+from proteusPy.ssparser import (
+    get_phipsi_atoms_coordinates,
+    get_residue_atoms_coordinates,
+)
+from proteusPy.turtle3D import ORIENT_SIDECHAIN, Turtle3D
+from proteusPy.vector3D import (
+    Vector3D,
+    calc_dihedral,
+    calculate_bond_angle,
+    distance3d,
+    rms_difference,
+)
 
 np.set_printoptions(suppress=True)
 pv.global_theme.color = "white"
@@ -29,22 +54,6 @@ logging.basicConfig(
 
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
-
-import proteusPy
-from proteusPy.atoms import *
-from proteusPy.DisulfideExceptions import *
-from proteusPy.DisulfideList import DisulfideList
-from proteusPy.logger_config import get_logger
-from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, WINSIZE
-from proteusPy.Residue import build_residue
-from proteusPy.turtle3D import ORIENT_SIDECHAIN, Turtle3D
-from proteusPy.vector3D import (
-    Vector3D,
-    calc_dihedral,
-    calculate_bond_angle,
-    distance3d,
-    rms_difference,
-)
 
 # columns for the torsions file dataframe.
 Torsion_DF_Cols = [
@@ -489,7 +498,7 @@ class Disulfide:
 
             for i in range(len(bond_conn)):
                 if all_atoms:
-                    if i > 10 and missing_atoms == True:  # skip missing atoms
+                    if i > 10 and missing_atoms is True:  # skip missing atoms
                         continue
 
                 bond = bond_conn[i]
@@ -837,7 +846,7 @@ class Disulfide:
 
             for i in range(len(bond_conn)):
                 if all_atoms:
-                    if i > 10 and missing_atoms == True:  # skip missing atoms
+                    if i > 10 and missing_atoms is True:  # skip missing atoms
                         continue
 
                 bond = bond_conn[i]
@@ -987,7 +996,7 @@ class Disulfide:
         if self.quiet:
             # just print a warning - some residues/atoms may be missing
             warnings.warn(
-                "DisulfideConstructionException: %s\n"
+                f"DisulfideConstructionException: %s\n"
                 "Exception ignored.\n"
                 "Some atoms may be missing in the data structure." % message,
                 DisulfideConstructionWarning,
@@ -1528,7 +1537,7 @@ class Disulfide:
         else:
             pv.set_plot_theme("dark")
 
-        if single == True:
+        if single is True:
             _pl = pv.Plotter(window_size=WINSIZE)
             _pl.add_title(title=title, font_size=FONTSIZE)
             _pl.enable_anti_aliasing("msaa")
@@ -1542,7 +1551,7 @@ class Disulfide:
                 specpow=SPEC_POWER,
             )
             _pl.reset_camera()
-            if shadows == True:
+            if shadows is True:
                 _pl.enable_shadows()
             _pl.show()
 
@@ -1602,7 +1611,7 @@ class Disulfide:
 
             pl.link_views()
             pl.reset_camera()
-            if shadows == True:
+            if shadows is True:
                 pl.enable_shadows()
             pl.show()
         return
@@ -1613,6 +1622,13 @@ class Disulfide:
         Return the energy of the Disulfide bond.
         """
         return self._compute_torsional_energy()
+
+    @property
+    def TorsionLength(self) -> float:
+        """
+        Return the energy of the Disulfide bond.
+        """
+        return self._compute_torsion_length()
 
     def plot(
         self, pl, single=True, style="sb", light=True, shadows=False
@@ -1639,7 +1655,7 @@ class Disulfide:
         else:
             pv.set_plot_theme("dark")
 
-        if single == True:
+        if single is True:
             # _pl = pv.Plotter(window_size=WINSIZE)
             # _pl.add_title(title=title, font_size=FONTSIZE)
             pl.clear()
@@ -1654,7 +1670,7 @@ class Disulfide:
                 specpow=SPEC_POWER,
             )
             pl.reset_camera()
-            if shadows == True:
+            if shadows is True:
                 pl.enable_shadows()
         else:
             pl = pv.Plotter(shape=(2, 2))
@@ -1708,7 +1724,7 @@ class Disulfide:
 
             pl.link_views()
             pl.reset_camera()
-            if shadows == True:
+            if shadows is True:
                 pl.enable_shadows()
         return pl
 
@@ -1751,7 +1767,6 @@ class Disulfide:
         :param other: Comparison Disulfide
         :return: RMS distance (deg).
         """
-        import math
 
         # Get internal coordinates of both objects
         ic1 = self.torsion_array
@@ -2406,8 +2421,6 @@ class Disulfide:
         :return: Euclidean distance (Degrees) between ```self``` and ```other```.
         """
 
-        from proteusPy.ProteusPyWarning import ProteusPyWarning
-
         # Check length of torsion arrays
         if len(self.torsion_array) != 5 or len(other.torsion_array) != 5:
             raise ProteusPyWarning(
@@ -2465,34 +2478,9 @@ class Disulfide:
         >>> low_energy_neighbors.display_overlay()
 
         """
-        from proteusPy import DisulfideList
 
         res = [ss for ss in others if self.Torsion_Distance(ss) <= cutoff]
         return DisulfideList(res, "neighbors")
-
-    def torsion_to_sixclass(self) -> str:
-        """
-        Return the sextant class string for ``self``.
-
-        :return: Sextant string
-        """
-        from proteusPy.DisulfideClasses import get_sixth_quadrant
-
-        tors = self.torsion_array
-        res = [get_sixth_quadrant(x) for x in tors]
-        return "".join([str(r) for r in res])
-
-    def torsion_to_eightclass(self) -> str:
-        """
-        Return the sextant class string for ``self``.
-
-        :return: Sextant string
-        """
-        from proteusPy.DisulfideClasses import get_eighth_quadrant
-
-        tors = self.torsion_array
-        res = [get_eighth_quadrant(x) for x in tors]
-        return "".join([str(r) for r in res])
 
 
 # Class defination ends
@@ -2512,7 +2500,6 @@ def Disulfide_Energy_Function(x: list) -> float:
     >>> float(res)
     2.5999999999999996
     """
-    import numpy as np
 
     chi1, chi2, chi3, chi4, chi5 = x
     energy = 2.0 * (np.cos(np.deg2rad(3.0 * chi1)) + np.cos(np.deg2rad(3.0 * chi5)))
@@ -2536,9 +2523,6 @@ def Minimize(inputSS: Disulfide) -> Disulfide:
         Disulfide: The minimized Disulfide object.
 
     """
-    from scipy.optimize import minimize
-
-    from proteusPy import Disulfide, Disulfide_Energy_Function
 
     initial_guess = inputSS.torsion_array
     result = minimize(Disulfide_Energy_Function, initial_guess, method="Nelder-Mead")
@@ -2594,16 +2578,6 @@ def Initialize_Disulfide_From_Coords(
     :raises DisulfideConstructionWarning: Raised when the disulfide bond is not parsed correctly.
 
     """
-    import logging
-
-    import numpy as np
-
-    from proteusPy.ssparser import (
-        get_phipsi_atoms_coordinates,
-        get_residue_atoms_coordinates,
-    )
-    from proteusPy.vector3D import Vector3D as Vector
-    from proteusPy.vector3D import calc_dihedral, distance3d
 
     ssbond_name = f"{pdb_id}_{proximal}{proximal_chain_id}_{distal}{distal_chain_id}"
     new_ss = Disulfide(ssbond_name)
