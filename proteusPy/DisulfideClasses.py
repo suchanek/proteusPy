@@ -12,12 +12,18 @@ Last Modification: 2/19/24 -egs-
 
 """
 
-from io import StringIO
+# pylint: disable=C0301
+# pylint: disable=C0103
 
+
+import math
+
+import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import plotly_express as px
 
-import proteusPy
 from proteusPy.angle_annotation import AngleAnnotation
 from proteusPy.DisulfideLoader import DisulfideLoader
 from proteusPy.ProteusGlobals import DPI
@@ -85,7 +91,6 @@ def angle_within_range(angle, min_angle, max_angle):
     Returns:
         bool: True if the angle is within the range, False otherwise.
     """
-    import math
 
     # Convert angles to radians
     angle_rad = math.radians(angle)
@@ -129,9 +134,7 @@ def torsion_to_sixclass(tors):
     :return: Sextant string
     """
 
-    from proteusPy.DisulfideClasses import get_sixth_quadrant
-
-    res = [get_sixth_quadrant(x) for x in tors]
+    res = [get_angle_class(x, 6) for x in tors]
     return "".join([str(r) for r in res])
 
 
@@ -143,9 +146,45 @@ def torsion_to_eightclass(tors):
     :return: Sextant string
     """
 
-    from proteusPy.DisulfideClasses import get_sixth_quadrant
+    res = [get_angle_class(x, 8) for x in tors]
+    return "".join([str(r) for r in res])
 
-    res = [get_sixth_quadrant(x) for x in tors]
+
+def get_angle_class(_angle_deg, base=8) -> str:
+    """
+    Returns the class of the angle based on its degree value and the specified base.
+
+    The angle is divided into equal segments based on the base value, and the class is determined
+    by which segment the angle falls into.
+
+    :param _angle_deg: The angle in degrees.
+    :type _angle_deg: float
+    :param base: The number of segments to divide the angle into. Must be one of [4, 6, 8].
+    :type base: int, optional
+    :return: The class of the angle as a string.
+    :rtype: str
+    :raises ValueError: If the base is not one of [4, 6, 8] or if the angle is not in the range [0, 360).
+    """
+    bases = [4, 6, 8]
+    if base not in bases:
+        raise ValueError(f"Invalid base value: base must be one of {bases}.")
+
+    if _angle_deg < 0 or _angle_deg >= 360:
+        raise ValueError("Invalid angle value: angle must be in the range [0, 360).")
+
+    deg = 360 // base
+    return str(base - (_angle_deg // deg))
+
+
+def torsion_to_class_string(tors, base=8):
+    """
+    Return the sextant class string for the input array of torsions.
+
+    :param tors: Array of five torsions
+    :return: Sextant string
+    """
+
+    res = [get_angle_class(x, base) for x in tors]
     return "".join([str(r) for r in res])
 
 
@@ -160,19 +199,19 @@ def get_sixth_quadrant(angle_deg):
         int: The sextant (1-6) that the angle belongs to.
     """
     # Normalize the angle to the range [0, 360)
-    angle_deg = angle_deg % 360
+    _angle_deg = angle_deg % 360
 
-    if angle_deg >= 0 and angle_deg < 60:
+    if _angle_deg >= 0 and _angle_deg < 60:
         return str(6)
-    elif angle_deg >= 60 and angle_deg < 120:
+    elif _angle_deg >= 60 and _angle_deg < 120:
         return str(5)
-    elif angle_deg >= 120 and angle_deg < 180:
+    elif _angle_deg >= 120 and _angle_deg < 180:
         return str(4)
-    elif angle_deg >= 180 and angle_deg < 240:
+    elif _angle_deg >= 180 and _angle_deg < 240:
         return str(3)
-    elif angle_deg >= 240 and angle_deg < 300:
+    elif _angle_deg >= 240 and _angle_deg < 300:
         return str(2)
-    elif angle_deg >= 300 and angle_deg < 360:
+    elif _angle_deg >= 300 and _angle_deg < 360:
         return str(1)
     else:
         raise ValueError("Invalid angle value: angle must be in the range [-360, 360).")
@@ -188,23 +227,23 @@ def get_eighth_quadrant(angle_deg):
     :return str: The octant (1-8) that the angle belongs to.
     """
     # Normalize the angle to the range [0, 360)
-    angle_deg = angle_deg % 360
+    _angle_deg = angle_deg % 360
 
-    if angle_deg >= 0 and angle_deg < 45:
+    if _angle_deg >= 0 and _angle_deg < 45:
         return str(8)
-    elif angle_deg >= 45 and angle_deg < 90:
+    elif _angle_deg >= 45 and _angle_deg < 90:
         return str(7)
-    elif angle_deg >= 90 and angle_deg < 135:
+    elif _angle_deg >= 90 and _angle_deg < 135:
         return str(6)
-    elif angle_deg >= 135 and angle_deg < 180:
+    elif _angle_deg >= 135 and _angle_deg < 180:
         return str(5)
-    elif angle_deg >= 180 and angle_deg < 225:
+    elif _angle_deg >= 180 and _angle_deg < 225:
         return str(4)
-    elif angle_deg >= 225 and angle_deg < 270:
+    elif _angle_deg >= 225 and _angle_deg < 270:
         return str(3)
-    elif angle_deg >= 270 and angle_deg < 315:
+    elif _angle_deg >= 270 and _angle_deg < 315:
         return str(2)
-    elif angle_deg >= 315 and angle_deg < 360:
+    elif _angle_deg >= 315 and _angle_deg < 360:
         return str(1)
     else:
         raise ValueError("Invalid angle value: angle must be in the range [-360, 360).")
@@ -249,9 +288,9 @@ def get_section(angle_deg, basis):
         int: The section number (1-basis) that the angle belongs to.
     """
     # Normalize the angle to the range [-180, 180)
-    angle_deg = angle_deg % 360
-    if angle_deg < -180:
-        angle_deg += 360
+    _angle_deg = angle_deg % 360
+    if _angle_deg < -180:
+        _angle_deg += 360
     elif angle_deg >= 180:
         angle_deg -= 360
 
@@ -298,11 +337,6 @@ def plot_class_chart(classes: int) -> None:
     >>> plot_class_chart(4)
     """
 
-    import matplotlib.pyplot as plt
-    import numpy as np
-
-    from proteusPy.angle_annotation import AngleAnnotation
-
     # Helper function to draw angle easily.
     def plot_angle(ax, pos, angle, length=0.95, acol="C4", **kwargs):
         """
@@ -330,8 +364,6 @@ def plot_class_chart(classes: int) -> None:
         ax.plot(*xy.T, color=acol)
         return AngleAnnotation(pos, xy[0], xy[2], ax=ax, **kwargs)
 
-    import matplotlib
-
     fig, ax1 = plt.subplots(sharex=True)
 
     # Set up the figure
@@ -348,7 +380,7 @@ def plot_class_chart(classes: int) -> None:
     kw = dict(size=144, unit="pixels", text=_text)
     # am1 = AngleAnnotation(center, p1[1], p2[1], ax=ax, size=75, text=r"$\alpha$")
 
-    am7 = plot_angle(ax1, (0, 0), 360 / classes, textposition="outside", **kw)
+    _ = plot_angle(ax1, (0, 0), 360 / classes, textposition="outside", **kw)
 
     # Create a list of segment values
     values = [1 for _ in range(classes)]
@@ -392,7 +424,6 @@ def plot_count_vs_class_df(df, title="title", theme="light", save=False, savedir
     :param theme: A string representing the name of the theme to use. Can be either 'notebook' or 'plotly_dark'. Default is 'plotly_dark'.
     :return: None
     """
-    import plotly_express as px
 
     fig = px.line(
         df,
@@ -423,6 +454,7 @@ def plot_count_vs_class_df(df, title="title", theme="light", save=False, savedir
         fig.show()
     return fig
 
+
 def plot_count_vs_classid(df, cls=None, title="title", theme="light"):
     """
     Plots a line graph of count vs class ID using Plotly.
@@ -432,8 +464,6 @@ def plot_count_vs_classid(df, cls=None, title="title", theme="light"):
     :param theme: A string representing the theme of the plot. Anything other than `light` is in `plotly_dark`.
     :return: None
     """
-
-    import plotly_express as px
 
     if cls is None:
         fig = px.line(df, x="class_id", y="count", title=f"{title}")
@@ -522,7 +552,6 @@ def plot_classes_vs_cutoff(cutoff, steps, loader):
     :param cutoff: Percent cutoff value for filtering the classes.
     :return: None
     """
-    import matplotlib.pyplot as plt
 
     _cutoff = np.linspace(0, cutoff, steps)
     tot_list = []
@@ -537,7 +566,7 @@ def plot_classes_vs_cutoff(cutoff, steps, loader):
             f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
         )
 
-    fig, ax1 = plt.subplots()
+    _, ax1 = plt.subplots()
 
     ax2 = ax1.twinx()
     ax1.plot(_cutoff, tot_list, label="Total percentage", color="blue")
