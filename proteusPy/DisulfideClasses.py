@@ -150,7 +150,7 @@ def torsion_to_eightclass(tors):
     return "".join([str(r) for r in res])
 
 
-def get_angle_class(_angle_deg, base=8) -> str:
+def get_angle_class(angle_deg, base=8) -> str:
     """
     Returns the class of the angle based on its degree value and the specified base.
 
@@ -169,11 +169,15 @@ def get_angle_class(_angle_deg, base=8) -> str:
     if base not in bases:
         raise ValueError(f"Invalid base value: base must be one of {bases}.")
 
-    if _angle_deg < 0 or _angle_deg >= 360:
-        raise ValueError("Invalid angle value: angle must be in the range [0, 360).")
+    angle = angle_deg % 360
+
+    if angle < 0 or angle_deg >= 360:
+        raise ValueError(
+            f"Invalid angle value: {angle_deg} angle must be in the range [0, 360)."
+        )
 
     deg = 360 // base
-    return str(base - (_angle_deg // deg))
+    return str(base - (angle // deg))
 
 
 def torsion_to_class_string(tors, base=8):
