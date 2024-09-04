@@ -12,7 +12,7 @@ import pandas as pd
 from colorama import Fore, Style, init
 from tqdm import tqdm
 
-from proteusPy.ProteusGlobals import SS_CONSENSUS_BIN_FILE, SS_CONSENSUS_FILE
+from proteusPy.ProteusGlobals import SS_CONSENSUS_BIN_FILE, SS_CONSENSUS_OCT_FILE
 
 # Initialize colorama
 init(autoreset=True)
@@ -153,8 +153,8 @@ def analyze_classes_multiprocess(
     chunk_size = tot_classes // num_processes
 
     if do_sextant:
-        # class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_FILE)
-        class_filename = DATA_DIR / SS_CONSENSUS_FILE
+        # class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_OCT_FILE)
+        class_filename = DATA_DIR / SS_CONSENSUS_OCT_FILE
 
         # sextant is actually doing octant
         _SAVE_DIR = OCTANT
@@ -439,8 +439,8 @@ def Update_Repository(source_dir, repo_dir, verbose=True, binary=False, sextant=
         shutil.copy(source, dest)
 
     if sextant:
-        source = os.path.join(source_dir, SS_CONSENSUS_FILE)
-        dest = os.path.join(repo_dir, SS_CONSENSUS_FILE)
+        source = os.path.join(source_dir, SS_CONSENSUS_OCT_FILE)
+        dest = os.path.join(repo_dir, SS_CONSENSUS_OCT_FILE)
 
         if verbose:
             print(f"Copying {source} to {dest}")

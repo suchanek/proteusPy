@@ -33,7 +33,7 @@ from proteusPy.ProteusGlobals import (
     PBAR_COLS,
     SS_CLASS_DEFINITIONS,
     SS_CLASS_DICT_FILE,
-    SS_CONSENSUS_FILE,
+    SS_CONSENSUS_OCT_FILE,
 )
 
 _logger = get_logger(__name__)
@@ -128,7 +128,7 @@ class DisulfideClass_Constructor:
         with open(fname, "rb") as f:
             self.classdict = pickle.load(f)
 
-    def load_consensus_file(self, fname=Path(DATA_DIR) / SS_CONSENSUS_FILE):
+    def load_consensus_file(self, fname=Path(DATA_DIR) / SS_CONSENSUS_OCT_FILE):
         with open(fname, "rb") as f:
             res = pickle.load(f)
         return res
