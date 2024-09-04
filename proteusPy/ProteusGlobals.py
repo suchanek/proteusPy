@@ -3,8 +3,10 @@ This file contains global declarations for the *proteusPy* package, a Python pac
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 7/12/24 -egs-
+Last revision: 8/3/24 -egs-
 """
+
+# plyint: disable=C0103
 
 import math
 import os
@@ -55,7 +57,7 @@ SS_PROBLEM_SUBSET_ID_FILE = "PDB_subset_problems.csv"
 
 # contains the dihedral classes and their members
 SS_CLASS_DICT_FILE = "PDB_ss_classes_dict.pkl"
-SS_CONSENSUS_FILE = "SS_consensus_class_oct.pkl"
+SS_CONSENSUS_OCT_FILE = "SS_consensus_class_oct.pkl"
 SS_CONSENSUS_SEXT_FILE = "SS_consensus_class_sext.pkl"
 SS_CONSENSUS_BIN_FILE = "SS_consensus_class_32.pkl"
 

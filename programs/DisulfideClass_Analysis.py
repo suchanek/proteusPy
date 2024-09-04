@@ -85,6 +85,7 @@ octant analysis takes around 22 minutes with 6 threads. Binary analysis takes ar
 
 Author: Eric G. Suchanek, PhD. Last Modified: 8/27/2024
 """
+# plyint: disable=C0103
 
 import argparse
 import os
@@ -103,18 +104,18 @@ from colorama import Fore, Style, init
 from tqdm import tqdm
 
 from proteusPy import Disulfide, DisulfideList, DisulfideLoader, Load_PDB_SS
-from proteusPy.ProteusGlobals import SS_CONSENSUS_BIN_FILE, SS_CONSENSUS_FILE
+from proteusPy.ProteusGlobals import SS_CONSENSUS_BIN_FILE, SS_CONSENSUS_OCT_FILE
 
 # Initialize colorama
 init(autoreset=True)
 
 
-HOME = Path.home()
-PDB = Path(os.getenv("PDB", HOME / "pdb"))
+HOME_DIR = Path.home()
+PDB = Path(os.getenv("PDB", HOME_DIR / "pdb"))
 
 DATA_DIR = PDB / "data"
-SAVE_DIR = HOME / "Documents" / "proteusPyDocs" / "classes"
-REPO_DIR = HOME / "repos" / "proteusPy" / "data"
+SAVE_DIR = HOME_DIR / "Documents" / "proteusPyDocs" / "classes"
+REPO_DIR = HOME_DIR / "repos" / "proteusPy" / "data"
 
 OCTANT = SAVE_DIR / "octant"
 OCTANT.mkdir(parents=True, exist_ok=True)
@@ -124,6 +125,12 @@ SEXTANT.mkdir(parents=True, exist_ok=True)
 
 BINARY = SAVE_DIR / "binary"
 BINARY.mkdir(parents=True, exist_ok=True)
+
+MINIFORGE_DIR = HOME_DIR / Path("miniforge3/envs")
+MAMBAFORGE_DIR = HOME_DIR / Path("mambaforge/envs")
+
+VENV_DIR = Path("lib/python3.11/site-packages/proteusPy/data")
+
 
 PBAR_COLS = 78
 
@@ -136,9 +143,10 @@ def get_args():
     - `-b`, `--binary`: Analyze binary classes (default: False).
     - `-o`, `--octant`: Analyze octant classes (default: False).
     - `-t`, `--threads`: Number of threads to use (default: 8).
-    - `-l`, `--ll`: Analyze both binary and octant classes (default: False).
+    - `-f`, `--forge`: Forge directory (default: "miniforge3").
+    - `-e`, `--env`: ProteusPy environment (default: "ppydev").
     - `-g`, `--graph`: Create class graphs (default: False).
-    - `-c`, `--cutoff`: Cutoff percentage for class filtering (default: 0.0).
+    - `-c`, `--cutoff`: Cutoff percentage for class filtering (default: -1.0).
     - `-v`, `--verbose`: Enable verbose output (default: False).
     - `-u`, `--update`: Update repository with the consensus classes (default: True).
 
@@ -168,11 +176,18 @@ def get_args():
         default=8,
     )
     parser.add_argument(
-        "-l",
-        "--ll",
-        help="Both binary and octant classes.",
-        action=argparse.BooleanOptionalAction,
-        default=False,
+        "-f",
+        "--forge",
+        help="Forge directory.",
+        type=str,
+        default="miniforge3",
+    )
+    parser.add_argument(
+        "-e",
+        "--env",
+        help="ProteusPy environment.",
+        type=str,
+        default="ppydev",
     )
     parser.add_argument(
         "-g",
@@ -181,7 +196,6 @@ def get_args():
         default=False,
         action=argparse.BooleanOptionalAction,
     )
-
     parser.add_argument(
         "-c",
         "--cutoff",
@@ -274,16 +288,21 @@ def task(
         class_disulfides_deque = deque()
         counter = 0
         update_freq = 50
+        remaining = 0
 
         for ssid in ss_list:
             _ss = loader[ssid]
             class_disulfides_deque.append(_ss)
             counter += 1
-            if counter % update_freq == 0 or counter == len(ss_list) - 1:
-                task_pbar.update(update_freq)
+            if counter % update_freq == 0 or counter == len(ss_list):
+                # Calculate the remaining updates correctly
+                remaining = len(ss_list) - counter
+                task_pbar.update(update_freq if remaining >= update_freq else remaining)
 
         task_pbar.close()
+
         class_disulfides = DisulfideList(list(class_disulfides_deque), cls, quiet=True)
+
         if do_graph:
             class_disulfides.display_torsion_statistics(
                 display=False, save=True, fname=fname, light=True, stats=False
@@ -293,14 +312,7 @@ def task(
             avg_conformation = class_disulfides.Average_Conformation
 
             ssname = f"{cls}_avg"
-            exemplar = Disulfide(ssname)
-            exemplar.build_model(
-                avg_conformation[0],
-                avg_conformation[1],
-                avg_conformation[2],
-                avg_conformation[3],
-                avg_conformation[4],
-            )
+            exemplar = Disulfide(ssname, torsions=avg_conformation)
             result_list.append(exemplar)
             overall_pbar.update(1)
 
@@ -335,8 +347,8 @@ def analyze_classes_threaded(
     save_dir = None
 
     if do_octant:
-        # class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_FILE)
-        class_filename = DATA_DIR / SS_CONSENSUS_FILE
+        # class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_OCT_FILE)
+        class_filename = DATA_DIR / SS_CONSENSUS_OCT_FILE
         save_dir = OCTANT
         eight_or_bin = loader.tclass.eightclass_df
         tot_classes = eight_or_bin.shape[0]
@@ -425,7 +437,6 @@ def analyze_classes(
     loader: DisulfideLoader,
     binary: bool,
     octant: bool,
-    do_all: bool,
     threads: int = 4,
     do_graph: bool = False,
     cutoff: float = 0.0,
@@ -443,8 +454,6 @@ def analyze_classes(
     :type binary: bool
     :param octant: If True, analyzes octant classes.
     :type octant: bool
-    :param do_all: If True, analyzes both binary and octant classes.
-    :type do_all: bool
     :param threads: The number of threads to use for analysis. Default is 4.
     :type threads: int
     :param do_graph: If True, generates graphs for the analysis. Default is False.
@@ -455,28 +464,6 @@ def analyze_classes(
     :type verbose: bool
     :return: None
     """
-    if do_all:
-        analyze_classes_threaded(
-            loader,
-            do_graph=do_graph,
-            do_consensus=True,
-            cutoff=cutoff,
-            verbose=verbose,
-            num_threads=threads,
-            do_octant=True,
-        )
-
-        analyze_classes_threaded(
-            loader,
-            do_graph=do_graph,
-            do_consensus=True,
-            cutoff=0,
-            verbose=verbose,
-            num_threads=threads,
-            do_octant=False,
-        )
-
-        return
 
     if octant:
         print("Analyzing octant classes.")
@@ -570,8 +557,8 @@ def update_repository(source_dir, repo_dir, verbose=True, binary=False, octant=F
         shutil.copy(source, dest)
 
     if octant:
-        source = Path(source_dir) / SS_CONSENSUS_FILE
-        dest = Path(repo_dir) / SS_CONSENSUS_FILE
+        source = Path(source_dir) / SS_CONSENSUS_OCT_FILE
+        dest = Path(repo_dir) / SS_CONSENSUS_OCT_FILE
 
         if verbose:
             print(f"Copying consensus structures from {source} to {dest}")
@@ -594,12 +581,13 @@ def main():
     args = get_args()
     octant = args.octant
     binary = args.binary
-    do_all = args.ll
     threads = args.threads
     do_graph = args.graph
     cutoff = args.cutoff
     do_update = args.update
     verbose = args.verbose
+    forge = args.forge
+    env = args.env
 
     # Clear the terminal window
     print("\033c", end="")
@@ -608,7 +596,6 @@ def main():
     print(
         f"Binary:                {binary}\n"
         f"Octant:                {octant}\n"
-        f"All:                   {do_all}\n"
         f"Threads:               {threads}\n"
         f"Cutoff:                {cutoff}\n"
         f"Graph:                 {do_graph}\n"
@@ -618,8 +605,10 @@ def main():
         f"Data directory:        {DATA_DIR}\n"
         f"Save directory:        {SAVE_DIR}\n"
         f"Repository directory:  {REPO_DIR}\n"
-        f"Home directory:        {HOME}\n"
+        f"Home directory:        {HOME_DIR}\n"
         f"PDB directory:         {PDB}\n"
+        f"Forge:                 {forge}\n"
+        f"Env:                   {env}\n"
         f"Loading PDB SS data...\n"
     )
 
@@ -630,7 +619,6 @@ def main():
         PDB_SS,
         binary,
         octant,
-        do_all,
         threads=threads,
         do_graph=do_graph,
         cutoff=cutoff,
@@ -639,6 +627,16 @@ def main():
     if do_update:
         print("Updating repository with consensus classes.")
         update_repository(DATA_DIR, REPO_DIR, binary=binary, octant=octant)
+
+        if forge == "miniforge3":
+            venv_dir = MINIFORGE_DIR / env / VENV_DIR
+        else:
+            venv_dir = MAMBAFORGE_DIR / env / VENV_DIR
+
+        if verbose:
+            print(f"Copying SS files from: {DATA_DIR} to {venv_dir}")
+
+        update_repository(DATA_DIR, venv_dir, binary=binary, octant=octant)
 
 
 if __name__ == "__main__":
