@@ -80,7 +80,7 @@ and creates graphs illustrating the membership across the binary and octant clas
 global SAVE_DIR location. Binary analysis takes approximately 20 minutes with octant analysis taking about
 75 minutes on a 2023 M3 Max Macbook Pro. (single-threaded).
 
-Update 8/28/2024 - multithreading is implemented and runs well up to around 6 threads on a 2023 M3 Max Macbook Pro.
+Update 8/28/2024 - multithreading is implemented and runs well up to around 10 threads on a 2023 M3 Max Macbook Pro.
 octant analysis takes around 22 minutes with 6 threads. Binary analysis takes around 25 minutes with 6 threads.
 
 Author: Eric G. Suchanek, PhD. Last Modified: 8/27/2024
@@ -142,7 +142,7 @@ def get_args():
     The following arguments are supported:
     - `-b`, `--binary`: Analyze binary classes (default: False).
     - `-o`, `--octant`: Analyze octant classes (default: False).
-    - `-t`, `--threads`: Number of threads to use (default: 8).
+    - `-t`, `--threads`: Number of threads to use (default: 10).
     - `-f`, `--forge`: Forge directory (default: "miniforge3").
     - `-e`, `--env`: ProteusPy environment (default: "ppydev").
     - `-g`, `--graph`: Create class graphs (default: False).
@@ -234,7 +234,6 @@ def task(
     total_ss: int,
     cutoff: float,
     do_graph: bool,
-    do_consensus: bool,
     save_dir: str,
     prefix: str,
     position: int,
@@ -253,7 +252,6 @@ def task(
     :param total_ss: Total number of disulfides.
     :param cutoff: Cutoff percentage to filter classes.
     :param do_graph: Boolean flag to generate and save graphs.
-    :param do_consensus: Boolean flag to generate consensus conformations.
     :param save_dir: Directory to save the output files.
     :param prefix: Prefix for the output file names.
     :param position: Vertical position of the progress bar.
@@ -308,13 +306,12 @@ def task(
                 display=False, save=True, fname=fname, light=True, stats=False
             )
 
-        if do_consensus:
-            avg_conformation = class_disulfides.Average_Conformation
+        avg_conformation = class_disulfides.Average_Conformation
 
-            ssname = f"{cls}_avg"
-            exemplar = Disulfide(ssname, torsions=avg_conformation)
-            result_list.append(exemplar)
-            overall_pbar.update(1)
+        ssname = f"{cls}_avg"
+        exemplar = Disulfide(ssname, torsions=avg_conformation)
+        result_list.append(exemplar)
+        overall_pbar.update(1)
 
     pbar.close()
     return
@@ -323,7 +320,6 @@ def task(
 def analyze_classes_threaded(
     loader: DisulfideLoader,
     do_graph=False,
-    do_consensus=False,
     cutoff=0.0,
     num_threads=6,
     verbose=False,
@@ -335,7 +331,6 @@ def analyze_classes_threaded(
 
     :param loader: The ``proteusPy.DisulfideLoader`` object.
     :param do_graph: Whether or not to display torsion statistics graphs. Default is True.
-    :param do_consensus: Whether or not to compute average conformations for each class. Default is True.
     :param cutoff: The cutoff percentage for each class. If the percentage of disulfides for a class is below
                    this value, the class will be skipped. Default is 0.1.
     :param num_threads: Number of threads to use for processing. Default is 4.
@@ -407,7 +402,6 @@ def analyze_classes_threaded(
                 total_ss,
                 cutoff,
                 do_graph,
-                do_consensus,
                 save_dir,
                 prefix,
                 pbar_index,
@@ -417,18 +411,19 @@ def analyze_classes_threaded(
         threads.append(thread)
         thread.start()
 
+    # Wait for all threads to finish
     for thread in threads:
         thread.join()
 
+    # Combine the results from all threads, yielding the final list of consensus structures.
     for result_list in result_lists:
         res_list.extend(result_list)
 
     overall_pbar.close()
 
-    if do_consensus:
-        print(f"Writing consensus structures to: {class_filename}")
-        with open(class_filename, "wb+") as f:
-            pickle.dump(res_list, f)
+    print(f"Writing consensus structures to: {class_filename}")
+    with open(class_filename, "wb+") as f:
+        pickle.dump(res_list, f)
 
     return res_list
 
@@ -472,7 +467,6 @@ def analyze_classes(
         analyze_classes_threaded(
             loader,
             do_graph=do_graph,
-            do_consensus=True,
             cutoff=cutoff,
             verbose=verbose,
             num_threads=threads,
@@ -486,7 +480,6 @@ def analyze_classes(
         analyze_classes_threaded(
             loader,
             do_graph=do_graph,
-            do_consensus=True,
             cutoff=0.0,
             verbose=verbose,
             num_threads=threads,
@@ -597,9 +590,8 @@ def main():
         f"Binary:                {binary}\n"
         f"Octant:                {octant}\n"
         f"Threads:               {threads}\n"
-        f"Cutoff:                {cutoff}\n"
+        f"Cutoff:                {cutoff}%\n"
         f"Graph:                 {do_graph}\n"
-        f"Consensus:             True \n"
         f"Update:                {do_update}\n"
         f"Verbose:               {verbose}\n"
         f"Data directory:        {DATA_DIR}\n"
