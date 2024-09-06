@@ -95,7 +95,10 @@ class Vector3D:
     """
 
     def __init__(self, x, y=None, z=None):
-        """Initialize the vector with either a list/tuple/array of 3 elements or three separate values."""
+        """
+        Initialize the vector with either a list/tuple/array of 3 elements or 
+        three separate values.
+        """
         if y is None and z is None:
             if len(x) != 3:
                 raise ValueError(
@@ -358,9 +361,9 @@ def calculate_bond_angle(atom1, atom2, atom3):
     """
     Calculate the bond angle between three atoms given their x, y, z coordinates.
 
-    :param tuple atom1: A tuple or list containing the x, y, z coordinates of the first atom (e.g., (x1, y1, z1)).
-    :param tuple atom2: A tuple or list containing the x, y, z coordinates of the second atom (e.g., (x2, y2, z2)).
-    :param tuple atom3: A tuple or list containing the x, y, z coordinates of the third atom (e.g., (x3, y3, z3)).
+    :param tuple atom1: A list containing the x, y, z coordinates of the first atom (e.g., [x1, y1, z1]).
+    :param tuple atom2: A list containing the x, y, z coordinates of the second atom (e.g., [x2, y2, z2]).
+    :param tuple atom3: A list containing the x, y, z coordinates of the third atom (e.g., [x3, y3, z3]).
     :return: Bond angle in degrees.
     :rtype: float
     """

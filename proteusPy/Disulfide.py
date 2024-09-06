@@ -7,15 +7,19 @@ This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 Author: Eric G. Suchanek, PhD
 """
 
-# pylint: disable=W1203
-# pylint: disable=C0103
-# pylint: disable=C0301  # Corrected typo
+# pylint: disable=W1203 # use of print
+# pylint: disable=C0103 # invalid name
+# pylint: disable=C0301 # line too long
+# pylint: disable=W0212 # access to protected member
+# pylint: disable=W0612 # unused variable
+# pylint: disable=W0613 # unused argument
 
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
 
 import copy
 import logging
 import math
+import warnings
 from math import cos
 
 import numpy as np
@@ -23,8 +27,22 @@ import pyvista as pv
 from scipy.optimize import minimize
 
 # import proteusPy
-from proteusPy.atoms import *
-from proteusPy.DisulfideExceptions import *
+from proteusPy.atoms import (
+    ATOM_COLORS,
+    ATOM_RADII_COVALENT,
+    ATOM_RADII_CPK,
+    BOND_COLOR,
+    BOND_RADIUS,
+    BS_SCALE,
+    FONTSIZE,
+    SPEC_POWER,
+    SPECULARITY,
+)
+from proteusPy.DisulfideExceptions import (
+    DisulfideConstructionException,
+    DisulfideConstructionWarning,
+    ProteusPyWarning,
+)
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.logger_config import get_logger
 from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, WINSIZE
@@ -496,12 +514,10 @@ class Disulfide:
                 bond_conn = _bond_conn_backbone
                 bond_split_colors = _bond_split_colors_backbone
 
-            for i in range(len(bond_conn)):
+            for i, bond in enumerate(bond_conn):
                 if all_atoms:
                     if i > 10 and missing_atoms is True:  # skip missing atoms
                         continue
-
-                bond = bond_conn[i]
 
                 # get the indices for the origin and destination atoms
                 orig = bond[0]
@@ -996,9 +1012,9 @@ class Disulfide:
         if self.quiet:
             # just print a warning - some residues/atoms may be missing
             warnings.warn(
-                f"DisulfideConstructionException: %s\n"
-                "Exception ignored.\n"
-                "Some atoms may be missing in the data structure." % message,
+                f"DisulfideConstructionException: {message}\n",
+                "Exception ignored.\n",
+                "Some atoms may be missing in the data structure.",
                 DisulfideConstructionWarning,
             )
         else:
@@ -1648,7 +1664,7 @@ class Disulfide:
         src = self.pdb_id
         enrg = self.energy
 
-        title = f"{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Cβ: {self.cb_distance:.2f} Å Tors: {self.torsion_length:.2f}°"
+        # title = f"{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Cβ: {self.cb_distance:.2f} Å Tors: {self.torsion_length:.2f}°"
 
         if light:
             pv.set_plot_theme("document")
@@ -1863,14 +1879,13 @@ class Disulfide:
             )
         return res_array
 
-    @property
-    def internal_coords_res(self) -> np.array:
+    def internal_coords_res(self, resnumb) -> np.array:
         """
         Return the internal coordinates for the Disulfide. Missing atoms are not included.
 
         :return: Array containing the coordinates, [12][3].
         """
-        return self._internal_coords_res()
+        return self._internal_coords_res(resnumb)
 
     def _internal_coords_res(self, resnumb) -> np.array:
         """
@@ -2104,6 +2119,19 @@ class Disulfide:
         return f"{self.repr_ss_residue_ids()}"
 
     def _compute_rho(self) -> float:
+        """Compute the dihedral angle rho for a given secondary structure element."""
+
+        v1 = self.n_prox - self.ca_prox
+        v2 = self.c_prox - self.ca_prox
+        n1 = np.cross(v2.get_array(), v1.get_array())
+
+        v4 = self.n_dist - self.ca_dist
+        v3 = self.c_dist - self.ca_dist
+        n2 = np.cross(v4.get_array(), v3.get_array())
+        rho = calc_dihedral(Vector3D(n1), self.ca_prox, self.ca_dist, Vector3D(n2))
+        return rho
+
+    def _Ocompute_rho(self) -> float:
         self.rho = calc_dihedral(self.n_prox, self.ca_prox, self.ca_dist, self.n_dist)
         return self.rho
 
