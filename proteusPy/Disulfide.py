@@ -258,7 +258,7 @@ class Disulfide:
         self.chi3 = _ANG_INIT
         self.chi4 = _ANG_INIT
         self.chi5 = _ANG_INIT
-        self.rho = _ANG_INIT  # new dihedral angle: Nprox - Ca_prox - Ca_dist - N_dist
+        self._rho = _ANG_INIT  # new dihedral angle: Nprox - Ca_prox - Ca_dist - N_dist
 
         self.torsion_length = _FLOAT_INIT
 
@@ -2118,8 +2118,25 @@ class Disulfide:
         """
         return f"{self.repr_ss_residue_ids()}"
 
+    @property
+    def rho(self) -> float:
+        """
+        Return the dihedral angle rho for the Disulfide.
+        """
+        return self._compute_rho()
+
+    @rho.setter
+    def rho(self, value: float):
+        """
+        Set the dihedral angle rho for the Disulfide.
+        """
+        self._rho = value
+
     def _compute_rho(self) -> float:
-        """Compute the dihedral angle rho for a given secondary structure element."""
+        """
+        Compute the dihedral angle rho for a Disulfide object and
+        sets the internal state of the object.
+        """
 
         v1 = self.n_prox - self.ca_prox
         v2 = self.c_prox - self.ca_prox
@@ -2128,12 +2145,10 @@ class Disulfide:
         v4 = self.n_dist - self.ca_dist
         v3 = self.c_dist - self.ca_dist
         n2 = np.cross(v4.get_array(), v3.get_array())
-        rho = calc_dihedral(Vector3D(n1), self.ca_prox, self.ca_dist, Vector3D(n2))
-        return rho
-
-    def _Ocompute_rho(self) -> float:
-        self.rho = calc_dihedral(self.n_prox, self.ca_prox, self.ca_dist, self.n_dist)
-        return self.rho
+        self._rho = calc_dihedral(
+            Vector3D(n1), self.ca_prox, self.ca_dist, Vector3D(n2)
+        )
+        return self._rho
 
     def reset(self) -> None:
         """

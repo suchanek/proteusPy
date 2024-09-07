@@ -256,20 +256,6 @@ class DisulfideLoader:
                     res.append(self.SSList[value])
         return res
 
-    def OObuild_ss_from_idlist(self, idlist) -> DisulfideList:
-        """
-        Return a DisulfideList of Disulfides for a given list of PDBIDs
-
-        :param idlist: List of PDBIDs, e.g. ['4yys', '2q7q']
-        :return: DisulfideList
-        """
-        res = DisulfideList([], "RCSB_list")
-        for k, v in self.SSDict.items():
-            if k in idlist:
-                for ss_index, value in enumerate(v):
-                    res.append(self.SSList[value])
-        return res
-
     def copy(self):
         """
         Return a copy of self.
