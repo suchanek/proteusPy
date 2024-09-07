@@ -15,7 +15,6 @@ Last Modification: 2/19/24 -egs-
 # pylint: disable=C0301
 # pylint: disable=C0103
 
-
 import math
 
 import matplotlib
