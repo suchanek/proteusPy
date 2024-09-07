@@ -1,6 +1,6 @@
-# pylint: disable=C0301
-# pylint: disable=C0413
-# pylint: disable=C0103
+# pylint: disable=C0301 # line too long
+# pylint: disable=C0413 # wrong import order
+# pylint: disable=C0103 # invalid variable name
 
 """
 `DisulfideExtractor.py`
@@ -50,6 +50,8 @@ from proteusPy import (
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
     LOADER_FNAME,
+    LOADER_MASTER_FNAME,
+    LOADER_MASTER_SUBSET_FNAME,
     LOADER_SUBSET_FNAME,
     SS_PICKLE_FILE,
     SS_SUBSET_PICKLE_FILE,
@@ -235,7 +237,7 @@ def extract_disulfides_chunk(args):
     return result_list
 
 
-def do_extract(verbose, full, cutoff, prune, nthreads=8):
+def do_extract(verbose, full, cutoff, nthreads=8):
     """
     Extracts the disulfides from the PDB files using multiprocessing.
 
@@ -340,7 +342,7 @@ def do_build(verbose, full, subset, cutoff):
     return
 
 
-def update_repo(datadir, destdir):
+def update_repo(datadir, destdir, master=False):
     """
     Updates the repository with the latest SS files.
     """
@@ -348,6 +350,11 @@ def update_repo(datadir, destdir):
     copy(Path(datadir) / LOADER_FNAME, Path(destdir))
     copy(Path(datadir) / LOADER_SUBSET_FNAME, Path(destdir))
     copy(Path(datadir) / SS_PICKLE_FILE, Path(destdir))
+    copy(Path(datadir) / SS_SUBSET_PICKLE_FILE, Path(destdir))
+
+    if master:
+        copy(Path(datadir) / LOADER_MASTER_FNAME, Path(destdir))
+        copy(Path(datadir) / LOADER_MASTER_SUBSET_FNAME, Path(destdir))
 
 
 def do_stuff(
@@ -393,7 +400,6 @@ def do_stuff(
             verbose=_verbose,
             full=_full,
             cutoff=cutoff,
-            prune=prune,
             nthreads=_threads,
         )
         print("\n")

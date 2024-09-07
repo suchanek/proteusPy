@@ -12,7 +12,8 @@ Functions:
         Calculate the dihedral angle between four vectors representing four connected points.
 """
 
-import logging
+# pylint: disable=C0301
+
 import math
 
 import numpy as np
@@ -96,7 +97,7 @@ class Vector3D:
 
     def __init__(self, x, y=None, z=None):
         """
-        Initialize the vector with either a list/tuple/array of 3 elements or 
+        Initialize the vector with either a list/tuple/array of 3 elements or
         three separate values.
         """
         if y is None and z is None:
@@ -182,12 +183,6 @@ class Vector3D:
             self._coords = self._coords / norm
         else:
             _logger.error("Vector3D: Cannot normalize a zero vector")
-
-    def normalized(self):
-        """Return a normalized copy of the vector."""
-        res = self.copy()
-        res.normalize()
-        return res
 
     def angle_with(self, other):
         """

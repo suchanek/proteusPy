@@ -190,8 +190,8 @@ class Disulfide:
         self.distal_chain = distal_chain
         self.pdb_id = pdb_id
         self.quiet = quiet
-        self.proximal_secondary = ("Nosecondary",)
-        self.distal_secondary = ("Nosecondary",)
+        self.proximal_secondary = "Nosecondary"
+        self.distal_secondary = "Nosecondary"
         self.ca_distance = _FLOAT_INIT
         self.cb_distance = _FLOAT_INIT
         self.torsion_array = np.array(
@@ -860,12 +860,12 @@ class Disulfide:
                 bond_conn = _bond_conn_backbone
                 bond_split_colors = _bond_split_colors_backbone
 
-            for i in range(len(bond_conn)):
+            for i, bond in enumerate(bond_conn):
                 if all_atoms:
                     if i > 10 and missing_atoms is True:  # skip missing atoms
                         continue
 
-                bond = bond_conn[i]
+                # bond = bond_conn[i]
 
                 # get the indices for the origin and destination atoms
                 orig = bond[0]
@@ -2655,7 +2655,7 @@ def Initialize_Disulfide_From_Coords(
         cb1 = prox_atom_list[4]
         sg1 = prox_atom_list[5]
 
-    except Exception:
+    except KeyError:
         # i'm torn on this. there are a lot of missing coordinates, so is
         # it worth the trouble to note them? I think so.
         _logger.error(f"Invalid/missing coordinates for: {id}, proximal: {proximal}")

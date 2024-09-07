@@ -6,38 +6,46 @@ Copyright (c)2024 Eric G. Suchanek, PhD, all rights reserved
 """
 
 # Last modification 7/25/24 -egs-
-
+# pylint: disable=c0103
+# pylint: disable=c0413
+# pylint: disable=w1514
 
 import copy
 import datetime
 import glob
+import itertools
 import logging
 import math
 import os
 import pickle
+import shutil
 import subprocess
 import time
 from pathlib import Path
 
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import psutil
+from tqdm.contrib.logging import logging_redirect_tqdm
 
-from proteusPy import Disulfide
+from proteusPy import Disulfide, DisulfideList, __version__
+from proteusPy.angle_annotation import AngleAnnotation
+from proteusPy.DisulfideExceptions import DisulfideIOException
 from proteusPy.logger_config import get_logger
+from proteusPy.ProteusGlobals import (
+    MODEL_DIR,
+    PDB_DIR,
+    PROBLEM_ID_FILE,
+    SS_ID_FILE,
+    SS_PICKLE_FILE,
+)
 
 _logger = get_logger(__name__)
 
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
-
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-from matplotlib import cm
-
-from proteusPy import DisulfideList, __version__
-from proteusPy.DisulfideExceptions import DisulfideIOException, DisulfideParseWarning
-from proteusPy.ProteusPyWarning import ProteusPyWarning
-from proteusPy.vector3D import Vector3D
 
 try:
     # Check if running in Jupyter
@@ -49,16 +57,6 @@ try:
 except NameError:
     from tqdm import tqdm
 
-from tqdm.contrib.logging import logging_redirect_tqdm
-
-from proteusPy.ProteusGlobals import (
-    DATA_DIR,
-    MODEL_DIR,
-    PDB_DIR,
-    PROBLEM_ID_FILE,
-    SS_ID_FILE,
-    SS_PICKLE_FILE,
-)
 
 PBAR_COLS = 80
 
@@ -89,7 +87,8 @@ def get_jet_colormap(steps):
 
     :param steps: The number of steps in the output array.
 
-    :return: An array of uniformly spaced RGB values using the 'jet' colormap. The shape of the array is (steps, 3).
+    :return: An array of uniformly spaced RGB values using the 'jet' colormap. The shape
+    of the array is (steps, 3).
     :rtype: numpy.ndarray
 
     Example:
@@ -100,7 +99,6 @@ def get_jet_colormap(steps):
                [255, 148,   0],
                [127,   0,   0]], dtype=uint8)
     """
-    import matplotlib
 
     norm = np.linspace(0.0, 1.0, steps)
     colormap = matplotlib.colormaps["jet"]
@@ -145,7 +143,6 @@ def extract_firstchain_ss(sslist, verbose=False):
     :param sslist: Starting SS list
     :return: (Pruned SS list, xchain)
     """
-    from proteusPy import DisulfideList
 
     chain = ""
     chainlist = []
@@ -160,12 +157,14 @@ def extract_firstchain_ss(sslist, verbose=False):
         if pc != dc:
             xchain += 1
             if verbose:
-                _logger.info(f"extract_firstchain_ss(): Cross chain ss: {ss}")
+                _logger.info("extract_firstchain_ss(): Cross chain ss: %s", ss)
         chainlist.append(pc)
     try:
         chain = chainlist[0]
     except IndexError:
-        _logger.warning(f"extract_firstchain_ss(): No chains found in SS list: {chain}")
+        _logger.warning(
+            "extract_firstchain_ss(): No chains found in SS list: %s", chain
+        )
         return res, xchain
 
     for ss in sslist:
@@ -183,11 +182,10 @@ def prune_extra_ss(sslist):
     :param ssdict: input dictionary with disulfides
     """
     xchain = 0
-    from proteusPy import DisulfideList
 
     # print(f'Processing: {ss} with: {sslist}')
-    id = sslist.pdb_id
-    pruned_list = DisulfideList([], id)
+    sid = sslist.pdb_id
+    pruned_list = DisulfideList([], sid)
     pruned_list, xchain = extract_firstchain_ss(sslist)
 
     return copy.deepcopy(pruned_list), xchain
@@ -206,7 +204,7 @@ def download_file(url, directory, verbose=False):
 
     if not os.path.exists(file_path):
         if verbose:
-            _logger.info(f"Downloading {file_name}...")
+            _logger.info("Downloading %s...", file_name)
         command = ["wget", "-P", directory, url]
         subprocess.run(command, check=True)
         print("Download complete.")
@@ -228,6 +226,7 @@ def get_memory_usage():
 
 
 def get_object_size_mb(obj):
+    """Return the size of the object in MB."""
     from pympler import asizeof
 
     size_bytes = asizeof.asizeof(obj)
@@ -294,25 +293,34 @@ def image_to_ascii_art(fname, nwidth):
 
 def generate_vector_dataframe(base=3):
     """
-    Generate a pandas DataFrame containing all combinations for a vector of length 5 with a given base.
+    Generate a pandas DataFrame containing all combinations for a vector of length 5
+    with a given base.
 
-    :param base: An integer representing the base of the vector elements. Must be 2, 3, or 4.
-    :return: A pandas DataFrame with columns 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', where each row
-             contains all combinations for a vector of length 5 with the specified base. The symbols used
-             to represent the vector elements are '-' and '+' for base 2, '-' '+' and '*' for base 3,
-             and '-' '+' '*' and '@' for base 4.
-    :raises ValueError: If the specified base is not supported (i.e., not 2, 3, or 4).
+    The function generates combinations of states based on the provided base and
+    returns them in a pandas DataFrame. The states are defined as follows:
+    - Base 2: ["-", "+"]
+    - Base 4: ["1", "2", "3", "4"]
+    - Base 6: ["1", "2", "3", "4", "5", "6"]
+    - Base 8: ["1", "2", "3", "4", "5", "6", "7", "8"]
+
+    Args:
+        base (int): The base for generating the vector states. Supported bases are 2, 4, 6, and 8.
+
+    Returns:
+        pandas.DataFrame: A DataFrame containing all combinations of the vector states
+        with columns ["chi1", "chi2", "chi3", "chi4", "chi5"].
+
+    Raises:
+        ValueError: If the provided base is not supported.
     """
-    import itertools
-
-    import pandas as pd
-
     if base == 2:
         states = ["-", "+"]
-    elif base == 3:
-        states = ["-", "+", "*"]
     elif base == 4:
-        states = ["-", "+", "*", "@"]
+        states = ["1", "2", "3", "4"]
+    elif base == 6:
+        states = ["1", "2", "3", "4", "5", "6"]
+    elif base == 8:
+        states = ["1", "2", "3", "4", "5", "6", "7", "8"]
     else:
         raise ValueError("Unsupported base")
 
@@ -349,11 +357,6 @@ def plot_class_chart(classes: int) -> None:
 
     This will create a pie chart with 4 equal segments.
     """
-    import matplotlib
-    import matplotlib.pyplot as plt
-    import numpy as np
-
-    from proteusPy.angle_annotation import AngleAnnotation
 
     # Helper function to draw angle easily.
     def plot_angle(ax, pos, angle, length=0.95, acol="C0", **kwargs):
@@ -433,7 +436,7 @@ def retrieve_git_lfs_files(repo_url, objects):
     }
     data = {"operation": "download", "transfer": ["basic"], "objects": objects}
 
-    response = requests.post(batch_url, headers=headers, json=data)
+    response = requests.post(batch_url, headers=headers, json=data, timeout=10)
     if response.status_code == 200:
         # Process the response or save the files
         # For example, you can access the file contents using response.json()
@@ -482,7 +485,7 @@ def display_ss_pymol(
     pm(f"remove not chain {chain}")
     pm(f"show spheres, resi {proximal}+{distal}")
     if solvent:
-        pm(f"show spheres, solvent")
+        pm("show spheres, solvent")
 
     pm(f"color green, resi {proximal}+{distal}")
     pm(f"zoom resi {proximal}+{distal}")
@@ -515,9 +518,6 @@ def Download_Disulfides(
     :param reset: Reset the downloaded files index. Used to restart the download.
     :raises DisulfideIOException: I/O error raised when the PDB file is not found.
     """
-    import os
-    import time
-
     from Bio.PDB import PDBList
 
     start = time.time()
@@ -534,7 +534,7 @@ def Download_Disulfides(
 
     # list of IDs containing >1 SSBond record
     try:
-        ssfile = open(ssfilename)
+        ssfile = open(ssfilename, "r")
         Line = ssfile.readlines()
     except Exception:
         raise DisulfideIOException(f"Cannot open file: {ssfile}")
@@ -549,7 +549,6 @@ def Download_Disulfides(
     if reset is True:
         completed_file = open(f"{model_home}ss_completed.txt", "w")
         donelines = []
-        SS_DONE = []
     else:
         completed_file = open(f"{model_home}ss_completed.txt", "w+")
         donelines = completed_file.readlines()
@@ -584,6 +583,7 @@ def Download_Disulfides(
 
 
 def remove_duplicate_ss(sslist: DisulfideList) -> list[Disulfide]:
+    """Remove duplicate disulfides from the input list."""
     pruned = []
     for ss in sslist:
         if ss not in pruned:
@@ -626,6 +626,7 @@ def Extract_Disulfides(
     :param dist_cutoff:    Ca distance cutoff to reject a Disulfide.
     :param prune:          Move bad files to bad directory, defaults to True
     """
+    from proteusPy.DisulfideList import load_disulfides_from_id
 
     def name_to_id(fname: str) -> str:
         """
@@ -636,11 +637,6 @@ def Extract_Disulfides(
         """
         ent = fname[3:-4]
         return ent
-
-    import shutil
-
-    from proteusPy import DisulfideList, load_disulfides_from_id
-    from proteusPy.Disulfide import Torsion_DF_Cols
 
     if quiet:
         _logger.setLevel(logging.ERROR)
@@ -674,7 +670,7 @@ def Extract_Disulfides(
         entrylist.append(name_to_id(entry))
 
     if verbose:
-        _logger.info(f"PDB Ids: {entrylist}, len: {len(entrylist)}")
+        _logger.info("PDB Ids: %s, len: %s", entrylist, len(entrylist))
 
     if numb < 0:
         tot = len(entrylist)
@@ -721,29 +717,6 @@ def Extract_Disulfides(
                 sslist2 = []  # list to hold indices for ss_dict2
                 for ss in sslist:
                     All_ss_list.append(ss)
-                    new_row = [
-                        ss.pdb_id,
-                        ss.name,
-                        ss.proximal,
-                        ss.distal,
-                        ss.chi1,
-                        ss.chi2,
-                        ss.chi3,
-                        ss.chi4,
-                        ss.chi5,
-                        ss.energy,
-                        ss.ca_distance,
-                        ss.cb_distance,
-                        ss.phiprox,
-                        ss.psiprox,
-                        ss.phidist,
-                        ss.psidist,
-                        ss.torsion_length,
-                        ss.rho,
-                    ]
-
-                    # add the row to the end of the dataframe
-                    # SS_df.loc[len(SS_df.index)] = new_row.copy()  # deep copy
                     sslist2.append(cnt)
                     cnt += 1
                     tot += 1
@@ -758,7 +731,9 @@ def Extract_Disulfides(
                 bad += 1
                 problem_ids.append(entry)
                 if verbose:
-                    _logger.warning(f"Extract_Disulfides(): No SS parsed for: {entry}!")
+                    _logger.warning(
+                        "Extract_Disulfides(): No SS parsed for: %s!", entry
+                    )
 
                 if prune:
                     fname = f"pdb{entry}.ent"
@@ -767,10 +742,12 @@ def Extract_Disulfides(
 
                     # Copy the file to the new destination with the correct filename
                     _logger.warning(
-                        f"Extract_Disulfides(): Moving {fname} to {destination_file_path}"
+                        "Extract_Disulfides(): Moving %s to %s",
+                        fname,
+                        destination_file_path,
                     )
                     shutil.move(fname, destination_file_path)
-                continue  ## this entry has no SS bonds, so we break the loop and move on to the next entry
+                continue  ## this entry has no SS bonds, so we break the loop
 
             i += 1
             if i % 100 == 0:
@@ -784,10 +761,9 @@ def Extract_Disulfides(
         problem_df["id"] = problem_ids
 
         _logger.warning(
-            (
-                f"Found and moved: {len(problem_ids)} non-parsable structures."
-                f"Saving problem IDs to file: {Path(datadir) / problemfile}"
-            )
+            "Found and moved: %d non-parsable structures. Saving problem IDs to file: %s",
+            len(problem_ids),
+            Path(datadir) / problemfile,
         )
 
         problem_df.to_csv(Path(datadir) / problemfile)
@@ -797,7 +773,7 @@ def Extract_Disulfides(
 
     if bad_dist > 0:
         if verbose:
-            _logger.warning(f"Found and ignored: {bad_dist} long SS bonds.")
+            _logger.warning("Found and ignored: %s long SS bonds.", bad_dist)
 
     else:
         if verbose:
@@ -807,7 +783,7 @@ def Extract_Disulfides(
     fname = Path(datadir) / picklefile
 
     if verbose:
-        _logger.info(f"Saving {len(All_ss_list)} Disulfides to file: {fname}")
+        _logger.info("Saving %d Disulfides to file: %s", len(All_ss_list), fname)
 
     with open(fname, "wb+") as f:
         pickle.dump(All_ss_list, f)
@@ -817,8 +793,8 @@ def Extract_Disulfides(
 
     if verbose:
         _logger.info(
-            f"Disulfide Extraction complete! Elapsed time:\
-    	    {datetime.timedelta(seconds=elapsed)} (h:m:s)"
+            "Disulfide Extraction complete! Elapsed time: %s (h:m:s)",
+            datetime.timedelta(seconds=elapsed),
         )
 
     # return to original directory
@@ -841,7 +817,7 @@ def Extract_Disulfides_From_List(
     problemfile=PROBLEM_ID_FILE,
     dist_cutoff=-1.0,
     prune=True,
-    sslist=[],
+    sslist=None,
 ) -> None:
     """
     Read the PDB files contained in ``pdbdir`` and create the .pkl files needed for the
@@ -863,11 +839,7 @@ def Extract_Disulfides_From_List(
     :param dist_cutoff:    Ca distance cutoff to reject a Disulfide.
     :param prune:          Move bad files to bad directory, defaults to True
     """
-
-    import shutil
-
-    from proteusPy import DisulfideList, load_disulfides_from_id
-    from proteusPy.Disulfide import Torsion_DF_Cols
+    from proteusPy.DisulfideList import load_disulfides_from_id
 
     if quiet:
         _logger.setLevel(logging.ERROR)
@@ -891,7 +863,9 @@ def Extract_Disulfides_From_List(
     entrylist = sslist
     if verbose:
         _logger.info(
-            f"Extract_Disulfides(): PDB Ids: {entrylist}, len: {len(entrylist)}"
+            "Extract_Disulfides(): PDB Ids: %s, len: %d",
+            entrylist,
+            len(entrylist),
         )
 
     # create a dataframe with the following columns for the disulfide conformations
@@ -934,29 +908,6 @@ def Extract_Disulfides_From_List(
                 sslist2 = []  # list to hold indices for ss_dict2
                 for ss in sslist:
                     All_ss_list.append(ss)
-                    new_row = [
-                        ss.pdb_id,
-                        ss.name,
-                        ss.proximal,
-                        ss.distal,
-                        ss.chi1,
-                        ss.chi2,
-                        ss.chi3,
-                        ss.chi4,
-                        ss.chi5,
-                        ss.energy,
-                        ss.ca_distance,
-                        ss.cb_distance,
-                        ss.phiprox,
-                        ss.psiprox,
-                        ss.phidist,
-                        ss.psidist,
-                        ss.torsion_length,
-                        ss.rho,
-                    ]
-
-                    # add the row to the end of the dataframe
-                    # SS_df.loc[len(SS_df.index)] = new_row.copy()  # deep copy
                     sslist2.append(cnt)
                     cnt += 1
                     tot += 1
@@ -971,17 +922,21 @@ def Extract_Disulfides_From_List(
                 bad += 1
                 problem_ids.append(entry)
                 if verbose:
-                    _logger.warning(f"Extract_Disulfides(): No SS parsed for: {entry}!")
+                    _logger.warning(
+                        "Extract_Disulfides(): No SS parsed for: %s!", entry
+                    )
                 if prune:
                     fname = f"pdb{entry}.ent"
                     # Construct the full path for the new destination file
                     destination_file_path = Path(bad_dir) / fname
                     # Copy the file to the new destination with the correct filename
                     _logger.warning(
-                        f"Extract_Disulfides(): Moving {fname} to {destination_file_path}"
+                        "Extract_Disulfides(): Moving %s to %s",
+                        fname,
+                        destination_file_path,
                     )
                     shutil.move(fname, destination_file_path)
-                continue  ## this entry has no SS bonds, so we break the loop and move on to the next entry
+                continue  ## this entry has no SS bonds, so we break the loop
 
             pbar.set_postfix(
                 {"ID": entry, "NoSS": bad, "Cnt": tot}
@@ -994,8 +949,10 @@ def Extract_Disulfides_From_List(
 
         _logger.warning(
             (
-                f"Found and moved: {len(problem_ids)} non-parsable structures."
-                f"Saving problem IDs to file: {datadir}{problemfile}"
+                "Found and moved: %d non-parsable structures.\nSaving problem IDs to file: %s%s",
+                len(problem_ids),
+                datadir,
+                problemfile,
             )
         )
 
@@ -1007,7 +964,7 @@ def Extract_Disulfides_From_List(
 
     if bad_dist > 0:
         if verbose:
-            _logger.warning(f"Found and ignored: {bad_dist} long SS bonds.")
+            _logger.warning("Found and ignored: %s long SS bonds.", bad_dist)
 
     else:
         if verbose:
@@ -1017,7 +974,7 @@ def Extract_Disulfides_From_List(
     fname = Path(datadir) / picklefile
 
     if verbose:
-        _logger.info(f"Saving {len(All_ss_list)} Disulfides to file: {fname}")
+        _logger.info("Saving %d Disulfides to file: %s", len(All_ss_list), fname)
 
     with open(fname, "wb+") as f:
         pickle.dump(All_ss_list, f)
@@ -1027,8 +984,8 @@ def Extract_Disulfides_From_List(
 
     if verbose:
         _logger.info(
-            f"Disulfide Extraction complete! Elapsed time:\
-    	    {datetime.timedelta(seconds=elapsed)} (h:m:s)"
+            "Disulfide Extraction complete! Elapsed time: %s (h:m:s)",
+            datetime.timedelta(seconds=elapsed),
         )
 
     # return to original directory
@@ -1052,14 +1009,7 @@ def Extract_Disulfide(
     :param pdbdir:         path to PDB files
     :param xtra:           Prune duplicate disulfides
     """
-
-    import glob
-    import os
-    import shutil
-    import time
-
-    import proteusPy
-    from proteusPy import DisulfideList, load_disulfides_from_id
+    from proteusPy.DisulfideList import load_disulfides_from_id
 
     def extract_id_from_filename(filename: str) -> str:
         """
@@ -1085,12 +1035,12 @@ def Extract_Disulfide(
     # Build a list of PDB files in PDB_DIR that are readable. These files were downloaded
     # via the RCSB web query interface for structures containing >= 1 SS Bond.
 
-    id = extract_id_from_filename(pdbid)
+    pid = extract_id_from_filename(pdbid)
 
     # returns an empty list if none are found.
-    _sslist = DisulfideList([], id)
+    _sslist = DisulfideList([], pid)
     _sslist = load_disulfides_from_id(
-        id, model_numb=0, verbose=verbose, quiet=quiet, pdb_dir=pdbdir
+        pid, model_numb=0, verbose=verbose, quiet=quiet, pdb_dir=pdbdir
     )
 
     if len(_sslist) == 0 or _sslist is None:
@@ -1131,6 +1081,7 @@ def get_macos_theme():
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
+            check=True,
         )
 
         # Check the output
@@ -1142,7 +1093,7 @@ def get_macos_theme():
                 return "none"
         else:
             return "none"
-    except Exception as e:
+    except Exception:
         # In case of any exception, return 'none'
         return "none"
 
@@ -1152,8 +1103,8 @@ def get_macos_theme():
 
 def create_deviation_dataframe(disulfide_list):
     """
-    Create a DataFrame with columns PDB_ID, SS_Name, Angle_Deviation, Distance_Deviation, Ca Distance
-    from a list of disulfides.
+    Create a DataFrame with columns PDB_ID, SS_Name, Angle_Deviation, Distance_Deviation,
+    Ca Distance from a list of disulfides.
 
     :param disulfide_list: List of disulfide objects.
     :type proteusPy.DisulfideList: list
@@ -1327,8 +1278,8 @@ def set_logger_level_for_module(pkg_name, level=""):
     logger_dict = logging.Logger.manager.loggerDict
     registered_loggers = [
         name
-        for name in logger_dict
-        if isinstance(logger_dict[name], logging.Logger) and name.startswith(pkg_name)
+        for name, logger in logger_dict.items()
+        if isinstance(logger, logging.Logger) and name.startswith(pkg_name)
     ]
     for logger_name in registered_loggers:
         logger = logging.getLogger(logger_name)
