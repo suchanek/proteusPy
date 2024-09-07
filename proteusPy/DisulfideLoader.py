@@ -10,6 +10,8 @@ Last revision: 8/21/2024
 # pylint: disable=C0301
 # pylint: disable=W1203
 # pylint: disable=C0103
+# pylint: disable=W0612
+
 
 import copy
 import pickle
@@ -42,12 +44,8 @@ from proteusPy.ProteusGlobals import (
     LOADER_SUBSET_URL,
     REPO_DATA_DIR,
     SS_CLASS_DICT_FILE,
-    SS_DICT_PICKLE_FILE,
     SS_PICKLE_FILE,
-    SS_SUBSET_DICT_PICKLE_FILE,
     SS_SUBSET_PICKLE_FILE,
-    SS_SUBSET_TORSIONS_FILE,
-    SS_TORSIONS_FILE,
 )
 
 _logger = get_logger(__name__)
@@ -63,10 +61,6 @@ except NameError:
     from tqdm import tqdm
 
 # Now use tqdm as normal, depending on your environment
-
-# torsion_file and pickle_dict_file will be deprecated in the future.
-# this will cause a change in database structure, necessitating an upload of the new database.
-#
 
 
 class DisulfideLoader:
@@ -99,8 +93,6 @@ class DisulfideLoader:
         verbose: bool = False,
         datadir: Path = REPO_DATA_DIR,
         picklefile: str = SS_PICKLE_FILE,
-        pickle_dict_file: str = SS_DICT_PICKLE_FILE,
-        torsion_file: str = SS_TORSIONS_FILE,
         quiet: bool = True,
         subset: bool = False,
         cutoff: float = -1.0,
@@ -117,9 +109,7 @@ class DisulfideLoader:
 
         self.ModelDir = datadir
         self.PickleFile = Path(datadir) / picklefile
-        self.PickleDictFile = Path(datadir) / pickle_dict_file
         self.PickleClassFile = Path(datadir) / SS_CLASS_DICT_FILE
-        self.TorsionFile = Path(datadir) / torsion_file
         self.SSList = DisulfideList([], "ALL_PDB_SS")
         self.SSDict = {}
         self.TorsionDF = pd.DataFrame()
@@ -135,8 +125,6 @@ class DisulfideLoader:
 
         if subset:
             self.PickleFile = Path(datadir) / SS_SUBSET_PICKLE_FILE
-            self.PickleDictFile = Path(datadir) / SS_SUBSET_DICT_PICKLE_FILE
-            self.TorsionFile = Path(datadir) / SS_SUBSET_TORSIONS_FILE
 
         if self.verbose:
             _logger.info(
@@ -150,10 +138,6 @@ class DisulfideLoader:
 
         self.SSDict = self.create_disulfide_dict()
         self.IDList = list(self.SSDict.keys())
-
-        # tmpDF = pd.read_csv(self.TorsionFile)
-        # tmpDF.drop(tmpDF.columns[[0]], axis=1, inplace=True)
-        # self.TorsionDF = tmpDF.copy()
 
         self.TorsionDF = sslist.torsion_df
         self.TotalDisulfides = len(self.SSList)
@@ -444,7 +428,6 @@ class DisulfideLoader:
 
         if pdbID:
             try:
-                # pylint: ignore=W0612
                 res = self.SSDict[pdbID]
                 sel = self.TorsionDF["source"] == pdbID
                 res_df = self.TorsionDF[sel]

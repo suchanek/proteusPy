@@ -53,6 +53,8 @@ from proteusPy.ProteusGlobals import (
     LOADER_MASTER_FNAME,
     LOADER_MASTER_SUBSET_FNAME,
     LOADER_SUBSET_FNAME,
+    SS_MASTER_PICKLE_FILE,
+    SS_MASTER_SUBSET_PICKLE_FILE,
     SS_PICKLE_FILE,
     SS_SUBSET_PICKLE_FILE,
 )
@@ -237,7 +239,7 @@ def extract_disulfides_chunk(args):
     return result_list
 
 
-def do_extract(verbose, full, cutoff, nthreads=8):
+def do_extract(verbose, full, cutoff, nthreads=8, master=False):
     """
     Extracts the disulfides from the PDB files using multiprocessing.
 
@@ -306,10 +308,27 @@ def do_extract(verbose, full, cutoff, nthreads=8):
         with open(str(DATA_DIR / SS_SUBSET_PICKLE_FILE), "wb+") as f:
             pickle.dump(res_list, f)
 
+    if master:
+        if full:
+            if verbose:
+                print(f"Saving Master SS list to: {DATA_DIR / SS_MASTER_PICKLE_FILE}")
+
+            with open(str(DATA_DIR / SS_MASTER_PICKLE_FILE), "wb+") as f:
+                pickle.dump(res_list, f)
+
+        else:
+            if verbose:
+                print(
+                    f"Saving Master SS subset list to: {DATA_DIR / SS_MASTER_SUBSET_PICKLE_FILE}"
+                )
+
+            with open(str(DATA_DIR / SS_MASTER_SUBSET_PICKLE_FILE), "wb+") as f:
+                pickle.dump(res_list, f)
+
     return
 
 
-def do_build(verbose, full, subset, cutoff):
+def do_build(verbose, full, subset, cutoff, master):
     """
     Load and save a ```proteusPy.DisulfideLoader``` object
     to a .pkl file.
@@ -322,12 +341,19 @@ def do_build(verbose, full, subset, cutoff):
     if full:
         if verbose:
             print(
-                f"Building the packed loader for the full dataset with cutoff: {cutoff}..."
+                f"Building the compressed loader for the full dataset with cutoff: {cutoff}..."
             )
         PDB_SS = DisulfideLoader(
-            datadir=DATA_DIR, subset=False, verbose=verbose, cutoff=cutoff
+            datadir=DATA_DIR,
+            subset=False,
+            verbose=verbose,
+            cutoff=cutoff,
         )
-        PDB_SS.save(savepath=DATA_DIR, subset=False, cutoff=cutoff)
+        if master:
+            PDB_SS.save(savepath=DATA_DIR, subset=False, cutoff=cutoff, master=master)
+
+        # this will save twice if master so that the 'normal' loader is saved as well.
+        PDB_SS.save(savepath=DATA_DIR, subset=False, cutoff=cutoff, master=False)
 
     if subset:
         if verbose:
@@ -335,14 +361,20 @@ def do_build(verbose, full, subset, cutoff):
                 f"Building the packed loader for the Disulfide subset with cutoff: {cutoff}..."
             )
         PDB_SS = DisulfideLoader(
-            datadir=DATA_DIR, subset=True, verbose=verbose, cutoff=cutoff
+            datadir=DATA_DIR,
+            subset=True,
+            verbose=verbose,
+            cutoff=cutoff,
         )
-        PDB_SS.save(savepath=DATA_DIR, subset=True, cutoff=cutoff)
+        if master:
+            PDB_SS.save(savepath=DATA_DIR, subset=True, cutoff=cutoff, master=master)
+
+        PDB_SS.save(savepath=DATA_DIR, subset=True, cutoff=cutoff, master=False)
 
     return
 
 
-def update_repo(datadir, destdir, master=False):
+def update_repo(datadir, destdir, master=False, full=True):
     """
     Updates the repository with the latest SS files.
     """
@@ -353,8 +385,12 @@ def update_repo(datadir, destdir, master=False):
     copy(Path(datadir) / SS_SUBSET_PICKLE_FILE, Path(destdir))
 
     if master:
-        copy(Path(datadir) / LOADER_MASTER_FNAME, Path(destdir))
-        copy(Path(datadir) / LOADER_MASTER_SUBSET_FNAME, Path(destdir))
+        if full:
+            copy(Path(datadir) / LOADER_MASTER_FNAME, Path(destdir))
+            copy(Path(datadir) / SS_MASTER_PICKLE_FILE, Path(destdir))
+        else:
+            copy(Path(datadir) / LOADER_MASTER_SUBSET_FNAME, Path(destdir))
+            copy(Path(datadir) / SS_MASTER_SUBSET_PICKLE_FILE, Path(destdir))
 
 
 def do_stuff(
@@ -365,7 +401,6 @@ def do_stuff(
     subset=False,
     verbose=False,
     cutoff=-1.0,
-    prune=True,
     threads=8,
     forge="miniforge3",
     env="ppydev",
@@ -391,6 +426,9 @@ def do_stuff(
     _threads = threads
     _forge = forge
     _env = env
+    _cutoff = cutoff
+
+    _master = bool(_cutoff < 0.0)
 
     if _extract is True:
         if verbose:
@@ -401,19 +439,23 @@ def do_stuff(
             full=_full,
             cutoff=cutoff,
             nthreads=_threads,
+            master=_master,
         )
         print("\n")
 
     if _build is True:
         if verbose:
-            print(f"Building with cutoff: {cutoff}")
-        do_build(_verbose, _full, _subset, cutoff)
+            if _master:
+                print("Building master loader since cutoff is negative.")
+            else:
+                print(f"Building with cutoff: {cutoff}")
+        do_build(_verbose, _full, _subset, cutoff, master=_master)
 
     if _update is True:
         if verbose:
             print(f"Copying SS files from: {DATA_DIR} to {REPO_DATA}")
 
-        update_repo(DATA_DIR, REPO_DATA)
+        update_repo(DATA_DIR, REPO_DATA, master=_master, full=_full)
 
         if _forge == "miniforge3":
             venv_dir = MINIFORGE_DIR / _env / VENV_DIR
@@ -423,7 +465,7 @@ def do_stuff(
         if verbose:
             print(f"Copying SS files from: {DATA_DIR} to {venv_dir}")
 
-        update_repo(DATA_DIR, venv_dir)
+        update_repo(DATA_DIR, venv_dir, master=_master, full=_full)
 
     return
 

@@ -271,26 +271,22 @@ class Disulfide:
     def __lt__(self, other):
         if isinstance(other, Disulfide):
             return self.energy < other.energy
-        else:
-            return NotImplemented
+        return NotImplemented
 
     def __le__(self, other):
         if isinstance(other, Disulfide):
             return self.energy <= other.energy
-        else:
-            return NotImplemented
+        return NotImplemented
 
     def __gt__(self, other):
         if isinstance(other, Disulfide):
             return self.energy > other.energy
-        else:
-            return NotImplemented
+        return NotImplemented
 
     def __ge__(self, other):
         if isinstance(other, Disulfide):
             return self.energy >= other.energy
-        else:
-            return NotImplemented
+        return NotImplemented
 
     def __eq__(self, other):
         if isinstance(other, Disulfide):
@@ -304,8 +300,7 @@ class Disulfide:
     def __ne__(self, other):
         if isinstance(other, Disulfide):
             return self.proximal != other.proximal or self.distal != other.distal
-        else:
-            return NotImplemented
+        return NotImplemented
 
     def __repr__(self):
         """
