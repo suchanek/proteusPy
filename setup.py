@@ -22,6 +22,9 @@ This code is in beta.
 Eric G. Suchanek, PhD., suchanek@mac.com
 """
 
+# pylint: disable=E0011
+# pylint: disable=W0611
+
 import sys
 from pathlib import Path
 
@@ -35,7 +38,7 @@ except ImportError:
 
 if "bdist_wheel" in sys.argv:
     try:
-        import wheel  # noqa: F401
+        import wheel  # pylint: disable=E0011
     except ImportError:
         sys.exit(
             "We need both setuptools AND wheel packages installed "
@@ -144,7 +147,6 @@ setup(
         "proteusPy": [
             "data/PDB_all_ss.pkl",
             "data/PDB_SS_ALL_LOADER.pkl",
-            "data/PDB_all_ss_dict.pkl",
         ]
     },
     zip_safe=False,

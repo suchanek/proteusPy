@@ -36,6 +36,8 @@ from proteusPy.ProteusGlobals import (
     DATA_DIR,
     LOADER_ALL_URL,
     LOADER_FNAME,
+    LOADER_MASTER_FNAME,
+    LOADER_MASTER_SUBSET_FNAME,
     LOADER_SUBSET_FNAME,
     LOADER_SUBSET_URL,
     REPO_DATA_DIR,
@@ -250,24 +252,22 @@ class DisulfideLoader:
         res = DisulfideList([], "RCSB_list")
         for k, v in self.SSDict.items():
             if k in idlist:
-                for ss_index in range(len(v)):
-                    res.append(self.SSList[v[ss_index]])
+                for value in v:
+                    res.append(self.SSList[value])
         return res
 
-    def Obuild_ss_from_idlist(self, idlist):
+    def OObuild_ss_from_idlist(self, idlist) -> DisulfideList:
         """
-        Given a list of PDBid, return a DisulfideList of Disulfides
+        Return a DisulfideList of Disulfides for a given list of PDBIDs
 
         :param idlist: List of PDBIDs, e.g. ['4yys', '2q7q']
         :return: DisulfideList
         """
-        res = DisulfideList([], "tmp")
-
-        for sid in idlist:
-            for ss in self.SSList:
-                if ss.pdb_id == sid:
-                    res.append(ss)
-                    break
+        res = DisulfideList([], "RCSB_list")
+        for k, v in self.SSDict.items():
+            if k in idlist:
+                for ss_index, value in enumerate(v):
+                    res.append(self.SSList[value])
         return res
 
     def copy(self):
@@ -458,6 +458,7 @@ class DisulfideLoader:
 
         if pdbID:
             try:
+                # pylint: ignore=W0612
                 res = self.SSDict[pdbID]
                 sel = self.TorsionDF["source"] == pdbID
                 res_df = self.TorsionDF[sel]
@@ -793,7 +794,7 @@ class DisulfideLoader:
         sslist_df["count"] = y
         return sslist_df
 
-    def save(self, savepath=DATA_DIR, subset=False, cutoff=-1.0):
+    def save(self, savepath=DATA_DIR, subset=False, cutoff=-1.0, master=False):
         """
         Save a copy of the fully instantiated Loader to the specified file.
 
@@ -805,10 +806,19 @@ class DisulfideLoader:
         self.version = __version__
         self.cutoff = cutoff
 
-        if subset:
-            fname = LOADER_SUBSET_FNAME
+        fname = None
+
+        if master:
+            if subset:
+                fname = LOADER_MASTER_SUBSET_FNAME
+            else:
+                fname = LOADER_MASTER_FNAME
+
         else:
-            fname = LOADER_FNAME
+            if subset:
+                fname = LOADER_SUBSET_FNAME
+            else:
+                fname = LOADER_FNAME
 
         _fname = Path(savepath) / fname
 
