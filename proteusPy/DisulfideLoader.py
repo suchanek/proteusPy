@@ -91,8 +91,8 @@ class DisulfideLoader:
     def __init__(
         self,
         verbose: bool = False,
-        datadir: Path = REPO_DATA_DIR,
-        picklefile: str = SS_PICKLE_FILE,
+        datadir: Path = DATA_DIR,  # the package installation data directory
+        picklefile: str = SS_PICKLE_FILE,  # PDB_all_ss.pkl by default
         quiet: bool = True,
         subset: bool = False,
         cutoff: float = -1.0,
