@@ -8,6 +8,7 @@ Copyright (c)2024 Eric G. Suchanek, PhD, all rights reserved
 # Last modification 7/25/24 -egs-
 # pylint: disable=c0103
 # pylint: disable=c0413
+# pylint: disable=c0415
 # pylint: disable=w1514
 
 import copy
@@ -82,6 +83,32 @@ def distance_squared(p1: np.array, p2: np.array) -> np.array:
 
 
 def get_jet_colormap(steps):
+    """
+    Return an array of uniformly spaced RGB values using the 'viridis' colormap.
+
+    :param steps: The number of steps in the output array.
+
+    :return: An array of uniformly spaced RGB values using the 'viridis' colormap. The shape
+    of the array is (steps, 3).
+    :rtype: numpy.ndarray
+
+    Example:
+        >>> get_viridis_colormap(5)
+        array([[ 68,   1,  84],
+               [ 72,  40, 120],
+               [ 32, 144, 140],
+               [ 94, 201,  98],
+               [253, 231,  37]], dtype=uint8)
+    """
+
+    norm = np.linspace(0.0, 1.0, steps)
+    colormap = plt.get_cmap("viridis")
+    rgbcol = colormap(norm, bytes=True)[:, :3]
+
+    return rgbcol
+
+
+def Oget_jet_colormap(steps):
     """
     Return an array of uniformly spaced RGB values using the 'jet' colormap.
 

@@ -19,6 +19,7 @@ Author: Eric G. Suchanek, PhD
 import copy
 import logging
 import math
+import os
 import warnings
 from math import cos
 
