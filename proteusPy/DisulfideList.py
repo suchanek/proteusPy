@@ -10,6 +10,9 @@ Author: Eric G. Suchanek, PhD
 Last revision: 7/12/2024 -egs-
 """
 
+# pylint: disable=c0103
+# pylint: disable=c0301
+
 try:
     # Check if running in Jupyter
     shell = get_ipython().__class__.__name__
@@ -20,13 +23,14 @@ try:
 except NameError:
     from tqdm import tqdm
 
+import copy
 import logging
+import os
 from collections import UserList
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
 import pyvista as pv
 from plotly.subplots import make_subplots
@@ -35,7 +39,7 @@ import proteusPy
 from proteusPy import Disulfide
 from proteusPy.atoms import *
 from proteusPy.logger_config import get_logger
-from proteusPy.ProteusGlobals import DATA_DIR, MODEL_DIR, PBAR_COLS, WINSIZE
+from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, WINSIZE
 from proteusPy.utility import get_jet_colormap, grid_dimensions
 
 _logger = get_logger(__name__)
@@ -139,7 +143,7 @@ class DisulfideList(UserList):
     >>> subset.display_overlay()
     """
 
-    def __init__(self, iterable, id: str, res=-1.0, quiet=True):
+    def __init__(self, iterable, pid: str, res=-1.0, quiet=True):
         """
         Initialize the DisulfideList
 
@@ -167,7 +171,7 @@ class DisulfideList(UserList):
 
         super().__init__(self.validate_ss(item) for item in iterable)
 
-        self.pdb_id = id
+        self.pdb_id = pid
         self.quiet = quiet
         total = 0
         count = 0
@@ -217,7 +221,6 @@ class DisulfideList(UserList):
         :return: Window in the relevant style
         """
         ssList = self.data
-        name = self.id
         tot_ss = len(ssList)  # number off ssbonds
         rows, cols = grid_dimensions(tot_ss)
         winsize = (panelsize * cols, panelsize * rows)
@@ -255,7 +258,6 @@ class DisulfideList(UserList):
 
         """
         sslist = self.data
-        tot = len(sslist)
         cnt = 1
 
         total = 0.0
@@ -297,9 +299,6 @@ class DisulfideList(UserList):
 
         sslist = self.data
         tot = len(sslist)
-
-        tors = self.build_torsion_df()
-
         res = np.zeros(5)
 
         for ss, i in zip(sslist, range(tot)):
@@ -342,7 +341,6 @@ class DisulfideList(UserList):
         :return: Torsion Distance (degrees)
         """
         sslist = self.data
-        tot = len(sslist)
         total = 0
         cnt = 1
 
@@ -476,13 +474,13 @@ class DisulfideList(UserList):
     def calculate_torsion_statistics(self):
         df = self.build_torsion_df()
 
-        df_subset = df.iloc[:, 4:]
-        df_stats = df_subset.describe()
+        # df_subset = df.iloc[:, 4:]
+        # df_stats = df_subset.describe()
 
         # print(df_stats.head())
 
-        mean_vals = df_stats.loc["mean"].values
-        std_vals = df_stats.loc["std"].values
+        # mean_vals = df_stats.loc["mean"].values
+        # std_vals = df_stats.loc["std"].values
 
         tor_cols = ["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]
         dist_cols = ["ca_distance", "cb_distance", "energy"]
@@ -513,7 +511,7 @@ class DisulfideList(UserList):
             - 'plain' - boring single color
         :light: If True, light background, if False, dark
         """
-        id = self.pdb_id
+        pid = self.pdb_id
         ssbonds = self.data
         tot_ss = len(ssbonds)  # number off ssbonds
         avg_enrg = self.Average_Energy
@@ -525,7 +523,7 @@ class DisulfideList(UserList):
         else:
             pv.set_plot_theme("dark")
 
-        title = f"<{id}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
+        title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
 
         pl = pv.Plotter()
         pl = self._render(style, panelsize)
@@ -730,7 +728,7 @@ class DisulfideList(UserList):
         :param light: Background color, defaults to True for White. False for Dark.
         """
 
-        id = self.pdb_id
+        pid = self.pdb_id
         ssbonds = self.data
         tot_ss = len(ssbonds)  # number off ssbonds
         avg_enrg = self.Average_Energy
@@ -746,7 +744,7 @@ class DisulfideList(UserList):
         if tot_ss > 300:
             res = 8
 
-        title = f"<{id}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
+        title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
 
         if light:
             pv.set_plot_theme("document")
@@ -1163,8 +1161,6 @@ def load_disulfides_from_id(
     >>> SSlist
     [<Disulfide 5rsa_26A_84A, Source: 5rsa, Resolution: 2.0 Å>, <Disulfide 5rsa_40A_95A, Source: 5rsa, Resolution: 2.0 Å>, <Disulfide 5rsa_58A_110A, Source: 5rsa, Resolution: 2.0 Å>, <Disulfide 5rsa_65A_72A, Source: 5rsa, Resolution: 2.0 Å>]
     """
-    import copy
-    import os
 
     from proteusPy.Disulfide import Initialize_Disulfide_From_Coords
     from proteusPy.ssparser import extract_ssbonds_and_atoms
@@ -1181,7 +1177,8 @@ def load_disulfides_from_id(
     # model = structure[model_numb]
 
     if verbose:
-        _logger.info(f"-> load_disulfide_from_id() - Parsing structure: {pdb_id}:")
+        mess = f"-> load_disulfide_from_id() - Parsing structure: {pdb_id}:"
+        _logger.info(mess)
 
     SSList = DisulfideList([], pdb_id, resolution)
 
@@ -1194,14 +1191,14 @@ def load_disulfides_from_id(
 
     if num_ssbonds == 0:
         if verbose:
-            print(f"-> load_disulfides_from_id(): {pdb_id} has no SSBonds.")
-        _logger.warning(f"-> load_disulfides_from_id(): {pdb_id} has no SSBonds.")
+            mess = f"-> load_disulfides_from_id(): {pdb_id} has no SSBonds."
+            print(mess)
+        _logger.warning(mess)
         return None
 
     if verbose:
-        _logger.info(
-            f"-> load_disulfides_from_id(): {pdb_id} has {num_ssbonds} SSBonds, found: {errors} errors"
-        )
+        mess = f"-> load_disulfides_from_id(): {pdb_id} has {num_ssbonds} SSBonds, found: {errors} errors"
+        _logger.info(mess)
 
     # with warnings.catch_warnings():
     if quiet:
@@ -1213,13 +1210,12 @@ def load_disulfides_from_id(
         chain1_id = pair["proximal"][0]
         distal = pair["distal"][1]
         chain2_id = pair["distal"][0]
-        proximal_secondary = pair['prox_secondary']
-        distal_secondary = pair['dist_secondary']
+        proximal_secondary = pair["prox_secondary"]
+        distal_secondary = pair["dist_secondary"]
 
         if dbg:
-            _logger.info(
-                f"Proximal: {proximal} {chain1_id} Distal: {distal} {chain2_id}"
-            )
+            mess = f"Proximal: {proximal} {chain1_id} Distal: {distal} {chain2_id}"
+            _logger.info(mess)
 
         proximal_int = int(proximal)
         distal_int = int(distal)
@@ -1231,9 +1227,8 @@ def load_disulfides_from_id(
                 _logger.info(mess)
 
         if verbose:
-            _logger.info(
-                f"-> load_disulfides_from_id(): SSBond: {i}: {pdb_id}: {proximal} {chain1_id} - {distal} {chain2_id}"
-            )
+            mess = f"-> load_disulfides_from_id(): SSBond: {i}: {pdb_id}: {proximal} {chain1_id} - {distal} {chain2_id}"
+            _logger.info(mess)
 
         new_ss = Initialize_Disulfide_From_Coords(
             ssbond_atom_list,
@@ -1250,7 +1245,7 @@ def load_disulfides_from_id(
             dbg=dbg,
         )
         if verbose:
-            _logger.info(f"New SS: {new_ss}")
+            _logger.info("New SS: %s", new_ss)
 
         if new_ss is not None:
             SSList.append(new_ss)
