@@ -179,7 +179,7 @@ class DisulfideLoader:
         if isinstance(item, int):
             if item < 0 or item >= self.TotalDisulfides:
                 mess = f"DisulfideLoader(): Index {item} out of range 0-{self.TotalDisulfides - 1}"
-                raise DisulfideException(mess)
+                _logger.error(mess)
             else:
                 return self.SSList[item]
 
@@ -880,7 +880,9 @@ def Download_PDB_SS_GitHub(loadpath=DATA_DIR, verbose=True, subset=False):
     return _good1 + _good2
 
 
-def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoader:
+def Load_PDB_SS(
+    loadpath=DATA_DIR, verbose=False, subset=False, master=False
+) -> DisulfideLoader:
     """
     Load the fully instantiated Disulfide database from the specified file. Use the
     defaults unless you are building the database by hand. *This is the function
@@ -889,6 +891,7 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
     :param loadpath: Path from which to load, defaults to DATA_DIR
     :param verbose: Verbosity, defaults to False
     :param subset: If True, load the subset DB, otherwise load the full database
+    :param master: If True, load the master database, otherwise load the standard database
     """
     # normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy
     # distribution. In that case we need to download the files for all disulfides and the subset
@@ -897,8 +900,13 @@ def Load_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False) -> DisulfideLoad
     _good1 = False  # all data
     _good2 = False  # subset data
 
-    _fname_sub = Path(loadpath) / LOADER_SUBSET_FNAME
-    _fname_all = Path(loadpath) / LOADER_FNAME
+    if master:
+        loadpath = Path(DATA_DIR)
+        _fname_sub = Path(loadpath) / LOADER_MASTER_SUBSET_FNAME
+        _fname_all = Path(loadpath) / LOADER_MASTER_FNAME
+    else:
+        _fname_sub = Path(loadpath) / LOADER_SUBSET_FNAME
+        _fname_all = Path(loadpath) / LOADER_FNAME
 
     if subset:
         _fname = _fname_sub

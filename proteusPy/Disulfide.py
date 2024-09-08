@@ -19,7 +19,6 @@ Author: Eric G. Suchanek, PhD
 import copy
 import logging
 import math
-import os
 import warnings
 from math import cos
 
@@ -2684,7 +2683,7 @@ def Initialize_Disulfide_From_Coords(
         cb2 = dist_atom_list[4]
         sg2 = dist_atom_list[5]
 
-    except Exception:
+    except KeyError:
         _logger.error(f"Invalid/missing coordinates for: {id}, distal: {distal}")
         return False
 
@@ -2774,9 +2773,6 @@ def Initialize_Disulfide_From_Coords(
     new_ss.chi3 = calc_dihedral(cb1, sg1, sg2, cb2)
     new_ss.chi4 = calc_dihedral(sg1, sg2, cb2, ca2)
     new_ss.chi5 = calc_dihedral(sg2, cb2, ca2, n2)
-
-    new_ss.rho = calc_dihedral(n1, ca1, ca2, n2)
-
     new_ss.ca_distance = distance3d(new_ss.ca_prox, new_ss.ca_dist)
     new_ss.cb_distance = distance3d(new_ss.cb_prox, new_ss.cb_dist)
     new_ss.torsion_array = np.array(
@@ -2789,6 +2785,9 @@ def Initialize_Disulfide_From_Coords(
 
     # compute and set the local coordinates
     new_ss._compute_local_coords()
+
+    # compute rho
+    new_ss._compute_rho()
 
     # turn warnings back on
     if quiet:
