@@ -23,7 +23,6 @@ if PDB_DIR is None:
 
 
 DATA_DIR = _this_dir / "data"
-REPO_DATA_DIR = Path(_this_dir).parent / "data"
 MODEL_DIR = Path(PDB_DIR) / "good"
 
 
