@@ -64,18 +64,19 @@ devclean: .
 
 	
 # activate the package before running!
-install: 
+install: sdist
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	@echo "Installing additional..."
 	@$(CONDA) install vtk==9.2.6 -y
-	@echo "Installing proteusPy..."
 
+	@echo "Installing proteusPy..."
 	@pip install . -q
+	
 	@echo "Installing jupyter..."
 	@python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Installation finished!"
 
-install_dev:
+install_dev: sdist
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	@$(CONDA) install vtk==9.2.6 -y
 	
@@ -99,7 +100,7 @@ jup_dev: .
 format: .
 	black proteusPy
 
-bld:  format  docs sdist
+bld:  docs sdist
 
 sdist: proteusPy/_version.py
 	python setup.py sdist
