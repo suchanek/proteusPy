@@ -141,6 +141,8 @@ setup(
             "data/ss_ids.txt",
             "data/SS_consensus_class_oct.pkl",
             "data/SS_consensus_class_32.pkl",
+            "data/2q7q_seqsim.csv",
+            "data/PDB_SS_class_definitions.csv",
         ]
     },
     exclude_package_data={

@@ -1,0 +1,9 @@
+include README.md
+include proteusPy/data/pdb5rsa.ent
+include proteusPy/data/ss_completed.txt
+include proteusPy/data/ss_query.json
+include proteusPy/data/ss_ids.txt
+include proteusPy/data/SS_consensus_class_oct.pkl
+include proteusPy/data/SS_consensus_class_32.pkl
+include proteusPy/data/2q7q_seqsim.csv
+include proteusPy/data/PDB_SS_class_definitions.csv
