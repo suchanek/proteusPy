@@ -13,7 +13,7 @@ import math
 import os
 from pathlib import Path
 
-_this_dir = Path(pkg_resources.files("proteusPy"))
+_this_dir = pkg_resources.files("proteusPy")
 
 HOME_DIR = os.path.expanduser("~")
 PDB_DIR = os.getenv("PDB")
@@ -23,9 +23,8 @@ if PDB_DIR is None:
     PDB_DIR = HOME_DIR
 
 
-DATA_DIR = _this_dir / "data"
-MODEL_DIR = Path(PDB_DIR) / "good"
-
+DATA_DIR = os.path.join(_this_dir, "data")
+MODEL_DIR = os.path.join(PDB_DIR, "good")
 
 WINFRAME = 256  # single panel width
 WINSIZE = (512, 512)
