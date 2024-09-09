@@ -36,11 +36,13 @@ from proteusPy.DisulfideList import DisulfideList
 from proteusPy.logger_config import get_logger
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
+    LOADER_ALL_MASTER_URL,
     LOADER_ALL_URL,
     LOADER_FNAME,
     LOADER_MASTER_FNAME,
     LOADER_MASTER_SUBSET_FNAME,
     LOADER_SUBSET_FNAME,
+    LOADER_SUBSET_MASTER_URL,
     LOADER_SUBSET_URL,
     SS_CLASS_DICT_FILE,
     SS_PICKLE_FILE,
@@ -803,7 +805,7 @@ class DisulfideLoader:
 # class ends
 
 
-def Download_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False):
+def Download_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False, master=False):
     """
     Download the databases from my Google Drive.
 
@@ -811,21 +813,41 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False):
     :param verbose: Verbosity, defaults to False
     """
 
-    _fname_sub = Path(loadpath) / LOADER_SUBSET_FNAME
-    _fname_all = Path(loadpath) / LOADER_FNAME
+    fname = None
+
+    if master:
+        if subset:
+            fname = LOADER_MASTER_SUBSET_FNAME
+            url = LOADER_SUBSET_MASTER_URL
+        else:
+            fname = LOADER_MASTER_FNAME
+            url = LOADER_ALL_MASTER_URL
+
+    else:
+        if subset:
+            fname = LOADER_SUBSET_FNAME
+            url = LOADER_SUBSET_URL
+        else:
+            fname = LOADER_FNAME
+            url = LOADER_ALL_URL
+
+    _fname = Path(loadpath) / fname
+
+    _fname_sub = Path(loadpath) / fname
+    _fname_all = Path(loadpath) / fname
 
     if verbose:
         print("--> DisulfideLoader: Downloading Disulfide Database from Drive...")
 
-    gdown.download(LOADER_ALL_URL, str(_fname_all), quiet=False)
+    gdown.download(url, str(_fname_all), quiet=False)
 
-    if subset:
-        if verbose:
-            print(
-                "--> DisulfideLoader: Downloading Disulfide Subset Database from Drive..."
-            )
-
-        gdown.download(LOADER_SUBSET_URL, str(_fname_sub), quiet=False)
+    # if subset:
+    #    if verbose:
+    #        print(
+    #            "--> DisulfideLoader: Downloading Disulfide Subset Database from Drive..."
+    #        )
+    #
+    #    gdown.download(url, str(_fname_sub), quiet=False)
 
     return
 
