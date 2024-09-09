@@ -8,11 +8,12 @@ Last revision: 8/3/24 -egs-
 
 # plyint: disable=C0103
 
+import importlib.resources as pkg_resources
 import math
 import os
 from pathlib import Path
 
-_this_dir = Path(__file__).parent
+_this_dir = Path(pkg_resources.files("proteusPy"))
 
 HOME_DIR = os.path.expanduser("~")
 PDB_DIR = os.getenv("PDB")
@@ -26,8 +27,8 @@ DATA_DIR = _this_dir / "data"
 MODEL_DIR = Path(PDB_DIR) / "good"
 
 
-WINFRAME = 512  # single panel width
-WINSIZE = (1024, 1024)
+WINFRAME = 256  # single panel width
+WINSIZE = (512, 512)
 CAMERA_POS = ((0, 0, -10), (0, 0, 0), (0, 1, 0))
 
 # global for initialization of dihedrals and energies

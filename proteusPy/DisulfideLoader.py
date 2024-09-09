@@ -106,7 +106,7 @@ class DisulfideLoader:
         function.
         """
 
-        self.ModelDir = datadir
+        self.ModelDir = Path(datadir)
         self.PickleFile = Path(datadir) / picklefile
         self.PickleClassFile = Path(datadir) / SS_CLASS_DICT_FILE
         self.SSList = DisulfideList([], "ALL_PDB_SS")
@@ -130,7 +130,7 @@ class DisulfideLoader:
                 f"-> DisulfideLoader(): Reading disulfides from: {self.PickleFile}... ",
             )
 
-        with open(str(self.PickleFile), "rb") as f:
+        with open(self.PickleFile, "rb") as f:
             sslist = pickle.load(f)
             self.SSList = sslist
             self.TotalDisulfides = len(self.SSList)
@@ -922,7 +922,7 @@ def Load_PDB_SS(
     if verbose:
         print(f"-> load_PDB_SS(): Reading {_fname}... ")
 
-    with open(str(_fname), "rb") as f:
+    with open(_fname, "rb") as f:
         res = pickle.load(f)
 
     if verbose:
