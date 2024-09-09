@@ -14,11 +14,11 @@ Last revision: 8/21/2024
 
 
 import copy
+import os
 import pickle
 import sys
 import time
 import urllib
-from pathlib import Path
 
 import gdown
 import matplotlib.pyplot as plt
@@ -48,6 +48,9 @@ from proteusPy.ProteusGlobals import (
     SS_PICKLE_FILE,
     SS_SUBSET_PICKLE_FILE,
 )
+
+# from pathlib import Path
+
 
 _logger = get_logger(__name__)
 
@@ -92,7 +95,7 @@ class DisulfideLoader:
     def __init__(
         self,
         verbose: bool = False,
-        datadir: Path = DATA_DIR,  # the package installation data directory
+        datadir: str = DATA_DIR,  # the package installation data directory
         picklefile: str = SS_PICKLE_FILE,  # PDB_all_ss.pkl by default
         quiet: bool = True,
         subset: bool = False,
@@ -108,9 +111,9 @@ class DisulfideLoader:
         function.
         """
 
-        self.ModelDir = Path(datadir)
-        self.PickleFile = Path(datadir) / picklefile
-        self.PickleClassFile = Path(datadir) / SS_CLASS_DICT_FILE
+        self.ModelDir = datadir
+        self.PickleFile = datadir / picklefile
+        self.PickleClassFile = datadir / SS_CLASS_DICT_FILE
         self.SSList = DisulfideList([], "ALL_PDB_SS")
         self.SSDict = {}
         self.TorsionDF = pd.DataFrame()
@@ -125,7 +128,7 @@ class DisulfideLoader:
         self.version = __version__
 
         if subset:
-            self.PickleFile = Path(datadir) / SS_SUBSET_PICKLE_FILE
+            self.PickleFile = datadir / SS_SUBSET_PICKLE_FILE
 
         if self.verbose:
             _logger.info(
@@ -630,7 +633,7 @@ class DisulfideLoader:
         fig.update_layout(autosize=True)
 
         if save:
-            fname = Path(savedir) / f"{title}_{_prefix}.png"
+            fname = os.path.join(savedir, f"{title}_{_prefix}.png")
 
             if verbose:
                 _logger.info(f"Saving {title} plot to {fname}")
@@ -790,8 +793,7 @@ class DisulfideLoader:
             else:
                 fname = LOADER_FNAME
 
-        _fname = Path(savepath) / fname
-
+        _fname = os.path.join(savepath, fname)
         if self.verbose:
             print(f"-> DisulfideLoader.save(): Writing {_fname}... ")
 
@@ -831,15 +833,14 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False, master=False
             fname = LOADER_FNAME
             url = LOADER_ALL_URL
 
-    _fname = Path(loadpath) / fname
+    _fname = os.path.join(loadpath, fname)
 
-    _fname_sub = Path(loadpath) / fname
-    _fname_all = Path(loadpath) / fname
-
+    _fname_sub = os.path.join(loadpath, fname)
+    _fname_all = os.path.join(loadpath, fname)
     if verbose:
         print("--> DisulfideLoader: Downloading Disulfide Database from Drive...")
 
-    gdown.download(url, str(_fname_all), quiet=False)
+    gdown.download(url, str(_fname), quiet=False)
 
     # if subset:
     #    if verbose:
@@ -864,8 +865,8 @@ def Download_PDB_SS_GitHub(loadpath=DATA_DIR, verbose=True, subset=False):
     _good1 = 0  # all data
     _good2 = 0  # subset data
 
-    _fname_sub = Path(loadpath) / LOADER_SUBSET_FNAME
-    _fname_all = Path(loadpath) / LOADER_FNAME
+    _fname_sub = os.path.join(loadpath, LOADER_SUBSET_FNAME)
+    _fname_all = os.path.join(loadpath, LOADER_FNAME)
 
     _all_length = 340371775
     _subset_length = 9636086
@@ -922,22 +923,21 @@ def Load_PDB_SS(
     _good2 = False  # subset data
 
     if master:
-        loadpath = Path(DATA_DIR)
-        _fname_sub = Path(loadpath) / LOADER_MASTER_SUBSET_FNAME
-        _fname_all = Path(loadpath) / LOADER_MASTER_FNAME
+        loadpath = DATA_DIR
+        _fname_sub = os.path.join(loadpath, LOADER_MASTER_SUBSET_FNAME)
+        _fname_all = os.path.join(loadpath, LOADER_MASTER_FNAME)
     else:
-        _fname_sub = Path(loadpath) / LOADER_SUBSET_FNAME
-        _fname_all = Path(loadpath) / LOADER_FNAME
-
+        _fname_sub = os.path.join(loadpath, LOADER_SUBSET_FNAME)
+        _fname_all = os.path.join(loadpath, LOADER_FNAME)
     if subset:
         _fname = _fname_sub
     else:
         _fname = _fname_all
 
-    if not Path(_fname_sub).exists():
+    if not os.path.exists(_fname_sub):
         Download_PDB_SS(loadpath=loadpath, verbose=verbose, subset=True)
 
-    if not Path(_fname_all).exists():
+    if not os.path.exists(_fname_all):
         Download_PDB_SS(loadpath=loadpath, verbose=verbose, subset=False)
 
     # first attempt to read the local copy of the loader
