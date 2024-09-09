@@ -149,6 +149,7 @@ setup(
         "proteusPy": [
             "data/PDB_all_ss.pkl",
             "data/PDB_SS_ALL_LOADER.pkl",
+            "data/PDB_SS_SUBSET_LOADER.pkl",
         ]
     },
     zip_safe=False,
