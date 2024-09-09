@@ -112,8 +112,8 @@ class DisulfideLoader:
         """
 
         self.ModelDir = datadir
-        self.PickleFile = datadir / picklefile
-        self.PickleClassFile = datadir / SS_CLASS_DICT_FILE
+        self.PickleFile = os.path.join(datadir, picklefile)
+        self.PickleClassFile = os.path.join(datadir, SS_CLASS_DICT_FILE)
         self.SSList = DisulfideList([], "ALL_PDB_SS")
         self.SSDict = {}
         self.TorsionDF = pd.DataFrame()
@@ -128,7 +128,7 @@ class DisulfideLoader:
         self.version = __version__
 
         if subset:
-            self.PickleFile = datadir / SS_SUBSET_PICKLE_FILE
+            self.PickleFile = os.path.join(datadir, SS_SUBSET_PICKLE_FILE)
 
         if self.verbose:
             _logger.info(
