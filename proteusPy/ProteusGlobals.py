@@ -3,14 +3,17 @@ This file contains global declarations for the *proteusPy* package, a Python pac
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 7/12/24 -egs-
+Last revision: 8/3/24 -egs-
 """
 
+# plyint: disable=C0103
+
+import importlib.resources as pkg_resources
 import math
 import os
 from pathlib import Path
 
-_this_dir = Path(__file__).parent
+_this_dir = pkg_resources.files("proteusPy")
 
 HOME_DIR = os.path.expanduser("~")
 PDB_DIR = os.getenv("PDB")
@@ -20,12 +23,11 @@ if PDB_DIR is None:
     PDB_DIR = HOME_DIR
 
 
-DATA_DIR = os.path.join(_this_dir, "data", "")
-REPO_DATA_DIR = os.path.join(_this_dir, "data", "")
-MODEL_DIR = os.path.join(PDB_DIR, "good", "")
+DATA_DIR = os.path.join(_this_dir, "data")
+MODEL_DIR = os.path.join(PDB_DIR, "good")
 
-WINFRAME = 512  # single panel width
-WINSIZE = (1024, 1024)
+WINFRAME = 256  # single panel width
+WINSIZE = (512, 512)
 CAMERA_POS = ((0, 0, -10), (0, 0, 0), (0, 1, 0))
 
 # global for initialization of dihedrals and energies
@@ -33,38 +35,48 @@ _FLOAT_INIT = math.nan
 _INT_INIT = -1
 _ANG_INIT = -180.0
 
-PBAR_COLS = 105
+PBAR_COLS = 80
 # nominal macbook Pro screen resolution
 DPI = 220
 
 # global names for the disulfide .pkl files
 
 SS_PICKLE_FILE = "PDB_all_ss.pkl"
-SS_DICT_PICKLE_FILE = "PDB_all_ss_dict.pkl"
-SS_DICT_PICKLE_FILE2 = "PDB_all_ss_dict_ind.pkl"
-SS_TORSIONS_FILE = "PDB_all_ss_torsions.csv"
+SS_MASTER_PICKLE_FILE = "PDB_all_ss_master.pkl"
+
 PROBLEM_ID_FILE = "PDB_all_SS_problems.csv"
 SS_ID_FILE = "ss_ids.txt"
 
 SS_SUBSET_PICKLE_FILE = "PDB_subset_ss.pkl"
-SS_SUBSET_DICT_PICKLE_FILE = "PDB_subset_ss_dict.pkl"
-SS_SUBSET_DICT_PICKLE_FILE_IND = "PDB_subset_ss_dict_ind.pkl"
-SS_SUBSET_TORSIONS_FILE = "PDB_subset_torsions.csv"
+SS_MASTER_SUBSET_PICKLE_FILE = "PDB_subset_ss_master.pkl"
+
 SS_PROBLEM_SUBSET_ID_FILE = "PDB_subset_problems.csv"
 
 # contains the dihedral classes and their members
 SS_CLASS_DICT_FILE = "PDB_ss_classes_dict.pkl"
-SS_CONSENSUS_FILE = "SS_consensus_class_sext.pkl"
+SS_CONSENSUS_OCT_FILE = "SS_consensus_class_oct.pkl"
+SS_CONSENSUS_SEXT_FILE = "SS_consensus_class_sext.pkl"
+SS_CONSENSUS_BIN_FILE = "SS_consensus_class_32.pkl"
 
 LOADER_FNAME = "PDB_SS_ALL_LOADER.pkl"
 LOADER_SUBSET_FNAME = "PDB_SS_SUBSET_LOADER.pkl"
 
+# the unfiltered master loaders
+LOADER_MASTER_FNAME = "PDB_SS_ALL_LOADER_MASTER.pkl"
+LOADER_MASTER_SUBSET_FNAME = "PDB_SS_SUBSET_LOADER_MASTER.pkl"
+
 LOADER_FNAME_URL = "https://raw.githubusercontent.com/suchanek/proteusPy/master/proteusPy/data/PDB_SS_ALL_LOADER.pkl"
 LOADER_SUBSET_FNAME_URL = "https://raw.githubusercontent.com/suchanek/proteusPy/blob/master/proteusPy/data/PDB_SS_SUBSET_LOADER.pkl"
 
-
+LOADER_ALL_MASTER_URL = (
+    "https://drive.google.com/uc?id=1bpb9jkZO_XNNXiSlbsLQRHhl1MHJ1cJP"
+)
+LOADER_SUBSET_MASTER_URL = (
+    "https://drive.google.com/uc?id=1gCbELI9nBRknhLYOHWOZaUtI-L7tXVg9"
+)
 LOADER_ALL_URL = "https://drive.google.com/uc?id=1igF-sppLPaNsBaUS7nkb13vtOGZZmsFp"
 LOADER_SUBSET_URL = "https://drive.google.com/uc?id=1puy9pxrClFks0KN9q5PPV_ONKvL-hg33"
+SS_LIST_URL = "https://drive.google.com/uc?id=1H_Yn8DifsCCilifNicpkcjOQDAGbNGSU"
 
 SS_CLASS_DEFINITIONS = """
 Idx,chi1_s,chi2_s,chi3_s,chi4_s,chi5_s,class_id,SS_Classname,FXN
