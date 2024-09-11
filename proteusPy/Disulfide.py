@@ -2506,7 +2506,7 @@ class Disulfide:
         sidechain dihedral angle space.
 
         >>> low_energy_neighbors = DisulfideList([],'Neighbors')
-        >>> low_energy_neighbors = ssmin_enrg.Torsion_neighbors(sslist, 2)
+        >>> low_energy_neighbors = ssmin_enrg.Torsion_neighbors(sslist, 10)
 
         Display the number found, and then display them overlaid onto their common reference frame.
 
