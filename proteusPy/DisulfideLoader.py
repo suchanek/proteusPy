@@ -4,7 +4,7 @@ the analysis and modeling of protein structures, with an emphasis on disulfide b
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
 Author: Eric G. Suchanek, PhD
-Last revision: 8/21/2024
+Last revision: 9/11/2024
 """
 
 # pylint: disable=C0301
@@ -36,21 +36,13 @@ from proteusPy.DisulfideList import DisulfideList
 from proteusPy.logger_config import get_logger
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
-    LOADER_ALL_MASTER_URL,
     LOADER_ALL_URL,
     LOADER_FNAME,
-    LOADER_MASTER_FNAME,
-    LOADER_MASTER_SUBSET_FNAME,
     LOADER_SUBSET_FNAME,
-    LOADER_SUBSET_MASTER_URL,
     LOADER_SUBSET_URL,
     SS_LIST_URL,
     SS_PICKLE_FILE,
-    SS_SUBSET_PICKLE_FILE,
 )
-
-# from pathlib import Path
-
 
 _logger = get_logger(__name__)
 
@@ -63,8 +55,6 @@ try:
         from tqdm import tqdm
 except NameError:
     from tqdm import tqdm
-
-# Now use tqdm as normal, depending on your environment
 
 
 class DisulfideLoader:
@@ -167,10 +157,7 @@ class DisulfideLoader:
         if self.verbose and not self.quiet:
             _logger.info("Initialization complete.")
 
-    ##
-
     # overload __getitem__ to handle slicing and indexing, and access by name
-
     def __getitem__(self, item):
         """
         Implements indexing and slicing to retrieve DisulfideList objects from the
@@ -815,7 +802,7 @@ class DisulfideLoader:
 # class ends
 
 
-def Download_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False, master=False):
+def Download_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False):
     """
     Download the databases from my Google Drive.
 
@@ -825,21 +812,12 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False, master=False
 
     fname = None
 
-    if master:
-        if subset:
-            fname = LOADER_MASTER_SUBSET_FNAME
-            url = LOADER_SUBSET_MASTER_URL
-        else:
-            fname = LOADER_MASTER_FNAME
-            url = LOADER_ALL_MASTER_URL
-
+    if subset:
+        fname = LOADER_SUBSET_FNAME
+        url = LOADER_SUBSET_URL
     else:
-        if subset:
-            fname = LOADER_SUBSET_FNAME
-            url = LOADER_SUBSET_URL
-        else:
-            fname = LOADER_FNAME
-            url = LOADER_ALL_URL
+        fname = LOADER_FNAME
+        url = LOADER_ALL_URL
 
     _fname = os.path.join(loadpath, fname)
 
@@ -849,15 +827,6 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False, master=False
         print("--> DisulfideLoader: Downloading Disulfide Database from Drive...")
 
     gdown.download(url, str(_fname), quiet=False)
-
-    # if subset:
-    #    if verbose:
-    #        print(
-    #            "--> DisulfideLoader: Downloading Disulfide Subset Database from Drive..."
-    #        )
-    #
-    #    gdown.download(url, str(_fname_sub), quiet=False)
-
     return
 
 
@@ -934,7 +903,6 @@ def Load_PDB_SS(
 
     if subset:
         if not os.path.exists(_fname_sub):
-            #    Download_PDB_SS(loadpath=loadpath, verbose=verbose, subset=True)
             loader = Bootstrap_PDB_SS(
                 loadpath=loadpath,
                 verbose=verbose,
@@ -970,7 +938,7 @@ def Load_PDB_SS(
             if verbose:
                 print(f"-> load_PDB_SS(): Done Reading {_fname_all}... ")
 
-            return loader
+        return loader
 
 
 def Bootstrap_PDB_SS(
