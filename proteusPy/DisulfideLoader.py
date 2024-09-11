@@ -127,7 +127,7 @@ class DisulfideLoader:
         _pickleFile = picklefile
 
         full_path = os.path.join(datadir, _pickleFile)
-        if self.verbose:
+        if self.verbose and not self.quiet:
             _logger.info(
                 f"Reading disulfides from: {full_path}... ",
             )
@@ -152,10 +152,6 @@ class DisulfideLoader:
             _logger.error(f"File not found: {full_path}")
             raise e
 
-        except pickle.UnpicklingError as e:
-            _logger.error(f"Error unpickling file: {full_path}")
-            raise e
-
         except Exception as e:
             _logger.error(f"An error occurred while loading the file: {full_path}")
             raise e
@@ -168,8 +164,8 @@ class DisulfideLoader:
 
         self.tclass = DisulfideClass_Constructor(self, self.verbose)
 
-        if self.verbose:
-            _logger.info("Loading complete.")
+        if self.verbose and not self.quiet:
+            _logger.info("Initialization complete.")
 
     ##
 
@@ -981,9 +977,9 @@ def Bootstrap_PDB_SS(
     loadpath=DATA_DIR, cutoff=8.0, verbose=False, subset=False, force=False
 ):
     """
-    Download and load the disulfide databases from Google Drive.
+    Download and instantiate the disulfide databases from Google Drive.
 
-    This function downloads the disulfide databases from Google Drive if they do not
+    This function downloads the disulfide master SS list from Google Drive if it doesn't
     already exist in the specified load path or if the force flag is set to True.
     It then loads the disulfide data from the downloaded file and initializes a
     DisulfideLoader instance.
@@ -1009,33 +1005,14 @@ def Bootstrap_PDB_SS(
     url = SS_LIST_URL
 
     _fname = os.path.join(loadpath, fname)
-
-    if verbose:
-        print("Downloading Disulfide Database from Drive...")
+    # print(_fname)
 
     if not os.path.exists(_fname) or force is True:
+        if verbose:
+            print("Downloading Disulfide Database from Drive...")
         gdown.download(url, str(_fname), quiet=False)
 
     full_path = os.path.join(loadpath, _fname)
-    if verbose:
-        _logger.info(
-            f"Reading disulfides from: {full_path}... ",
-        )
-
-    try:
-        with open(full_path, "rb") as f:
-            sslist = pickle.load(f)
-
-    except FileNotFoundError as e:
-        _logger.error(f"File not found: {full_path}")
-        raise e
-    except pickle.UnpicklingError as e:
-        _logger.error(f"Error unpickling file: {full_path}")
-        raise e
-    except Exception as e:
-        _logger.error(f"An error occurred while loading the file: {full_path}")
-        raise e
-
     loader = DisulfideLoader(
         datadir=DATA_DIR, subset=subset, verbose=verbose, cutoff=cutoff
     )
