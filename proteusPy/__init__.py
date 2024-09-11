@@ -70,6 +70,7 @@ from .DisulfideExceptions import (
 )
 from .DisulfideList import DisulfideList, load_disulfides_from_id
 from .DisulfideLoader import (
+    Bootstrap_PDB_SS,
     DisulfideLoader,
     Download_PDB_SS,
     Download_PDB_SS_GitHub,
