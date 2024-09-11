@@ -50,11 +50,7 @@ from proteusPy import (
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
     LOADER_FNAME,
-    LOADER_MASTER_FNAME,
-    LOADER_MASTER_SUBSET_FNAME,
     LOADER_SUBSET_FNAME,
-    SS_MASTER_PICKLE_FILE,
-    SS_MASTER_SUBSET_PICKLE_FILE,
     SS_PICKLE_FILE,
     SS_SUBSET_PICKLE_FILE,
 )
@@ -112,7 +108,7 @@ pdb_id_list = [Path(f).stem[3:7] for f in ent_files]
 
 num_ent_files = len(ent_files)
 
-__version__ = "2.0.3"
+__version__ = "2.0.4"
 
 
 def parse_arguments():
@@ -239,7 +235,7 @@ def extract_disulfides_chunk(args):
     return result_list
 
 
-def do_extract(verbose, full, cutoff, nthreads=8, master=False):
+def do_extract(verbose, full, cutoff, nthreads=8):
     """
     Extracts the disulfides from the PDB files using multiprocessing.
 
@@ -308,27 +304,8 @@ def do_extract(verbose, full, cutoff, nthreads=8, master=False):
         with open(str(DATA_DIR / SS_SUBSET_PICKLE_FILE), "wb+") as f:
             pickle.dump(res_list, f)
 
-    if master:
-        if full:
-            if verbose:
-                print(f"Saving Master SS list to: {DATA_DIR / SS_MASTER_PICKLE_FILE}")
 
-            with open(str(DATA_DIR / SS_MASTER_PICKLE_FILE), "wb+") as f:
-                pickle.dump(res_list, f)
-
-        else:
-            if verbose:
-                print(
-                    f"Saving Master SS subset list to: {DATA_DIR / SS_MASTER_SUBSET_PICKLE_FILE}"
-                )
-
-            with open(str(DATA_DIR / SS_MASTER_SUBSET_PICKLE_FILE), "wb+") as f:
-                pickle.dump(res_list, f)
-
-    return
-
-
-def do_build(verbose, full, subset, cutoff, master):
+def do_build(verbose, full, subset, cutoff):
     """
     Load and save a ```proteusPy.DisulfideLoader``` object
     to a .pkl file.
@@ -366,7 +343,7 @@ def do_build(verbose, full, subset, cutoff, master):
         PDB_SS.save(savepath=DATA_DIR, subset=True, cutoff=cutoff)
 
 
-def update_repo(datadir, destdir, master=False, full=True):
+def update_repo(datadir, destdir):
     """
     Updates the repository with the latest SS files.
     """
@@ -375,14 +352,6 @@ def update_repo(datadir, destdir, master=False, full=True):
     copy(Path(datadir) / LOADER_SUBSET_FNAME, Path(destdir))
     copy(Path(datadir) / SS_PICKLE_FILE, Path(destdir))
     copy(Path(datadir) / SS_SUBSET_PICKLE_FILE, Path(destdir))
-
-    if master:
-        if full:
-            copy(Path(datadir) / LOADER_MASTER_FNAME, Path(destdir))
-            copy(Path(datadir) / SS_MASTER_PICKLE_FILE, Path(destdir))
-        else:
-            copy(Path(datadir) / LOADER_MASTER_SUBSET_FNAME, Path(destdir))
-            copy(Path(datadir) / SS_MASTER_SUBSET_PICKLE_FILE, Path(destdir))
 
 
 def do_stuff(
@@ -431,7 +400,6 @@ def do_stuff(
             full=_full,
             cutoff=cutoff,
             nthreads=_threads,
-            master=_master,
         )
         print("\n")
 
@@ -441,13 +409,13 @@ def do_stuff(
                 print("Building master loader since cutoff is negative.")
             else:
                 print(f"Building with cutoff: {cutoff}")
-        do_build(_verbose, _full, _subset, cutoff, master=_master)
+        do_build(_verbose, _full, _subset, cutoff)
 
     if _update is True:
         if verbose:
             print(f"Copying SS files from: {DATA_DIR} to {REPO_DATA}")
 
-        update_repo(DATA_DIR, REPO_DATA, master=_master, full=_full)
+        # update_repo(DATA_DIR, REPO_DATA)
 
         if _forge == "miniforge3":
             venv_dir = MINIFORGE_DIR / _env / VENV_DIR
@@ -457,7 +425,7 @@ def do_stuff(
         if verbose:
             print(f"Copying SS files from: {DATA_DIR} to {venv_dir}")
 
-        update_repo(DATA_DIR, venv_dir, master=_master, full=_full)
+        update_repo(DATA_DIR, venv_dir)
 
     return
 
