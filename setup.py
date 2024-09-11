@@ -22,7 +22,11 @@ This code is in beta.
 Eric G. Suchanek, PhD., suchanek@mac.com
 """
 
+# pylint: disable=E0011
+# pylint: disable=W0611
+
 import sys
+from pathlib import Path
 
 try:
     from setuptools import Command, Extension, setup
@@ -34,7 +38,7 @@ except ImportError:
 
 if "bdist_wheel" in sys.argv:
     try:
-        import wheel  # noqa: F401
+        import wheel  # pylint: disable=E0011
     except ImportError:
         sys.exit(
             "We need both setuptools AND wheel packages installed "
@@ -49,8 +53,6 @@ def can_import(module_name):
     except ImportError:
         return None
 
-
-from pathlib import Path
 
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
@@ -81,7 +83,7 @@ setup(
         "numpy",
         "matplotlib",
         "pandas",
-        "pyvista[all,trame]",
+        "pyvista[all]",
         "traitlets==5.9.0",
         "jupyter",
         "jupyter_server",
@@ -109,7 +111,10 @@ setup(
         "jupyter_contrib_nbextensions",
         "ipywidgets",
         "pymolpy3",
+        "pympler",
         "imageio[ffmpeg]",
+        "colorama",
+        "Biopython",
     ],
     source="https://github.com/suchanek/proteusPy/",
     project_urls={
@@ -134,14 +139,17 @@ setup(
             "data/ss_completed.txt",
             "data/ss_query.json",
             "data/ss_ids.txt",
-            "data/SS_consensus_class_sext.pkl",
+            "data/SS_consensus_class_oct.pkl",
+            "data/SS_consensus_class_32.pkl",
+            "data/2q7q_seqsim.csv",
+            "data/PDB_SS_class_definitions.csv",
         ]
     },
     exclude_package_data={
         "proteusPy": [
             "data/PDB_all_ss.pkl",
             "data/PDB_SS_ALL_LOADER.pkl",
-            "data/PDB_all_ss_dict.pkl",
+            "data/PDB_SS_SUBSET_LOADER.pkl",
         ]
     },
     zip_safe=False,

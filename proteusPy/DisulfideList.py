@@ -10,9 +10,12 @@ Author: Eric G. Suchanek, PhD
 Last revision: 7/12/2024 -egs-
 """
 
+# pylint: disable=c0103
+# pylint: disable=c0301
+
 try:
     # Check if running in Jupyter
-    shell = get_ipython().__class__.__name__ # type: ignore
+    shell = get_ipython().__class__.__name__
     if shell == "ZMQInteractiveShell":
         from tqdm.notebook import tqdm
     else:
@@ -20,22 +23,27 @@ try:
 except NameError:
     from tqdm import tqdm
 
+import copy
+import logging
+import os
 from collections import UserList
 from pathlib import Path
 
 import numpy as np
-import pandas
-import plotly.express as px
+import pandas as pd
 import plotly.graph_objects as go
 import pyvista as pv
-from Bio.PDB import PDBParser
 from plotly.subplots import make_subplots
 
 import proteusPy
 from proteusPy import Disulfide
 from proteusPy.atoms import *
-from proteusPy.ProteusGlobals import DATA_DIR, MODEL_DIR, PBAR_COLS, WINSIZE
+from proteusPy.logger_config import get_logger
+from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, WINSIZE
 from proteusPy.utility import get_jet_colormap, grid_dimensions
+
+_logger = get_logger(__name__)
+
 
 # Set the figure sizes and axis limits.
 DPI = 220
@@ -135,7 +143,7 @@ class DisulfideList(UserList):
     >>> subset.display_overlay()
     """
 
-    def __init__(self, iterable, id: str, res=-1.0, quiet=True):
+    def __init__(self, iterable, pid: str, res=-1.0, quiet=True):
         """
         Initialize the DisulfideList
 
@@ -163,7 +171,7 @@ class DisulfideList(UserList):
 
         super().__init__(self.validate_ss(item) for item in iterable)
 
-        self.pdb_id = id
+        self.pdb_id = pid
         self.quiet = quiet
         total = 0
         count = 0
@@ -189,7 +197,13 @@ class DisulfideList(UserList):
         """
         if isinstance(item, slice):
             indices = range(*item.indices(len(self.data)))
-            name = self.data[0].pdb_id
+            ind_list = list(indices)
+            first_ind = ind_list[0]
+            last_ind = ind_list[-1]
+            name = (
+                self.data[first_ind].pdb_id
+                + f"_slice[{first_ind}:{last_ind+1}]_{self.data[last_ind].pdb_id}"
+            )
             sublist = [self.data[i] for i in indices]
             return DisulfideList(sublist, name)
         return UserList.__getitem__(self, item)
@@ -207,7 +221,6 @@ class DisulfideList(UserList):
         :return: Window in the relevant style
         """
         ssList = self.data
-        name = self.id
         tot_ss = len(ssList)  # number off ssbonds
         rows, cols = grid_dimensions(tot_ss)
         winsize = (panelsize * cols, panelsize * rows)
@@ -245,7 +258,6 @@ class DisulfideList(UserList):
 
         """
         sslist = self.data
-        tot = len(sslist)
         cnt = 1
 
         total = 0.0
@@ -268,6 +280,8 @@ class DisulfideList(UserList):
         """
         sslist = self.data
         tot = len(sslist)
+        if tot == 0:
+            return 0.0
 
         total = 0.0
         for ss1 in sslist:
@@ -285,9 +299,6 @@ class DisulfideList(UserList):
 
         sslist = self.data
         tot = len(sslist)
-
-        tors = self.build_torsion_df()
-
         res = np.zeros(5)
 
         for ss, i in zip(sslist, range(tot)):
@@ -330,7 +341,6 @@ class DisulfideList(UserList):
         :return: Torsion Distance (degrees)
         """
         sslist = self.data
-        tot = len(sslist)
         total = 0
         cnt = 1
 
@@ -343,78 +353,100 @@ class DisulfideList(UserList):
 
         return total / cnt
 
-    def build_distance_df(self) -> pandas.DataFrame:
+    def build_distance_df(self) -> pd.DataFrame:
         """
         Create a dataframe containing the input DisulfideList Cα-Cα distance, energy.
         This can take several minutes for the entire database.
 
         :return: DataFrame containing Ca distances
-        :rtype: pandas.DataFrame
+        :rtype: pd.DataFrame
         """
-
-        # create a dataframe with the following columns for the disulfide
-        # conformations extracted from the structure
-
-        SS_df = pandas.DataFrame(columns=Distance_DF_Cols)
+        # create a list to collect rows as dictionaries
+        rows = []
+        i = 0
         sslist = self.data
+        total_length = len(sslist)
+        update_interval = max(1, total_length // 20)  # 5% of the list length
 
-        pbar = tqdm(sslist, ncols=PBAR_COLS)
+        pbar = tqdm(sslist, ncols=PBAR_COLS, leave=False)
         for ss in pbar:
-            new_row = [
-                ss.pdb_id,
-                ss.name,
-                ss.proximal,
-                ss.distal,
-                ss.energy,
-                ss.ca_distance,
-            ]
-            # add the row to the end of the dataframe
-            SS_df.loc[len(SS_df.index)] = new_row
+            new_row = {
+                "source": ss.pdb_id,
+                "ss_id": ss.name,
+                "proximal": ss.proximal,
+                "distal": ss.distal,
+                "energy": ss.energy,
+                "ca_distance": ss.ca_distance,
+                "cb_distance": ss.cb_distance,
+            }
+            rows.append(new_row)
+            i += 1
+
+            if i % update_interval == 0 or i == total_length - 1:
+                pbar.update(update_interval)
+
+        pbar.close()
+
+        # create the dataframe from the list of dictionaries
+        SS_df = pd.DataFrame(rows, columns=Distance_DF_Cols)
 
         return SS_df
 
-    def build_torsion_df(self) -> pandas.DataFrame:
+    # here we build a dataframe containing the torsional parameters
+
+    def build_torsion_df(self) -> pd.DataFrame:
         """
         Create a dataframe containing the input DisulfideList torsional parameters,
         Cα-Cα distance, energy, and phi-psi angles. This can take several minutes for the
         entire database.
 
-        :param SSList: DisulfideList - input list of Disulfides
-        :return: pandas.Dataframe containing the torsions
+        :return: pd.DataFrame containing the torsions
         """
-        # create a dataframe with the following columns for the disulfide
-        # conformations extracted from the structure
+        # create a list to collect rows as dictionaries
+        rows = []
+        i = 0
+        total_length = len(self.data)
+        update_interval = max(1, total_length // 20)  # 5% of the list length
 
-        SS_df = pandas.DataFrame(columns=Torsion_DF_Cols)
         sslist = self.data
-        if self.quiet or len(sslist) < 100:
+        if self.quiet:
             pbar = sslist
         else:
             pbar = tqdm(sslist, ncols=PBAR_COLS, leave=False)
 
         for ss in pbar:
-            new_row = [
-                ss.pdb_id,
-                ss.name,
-                ss.proximal,
-                ss.distal,
-                ss.chi1,
-                ss.chi2,
-                ss.chi3,
-                ss.chi4,
-                ss.chi5,
-                ss.energy,
-                ss.ca_distance,
-                ss.cb_distance,
-                ss.psiprox,
-                ss.psiprox,
-                ss.phidist,
-                ss.psidist,
-                ss.torsion_length,
-                ss.rho,
-            ]
-            # add the row to the end of the dataframe
-            SS_df.loc[len(SS_df.index)] = new_row
+            new_row = {
+                "source": ss.pdb_id,
+                "ss_id": ss.name,
+                "proximal": ss.proximal,
+                "distal": ss.distal,
+                "chi1": ss.chi1,
+                "chi2": ss.chi2,
+                "chi3": ss.chi3,
+                "chi4": ss.chi4,
+                "chi5": ss.chi5,
+                "energy": ss.energy,
+                "ca_distance": ss.ca_distance,
+                "cb_distance": ss.cb_distance,
+                "psiprox": ss.psiprox,
+                "phiprox": ss.phiprox,
+                "phidist": ss.phidist,
+                "psidist": ss.psidist,
+                "torsion_length": ss.torsion_length,
+                "rho": ss.rho,
+            }
+            rows.append(new_row)
+            i += 1
+
+            if not self.quiet:
+                if i % update_interval == 0 or i == total_length - 1:
+                    pbar.update(update_interval)
+
+        if not self.quiet:
+            pbar.close()
+
+        # create the dataframe from the list of dictionaries
+        SS_df = pd.DataFrame(rows, columns=Torsion_DF_Cols)
 
         return SS_df
 
@@ -442,13 +474,13 @@ class DisulfideList(UserList):
     def calculate_torsion_statistics(self):
         df = self.build_torsion_df()
 
-        df_subset = df.iloc[:, 4:]
-        df_stats = df_subset.describe()
+        # df_subset = df.iloc[:, 4:]
+        # df_stats = df_subset.describe()
 
         # print(df_stats.head())
 
-        mean_vals = df_stats.loc["mean"].values
-        std_vals = df_stats.loc["std"].values
+        # mean_vals = df_stats.loc["mean"].values
+        # std_vals = df_stats.loc["std"].values
 
         tor_cols = ["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]
         dist_cols = ["ca_distance", "cb_distance", "energy"]
@@ -461,8 +493,8 @@ class DisulfideList(UserList):
         for col in dist_cols:
             dist_stats[col] = {"mean": df[col].mean(), "std": df[col].std()}
 
-        tor_stats = pandas.DataFrame(tor_stats, columns=tor_cols)
-        dist_stats = pandas.DataFrame(dist_stats, columns=dist_cols)
+        tor_stats = pd.DataFrame(tor_stats, columns=tor_cols)
+        dist_stats = pd.DataFrame(dist_stats, columns=dist_cols)
 
         return tor_stats, dist_stats
 
@@ -479,7 +511,7 @@ class DisulfideList(UserList):
             - 'plain' - boring single color
         :light: If True, light background, if False, dark
         """
-        id = self.pdb_id
+        pid = self.pdb_id
         ssbonds = self.data
         tot_ss = len(ssbonds)  # number off ssbonds
         avg_enrg = self.Average_Energy
@@ -491,7 +523,7 @@ class DisulfideList(UserList):
         else:
             pv.set_plot_theme("dark")
 
-        title = f"<{id}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
+        title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
 
         pl = pv.Plotter()
         pl = self._render(style, panelsize)
@@ -662,7 +694,7 @@ class DisulfideList(UserList):
         return
 
     @property
-    def distance_df(self) -> pandas.DataFrame:
+    def distance_df(self) -> pd.DataFrame:
         """
         Build and return the distance dataframe for the input list.
         This can take considerable time for the entire list.
@@ -696,7 +728,7 @@ class DisulfideList(UserList):
         :param light: Background color, defaults to True for White. False for Dark.
         """
 
-        id = self.pdb_id
+        pid = self.pdb_id
         ssbonds = self.data
         tot_ss = len(ssbonds)  # number off ssbonds
         avg_enrg = self.Average_Energy
@@ -712,7 +744,7 @@ class DisulfideList(UserList):
         if tot_ss > 300:
             res = 8
 
-        title = f"<{id}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
+        title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
 
         if light:
             pv.set_plot_theme("document")
@@ -788,6 +820,31 @@ class DisulfideList(UserList):
             self.data.extend(other)
         else:
             self.data.extend(self.validate_ss(item) for item in other)
+
+    def filter_by_distance(self, distance: float, minimum: float = 2.0):
+        """
+        Return a DisulfideList filtered by to between the maxium Ca distance and
+        the minimum, which defaults to 2.0A.
+
+        :param distance: Distance in Å
+        :param minimum: Distance in Å
+        :return: DisulfideList containing disulfides with the given distance.
+        """
+
+        reslist = DisulfideList([], f"filtered by distance < {distance:.2f}")
+        sslist = self.data
+
+        # if distance is -1.0, return the entire list
+        if distance == -1.0:
+            return sslist.copy()
+
+        reslist = [
+            ss
+            for ss in sslist
+            if ss.ca_distance < distance and ss.ca_distance > minimum
+        ]
+
+        return reslist
 
     def get_by_name(self, name):
         """
@@ -886,6 +943,23 @@ class DisulfideList(UserList):
     def TorsionGraph(
         self, display=True, save=False, fname="ss_torsions.png", light=True
     ):
+        """
+        Generate and optionally display or save a torsion graph.
+
+        This method generates a torsion graph based on the torsion statistics
+        of disulfide bonds. It can display the graph, save it to a file, or both.
+
+        :param display: If True, the torsion graph will be displayed. Default is True.
+        :type display: bool
+        :param save: If True, the torsion graph will be saved to a file. Default is False.
+        :type save: bool
+        :param fname: The filename to save the torsion graph. Default is "ss_torsions.png".
+        :type fname: str
+        :param light: If True, a light theme will be used for the graph. Default is True.
+        :type light: bool
+
+        :return: None
+        """
         # tor_stats, dist_stats = self.calculate_torsion_statistics()
         self.display_torsion_statistics(
             display=display, save=save, fname=fname, light=light
@@ -1004,7 +1078,6 @@ class DisulfideList(UserList):
         the list of Disulfides within the cutoff
 
         :param ss: Disulfide to compare to
-        :param chi5: Chi5 (degrees)
         :param cutoff: Distance cutoff, degrees
         :return: DisulfideList of neighbors
         """
@@ -1054,17 +1127,14 @@ class DisulfideList(UserList):
     # class ends
 
 
-# utility functions
-from proteusPy.DisulfideExceptions import DisulfideConstructionWarning
-
-
 def load_disulfides_from_id(
-    struct_name: str,
+    pdb_id: str,
     pdb_dir=MODEL_DIR,
     model_numb=0,
     verbose=False,
-    quiet=False,
+    quiet=True,
     dbg=False,
+    cutoff=-1.0,
 ) -> DisulfideList:
     """
     Loads the Disulfides by PDB ID and returns a ```DisulfideList``` of Disulfide objects.
@@ -1072,7 +1142,7 @@ def load_disulfides_from_id(
 
     *NB:* Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython
 
-    :param struct_name: the name of the PDB entry.
+    :param pdb_id: the name of the PDB entry.
     :param pdb_dir: path to the PDB files, defaults to MODEL_DIR - this is: PDB_DIR/good and are
     the pre-parsed PDB files that have been scanned by the DisulfideDownloader program.
     :param model_numb: model number to use, defaults to 0 for single structure files.
@@ -1084,115 +1154,116 @@ def load_disulfides_from_id(
     PDB_DIR defaults to os.getenv('PDB').
     To load the Disulfides from the PDB ID 5rsa we'd use the following:
 
-    >>> from proteusPy import DisulfideList, load_disulfides_from_id
+    >>> from proteusPy.DisulfideList import DisulfideList, load_disulfides_from_id
     >>> from proteusPy.ProteusGlobals import DATA_DIR
     >>> SSlist = DisulfideList([],'5rsa')
     >>> SSlist = load_disulfides_from_id('5rsa', pdb_dir=DATA_DIR, verbose=False)
     >>> SSlist
     [<Disulfide 5rsa_26A_84A, Source: 5rsa, Resolution: 2.0 Å>, <Disulfide 5rsa_40A_95A, Source: 5rsa, Resolution: 2.0 Å>, <Disulfide 5rsa_58A_110A, Source: 5rsa, Resolution: 2.0 Å>, <Disulfide 5rsa_65A_72A, Source: 5rsa, Resolution: 2.0 Å>]
     """
-    import copy
-    import os
-    import warnings
 
-    from proteusPy import Disulfide, parse_ssbond_header_rec
+    from proteusPy.Disulfide import Initialize_Disulfide_From_Coords
+    from proteusPy.ssparser import extract_ssbonds_and_atoms
 
     i = 1
     proximal = distal = -1
+    chain1_id = chain2_id = ""
+    ssbond_atom_list = {}
+    num_ssbonds = 0
+    errors = 0
     resolution = -1.0
 
-    _chaina = None
-    _chainb = None
-
-    parser = PDBParser(PERMISSIVE=True)
-
-    # Biopython uses the Structure -> Model -> Chain hierarchy to organize
-    # structures. All are iterable.
-    structure_fname = os.path.join(pdb_dir, f"pdb{struct_name}.ent")
-    structure = parser.get_structure(struct_name, file=structure_fname)
-    model = structure[model_numb]
+    structure_fname = os.path.join(pdb_dir, f"pdb{pdb_id}.ent")
+    # model = structure[model_numb]
 
     if verbose:
-        print(f"-> load_disulfide_from_id() - Parsing structure: {struct_name}:")
+        mess = f"-> load_disulfide_from_id() - Parsing structure: {pdb_id}:"
+        _logger.info(mess)
 
-    ssbond_dict = structure.header["ssbond"]  # NB: this requires the modified code
-    resolution = structure.header["resolution"]
-
-    SSList = DisulfideList([], struct_name, resolution)
+    SSList = DisulfideList([], pdb_id, resolution)
 
     # list of tuples with (proximal distal chaina chainb)
-    ssbonds = parse_ssbond_header_rec(ssbond_dict)
+    # ssbonds = parse_ssbond_header_rec(ssbond_dict)
 
-    with warnings.catch_warnings():
-        if quiet:
-            warnings.filterwarnings("ignore")
-        for pair in ssbonds:
-            # in the form (proximal, distal, chain)
-            proximal = pair[0]
-            distal = pair[1]
-            chain1_id = pair[2]
-            chain2_id = pair[3]
+    ssbond_atom_list, num_ssbonds, errors = extract_ssbonds_and_atoms(
+        structure_fname, verbose=verbose
+    )
 
-            if not proximal.isnumeric() or not distal.isnumeric():
-                mess = f" -> load_disulfides_from_id(): Cannot parse SSBond record (non-numeric IDs):\
-                {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring."
-                warnings.warn(mess, DisulfideConstructionWarning)
-                continue
-            else:
-                proximal = int(proximal)
-                distal = int(distal)
+    if num_ssbonds == 0:
+        if verbose:
+            mess = f"-> load_disulfides_from_id(): {pdb_id} has no SSBonds."
+            print(mess)
+        _logger.warning(mess)
+        return None
 
-            if proximal == distal:
-                mess = f" -> load_disulfides_from_id(): Cannot parse SSBond record (proximal == distal):\
-                {struct_name} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
-                warnings.warn(mess, DisulfideConstructionWarning)
+    if verbose:
+        mess = f"-> load_disulfides_from_id(): {pdb_id} has {num_ssbonds} SSBonds, found: {errors} errors"
+        _logger.info(mess)
 
-            _chaina = model[chain1_id]
-            _chainb = model[chain2_id]
+    # with warnings.catch_warnings():
+    if quiet:
+        _logger.setLevel(logging.ERROR)
 
-            if (_chaina is None) or (_chainb is None):
-                mess = f" -> load_disulfides_from_id(): NULL chain(s): {struct_name}: {proximal} {chain1_id}\
-                - {distal} {chain2_id}, ignoring!"
-                warnings.warn(mess, DisulfideConstructionWarning)
-                continue
+    resolution = ssbond_atom_list["resolution"]
+    for pair in ssbond_atom_list["pairs"]:
+        proximal = pair["proximal"][1]
+        chain1_id = pair["proximal"][0]
+        distal = pair["distal"][1]
+        chain2_id = pair["distal"][0]
+        proximal_secondary = pair["prox_secondary"]
+        distal_secondary = pair["dist_secondary"]
 
-            if chain1_id != chain2_id:
-                if verbose:
-                    mess = f" -> load_disulfides_from_id(): Cross Chain SS for: Prox: {proximal} {chain1_id}\
-                    Dist: {distal} {chain2_id}"
-                    warnings.warn(mess, DisulfideConstructionWarning)
-                pass  # was break
+        if dbg:
+            mess = f"Proximal: {proximal} {chain1_id} Distal: {distal} {chain2_id}"
+            _logger.info(mess)
 
-            try:
-                prox_res = _chaina[proximal]
-                dist_res = _chainb[distal]
+        proximal_int = int(proximal)
+        distal_int = int(distal)
 
-            except KeyError:
-                mess = f"Cannot parse SSBond record (KeyError): {struct_name} Prox:\
-                {proximal} {chain1_id} Dist: {distal} {chain2_id}, ignoring!"
-                warnings.warn(mess, DisulfideConstructionWarning)
-                continue
+        if proximal == distal:
+            if verbose:
+                mess = f"-> load_disulfides_from_id(): SSBond record has (proximal == distal):\
+                {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
+                _logger.info(mess)
 
-            # make a new Disulfide object, name them based on proximal and distal
-            # initialize SS bond from the proximal, distal coordinates
+        if verbose:
+            mess = f"-> load_disulfides_from_id(): SSBond: {i}: {pdb_id}: {proximal} {chain1_id} - {distal} {chain2_id}"
+            _logger.info(mess)
 
-            if _chaina[proximal].is_disordered() or _chainb[distal].is_disordered():
-                mess = f" -> load_disulfides_from_id(): Disordered chain(s): {struct_name}: {proximal} {chain1_id} - {distal} {chain2_id}, ignoring!"
-                warnings.warn(mess, DisulfideConstructionWarning)
-                continue
-            else:
-                if verbose:
-                    print(
-                        f" -> load_disulfides_from_id(): SSBond: {i}: {struct_name}: {proximal} |{chain1_id}| - {distal} |{chain2_id}|"
-                    )
-                ssbond_name = f"{struct_name}_{proximal}{chain1_id}_{distal}{chain2_id}"
-                new_ss = Disulfide(ssbond_name)
-                res = new_ss.initialize_disulfide_from_chain(
-                    _chaina, _chainb, proximal, distal, resolution, quiet=quiet
-                )
-                if res:
-                    SSList.append(new_ss)
-            i += 1
+        new_ss = Initialize_Disulfide_From_Coords(
+            ssbond_atom_list,
+            pdb_id,
+            chain1_id,
+            chain2_id,
+            proximal_int,
+            distal_int,
+            resolution,
+            proximal_secondary,
+            distal_secondary,
+            verbose=verbose,
+            quiet=quiet,
+            dbg=dbg,
+        )
+        if verbose:
+            _logger.info("New SS: %s", new_ss)
+
+        if new_ss is not None:
+            SSList.append(new_ss)
+            if verbose:
+                mess = f"-> load_disulfides_from_id(): Initialized Disulfide: {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
+                _logger.info(mess)
+        else:
+            mess = f"-> load_disulfides_from_id(): Cannot initialize Disulfide: {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
+            _logger.ERROR(mess)
+
+        i += 1
+
+    if quiet:
+        _logger.setLevel(logging.WARNING)
+
+    if cutoff > 0:
+        SSList = SSList.filter_by_distance(cutoff)
+
     return copy.deepcopy(SSList)
 
 
@@ -1201,5 +1272,4 @@ if __name__ == "__main__":
 
     doctest.testmod()
 
-# end of file
 # end of file

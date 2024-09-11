@@ -7,9 +7,11 @@
 #
 
 import numpy  # type: ignore
-from Bio.PDB import Vector
 
 from proteusPy.turtle3D import Turtle3D
+from proteusPy.vector3D import Vector3D
+
+# @todo investigate distal N atom position
 
 
 def build_residue(turtle: Turtle3D):
@@ -34,10 +36,10 @@ def build_residue(turtle: Turtle3D):
     _cb = numpy.array((-0.523, -0.719, -1.245), "d")
     _c = numpy.array((1.53, 0.0, 0.0), "d")
 
-    n = Vector(turtle.to_global(_n))
-    ca = Vector(turtle.to_global(_ca))
-    cb = Vector(turtle.to_global(_cb))
-    c = Vector(turtle.to_global(_c))
+    n = Vector3D(turtle.to_global(_n))
+    ca = Vector3D(turtle.to_global(_ca))
+    cb = Vector3D(turtle.to_global(_cb))
+    c = Vector3D(turtle.to_global(_c))
     return n, ca, cb, c
 
 
@@ -80,7 +82,7 @@ def to_alpha(turtle: Turtle3D, phi):
     turtle.move(1.45)
     turtle.roll(phi)
     turtle.yaw(110.0)
-    return Vector(turtle.getPosition())
+    return Vector3D(turtle.getPosition())
 
 
 def to_carbonyl(turtle: Turtle3D, psi):
@@ -98,7 +100,7 @@ def to_carbonyl(turtle: Turtle3D, psi):
     turtle.move(1.53)
     turtle.roll(psi)
     turtle.yaw(114.0)
-    return Vector(turtle.getPosition())
+    return Vector3D(turtle.getPosition())
 
 
 def to_nitrogen(turtle: Turtle3D, omega):
@@ -117,7 +119,7 @@ def to_nitrogen(turtle: Turtle3D, omega):
     turtle.move(1.32)
     turtle.roll(omega)
     turtle.yaw(123.0)
-    return Vector(turtle.getPosition())
+    return Vector3D(turtle.getPosition())
 
 
 def add_oxygen(turtle: Turtle3D):
@@ -132,7 +134,7 @@ def add_oxygen(turtle: Turtle3D):
     """
     loc = numpy.array((-0.673, -1.029, 0), "d")
 
-    return Vector(turtle.to_global(loc))
+    return Vector3D(turtle.to_global(loc))
 
 
 def to_oxygen(turtle: Turtle3D):

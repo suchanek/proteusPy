@@ -1,6 +1,6 @@
 # Makefile for proteusPy
 # Author: Eric G. Suchanek, PhD
-# Last revision: 7/16/24 -egs-
+# Last revision: 8/23/24 -egs-
 
 
 # assumes file VERSION contains only the version number
@@ -13,11 +13,15 @@ else
 
 endif
 
+# mamba is better than conda. Install it with 'conda install mamba -n base -c conda-forge'
+# or use conda instead of mamba.
+
 CONDA = mamba
 
-#MESS = $(VERS)
-MESS = "proteusPy: A Python Package for Protein Structure and Disulfide Bond Modeling and Analysis"
+MESS = $(VERS)
+#MESS = "proteusPy: A Python Package for Protein Structure and Disulfide Bond Modeling and Analysis"
 
+# MESS = f"{$VERS}: Biopython removal"
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
 
@@ -40,12 +44,12 @@ nuke: clean devclean
 
 pkg:
 	@echo "Starting installation step 1/2..."
-	$(CONDA) create --name proteusPy -y python=3.11.7
+	$(CONDA) create --name proteusPy -y python=3.11.7 numpy pandas matplotlib
 	@echo "Step 1 done. Now activate the environment with 'conda activate proteusPy' and run 'make install'"
 
 dev:
 	@echo "Building $(DEVNAME)..."
-	$(CONDA) create --name $(DEVNAME) -y python=3.11.7
+	$(CONDA) create --name $(DEVNAME) -y python=3.11.7 numpy pandas matplotlib
 	@echo "Step 1 done. Now activate the environment with 'conda activate $(DEVNAME)' and run 'make install_dev'"
 
 clean: .
@@ -60,26 +64,24 @@ devclean: .
 
 	
 # activate the package before running!
-install: 
+install: sdist
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	@echo "Installing additional..."
 	@$(CONDA) install vtk==9.2.6 -y
-	@echo "Installing proteusPy..."
 
-	@pip install .
-	@echo "Installing Biopython..."
-	@pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
+	@echo "Installing proteusPy..."
+	@pip install . -q
+	
 	@echo "Installing jupyter..."
 	@python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Installation finished!"
 
-install_dev:
+install_dev: sdist
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	@$(CONDA) install vtk==9.2.6 -y
 	
-	pip install -e .
-	pip install git+https://github.com/suchanek/biopython.git@egs_ssbond_240305#egg=biopython
-	pip install pdoc twine black pytest build
+	pip install . -q
+	pip install pdoc twine black pytest build -q
 	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
 	@echo "Installation finished!"
 
@@ -98,7 +100,7 @@ jup_dev: .
 format: .
 	black proteusPy
 
-bld:  format  docs sdist
+bld:  docs sdist
 
 sdist: proteusPy/_version.py
 	python setup.py sdist
@@ -116,7 +118,7 @@ tag:
 
 commit:
 	git commit -a -m $(MESS)
-	git push --all origin
+	git push origin
 
 # run the tests
 

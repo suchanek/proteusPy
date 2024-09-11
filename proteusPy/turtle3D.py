@@ -17,7 +17,9 @@ import numpy
 
 numpy.set_printoptions(suppress=True)
 
-from Bio.PDB.vectors import Vector, calc_angle, calc_dihedral
+# from Bio.PDB.vectors import Vector, calc_angle, calc_dihedral
+from proteusPy.vector3D import Vector3D as Vector
+from proteusPy.vector3D import calc_angle, calc_dihedral
 
 _DOWN_ = -1
 _UP_ = 1
@@ -76,10 +78,10 @@ class Turtle3D:
         self.l = left.normalized()
         self.u = up.normalized()
 
-        self._position = pos._ar
-        self._left = left.normalized()._ar
-        self._heading = head.normalized()._ar
-        self._up = up.normalized()._ar
+        self._position = pos.get_array()
+        self._left = left.normalized().get_array()
+        self._heading = head.normalized().get_array()
+        self._up = up.normalized().get_array()
 
         self._recording = recording
 
