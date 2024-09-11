@@ -964,16 +964,12 @@ def Bootstrap_PDB_SS(
     :type force: bool
     :return: An instance of DisulfideLoader initialized with the loaded data
     :rtype: DisulfideLoader
-    :raises FileNotFoundError: If the downloaded file is not found
-    :raises pickle.UnpicklingError: If there is an error unpickling the file
-    :raises Exception: For any other exceptions that may occur during file loading
     """
 
     fname = SS_PICKLE_FILE
     url = SS_LIST_URL
 
     _fname = os.path.join(loadpath, fname)
-    # print(_fname)
 
     if not os.path.exists(_fname) or force is True:
         if verbose:
