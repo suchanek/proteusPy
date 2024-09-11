@@ -290,6 +290,9 @@ class DisulfideClass_Constructor:
         grouped_sixclass = self.create_six_classes(tors_df)
         self.sixclass_df = grouped_sixclass.copy()
 
+        if self.verbose:
+            _logger.info("Creating eightfold SS classes...")
+
         grouped_eightclass = self.create_eight_classes(tors_df)
         self.eightclass_df = grouped_eightclass.copy()
 
