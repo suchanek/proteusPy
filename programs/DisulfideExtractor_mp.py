@@ -349,11 +349,8 @@ def do_build(verbose, full, subset, cutoff, master):
             verbose=verbose,
             cutoff=cutoff,
         )
-        if master:
-            PDB_SS.save(savepath=DATA_DIR, subset=False, cutoff=cutoff, master=master)
-
         # this will save twice if master so that the 'normal' loader is saved as well.
-        PDB_SS.save(savepath=DATA_DIR, subset=False, cutoff=cutoff, master=False)
+        PDB_SS.save(savepath=DATA_DIR, subset=False, cutoff=cutoff)
 
     if subset:
         if verbose:
@@ -366,12 +363,7 @@ def do_build(verbose, full, subset, cutoff, master):
             verbose=verbose,
             cutoff=cutoff,
         )
-        if master:
-            PDB_SS.save(savepath=DATA_DIR, subset=True, cutoff=cutoff, master=master)
-
-        PDB_SS.save(savepath=DATA_DIR, subset=True, cutoff=cutoff, master=False)
-
-    return
+        PDB_SS.save(savepath=DATA_DIR, subset=True, cutoff=cutoff)
 
 
 def update_repo(datadir, destdir, master=False, full=True):

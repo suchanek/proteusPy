@@ -44,7 +44,7 @@ from proteusPy.ProteusGlobals import (
     LOADER_SUBSET_FNAME,
     LOADER_SUBSET_MASTER_URL,
     LOADER_SUBSET_URL,
-    SS_CLASS_DICT_FILE,
+    SS_LIST_URL,
     SS_PICKLE_FILE,
     SS_SUBSET_PICKLE_FILE,
 )
@@ -111,34 +111,54 @@ class DisulfideLoader:
         function.
         """
 
-        self.ModelDir = datadir
-        self.PickleFile = os.path.join(datadir, picklefile)
-        self.PickleClassFile = os.path.join(datadir, SS_CLASS_DICT_FILE)
         self.SSList = DisulfideList([], "ALL_PDB_SS")
         self.SSDict = {}
         self.TorsionDF = pd.DataFrame()
         self.TotalDisulfides = 0
         self.IDList = []
         self._quiet = quiet
-
         self.tclass = None  # disulfideClass_constructor to manage classes
         self.cutoff = cutoff  # distance cutoff used to bulid the database
         self.verbose = verbose
         self.timestamp = time.time()
         self.version = __version__
 
-        if subset:
-            self.PickleFile = os.path.join(datadir, SS_SUBSET_PICKLE_FILE)
+        _pickleFile = None
+        _pickleFile = picklefile
 
+        full_path = os.path.join(datadir, _pickleFile)
         if self.verbose:
             _logger.info(
-                f"-> DisulfideLoader(): Reading disulfides from: {self.PickleFile}... ",
+                f"Reading disulfides from: {full_path}... ",
             )
 
-        with open(self.PickleFile, "rb") as f:
-            sslist = pickle.load(f)
-            self.SSList = sslist
-            self.TotalDisulfides = len(self.SSList)
+        try:
+            # Check if the file exists before attempting to open it
+            if not os.path.exists(full_path):
+                raise FileNotFoundError(f"File not found: {full_path}")
+
+            with open(full_path, "rb") as f:
+                sslist = pickle.load(f)
+                filt = sslist.filter_by_distance(cutoff)
+
+                if subset:
+                    self.SSList = DisulfideList(filt[:5000], "SUBSET_PDB_SS")
+                    self.TotalDisulfides = len(self.SSList)
+                else:
+                    self.SSList = DisulfideList(filt, "ALL_PDB_SS")
+                    self.TotalDisulfides = len(self.SSList)
+
+        except FileNotFoundError as e:
+            _logger.error(f"File not found: {full_path}")
+            raise e
+
+        except pickle.UnpicklingError as e:
+            _logger.error(f"Error unpickling file: {full_path}")
+            raise e
+
+        except Exception as e:
+            _logger.error(f"An error occurred while loading the file: {full_path}")
+            raise e
 
         self.SSDict = self.create_disulfide_dict()
         self.IDList = list(self.SSDict.keys())
@@ -149,10 +169,9 @@ class DisulfideLoader:
         self.tclass = DisulfideClass_Constructor(self, self.verbose)
 
         if self.verbose:
-            _logger.info("-> DisulfideLoader(): Loading complete.")
+            _logger.info("Loading complete.")
 
-        self.describe()
-        return
+    ##
 
     # overload __getitem__ to handle slicing and indexing, and access by name
 
@@ -767,7 +786,7 @@ class DisulfideLoader:
         sslist_df["count"] = y
         return sslist_df
 
-    def save(self, savepath=DATA_DIR, subset=False, cutoff=-1.0, master=False):
+    def save(self, savepath=DATA_DIR, subset=False, cutoff=-1.0):
         """
         Save a copy of the fully instantiated Loader to the specified file.
 
@@ -781,27 +800,20 @@ class DisulfideLoader:
 
         fname = None
 
-        if master:
-            if subset:
-                fname = LOADER_MASTER_SUBSET_FNAME
-            else:
-                fname = LOADER_MASTER_FNAME
-
+        if subset:
+            fname = LOADER_SUBSET_FNAME
         else:
-            if subset:
-                fname = LOADER_SUBSET_FNAME
-            else:
-                fname = LOADER_FNAME
+            fname = LOADER_FNAME
 
         _fname = os.path.join(savepath, fname)
         if self.verbose:
-            print(f"-> DisulfideLoader.save(): Writing {_fname}... ")
+            _logger.info(f"-> DisulfideLoader.save(): Writing {_fname}... ")
 
         with open(str(_fname), "wb+") as f:
             pickle.dump(self, f)
 
         if self.verbose:
-            print("-> DisulfideLoader.save(): Done.")
+            _logger.info("Done saving loader.")
 
 
 # class ends
@@ -903,7 +915,7 @@ def Download_PDB_SS_GitHub(loadpath=DATA_DIR, verbose=True, subset=False):
 
 
 def Load_PDB_SS(
-    loadpath=DATA_DIR, verbose=False, subset=False, master=False
+    loadpath=DATA_DIR, verbose=False, subset=False, cutoff=8.0, force=False
 ) -> DisulfideLoader:
     """
     Load the fully instantiated Disulfide database from the specified file. Use the
@@ -913,7 +925,6 @@ def Load_PDB_SS(
     :param loadpath: Path from which to load, defaults to DATA_DIR
     :param verbose: Verbosity, defaults to False
     :param subset: If True, load the subset DB, otherwise load the full database
-    :param master: If True, load the master database, otherwise load the standard database
     """
     # normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy
     # distribution. In that case we need to download the files for all disulfides and the subset
@@ -922,34 +933,114 @@ def Load_PDB_SS(
     _good1 = False  # all data
     _good2 = False  # subset data
 
-    if master:
-        loadpath = DATA_DIR
-        _fname_sub = os.path.join(loadpath, LOADER_MASTER_SUBSET_FNAME)
-        _fname_all = os.path.join(loadpath, LOADER_MASTER_FNAME)
-    else:
-        _fname_sub = os.path.join(loadpath, LOADER_SUBSET_FNAME)
-        _fname_all = os.path.join(loadpath, LOADER_FNAME)
+    _fname_sub = os.path.join(loadpath, LOADER_SUBSET_FNAME)
+    _fname_all = os.path.join(loadpath, LOADER_FNAME)
+
     if subset:
-        _fname = _fname_sub
+        if not os.path.exists(_fname_sub):
+            #    Download_PDB_SS(loadpath=loadpath, verbose=verbose, subset=True)
+            loader = Bootstrap_PDB_SS(
+                loadpath=loadpath,
+                verbose=verbose,
+                subset=True,
+                force=force,
+                cutoff=cutoff,
+            )
+            loader.save(savepath=loadpath, subset=True, cutoff=cutoff)
+        else:
+            if verbose:
+                print(f"-> load_PDB_SS(): Reading {_fname_sub}... ")
+
+            with open(_fname_sub, "rb") as f:
+                subloader = pickle.load(f)
+            return subloader
     else:
-        _fname = _fname_all
+        if not os.path.exists(_fname_all):
+            loader = Bootstrap_PDB_SS(
+                loadpath=loadpath,
+                verbose=verbose,
+                subset=False,
+                force=force,
+                cutoff=cutoff,
+            )
+            loader.save(savepath=loadpath, subset=False, cutoff=cutoff)
+        else:
+            if verbose:
+                print(f"-> load_PDB_SS(): Reading {_fname_all}... ")
 
-    if not os.path.exists(_fname_sub):
-        Download_PDB_SS(loadpath=loadpath, verbose=verbose, subset=True)
+            with open(_fname_all, "rb") as f:
+                loader = pickle.load(f)
 
-    if not os.path.exists(_fname_all):
-        Download_PDB_SS(loadpath=loadpath, verbose=verbose, subset=False)
+            if verbose:
+                print(f"-> load_PDB_SS(): Done Reading {_fname_all}... ")
 
-    # first attempt to read the local copy of the loader
+            return loader
+
+
+def Bootstrap_PDB_SS(
+    loadpath=DATA_DIR, cutoff=8.0, verbose=False, subset=False, force=False
+):
+    """
+    Download and load the disulfide databases from Google Drive.
+
+    This function downloads the disulfide databases from Google Drive if they do not
+    already exist in the specified load path or if the force flag is set to True.
+    It then loads the disulfide data from the downloaded file and initializes a
+    DisulfideLoader instance.
+
+    :param loadpath: Path from which to load the data, defaults to DATA_DIR
+    :type loadpath: str
+    :param cutoff: Cutoff value for disulfide loading, defaults to 8.0
+    :type cutoff: float
+    :param verbose: Flag to enable verbose logging, defaults to False
+    :type verbose: bool
+    :param subset: Flag to indicate whether to load a subset of the data, defaults to False
+    :type subset: bool
+    :param force: Flag to force download even if the file exists, defaults to False
+    :type force: bool
+    :return: An instance of DisulfideLoader initialized with the loaded data
+    :rtype: DisulfideLoader
+    :raises FileNotFoundError: If the downloaded file is not found
+    :raises pickle.UnpicklingError: If there is an error unpickling the file
+    :raises Exception: For any other exceptions that may occur during file loading
+    """
+
+    fname = SS_PICKLE_FILE
+    url = SS_LIST_URL
+
+    _fname = os.path.join(loadpath, fname)
+
     if verbose:
-        print(f"-> load_PDB_SS(): Reading {_fname}... ")
+        print("Downloading Disulfide Database from Drive...")
 
-    with open(_fname, "rb") as f:
-        res = pickle.load(f)
+    if not os.path.exists(_fname) or force is True:
+        gdown.download(url, str(_fname), quiet=False)
 
+    full_path = os.path.join(loadpath, _fname)
     if verbose:
-        print(f"-> load_PDB_SS(): Done reading {_fname}... ")
-    return res
+        _logger.info(
+            f"Reading disulfides from: {full_path}... ",
+        )
+
+    try:
+        with open(full_path, "rb") as f:
+            sslist = pickle.load(f)
+
+    except FileNotFoundError as e:
+        _logger.error(f"File not found: {full_path}")
+        raise e
+    except pickle.UnpicklingError as e:
+        _logger.error(f"Error unpickling file: {full_path}")
+        raise e
+    except Exception as e:
+        _logger.error(f"An error occurred while loading the file: {full_path}")
+        raise e
+
+    loader = DisulfideLoader(
+        datadir=DATA_DIR, subset=subset, verbose=verbose, cutoff=cutoff
+    )
+    loader.save(savepath=DATA_DIR, subset=subset, cutoff=cutoff)
+    return loader
 
 
 if __name__ == "__main__":
