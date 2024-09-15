@@ -897,7 +897,7 @@ def Load_PDB_SS(
     _fname_all = os.path.join(loadpath, LOADER_FNAME)
 
     if subset:
-        if not os.path.exists(_fname_sub):
+        if not os.path.exists(_fname_sub) or force is True:
             loader = Bootstrap_PDB_SS(
                 loadpath=loadpath,
                 verbose=verbose,
@@ -914,7 +914,7 @@ def Load_PDB_SS(
                 subloader = pickle.load(f)
             return subloader
     else:
-        if not os.path.exists(_fname_all):
+        if not os.path.exists(_fname_all) or force is True:
             loader = Bootstrap_PDB_SS(
                 loadpath=loadpath,
                 verbose=verbose,

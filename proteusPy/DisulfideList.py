@@ -877,21 +877,13 @@ class DisulfideList(UserList):
 
     def get_torsion_array(self):
         """
-        Returns a 2D NumPy array representing the dihedral angles in the given disulfide list.
+        Return a 2D NumPy array representing the dihedral angles in the given disulfide list.
 
         :return: A 2D NumPy array of shape (n, 5), where n is the number of disulfide bonds in the list. Each row
                 of the array represents the dihedral angles of a disulfide bond, in the following order:
-                [X1_i, X2_i, X3_i, X4_i, X5_i], where i is the index of the disulfide bond in the list.
+                [X1, X, X3, X4, X5], where i is the index of the disulfide bond in the list.
         """
-        sslist = self.data
-        tot = len(sslist)
-        res = np.zeros(shape=(tot, 5))
-
-        for idx, ss in enumerate(sslist):
-            row = ss.torsion_array
-            res[idx, :] = row
-
-        return res
+        return np.array([ss.torsion_array for ss in self.data])
 
     def has_chain(self, chain) -> bool:
         """
