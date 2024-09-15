@@ -283,23 +283,16 @@ def task(
 
         fname = os.path.join(save_dir, f"{prefix}_{cls}.png")
 
-        class_disulfides_deque = deque()
-        counter = 0
+        class_disulfides_array = np.empty(len(ss_list), dtype=object)
         update_freq = 50
-        remaining = 0
-
-        for ssid in ss_list:
-            _ss = loader[ssid]
-            class_disulfides_deque.append(_ss)
-            counter += 1
-            if counter % update_freq == 0 or counter == len(ss_list):
-                # Calculate the remaining updates correctly
-                remaining = len(ss_list) - counter
+        for idx, ssid in enumerate(ss_list):
+            class_disulfides_array[idx] = loader[ssid]
+            if (idx + 1) % update_freq == 0 or (idx + 1) == len(ss_list):
+                remaining = len(ss_list) - (idx + 1)
                 task_pbar.update(update_freq if remaining >= update_freq else remaining)
+                task_pbar.close()
 
-        task_pbar.close()
-
-        class_disulfides = DisulfideList(list(class_disulfides_deque), cls, quiet=True)
+        class_disulfides = DisulfideList(list(class_disulfides_array), cls, quiet=True)
 
         if do_graph:
             class_disulfides.display_torsion_statistics(

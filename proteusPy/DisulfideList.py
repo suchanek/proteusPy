@@ -12,6 +12,9 @@ Last revision: 7/12/2024 -egs-
 
 # pylint: disable=c0103
 # pylint: disable=c0301
+# pylint: disable=c0415
+# pylint: disable=w0212
+
 
 try:
     # Check if running in Jupyter
@@ -37,9 +40,16 @@ from plotly.subplots import make_subplots
 
 import proteusPy
 from proteusPy import Disulfide
-from proteusPy.atoms import *
+from proteusPy.atoms import (
+    BOND_COLOR,
+    BOND_RADIUS,
+    BS_SCALE,
+    FONTSIZE,
+    SPEC_POWER,
+    SPECULARITY,
+)
 from proteusPy.logger_config import get_logger
-from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, WINSIZE
+from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, PDB_DIR, WINSIZE
 from proteusPy.utility import get_jet_colormap, grid_dimensions
 
 _logger = get_logger(__name__)
@@ -250,7 +260,7 @@ class DisulfideList(UserList):
         return pl
 
     @property
-    def Average_Distance(self):
+    def average_distance(self):
         """
         Return the Average distance (Å) between the atoms in the list.
 
@@ -271,7 +281,7 @@ class DisulfideList(UserList):
         return total / cnt
 
     @property
-    def Average_Energy(self):
+    def average_energy(self):
         """
         Return the Average energy (kcal/mol) for the Disulfides in the list.
 
@@ -290,21 +300,15 @@ class DisulfideList(UserList):
         return total / tot
 
     @property
-    def Average_Conformation(self):
+    def average_conformation(self):
         """
-        Return the Average conformation for the Disulfides in the list.
+        Return the average conformation for the disulfides in the list.
 
         :return: Average conformation: [x1, x2, x3, x4, x5]
         """
-
         sslist = self.data
-        tot = len(sslist)
-        res = np.zeros(5)
-
-        for ss, i in zip(sslist, range(tot)):
-            res += ss.torsion_array
-
-        return res / tot
+        res = np.mean([ss.torsion_array for ss in sslist], axis=0)
+        return res
 
     def append(self, item):
         """
@@ -316,24 +320,17 @@ class DisulfideList(UserList):
         self.data.append(self.validate_ss(item))
 
     @property
-    def Average_Resolution(self) -> float:
+    def average_resolution(self) -> float:
         """
         Compute and return the average structure resolution for the given list.
 
         :return: Average resolution (A)
         """
-        res = 0.0
-        cnt = 1
-
-        for ss in self.data:
-            _res = ss.resolution
-            if _res is not None and _res != -1.0:
-                res += _res
-                cnt += 1
-        return res / cnt if cnt else -1.0
+        resolutions = [ss.resolution for ss in self.data if ss.resolution != -1.0]
+        return sum(resolutions) / len(resolutions) if resolutions else -1.0
 
     @property
-    def Average_Torsion_Distance(self):
+    def average_torsion_distance(self):
         """
         Return the average distance in torsion space (degrees), between all pairs in the
         DisulfideList
@@ -472,15 +469,19 @@ class DisulfideList(UserList):
         return reslist
 
     def calculate_torsion_statistics(self):
+        """
+        Calculate and return the torsion and distance statistics for the DisulfideList.
+
+        This method builds a DataFrame containing torsional parameters, Cα-Cα distance,
+        energy, and phi-psi angles for the DisulfideList. It then calculates the mean
+        and standard deviation for the torsional and distance parameters.
+
+        :return: A tuple containing two DataFrames:
+                - tor_stats: DataFrame with mean and standard deviation for torsional parameters.
+                - dist_stats: DataFrame with mean and standard deviation for distance parameters.
+        :rtype: tuple (pd.DataFrame, pd.DataFrame)
+        """
         df = self.build_torsion_df()
-
-        # df_subset = df.iloc[:, 4:]
-        # df_stats = df_subset.describe()
-
-        # print(df_stats.head())
-
-        # mean_vals = df_stats.loc["mean"].values
-        # std_vals = df_stats.loc["std"].values
 
         tor_cols = ["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]
         dist_cols = ["ca_distance", "cb_distance", "energy"]
@@ -514,8 +515,8 @@ class DisulfideList(UserList):
         pid = self.pdb_id
         ssbonds = self.data
         tot_ss = len(ssbonds)  # number off ssbonds
-        avg_enrg = self.Average_Energy
-        avg_dist = self.Average_Distance
+        avg_enrg = self.average_energy
+        avg_dist = self.average_distance
         resolution = self.resolution
 
         if light:
@@ -731,8 +732,8 @@ class DisulfideList(UserList):
         pid = self.pdb_id
         ssbonds = self.data
         tot_ss = len(ssbonds)  # number off ssbonds
-        avg_enrg = self.Average_Energy
-        avg_dist = self.Average_Distance
+        avg_enrg = self.average_energy
+        avg_dist = self.average_distance
         resolution = self.resolution
 
         res = 100
@@ -978,6 +979,7 @@ class DisulfideList(UserList):
 
     @property
     def length(self):
+        """Return the length of the list"""
         return len(self.data)
 
     @property
@@ -1115,14 +1117,52 @@ class DisulfideList(UserList):
 
     @property
     def torsion_df(self):
+        """Return the Torsion DataFrame for the DisulfideList"""
         return self.build_torsion_df()
 
     @property
     def torsion_array(self):
+        """Return the Torsions as an Array"""
         return self.get_torsion_array()
 
     def validate_ss(self, value):
+        """Return the Disulfide object if it is a Disulfide, otherwise raise an error"""
         return value
+
+    def create_deviation_dataframe(self):
+        """
+        Create a DataFrame with columns PDB_ID, SS_Name, Angle_Deviation, Distance_Deviation,
+        Ca Distance from a list of disulfides.
+
+        :return: DataFrame containing the disulfide information.
+        :rtype: pd.DataFrame
+        """
+        disulfide_list = self.data
+        data = {
+            "PDB_ID": [],
+            "Resolution": [],
+            "SS_Name": [],
+            "Angle_Deviation": [],
+            "Bondlength_Deviation": [],
+            "Ca_Distance": [],
+        }
+
+        for ss in tqdm(disulfide_list, desc="Processing..."):
+            pdb_id = ss.pdb_id
+            resolution = ss.resolution
+            ca_distance = ss.ca_distance
+            angle_deviation = ss.bond_angle_ideality
+            distance_deviation = ss.bond_length_ideality
+
+            data["PDB_ID"].append(pdb_id)
+            data["Resolution"].append(resolution)
+            data["SS_Name"].append(ss.name)
+            data["Angle_Deviation"].append(angle_deviation)
+            data["Bondlength_Deviation"].append(distance_deviation)
+            data["Ca_Distance"].append(ca_distance)
+
+        df = pd.DataFrame(data)
+        return df
 
     # class ends
 
@@ -1130,7 +1170,6 @@ class DisulfideList(UserList):
 def load_disulfides_from_id(
     pdb_id: str,
     pdb_dir=MODEL_DIR,
-    model_numb=0,
     verbose=False,
     quiet=True,
     dbg=False,
@@ -1174,7 +1213,6 @@ def load_disulfides_from_id(
     resolution = -1.0
 
     structure_fname = os.path.join(pdb_dir, f"pdb{pdb_id}.ent")
-    # model = structure[model_numb]
 
     if verbose:
         mess = f"-> load_disulfide_from_id() - Parsing structure: {pdb_id}:"
@@ -1182,25 +1220,21 @@ def load_disulfides_from_id(
 
     SSList = DisulfideList([], pdb_id, resolution)
 
-    # list of tuples with (proximal distal chaina chainb)
-    # ssbonds = parse_ssbond_header_rec(ssbond_dict)
-
     ssbond_atom_list, num_ssbonds, errors = extract_ssbonds_and_atoms(
         structure_fname, verbose=verbose
     )
 
     if num_ssbonds == 0:
+        mess = f"->{pdb_id} has no SSBonds."
         if verbose:
-            mess = f"-> load_disulfides_from_id(): {pdb_id} has no SSBonds."
             print(mess)
         _logger.warning(mess)
         return None
 
     if verbose:
-        mess = f"-> load_disulfides_from_id(): {pdb_id} has {num_ssbonds} SSBonds, found: {errors} errors"
+        mess = f"{pdb_id} has {num_ssbonds} SSBonds, found: {errors} errors"
         _logger.info(mess)
 
-    # with warnings.catch_warnings():
     if quiet:
         _logger.setLevel(logging.ERROR)
 
@@ -1215,19 +1249,21 @@ def load_disulfides_from_id(
 
         if dbg:
             mess = f"Proximal: {proximal} {chain1_id} Distal: {distal} {chain2_id}"
-            _logger.info(mess)
+            _logger.debug(mess)
 
         proximal_int = int(proximal)
         distal_int = int(distal)
 
         if proximal == distal:
             if verbose:
-                mess = f"-> load_disulfides_from_id(): SSBond record has (proximal == distal):\
+                mess = f"SSBond record has (proximal == distal):\
                 {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
                 _logger.info(mess)
 
         if verbose:
-            mess = f"-> load_disulfides_from_id(): SSBond: {i}: {pdb_id}: {proximal} {chain1_id} - {distal} {chain2_id}"
+            mess = (
+                f"SSBond: {i}: {pdb_id}: {proximal} {chain1_id} - {distal} {chain2_id}"
+            )
             _logger.info(mess)
 
         new_ss = Initialize_Disulfide_From_Coords(
@@ -1244,16 +1280,15 @@ def load_disulfides_from_id(
             quiet=quiet,
             dbg=dbg,
         )
-        if verbose:
-            _logger.info("New SS: %s", new_ss)
 
         if new_ss is not None:
+
             SSList.append(new_ss)
             if verbose:
-                mess = f"-> load_disulfides_from_id(): Initialized Disulfide: {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
+                mess = f"Initialized Disulfide: {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
                 _logger.info(mess)
         else:
-            mess = f"-> load_disulfides_from_id(): Cannot initialize Disulfide: {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
+            mess = f"Cannot initialize Disulfide: {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
             _logger.ERROR(mess)
 
         i += 1
@@ -1265,6 +1300,55 @@ def load_disulfides_from_id(
         SSList = SSList.filter_by_distance(cutoff)
 
     return copy.deepcopy(SSList)
+
+
+def extract_disulfide(
+    pdb_filename: str, verbose=False, quiet=True, pdbdir=PDB_DIR
+) -> DisulfideList:
+    """
+    Read the PDB file represented by `pdb_filename` and return a `DisulfideList`
+    containing the Disulfide bonds found.
+
+    :param pdb_filename:   The filename of the PDB file to read.
+    :param verbose:        Display more messages (default: False).
+    :param quiet:          Turn off DisulfideConstruction warnings (default: True).
+    :param pdbdir:         Path to PDB files (default: PDB_DIR).
+    :return:               A `DisulfideList` containing the Disulfide bonds found.
+    :rtype:                DisulfideList
+    """
+
+    def extract_id_from_filename(filename: str) -> str:
+        """
+        Extract the ID from a filename formatted as 'pdb{id}.ent'.
+
+        :param filename: The filename to extract the ID from.
+        :type filename: str
+        :return: The extracted ID.
+        :rtype: str
+        """
+        basename = os.path.basename(filename)
+        # Check if the filename follows the expected format
+        if basename.startswith("pdb") and filename.endswith(".ent"):
+            # Extract the ID part of the filename
+            return filename[3:-4]
+
+        mess = f"Filename {filename} does not follow the expected format 'pdb{id}.ent'"
+        raise ValueError(mess)
+
+    pdbid = extract_id_from_filename(pdb_filename)
+
+    # returns an empty list if none are found.
+    _sslist = DisulfideList([], pdbid)
+    _sslist = load_disulfides_from_id(
+        pdbid, verbose=verbose, quiet=quiet, pdb_dir=pdbdir
+    )
+
+    if len(_sslist) == 0 or _sslist is None:
+        mess = f"Can't find SSBonds: {pdbid}"
+        _logger.error(mess)
+        return DisulfideList([], pdbid)
+
+    return _sslist
 
 
 if __name__ == "__main__":

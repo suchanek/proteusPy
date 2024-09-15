@@ -2,11 +2,11 @@
 # Copyright (c) 2024 Eric G. Suchanek, PhD., all rights reserved
 # Subject to the BSD public license.
 
+# pylint: disable=C0413
+
 """
 .. include:: ../README.md
 """
-
-from pathlib import Path
 
 __pdoc__ = {
     "version": None,
@@ -16,15 +16,15 @@ __pdoc__ = {
 
 import logging
 
+import matplotlib.pyplot as plt
+import numpy as np
+
 # Set the default logger level to CRITICAL
 logging.basicConfig(level=logging.CRITICAL)
-
 
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
 
-import matplotlib.pyplot as plt
-import numpy as np
 
 from ._version import __version__
 from .angle_annotation import AngleAnnotation, plot_angle
@@ -68,7 +68,7 @@ from .DisulfideExceptions import (
     DisulfideIOException,
     DisulfideParseWarning,
 )
-from .DisulfideList import DisulfideList, load_disulfides_from_id
+from .DisulfideList import DisulfideList, extract_disulfide, load_disulfides_from_id
 from .DisulfideLoader import (
     Bootstrap_PDB_SS,
     DisulfideLoader,
@@ -108,12 +108,10 @@ from .ssparser import (
 from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN, Turtle3D
 from .utility import (
     Download_Disulfides,
-    Extract_Disulfide,
     Extract_Disulfides,
     Extract_Disulfides_From_List,
     calculate_percentile_cutoff,
     calculate_std_cutoff,
-    create_deviation_dataframe,
     display_ss_pymol,
     distance_squared,
     extract_firstchain_ss,
@@ -125,7 +123,6 @@ from .utility import (
     grid_dimensions,
     image_to_ascii_art,
     load_list_from_file,
-    plot_class_chart,
     print_memory_used,
     prune_extra_ss,
     remove_duplicate_ss,

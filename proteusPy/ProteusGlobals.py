@@ -48,7 +48,6 @@ PROBLEM_ID_FILE = "PDB_all_SS_problems.csv"
 SS_ID_FILE = "ss_ids.txt"
 
 SS_SUBSET_PICKLE_FILE = "PDB_subset_ss.pkl"
-SS_MASTER_SUBSET_PICKLE_FILE = "PDB_subset_ss_master.pkl"
 
 SS_PROBLEM_SUBSET_ID_FILE = "PDB_subset_problems.csv"
 
@@ -60,10 +59,6 @@ SS_CONSENSUS_BIN_FILE = "SS_consensus_class_32.pkl"
 
 LOADER_FNAME = "PDB_SS_ALL_LOADER.pkl"
 LOADER_SUBSET_FNAME = "PDB_SS_SUBSET_LOADER.pkl"
-
-# the unfiltered master loaders
-LOADER_MASTER_FNAME = "PDB_SS_ALL_LOADER_MASTER.pkl"
-LOADER_MASTER_SUBSET_FNAME = "PDB_SS_SUBSET_LOADER_MASTER.pkl"
 
 LOADER_FNAME_URL = "https://raw.githubusercontent.com/suchanek/proteusPy/master/proteusPy/data/PDB_SS_ALL_LOADER.pkl"
 LOADER_SUBSET_FNAME_URL = "https://raw.githubusercontent.com/suchanek/proteusPy/blob/master/proteusPy/data/PDB_SS_SUBSET_LOADER.pkl"

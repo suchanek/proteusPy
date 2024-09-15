@@ -27,8 +27,6 @@ import pandas as pd
 import plotly_express as px
 
 from proteusPy import __version__
-
-# from proteusPy.atoms import *
 from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideClass_Constructor import DisulfideClass_Constructor
 from proteusPy.DisulfideExceptions import DisulfideException, DisulfideParseWarning
@@ -72,14 +70,12 @@ class DisulfideLoader:
 
     Important note: For typical usage one will access the database via the `Load_PDB_SS()` function.
     The difference is that the latter function loads the compressed database from its single
-    source. the `Load_PDB_SS()` function will load the individual torsions and disulfide .pkl,
-    builds the classlist structures.
+    source. The `DisulfideLoader` class is used to build the Disulifde database with a
+    specific cutoff, or for saving the database to a file.
 
     *Developer's Notes:*
     The .pkl files needed to instantiate this class and save it into its final .pkl file are
-    defined in the proteusPy.data class and should not be changed. Upon initialization the class
-    will load them and initialize itself.
-
+    defined in the proteusPy.data class and should not be changed.
     """
 
     def __init__(
@@ -93,7 +89,7 @@ class DisulfideLoader:
     ) -> None:
         """
         Initializing the class initiates loading either the entire Disulfide dataset,
-        or the 'subset', which consists of the first 1000 PDB structures. The subset
+        or the 'subset', which consists of the first 5000 disulfides. The subset
         is useful for testing and debugging since it doesn't require nearly as much
         memory or time. The name for the subset file is hard-coded. One can pass a
         different data directory and file names for the pickle files. These different
@@ -113,7 +109,6 @@ class DisulfideLoader:
         self.timestamp = time.time()
         self.version = __version__
 
-        _pickleFile = None
         _pickleFile = picklefile
 
         full_path = os.path.join(datadir, _pickleFile)
@@ -133,10 +128,10 @@ class DisulfideLoader:
 
                 if subset:
                     self.SSList = DisulfideList(filt[:5000], "SUBSET_PDB_SS")
-                    self.TotalDisulfides = len(self.SSList)
                 else:
                     self.SSList = DisulfideList(filt, "ALL_PDB_SS")
-                    self.TotalDisulfides = len(self.SSList)
+
+                self.TotalDisulfides = len(self.SSList)
 
         except FileNotFoundError as e:
             _logger.error(f"File not found: {full_path}")
@@ -981,6 +976,9 @@ def Bootstrap_PDB_SS(
         datadir=DATA_DIR, subset=subset, verbose=verbose, cutoff=cutoff
     )
     loader.save(savepath=DATA_DIR, subset=subset, cutoff=cutoff)
+    if verbose:
+        loader.describe()
+
     return loader
 
 

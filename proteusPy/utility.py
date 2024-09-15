@@ -369,86 +369,6 @@ def sort_by_column(df, column):
     return sorted_df
 
 
-def plot_class_chart(classes: int) -> None:
-    """
-    Create a Matplotlib pie chart with `classes` segments of equal size.
-
-    Parameters:
-        classes (int): The number of segments to create in the pie chart.
-
-    Returns:
-        None
-
-    Example:
-    >>> plot_class_chart(4)
-
-    This will create a pie chart with 4 equal segments.
-    """
-
-    # Helper function to draw angle easily.
-    def plot_angle(ax, pos, angle, length=0.95, acol="C0", **kwargs):
-        vec2 = np.array([np.cos(np.deg2rad(angle)), np.sin(np.deg2rad(angle))])
-        xy = np.c_[[length, 0], [0, 0], vec2 * length].T + np.array(pos)
-        ax.plot(*xy.T, color=acol)
-        return AngleAnnotation(pos, xy[0], xy[2], ax=ax, **kwargs)
-
-    # fig = plt.figure(figsize=(WIDTH, HEIGHT), dpi=DPI)
-    fig, ax1 = plt.subplots(sharex=True)
-
-    # ax1, ax2 = fig.subplots(1, 2, sharey=True, sharex=True)
-
-    fig.suptitle("SS Torsion Classes")
-    fig.set_dpi(220)
-    fig.set_size_inches(6, 6)
-
-    fig.canvas.draw()  # Need to draw the figure to define renderer
-
-    # Showcase different text positions.
-    ax1.margins(y=0.4)
-    ax1.set_title("textposition")
-    _text = f"${360/classes}°$"
-    kw = dict(size=75, unit="points", text=_text)
-
-    # am6 = plot_angle(ax1, (2.0, 0), 60, textposition="inside", **kw)
-    am7 = plot_angle(ax1, (0, 0), 360 / classes, textposition="outside", **kw)
-
-    # Create a list of segment values
-    # !!!
-    values = [1 for _ in range(classes)]
-
-    # Create the pie chart
-    # fig, ax = plt.subplots()
-    wedges, _ = ax1.pie(
-        values, startangle=0, counterclock=False, wedgeprops=dict(width=0.65)
-    )
-
-    # Set the chart title and size
-    ax1.set_title(f"{classes}-Class Angular Layout")
-
-    # Set the segment colors
-    color_palette = matplotlib.colormaps["tab20"]
-
-    # color_palette = plt.cm.get_cmap("tab20", classes)
-    ax1.set_prop_cycle("color", [color_palette(i) for i in range(classes)])
-
-    # Create the legend
-    legend_labels = [f"Class {i+1}" for i in range(classes)]
-    legend = ax1.legend(
-        wedges,
-        legend_labels,
-        title="Classes",
-        loc="center left",
-        bbox_to_anchor=(1.2, 0.5),
-    )
-
-    # Set the legend fontsize
-    plt.setp(legend.get_title(), fontsize="large")
-    plt.setp(legend.get_texts(), fontsize="medium")
-
-    # Show the chart
-    fig.show()
-
-
 def retrieve_git_lfs_files(repo_url, objects):
     """
     Retrieves a git-lfs json object from a specified repo.
@@ -619,7 +539,9 @@ def remove_duplicate_ss(sslist: DisulfideList) -> list[Disulfide]:
 
 
 # Function extracts the disulfide bonds from the PDB files and creates the .pkl files
-# needed for the proteusPy.DisulfideLoader.DisulfideLoader class.
+# needed for the proteusPy.DisulfideLoader class. This function is largely
+# replaced by the DisulfideExtractor_mp.py program which uses multiprocessing to
+# speed up the extraction process. The function is retained for reference.
 
 
 def Extract_Disulfides(
@@ -895,19 +817,6 @@ def Extract_Disulfides_From_List(
             len(entrylist),
         )
 
-    # create a dataframe with the following columns for the disulfide conformations
-    # extracted from the structure
-
-    # SS_df = pd.DataFrame(columns=Torsion_DF_Cols)
-
-    # define a tqdm progressbar using the fully loaded entrylist list.
-    # If numb is passed then
-    # only do the last numb entries.
-
-    # loop over ss_filelist, create disulfides and initialize them
-    # the logging_redirect_tqdm() context manager will redirect the logging output
-    # to the tqdm progress bar.
-
     with logging_redirect_tqdm(loggers=[_logger]):
         if numb > 0:
             pbar = tqdm(entrylist[:numb], ncols=PBAR_COLS)
@@ -1024,60 +933,6 @@ def Extract_Disulfides_From_List(
     return
 
 
-def Extract_Disulfide(
-    pdbid: str, verbose=False, quiet=True, pdbdir=PDB_DIR, xtra=True
-) -> DisulfideList:
-    """
-    Read the PDB file represented by `pdbid` and return a ``DisulfideList``
-    containing the Disulfide bonds found.
-
-    :param verbose:        Display more messages
-    :param quiet:          Turn off DisulfideConstruction warnings
-    :param pdbdir:         path to PDB files
-    :param xtra:           Prune duplicate disulfides
-    """
-    from proteusPy.DisulfideList import load_disulfides_from_id
-
-    def extract_id_from_filename(filename: str) -> str:
-        """
-        Extract the ID from a filename formatted as 'pdb{id}.ent'.
-
-        Parameters:
-        - filename (str): The filename to extract the ID from.
-
-        Returns:
-        - str: The extracted ID.
-        """
-        basename = os.path.basename(filename)
-        # Check if the filename follows the expected format
-        if basename.startswith("pdb") and filename.endswith(".ent"):
-            # Extract the ID part of the filename
-            return filename[3:-4]
-        else:
-            mess = (
-                f"Filename {filename} does not follow the expected format 'pdbid .ent'"
-            )
-            raise ValueError(mess)
-
-    # Build a list of PDB files in PDB_DIR that are readable. These files were downloaded
-    # via the RCSB web query interface for structures containing >= 1 SS Bond.
-
-    pid = extract_id_from_filename(pdbid)
-
-    # returns an empty list if none are found.
-    _sslist = DisulfideList([], pid)
-    _sslist = load_disulfides_from_id(
-        pid, model_numb=0, verbose=verbose, quiet=quiet, pdb_dir=pdbdir
-    )
-
-    if len(_sslist) == 0 or _sslist is None:
-        print(f"--> Can't find SSBonds: {pdbid}")
-        return DisulfideList([], id)
-
-    # return to original directory
-    return _sslist
-
-
 def get_macos_theme():
     """
     Determine the display theme for a macOS computer using AppleScript.
@@ -1116,53 +971,15 @@ def get_macos_theme():
             theme = result.stdout.strip().lower()
             if theme in ["dark", "light"]:
                 return theme
-            else:
-                return "none"
-        else:
             return "none"
+        return "none"
+
     except Exception:
         # In case of any exception, return 'none'
         return "none"
 
 
 # functions to calculate statistics and filter disulfide lists via pandas
-
-
-def create_deviation_dataframe(disulfide_list):
-    """
-    Create a DataFrame with columns PDB_ID, SS_Name, Angle_Deviation, Distance_Deviation,
-    Ca Distance from a list of disulfides.
-
-    :param disulfide_list: List of disulfide objects.
-    :type proteusPy.DisulfideList: list
-    :return: DataFrame containing the disulfide information.
-    :rtype: pd.DataFrame
-    """
-    data = {
-        "PDB_ID": [],
-        "Resolution": [],
-        "SS_Name": [],
-        "Angle_Deviation": [],
-        "Bondlength_Deviation": [],
-        "Ca_Distance": [],
-    }
-
-    for ss in tqdm(disulfide_list, desc="Processing..."):
-        pdb_id = ss.pdb_id
-        resolution = ss.resolution
-        ca_distance = ss.ca_distance
-        angle_deviation = ss.bond_angle_ideality
-        distance_deviation = ss.bond_length_ideality
-
-        data["PDB_ID"].append(pdb_id)
-        data["Resolution"].append(resolution)
-        data["SS_Name"].append(ss.name)
-        data["Angle_Deviation"].append(angle_deviation)
-        data["Bondlength_Deviation"].append(distance_deviation)
-        data["Ca_Distance"].append(ca_distance)
-
-    df = pd.DataFrame(data)
-    return df
 
 
 def calculate_std_cutoff(df, column, num_std=2):

@@ -217,7 +217,6 @@ def extract_disulfides_chunk(args):
     for entry in entrylist:
         _sslist = load_disulfides_from_id(
             entry,
-            model_numb=0,
             verbose=verbose,
             quiet=quiet,
             pdb_dir=pdbdir,
@@ -326,8 +325,7 @@ def do_build(verbose, full, subset, cutoff):
             verbose=verbose,
             cutoff=cutoff,
         )
-        # this will save twice if master so that the 'normal' loader is saved as well.
-        PDB_SS.save(savepath=DATA_DIR, subset=False, cutoff=cutoff)
+        PDB_SS.save(savepath=DATA_DIR, subset=subset, cutoff=cutoff)
 
     if subset:
         if verbose:
@@ -340,7 +338,9 @@ def do_build(verbose, full, subset, cutoff):
             verbose=verbose,
             cutoff=cutoff,
         )
-        PDB_SS.save(savepath=DATA_DIR, subset=True, cutoff=cutoff)
+        PDB_SS.save(savepath=DATA_DIR, subset=subset, cutoff=cutoff)
+
+    PDB_SS.describe()
 
 
 def update_repo(datadir, destdir):

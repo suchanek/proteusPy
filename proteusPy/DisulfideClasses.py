@@ -151,7 +151,7 @@ def torsion_to_eightclass(tors):
 
 def get_angle_class(angle_deg, base=8) -> str:
     """
-    Returns the class of the angle based on its degree value and the specified base.
+    Return the class of the angle based on its degree value and the specified base.
 
     The angle is divided into equal segments based on the base value, and the class is determined
     by which segment the angle falls into.
@@ -162,19 +162,12 @@ def get_angle_class(angle_deg, base=8) -> str:
     :type base: int, optional
     :return: The class of the angle as a string.
     :rtype: str
-    :raises ValueError: If the base is not one of [4, 6, 8] or if the angle is not in the range [0, 360).
     """
     bases = [4, 6, 8]
     if base not in bases:
         raise ValueError(f"Invalid base value: base must be one of {bases}.")
 
     angle = angle_deg % 360
-
-    if angle < 0 or angle_deg >= 360:
-        raise ValueError(
-            f"Invalid angle value: {angle_deg} angle must be in the range [0, 360)."
-        )
-
     deg = 360 // base
     return str(base - (angle // deg))
 
