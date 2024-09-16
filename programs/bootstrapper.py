@@ -5,15 +5,13 @@ builds the proteusPy database.
 """
 
 import argparse
-import logging
 
-from proteusPy import Bootstrap_PDB_SS, get_logger, set_logger_level_for_module
+from proteusPy import Bootstrap_PDB_SS, DisulfideLoader, get_logger
+from proteusPy.ProteusGlobals import DATA_DIR
 
 _logger = get_logger(__name__)
 
 __version__ = "0.1.0"
-
-# set_logger_level_for_module("proteusPy", logging.ERROR)
 
 
 def parse_arguments():
@@ -60,7 +58,15 @@ def main():
     if args.verbose:
         print(f"Building subset loader with cutoff: {args.cutoff}")
 
-    Bootstrap_PDB_SS(verbose=args.verbose, subset=True, cutoff=args.cutoff, force=False)
+    subset_loader = DisulfideLoader(
+        datadir=DATA_DIR, subset=True, verbose=args.verbose, cutoff=args.cutoff
+    )
+    subset_loader.save(savepath=DATA_DIR, subset=True, cutoff=args.cutoff)
+
+    if args.verbose:
+        subset_loader.describe()
+
+    # Bootstrap_PDB_SS(verbose=args.verbose, subset=True, cutoff=args.cutoff, force=False)
 
 
 if __name__ == "__main__":
