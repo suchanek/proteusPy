@@ -39,10 +39,10 @@ init()
 
 from tqdm import tqdm
 
-# ignore pyl
 from proteusPy import (
     DisulfideList,
     DisulfideLoader,
+    get_logger,
     load_disulfides_from_id,
     remove_duplicate_ss,
     set_logger_level_for_module,
@@ -55,8 +55,8 @@ from proteusPy.ProteusGlobals import (
     SS_SUBSET_PICKLE_FILE,
 )
 
-_logger = logging.getLogger("DisulfideExtractor")
-_logger.setLevel(logging.INFO)
+_logger = get_logger(__name__)
+_logger.setLevel(logging.info)
 
 set_logger_level_for_module("proteusPy", logging.ERROR)
 

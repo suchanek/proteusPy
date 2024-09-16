@@ -785,7 +785,7 @@ class DisulfideLoader:
 
         _fname = os.path.join(savepath, fname)
         if self.verbose:
-            _logger.info(f"-> DisulfideLoader.save(): Writing {_fname}... ")
+            _logger.info(f"Writing {_fname}... ")
 
         with open(str(_fname), "wb+") as f:
             pickle.dump(self, f)
