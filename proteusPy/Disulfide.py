@@ -1641,104 +1641,6 @@ class Disulfide:
         """
         return self._compute_torsion_length()
 
-    def plot(
-        self, pl, single=True, style="sb", light=True, shadows=False
-    ) -> pv.Plotter:
-        """
-        Return the pyVista Plotter object for the Disulfide bond in the specific rendering style.
-
-        :param single: Display the bond in a single panel in the specific style.
-        :param style:  Rendering style: One of:
-            * 'sb' - split bonds
-            * 'bs' - ball and stick
-            * 'cpk' - CPK style
-            * 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
-            * 'plain' - boring single color
-        :param light: If True, light background, if False, dark
-        """
-        src = self.pdb_id
-        enrg = self.energy
-
-        # title = f"{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Cβ: {self.cb_distance:.2f} Å Tors: {self.torsion_length:.2f}°"
-
-        if light:
-            pv.set_plot_theme("document")
-        else:
-            pv.set_plot_theme("dark")
-
-        if single is True:
-            # _pl = pv.Plotter(window_size=WINSIZE)
-            # _pl.add_title(title=title, font_size=FONTSIZE)
-            pl.clear()
-            pl.enable_anti_aliasing("msaa")
-            # pl.add_camera_orientation_widget()
-
-            self._render(
-                pl,
-                style=style,
-                bs_scale=BS_SCALE,
-                spec=SPECULARITY,
-                specpow=SPEC_POWER,
-            )
-            pl.reset_camera()
-            if shadows is True:
-                pl.enable_shadows()
-        else:
-            pl = pv.Plotter(shape=(2, 2))
-            pl.subplot(0, 0)
-
-            # pl.add_title(title=title, font_size=FONTSIZE)
-            pl.enable_anti_aliasing("msaa")
-
-            # pl.add_camera_orientation_widget()
-
-            self._render(
-                pl,
-                style="cpk",
-                bondcolor=BOND_COLOR,
-                bs_scale=BS_SCALE,
-                spec=SPECULARITY,
-                specpow=SPEC_POWER,
-            )
-
-            pl.subplot(0, 1)
-
-            self._render(
-                pl,
-                style="bs",
-                bondcolor=BOND_COLOR,
-                bs_scale=BS_SCALE,
-                spec=SPECULARITY,
-                specpow=SPEC_POWER,
-            )
-
-            pl.subplot(1, 0)
-
-            self._render(
-                pl,
-                style="sb",
-                bondcolor=BOND_COLOR,
-                bs_scale=BS_SCALE,
-                spec=SPECULARITY,
-                specpow=SPEC_POWER,
-            )
-
-            pl.subplot(1, 1)
-            self._render(
-                pl,
-                style="pd",
-                bondcolor=BOND_COLOR,
-                bs_scale=BS_SCALE,
-                spec=SPECULARITY,
-                specpow=SPEC_POWER,
-            )
-
-            pl.link_views()
-            pl.reset_camera()
-            if shadows is True:
-                pl.enable_shadows()
-        return pl
-
     def Distance_neighbors(self, others: DisulfideList, cutoff: float) -> DisulfideList:
         """
         Return list of Disulfides whose RMS atomic distance is within
@@ -2450,13 +2352,13 @@ class Disulfide:
 
     def Torsion_Distance(self, other) -> float:
         """
-        Calculate the 5D Euclidean distance between ```self``` and another Disulfide
+        Calculate the 5D Euclidean distance between `self` and another Disulfide
         object. This is used to compare Disulfide Bond torsion angles to
         determine their torsional similarity via a 5-Dimensional Euclidean distance metric.
 
         :param other: Comparison Disulfide
-        :raises ProteusPyWarning: Warning if ```other``` is not a Disulfide object
-        :return: Euclidean distance (Degrees) between ```self``` and ```other```.
+        :raises ProteusPyWarning: Warning if `other` is not a Disulfide object
+        :return: Euclidean distance (Degrees) between `self` and `other`.
         """
 
         # Check length of torsion arrays
@@ -2465,12 +2367,16 @@ class Disulfide:
                 "--> Torsion_Distance() requires vectors of length 5!"
             )
 
-        # Convert to numpy arrays and add 180 to each element
-        p1 = np.array(self.torsion_array) + 180.0
-        p2 = np.array(other.torsion_array) + 180.0
+        # Convert to numpy arrays
+        p1 = np.array(self.torsion_array)
+        p2 = np.array(other.torsion_array)
+
+        # Compute the difference and handle angle wrapping
+        diff = np.abs(p1 - p2)
+        diff = np.where(diff > 180, 360 - diff, diff)
 
         # Compute the 5D Euclidean distance using numpy's linalg.norm function
-        dist = np.linalg.norm(p1 - p2)
+        dist = np.linalg.norm(diff)
 
         return dist
 
@@ -2506,13 +2412,13 @@ class Disulfide:
         sidechain dihedral angle space.
 
         >>> low_energy_neighbors = DisulfideList([],'Neighbors')
-        >>> low_energy_neighbors = ssmin_enrg.Torsion_neighbors(sslist, 10)
+        >>> low_energy_neighbors = ssmin_enrg.Torsion_neighbors(sslist, 5)
 
         Display the number found, and then display them overlaid onto their common reference frame.
 
         >>> tot = low_energy_neighbors.length
         >>> print(f'Neighbors: {tot}')
-        Neighbors: 4
+        Neighbors: 3
         >>> low_energy_neighbors.display_overlay()
 
         """
