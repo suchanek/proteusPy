@@ -2350,7 +2350,7 @@ class Disulfide:
 
         return dist
 
-    def Torsion_Distance(self, other) -> float:
+    def torsion_distance(self, other) -> float:
         """
         Calculate the 5D Euclidean distance between `self` and another Disulfide
         object. This is used to compare Disulfide Bond torsion angles to
@@ -2423,14 +2423,14 @@ class Disulfide:
 
         """
 
-        res = [ss for ss in others if self.Torsion_Distance(ss) <= cutoff]
+        res = [ss for ss in others if self.torsion_distance(ss) <= cutoff]
         return DisulfideList(res, "neighbors")
 
 
 # Class defination ends
 
 
-def Disulfide_Energy_Function(x: list) -> float:
+def disulfide_energy_function(x: list) -> float:
     """
     Compute the approximate torsional energy (kcal/mpl) for the input dihedral angles.
 
@@ -2438,9 +2438,9 @@ def Disulfide_Energy_Function(x: list) -> float:
     :return: Energy in kcal/mol
 
     Example:
-    >>> from proteusPy import Disulfide_Energy_Function
+    >>> from proteusPy import disulfide_energy_function
     >>> dihed = [-60.0, -60.0, -90.0, -60.0, -90.0]
-    >>> res = Disulfide_Energy_Function(dihed)
+    >>> res = disulfide_energy_function(dihed)
     >>> float(res)
     2.5999999999999996
     """
@@ -2469,7 +2469,7 @@ def Minimize(inputSS: Disulfide) -> Disulfide:
     """
 
     initial_guess = inputSS.torsion_array
-    result = minimize(Disulfide_Energy_Function, initial_guess, method="Nelder-Mead")
+    result = minimize(disulfide_energy_function, initial_guess, method="Nelder-Mead")
     minimum_conformation = result.x
     modelled_min = Disulfide("minimized")
     modelled_min.dihedrals = minimum_conformation

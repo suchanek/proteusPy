@@ -336,7 +336,7 @@
                                 <a class="function" href="#Disulfide.set_resnum">set_resnum</a>
                         </li>
                         <li>
-                                <a class="function" href="#Disulfide.Torsion_Distance">Torsion_Distance</a>
+                                <a class="function" href="#Disulfide.torsion_distance">torsion_distance</a>
                         </li>
                         <li>
                                 <a class="function" href="#Disulfide.Torsion_neighbors">Torsion_neighbors</a>
@@ -345,7 +345,7 @@
 
             </li>
             <li>
-                    <a class="function" href="#Disulfide_Energy_Function">Disulfide_Energy_Function</a>
+                    <a class="function" href="#disulfide_energy_function">disulfide_energy_function</a>
             </li>
             <li>
                     <a class="function" href="#Minimize">Minimize</a>
@@ -2734,7 +2734,7 @@ It represents the core of the current implementation of <em>proteusPy</em>.</p>
 </span><span id="L-2350"><a href="#L-2350"><span class="linenos">2350</span></a>
 </span><span id="L-2351"><a href="#L-2351"><span class="linenos">2351</span></a>        <span class="k">return</span> <span class="n">dist</span>
 </span><span id="L-2352"><a href="#L-2352"><span class="linenos">2352</span></a>
-</span><span id="L-2353"><a href="#L-2353"><span class="linenos">2353</span></a>    <span class="k">def</span> <span class="nf">Torsion_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="L-2353"><a href="#L-2353"><span class="linenos">2353</span></a>    <span class="k">def</span> <span class="nf">torsion_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 </span><span id="L-2354"><a href="#L-2354"><span class="linenos">2354</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-2355"><a href="#L-2355"><span class="linenos">2355</span></a><span class="sd">        Calculate the 5D Euclidean distance between `self` and another Disulfide</span>
 </span><span id="L-2356"><a href="#L-2356"><span class="linenos">2356</span></a><span class="sd">        object. This is used to compare Disulfide Bond torsion angles to</span>
@@ -2807,14 +2807,14 @@ It represents the core of the current implementation of <em>proteusPy</em>.</p>
 </span><span id="L-2423"><a href="#L-2423"><span class="linenos">2423</span></a>
 </span><span id="L-2424"><a href="#L-2424"><span class="linenos">2424</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="L-2425"><a href="#L-2425"><span class="linenos">2425</span></a>
-</span><span id="L-2426"><a href="#L-2426"><span class="linenos">2426</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="n">ss</span> <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">others</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Torsion_Distance</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">cutoff</span><span class="p">]</span>
+</span><span id="L-2426"><a href="#L-2426"><span class="linenos">2426</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="n">ss</span> <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">others</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">torsion_distance</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">cutoff</span><span class="p">]</span>
 </span><span id="L-2427"><a href="#L-2427"><span class="linenos">2427</span></a>        <span class="k">return</span> <span class="n">DisulfideList</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="s2">&quot;neighbors&quot;</span><span class="p">)</span>
 </span><span id="L-2428"><a href="#L-2428"><span class="linenos">2428</span></a>
 </span><span id="L-2429"><a href="#L-2429"><span class="linenos">2429</span></a>
 </span><span id="L-2430"><a href="#L-2430"><span class="linenos">2430</span></a><span class="c1"># Class defination ends</span>
 </span><span id="L-2431"><a href="#L-2431"><span class="linenos">2431</span></a>
 </span><span id="L-2432"><a href="#L-2432"><span class="linenos">2432</span></a>
-</span><span id="L-2433"><a href="#L-2433"><span class="linenos">2433</span></a><span class="k">def</span> <span class="nf">Disulfide_Energy_Function</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="L-2433"><a href="#L-2433"><span class="linenos">2433</span></a><span class="k">def</span> <span class="nf">disulfide_energy_function</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 </span><span id="L-2434"><a href="#L-2434"><span class="linenos">2434</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-2435"><a href="#L-2435"><span class="linenos">2435</span></a><span class="sd">    Compute the approximate torsional energy (kcal/mpl) for the input dihedral angles.</span>
 </span><span id="L-2436"><a href="#L-2436"><span class="linenos">2436</span></a>
@@ -2822,9 +2822,9 @@ It represents the core of the current implementation of <em>proteusPy</em>.</p>
 </span><span id="L-2438"><a href="#L-2438"><span class="linenos">2438</span></a><span class="sd">    :return: Energy in kcal/mol</span>
 </span><span id="L-2439"><a href="#L-2439"><span class="linenos">2439</span></a>
 </span><span id="L-2440"><a href="#L-2440"><span class="linenos">2440</span></a><span class="sd">    Example:</span>
-</span><span id="L-2441"><a href="#L-2441"><span class="linenos">2441</span></a><span class="sd">    &gt;&gt;&gt; from proteusPy import Disulfide_Energy_Function</span>
+</span><span id="L-2441"><a href="#L-2441"><span class="linenos">2441</span></a><span class="sd">    &gt;&gt;&gt; from proteusPy import disulfide_energy_function</span>
 </span><span id="L-2442"><a href="#L-2442"><span class="linenos">2442</span></a><span class="sd">    &gt;&gt;&gt; dihed = [-60.0, -60.0, -90.0, -60.0, -90.0]</span>
-</span><span id="L-2443"><a href="#L-2443"><span class="linenos">2443</span></a><span class="sd">    &gt;&gt;&gt; res = Disulfide_Energy_Function(dihed)</span>
+</span><span id="L-2443"><a href="#L-2443"><span class="linenos">2443</span></a><span class="sd">    &gt;&gt;&gt; res = disulfide_energy_function(dihed)</span>
 </span><span id="L-2444"><a href="#L-2444"><span class="linenos">2444</span></a><span class="sd">    &gt;&gt;&gt; float(res)</span>
 </span><span id="L-2445"><a href="#L-2445"><span class="linenos">2445</span></a><span class="sd">    2.5999999999999996</span>
 </span><span id="L-2446"><a href="#L-2446"><span class="linenos">2446</span></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -2853,7 +2853,7 @@ It represents the core of the current implementation of <em>proteusPy</em>.</p>
 </span><span id="L-2469"><a href="#L-2469"><span class="linenos">2469</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-2470"><a href="#L-2470"><span class="linenos">2470</span></a>
 </span><span id="L-2471"><a href="#L-2471"><span class="linenos">2471</span></a>    <span class="n">initial_guess</span> <span class="o">=</span> <span class="n">inputSS</span><span class="o">.</span><span class="n">torsion_array</span>
-</span><span id="L-2472"><a href="#L-2472"><span class="linenos">2472</span></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">Disulfide_Energy_Function</span><span class="p">,</span> <span class="n">initial_guess</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;Nelder-Mead&quot;</span><span class="p">)</span>
+</span><span id="L-2472"><a href="#L-2472"><span class="linenos">2472</span></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">disulfide_energy_function</span><span class="p">,</span> <span class="n">initial_guess</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;Nelder-Mead&quot;</span><span class="p">)</span>
 </span><span id="L-2473"><a href="#L-2473"><span class="linenos">2473</span></a>    <span class="n">minimum_conformation</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">x</span>
 </span><span id="L-2474"><a href="#L-2474"><span class="linenos">2474</span></a>    <span class="n">modelled_min</span> <span class="o">=</span> <span class="n">Disulfide</span><span class="p">(</span><span class="s2">&quot;minimized&quot;</span><span class="p">)</span>
 </span><span id="L-2475"><a href="#L-2475"><span class="linenos">2475</span></a>    <span class="n">modelled_min</span><span class="o">.</span><span class="n">dihedrals</span> <span class="o">=</span> <span class="n">minimum_conformation</span>
@@ -5383,7 +5383,7 @@ It represents the core of the current implementation of <em>proteusPy</em>.</p>
 </span><span id="Disulfide-2351"><a href="#Disulfide-2351"><span class="linenos">2351</span></a>
 </span><span id="Disulfide-2352"><a href="#Disulfide-2352"><span class="linenos">2352</span></a>        <span class="k">return</span> <span class="n">dist</span>
 </span><span id="Disulfide-2353"><a href="#Disulfide-2353"><span class="linenos">2353</span></a>
-</span><span id="Disulfide-2354"><a href="#Disulfide-2354"><span class="linenos">2354</span></a>    <span class="k">def</span> <span class="nf">Torsion_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="Disulfide-2354"><a href="#Disulfide-2354"><span class="linenos">2354</span></a>    <span class="k">def</span> <span class="nf">torsion_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 </span><span id="Disulfide-2355"><a href="#Disulfide-2355"><span class="linenos">2355</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="Disulfide-2356"><a href="#Disulfide-2356"><span class="linenos">2356</span></a><span class="sd">        Calculate the 5D Euclidean distance between `self` and another Disulfide</span>
 </span><span id="Disulfide-2357"><a href="#Disulfide-2357"><span class="linenos">2357</span></a><span class="sd">        object. This is used to compare Disulfide Bond torsion angles to</span>
@@ -5456,7 +5456,7 @@ It represents the core of the current implementation of <em>proteusPy</em>.</p>
 </span><span id="Disulfide-2424"><a href="#Disulfide-2424"><span class="linenos">2424</span></a>
 </span><span id="Disulfide-2425"><a href="#Disulfide-2425"><span class="linenos">2425</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="Disulfide-2426"><a href="#Disulfide-2426"><span class="linenos">2426</span></a>
-</span><span id="Disulfide-2427"><a href="#Disulfide-2427"><span class="linenos">2427</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="n">ss</span> <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">others</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Torsion_Distance</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">cutoff</span><span class="p">]</span>
+</span><span id="Disulfide-2427"><a href="#Disulfide-2427"><span class="linenos">2427</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="n">ss</span> <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">others</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">torsion_distance</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">cutoff</span><span class="p">]</span>
 </span><span id="Disulfide-2428"><a href="#Disulfide-2428"><span class="linenos">2428</span></a>        <span class="k">return</span> <span class="n">DisulfideList</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="s2">&quot;neighbors&quot;</span><span class="p">)</span>
 </span></pre></div>
 
@@ -8421,46 +8421,46 @@ and filename</p>
 
 
                             </div>
-                            <div id="Disulfide.Torsion_Distance" class="classattr">
-                                        <input id="Disulfide.Torsion_Distance-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                            <div id="Disulfide.torsion_distance" class="classattr">
+                                        <input id="Disulfide.torsion_distance-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">Torsion_Distance</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">other</span></span><span class="return-annotation">) -> <span class="nb">float</span>:</span></span>
+        <span class="name">torsion_distance</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">other</span></span><span class="return-annotation">) -> <span class="nb">float</span>:</span></span>
 
-                <label class="view-source-button" for="Disulfide.Torsion_Distance-view-source"><span>View Source</span></label>
+                <label class="view-source-button" for="Disulfide.torsion_distance-view-source"><span>View Source</span></label>
 
     </div>
-    <a class="headerlink" href="#Disulfide.Torsion_Distance"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Disulfide.Torsion_Distance-2354"><a href="#Disulfide.Torsion_Distance-2354"><span class="linenos">2354</span></a>    <span class="k">def</span> <span class="nf">Torsion_Distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span id="Disulfide.Torsion_Distance-2355"><a href="#Disulfide.Torsion_Distance-2355"><span class="linenos">2355</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Disulfide.Torsion_Distance-2356"><a href="#Disulfide.Torsion_Distance-2356"><span class="linenos">2356</span></a><span class="sd">        Calculate the 5D Euclidean distance between `self` and another Disulfide</span>
-</span><span id="Disulfide.Torsion_Distance-2357"><a href="#Disulfide.Torsion_Distance-2357"><span class="linenos">2357</span></a><span class="sd">        object. This is used to compare Disulfide Bond torsion angles to</span>
-</span><span id="Disulfide.Torsion_Distance-2358"><a href="#Disulfide.Torsion_Distance-2358"><span class="linenos">2358</span></a><span class="sd">        determine their torsional similarity via a 5-Dimensional Euclidean distance metric.</span>
-</span><span id="Disulfide.Torsion_Distance-2359"><a href="#Disulfide.Torsion_Distance-2359"><span class="linenos">2359</span></a>
-</span><span id="Disulfide.Torsion_Distance-2360"><a href="#Disulfide.Torsion_Distance-2360"><span class="linenos">2360</span></a><span class="sd">        :param other: Comparison Disulfide</span>
-</span><span id="Disulfide.Torsion_Distance-2361"><a href="#Disulfide.Torsion_Distance-2361"><span class="linenos">2361</span></a><span class="sd">        :raises ProteusPyWarning: Warning if `other` is not a Disulfide object</span>
-</span><span id="Disulfide.Torsion_Distance-2362"><a href="#Disulfide.Torsion_Distance-2362"><span class="linenos">2362</span></a><span class="sd">        :return: Euclidean distance (Degrees) between `self` and `other`.</span>
-</span><span id="Disulfide.Torsion_Distance-2363"><a href="#Disulfide.Torsion_Distance-2363"><span class="linenos">2363</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Disulfide.Torsion_Distance-2364"><a href="#Disulfide.Torsion_Distance-2364"><span class="linenos">2364</span></a>
-</span><span id="Disulfide.Torsion_Distance-2365"><a href="#Disulfide.Torsion_Distance-2365"><span class="linenos">2365</span></a>        <span class="c1"># Check length of torsion arrays</span>
-</span><span id="Disulfide.Torsion_Distance-2366"><a href="#Disulfide.Torsion_Distance-2366"><span class="linenos">2366</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">torsion_array</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">5</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">torsion_array</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">5</span><span class="p">:</span>
-</span><span id="Disulfide.Torsion_Distance-2367"><a href="#Disulfide.Torsion_Distance-2367"><span class="linenos">2367</span></a>            <span class="k">raise</span> <span class="n">ProteusPyWarning</span><span class="p">(</span>
-</span><span id="Disulfide.Torsion_Distance-2368"><a href="#Disulfide.Torsion_Distance-2368"><span class="linenos">2368</span></a>                <span class="s2">&quot;--&gt; Torsion_Distance() requires vectors of length 5!&quot;</span>
-</span><span id="Disulfide.Torsion_Distance-2369"><a href="#Disulfide.Torsion_Distance-2369"><span class="linenos">2369</span></a>            <span class="p">)</span>
-</span><span id="Disulfide.Torsion_Distance-2370"><a href="#Disulfide.Torsion_Distance-2370"><span class="linenos">2370</span></a>
-</span><span id="Disulfide.Torsion_Distance-2371"><a href="#Disulfide.Torsion_Distance-2371"><span class="linenos">2371</span></a>        <span class="c1"># Convert to numpy arrays</span>
-</span><span id="Disulfide.Torsion_Distance-2372"><a href="#Disulfide.Torsion_Distance-2372"><span class="linenos">2372</span></a>        <span class="n">p1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">torsion_array</span><span class="p">)</span>
-</span><span id="Disulfide.Torsion_Distance-2373"><a href="#Disulfide.Torsion_Distance-2373"><span class="linenos">2373</span></a>        <span class="n">p2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">torsion_array</span><span class="p">)</span>
-</span><span id="Disulfide.Torsion_Distance-2374"><a href="#Disulfide.Torsion_Distance-2374"><span class="linenos">2374</span></a>
-</span><span id="Disulfide.Torsion_Distance-2375"><a href="#Disulfide.Torsion_Distance-2375"><span class="linenos">2375</span></a>        <span class="c1"># Compute the difference and handle angle wrapping</span>
-</span><span id="Disulfide.Torsion_Distance-2376"><a href="#Disulfide.Torsion_Distance-2376"><span class="linenos">2376</span></a>        <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">p1</span> <span class="o">-</span> <span class="n">p2</span><span class="p">)</span>
-</span><span id="Disulfide.Torsion_Distance-2377"><a href="#Disulfide.Torsion_Distance-2377"><span class="linenos">2377</span></a>        <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diff</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">360</span> <span class="o">-</span> <span class="n">diff</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span>
-</span><span id="Disulfide.Torsion_Distance-2378"><a href="#Disulfide.Torsion_Distance-2378"><span class="linenos">2378</span></a>
-</span><span id="Disulfide.Torsion_Distance-2379"><a href="#Disulfide.Torsion_Distance-2379"><span class="linenos">2379</span></a>        <span class="c1"># Compute the 5D Euclidean distance using numpy&#39;s linalg.norm function</span>
-</span><span id="Disulfide.Torsion_Distance-2380"><a href="#Disulfide.Torsion_Distance-2380"><span class="linenos">2380</span></a>        <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
-</span><span id="Disulfide.Torsion_Distance-2381"><a href="#Disulfide.Torsion_Distance-2381"><span class="linenos">2381</span></a>
-</span><span id="Disulfide.Torsion_Distance-2382"><a href="#Disulfide.Torsion_Distance-2382"><span class="linenos">2382</span></a>        <span class="k">return</span> <span class="n">dist</span>
+    <a class="headerlink" href="#Disulfide.torsion_distance"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Disulfide.torsion_distance-2354"><a href="#Disulfide.torsion_distance-2354"><span class="linenos">2354</span></a>    <span class="k">def</span> <span class="nf">torsion_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="Disulfide.torsion_distance-2355"><a href="#Disulfide.torsion_distance-2355"><span class="linenos">2355</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Disulfide.torsion_distance-2356"><a href="#Disulfide.torsion_distance-2356"><span class="linenos">2356</span></a><span class="sd">        Calculate the 5D Euclidean distance between `self` and another Disulfide</span>
+</span><span id="Disulfide.torsion_distance-2357"><a href="#Disulfide.torsion_distance-2357"><span class="linenos">2357</span></a><span class="sd">        object. This is used to compare Disulfide Bond torsion angles to</span>
+</span><span id="Disulfide.torsion_distance-2358"><a href="#Disulfide.torsion_distance-2358"><span class="linenos">2358</span></a><span class="sd">        determine their torsional similarity via a 5-Dimensional Euclidean distance metric.</span>
+</span><span id="Disulfide.torsion_distance-2359"><a href="#Disulfide.torsion_distance-2359"><span class="linenos">2359</span></a>
+</span><span id="Disulfide.torsion_distance-2360"><a href="#Disulfide.torsion_distance-2360"><span class="linenos">2360</span></a><span class="sd">        :param other: Comparison Disulfide</span>
+</span><span id="Disulfide.torsion_distance-2361"><a href="#Disulfide.torsion_distance-2361"><span class="linenos">2361</span></a><span class="sd">        :raises ProteusPyWarning: Warning if `other` is not a Disulfide object</span>
+</span><span id="Disulfide.torsion_distance-2362"><a href="#Disulfide.torsion_distance-2362"><span class="linenos">2362</span></a><span class="sd">        :return: Euclidean distance (Degrees) between `self` and `other`.</span>
+</span><span id="Disulfide.torsion_distance-2363"><a href="#Disulfide.torsion_distance-2363"><span class="linenos">2363</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Disulfide.torsion_distance-2364"><a href="#Disulfide.torsion_distance-2364"><span class="linenos">2364</span></a>
+</span><span id="Disulfide.torsion_distance-2365"><a href="#Disulfide.torsion_distance-2365"><span class="linenos">2365</span></a>        <span class="c1"># Check length of torsion arrays</span>
+</span><span id="Disulfide.torsion_distance-2366"><a href="#Disulfide.torsion_distance-2366"><span class="linenos">2366</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">torsion_array</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">5</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">torsion_array</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">5</span><span class="p">:</span>
+</span><span id="Disulfide.torsion_distance-2367"><a href="#Disulfide.torsion_distance-2367"><span class="linenos">2367</span></a>            <span class="k">raise</span> <span class="n">ProteusPyWarning</span><span class="p">(</span>
+</span><span id="Disulfide.torsion_distance-2368"><a href="#Disulfide.torsion_distance-2368"><span class="linenos">2368</span></a>                <span class="s2">&quot;--&gt; Torsion_Distance() requires vectors of length 5!&quot;</span>
+</span><span id="Disulfide.torsion_distance-2369"><a href="#Disulfide.torsion_distance-2369"><span class="linenos">2369</span></a>            <span class="p">)</span>
+</span><span id="Disulfide.torsion_distance-2370"><a href="#Disulfide.torsion_distance-2370"><span class="linenos">2370</span></a>
+</span><span id="Disulfide.torsion_distance-2371"><a href="#Disulfide.torsion_distance-2371"><span class="linenos">2371</span></a>        <span class="c1"># Convert to numpy arrays</span>
+</span><span id="Disulfide.torsion_distance-2372"><a href="#Disulfide.torsion_distance-2372"><span class="linenos">2372</span></a>        <span class="n">p1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">torsion_array</span><span class="p">)</span>
+</span><span id="Disulfide.torsion_distance-2373"><a href="#Disulfide.torsion_distance-2373"><span class="linenos">2373</span></a>        <span class="n">p2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">torsion_array</span><span class="p">)</span>
+</span><span id="Disulfide.torsion_distance-2374"><a href="#Disulfide.torsion_distance-2374"><span class="linenos">2374</span></a>
+</span><span id="Disulfide.torsion_distance-2375"><a href="#Disulfide.torsion_distance-2375"><span class="linenos">2375</span></a>        <span class="c1"># Compute the difference and handle angle wrapping</span>
+</span><span id="Disulfide.torsion_distance-2376"><a href="#Disulfide.torsion_distance-2376"><span class="linenos">2376</span></a>        <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">p1</span> <span class="o">-</span> <span class="n">p2</span><span class="p">)</span>
+</span><span id="Disulfide.torsion_distance-2377"><a href="#Disulfide.torsion_distance-2377"><span class="linenos">2377</span></a>        <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diff</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">360</span> <span class="o">-</span> <span class="n">diff</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span>
+</span><span id="Disulfide.torsion_distance-2378"><a href="#Disulfide.torsion_distance-2378"><span class="linenos">2378</span></a>
+</span><span id="Disulfide.torsion_distance-2379"><a href="#Disulfide.torsion_distance-2379"><span class="linenos">2379</span></a>        <span class="c1"># Compute the 5D Euclidean distance using numpy&#39;s linalg.norm function</span>
+</span><span id="Disulfide.torsion_distance-2380"><a href="#Disulfide.torsion_distance-2380"><span class="linenos">2380</span></a>        <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+</span><span id="Disulfide.torsion_distance-2381"><a href="#Disulfide.torsion_distance-2381"><span class="linenos">2381</span></a>
+</span><span id="Disulfide.torsion_distance-2382"><a href="#Disulfide.torsion_distance-2382"><span class="linenos">2382</span></a>        <span class="k">return</span> <span class="n">dist</span>
 </span></pre></div>
 
 
@@ -8543,7 +8543,7 @@ determine their torsional similarity via a 5-Dimensional Euclidean distance metr
 </span><span id="Disulfide.Torsion_neighbors-2424"><a href="#Disulfide.Torsion_neighbors-2424"><span class="linenos">2424</span></a>
 </span><span id="Disulfide.Torsion_neighbors-2425"><a href="#Disulfide.Torsion_neighbors-2425"><span class="linenos">2425</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="Disulfide.Torsion_neighbors-2426"><a href="#Disulfide.Torsion_neighbors-2426"><span class="linenos">2426</span></a>
-</span><span id="Disulfide.Torsion_neighbors-2427"><a href="#Disulfide.Torsion_neighbors-2427"><span class="linenos">2427</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="n">ss</span> <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">others</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Torsion_Distance</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">cutoff</span><span class="p">]</span>
+</span><span id="Disulfide.Torsion_neighbors-2427"><a href="#Disulfide.Torsion_neighbors-2427"><span class="linenos">2427</span></a>        <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="n">ss</span> <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">others</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">torsion_distance</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">cutoff</span><span class="p">]</span>
 </span><span id="Disulfide.Torsion_neighbors-2428"><a href="#Disulfide.Torsion_neighbors-2428"><span class="linenos">2428</span></a>        <span class="k">return</span> <span class="n">DisulfideList</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="s2">&quot;neighbors&quot;</span><span class="p">)</span>
 </span></pre></div>
 
@@ -8613,41 +8613,41 @@ sidechain dihedral angle space.</p>
 
                             </div>
                 </section>
-                <section id="Disulfide_Energy_Function">
-                            <input id="Disulfide_Energy_Function-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                <section id="disulfide_energy_function">
+                            <input id="disulfide_energy_function-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">Disulfide_Energy_Function</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">x</span><span class="p">:</span> <span class="nb">list</span></span><span class="return-annotation">) -> <span class="nb">float</span>:</span></span>
+        <span class="name">disulfide_energy_function</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">x</span><span class="p">:</span> <span class="nb">list</span></span><span class="return-annotation">) -> <span class="nb">float</span>:</span></span>
 
-                <label class="view-source-button" for="Disulfide_Energy_Function-view-source"><span>View Source</span></label>
+                <label class="view-source-button" for="disulfide_energy_function-view-source"><span>View Source</span></label>
 
     </div>
-    <a class="headerlink" href="#Disulfide_Energy_Function"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Disulfide_Energy_Function-2434"><a href="#Disulfide_Energy_Function-2434"><span class="linenos">2434</span></a><span class="k">def</span> <span class="nf">Disulfide_Energy_Function</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-</span><span id="Disulfide_Energy_Function-2435"><a href="#Disulfide_Energy_Function-2435"><span class="linenos">2435</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Disulfide_Energy_Function-2436"><a href="#Disulfide_Energy_Function-2436"><span class="linenos">2436</span></a><span class="sd">    Compute the approximate torsional energy (kcal/mpl) for the input dihedral angles.</span>
-</span><span id="Disulfide_Energy_Function-2437"><a href="#Disulfide_Energy_Function-2437"><span class="linenos">2437</span></a>
-</span><span id="Disulfide_Energy_Function-2438"><a href="#Disulfide_Energy_Function-2438"><span class="linenos">2438</span></a><span class="sd">    :param x: A list of dihedral angles: [chi1, chi2, chi3, chi4, chi5]</span>
-</span><span id="Disulfide_Energy_Function-2439"><a href="#Disulfide_Energy_Function-2439"><span class="linenos">2439</span></a><span class="sd">    :return: Energy in kcal/mol</span>
-</span><span id="Disulfide_Energy_Function-2440"><a href="#Disulfide_Energy_Function-2440"><span class="linenos">2440</span></a>
-</span><span id="Disulfide_Energy_Function-2441"><a href="#Disulfide_Energy_Function-2441"><span class="linenos">2441</span></a><span class="sd">    Example:</span>
-</span><span id="Disulfide_Energy_Function-2442"><a href="#Disulfide_Energy_Function-2442"><span class="linenos">2442</span></a><span class="sd">    &gt;&gt;&gt; from proteusPy import Disulfide_Energy_Function</span>
-</span><span id="Disulfide_Energy_Function-2443"><a href="#Disulfide_Energy_Function-2443"><span class="linenos">2443</span></a><span class="sd">    &gt;&gt;&gt; dihed = [-60.0, -60.0, -90.0, -60.0, -90.0]</span>
-</span><span id="Disulfide_Energy_Function-2444"><a href="#Disulfide_Energy_Function-2444"><span class="linenos">2444</span></a><span class="sd">    &gt;&gt;&gt; res = Disulfide_Energy_Function(dihed)</span>
-</span><span id="Disulfide_Energy_Function-2445"><a href="#Disulfide_Energy_Function-2445"><span class="linenos">2445</span></a><span class="sd">    &gt;&gt;&gt; float(res)</span>
-</span><span id="Disulfide_Energy_Function-2446"><a href="#Disulfide_Energy_Function-2446"><span class="linenos">2446</span></a><span class="sd">    2.5999999999999996</span>
-</span><span id="Disulfide_Energy_Function-2447"><a href="#Disulfide_Energy_Function-2447"><span class="linenos">2447</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="Disulfide_Energy_Function-2448"><a href="#Disulfide_Energy_Function-2448"><span class="linenos">2448</span></a>
-</span><span id="Disulfide_Energy_Function-2449"><a href="#Disulfide_Energy_Function-2449"><span class="linenos">2449</span></a>    <span class="n">chi1</span><span class="p">,</span> <span class="n">chi2</span><span class="p">,</span> <span class="n">chi3</span><span class="p">,</span> <span class="n">chi4</span><span class="p">,</span> <span class="n">chi5</span> <span class="o">=</span> <span class="n">x</span>
-</span><span id="Disulfide_Energy_Function-2450"><a href="#Disulfide_Energy_Function-2450"><span class="linenos">2450</span></a>    <span class="n">energy</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi1</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi5</span><span class="p">)))</span>
-</span><span id="Disulfide_Energy_Function-2451"><a href="#Disulfide_Energy_Function-2451"><span class="linenos">2451</span></a>    <span class="n">energy</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi2</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi4</span><span class="p">))</span>
-</span><span id="Disulfide_Energy_Function-2452"><a href="#Disulfide_Energy_Function-2452"><span class="linenos">2452</span></a>    <span class="n">energy</span> <span class="o">+=</span> <span class="p">(</span>
-</span><span id="Disulfide_Energy_Function-2453"><a href="#Disulfide_Energy_Function-2453"><span class="linenos">2453</span></a>        <span class="mf">3.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">chi3</span><span class="p">))</span>
-</span><span id="Disulfide_Energy_Function-2454"><a href="#Disulfide_Energy_Function-2454"><span class="linenos">2454</span></a>        <span class="o">+</span> <span class="mf">0.6</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi3</span><span class="p">))</span>
-</span><span id="Disulfide_Energy_Function-2455"><a href="#Disulfide_Energy_Function-2455"><span class="linenos">2455</span></a>        <span class="o">+</span> <span class="mf">10.1</span>
-</span><span id="Disulfide_Energy_Function-2456"><a href="#Disulfide_Energy_Function-2456"><span class="linenos">2456</span></a>    <span class="p">)</span>
-</span><span id="Disulfide_Energy_Function-2457"><a href="#Disulfide_Energy_Function-2457"><span class="linenos">2457</span></a>    <span class="k">return</span> <span class="n">energy</span>
+    <a class="headerlink" href="#disulfide_energy_function"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="disulfide_energy_function-2434"><a href="#disulfide_energy_function-2434"><span class="linenos">2434</span></a><span class="k">def</span> <span class="nf">disulfide_energy_function</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+</span><span id="disulfide_energy_function-2435"><a href="#disulfide_energy_function-2435"><span class="linenos">2435</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="disulfide_energy_function-2436"><a href="#disulfide_energy_function-2436"><span class="linenos">2436</span></a><span class="sd">    Compute the approximate torsional energy (kcal/mpl) for the input dihedral angles.</span>
+</span><span id="disulfide_energy_function-2437"><a href="#disulfide_energy_function-2437"><span class="linenos">2437</span></a>
+</span><span id="disulfide_energy_function-2438"><a href="#disulfide_energy_function-2438"><span class="linenos">2438</span></a><span class="sd">    :param x: A list of dihedral angles: [chi1, chi2, chi3, chi4, chi5]</span>
+</span><span id="disulfide_energy_function-2439"><a href="#disulfide_energy_function-2439"><span class="linenos">2439</span></a><span class="sd">    :return: Energy in kcal/mol</span>
+</span><span id="disulfide_energy_function-2440"><a href="#disulfide_energy_function-2440"><span class="linenos">2440</span></a>
+</span><span id="disulfide_energy_function-2441"><a href="#disulfide_energy_function-2441"><span class="linenos">2441</span></a><span class="sd">    Example:</span>
+</span><span id="disulfide_energy_function-2442"><a href="#disulfide_energy_function-2442"><span class="linenos">2442</span></a><span class="sd">    &gt;&gt;&gt; from proteusPy import disulfide_energy_function</span>
+</span><span id="disulfide_energy_function-2443"><a href="#disulfide_energy_function-2443"><span class="linenos">2443</span></a><span class="sd">    &gt;&gt;&gt; dihed = [-60.0, -60.0, -90.0, -60.0, -90.0]</span>
+</span><span id="disulfide_energy_function-2444"><a href="#disulfide_energy_function-2444"><span class="linenos">2444</span></a><span class="sd">    &gt;&gt;&gt; res = disulfide_energy_function(dihed)</span>
+</span><span id="disulfide_energy_function-2445"><a href="#disulfide_energy_function-2445"><span class="linenos">2445</span></a><span class="sd">    &gt;&gt;&gt; float(res)</span>
+</span><span id="disulfide_energy_function-2446"><a href="#disulfide_energy_function-2446"><span class="linenos">2446</span></a><span class="sd">    2.5999999999999996</span>
+</span><span id="disulfide_energy_function-2447"><a href="#disulfide_energy_function-2447"><span class="linenos">2447</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="disulfide_energy_function-2448"><a href="#disulfide_energy_function-2448"><span class="linenos">2448</span></a>
+</span><span id="disulfide_energy_function-2449"><a href="#disulfide_energy_function-2449"><span class="linenos">2449</span></a>    <span class="n">chi1</span><span class="p">,</span> <span class="n">chi2</span><span class="p">,</span> <span class="n">chi3</span><span class="p">,</span> <span class="n">chi4</span><span class="p">,</span> <span class="n">chi5</span> <span class="o">=</span> <span class="n">x</span>
+</span><span id="disulfide_energy_function-2450"><a href="#disulfide_energy_function-2450"><span class="linenos">2450</span></a>    <span class="n">energy</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi1</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi5</span><span class="p">)))</span>
+</span><span id="disulfide_energy_function-2451"><a href="#disulfide_energy_function-2451"><span class="linenos">2451</span></a>    <span class="n">energy</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi2</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi4</span><span class="p">))</span>
+</span><span id="disulfide_energy_function-2452"><a href="#disulfide_energy_function-2452"><span class="linenos">2452</span></a>    <span class="n">energy</span> <span class="o">+=</span> <span class="p">(</span>
+</span><span id="disulfide_energy_function-2453"><a href="#disulfide_energy_function-2453"><span class="linenos">2453</span></a>        <span class="mf">3.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">chi3</span><span class="p">))</span>
+</span><span id="disulfide_energy_function-2454"><a href="#disulfide_energy_function-2454"><span class="linenos">2454</span></a>        <span class="o">+</span> <span class="mf">0.6</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">chi3</span><span class="p">))</span>
+</span><span id="disulfide_energy_function-2455"><a href="#disulfide_energy_function-2455"><span class="linenos">2455</span></a>        <span class="o">+</span> <span class="mf">10.1</span>
+</span><span id="disulfide_energy_function-2456"><a href="#disulfide_energy_function-2456"><span class="linenos">2456</span></a>    <span class="p">)</span>
+</span><span id="disulfide_energy_function-2457"><a href="#disulfide_energy_function-2457"><span class="linenos">2457</span></a>    <span class="k">return</span> <span class="n">energy</span>
 </span></pre></div>
 
 
@@ -8668,9 +8668,9 @@ sidechain dihedral angle space.</p>
 <p>Example:</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">proteusPy</span> <span class="kn">import</span> <span class="n">Disulfide_Energy_Function</span>
+<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">proteusPy</span> <span class="kn">import</span> <span class="n">disulfide_energy_function</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dihed</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">60.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">60.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">60.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">Disulfide_Energy_Function</span><span class="p">(</span><span class="n">dihed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">disulfide_energy_function</span><span class="p">(</span><span class="n">dihed</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">float</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
 <span class="go">2.5999999999999996</span>
 </code></pre>
@@ -8703,7 +8703,7 @@ sidechain dihedral angle space.</p>
 </span><span id="Minimize-2470"><a href="#Minimize-2470"><span class="linenos">2470</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="Minimize-2471"><a href="#Minimize-2471"><span class="linenos">2471</span></a>
 </span><span id="Minimize-2472"><a href="#Minimize-2472"><span class="linenos">2472</span></a>    <span class="n">initial_guess</span> <span class="o">=</span> <span class="n">inputSS</span><span class="o">.</span><span class="n">torsion_array</span>
-</span><span id="Minimize-2473"><a href="#Minimize-2473"><span class="linenos">2473</span></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">Disulfide_Energy_Function</span><span class="p">,</span> <span class="n">initial_guess</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;Nelder-Mead&quot;</span><span class="p">)</span>
+</span><span id="Minimize-2473"><a href="#Minimize-2473"><span class="linenos">2473</span></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">disulfide_energy_function</span><span class="p">,</span> <span class="n">initial_guess</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;Nelder-Mead&quot;</span><span class="p">)</span>
 </span><span id="Minimize-2474"><a href="#Minimize-2474"><span class="linenos">2474</span></a>    <span class="n">minimum_conformation</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">x</span>
 </span><span id="Minimize-2475"><a href="#Minimize-2475"><span class="linenos">2475</span></a>    <span class="n">modelled_min</span> <span class="o">=</span> <span class="n">Disulfide</span><span class="p">(</span><span class="s2">&quot;minimized&quot;</span><span class="p">)</span>
 </span><span id="Minimize-2476"><a href="#Minimize-2476"><span class="linenos">2476</span></a>    <span class="n">modelled_min</span><span class="o">.</span><span class="n">dihedrals</span> <span class="o">=</span> <span class="n">minimum_conformation</span>

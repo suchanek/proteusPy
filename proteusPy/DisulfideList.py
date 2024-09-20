@@ -345,7 +345,7 @@ class DisulfideList(UserList):
             for ss2 in sslist:
                 if ss2 == ss1:
                     continue
-                total += ss1.Torsion_Distance(ss2)
+                total += ss1.torsion_distance(ss2)
                 cnt += 1
 
         return total / cnt

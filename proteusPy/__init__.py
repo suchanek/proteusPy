@@ -42,9 +42,9 @@ from .atoms import (
 )
 from .Disulfide import (
     Disulfide,
-    Disulfide_Energy_Function,
     Initialize_Disulfide_From_Coords,
     Minimize,
+    disulfide_energy_function,
 )
 from .DisulfideClass_Constructor import DisulfideClass_Constructor
 from .DisulfideClasses import (

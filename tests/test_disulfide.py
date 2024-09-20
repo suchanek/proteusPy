@@ -13,8 +13,10 @@ Methods:
     test_extract: Tests that the name of the first disulfide in the loaded list matches the expected value.
     test_dihedrals: Placeholder for testing the dihedral angles of the first disulfide in the loaded list.
 """
+
 import unittest
-from proteusPy import Disulfide, Disulfide_Energy_Function
+
+from proteusPy import Disulfide, disulfide_energy_function
 from proteusPy.ProteusGlobals import DATA_DIR
 
 
@@ -68,7 +70,7 @@ class TestDisulfide(unittest.TestCase):
     def test_energy(self):
 
         dihedrals = [-60.0, -60.0, -90.0, -60.0, -90.0]
-        result = Disulfide_Energy_Function(dihedrals)
+        result = disulfide_energy_function(dihedrals)
         expected_result = 2.5999999999999996
 
         self.assertEqual(result, expected_result)
@@ -76,7 +78,7 @@ class TestDisulfide(unittest.TestCase):
     def test_minimize(self):
         from scipy.optimize import minimize
 
-        from proteusPy import Disulfide_Energy_Function
+        from proteusPy import disulfide_energy_function
 
         # initial guess for chi1, chi2, chi3, chi4, chi5
         initial_guess = [
@@ -88,7 +90,7 @@ class TestDisulfide(unittest.TestCase):
         ]
 
         result = minimize(
-            Disulfide_Energy_Function, initial_guess, method="Nelder-Mead"
+            disulfide_energy_function, initial_guess, method="Nelder-Mead"
         )
         minimum_energy = result.fun
         expected_result = 0.4889387355489303
