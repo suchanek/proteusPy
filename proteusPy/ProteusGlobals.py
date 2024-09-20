@@ -26,8 +26,8 @@ if PDB_DIR is None:
 DATA_DIR = os.path.join(_this_dir, "data")
 MODEL_DIR = os.path.join(PDB_DIR, "good")
 
-WINFRAME = 256  # single panel width
-WINSIZE = (512, 512)
+WINFRAME = 512  # single panel width
+WINSIZE = (1024, 1024)
 CAMERA_POS = ((0, 0, -10), (0, 0, 0), (0, 1, 0))
 
 # global for initialization of dihedrals and energies

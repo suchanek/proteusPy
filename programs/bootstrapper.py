@@ -66,8 +66,6 @@ def main():
     if args.verbose:
         subset_loader.describe()
 
-    # Bootstrap_PDB_SS(verbose=args.verbose, subset=True, cutoff=args.cutoff, force=False)
-
 
 if __name__ == "__main__":
     main()
