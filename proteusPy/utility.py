@@ -19,6 +19,7 @@ import logging
 import math
 import os
 import pickle
+import platform
 import shutil
 import subprocess
 import time
@@ -32,7 +33,6 @@ import psutil
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from proteusPy import Disulfide, DisulfideList, __version__
-from proteusPy.angle_annotation import AngleAnnotation
 from proteusPy.DisulfideExceptions import DisulfideIOException
 from proteusPy.logger_config import get_logger
 from proteusPy.ProteusGlobals import (
@@ -651,7 +651,6 @@ def Extract_Disulfides(
             # returns an empty list if none are found.
             _sslist = load_disulfides_from_id(
                 entry,
-                model_numb=0,
                 verbose=verbose,
                 quiet=quiet,
                 pdb_dir=pdbdir,
@@ -829,7 +828,6 @@ def Extract_Disulfides_From_List(
             # returns an empty list if none are found.
             _sslist = load_disulfides_from_id(
                 entry,
-                model_numb=0,
                 verbose=verbose,
                 quiet=quiet,
                 pdb_dir=pdbdir,
@@ -938,12 +936,16 @@ def get_macos_theme():
     Determine the display theme for a macOS computer using AppleScript.
 
     Returns:
-    :return str: 'light', 'dark', or 'none' based on the current display theme.
+    :return str: 'light' if the theme is light, 'dark' if the theme is dark, and None otherwise
 
     Example:
     >>> get_macos_theme()
-    'dark'
+    True
     """
+    if platform.system() != "Darwin":
+        # Not running on macOS
+        return None
+
     try:
         # AppleScript to get the appearance setting
         script = """
@@ -971,12 +973,12 @@ def get_macos_theme():
             theme = result.stdout.strip().lower()
             if theme in ["dark", "light"]:
                 return theme
-            return "none"
-        return "none"
+            return None
+        return None
 
     except Exception:
         # In case of any exception, return 'none'
-        return "none"
+        return None
 
 
 # functions to calculate statistics and filter disulfide lists via pandas

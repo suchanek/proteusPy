@@ -56,7 +56,7 @@ from proteusPy.ProteusGlobals import (
 )
 
 _logger = get_logger(__name__)
-_logger.setLevel(logging.info)
+_logger.setLevel(logging.INFO)
 
 set_logger_level_for_module("proteusPy", logging.ERROR)
 
