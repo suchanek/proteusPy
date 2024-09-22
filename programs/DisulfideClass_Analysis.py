@@ -93,7 +93,6 @@ import pickle
 import shutil
 import threading
 import time
-from collections import deque
 from datetime import timedelta
 from pathlib import Path
 
@@ -292,14 +291,16 @@ def task(
                 task_pbar.update(update_freq if remaining >= update_freq else remaining)
                 task_pbar.close()
 
-        class_disulfides = DisulfideList(list(class_disulfides_array), cls, quiet=True)
+        class_disulfides = DisulfideList(
+            list(class_disulfides_array), cls, quiet=True, fast=True
+        )
 
         if do_graph:
             class_disulfides.display_torsion_statistics(
                 display=False, save=True, fname=fname, light=True, stats=False
             )
 
-        avg_conformation = class_disulfides.Average_Conformation
+        avg_conformation = class_disulfides.average_conformation
 
         ssname = f"{cls}_avg"
         exemplar = Disulfide(ssname, torsions=avg_conformation)
@@ -347,7 +348,8 @@ def analyze_classes_threaded(
                 f"--> analyze_eight_classes(): Expecting {pix} graphs for the octant classes."
             )
     else:
-        class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_BIN_FILE)
+        # class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_BIN_FILE)
+        class_filename = Path(DATA_DIR) / SS_CONSENSUS_BIN_FILE
         save_dir = BINARY
         eight_or_bin = loader.tclass.classdf
         tot_classes = eight_or_bin.shape[0]

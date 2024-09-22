@@ -52,6 +52,7 @@ from proteusPy.ssparser import (
     get_residue_atoms_coordinates,
 )
 from proteusPy.turtle3D import ORIENT_SIDECHAIN, Turtle3D
+from proteusPy.utility import get_macos_theme
 from proteusPy.vector3D import (
     Vector3D,
     calc_dihedral,
@@ -310,6 +311,199 @@ class Disulfide:
         res = f"{s1}>"
         return res
 
+    def _draw_bonds(
+        self,
+        pvp,
+        coords,
+        bond_radius=BOND_RADIUS,
+        style="sb",
+        bcolor=BOND_COLOR,
+        all_atoms=True,
+        res=100,
+    ):
+        """
+        Generate the appropriate pyVista cylinder objects to represent
+        a particular disulfide bond. This utilizes a connection table
+        for the starting and ending atoms and a color table for the
+        bond colors. Used internally.
+
+        :param pvp: input plotter object to be updated
+        :param bradius: bond radius
+        :param style: bond style. One of sb, plain, pd
+        :param bcolor: pyvista color
+        :param missing: True if atoms are missing, False othersie
+        :param all_atoms: True if rendering O, False if only backbone rendered
+
+        :return pvp: Updated Plotter object.
+
+        """
+        _bond_conn = np.array(
+            [
+                [0, 1],  # n-ca
+                [1, 2],  # ca-c
+                [2, 3],  # c-o
+                [1, 4],  # ca-cb
+                [4, 5],  # cb-sg
+                [6, 7],  # n-ca
+                [7, 8],  # ca-c
+                [8, 9],  # c-o
+                [7, 10],  # ca-cb
+                [10, 11],  # cb-sg
+                [5, 11],  # sg -sg
+                [12, 0],  # cprev_prox-n
+                [2, 13],  # c-nnext_prox
+                [14, 6],  # cprev_dist-n_dist
+                [8, 15],  # c-nnext_dist
+            ]
+        )
+
+        # modeled disulfides only have backbone atoms since
+        # phi and psi are undefined, which makes the carbonyl
+        # oxygen (O) undefined as well. Their previous and next N
+        # are also undefined.
+
+        missing = self.missing_atoms
+        bradius = bond_radius
+
+        _bond_conn_backbone = np.array(
+            [
+                [0, 1],  # n-ca
+                [1, 2],  # ca-c
+                [1, 4],  # ca-cb
+                [4, 5],  # cb-sg
+                [6, 7],  # n-ca
+                [7, 8],  # ca-c
+                [7, 10],  # ca-cb
+                [10, 11],  # cb-sg
+                [5, 11],  # sg -sg
+            ]
+        )
+
+        # colors for the bonds. Index into ATOM_COLORS array
+        _bond_split_colors = np.array(
+            [
+                ("N", "C"),
+                ("C", "C"),
+                ("C", "O"),
+                ("C", "C"),
+                ("C", "SG"),
+                ("N", "C"),
+                ("C", "C"),
+                ("C", "O"),
+                ("C", "C"),
+                ("C", "SG"),
+                ("SG", "SG"),
+                # prev and next C-N bonds - color by atom Z
+                ("C", "N"),
+                ("C", "N"),
+                ("C", "N"),
+                ("C", "N"),
+            ]
+        )
+
+        _bond_split_colors_backbone = np.array(
+            [
+                ("N", "C"),
+                ("C", "C"),
+                ("C", "C"),
+                ("C", "SG"),
+                ("N", "C"),
+                ("C", "C"),
+                ("C", "C"),
+                ("C", "SG"),
+                ("SG", "SG"),
+            ]
+        )
+        # work through connectivity and colors
+        orig_col = dest_col = bcolor
+
+        if all_atoms:
+            bond_conn = _bond_conn
+            bond_split_colors = _bond_split_colors
+        else:
+            bond_conn = _bond_conn_backbone
+            bond_split_colors = _bond_split_colors_backbone
+
+        for i, bond in enumerate(bond_conn):
+            if all_atoms:
+                if i > 10 and missing is True:  # skip missing atoms
+                    continue
+
+            # get the indices for the origin and destination atoms
+            # orig = bond[0]
+            # dest = bond[1]
+
+            orig, dest = bond
+            col = bond_split_colors[i]
+
+            # get the coords
+            prox_pos = coords[orig]
+            distal_pos = coords[dest]
+
+            # compute a direction vector
+            direction = distal_pos - prox_pos
+
+            # compute vector length. divide by 2 since split bond
+            height = math.dist(prox_pos, distal_pos) / 2.0
+
+            # the cylinder origins are actually in the
+            # middle so we translate
+
+            origin = prox_pos + 0.5 * direction  # for a single plain bond
+            origin1 = prox_pos + 0.25 * direction
+            origin2 = prox_pos + 0.75 * direction
+
+            if style == "plain":
+                orig_col = dest_col = bcolor
+
+            # proximal-distal red/green coloring
+            elif style == "pd":
+                if i <= 4 or i == 11 or i == 12:
+                    orig_col = dest_col = "red"
+                else:
+                    orig_col = dest_col = "green"
+                if i == 10:
+                    orig_col = dest_col = "yellow"
+            else:
+                orig_col = ATOM_COLORS[col[0]]
+                dest_col = ATOM_COLORS[col[1]]
+
+            if i >= 11:  # prev and next residue atoms for phi/psi calcs
+                bradius = bradius * 0.5  # make smaller to distinguish
+
+            cap1 = pv.Sphere(center=prox_pos, radius=bradius)
+            cap2 = pv.Sphere(center=distal_pos, radius=bradius)
+
+            if style == "plain":
+                cyl = pv.Cylinder(
+                    origin, direction, radius=bradius, height=height * 2.0
+                )
+                pvp.add_mesh(cyl, color=orig_col)
+            else:
+                cyl1 = pv.Cylinder(
+                    origin1,
+                    direction,
+                    radius=bradius,
+                    height=height,
+                    capping=False,
+                    resolution=res,
+                )
+                cyl2 = pv.Cylinder(
+                    origin2,
+                    direction,
+                    radius=bradius,
+                    height=height,
+                    capping=False,
+                    resolution=res,
+                )
+                pvp.add_mesh(cyl1, color=orig_col)
+                pvp.add_mesh(cyl2, color=dest_col)
+
+            pvp.add_mesh(cap1, color=orig_col)
+            pvp.add_mesh(cap2, color=dest_col)
+
+        return pvp  # end draw_bonds
+
     def _render(
         self,
         pvplot: pv.Plotter,
@@ -325,57 +519,51 @@ class Disulfide:
     ):
         """
         Update the passed pyVista plotter() object with the mesh data for the
-        input Disulfide Bond. Used internally
+        input Disulfide Bond. Used internally.
 
-        Parameters
-        ----------
-        pvplot : pv.Plotter
-            pyvista.Plotter object
+        :param pvplot: pyvista.Plotter object
+        :type pvplot: pv.Plotter
 
-        style : str, optional
-            Rendering style, by default 'bs'. One of 'bs', 'st', 'cpk', Render as \
+        :param style: Rendering style, by default 'bs'. One of 'bs', 'st', 'cpk'. Render as \
             CPK, ball-and-stick or stick. Bonds are colored by atom color, unless \
             'plain' is specified.
+        :type style: str, optional
 
-        plain : bool, optional
-            Used internally, by default False
+        :param plain: Used internally, by default False
+        :type plain: bool, optional
 
-        bondcolor : pyVista color name, optional bond color for simple bonds, by default BOND_COLOR
+        :param bondcolor: pyVista color name, optional bond color for simple bonds, by default BOND_COLOR
+        :type bondcolor: str, optional
 
-        bs_scale : float, optional
-            scale factor (0-1) to reduce the atom sizes for ball and stick, by default BS_SCALE
-        
-        spec : float, optional
-            specularity (0-1), where 1 is totally smooth and 0 is rough, by default SPECULARITY
+        :param bs_scale: Scale factor (0-1) to reduce the atom sizes for ball and stick, by default BS_SCALE
+        :type bs_scale: float, optional
 
-        specpow : int, optional
-            exponent used for specularity calculations, by default SPEC_POWER
+        :param spec: Specularity (0-1), where 1 is totally smooth and 0 is rough, by default SPECULARITY
+        :type spec: float, optional
 
-        translate : bool, optional
-            Flag used internally to indicate if we should translate \
+        :param specpow: Exponent used for specularity calculations, by default SPEC_POWER
+        :type specpow: int, optional
+
+        :param translate: Flag used internally to indicate if we should translate \
             the disulfide to its geometric center of mass, by default True.
+        :type translate: bool, optional
 
-        Returns
-        -------
-        pv.Plotter
-            Updated pv.Plotter object with atoms and bonds.
+        :returns: Updated pv.Plotter object with atoms and bonds.
+        :rtype: pv.Plotter
         """
 
-        _bradius = bond_radius
-        coords = self._internal_coords()
+        model = self.modelled
         missing_atoms = self.missing_atoms
+        coords = self._internal_coords()
         clen = coords.shape[0]
 
-        model = self.modelled
         if model:
             all_atoms = False
         else:
             all_atoms = True
 
         if translate:
-            cofmass = self.cofmass
-            for i in range(clen):
-                coords[i] = coords[i] - cofmass
+            coords -= self.cofmass
 
         atoms = (
             "N",
@@ -400,199 +588,8 @@ class Disulfide:
         # bond connection table with atoms in the specific order shown above:
         # returned by ss.get__internal_coords()
 
-        def draw_bonds(
-            pvp,
-            bradius=BOND_RADIUS,
-            style="sb",
-            bcolor=BOND_COLOR,
-            missing=True,
-            all_atoms=True,
-            res=100,
-        ):
-            """
-            Generate the appropriate pyVista cylinder objects to represent
-            a particular disulfide bond. This utilizes a connection table
-            for the starting and ending atoms and a color table for the
-            bond colors. Used internally.
-
-            :param pvp: input plotter object to be updated
-            :param bradius: bond radius
-            :param style: bond style. One of sb, plain, pd
-            :param bcolor: pyvista color
-            :param missing: True if atoms are missing, False othersie
-            :param all_atoms: True if rendering O, False if only backbone rendered
-
-            :return pvp: Updated Plotter object.
-
-            """
-            _bond_conn = np.array(
-                [
-                    [0, 1],  # n-ca
-                    [1, 2],  # ca-c
-                    [2, 3],  # c-o
-                    [1, 4],  # ca-cb
-                    [4, 5],  # cb-sg
-                    [6, 7],  # n-ca
-                    [7, 8],  # ca-c
-                    [8, 9],  # c-o
-                    [7, 10],  # ca-cb
-                    [10, 11],  # cb-sg
-                    [5, 11],  # sg -sg
-                    [12, 0],  # cprev_prox-n
-                    [2, 13],  # c-nnext_prox
-                    [14, 6],  # cprev_dist-n_dist
-                    [8, 15],  # c-nnext_dist
-                ]
-            )
-
-            # modeled disulfides only have backbone atoms since
-            # phi and psi are undefined, which makes the carbonyl
-            # oxygen (O) undefined as well. Their previous and next N
-            # are also undefined.
-
-            _bond_conn_backbone = np.array(
-                [
-                    [0, 1],  # n-ca
-                    [1, 2],  # ca-c
-                    [1, 4],  # ca-cb
-                    [4, 5],  # cb-sg
-                    [6, 7],  # n-ca
-                    [7, 8],  # ca-c
-                    [7, 10],  # ca-cb
-                    [10, 11],  # cb-sg
-                    [5, 11],  # sg -sg
-                ]
-            )
-
-            # colors for the bonds. Index into ATOM_COLORS array
-            _bond_split_colors = np.array(
-                [
-                    ("N", "C"),
-                    ("C", "C"),
-                    ("C", "O"),
-                    ("C", "C"),
-                    ("C", "SG"),
-                    ("N", "C"),
-                    ("C", "C"),
-                    ("C", "O"),
-                    ("C", "C"),
-                    ("C", "SG"),
-                    ("SG", "SG"),
-                    # prev and next C-N bonds - color by atom Z
-                    ("C", "N"),
-                    ("C", "N"),
-                    ("C", "N"),
-                    ("C", "N"),
-                ]
-            )
-
-            _bond_split_colors_backbone = np.array(
-                [
-                    ("N", "C"),
-                    ("C", "C"),
-                    ("C", "C"),
-                    ("C", "SG"),
-                    ("N", "C"),
-                    ("C", "C"),
-                    ("C", "C"),
-                    ("C", "SG"),
-                    ("SG", "SG"),
-                ]
-            )
-            # work through connectivity and colors
-            orig_col = dest_col = bcolor
-
-            if all_atoms:
-                bond_conn = _bond_conn
-                bond_split_colors = _bond_split_colors
-            else:
-                bond_conn = _bond_conn_backbone
-                bond_split_colors = _bond_split_colors_backbone
-
-            for i, bond in enumerate(bond_conn):
-                if all_atoms:
-                    if i > 10 and missing_atoms is True:  # skip missing atoms
-                        continue
-
-                # get the indices for the origin and destination atoms
-                orig = bond[0]
-                dest = bond[1]
-
-                col = bond_split_colors[i]
-
-                # get the coords
-                prox_pos = coords[orig]
-                distal_pos = coords[dest]
-
-                # compute a direction vector
-                direction = distal_pos - prox_pos
-
-                # compute vector length. divide by 2 since split bond
-                height = math.dist(prox_pos, distal_pos) / 2.0
-
-                # the cylinder origins are actually in the
-                # middle so we translate
-
-                origin = prox_pos + 0.5 * direction  # for a single plain bond
-                origin1 = prox_pos + 0.25 * direction
-                origin2 = prox_pos + 0.75 * direction
-
-                bradius = _bradius
-
-                if style == "plain":
-                    orig_col = dest_col = bcolor
-
-                # proximal-distal red/green coloring
-                elif style == "pd":
-                    if i <= 4 or i == 11 or i == 12:
-                        orig_col = dest_col = "red"
-                    else:
-                        orig_col = dest_col = "green"
-                    if i == 10:
-                        orig_col = dest_col = "yellow"
-                else:
-                    orig_col = ATOM_COLORS[col[0]]
-                    dest_col = ATOM_COLORS[col[1]]
-
-                if i >= 11:  # prev and next residue atoms for phi/psi calcs
-                    bradius = _bradius * 0.5  # make smaller to distinguish
-
-                cap1 = pv.Sphere(center=prox_pos, radius=bradius)
-                cap2 = pv.Sphere(center=distal_pos, radius=bradius)
-
-                if style == "plain":
-                    cyl = pv.Cylinder(
-                        origin, direction, radius=bradius, height=height * 2.0
-                    )
-                    pvp.add_mesh(cyl, color=orig_col)
-                else:
-                    cyl1 = pv.Cylinder(
-                        origin1,
-                        direction,
-                        radius=bradius,
-                        height=height,
-                        capping=False,
-                        resolution=res,
-                    )
-                    cyl2 = pv.Cylinder(
-                        origin2,
-                        direction,
-                        radius=bradius,
-                        height=height,
-                        capping=False,
-                        resolution=res,
-                    )
-                    pvp.add_mesh(cyl1, color=orig_col)
-                    pvp.add_mesh(cyl2, color=dest_col)
-
-                pvp.add_mesh(cap1, color=orig_col)
-                pvp.add_mesh(cap2, color=dest_col)
-
-            return pvp  # end draw_bonds
-
         if style == "cpk":
-            i = 0
-            for atom in atoms:
+            for i, atom in enumerate(atoms):
                 rad = ATOM_RADII_CPK[atom]
                 pvp.add_mesh(
                     pv.Sphere(center=coords[i], radius=rad),
@@ -601,11 +598,9 @@ class Disulfide:
                     specular=spec,
                     specular_power=specpow,
                 )
-                i += 1
 
         elif style == "cov":
-            i = 0
-            for atom in atoms:
+            for i, atom in enumerate(atoms):
                 rad = ATOM_RADII_COVALENT[atom]
                 pvp.add_mesh(
                     pv.Sphere(center=coords[i], radius=rad),
@@ -614,11 +609,9 @@ class Disulfide:
                     specular=spec,
                     specular_power=specpow,
                 )
-                i += 1
 
         elif style == "bs":  # ball and stick
-            i = 0
-            for atom in atoms:
+            for i, atom in enumerate(atoms):
                 rad = ATOM_RADII_CPK[atom] * bs_scale
                 if i > 11:
                     rad = rad * 0.75
@@ -630,28 +623,41 @@ class Disulfide:
                     specular=spec,
                     specular_power=specpow,
                 )
-                i += 1
-            pvp = draw_bonds(
-                pvp, style="bs", missing=missing_atoms, all_atoms=all_atoms
+
+            pvp = self._draw_bonds(
+                pvp,
+                coords,
+                style="bs",
+                all_atoms=all_atoms,
+                bond_radius=bond_radius,
             )
 
         elif style == "sb":  # splitbonds
-            pvp = draw_bonds(
-                pvp, style="sb", missing=missing_atoms, all_atoms=all_atoms
+            pvp = self._draw_bonds(
+                pvp,
+                coords,
+                style="sb",
+                all_atoms=all_atoms,
+                bond_radius=bond_radius,
             )
 
         elif style == "pd":  # proximal-distal
-            pvp = draw_bonds(
-                pvp, style="pd", missing=missing_atoms, all_atoms=all_atoms
+            pvp = self._draw_bonds(
+                pvp,
+                coords,
+                style="pd",
+                all_atoms=all_atoms,
+                bond_radius=bond_radius,
             )
 
         else:  # plain
-            pvp = draw_bonds(
+            pvp = self._draw_bonds(
                 pvp,
+                coords,
                 style="plain",
                 bcolor=bondcolor,
-                missing=missing_atoms,
                 all_atoms=all_atoms,
+                bond_radius=bond_radius,
             )
 
         return pvp
@@ -719,9 +725,7 @@ class Disulfide:
             all_atoms = True
 
         if translate:
-            cofmass = self.cofmass
-            for i in range(clen):
-                coords[i] = coords[i] - cofmass
+            coords -= self.cofmass
 
         atoms = (
             "N",
@@ -746,246 +750,37 @@ class Disulfide:
         # bond connection table with atoms in the specific order shown above:
         # returned by ss.get_internal_coords()
 
-        def draw_bonds(
-            pvp,
-            bradius=BOND_RADIUS,
-            style="sb",
-            bcolor=BOND_COLOR,
-            missing=True,
-            all_atoms=True,
-            res=100,
-        ):
-            """
-            Generate the appropriate pyVista cylinder objects to represent
-            a particular disulfide bond. This utilizes a connection table
-            for the starting and ending atoms and a color table for the
-            bond colors. Used internally.
-
-            :param pvp: input plotter object to be updated
-            :param bradius: bond radius
-            :param style: bond style. One of sb, plain, pd
-            :param bcolor: pyvista color
-            :param missing: True if atoms are missing, False othersie
-            :param all_atoms: True if rendering O, False if only backbone rendered
-
-            :return pvp: Updated Plotter object.
-
-            """
-            _bond_conn = np.array(
-                [
-                    [0, 1],  # n-ca
-                    [1, 2],  # ca-c
-                    [2, 3],  # c-o
-                    [1, 4],  # ca-cb
-                    [4, 5],  # cb-sg
-                    [6, 7],  # n-ca
-                    [7, 8],  # ca-c
-                    [8, 9],  # c-o
-                    [7, 10],  # ca-cb
-                    [10, 11],  # cb-sg
-                    [5, 11],  # sg -sg
-                    [12, 0],  # cprev_prox-n
-                    [2, 13],  # c-nnext_prox
-                    [14, 6],  # cprev_dist-n_dist
-                    [8, 15],  # c-nnext_dist
-                ]
-            )
-
-            # modeled disulfides only have backbone atoms since
-            # phi and psi are undefined, which makes the carbonyl
-            # oxygen (O) undefined as well. Their previous and next N
-            # are also undefined.
-
-            _bond_conn_backbone = np.array(
-                [
-                    [0, 1],  # n-ca
-                    [1, 2],  # ca-c
-                    [1, 4],  # ca-cb
-                    [4, 5],  # cb-sg
-                    [6, 7],  # n-ca
-                    [7, 8],  # ca-c
-                    [7, 10],  # ca-cb
-                    [10, 11],  # cb-sg
-                    [5, 11],  # sg -sg
-                ]
-            )
-
-            # colors for the bonds. Index into ATOM_COLORS array
-            _bond_split_colors = np.array(
-                [
-                    ("N", "C"),
-                    ("C", "C"),
-                    ("C", "O"),
-                    ("C", "C"),
-                    ("C", "SG"),
-                    ("N", "C"),
-                    ("C", "C"),
-                    ("C", "O"),
-                    ("C", "C"),
-                    ("C", "SG"),
-                    ("SG", "SG"),
-                    # prev and next C-N bonds - color by atom Z
-                    ("C", "N"),
-                    ("C", "N"),
-                    ("C", "N"),
-                    ("C", "N"),
-                ]
-            )
-
-            _bond_split_colors_backbone = np.array(
-                [
-                    ("N", "C"),
-                    ("C", "C"),
-                    ("C", "C"),
-                    ("C", "SG"),
-                    ("N", "C"),
-                    ("C", "C"),
-                    ("C", "C"),
-                    ("C", "SG"),
-                    ("SG", "SG"),
-                ]
-            )
-            # work through connectivity and colors
-            orig_col = dest_col = bcolor
-
-            if all_atoms:
-                bond_conn = _bond_conn
-                bond_split_colors = _bond_split_colors
-            else:
-                bond_conn = _bond_conn_backbone
-                bond_split_colors = _bond_split_colors_backbone
-
-            for i, bond in enumerate(bond_conn):
-                if all_atoms:
-                    if i > 10 and missing_atoms is True:  # skip missing atoms
-                        continue
-
-                # bond = bond_conn[i]
-
-                # get the indices for the origin and destination atoms
-                orig = bond[0]
-                dest = bond[1]
-
-                col = bond_split_colors[i]
-
-                # get the coords
-                prox_pos = coords[orig]
-                distal_pos = coords[dest]
-
-                # compute a direction vector
-                direction = distal_pos - prox_pos
-
-                # compute vector length. divide by 2 since split bond
-                height = math.dist(prox_pos, distal_pos) / 2.0
-
-                # the cylinder origins are actually in the
-                # middle so we translate
-
-                origin = prox_pos + 0.5 * direction  # for a single plain bond
-                origin1 = prox_pos + 0.25 * direction
-                origin2 = prox_pos + 0.75 * direction
-
-                bradius = _bradius
-
-                if style == "plain":
-                    orig_col = dest_col = bcolor
-
-                # proximal-distal red/green coloring
-                elif style == "pd":
-                    if i <= 4 or i == 11 or i == 12:
-                        orig_col = dest_col = "red"
-                    else:
-                        orig_col = dest_col = "green"
-                    if i == 10:
-                        orig_col = dest_col = "yellow"
-                else:
-                    orig_col = ATOM_COLORS[col[0]]
-                    dest_col = ATOM_COLORS[col[1]]
-
-                if i >= 11:  # prev and next residue atoms for phi/psi calcs
-                    bradius = _bradius * 0.5  # make smaller to distinguish
-
-                cap1 = pv.Sphere(center=prox_pos, radius=bradius)
-                cap2 = pv.Sphere(center=distal_pos, radius=bradius)
-
-                if style == "plain":
-                    cyl = pv.Cylinder(
-                        origin, direction, radius=bradius, height=height * 2.0
-                    )
-                    # pvp.add_mesh(cyl, color=orig_col)
-                    pvp.append(cyl)
-                else:
-                    cyl1 = pv.Cylinder(
-                        origin1,
-                        direction,
-                        radius=bradius,
-                        height=height,
-                        capping=False,
-                        resolution=res,
-                    )
-                    cyl2 = pv.Cylinder(
-                        origin2,
-                        direction,
-                        radius=bradius,
-                        height=height,
-                        capping=False,
-                        resolution=res,
-                    )
-                    # pvp.add_mesh(cyl1, color=orig_col)
-                    # pvp.add_mesh(cyl2, color=dest_col)
-                    pvp.append(cyl1)
-                    pvp.append(cyl2)
-
-                # pvp.add_mesh(cap1, color=orig_col)
-                # pvp.add_mesh(cap2, color=dest_col)
-                pvp.append(cap1)
-                pvp.append(cap2)
-
-            return pvp.copy()  # end draw_bonds
-
         if style == "cpk":
-            i = 0
-            for atom in atoms:
+            for i, atom in enumerate(atoms):
                 rad = ATOM_RADII_CPK[atom]
                 pvp.append(pv.Sphere(center=coords[i], radius=rad))
-                i += 1
 
         elif style == "cov":
-            i = 0
-            for atom in atoms:
+            for i, atom in enumerate(atoms):
                 rad = ATOM_RADII_COVALENT[atom]
                 pvp.append(pv.Sphere(center=coords[i], radius=rad))
-                i += 1
 
         elif style == "bs":  # ball and stick
-            i = 0
-            for atom in atoms:
+            for i, atom in enumerate(atoms):
                 rad = ATOM_RADII_CPK[atom] * bs_scale
                 if i > 11:
                     rad = rad * 0.75
 
                 pvp.append(pv.Sphere(center=coords[i]))
-                i += 1
-            pvp = draw_bonds(
-                pvp, style="bs", missing=missing_atoms, all_atoms=all_atoms
-            )
+            pvp = self._draw_bonds(pvp, coords, style="bs", all_atoms=all_atoms)
 
         elif style == "sb":  # splitbonds
-            pvp = draw_bonds(
-                pvp, style="sb", missing=missing_atoms, all_atoms=all_atoms
-            )
+            pvp = self._draw_bonds(pvp, coords, style="sb", all_atoms=all_atoms)
 
         elif style == "pd":  # proximal-distal
-            pvp = draw_bonds(
-                pvp, style="pd", missing=missing_atoms, all_atoms=all_atoms
-            )
+            pvp = self._draw_bonds(pvp, coords, style="pd", all_atoms=all_atoms)
 
         else:  # plain
-            pvp = draw_bonds(
+            pvp = self._draw_bonds(
                 pvp,
+                coords,
                 style="plain",
                 bcolor=bondcolor,
-                missing=missing_atoms,
                 all_atoms=all_atoms,
             )
 
@@ -1278,22 +1073,19 @@ class Disulfide:
 
     def bounding_box(self) -> np.array:
         """
-        Return the bounding box array for the given disulfide
+        Return the bounding box array for the given disulfide.
 
         Returns
         -------
-        :return: np.Array(3,2): Array containing the min, max for X, Y, and Z respectively.
+        :return: np.array(3, 2): Array containing the min, max for X, Y, and Z respectively.
         Does not currently take the atom's radius into account.
-
         """
-        res = np.zeros(shape=(3, 2))
-        xmin, xmax = self.compute_extents("x")
-        ymin, ymax = self.compute_extents("y")
-        zmin, zmax = self.compute_extents("z")
+        coords = self.internal_coords
 
-        res[0] = [xmin, xmax]
-        res[1] = [ymin, ymax]
-        res[2] = [zmin, zmax]
+        xmin, ymin, zmin = coords.min(axis=0)
+        xmax, ymax, zmax = coords.max(axis=0)
+
+        res = np.array([[xmin, xmax], [ymin, ymax], [zmin, zmax]])
 
         return res
 
@@ -1413,29 +1205,6 @@ class Disulfide:
         """
         return copy.deepcopy(self)
 
-    def compute_extents(self, dim="z"):
-        """
-        Calculate the internal coordinate extents for the input axis.
-
-        :param dim: Axis, one of 'x', 'y', 'z', by default 'z'
-        :return: min, max
-        """
-
-        ic = self._internal_coords()
-        # set default index to 'z'
-        idx = 2
-
-        if dim == "x":
-            idx = 0
-        elif dim == "y":
-            idx = 1
-        elif dim == "z":
-            idx = 2
-
-        _min = ic[:, idx].min()
-        _max = ic[:, idx].max()
-        return _min, _max
-
     def _compute_local_coords(self) -> None:
         """
         Compute the internal coordinates for a properly initialized Disulfide Object.
@@ -1515,7 +1284,9 @@ class Disulfide:
         self.energy = energy
         return energy
 
-    def display(self, single=True, style="sb", light=True, shadows=False) -> None:
+    def display(
+        self, single=True, style="sb", light="Auto", shadows=False, winsize=WINSIZE
+    ) -> None:
         """
         Display the Disulfide bond in the specific rendering style.
 
@@ -1543,13 +1314,22 @@ class Disulfide:
 
         title = f"{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Cβ: {self.cb_distance:.2f} Å Tors: {self.torsion_length:.2f}°"
 
-        if light:
+        if light == "Light":
             pv.set_plot_theme("document")
-        else:
+        elif light == "Dark":
             pv.set_plot_theme("dark")
+        else:
+            _theme = get_macos_theme()
+            if _theme == "light":
+                pv.set_plot_theme("document")
+            elif _theme == "dark":
+                pv.set_plot_theme("dark")
+                _logger.info("Dark mode detected.")
+            else:
+                pv.set_plot_theme("document")
 
         if single is True:
-            _pl = pv.Plotter(window_size=WINSIZE)
+            _pl = pv.Plotter(window_size=winsize)
             _pl.add_title(title=title, font_size=FONTSIZE)
             _pl.enable_anti_aliasing("msaa")
             # _pl.add_camera_orientation_widget()
@@ -1567,7 +1347,7 @@ class Disulfide:
             _pl.show()
 
         else:
-            pl = pv.Plotter(window_size=WINSIZE, shape=(2, 2))
+            pl = pv.Plotter(window_size=winsize, shape=(2, 2))
             pl.subplot(0, 0)
 
             pl.add_title(title=title, font_size=FONTSIZE)
@@ -1896,8 +1676,9 @@ class Disulfide:
         s5 = self.repr_chain_ids()
         s6 = self.repr_ss_ca_dist()
         s7 = self.repr_ss_torsion_length()
+        s8 = self.repr_ss_secondary_structure()
 
-        res = f"{s1} {s2} {s5} {s3} {s4}\n {s6}\n {s7}>"
+        res = f"{s1} {s2} {s5} {s3} {s4}\n {s6}\n {s7}\n {s8}>"
 
         print(res)
 
@@ -1962,6 +1743,13 @@ class Disulfide:
         s1 = f"Torsion length: {self.torsion_length:.2f} deg"
         return s1
 
+    def repr_ss_secondary_structure(self) -> str:
+        """
+        Representation for Disulfide secondary structure
+        """
+        s1 = f"Proximal secondary: {self.proximal_secondary} Distal secondary: {self.distal_secondary}"
+        return s1
+
     def repr_all(self) -> str:
         """
         Return a string representation for all Disulfide information
@@ -1976,8 +1764,9 @@ class Disulfide:
         s6 = self.repr_ss_ca_dist()
         s8 = self.repr_ss_cb_dist()
         s7 = self.repr_ss_torsion_length()
+        s9 = self.repr_ss_secondary_structure()
 
-        res = f"{s1} {s2} {s5} {s3} {s4} {s6} {s7} {s8}>"
+        res = f"{s1} {s2} {s5} {s3} {s4} {s6} {s7} {s8} {s9}>"
         return res
 
     def repr_compact(self) -> str:
@@ -2075,7 +1864,7 @@ class Disulfide:
         fname="ssbond.png",
         verbose=False,
         shadows=False,
-        light=True,
+        light="Auto",
     ) -> None:
         """
         Create and save a screenshot of the Disulfide in the given style
@@ -2098,10 +1887,18 @@ class Disulfide:
 
         title = f"{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Cβ: {self.cb_distance:.2f} Å, Tors: {self.torsion_length:.2f}"
 
-        if light:
+        if light == "Light":
             pv.set_plot_theme("document")
-        else:
+        elif light == "Dark":
             pv.set_plot_theme("dark")
+        else:
+            _theme = get_macos_theme()
+            if _theme == "light":
+                pv.set_plot_theme("document")
+            elif _theme == "dark":
+                pv.set_plot_theme("dark")
+            else:
+                pv.set_plot_theme("document")
 
         if verbose:
             print(f"-> screenshot(): Rendering screenshot to file {fname}")
@@ -2293,28 +2090,6 @@ class Disulfide:
         self.c_prev_dist = c_prev_dist.copy()
         self.n_next_dist = n_next_dist.copy()
 
-    def set_dihedrals(
-        self, chi1: float, chi2: float, chi3: float, chi4: float, chi5: float
-    ) -> None:
-        """
-        Set the disulfide's dihedral angles, Chi1-Chi5. -180 - 180 degrees.
-
-        :param chi1: Chi1
-        :param chi2: Chi2
-        :param chi3: Chi3
-        :param chi4: Chi4
-        :param chi5: Chi5
-        """
-        self.chi1 = chi1
-        self.chi2 = chi2
-        self.chi3 = chi3
-        self.chi4 = chi4
-        self.chi5 = chi5
-        self.torsion_array = np.array([chi1, chi2, chi3, chi4, chi5])
-        self._compute_torsional_energy()
-        self._compute_torsion_length()
-        self._compute_rho()
-
     def set_name(self, namestr="Disulfide") -> None:
         """
         Set the Disulfide's name.
@@ -2380,7 +2155,7 @@ class Disulfide:
 
         return dist
 
-    def Torsion_neighbors(self, others, cutoff) -> DisulfideList:
+    def torsion_neighbors(self, others, cutoff) -> DisulfideList:
         """
         Return a list of Disulfides within the angular cutoff in the others list.
         This routine is used to find Disulfides having the same torsion length
@@ -2400,7 +2175,8 @@ class Disulfide:
         the lowest and highest energies, and then find the nearest conformational neighbors.
         Finally, we display the neighbors overlaid against a common reference frame.
 
-        >>> from proteusPy import Load_PDB_SS, DisulfideList, Disulfide
+        >>> from proteusPy import Load_PDB_SS, DisulfideList, Disulfide, get_macos_theme
+        >>> light = get_macos_theme()
         >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
         >>> ss_list = DisulfideList([], 'tmp')
 
@@ -2412,14 +2188,14 @@ class Disulfide:
         sidechain dihedral angle space.
 
         >>> low_energy_neighbors = DisulfideList([],'Neighbors')
-        >>> low_energy_neighbors = ssmin_enrg.Torsion_neighbors(sslist, 5)
+        >>> low_energy_neighbors = ssmin_enrg.torsion_neighbors(sslist, 8)
 
         Display the number found, and then display them overlaid onto their common reference frame.
 
         >>> tot = low_energy_neighbors.length
         >>> print(f'Neighbors: {tot}')
-        Neighbors: 3
-        >>> low_energy_neighbors.display_overlay()
+        Neighbors: 9
+        >>> low_energy_neighbors.display_overlay(light="auto")
 
         """
 
@@ -2456,7 +2232,7 @@ def disulfide_energy_function(x: list) -> float:
     return energy
 
 
-def Minimize(inputSS: Disulfide) -> Disulfide:
+def minimize_ss_energy(inputSS: Disulfide) -> Disulfide:
     """
     Minimizes the energy of a Disulfide object using the Nelder-Mead optimization method.
 
@@ -2471,9 +2247,9 @@ def Minimize(inputSS: Disulfide) -> Disulfide:
     initial_guess = inputSS.torsion_array
     result = minimize(disulfide_energy_function, initial_guess, method="Nelder-Mead")
     minimum_conformation = result.x
-    modelled_min = Disulfide("minimized")
-    modelled_min.dihedrals = minimum_conformation
-    modelled_min.build_yourself()
+    modelled_min = Disulfide("minimized", minimum_conformation)
+    # modelled_min.dihedrals = minimum_conformation
+    # modelled_min.build_yourself()
     return modelled_min
 
 

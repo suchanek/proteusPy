@@ -153,7 +153,7 @@ class DisulfideList(UserList):
     >>> subset.display_overlay()
     """
 
-    def __init__(self, iterable, pid: str, res=-1.0, quiet=True):
+    def __init__(self, iterable, pid: str, res=-1.0, quiet=True, fast=False):
         """
         Initialize the DisulfideList
 
@@ -186,15 +186,18 @@ class DisulfideList(UserList):
         total = 0
         count = 0
 
-        if res == -1:
-            for ss in iterable:
-                if ss.resolution is not None:
-                    total += ss.resolution
-                    count += 1
-            if count != 0:
-                self.res = total / count
+        if not fast:
+            if res == -1:
+                for ss in iterable:
+                    if ss.resolution is not None:
+                        total += ss.resolution
+                        count += 1
+                if count != 0:
+                    self.res = total / count
+                else:
+                    self.res = -1.0
             else:
-                self.res = -1.0
+                self.res = res
         else:
             self.res = res
 
@@ -499,7 +502,7 @@ class DisulfideList(UserList):
 
         return tor_stats, dist_stats
 
-    def display(self, style="sb", light=True, panelsize=512):
+    def display(self, style="sb", light="Auto", panelsize=512):
         """
         Display the Disulfide list in the specific rendering style.
 
@@ -540,7 +543,7 @@ class DisulfideList(UserList):
         save=False,
         fname="ss_torsions.png",
         stats=False,
-        light=True,
+        light="Auto",
     ):
         """
         Display torsion and distance statistics for a given Disulfide list.
@@ -715,7 +718,7 @@ class DisulfideList(UserList):
         movie=False,
         verbose=True,
         fname="ss_overlay.png",
-        light=True,
+        light="Auto",
     ):
         """
         Display all disulfides in the list overlaid in stick mode against
@@ -934,7 +937,7 @@ class DisulfideList(UserList):
         self.res = value
 
     def TorsionGraph(
-        self, display=True, save=False, fname="ss_torsions.png", light=True
+        self, display=True, save=False, fname="ss_torsions.png", light="Auto"
     ):
         """
         Generate and optionally display or save a torsion graph.
@@ -1062,7 +1065,7 @@ class DisulfideList(UserList):
 
         modelss.build_model(chi1, chi2, chi3, chi4, chi5)
         res = DisulfideList([], "neighbors")
-        res = modelss.Torsion_neighbors(sslist, cutoff)
+        res = modelss.torsion_neighbors(sslist, cutoff)
 
         return res
 
@@ -1087,7 +1090,7 @@ class DisulfideList(UserList):
 
         modelss.build_model(chi1, chi2, chi3, chi4, chi5)
         res = DisulfideList([], "neighbors")
-        res = modelss.Torsion_neighbors(sslist, cutoff)
+        res = modelss.torsion_neighbors(sslist, cutoff)
 
         return res
 
