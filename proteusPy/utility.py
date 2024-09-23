@@ -981,6 +981,104 @@ def get_macos_theme():
         return None
 
 
+def get_theme():
+    """
+    Determine the display theme for the current operating system.
+
+    Returns:
+    :return str: 'light' if the theme is light, 'dark' if the theme is dark, and None otherwise
+
+    Example:
+    >>> get_theme()
+    'dark'
+    """
+    system = platform.system()
+
+    if system == "Darwin":
+        # macOS
+        try:
+            # AppleScript to get the appearance setting
+            script = """
+            tell application "System Events"
+                tell appearance preferences
+                    if (dark mode) then
+                        return "dark"
+                    else
+                        return "light"
+                    end if
+                end tell
+            end tell
+            """
+            # Run the AppleScript
+            result = subprocess.run(
+                ["osascript", "-e", script],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=True,
+            )
+
+            # Check the output
+            if result.returncode == 0:
+                theme = result.stdout.strip().lower()
+                if theme in ["dark", "light"]:
+                    return theme
+                return None
+            return None
+
+        except Exception:
+            # In case of any exception, return None
+            return None
+
+    elif system == "Windows":
+        # Windows
+        try:
+            import winreg
+
+            registry = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
+            key_path = r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
+            key = winreg.OpenKey(registry, key_path)
+            value, _ = winreg.QueryValueEx(key, "AppsUseLightTheme")
+            winreg.CloseKey(key)
+
+            if value == 0:
+                return "dark"
+            else:
+                return "light"
+
+        except Exception:
+            # In case of any exception, return None
+            return None
+
+    elif system == "Linux":
+        # Linux
+        try:
+            # Check for GTK theme setting
+            result = subprocess.run(
+                ["gsettings", "get", "org.gnome.desktop.interface", "gtk-theme"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=True,
+            )
+
+            if result.returncode == 0:
+                theme = result.stdout.strip().lower()
+                if "dark" in theme:
+                    return "dark"
+                else:
+                    return "light"
+            return None
+
+        except Exception:
+            # In case of any exception, return None
+            return None
+
+    else:
+        # Unsupported OS
+        return None
+
+
 # functions to calculate statistics and filter disulfide lists via pandas
 
 

@@ -120,6 +120,7 @@ from .utility import (
     get_macos_theme,
     get_memory_usage,
     get_object_size_mb,
+    get_theme,
     grid_dimensions,
     image_to_ascii_art,
     load_list_from_file,
