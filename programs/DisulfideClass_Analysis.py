@@ -88,8 +88,11 @@ Author: Eric G. Suchanek, PhD. Last Modified: 8/27/2024
 # plyint: disable=C0103
 
 import argparse
+import cProfile
+import io
 import os
 import pickle
+import pstats
 import shutil
 import threading
 import time
@@ -283,13 +286,13 @@ def task(
         fname = os.path.join(save_dir, f"{prefix}_{cls}.png")
 
         class_disulfides_array = np.empty(len(ss_list), dtype=object)
-        update_freq = 50
+        update_freq = 10
         for idx, ssid in enumerate(ss_list):
             class_disulfides_array[idx] = loader[ssid]
             if (idx + 1) % update_freq == 0 or (idx + 1) == len(ss_list):
                 remaining = len(ss_list) - (idx + 1)
                 task_pbar.update(update_freq if remaining >= update_freq else remaining)
-                task_pbar.close()
+        task_pbar.close()
 
         class_disulfides = DisulfideList(
             list(class_disulfides_array), cls, quiet=True, fast=True
@@ -628,10 +631,10 @@ def main():
 
 if __name__ == "__main__":
     start = time.time()
-
     main()
 
     end = time.time()
+
     elapsed = end - start
 
     print(
