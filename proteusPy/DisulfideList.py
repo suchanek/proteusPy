@@ -7,7 +7,7 @@ The module provides the implmentation and interface for the [DisulfideList](#Dis
 object, used extensively by Disulfide class.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 7/12/2024 -egs-
+Last revision: 8/23/2024 -egs-
 """
 
 # pylint: disable=c0103
@@ -183,19 +183,13 @@ class DisulfideList(UserList):
 
         self.pdb_id = pid
         self.quiet = quiet
-        total = 0
-        count = 0
 
         if not fast:
             if res == -1:
-                for ss in iterable:
-                    if ss.resolution is not None:
-                        total += ss.resolution
-                        count += 1
-                if count != 0:
-                    self.res = total / count
-                else:
-                    self.res = -1.0
+                resolutions = [
+                    ss.resolution for ss in iterable if ss.resolution is not None
+                ]
+                self.res = sum(resolutions) / len(resolutions) if resolutions else -1.0
             else:
                 self.res = res
         else:
