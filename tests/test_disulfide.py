@@ -8,29 +8,34 @@ Classes:
     TestDisulfide: Contains unit tests for the Disulfide class.
 
 Methods:
-    setUp: Initializes the test environment, loads disulfides from a PDB entry, and sets up a Disulfide instance.
+    setUp: Initializes the test environment, loads disulfides from a PDB entry, and sets 
+    up a Disulfide instance.
     test_name: Tests that the name attribute of the Disulfide instance is correctly set.
-    test_extract: Tests that the name of the first disulfide in the loaded list matches the expected value.
+    test_extract: Tests that the name of the first disulfide in the loaded list matches 
+    the expected value.
     test_dihedrals: Placeholder for testing the dihedral angles of the first disulfide in the loaded list.
 """
 
+# plyint: disable=C0115
+# plyint: disable=C0116
+# plyint: disable=C0103
+
+
+import tempfile
 import unittest
 
-from proteusPy import Disulfide, disulfide_energy_function
+from scipy.optimize import minimize
+
+from proteusPy import Disulfide, disulfide_energy_function, load_disulfides_from_id
 from proteusPy.ProteusGlobals import DATA_DIR
 
 
 class TestDisulfide(unittest.TestCase):
 
     def setUp(self):
-        import tempfile
-
-        from proteusPy.DisulfideList import load_disulfides_from_id
 
         entry = "5rsa"
         ok = False
-
-        temp_dir = tempfile.TemporaryDirectory()
 
         self.sslist = load_disulfides_from_id(entry, pdb_dir=DATA_DIR)
         if len(self.sslist) > 0:
@@ -76,10 +81,6 @@ class TestDisulfide(unittest.TestCase):
         self.assertEqual(result, expected_result)
 
     def test_minimize(self):
-        from scipy.optimize import minimize
-
-        from proteusPy import disulfide_energy_function
-
         # initial guess for chi1, chi2, chi3, chi4, chi5
         initial_guess = [
             -60.0,
@@ -97,9 +98,6 @@ class TestDisulfide(unittest.TestCase):
         self.assertEqual(minimum_energy, expected_result)
 
     def test_load(self):
-        import tempfile
-
-        from proteusPy import DisulfideList, load_disulfides_from_id
 
         with tempfile.TemporaryDirectory() as temp_dir:
             pdb_home = f"{temp_dir}/"

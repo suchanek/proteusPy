@@ -8,6 +8,9 @@ Author: Eric G. Suchanek, PhD
 Last revision: 2/24/2024
 """
 
+# plyint: disable=C0116
+# plyint: disable=C0103
+
 import os
 import shutil
 import tempfile

@@ -286,7 +286,7 @@ def task(
         fname = os.path.join(save_dir, f"{prefix}_{cls}.png")
 
         class_disulfides_array = np.empty(len(ss_list), dtype=object)
-        update_freq = 10
+        update_freq = 20
         for idx, ssid in enumerate(ss_list):
             class_disulfides_array[idx] = loader[ssid]
             if (idx + 1) % update_freq == 0 or (idx + 1) == len(ss_list):
