@@ -552,16 +552,31 @@ class Disulfide:
         :rtype: pv.Plotter
         """
 
+        def add_atoms(pvp, coords, atoms, radii, colors, spec, specpow):
+            for i, atom in enumerate(atoms):
+                rad = radii[atom]
+                if style == "bs" and i > 11:
+                    rad *= 0.75
+                pvp.add_mesh(
+                    pv.Sphere(center=coords[i], radius=rad),
+                    color=colors[atom],
+                    smooth_shading=True,
+                    specular=spec,
+                    specular_power=specpow,
+                )
+
+        def draw_bonds(pvp, coords, style, all_atoms, bond_radius, bondcolor=None):
+            return self._draw_bonds(
+                pvp,
+                coords,
+                style=style,
+                all_atoms=all_atoms,
+                bond_radius=bond_radius,
+                bcolor=bondcolor,
+            )
+
         model = self.modelled
-        missing_atoms = self.missing_atoms
         coords = self._internal_coords()
-        clen = coords.shape[0]
-
-        if model:
-            all_atoms = False
-        else:
-            all_atoms = True
-
         if translate:
             coords -= self.cofmass
 
@@ -584,80 +599,33 @@ class Disulfide:
             "N",
         )
         pvp = pvplot
-
-        # bond connection table with atoms in the specific order shown above:
-        # returned by ss.get__internal_coords()
+        all_atoms = not model
 
         if style == "cpk":
-            for i, atom in enumerate(atoms):
-                rad = ATOM_RADII_CPK[atom]
-                pvp.add_mesh(
-                    pv.Sphere(center=coords[i], radius=rad),
-                    color=ATOM_COLORS[atom],
-                    smooth_shading=True,
-                    specular=spec,
-                    specular_power=specpow,
-                )
-
+            add_atoms(pvp, coords, atoms, ATOM_RADII_CPK, ATOM_COLORS, spec, specpow)
         elif style == "cov":
-            for i, atom in enumerate(atoms):
-                rad = ATOM_RADII_COVALENT[atom]
-                pvp.add_mesh(
-                    pv.Sphere(center=coords[i], radius=rad),
-                    color=ATOM_COLORS[atom],
-                    smooth_shading=True,
-                    specular=spec,
-                    specular_power=specpow,
-                )
-
-        elif style == "bs":  # ball and stick
-            for i, atom in enumerate(atoms):
-                rad = ATOM_RADII_CPK[atom] * bs_scale
-                if i > 11:
-                    rad = rad * 0.75
-
-                pvp.add_mesh(
-                    pv.Sphere(center=coords[i], radius=rad),
-                    color=ATOM_COLORS[atom],
-                    smooth_shading=True,
-                    specular=spec,
-                    specular_power=specpow,
-                )
-
-            pvp = self._draw_bonds(
-                pvp,
-                coords,
-                style="bs",
-                all_atoms=all_atoms,
-                bond_radius=bond_radius,
+            add_atoms(
+                pvp, coords, atoms, ATOM_RADII_COVALENT, ATOM_COLORS, spec, specpow
             )
-
-        elif style == "sb":  # splitbonds
-            pvp = self._draw_bonds(
+        elif style == "bs":
+            add_atoms(
                 pvp,
                 coords,
-                style="sb",
-                all_atoms=all_atoms,
-                bond_radius=bond_radius,
+                atoms,
+                {atom: ATOM_RADII_CPK[atom] * bs_scale for atom in atoms},
+                ATOM_COLORS,
+                spec,
+                specpow,
             )
-
-        elif style == "pd":  # proximal-distal
-            pvp = self._draw_bonds(
+            pvp = draw_bonds(pvp, coords, "bs", all_atoms, bond_radius)
+        elif style in ["sb", "pd", "plain"]:
+            pvp = draw_bonds(
                 pvp,
                 coords,
-                style="pd",
-                all_atoms=all_atoms,
-                bond_radius=bond_radius,
-            )
-
-        else:  # plain
-            pvp = self._draw_bonds(
-                pvp,
-                coords,
-                style="plain",
-                bcolor=bondcolor,
-                all_atoms=all_atoms,
-                bond_radius=bond_radius,
+                style,
+                all_atoms,
+                bond_radius,
+                bondcolor if style == "plain" else None,
             )
 
         return pvp

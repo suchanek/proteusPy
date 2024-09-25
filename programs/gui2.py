@@ -12,17 +12,6 @@ from PyQt5.QtWidgets import (
 from pyvistaqt import QtInteractor
 
 from proteusPy import Load_PDB_SS
-from proteusPy.atoms import (
-    ATOM_COLORS,
-    ATOM_RADII_COVALENT,
-    ATOM_RADII_CPK,
-    BOND_COLOR,
-    BOND_RADIUS,
-    BS_SCALE,
-    FONTSIZE,
-    SPEC_POWER,
-    SPECULARITY,
-)
 
 
 class MolecularViewer(QMainWindow):
@@ -99,127 +88,6 @@ class MolecularViewer(QMainWindow):
         plotter.add_light(light2)
         # plotter.add_light(light3)
 
-    def plot(
-        self,
-        plotter,
-        style="bs",
-        bondcolor=BOND_COLOR,
-        bs_scale=BS_SCALE,
-        spec=SPECULARITY,
-        specpow=SPEC_POWER,
-        translate=True,
-        bond_radius=BOND_RADIUS,
-        res=100,
-    ):
-        pvp = plotter  # Use the provided plotter (QtInteractor)
-        ss = self.ss
-        model = ss.modelled
-        missing_atoms = ss.missing_atoms
-        coords = ss._internal_coords()
-        clen = coords.shape[0]
-
-        if model:
-            all_atoms = False
-        else:
-            all_atoms = True
-
-        if translate:
-            coords -= ss.cofmass
-
-        atoms = (
-            "N",
-            "C",
-            "C",
-            "O",
-            "C",
-            "SG",
-            "N",
-            "C",
-            "C",
-            "O",
-            "C",
-            "SG",
-            "C",
-            "N",
-            "C",
-            "N",
-        )
-
-        if style == "cpk":
-            for i, atom in enumerate(atoms):
-                rad = ATOM_RADII_CPK[atom]
-                pvp.add_mesh(
-                    pv.Sphere(center=coords[i], radius=rad),
-                    color=ATOM_COLORS[atom],
-                    smooth_shading=True,
-                    specular=spec,
-                    specular_power=specpow,
-                )
-
-        elif style == "cov":
-            for i, atom in enumerate(atoms):
-                rad = ATOM_RADII_COVALENT[atom]
-                pvp.add_mesh(
-                    pv.Sphere(center=coords[i], radius=rad),
-                    color=ATOM_COLORS[atom],
-                    smooth_shading=True,
-                    specular=spec,
-                    specular_power=specpow,
-                )
-
-        elif style == "bs":  # ball and stick
-            for i, atom in enumerate(atoms):
-                rad = ATOM_RADII_CPK[atom] * bs_scale
-                if i > 11:
-                    rad = rad * 0.75
-
-                pvp.add_mesh(
-                    pv.Sphere(center=coords[i], radius=rad),
-                    color=ATOM_COLORS[atom],
-                    smooth_shading=True,
-                    specular=spec,
-                    specular_power=specpow,
-                )
-
-            # Draw bonds using proteusPy's method
-            pvp = ss._draw_bonds(
-                pvp,
-                coords,
-                style="bs",
-                all_atoms=all_atoms,
-                bond_radius=bond_radius,
-            )
-
-        elif style == "sb":  # split bonds
-            pvp = ss._draw_bonds(
-                pvp,
-                coords,
-                style="sb",
-                all_atoms=all_atoms,
-                bond_radius=bond_radius,
-            )
-
-        elif style == "pd":  # proximal-distal
-            pvp = ss._draw_bonds(
-                pvp,
-                coords,
-                style="pd",
-                all_atoms=all_atoms,
-                bond_radius=bond_radius,
-            )
-
-        else:  # plain
-            pvp = ss._draw_bonds(
-                pvp,
-                coords,
-                style="plain",
-                bcolor=bondcolor,
-                all_atoms=all_atoms,
-                bond_radius=bond_radius,
-            )
-
-        return pvp
-
     def display(self, style, light="Auto", single=True, winsize=(800, 800)):
         from proteusPy import get_macos_theme
 
@@ -251,7 +119,6 @@ class MolecularViewer(QMainWindow):
 
         # Perform the plotting with the specified style
         self.ss._render(plotter, style=style)
-        self.plot(plotter=plotter, style=style)
 
         # Set perspective projection
         plotter.camera.SetParallelProjection(False)  # False for perspective
