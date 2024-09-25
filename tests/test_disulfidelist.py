@@ -39,6 +39,19 @@ def test_calength(pdb_5rsa):
     assert pdb_5rsa[0].ca_distance == pytest.approx(5.53462, rel=1e-5)
 
 
+def test_average_conformation(pdb_5rsa):
+    assert pdb_5rsa.average_conformation == pytest.approx(
+        [
+            -61.87699859,
+            -66.80281181,
+            -34.91612161,
+            -38.36943922,
+            -63.74957406,
+        ],
+        rel=1e-5,
+    )
+
+
 def test_insert_at_beginning(disulfide_list):
     disulfide_list.insert(0, "item1")
     assert disulfide_list.data == ["item1"]
