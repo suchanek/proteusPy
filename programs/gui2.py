@@ -250,6 +250,7 @@ class MolecularViewer(QMainWindow):
         self.add_custom_lights(plotter)
 
         # Perform the plotting with the specified style
+        self.ss._render(plotter, style=style)
         self.plot(plotter=plotter, style=style)
 
         # Set perspective projection
