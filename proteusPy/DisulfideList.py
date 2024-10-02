@@ -221,7 +221,7 @@ class DisulfideList(UserList):
     # Rendering engine calculates and instantiates all bond
     # cylinders and atomic sphere meshes. Called by all high level routines
 
-    def _render(self, style, panelsize=256) -> pv.Plotter:
+    def _render(self, pl, style) -> pv.Plotter:
         """
         Display a window showing the list of disulfides in the given style.
         :param style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd'
@@ -230,9 +230,10 @@ class DisulfideList(UserList):
         ssList = self.data
         tot_ss = len(ssList)  # number off ssbonds
         rows, cols = grid_dimensions(tot_ss)
-        winsize = (panelsize * cols, panelsize * rows)
 
-        pl = pv.Plotter(window_size=winsize, shape=(rows, cols))
+        # winsize = (panelsize * cols, panelsize * rows)
+        # pl = pv.Plotter(window_size=winsize, shape=(rows, cols))
+
         i = 0
 
         for r in range(rows):
@@ -512,6 +513,9 @@ class DisulfideList(UserList):
         pid = self.pdb_id
         ssbonds = self.data
         tot_ss = len(ssbonds)  # number off ssbonds
+        rows, cols = grid_dimensions(tot_ss)
+        winsize = (panelsize * cols, panelsize * rows)
+
         avg_enrg = self.average_energy
         avg_dist = self.average_distance
         resolution = self.resolution
@@ -523,8 +527,8 @@ class DisulfideList(UserList):
 
         title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
 
-        pl = pv.Plotter()
-        pl = self._render(style, panelsize)
+        pl = pv.Plotter(window_size=winsize, shape=(rows, cols))
+        pl = self._render(pl, style)
         pl.enable_anti_aliasing("msaa")
         pl.add_title(title=title, font_size=FONTSIZE)
         pl.link_views()
