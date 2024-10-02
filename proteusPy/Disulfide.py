@@ -737,20 +737,8 @@ class Disulfide:
                 pvp.append(pv.Sphere(center=coords[i]))
             pvp = self._draw_bonds(pvp, coords, style="bs", all_atoms=all_atoms)
 
-        elif style == "sb":  # splitbonds
-            pvp = self._draw_bonds(pvp, coords, style="sb", all_atoms=all_atoms)
-
-        elif style == "pd":  # proximal-distal
-            pvp = self._draw_bonds(pvp, coords, style="pd", all_atoms=all_atoms)
-
-        else:  # plain
-            pvp = self._draw_bonds(
-                pvp,
-                coords,
-                style="plain",
-                bcolor=bondcolor,
-                all_atoms=all_atoms,
-            )
+        else:
+            pvp = self._draw_bonds(pvp, coords, style=style, all_atoms=all_atoms)
 
         return
 
