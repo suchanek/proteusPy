@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Molecular Viewer</title>
+</head>
+<body>
+    <h1>Molecular Viewer</h1>
+    <form action="/generate" method="post">
+        <label for="pdb_id">PDB ID:</label>
+        <input type="text" id="pdb_id" name="pdb_id" required>
+        <label for="style">Style:</label>
+        <select id="style" name="style">
+            <option value="cpk">CPK</option>
+            <option value="sb">SB</option>
+            <option value="bs">BS</option>
+            <option value="pd">PD</option>
+        </select>
+        <button type="submit">Generate</button>
+    </form>
+</body>
+</html>
