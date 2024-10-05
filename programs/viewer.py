@@ -38,6 +38,8 @@ from PyQt5.QtWidgets import (
     QComboBox,
     QFileDialog,
     QHBoxLayout,
+    QLabel,
+    QLineEdit,
     QMainWindow,
     QMessageBox,
     QPushButton,
@@ -55,6 +57,8 @@ from proteusPy import (
 )
 
 os.environ["QT_IM_MODULE"] = "qtvirtualkeyboard"
+
+_version = 1.0
 
 
 class MolecularViewer(QMainWindow):
@@ -82,7 +86,9 @@ class MolecularViewer(QMainWindow):
         super().__init__()
 
         # Set up the main window
-        self.setWindowTitle("Molecular Structure Viewer")
+        self._version = _version
+        self.pdb_label = QLabel("PDB ID:")
+        self.setWindowTitle("proteusPy Disulfide Viewer")
         self.setGeometry(100, 100, winsize[0], winsize[1])
 
         # Validate and store the list of disulfides
@@ -92,17 +98,24 @@ class MolecularViewer(QMainWindow):
                 self, "Error", "No disulfide bonds found in the provided PDB."
             )
             sys.exit(1)
+
         self.current_ss = self.ss_list[0]
+        self.current_pdb_id = self.current_ss.pdb_id
         self.current_style = "sb"  # Initialize with default style
+        self.single = True
 
         # Create a dictionary where keys are pdb_id and values are lists of disulfides
         # with that pdb_id
+
+        self.current_sslist = DisulfideList([], "sublist")
+
+        # populate the dictionary with key pdb_id and values list of disulfides
+        # for that pdb_id
 
         self.ss_dict = {}
         for ss in self.ss_list:
             if ss.pdb_id not in self.ss_dict:
                 self.ss_dict[ss.pdb_id] = []
-
             self.ss_dict[ss.pdb_id].append(ss)
 
         # Create buttons for different rendering styles
@@ -118,6 +131,11 @@ class MolecularViewer(QMainWindow):
         self.button_bs.clicked.connect(lambda: self.update_style("bs"))
         self.button_pd.clicked.connect(lambda: self.update_style("pd"))
         # self.button_cov.clicked.connect(lambda: self.update_style("cov"))
+
+        # Create a text box for entering PDB IDs
+        self.pdb_textbox = QLineEdit()
+        self.pdb_textbox.setPlaceholderText("Enter PDB ID")
+        self.pdb_textbox.returnPressed.connect(self.on_pdb_textbox_enter)
 
         # Create a dropdown selector for PDB IDs
         self.pdb_dropdown = QComboBox()
@@ -138,6 +156,9 @@ class MolecularViewer(QMainWindow):
         self.checkbox_single.setChecked(True)
         self.checkbox_single.stateChanged.connect(self.on_checkbox_single_change)
 
+        self.button_reset = QPushButton("Reset")
+        self.button_reset.clicked.connect(self.reset)
+
         # Layout for the buttons and dropdown
         button_layout = QVBoxLayout()
         button_layout.addWidget(self.button_cpk)
@@ -145,9 +166,12 @@ class MolecularViewer(QMainWindow):
         button_layout.addWidget(self.button_bs)
         button_layout.addWidget(self.button_pd)
         # button_layout.addWidget(self.button_cov)
+        button_layout.addWidget(self.pdb_label)  # Add PDB label
+        button_layout.addWidget(self.pdb_textbox)
         button_layout.addWidget(self.pdb_dropdown)  # Add PDB ID dropdown
         button_layout.addWidget(self.dropdown)
         button_layout.addWidget(self.button_theme)  # Add theme toggle button
+        button_layout.addWidget(self.button_reset)  # Add Reset button
         button_layout.addWidget(self.checkbox_single)  # Add single/multiple checkbox
         button_layout.addStretch(1)
 
@@ -173,7 +197,7 @@ class MolecularViewer(QMainWindow):
         self.statusBar().showMessage(f"Displaying: {self.current_ss.name}")
 
         # Initialize the theme
-        self.current_theme = "dark"  # Default theme
+        self.current_theme = "auto"  # Default theme
         self.apply_theme()
 
         # Create the menubar
@@ -183,17 +207,64 @@ class MolecularViewer(QMainWindow):
         self.on_pdb_dropdown_change(0)
 
         # Initial display
-        self.display(self.current_style)  # Set a default view with current style
+        # self.display()  # Set a default view with current style
+
+    def reset(self):
+        """
+        Resets all widgets and data structures to their default state.
+        """
+        self.statusBar().showMessage(f"Resetting...")
+        self.pdb_textbox.clear()
+        self.pdb_dropdown.setCurrentIndex(0)
+        self.dropdown.clear()
+        self.checkbox_single.setChecked(True)
+        self.current_style = "sb"
+        self.current_ss = self.ss_list[0]
+        self.current_pdb_id = self.current_ss.pdb_id
+        self.on_pdb_dropdown_change(0)
+        self.display(self.current_style)
+
+    def add_floor(self, plotter, size=15, position=(0, 0, -5)):
+        """
+        Adds a simple plane beneath the disulfide bond to act as a 'floor'.
+
+        :param plotter: The PyVista plotter to add the floor to.
+        :type plotter: pv.Plotter
+        :param size: The size of the floor plane.
+        :type size: float
+        :param position: The position of the floor plane.
+        :type position: tuple
+        """
+        floor = pv.Plane(center=position, direction=(0, 0, 1), i_size=size, j_size=size)
+        plotter.add_mesh(floor, color="lightgrey", opacity=1.0)
 
     def update_style(self, style):
         """
         Updates the current rendering style and refreshes the visualization.
 
-        Parameters:
-            style (str): The rendering style to apply (e.g., 'cpk', 'sb').
+        :param style: The rendering style to apply (e.g., 'cpk', 'sb').
+        :type style: str
         """
         self.current_style = style
-        self.display(style)
+        self.display()
+
+    def on_pdb_textbox_enter(self):
+        """
+        Handles the event when the user presses Enter in the PDB ID text box.
+        """
+        pdb_id = self.pdb_textbox.text()
+        if pdb_id in self.ss_dict:
+            self.update_pdb_selection(pdb_id)
+        else:
+            QMessageBox.warning(
+                self, "Invalid PDB ID", "The entered PDB ID is not valid."
+            )
+        disulfides = self.ss_dict.get(pdb_id, [])
+
+        self.dropdown.clear()
+        self.dropdown.addItems([ss.name for ss in disulfides])
+        self.current_sslist = DisulfideList(list(disulfides), "sub")
+        self.pdb_dropdown.setCurrentText(pdb_id)
 
     def on_pdb_dropdown_change(self, index):
         """
@@ -204,14 +275,32 @@ class MolecularViewer(QMainWindow):
         """
         pdb_id = self.pdb_dropdown.currentText()
         disulfides = self.ss_dict.get(pdb_id, [])
+
         self.dropdown.clear()
-        self.dropdown.addItems([ss.name for ss in disulfides])
+        self.pdb_textbox.setText(pdb_id)
         if disulfides:
+            self.dropdown.addItems([ss.name for ss in disulfides])
             self.current_ss = disulfides[0]
             self.current_sslist = DisulfideList(list(disulfides), "sublist")
-            print(f"sslist: {self.current_sslist}")
             self.statusBar().showMessage(f"Displaying: {self.current_ss.name}")
-            self.display(self.current_style)
+            self.display()
+
+    def update_pdb_selection(self, pdb_id):
+        """
+        Updates the current PDB selection and refreshes the disulfide dropdown.
+
+        :param pdb_id: The PDB ID to select.
+        :type pdb_id: str
+        """
+        self.current_pdb_id = pdb_id
+        ### ...
+        disulfides = self.ss_dict.get(pdb_id, [])
+
+        self.current_sslist = DisulfideList(list(disulfides), "sublist2")
+        self.dropdown.clear()
+        self.dropdown.addItems([ss.name for ss in self.ss_list])
+        # Trigger the dropdown change event to update the display
+        # self.on_dropdown_change(0)
 
     def on_dropdown_change(self, index):
         """
@@ -222,7 +311,7 @@ class MolecularViewer(QMainWindow):
         """
         self.current_ss = self.ss_list[index]
         self.statusBar().showMessage(f"Displaying: {self.current_ss.name}")
-        self.display(self.current_style)  # Use the current style
+        self.display(self)  # Use the current style
 
     def on_checkbox_single_change(self, state):
         """
@@ -231,15 +320,14 @@ class MolecularViewer(QMainWindow):
         Parameters:
             state (int): The state of the checkbox (Qt.Checked or Qt.Unchecked).
         """
-        self.display(self.current_style, single=state == Qt.Checked)
+        self.single = state == Qt.Checked
+        self.on_pdb_dropdown_change(0)
 
     def toggle_theme(self):
         """
         Toggles between light and dark themes for the visualization.
         """
         self.current_theme = "dark" if self.current_theme == "light" else "light"
-        # print(f"Toggling theme to: {self.current_theme}")
-
         self.statusBar().showMessage(
             f"Theme switched to: {self.current_theme.capitalize()}"
         )
@@ -256,13 +344,14 @@ class MolecularViewer(QMainWindow):
         else:
             pv.set_plot_theme("document")
             self.plotter_widget.set_background("white")
-        # print(f"Applying theme: {_theme}")
 
         # Render the plotter to apply the changes
         self.plotter_widget.render()
 
     def create_menubar(self):
-        """Creates the menubar"""
+        """
+        Creates the menubar
+        """
         menubar = self.menuBar()
 
         # File menu
@@ -279,7 +368,9 @@ class MolecularViewer(QMainWindow):
         file_menu.addAction(export_scene_action)
 
     def save_screenshot(self):
-        """Save the current scene as a screenshot"""
+        """
+        Save the current scene as a screenshot
+        """
         options = QFileDialog.Options()
         file_path, _ = QFileDialog.getSaveFileName(
             self,
@@ -292,7 +383,9 @@ class MolecularViewer(QMainWindow):
             self.plotter_widget.screenshot(file_path)
 
     def export_scene(self):
-        """Export the current scene as an HTML file"""
+        """
+        Export the current scene as an HTML file
+        """
         options = QFileDialog.Options()
         file_path, _ = QFileDialog.getSaveFileName(
             self,
@@ -316,20 +409,20 @@ class MolecularViewer(QMainWindow):
 
         # Define multiple light sources for better illumination
         light1 = pv.Light(
-            position=(1, 1, 1), focal_point=(0, 0, 0), color="white", intensity=1.0
+            position=(5, 5, 5), focal_point=(0, 0, 0), color="white", intensity=1.0
         )
         light2 = pv.Light(
-            position=(-1, -1, 1), focal_point=(0, 0, 0), color="white", intensity=0.5
+            position=(-5, -5, 5), focal_point=(0, 0, 0), color="white", intensity=0.5
         )
         light3 = pv.Light(
-            position=(1, -1, -1), focal_point=(0, 0, 0), color="white", intensity=0.5
+            position=(5, -5, -5), focal_point=(0, 0, 0), color="white", intensity=0.5
         )
 
         plotter.add_light(light1)
         plotter.add_light(light2)
         plotter.add_light(light3)
 
-    def display(self, style, light="Auto", single=True):
+    def display(self, light="Auto", shadows=False):
         """
         Renders the current disulfide bond using the specified style.
 
@@ -339,10 +432,15 @@ class MolecularViewer(QMainWindow):
             single (bool): Whether to display a single bond or multiple.
             winsize (tuple): The window size for rendering.
         """
-
+        style = self.current_style
         plotter = self.plotter_widget  # Use QtInteractor as the plotter
 
         plotter.clear()
+        plotter.add_axes()
+        plotter.reset_camera()
+
+        if shadows is True:
+            plotter.enable_shadows()
 
         title = (
             f"{self.current_ss.energy:.2f} kcal/mol. "
@@ -365,17 +463,19 @@ class MolecularViewer(QMainWindow):
         self.current_theme = _theme
         self.apply_theme()
 
-        self.setWindowTitle(f"{self.current_ss.name} - {title}")
+        self.setWindowTitle(f"{self.current_ss.name}: {title}")
         plotter.enable_anti_aliasing("msaa")
 
         # Add custom lights
         self.add_custom_lights(plotter)
 
         # Perform the plotting with the specified style
-        if single:
+        if self.single is True:
             self.current_ss._render(plotter, style=style)
         else:
-            self.current_sslist._render(plotter, style=style)
+            self.display_overlay(plotter)
+
+        # self.add_floor(plotter)
 
         # Set perspective projection
         plotter.camera.SetParallelProjection(False)  # False for perspective
@@ -385,7 +485,6 @@ class MolecularViewer(QMainWindow):
     def display_overlay(
         self,
         pl,
-        light="light",
     ):
         """
         Display all disulfides in the list overlaid in stick mode against
@@ -398,13 +497,12 @@ class MolecularViewer(QMainWindow):
         :param fname: Filename to save for the movie or screenshot, defaults to 'ss_overlay.png'
         :param light: Background color, defaults to True for White. False for Dark.
         """
-
-        pid = self.pdb_id
-        ssbonds = self.data
+        sslist = self.current_sslist
+        ssbonds = sslist.data
         tot_ss = len(ssbonds)  # number off ssbonds
-        avg_enrg = self.average_energy
-        avg_dist = self.average_distance
-        resolution = self.resolution
+        avg_enrg = sslist.average_energy
+        avg_dist = sslist.average_distance
+        resolution = sslist.resolution
 
         res = 100
 
@@ -415,12 +513,12 @@ class MolecularViewer(QMainWindow):
         if tot_ss > 300:
             res = 8
 
-        title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
+        title = (
+            f"{self.current_ss.name}: {resolution:.2f} Å: ({tot_ss} SS), "
+            f"Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
+        )
 
-        if light:
-            pv.set_plot_theme("document")
-        else:
-            pv.set_plot_theme("dark")
+        self.setWindowTitle(f"{title}")
 
         pl.add_axes()
 
@@ -430,13 +528,16 @@ class MolecularViewer(QMainWindow):
         # scale the overlay bond radii down so that we can see the individual elements better
         # maximum 90% reduction
 
-        brad = BOND_RADIUS if tot_ss < 10 else BOND_RADIUS * 0.75
-        brad = brad if tot_ss < 25 else brad * 0.8
-        brad = brad if tot_ss < 50 else brad * 0.8
-        brad = brad if tot_ss < 100 else brad * 0.6
-
-        # print(f'Brad: {brad}')
-        # pbar = tqdm(range(tot_ss), ncols=PBAR_COLS)
+        if tot_ss < 10:
+            brad = BOND_RADIUS
+        elif tot_ss < 25:
+            brad = BOND_RADIUS * 0.75
+        elif tot_ss < 50:
+            brad = BOND_RADIUS * 0.75 * 0.8
+        elif tot_ss < 100:
+            brad = BOND_RADIUS * 0.75 * 0.8 * 0.7
+        else:
+            brad = BOND_RADIUS * 0.75 * 0.8 * 0.7 * 0.6
 
         for i, ss in zip(range(tot_ss), ssbonds):
             color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
@@ -458,7 +559,7 @@ def main():
     The main entry point of the application.
     """
 
-    pdb = Load_PDB_SS(subset=True, verbose=True)
+    pdb = Load_PDB_SS(subset=False, verbose=True)
     if pdb is not None:
         ss_list = sorted(pdb.SSList, key=lambda ss: ss.pdb_id)
         app = QApplication(sys.argv)

@@ -245,7 +245,7 @@ class DisulfideList(UserList):
                     src = ss.pdb_id
                     enrg = ss.energy
                     title = f"{src} {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°"
-                    # pl.add_title(title=title, font_size=FONTSIZE)
+                    pl.add_title(title=title, font_size=FONTSIZE)
                     ss._render(
                         pl,
                         style=style,
