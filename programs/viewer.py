@@ -37,12 +37,14 @@ from PyQt5.QtWidgets import (
     QCheckBox,
     QComboBox,
     QFileDialog,
+    QGroupBox,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QMainWindow,
     QMessageBox,
     QPushButton,
+    QSlider,
     QVBoxLayout,
     QWidget,
 )
@@ -54,6 +56,7 @@ from proteusPy import (
     Load_PDB_SS,
     get_jet_colormap,
     get_macos_theme,
+    grid_dimensions,
 )
 
 os.environ["QT_IM_MODULE"] = "qtvirtualkeyboard"
@@ -85,6 +88,25 @@ class MolecularViewer(QMainWindow):
         """
         super().__init__()
 
+        # Define color dictionary
+        self.colors = {
+            "dark": {
+                "background": "#2E2E2E",  # Dark Gray
+                "midnight_blue": "#191970",
+                "dark_slate_gray": "#2F4F4F",
+                "charcoal": "#36454F",
+                "deep_space_sparkle": "#4A646C",
+                "black": "black",
+            },
+            "light": {
+                "background": "#FFFFFF",  # White
+                "light_gray": "#D3D3D3",
+                "ivory": "#FFFFF0",
+                "honeydew": "#F0FFF0",
+                "azure": "#F0FFFF",
+            },
+        }
+
         # Set up the main window
         self._version = _version
         self.pdb_label = QLabel("PDB ID:")
@@ -93,12 +115,6 @@ class MolecularViewer(QMainWindow):
 
         # Validate and store the list of disulfides
         self.ss_list = ss_list
-        if not self.ss_list:
-            QMessageBox.critical(
-                self, "Error", "No disulfide bonds found in the provided PDB."
-            )
-            sys.exit(1)
-
         self.current_ss = self.ss_list[0]
         self.current_pdb_id = self.current_ss.pdb_id
         self.current_style = "sb"  # Initialize with default style
@@ -159,39 +175,64 @@ class MolecularViewer(QMainWindow):
         self.button_reset = QPushButton("Reset")
         self.button_reset.clicked.connect(self.reset)
 
-        # Layout for the buttons and dropdown
+        # Group the buttons with a label
+        button_group = QGroupBox("Rendering Styles")
         button_layout = QVBoxLayout()
         button_layout.addWidget(self.button_cpk)
         button_layout.addWidget(self.button_sb)
         button_layout.addWidget(self.button_bs)
         button_layout.addWidget(self.button_pd)
-        # button_layout.addWidget(self.button_cov)
-        button_layout.addWidget(self.pdb_label)  # Add PDB label
-        button_layout.addWidget(self.pdb_textbox)
-        button_layout.addWidget(self.pdb_dropdown)  # Add PDB ID dropdown
-        button_layout.addWidget(self.dropdown)
-        button_layout.addWidget(self.button_theme)  # Add theme toggle button
-        button_layout.addWidget(self.button_reset)  # Add Reset button
         button_layout.addWidget(self.checkbox_single)  # Add single/multiple checkbox
-        button_layout.addStretch(1)
+        # button_layout.addWidget(self.button_cov)
+        button_group.setLayout(button_layout)
 
-        # Create a QWidget for the buttons and dropdown
-        button_widget = QWidget()
-        button_widget.setLayout(button_layout)
+        # Layout for the main controls
+        control_layout = QVBoxLayout()
+        control_layout.addWidget(button_group)  # Add button group
+        control_layout.addWidget(self.pdb_label)  # Add PDB label
+        control_layout.addWidget(self.pdb_textbox)  # Add PDB ID text box
+        control_layout.addWidget(self.pdb_dropdown)  # Add PDB ID dropdown
+        control_layout.addWidget(self.dropdown)  # Add Disulfides dropdown
+        control_layout.addWidget(self.button_theme)  # Add theme toggle button
+        control_layout.addWidget(self.button_reset)  # Add Reset button
+        control_layout.addStretch(1)
+
+        # Create a QWidget for the controls
+        control_widget = QWidget()
+        control_widget.setLayout(control_layout)
 
         # Create the PyVista QtInteractor widget for 3D visualization
         self.plotter_widget = QtInteractor(self)
         # self.plotter_widget.setMinimumSize(*winsize)
 
+        # Create sliders for camera control
+        self.slider_x = QSlider(Qt.Horizontal)
+        self.slider_x.setRange(-100, 100)
+        self.slider_x.setValue(0)
+        self.slider_x.valueChanged.connect(self.update_camera_position)
+
+        self.slider_y = QSlider(Qt.Vertical)
+        self.slider_y.setRange(-100, 100)
+        self.slider_y.setValue(0)
+        self.slider_y.valueChanged.connect(self.update_camera_position)
+
         # Main layout combining controls and visualization
         main_layout = QHBoxLayout()
-        main_layout.addWidget(button_widget)
+        main_layout.addWidget(control_widget)
         main_layout.addWidget(self.plotter_widget, 1)
+        main_layout.addWidget(self.slider_y)  # Add vertical slider
 
-        # Central widget setup
+        # Set the central widgetxf
         container = QWidget()
         container.setLayout(main_layout)
-        self.setCentralWidget(container)
+
+        bottom_layout = QVBoxLayout()
+        bottom_layout.addWidget(container)
+        bottom_layout.addWidget(self.slider_x)  # Add horizontal slider
+
+        main_container = QWidget()
+        main_container.setLayout(bottom_layout)
+        self.setCentralWidget(main_container)
 
         # Status Bar for user feedback
         self.statusBar().showMessage(f"Displaying: {self.current_ss.name}")
@@ -204,16 +245,25 @@ class MolecularViewer(QMainWindow):
         self.create_menubar()
 
         # Force a refresh on the disulfide list dropdown
+        self.set_camera_view()
         self.on_pdb_dropdown_change(0)
 
         # Initial display
         # self.display()  # Set a default view with current style
 
+    def set_camera_view(self):
+        """
+        Sets the camera to a specific view where the x-axis is pointed down and the y-axis into the screen.
+        """
+        camera_position = [(0, 0, 10), (0, 0, 0), (-1, 0, 0)]  # Example values
+        self.plotter_widget.camera_position = camera_position
+        self.plotter_widget.reset_camera()
+
     def reset(self):
         """
         Resets all widgets and data structures to their default state.
         """
-        self.statusBar().showMessage(f"Resetting...")
+        self.statusBar().showMessage("Resetting...")
         self.pdb_textbox.clear()
         self.pdb_dropdown.setCurrentIndex(0)
         self.dropdown.clear()
@@ -221,8 +271,9 @@ class MolecularViewer(QMainWindow):
         self.current_style = "sb"
         self.current_ss = self.ss_list[0]
         self.current_pdb_id = self.current_ss.pdb_id
+        self.set_camera_view()
         self.on_pdb_dropdown_change(0)
-        self.display(self.current_style)
+        # self.display(self.current_style)
 
     def add_floor(self, plotter, size=15, position=(0, 0, -5)):
         """
@@ -277,13 +328,14 @@ class MolecularViewer(QMainWindow):
         disulfides = self.ss_dict.get(pdb_id, [])
 
         self.dropdown.clear()
-        self.pdb_textbox.setText(pdb_id)
         if disulfides:
             self.dropdown.addItems([ss.name for ss in disulfides])
             self.current_ss = disulfides[0]
             self.current_sslist = DisulfideList(list(disulfides), "sublist")
             self.statusBar().showMessage(f"Displaying: {self.current_ss.name}")
             self.display()
+
+        self.pdb_textbox.setText(pdb_id)
 
     def update_pdb_selection(self, pdb_id):
         """
@@ -321,29 +373,36 @@ class MolecularViewer(QMainWindow):
             state (int): The state of the checkbox (Qt.Checked or Qt.Unchecked).
         """
         self.single = state == Qt.Checked
-        self.on_pdb_dropdown_change(0)
+        self.display(self)  # Use the current style
+        # self.on_pdb_dropdown_change(0)
+
+    def update_camera_position(self):
+        """
+        Update the camera position based on the slider values.
+        """
+        x = self.slider_x.value()
+        y = self.slider_y.value()
+        self.plotter_widget.camera_position = [(x, y, 10), (0, 0, 0), (0, 1, 0)]
+        self.plotter_widget.render()
 
     def toggle_theme(self):
         """
-        Toggles between light and dark themes for the visualization.
+        Toggle between light and dark themes.
         """
-        self.current_theme = "dark" if self.current_theme == "light" else "light"
-        self.statusBar().showMessage(
-            f"Theme switched to: {self.current_theme.capitalize()}"
-        )
+        if self.current_theme == "dark":
+            self.current_theme = "light"
+        else:
+            self.current_theme = "dark"
         self.apply_theme()
 
     def apply_theme(self):
         """
-        Applies the specified theme to the visualization.
+        Apply the current theme to the plotter widget.
         """
-        _theme = self.current_theme.lower()
-        if _theme == "dark":
-            pv.set_plot_theme("dark")
-            self.plotter_widget.set_background("black")
+        if self.current_theme == "dark":
+            self.plotter_widget.set_background(self.colors["dark"]["background"])
         else:
-            pv.set_plot_theme("document")
-            self.plotter_widget.set_background("white")
+            self.plotter_widget.set_background(self.colors["light"]["background"])
 
         # Render the plotter to apply the changes
         self.plotter_widget.render()
@@ -356,6 +415,7 @@ class MolecularViewer(QMainWindow):
 
         # File menu
         file_menu = menubar.addMenu("File")
+        reset_menu = menubar.addMenu("Reset")
 
         # Save screenshot action
         save_screenshot_action = QAction("Save Screenshot", self)
@@ -366,6 +426,11 @@ class MolecularViewer(QMainWindow):
         export_scene_action = QAction("Export Scene", self)
         export_scene_action.triggered.connect(self.export_scene)
         file_menu.addAction(export_scene_action)
+
+        # Reset action
+        reset_action = QAction("Reset", self)
+        reset_action.triggered.connect(self.reset)
+        reset_menu.addAction(reset_action)
 
     def save_screenshot(self):
         """
@@ -422,6 +487,66 @@ class MolecularViewer(QMainWindow):
         plotter.add_light(light2)
         plotter.add_light(light3)
 
+    def new_plotter(self, rows=1, cols=1):
+        """
+        Create a new QtInteractor with the specified number of rows and columns.
+        """
+
+        # Create a new QtInteractor with the desired shape
+        new_plotter_widget = QtInteractor(self, shape=(rows, cols))
+
+        # Update the layout to replace the old plotter widget with the new one
+        layout = self.centralWidget().layout()
+        layout.removeWidget(self.plotter_widget)  # Remove the old plotter widget
+        self.plotter_widget.setParent(
+            None
+        )  # Detach the old plotter widget from its parent
+
+        layout.addWidget(new_plotter_widget)  # Add the new plotter widget to the layout
+        self.plotter_widget = (
+            new_plotter_widget  # Update the reference to the new plotter widget
+        )
+
+    def display_list(self, style="sb", light="Auto", panelsize=512):
+        """
+        Display the Disulfide list in the specific rendering style.
+
+        :param style:  Rendering style: One of:
+            - 'sb' - split bonds
+            - 'bs' - ball and stick
+            - 'cpk' - CPK style
+            - 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
+            - 'plain' - boring single color
+        :param light: If True, light background, if False, dark
+        """
+        sslist = self.current_sslist
+        pid = sslist.pdb_id
+        ssbonds = sslist.data
+        tot_ss = len(ssbonds)  # number of ssbonds
+        rows, cols = grid_dimensions(tot_ss)
+        winsize = (panelsize * cols, panelsize * rows)
+
+        self.new_plotter(rows, cols)
+
+        pl = self.plotter_widget
+
+        avg_enrg = sslist.average_energy
+        avg_dist = sslist.average_distance
+        resolution = sslist.resolution
+
+        if light:
+            pv.set_plot_theme("document")
+        else:
+            pv.set_plot_theme("dark")
+
+        title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
+
+        pl = sslist._render(pl, style)
+        pl.enable_anti_aliasing("msaa")
+        # pl.add_title(title=title, font_size=FONTSIZE)
+        pl.link_views()
+        pl.reset_camera()
+
     def display(self, light="Auto", shadows=False):
         """
         Renders the current disulfide bond using the specified style.
@@ -433,7 +558,10 @@ class MolecularViewer(QMainWindow):
             winsize (tuple): The window size for rendering.
         """
         style = self.current_style
+        camera_position = [(0, 0, 10), (0, 0, 0), (-1, 0, 0)]  # Example values
+
         plotter = self.plotter_widget  # Use QtInteractor as the plotter
+        self.plotter_widget.camera_position = camera_position
 
         plotter.clear()
         plotter.add_axes()
@@ -471,9 +599,11 @@ class MolecularViewer(QMainWindow):
 
         # Perform the plotting with the specified style
         if self.single is True:
+            # self.new_plotter(rows=1, cols=1)
             self.current_ss._render(plotter, style=style)
         else:
             self.display_overlay(plotter)
+            # self.display_list(style=style, light=light)
 
         # self.add_floor(plotter)
 
@@ -550,7 +680,7 @@ class MolecularViewer(QMainWindow):
                 res=res,
             )
 
-        pl.reset_camera()
+        self.set_camera_view()
         return pl
 
 
@@ -559,7 +689,7 @@ def main():
     The main entry point of the application.
     """
 
-    pdb = Load_PDB_SS(subset=False, verbose=True)
+    pdb = Load_PDB_SS(subset=True, verbose=True)
     if pdb is not None:
         ss_list = sorted(pdb.SSList, key=lambda ss: ss.pdb_id)
         app = QApplication(sys.argv)
