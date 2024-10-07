@@ -172,8 +172,8 @@ class MolecularViewer(QMainWindow):
         self.checkbox_single.setChecked(True)
         self.checkbox_single.stateChanged.connect(self.on_checkbox_single_change)
 
-        self.button_reset = QPushButton("Reset")
-        self.button_reset.clicked.connect(self.reset)
+        self.button_reset = QPushButton("Reset Camera")
+        self.button_reset.clicked.connect(self.set_camera_view)
 
         # Group the buttons with a label
         button_group = QGroupBox("Rendering Styles")
@@ -253,7 +253,8 @@ class MolecularViewer(QMainWindow):
 
     def set_camera_view(self):
         """
-        Sets the camera to a specific view where the x-axis is pointed down and the y-axis into the screen.
+        Sets the camera to a specific view where the x-axis is pointed down and the
+        y-axis into the screen.
         """
         camera_position = [(0, 0, 10), (0, 0, 0), (-1, 0, 0)]  # Example values
         self.plotter_widget.camera_position = camera_position
@@ -539,7 +540,7 @@ class MolecularViewer(QMainWindow):
         else:
             pv.set_plot_theme("dark")
 
-        title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
+        # title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
 
         pl = sslist._render(pl, style)
         pl.enable_anti_aliasing("msaa")
