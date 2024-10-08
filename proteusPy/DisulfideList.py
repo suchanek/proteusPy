@@ -1119,7 +1119,13 @@ class DisulfideList(UserList):
         return self.get_torsion_array()
 
     def validate_ss(self, value):
+        from proteusPy.Disulfide import Disulfide
         """Return the Disulfide object if it is a Disulfide, otherwise raise an error"""
+        if value is None:
+            raise ValueError("The value cannot be None.")
+        
+        if not isinstance(value, Disulfide):
+            raise TypeError("The value must be an instance of Disulfide.")
         return value
 
     def create_deviation_dataframe(self):
