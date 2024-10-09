@@ -1,5 +1,5 @@
 """
-Molecular Structure Viewer
+Disulfide Structure Viewer
 
 This program is a PyQt5-based application for viewing molecular structures with support for
 multiple disulfide bonds and various rendering styles. It uses PyVista for 3D visualization
@@ -17,7 +17,7 @@ Modules:
     proteusPy: Custom module for loading PDB files and getting macOS theme.
 
 Classes:
-    MolecularViewer: Main window class for the molecular structure viewer application.
+    DisulfideViewer: Main window class for the molecular structure viewer application.
 
 Functions:
     main: The main entry point of the application.
@@ -55,7 +55,7 @@ from proteusPy import (
     DisulfideList,
     Load_PDB_SS,
     get_jet_colormap,
-    get_macos_theme,
+    get_theme,
     grid_dimensions,
 )
 
@@ -64,7 +64,7 @@ os.environ["QT_IM_MODULE"] = "qtvirtualkeyboard"
 _version = 1.0
 
 
-class MolecularViewer(QMainWindow):
+class DisulfideViewer(QMainWindow):
     """
     A PyQt5-based application for viewing molecular structures with support for
     multiple disulfide bonds and various rendering styles.
@@ -540,10 +540,12 @@ class MolecularViewer(QMainWindow):
         else:
             pv.set_plot_theme("dark")
 
-        # title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
+        title = f"{resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
 
         pl = sslist._render(pl, style)
         pl.enable_anti_aliasing("msaa")
+        self.setWindowTitle(f"{self.current_ss.name}: {title}")
+
         # pl.add_title(title=title, font_size=FONTSIZE)
         pl.link_views()
         pl.reset_camera()
@@ -578,9 +580,7 @@ class MolecularViewer(QMainWindow):
             f"Tors: {self.current_ss.torsion_length:.2f}°"
         )
         # Determine the theme and set the background color
-        _theme = (
-            light.lower() if light in ["Light", "Dark"] else get_macos_theme().lower()
-        )
+        _theme = light.lower() if light in ["Light", "Dark"] else get_theme()
         if _theme == "dark":
             pv.set_plot_theme("dark")
             plotter.set_background("black")
@@ -694,7 +694,7 @@ def main():
     if pdb is not None:
         ss_list = sorted(pdb.SSList, key=lambda ss: ss.pdb_id)
         app = QApplication(sys.argv)
-        viewer = MolecularViewer(ss_list)
+        viewer = DisulfideViewer(ss_list)
         viewer.show()
         sys.exit(app.exec_())
     else:

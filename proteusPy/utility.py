@@ -10,6 +10,7 @@ Copyright (c)2024 Eric G. Suchanek, PhD, all rights reserved
 # pylint: disable=c0413
 # pylint: disable=c0415
 # pylint: disable=w1514
+# pylint: disable=w0718
 
 import copy
 import datetime
@@ -944,7 +945,7 @@ def get_macos_theme():
     """
     if platform.system() != "Darwin":
         # Not running on macOS
-        return None
+        return "light"
 
     try:
         # AppleScript to get the appearance setting
@@ -986,7 +987,7 @@ def get_theme():
     Determine the display theme for the current operating system.
 
     Returns:
-    :return str: 'light' if the theme is light, 'dark' if the theme is dark, and None otherwise
+    :return str: 'light' if the theme is light, 'dark' if the theme is dark, and 'light' otherwise
 
     Example:
     >>> get_theme()
@@ -1072,11 +1073,11 @@ def get_theme():
 
         except Exception:
             # In case of any exception, return None
-            return None
+            return "light"
 
     else:
         # Unsupported OS
-        return None
+        return "light"
 
 
 # functions to calculate statistics and filter disulfide lists via pandas

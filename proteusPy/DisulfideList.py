@@ -50,7 +50,7 @@ from proteusPy.atoms import (
 )
 from proteusPy.logger_config import get_logger
 from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, PDB_DIR, WINSIZE
-from proteusPy.utility import get_jet_colormap, grid_dimensions
+from proteusPy.utility import get_jet_colormap, get_theme, grid_dimensions
 
 _logger = get_logger(__name__)
 
@@ -153,14 +153,20 @@ class DisulfideList(UserList):
     >>> subset.display_overlay()
     """
 
-    def __init__(self, iterable, pid: str, res=-1.0, quiet=True, fast=False):
+    def __init__(self, iterable, pid: str = "nil", res=-1.0, quiet=True, fast=False):
         """
-        Initialize the DisulfideList
+        Initialize the DisulfideList.
 
-        :param iterable: an iterable e.g. []
+        :param iterable: An iterable of disulfide bonds.
         :type iterable: iterable
-        :param id: Name for the list
-        :type id: str
+        :param pid: Name for the list, default is "nil".
+        :type pid: str
+        :param res: Resolution, default is -1.0. If -1, the average resolution is used.
+        :type res: float
+        :param quiet: If True, suppress output, default is True.
+        :type quiet: bool
+        :param fast: If True, enable fast mode, default is False.
+        :type fast: bool
 
         Example:
         >>> from proteusPy import DisulfideList, Disulfide
@@ -186,14 +192,11 @@ class DisulfideList(UserList):
 
         if not fast:
             if res == -1:
-                resolutions = [
-                    ss.resolution for ss in iterable if ss.resolution is not None
-                ]
-                self.res = sum(resolutions) / len(resolutions) if resolutions else -1.0
+                self._res = self.average_resolution
             else:
-                self.res = res
+                self._res = res
         else:
-            self.res = res
+            self._res = res
 
     def __getitem__(self, item):
         """
@@ -326,6 +329,27 @@ class DisulfideList(UserList):
         """
         resolutions = [ss.resolution for ss in self.data if ss.resolution != -1.0]
         return sum(resolutions) / len(resolutions) if resolutions else -1.0
+
+    @property
+    def resolution(self) -> float:
+        """
+        Compute and return the average structure resolution for the given list.
+
+        :return: Average resolution (A)
+        """
+        return self._res
+
+    @resolution.setter
+    def resolution(self, value: float):
+        """
+        Set the average structure resolution for the given list.
+
+        :param value: The new resolution value to set.
+        :type value: float
+        """
+        if not isinstance(value, float):
+            raise TypeError("Resolution must be a float.")
+        self._res = value
 
     @property
     def average_torsion_distance(self):
@@ -510,6 +534,8 @@ class DisulfideList(UserList):
             - 'plain' - boring single color
         :light: If True, light background, if False, dark
         """
+        from proteusPy.utility import get_theme
+
         pid = self.pdb_id
         ssbonds = self.data
         tot_ss = len(ssbonds)  # number off ssbonds
@@ -518,12 +544,21 @@ class DisulfideList(UserList):
 
         avg_enrg = self.average_energy
         avg_dist = self.average_distance
-        resolution = self.resolution
+        resolution = self.average_resolution
 
-        if light:
+        if light == "light":
             pv.set_plot_theme("document")
-        else:
+        elif light == "dark":
             pv.set_plot_theme("dark")
+        else:
+            _theme = get_theme()
+            if _theme == "light":
+                pv.set_plot_theme("document")
+            elif _theme == "dark":
+                pv.set_plot_theme("dark")
+                _logger.info("Dark mode detected.")
+            else:
+                pv.set_plot_theme("document")
 
         title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
 
@@ -730,12 +765,14 @@ class DisulfideList(UserList):
         :param light: Background color, defaults to True for White. False for Dark.
         """
 
+        from proteusPy.utility import get_theme
+
         pid = self.pdb_id
         ssbonds = self.data
         tot_ss = len(ssbonds)  # number off ssbonds
         avg_enrg = self.average_energy
         avg_dist = self.average_distance
-        resolution = self.resolution
+        resolution = self.average_resolution
 
         res = 100
 
@@ -748,10 +785,19 @@ class DisulfideList(UserList):
 
         title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
 
-        if light:
+        if light == "light":
             pv.set_plot_theme("document")
-        else:
+        elif light == "dark":
             pv.set_plot_theme("dark")
+        else:
+            _theme = get_theme()
+            if _theme == "light":
+                pv.set_plot_theme("document")
+            elif _theme == "dark":
+                pv.set_plot_theme("dark")
+                _logger.info("Dark mode detected.")
+            else:
+                pv.set_plot_theme("document")
 
         if movie:
             pl = pv.Plotter(window_size=WINSIZE, off_screen=True)
@@ -923,7 +969,7 @@ class DisulfideList(UserList):
         """
         Resolution of the parent sturcture (A)
         """
-        return self.res
+        return self._res
 
     @resolution.setter
     def resolution(self, value):
@@ -932,7 +978,7 @@ class DisulfideList(UserList):
 
         :param value: Resolution (A)
         """
-        self.res = value
+        self._res = value
 
     def TorsionGraph(
         self, display=True, save=False, fname="ss_torsions.png", light="Auto"
@@ -1119,11 +1165,12 @@ class DisulfideList(UserList):
         return self.get_torsion_array()
 
     def validate_ss(self, value):
-        from proteusPy.Disulfide import Disulfide
         """Return the Disulfide object if it is a Disulfide, otherwise raise an error"""
+        from proteusPy.Disulfide import Disulfide
+
         if value is None:
             raise ValueError("The value cannot be None.")
-        
+
         if not isinstance(value, Disulfide):
             raise TypeError("The value must be an instance of Disulfide.")
         return value

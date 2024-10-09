@@ -52,7 +52,7 @@ from proteusPy.ssparser import (
     get_residue_atoms_coordinates,
 )
 from proteusPy.turtle3D import ORIENT_SIDECHAIN, Turtle3D
-from proteusPy.utility import get_macos_theme
+from proteusPy.utility import get_theme
 from proteusPy.vector3D import (
     Vector3D,
     calc_dihedral,
@@ -1270,12 +1270,12 @@ class Disulfide:
 
         title = f"{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Cβ: {self.cb_distance:.2f} Å Tors: {self.torsion_length:.2f}°"
 
-        if light == "Light":
+        if light == "light":
             pv.set_plot_theme("document")
-        elif light == "Dark":
+        elif light == "dark":
             pv.set_plot_theme("dark")
         else:
-            _theme = get_macos_theme()
+            _theme = get_theme()
             if _theme == "light":
                 pv.set_plot_theme("document")
             elif _theme == "dark":
@@ -1848,7 +1848,7 @@ class Disulfide:
         elif light == "Dark":
             pv.set_plot_theme("dark")
         else:
-            _theme = get_macos_theme()
+            _theme = get_theme()
             if _theme == "light":
                 pv.set_plot_theme("document")
             elif _theme == "dark":
@@ -2132,7 +2132,7 @@ class Disulfide:
         Finally, we display the neighbors overlaid against a common reference frame.
 
         >>> from proteusPy import Load_PDB_SS, DisulfideList, Disulfide, get_macos_theme
-        >>> light = get_macos_theme()
+        >>> light = get_theme()
         >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
         >>> ss_list = DisulfideList([], 'tmp')
 
