@@ -534,7 +534,7 @@ class DisulfideList(UserList):
             - 'plain' - boring single color
         :light: If True, light background, if False, dark
         """
-        from proteusPy.utility import get_theme
+        # from proteusPy.utility import get_theme
 
         pid = self.pdb_id
         ssbonds = self.data
@@ -765,7 +765,7 @@ class DisulfideList(UserList):
         :param light: Background color, defaults to True for White. False for Dark.
         """
 
-        from proteusPy.utility import get_theme
+        # from proteusPy.utility import get_theme
 
         pid = self.pdb_id
         ssbonds = self.data
@@ -964,22 +964,6 @@ class DisulfideList(UserList):
         """
         self.pdb_id = value
 
-    @property
-    def resolution(self):
-        """
-        Resolution of the parent sturcture (A)
-        """
-        return self._res
-
-    @resolution.setter
-    def resolution(self, value):
-        """
-        Set the resolution of the list
-
-        :param value: Resolution (A)
-        """
-        self._res = value
-
     def TorsionGraph(
         self, display=True, save=False, fname="ss_torsions.png", light="Auto"
     ):
@@ -1083,33 +1067,29 @@ class DisulfideList(UserList):
         sslist = sorted(self.data)
         return sslist[0], sslist[-1]
 
-    def nearest_neighbors(
-        self,
-        chi1: float,
-        chi2: float,
-        chi3: float,
-        chi4: float,
-        chi5: float,
-        cutoff: float,
-    ):
+    def nearest_neighbors(self, cutoff: float, *args):
         """
-        Given a torsional array of chi1-chi5,
+        Find all neighbor Disulfides within the given angle cutoff of the input Disulfide.
 
-        :param chi1: Chi1 (degrees)
-        :param chi2: Chi2 (degrees)
-        :param chi3: Chi3 (degrees)
-        :param chi4: Chi4 (degrees)
-        :param chi5: Chi5 (degrees)
         :param cutoff: Distance cutoff, degrees
-        :return: DisulfideList of neighbors
+        :param args: Either 5 individual angles (chi1, chi2, chi3, chi4, chi5) or a list of 5 angles
+        :return: DisulfideList of neighbors within the cutoff
         """
+        if len(args) == 1 and isinstance(args[0], list) and len(args[0]) == 5:
+            chi1, chi2, chi3, chi4, chi5 = args[0]
+        elif len(args) == 5:
+            chi1, chi2, chi3, chi4, chi5 = args
+        else:
+            raise ValueError(
+                "You must provide either 5 individual angles or a list of 5 angles."
+            )
 
         sslist = self.data
-        modelss = proteusPy.Disulfide("model")
-
-        modelss.build_model(chi1, chi2, chi3, chi4, chi5)
-        res = DisulfideList([], "neighbors")
+        modelss = proteusPy.Disulfide("model", torsions=[chi1, chi2, chi3, chi4, chi5])
         res = modelss.torsion_neighbors(sslist, cutoff)
+
+        resname = f"SS neighbors within {cutoff}° of {modelss.torsion_array}"
+        res.pdb_id = resname
 
         return res
 
@@ -1123,18 +1103,11 @@ class DisulfideList(UserList):
         :return: DisulfideList of neighbors
         """
 
-        chi1 = ss.chi1
-        chi2 = ss.chi2
-        chi3 = ss.chi3
-        chi4 = ss.chi4
-        chi5 = ss.chi5
-
         sslist = self.data
-        modelss = proteusPy.Disulfide("model")
+        res = ss.torsion_neighbors(sslist, cutoff)
 
-        modelss.build_model(chi1, chi2, chi3, chi4, chi5)
-        res = DisulfideList([], "neighbors")
-        res = modelss.torsion_neighbors(sslist, cutoff)
+        resname = f"{ss.name} neighbors within {cutoff}°"
+        res.pdb_id = resname
 
         return res
 
@@ -1193,19 +1166,29 @@ class DisulfideList(UserList):
             "Ca_Distance": [],
         }
 
-        for ss in tqdm(disulfide_list, desc="Processing..."):
-            pdb_id = ss.pdb_id
-            resolution = ss.resolution
-            ca_distance = ss.ca_distance
-            angle_deviation = ss.bond_angle_ideality
-            distance_deviation = ss.bond_length_ideality
+        # Collect data in batches
+        pdb_ids = []
+        resolutions = []
+        ss_names = []
+        angle_deviations = []
+        bondlength_deviations = []
+        ca_distances = []
 
-            data["PDB_ID"].append(pdb_id)
-            data["Resolution"].append(resolution)
-            data["SS_Name"].append(ss.name)
-            data["Angle_Deviation"].append(angle_deviation)
-            data["Bondlength_Deviation"].append(distance_deviation)
-            data["Ca_Distance"].append(ca_distance)
+        for ss in tqdm(disulfide_list, desc="Processing..."):
+            pdb_ids.append(ss.pdb_id)
+            resolutions.append(ss.resolution)
+            ss_names.append(ss.name)
+            angle_deviations.append(ss.bond_angle_ideality)
+            bondlength_deviations.append(ss.bond_length_ideality)
+            ca_distances.append(ss.ca_distance)
+
+        # Extend the data dictionary in one go
+        data["PDB_ID"].extend(pdb_ids)
+        data["Resolution"].extend(resolutions)
+        data["SS_Name"].extend(ss_names)
+        data["Angle_Deviation"].extend(angle_deviations)
+        data["Bondlength_Deviation"].extend(bondlength_deviations)
+        data["Ca_Distance"].extend(ca_distances)
 
         df = pd.DataFrame(data)
         return df

@@ -88,11 +88,8 @@ Author: Eric G. Suchanek, PhD. Last Modified: 8/27/2024
 # plyint: disable=C0103
 
 import argparse
-import cProfile
-import io
 import os
 import pickle
-import pstats
 import shutil
 import threading
 import time
@@ -105,7 +102,7 @@ import pandas as pd
 from colorama import Fore, Style, init
 from tqdm import tqdm
 
-from proteusPy import Disulfide, DisulfideList, DisulfideLoader, Load_PDB_SS
+from proteusPy import Disulfide, DisulfideList, DisulfideLoader, Load_PDB_SS, get_logger
 from proteusPy.ProteusGlobals import SS_CONSENSUS_BIN_FILE, SS_CONSENSUS_OCT_FILE
 
 # Initialize colorama
@@ -133,8 +130,9 @@ MAMBAFORGE_DIR = HOME_DIR / Path("mambaforge/envs")
 
 VENV_DIR = Path("lib/python3.11/site-packages/proteusPy/data")
 
-
 PBAR_COLS = 78
+
+_logger = get_logger(__name__)
 
 
 def get_args():
@@ -168,7 +166,7 @@ def get_args():
         "--octant",
         help="Analyze octant classes.",
         action=argparse.BooleanOptionalAction,
-        default=False,
+        default=True,
     )
     parser.add_argument(
         "-t",
@@ -195,7 +193,7 @@ def get_args():
         "-g",
         "--graph",
         help="Create class graphs.",
-        default=False,
+        default=True,
         action=argparse.BooleanOptionalAction,
     )
     parser.add_argument(
@@ -283,11 +281,17 @@ def task(
             bar_format="{l_bar}%s{bar}{r_bar}%s" % (Fore.YELLOW, Style.RESET_ALL),
         )
 
-        fname = os.path.join(save_dir, f"{prefix}_{cls}.png")
+        fname = Path(save_dir) / f"{prefix}_{cls}_{cutoff}.png"
 
         class_disulfides_array = np.empty(len(ss_list), dtype=object)
         update_freq = 20
         for idx, ssid in enumerate(ss_list):
+            _ss = loader[ssid]
+            if _ss is None:
+                _mess = f"Error: Disulfide {ssid} not found."
+                _logger.error(_mess)
+                continue
+
             class_disulfides_array[idx] = loader[ssid]
             if (idx + 1) % update_freq == 0 or (idx + 1) == len(ss_list):
                 remaining = len(ss_list) - (idx + 1)

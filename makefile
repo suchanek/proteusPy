@@ -125,6 +125,7 @@ commit:
 .PHONY: tests
 tests: 
 	pytest .
+	python tests/Test_DisplaySS.py
 	python proteusPy/Disulfide.py
 	python proteusPy/DisulfideLoader.py
 	python proteusPy/DisulfideList.py
