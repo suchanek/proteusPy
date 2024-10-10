@@ -105,10 +105,6 @@ from tqdm import tqdm
 from proteusPy import Disulfide, DisulfideList, DisulfideLoader, Load_PDB_SS, get_logger
 from proteusPy.ProteusGlobals import SS_CONSENSUS_BIN_FILE, SS_CONSENSUS_OCT_FILE
 
-# Initialize colorama
-init(autoreset=True)
-
-
 HOME_DIR = Path.home()
 PDB = Path(os.getenv("PDB", HOME_DIR / "pdb"))
 
@@ -131,6 +127,9 @@ MAMBAFORGE_DIR = HOME_DIR / Path("mambaforge/envs")
 VENV_DIR = Path("lib/python3.11/site-packages/proteusPy/data")
 
 PBAR_COLS = 78
+
+# Initialize colorama
+init(autoreset=True)
 
 _logger = get_logger(__name__)
 
@@ -166,7 +165,7 @@ def get_args():
         "--octant",
         help="Analyze octant classes.",
         action=argparse.BooleanOptionalAction,
-        default=True,
+        default=False,
     )
     parser.add_argument(
         "-t",
@@ -281,7 +280,7 @@ def task(
             bar_format="{l_bar}%s{bar}{r_bar}%s" % (Fore.YELLOW, Style.RESET_ALL),
         )
 
-        fname = Path(save_dir) / f"{prefix}_{cls}_{cutoff}.png"
+        fname = Path(save_dir) / f"{prefix}_{cutoff}_{cls}_{len(ss_list)}.png"
 
         class_disulfides_array = np.empty(len(ss_list), dtype=object)
         update_freq = 20
@@ -292,7 +291,11 @@ def task(
                 _logger.error(_mess)
                 continue
 
-            class_disulfides_array[idx] = loader[ssid]
+            try:
+                class_disulfides_array[idx] = loader[ssid]
+            except Exception as e:
+                _logger.error(f"Error: {e}")
+
             if (idx + 1) % update_freq == 0 or (idx + 1) == len(ss_list):
                 remaining = len(ss_list) - (idx + 1)
                 task_pbar.update(update_freq if remaining >= update_freq else remaining)
@@ -325,7 +328,7 @@ def analyze_classes_threaded(
     num_threads=6,
     verbose=False,
     do_octant=True,
-    prefix="ss_class",
+    prefix="ss",
 ) -> DisulfideList:
     """
     Analyze the six classes of disulfide bonds.
@@ -473,7 +476,7 @@ def analyze_classes(
             verbose=verbose,
             num_threads=threads,
             do_octant=True,
-            prefix="ss_class_oct",
+            prefix="ss_oct",
         )
 
     if binary:
@@ -486,7 +489,7 @@ def analyze_classes(
             verbose=verbose,
             num_threads=threads,
             do_octant=False,
-            prefix="ss_class_bin",
+            prefix="ss_bin",
         )
 
     return

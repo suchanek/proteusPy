@@ -599,7 +599,7 @@ class DisulfideLoader:
 
         _title = f"Binary Class: {title}"
         _labels = {}
-
+        _prefix = "None"
         if base == 8:
             _labels = {"class_id": "Octant Class ID", "count": "Count"}
             _prefix = "Octant"
@@ -654,6 +654,8 @@ class DisulfideLoader:
         :param theme: A string representing the theme of the plot. Anything other than `light` is in `plotly_dark`.
         :return: None
         """
+
+        _title = f"Binary Class: {title}"
 
         if base == 8:
             _title = f"Octant Class: {title}"
