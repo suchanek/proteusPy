@@ -1299,23 +1299,24 @@ def load_disulfides_from_id(
         if proximal == distal and chain1_id == chain2_id:
             mess = f"SSBond record has (proximal == distal) and (chain1 == chain2):\
             {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
-            _logger.warning(mess)
+
+            _logger.error(mess)
             continue
-        else:
-            new_ss = Initialize_Disulfide_From_Coords(
-                ssbond_atom_list,
-                pdb_id,
-                chain1_id,
-                chain2_id,
-                proximal_int,
-                distal_int,
-                resolution,
-                proximal_secondary,
-                distal_secondary,
-                verbose=verbose,
-                quiet=quiet,
-                dbg=dbg,
-            )
+
+        new_ss = Initialize_Disulfide_From_Coords(
+            ssbond_atom_list,
+            pdb_id,
+            chain1_id,
+            chain2_id,
+            proximal_int,
+            distal_int,
+            resolution,
+            proximal_secondary,
+            distal_secondary,
+            verbose=verbose,
+            quiet=quiet,
+            dbg=dbg,
+        )
 
         if new_ss is not None:
             SSList.append(new_ss)
@@ -1324,7 +1325,7 @@ def load_disulfides_from_id(
                 _logger.info(mess)
         else:
             mess = f"Cannot initialize Disulfide: {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
-            _logger.ERROR(mess)
+            _logger.error(mess)
 
         i += 1
 

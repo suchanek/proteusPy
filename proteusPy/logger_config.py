@@ -28,7 +28,7 @@ def get_logger(
     name: str,
     log_level: int = logging.INFO,
     log_dir: str = None,
-    max_bytes: int = 10**6,
+    max_bytes: int = 0,
     backup_count: int = 5,
 ) -> logging.Logger:
     """
@@ -57,7 +57,7 @@ def get_logger(
 
     # Define formatter
     formatter = logging.Formatter(
-        "proteusPy: %(levelname)s %(asctime)s - %(name)s.%(funcName)s - %(message)s"
+        "proteusPy: %(levelname)-7s %(asctime)s - %(name)s.%(funcName)s - %(message)s"
     )
 
     # StreamHandler setup
@@ -71,9 +71,10 @@ def get_logger(
 
     # Determine log directory
     if log_dir is None:
-        log_dir = os.getcwd()
-    else:
-        os.makedirs(log_dir, exist_ok=True)
+        home_dir = os.path.expanduser("~")
+        log_dir = os.path.join(home_dir, "logs")
+
+    os.makedirs(log_dir, exist_ok=True)
 
     log_path = os.path.abspath(os.path.join(log_dir, f"{name}.log"))
 
@@ -85,14 +86,15 @@ def get_logger(
             maxBytes=max_bytes,
             backupCount=backup_count,
             encoding="utf-8",
+            delay=True,
         )
         file_handler.setLevel(log_level)
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
-        logger.debug(f"Logging to file: {log_path}")
+        logger.debug(f"{name} Logging to file: {log_path}")
 
     except Exception as e:
-        logger.error(f"Failed to set up file handler: {e}")
+        logger.error(f"Failed to set up file handler for {name}: {e}")
 
     return logger
 
