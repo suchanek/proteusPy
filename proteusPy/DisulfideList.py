@@ -7,7 +7,7 @@ The module provides the implmentation and interface for the [DisulfideList](#Dis
 object, used extensively by Disulfide class.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 8/23/2024 -egs-
+Last revision: 10/09/2024 -egs-
 """
 
 # pylint: disable=c0103
@@ -768,6 +768,7 @@ class DisulfideList(UserList):
         # from proteusPy.utility import get_theme
 
         pid = self.pdb_id
+
         ssbonds = self.data
         tot_ss = len(ssbonds)  # number off ssbonds
         avg_enrg = self.average_energy
@@ -1088,7 +1089,7 @@ class DisulfideList(UserList):
         modelss = proteusPy.Disulfide("model", torsions=[chi1, chi2, chi3, chi4, chi5])
         res = modelss.torsion_neighbors(sslist, cutoff)
 
-        resname = f"SS neighbors within {cutoff}° of {modelss.torsion_array}"
+        resname = f"Neighbors within {cutoff:.2f}° of [{', '.join(f'{angle:.2f}' for angle in modelss.dihedrals)}]"
         res.pdb_id = resname
 
         return res
@@ -1287,7 +1288,7 @@ def load_disulfides_from_id(
             if verbose:
                 mess = f"SSBond record has (proximal == distal):\
                 {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
-                _logger.info(mess)
+                _logger.warning(mess)
 
         if verbose:
             mess = (
@@ -1295,23 +1296,28 @@ def load_disulfides_from_id(
             )
             _logger.info(mess)
 
-        new_ss = Initialize_Disulfide_From_Coords(
-            ssbond_atom_list,
-            pdb_id,
-            chain1_id,
-            chain2_id,
-            proximal_int,
-            distal_int,
-            resolution,
-            proximal_secondary,
-            distal_secondary,
-            verbose=verbose,
-            quiet=quiet,
-            dbg=dbg,
-        )
+        if proximal == distal and chain1_id == chain2_id:
+            mess = f"SSBond record has (proximal == distal) and (chain1 == chain2):\
+            {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
+            _logger.warning(mess)
+            continue
+        else:
+            new_ss = Initialize_Disulfide_From_Coords(
+                ssbond_atom_list,
+                pdb_id,
+                chain1_id,
+                chain2_id,
+                proximal_int,
+                distal_int,
+                resolution,
+                proximal_secondary,
+                distal_secondary,
+                verbose=verbose,
+                quiet=quiet,
+                dbg=dbg,
+            )
 
         if new_ss is not None:
-
             SSList.append(new_ss)
             if verbose:
                 mess = f"Initialized Disulfide: {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."

@@ -235,10 +235,10 @@ class DisulfideLoader:
         :return: DisulfideList
         """
         res = DisulfideList([], "RCSB_list")
-        for k, v in self.SSDict.items():
-            if k in idlist:
-                for value in v:
-                    res.append(self.SSList[value])
+        for pdbid, sslist in self.SSDict.items():
+            if pdbid in idlist:
+                for ssid in sslist:
+                    res.append(self.SSList[ssid])
         return res
 
     def copy(self):
@@ -278,20 +278,20 @@ class DisulfideLoader:
         :return: The list of disulfide bonds from the class.
         """
 
-        sixorbin = None
+        eightorbin = None
 
         if "0" in clsid:
-            sixorbin = self.tclass.classdf
+            eightorbin = self.tclass.classdf
         else:
-            sixorbin = self.tclass.eightclass_df
+            eightorbin = self.tclass.eightclass_df
 
-        tot_classes = sixorbin.shape[0]
+        tot_classes = eightorbin.shape[0]
         class_disulfides = DisulfideList([], clsid, quiet=True)
 
         if verbose:
-            _pbar = tqdm(sixorbin.iterrows(), total=tot_classes, leave=True)
+            _pbar = tqdm(eightorbin.iterrows(), total=tot_classes, leave=True)
         else:
-            _pbar = sixorbin.iterrows()
+            _pbar = eightorbin.iterrows()
 
         for idx, row in _pbar:
             _cls = row["class_id"]
@@ -325,7 +325,7 @@ class DisulfideLoader:
 
     def get_by_name(self, name) -> Disulfide:
         """
-        Returns the Disulfide with the given name from the list.
+        Return the Disulfide with the given name from the list.
         """
         for ss in self.SSList.data:
             if ss.name == name:
@@ -334,7 +334,7 @@ class DisulfideLoader:
 
     def describe(self) -> None:
         """
-        Provides information about the Disulfide database contained in `self`.
+        Display information about the Disulfide database contained in `self`.
 
         Example:<br>
 
@@ -405,7 +405,13 @@ class DisulfideLoader:
 
         """
 
-        ssbonds = self[pdbid]
+        try:
+            ssbonds = self[pdbid]
+        except KeyError:
+            mess = f"! Cannot find key {pdbid} in SSBond DB"
+            _logger.error(mess)
+            return
+
         ssbonds.display_overlay()
         return
 
