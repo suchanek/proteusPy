@@ -3,7 +3,7 @@ This module provides utility functions for configuring and managing loggers
 within the proteusPy package.
 
 Functions:
-    get_logger(name): Returns a logger with the specified name, configured to use a shared 
+    create_logger(name): Returns a logger with the specified name, configured to use a shared 
     StreamHandler.
     set_logger_level(name, level): Sets the logging level for the logger with the 
     specified name.
@@ -11,7 +11,7 @@ Functions:
     with the specified name.
 
 Example usage:
-    logger = get_logger("example_logger")
+    logger = create_logger("example_logger")
     logger.info("This is an info message")
     set_logger_level("example_logger", "ERROR")
     logger.info("This info message will not be shown")
@@ -28,7 +28,37 @@ from logging.handlers import RotatingFileHandler
 logging.getLogger().disabled = True
 
 
-def get_logger(
+def configure_master_logger(log_file: str, max_bytes: int = 0, backup_count: int = 0):
+    """
+    Configures the root logger to write to a specified log file.
+
+    Args:
+        log_file (str): Path to the log file.
+        max_bytes (int): Maximum size of the log file before rotating.
+        backup_count (int): Number of backup files to keep.
+    """
+    root_logger = logging.getLogger()
+    root_logger.setLevel(
+        logging.DEBUG
+    )  # Set the root logger level to DEBUG to capture all messages
+
+    if max_bytes > 0:
+        handler = RotatingFileHandler(
+            log_file, maxBytes=max_bytes, backupCount=backup_count
+        )
+    else:
+        handler = logging.FileHandler(log_file)
+
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+    handler.setFormatter(formatter)
+
+    root_logger.addHandler(handler)
+    root_logger.disabled = False  # Enable the root logger
+
+
+def create_logger(
     name: str,
     log_level: int = logging.INFO,
     log_dir: str = None,
@@ -71,7 +101,7 @@ def get_logger(
     logger.addHandler(stream_handler)
 
     # Prevent log messages from being propagated to the root logger
-    logger.propagate = False
+    logger.propagate = True
 
     # Determine log directory
     if log_dir is None:
@@ -122,7 +152,10 @@ def set_logger_level(name, level):
 
     if level not in level_dict:
         raise ValueError(
-            f"--> set_logger_level(): Invalid logging level: {level}. Must be one of ['WARNING', 'ERROR', 'INFO', 'DEBUG']"
+            (
+                f"--> set_logger_level(): Invalid logging level: {level}."
+                f"Must be one of ['WARNING', 'ERROR', 'INFO', 'DEBUG']"
+            )
         )
 
     _logger = logging.getLogger(name)
@@ -200,6 +233,35 @@ def list_handlers(name):
         handlers_info.append(handler_info)
 
     return handlers_info
+
+
+def set_logger_level_for_module(pkg_name, level=""):
+    """
+    Set the logging level for all loggers within a specified package.
+
+    This function iterates through all registered loggers and sets the logging
+    level for those that belong to the specified package.
+
+    :param pkg_name: The name of the package for which to set the logging level.
+    :type pkg_name: str
+    :param level: The logging level to set (e.g., 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL').
+                  If not specified, the logging level will not be changed.
+    :type level: str, optional
+    :return: A list of logger names that were found and had their levels set.
+    :rtype: list
+    """
+    logger_dict = logging.Logger.manager.loggerDict
+    registered_loggers = [
+        name
+        for name, logger in logger_dict.items()
+        if isinstance(logger, logging.Logger) and name.startswith(pkg_name)
+    ]
+    for logger_name in registered_loggers:
+        logger = logging.getLogger(logger_name)
+        if level:
+            logger.setLevel(level)
+
+    return registered_loggers
 
 
 if __name__ == "__main__":

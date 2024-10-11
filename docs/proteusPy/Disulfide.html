@@ -425,7 +425,7 @@ It represents the core of the current implementation of <em>proteusPy</em>.</p>
 </span><span id="L-44"><a href="#L-44"><span class="linenos">  44</span></a>    <span class="n">ProteusPyWarning</span><span class="p">,</span>
 </span><span id="L-45"><a href="#L-45"><span class="linenos">  45</span></a><span class="p">)</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos">  46</span></a><span class="kn">from</span> <span class="nn">proteusPy.DisulfideList</span> <span class="kn">import</span> <span class="n">DisulfideList</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos">  47</span></a><span class="kn">from</span> <span class="nn">proteusPy.logger_config</span> <span class="kn">import</span> <span class="n">get_logger</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">  47</span></a><span class="kn">from</span> <span class="nn">proteusPy.logger_config</span> <span class="kn">import</span> <span class="n">create_logger</span>
 </span><span id="L-48"><a href="#L-48"><span class="linenos">  48</span></a><span class="kn">from</span> <span class="nn">proteusPy.ProteusGlobals</span> <span class="kn">import</span> <span class="n">_ANG_INIT</span><span class="p">,</span> <span class="n">_FLOAT_INIT</span><span class="p">,</span> <span class="n">WINSIZE</span>
 </span><span id="L-49"><a href="#L-49"><span class="linenos">  49</span></a><span class="kn">from</span> <span class="nn">proteusPy.Residue</span> <span class="kn">import</span> <span class="n">build_residue</span>
 </span><span id="L-50"><a href="#L-50"><span class="linenos">  50</span></a><span class="kn">from</span> <span class="nn">proteusPy.ssparser</span> <span class="kn">import</span> <span class="p">(</span>
@@ -479,7 +479,7 @@ It represents the core of the current implementation of <em>proteusPy</em>.</p>
 </span><span id="L-98"><a href="#L-98"><span class="linenos">  98</span></a>
 </span><span id="L-99"><a href="#L-99"><span class="linenos">  99</span></a><span class="n">ORIGIN</span> <span class="o">=</span> <span class="n">Vector3D</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
 </span><span id="L-100"><a href="#L-100"><span class="linenos"> 100</span></a>
-</span><span id="L-101"><a href="#L-101"><span class="linenos"> 101</span></a><span class="n">_logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos"> 101</span></a><span class="n">_logger</span> <span class="o">=</span> <span class="n">create_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 </span><span id="L-102"><a href="#L-102"><span class="linenos"> 102</span></a><span class="n">_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
 </span><span id="L-103"><a href="#L-103"><span class="linenos"> 103</span></a>
 </span><span id="L-104"><a href="#L-104"><span class="linenos"> 104</span></a>

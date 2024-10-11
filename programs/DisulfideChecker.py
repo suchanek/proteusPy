@@ -14,13 +14,12 @@ import time
 from datetime import timedelta
 from glob import glob
 
-
 from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from proteusPy import get_logger
+from proteusPy import create_logger
 
-_logger = get_logger("DisulfideChecker")
+_logger = create_logger("DisulfideChecker")
 
 # Paths
 HOME_DIR = os.path.expanduser("~")

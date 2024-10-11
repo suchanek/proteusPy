@@ -25,7 +25,7 @@ import pandas as pd
 
 from proteusPy.angle_annotation import AngleAnnotation
 from proteusPy.DisulfideList import DisulfideList
-from proteusPy.logger_config import get_logger
+from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
     CLASSOBJ_FNAME,
     DATA_DIR,
@@ -36,7 +36,7 @@ from proteusPy.ProteusGlobals import (
     SS_CONSENSUS_OCT_FILE,
 )
 
-_logger = get_logger(__name__)
+_logger = create_logger(__name__)
 _logger.setLevel("INFO")
 
 merge_cols = [

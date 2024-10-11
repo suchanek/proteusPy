@@ -55,7 +55,7 @@ from proteusPy.ProteusGlobals import (
     SS_SUBSET_PICKLE_FILE,
 )
 
-_logger = get_logger(__name__)
+_logger = create_logger(__name__)
 _logger.setLevel(logging.INFO)
 
 set_logger_level_for_module("proteusPy", logging.ERROR)
