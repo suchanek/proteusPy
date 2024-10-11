@@ -7,6 +7,8 @@ Functions:
     StreamHandler.
     set_logger_level(name, level): Sets the logging level for the logger with the 
     specified name.
+    toggle_stream_handler(name, enable): Enables or disables the StreamHandler for the logger 
+    with the specified name.
 
 Example usage:
     logger = get_logger("example_logger")
@@ -14,6 +16,8 @@ Example usage:
     set_logger_level("example_logger", "ERROR")
     logger.info("This info message will not be shown")
     logger.error("This is an error message")
+    toggle_stream_handler("example_logger", False)
+    logger.info("This info message will not be shown in the console")
 """
 
 import logging
@@ -99,18 +103,13 @@ def get_logger(
     return logger
 
 
-# set_logger_level("example_logger", "ERROR")
-# logger.info("This info message will not be shown")
-# logger.error("This is an error message")
-
-
 def set_logger_level(name, level):
     """
     Sets the logging level for the logger with the specified name.
 
     :param name: The name of the logger.
     :type name: str
-    :param level: The logging level to set. Must be one of ["WARNING", "ERROR", "INFO"].
+    :param level: The logging level to set. Must be one of ["WARNING", "ERROR", "INFO", "DEBUG"].
     :type level: str
     :raises ValueError: If the provided level is not one of the allowed values.
     """
@@ -128,6 +127,79 @@ def set_logger_level(name, level):
 
     _logger = logging.getLogger(name)
     _logger.setLevel(level_dict[level])
+
+
+def toggle_stream_handler(name, enable):
+    """
+    Enables or disables the StreamHandler for the logger with the specified name.
+
+    :param name: The name of the logger.
+    :type name: str
+    :param enable: If True, enables the StreamHandler; if False, disables it.
+    :type enable: bool
+    """
+    logger = logging.getLogger(name)
+    stream_handler = None
+
+    # Find the StreamHandler if it exists
+    for handler in logger.handlers:
+        if isinstance(handler, logging.StreamHandler):
+            stream_handler = handler
+            break
+
+    if enable:
+        if stream_handler is None:
+            # Define formatter
+            formatter = logging.Formatter(
+                "proteusPy: %(levelname)-7s %(asctime)s - %(name)s.%(funcName)s - %(message)s"
+            )
+            # Create and add a new StreamHandler
+            stream_handler = logging.StreamHandler()
+            stream_handler.setLevel(logger.level)
+            stream_handler.setFormatter(formatter)
+            logger.addHandler(stream_handler)
+    else:
+        if stream_handler is not None:
+            # Remove the existing StreamHandler
+            logger.removeHandler(stream_handler)
+
+
+def list_all_loggers():
+    """
+    Lists all loggers that have been created in the application.
+
+    :return: List of logger names.
+    :rtype: list
+    """
+    logger_dict = logging.Logger.manager.loggerDict
+    loggers = [
+        name for name in logger_dict if isinstance(logger_dict[name], logging.Logger)
+    ]
+    return loggers
+
+
+def list_handlers(name):
+    """
+    Lists the handlers for the logger with the specified name.
+
+    :param name: The name of the logger.
+    :type name: str
+    :return: List of handler types and their configurations.
+    :rtype: list
+    """
+    logger = logging.getLogger(name)
+    handlers_info = []
+
+    for handler in logger.handlers:
+        handler_type = type(handler).__name__
+        handler_info = {
+            "type": handler_type,
+            "level": logging.getLevelName(handler.level),
+            "formatter": handler.formatter._fmt if handler.formatter else None,
+        }
+        handlers_info.append(handler_info)
+
+    return handlers_info
 
 
 if __name__ == "__main__":

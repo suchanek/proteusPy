@@ -76,7 +76,7 @@ from .DisulfideLoader import (
     Download_PDB_SS_GitHub,
     Load_PDB_SS,
 )
-from .logger_config import get_logger, set_logger_level
+from .logger_config import get_logger, set_logger_level, toggle_stream_handler
 from .ProteusGlobals import (
     _ANG_INIT,
     _FLOAT_INIT,
