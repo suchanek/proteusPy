@@ -1297,10 +1297,12 @@ def load_disulfides_from_id(
             _logger.info(mess)
 
         if proximal == distal and chain1_id == chain2_id:
-            mess = f"SSBond record has (proximal == distal) and (chain1 == chain2):\
-            {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
+            mess = (
+                f"SSBond record has self reference: "
+                f"{pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
+            )
 
-            _logger.error(mess)
+            _logger.warning(mess)
             continue
 
         new_ss = Initialize_Disulfide_From_Coords(

@@ -102,7 +102,14 @@ import pandas as pd
 from colorama import Fore, Style, init
 from tqdm import tqdm
 
-from proteusPy import Disulfide, DisulfideList, DisulfideLoader, Load_PDB_SS, get_logger
+from proteusPy import (
+    Disulfide,
+    DisulfideList,
+    DisulfideLoader,
+    Load_PDB_SS,
+    get_logger,
+    toggle_stream_handler,
+)
 from proteusPy.ProteusGlobals import SS_CONSENSUS_BIN_FILE, SS_CONSENSUS_OCT_FILE
 
 HOME_DIR = Path.home()
@@ -132,6 +139,7 @@ PBAR_COLS = 78
 init(autoreset=True)
 
 _logger = get_logger(__name__)
+# toggle_stream_handler("proteusPy.DisulfideList", False)
 
 
 def get_args():
