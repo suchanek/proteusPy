@@ -44,7 +44,7 @@ from proteusPy.DisulfideExceptions import (
     ProteusPyWarning,
 )
 from proteusPy.DisulfideList import DisulfideList
-from proteusPy.logger_config import get_logger
+from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, WINSIZE
 from proteusPy.Residue import build_residue
 from proteusPy.ssparser import (
@@ -98,7 +98,7 @@ Torsion_DF_Cols = [
 
 ORIGIN = Vector3D(0.0, 0.0, 0.0)
 
-_logger = get_logger(__name__)
+_logger = create_logger(__name__)
 _logger.setLevel(logging.ERROR)
 
 

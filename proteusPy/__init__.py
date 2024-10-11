@@ -76,7 +76,15 @@ from .DisulfideLoader import (
     Download_PDB_SS_GitHub,
     Load_PDB_SS,
 )
-from .logger_config import get_logger, set_logger_level, toggle_stream_handler
+from .logger_config import (
+    configure_master_logger,
+    create_logger,
+    list_all_loggers,
+    list_handlers,
+    set_logger_level,
+    set_logger_level_for_module,
+    toggle_stream_handler,
+)
 from .ProteusGlobals import (
     _ANG_INIT,
     _FLOAT_INIT,
@@ -117,7 +125,6 @@ from .utility import (
     extract_firstchain_ss,
     generate_vector_dataframe,
     get_jet_colormap,
-    get_macos_theme,
     get_memory_usage,
     get_object_size_mb,
     get_theme,
@@ -129,7 +136,6 @@ from .utility import (
     remove_duplicate_ss,
     retrieve_git_lfs_files,
     save_list_to_file,
-    set_logger_level_for_module,
     sort_by_column,
 )
 from .vector3D import (

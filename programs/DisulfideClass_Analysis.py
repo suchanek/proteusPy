@@ -138,7 +138,7 @@ PBAR_COLS = 78
 # Initialize colorama
 init(autoreset=True)
 
-_logger = get_logger(__name__)
+_logger = create_logger(__name__)
 # toggle_stream_handler("proteusPy.DisulfideList", False)
 
 

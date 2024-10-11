@@ -171,10 +171,10 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 </span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="kn">import</span> <span class="nn">os</span>
 </span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="kn">import</span> <span class="nn">pickle</span>
 </span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="kn">from</span> <span class="nn">proteusPy.logger_config</span> <span class="kn">import</span> <span class="n">get_logger</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="kn">from</span> <span class="nn">proteusPy.logger_config</span> <span class="kn">import</span> <span class="n">create_logger</span>
 </span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="kn">from</span> <span class="nn">proteusPy.vector3D</span> <span class="kn">import</span> <span class="n">Vector3D</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>
-</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="n">_logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="n">_logger</span> <span class="o">=</span> <span class="n">create_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 </span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="k">def</span> <span class="nf">extract_id_from_filename</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>

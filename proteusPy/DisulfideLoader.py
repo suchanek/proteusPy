@@ -31,7 +31,7 @@ from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideClass_Constructor import DisulfideClass_Constructor
 from proteusPy.DisulfideExceptions import DisulfideException, DisulfideParseWarning
 from proteusPy.DisulfideList import DisulfideList
-from proteusPy.logger_config import get_logger
+from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
     LOADER_ALL_URL,
@@ -42,7 +42,7 @@ from proteusPy.ProteusGlobals import (
     SS_PICKLE_FILE,
 )
 
-_logger = get_logger(__name__)
+_logger = create_logger(__name__)
 
 try:
     # Check if running in Jupyter

@@ -48,11 +48,11 @@ from proteusPy.atoms import (
     SPEC_POWER,
     SPECULARITY,
 )
-from proteusPy.logger_config import get_logger
+from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, PDB_DIR, WINSIZE
 from proteusPy.utility import get_jet_colormap, get_theme, grid_dimensions
 
-_logger = get_logger(__name__)
+_logger = create_logger(__name__)
 
 
 # Set the figure sizes and axis limits.
@@ -1261,12 +1261,12 @@ def load_disulfides_from_id(
         _logger.warning(mess)
         return None
 
+    if quiet:
+        _logger.setLevel(logging.ERROR)
+
     if verbose:
         mess = f"{pdb_id} has {num_ssbonds} SSBonds, found: {errors} errors"
         _logger.info(mess)
-
-    if quiet:
-        _logger.setLevel(logging.ERROR)
 
     resolution = ssbond_atom_list["resolution"]
     for pair in ssbond_atom_list["pairs"]:
@@ -1298,8 +1298,8 @@ def load_disulfides_from_id(
 
         if proximal == distal and chain1_id == chain2_id:
             mess = (
-                f"SSBond record has self reference: "
-                f"{pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
+                f"SSBond record has self reference, skipping: "
+                f"{pdb_id} <{proximal} {chain1_id}> <{distal} {chain2_id}>"
             )
 
             _logger.warning(mess)
@@ -1326,11 +1326,12 @@ def load_disulfides_from_id(
                 mess = f"Initialized Disulfide: {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
                 _logger.info(mess)
         else:
-            mess = f"Cannot initialize Disulfide: {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
+            mess = f"Cannot initialize Disulfide: {pdb_id} <{proximal} {chain1_id}> <{distal} {chain2_id}>"
             _logger.error(mess)
 
         i += 1
 
+    # restore default logging level
     if quiet:
         _logger.setLevel(logging.WARNING)
 
