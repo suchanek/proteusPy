@@ -17,7 +17,7 @@ utilizes multiprocessing to speed up the extraction process.
 * Subset: Only extract and process the first 1000 Disulfides found in the PDB directory.
 
 Author: Eric G. Suchanek, PhD.
-Last revision: 9/1/24 -egs-
+Last revision: 10/12/24 -egs-
 """
 
 import argparse
@@ -35,6 +35,7 @@ from shutil import copy
 
 from colorama import Fore, Style, init
 
+# Initialize colorama
 init()
 
 from tqdm import tqdm
@@ -42,10 +43,12 @@ from tqdm import tqdm
 from proteusPy import (
     DisulfideList,
     DisulfideLoader,
-    get_logger,
+    configure_master_logger,
+    create_logger,
     load_disulfides_from_id,
     remove_duplicate_ss,
-    set_logger_level_for_module,
+    set_logger_level,
+    toggle_stream_handler,
 )
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
@@ -55,10 +58,24 @@ from proteusPy.ProteusGlobals import (
     SS_SUBSET_PICKLE_FILE,
 )
 
-_logger = create_logger(__name__)
-_logger.setLevel(logging.INFO)
+# Create a root logger. This will open ~/logs/DisulfideExtractor.log
+# and write all log messages to it. There are quite a few messages
+# generated while parsing. This provides a record of the process.
 
-set_logger_level_for_module("proteusPy", logging.ERROR)
+configure_master_logger("DisulfideExtractor.log")
+set_logger_level("proteusPy.ssparser", "ERROR")
+set_logger_level("proteusPy.DisulfideList", "INFO")
+
+# Disable the stream handlers for the following namespaces.
+# This will suppress the output to the console.
+toggle_stream_handler("proteusPy.ssparser", False)
+toggle_stream_handler("proteusPy.DisulfideList", False)
+toggle_stream_handler("proteusPy.DisulfideClass_Constructor", False)
+
+# Create a logger for this program.
+_logger = create_logger("DisulfideExtractor")
+_logger.setLevel("INFO")
+
 
 PBAR_COLS = 79
 
@@ -108,7 +125,7 @@ pdb_id_list = [Path(f).stem[3:7] for f in ent_files]
 
 num_ent_files = len(ent_files)
 
-__version__ = "2.0.4"
+__version__ = "2.1.0"
 
 
 def parse_arguments():
@@ -200,7 +217,7 @@ def extract_disulfides_chunk(args):
     result_list = []
 
     if quiet:
-        _logger.setLevel(logging.ERROR)
+        _logger.setLevel(logging.WARNING)
 
     entrylist = sslist[start_idx:end_idx]
 
@@ -228,7 +245,6 @@ def extract_disulfides_chunk(args):
             result_list.extend(sslist)
 
         task_pbar.update(1)
-        # overall_pbar.update(1)
 
     task_pbar.close()
     return result_list
@@ -445,9 +461,18 @@ def main():
     clear_screen()
     start = time.time()
     args = parse_arguments()
-    set_logger_level_for_module("proteusPy", logging.ERROR)
 
-    print(
+    # set_logging_level_for_all_handlers(logging.ERROR)
+
+    # toggle_stream_handler("proteusPy.ssparser", False)
+
+    # set_logging_level_for_all_handlers(logging.ERROR)
+    # disable_stream_handlers_for_namespace("proteusPy")
+
+    mess = f"Starting DisulfideExtractor at time {datetime.datetime.now()}"
+    _logger.info(mess)
+
+    mess = (
         f"proteusPy DisulfideExtractor v{__version__}\n"
         f"PDB model directory:       {PDB_DIR}\n"
         f"Data directory:            {DATA_DIR}\n"
@@ -466,6 +491,8 @@ def main():
         f"Environment:               {args.env}\n"
         f"Starting at:               {datetime.datetime.now()}\n"
     )
+
+    _logger.info(mess)
 
     do_stuff(
         extract=args.extract,
@@ -486,10 +513,14 @@ def main():
 
     hours, remainder = divmod(elapsed_time.total_seconds(), 3600)
     minutes, seconds = divmod(remainder, 60)
-    print(f"Processing completed in {int(hours)}:{int(minutes)}:{int(seconds)}")
+    mess = f"Processing completed in {int(hours)}h:{int(minutes)}m:{int(seconds)}"
 
 
 if __name__ == "__main__":
     main()
+
+    mess = f"Finished DisulfideExtraction at time {datetime.datetime.now()}"
+    print(mess)
+
 
 # End of file

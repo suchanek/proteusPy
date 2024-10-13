@@ -107,7 +107,9 @@ from proteusPy import (
     DisulfideList,
     DisulfideLoader,
     Load_PDB_SS,
-    get_logger,
+    configure_master_logger,
+    create_logger,
+    set_logger_level,
     toggle_stream_handler,
 )
 from proteusPy.ProteusGlobals import SS_CONSENSUS_BIN_FILE, SS_CONSENSUS_OCT_FILE
@@ -138,7 +140,16 @@ PBAR_COLS = 78
 # Initialize colorama
 init(autoreset=True)
 
-_logger = create_logger(__name__)
+_logger = create_logger("DisulfideClass_Analysis")
+
+configure_master_logger("DisulfidClass_Analysis.log")
+
+# set_logger_level("proteusPy.ssparser", "WARNING")
+# set_logger_level("proteusPy.DisulfideList", "WARNING")
+
+# toggle_stream_handler("proteusPy.ssparser", False)
+# toggle_stream_handler("proteusPy.DisulfideList", False)
+
 # toggle_stream_handler("proteusPy.DisulfideList", False)
 
 

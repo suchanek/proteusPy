@@ -79,10 +79,12 @@ from .DisulfideLoader import (
 from .logger_config import (
     configure_master_logger,
     create_logger,
+    disable_stream_handlers_for_namespace,
     list_all_loggers,
     list_handlers,
     set_logger_level,
     set_logger_level_for_module,
+    set_logging_level_for_all_handlers,
     toggle_stream_handler,
 )
 from .ProteusGlobals import (

@@ -22,48 +22,98 @@ Example usage:
 
 import logging
 import os
-from logging.handlers import RotatingFileHandler
-
-# Disable the root logger
-logging.getLogger().disabled = True
 
 
-def configure_master_logger(log_file: str, max_bytes: int = 0, backup_count: int = 0):
+def set_logging_level_for_all_handlers(log_level: int):
+    """
+    Sets the logging level for all handlers of all loggers in the proteusPy package.
+
+    :param log_level: The logging level to set.
+    :type log_level: int
+    """
+    # Get the root logger
+    root_logger = logging.getLogger()
+
+    # Set the level for the root logger
+    root_logger.setLevel(log_level)
+
+    # Iterate through all loggers
+    for logger_name in logging.Logger.manager.loggerDict:
+        _logger = logging.getLogger(logger_name)
+
+        # Set the level for the logger itself
+        _logger.setLevel(log_level)
+
+        # Iterate through all handlers of the logger
+        for handler in _logger.handlers:
+            handler.setLevel(log_level)
+
+
+def disable_stream_handlers_for_namespace(namespace: str):
+    """
+    Disables all stream handlers for all loggers under the specified namespace.
+
+    :param namespace: The namespace whose stream handlers should be disabled.
+    :type namespace: str
+    """
+    for logger_name in logging.Logger.manager.loggerDict:
+        if logger_name.startswith(namespace):
+            _logger = logging.getLogger(logger_name)
+            for handler in _logger.handlers:
+                if isinstance(handler, logging.StreamHandler):
+                    _logger.removeHandler(handler)
+
+
+def configure_master_logger(
+    log_file: str,
+    file_path: str = "~/logs",
+    log_level: int = logging.DEBUG,
+):
     """
     Configures the root logger to write to a specified log file.
 
     Args:
-        log_file (str): Path to the log file.
+        log_file (str): Name of the log file.
+        file_path (str): Path to the directory where log files will be stored. Defaults to '~/logs'.
         max_bytes (int): Maximum size of the log file before rotating.
         backup_count (int): Number of backup files to keep.
     """
-    root_logger = logging.getLogger()
-    root_logger.setLevel(
-        logging.DEBUG
-    )  # Set the root logger level to DEBUG to capture all messages
+    # Expand user path
+    file_path = os.path.expanduser(file_path)
 
-    if max_bytes > 0:
-        handler = RotatingFileHandler(
-            log_file, maxBytes=max_bytes, backupCount=backup_count
-        )
-    else:
-        handler = logging.FileHandler(log_file)
+    # Ensure the directory exists
+    if not os.path.exists(file_path):
+        os.makedirs(file_path)
+
+    # Full path to the log file
+    full_log_file_path = os.path.join(file_path, log_file)
+
+    root_logger = logging.getLogger()
+
+    # Set the root logger level to DEBUG to capture all messages
+    root_logger.setLevel(log_level)
+
+    # Remove all existing handlers
+    for handler in root_logger.handlers[:]:
+        root_logger.removeHandler(handler)
+
+    # Create a new FileHandler
+    handler = logging.FileHandler(full_log_file_path, mode="w")
 
     formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        "proteusPy: %(levelname)s %(asctime)s - %(name)s.%(funcName)s - %(message)s"
     )
     handler.setFormatter(formatter)
 
     root_logger.addHandler(handler)
     root_logger.disabled = False  # Enable the root logger
+    for handler in root_logger.handlers:
+        handler.setLevel(log_level)
 
 
 def create_logger(
     name: str,
     log_level: int = logging.INFO,
-    log_dir: str = None,
-    max_bytes: int = 0,
-    backup_count: int = 5,
 ) -> logging.Logger:
     """
     Returns a logger with the specified name, configured to use both StreamHandler
@@ -91,7 +141,7 @@ def create_logger(
 
     # Define formatter
     formatter = logging.Formatter(
-        "proteusPy: %(levelname)-7s %(asctime)s - %(name)s.%(funcName)s - %(message)s"
+        "proteusPy: %(levelname)s %(asctime)s - %(name)s.%(funcName)s - %(message)s"
     )
 
     # StreamHandler setup
@@ -100,35 +150,8 @@ def create_logger(
     stream_handler.setFormatter(formatter)
     logger.addHandler(stream_handler)
 
-    # Prevent log messages from being propagated to the root logger
+    # Allows log messages to propagate to the root logger
     logger.propagate = True
-
-    # Determine log directory
-    if log_dir is None:
-        home_dir = os.path.expanduser("~")
-        log_dir = os.path.join(home_dir, "logs")
-
-    os.makedirs(log_dir, exist_ok=True)
-
-    log_path = os.path.abspath(os.path.join(log_dir, f"{name}.log"))
-
-    try:
-        # RotatingFileHandler setup
-        file_handler = RotatingFileHandler(
-            log_path,
-            mode="a",
-            maxBytes=max_bytes,
-            backupCount=backup_count,
-            encoding="utf-8",
-            delay=True,
-        )
-        file_handler.setLevel(log_level)
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-        logger.debug(f"{name} Logging to file: {log_path}")
-
-    except Exception as e:
-        logger.error(f"Failed to set up file handler for {name}: {e}")
 
     return logger
 
@@ -161,6 +184,9 @@ def set_logger_level(name, level):
     _logger = logging.getLogger(name)
     _logger.setLevel(level_dict[level])
 
+    for handler in _logger.handlers:
+        handler.setLevel(level_dict[level])
+
 
 def toggle_stream_handler(name, enable):
     """
@@ -184,7 +210,7 @@ def toggle_stream_handler(name, enable):
         if stream_handler is None:
             # Define formatter
             formatter = logging.Formatter(
-                "proteusPy: %(levelname)-7s %(asctime)s - %(name)s.%(funcName)s - %(message)s"
+                "stream proteusPy: %(levelname)-7s %(asctime)s - %(name)s.%(funcName)s - %(message)s"
             )
             # Create and add a new StreamHandler
             stream_handler = logging.StreamHandler()

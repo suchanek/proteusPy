@@ -264,8 +264,8 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
     for line in lines:
         if line.startswith("SSBOND"):
             ssbonds.append(line)
-            if verbose:
-                _logger.info(str(f"Found SSBOND record for {pdbid}: {line.strip()}"))
+            if dbg:
+                _logger.debug(str(f"Found SSBOND record for {pdbid}: {line.strip()}"))
 
         elif line.startswith("ATOM") or line.startswith(
             "HETATM"
@@ -282,7 +282,7 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
             key = (chain_id, res_seq_num, atom_name)
             atom_list[key] = {"coords": [x, y, z]}
             if dbg:
-                _logger.info(
+                _logger.debug(
                     str(
                         f"Found ATOM record for chain {chain_id}, residue {res_seq_num}, atom {atom_name}"
                     )
@@ -294,31 +294,31 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                 resolution = float(resolution_str)
             except ValueError:
                 if verbose:
-                    _logger.warning(
+                    _logger.error(
                         str(
                             f"Error parsing resolution value from line: {line.strip()}. Found: {resolution_str}"
                         )
                     )
-            if verbose:
-                _logger.info(str(f"Found RESOLUTION record: {resolution} Å"))
+            if dbg:
+                _logger.debug(str(f"Found RESOLUTION record: {resolution} Å"))
 
         elif line.startswith("HELIX"):
             helix_info = parse_helix_record(line)
             helices.append(helix_info)
             if verbose:
-                _logger.info(str(f"Found HELIX record: {helix_info}"))
+                _logger.debug(str(f"Found HELIX record: {helix_info}"))
 
         elif line.startswith("SHEET"):
             sheet_info = parse_sheet_record(line)
             sheets.append(sheet_info)
             if verbose:
-                _logger.info(str(f"Found SHEET record: {sheet_info}"))
+                _logger.debug(str(f"Found SHEET record: {sheet_info}"))
 
         elif line.startswith("TURN"):
             turn_info = parse_turn_record(line)
             turns.append(turn_info)
             if verbose:
-                _logger.info(str(f"Found TURN record: {turn_info}"))
+                _logger.debug(str(f"Found TURN record: {turn_info}"))
 
     # Extract the ATOM records corresponding to SSBOND
     ssbond_atom_list = {
