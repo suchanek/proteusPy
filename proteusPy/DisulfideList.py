@@ -1245,7 +1245,7 @@ def load_disulfides_from_id(
     structure_fname = os.path.join(pdb_dir, f"pdb{pdb_id}.ent")
 
     if verbose:
-        mess = f"-> load_disulfide_from_id() - Parsing structure: {pdb_id}:"
+        mess = f"Parsing structure: {pdb_id}:"
         _logger.info(mess)
 
     SSList = DisulfideList([], pdb_id, resolution)
@@ -1286,15 +1286,11 @@ def load_disulfides_from_id(
 
         if proximal == distal:
             if verbose:
-                mess = f"SSBond record has (proximal == distal):\
-                {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
-                _logger.warning(mess)
-
-        if verbose:
-            mess = (
-                f"SSBond: {i}: {pdb_id}: {proximal} {chain1_id} - {distal} {chain2_id}"
-            )
-            _logger.info(mess)
+                mess = (
+                    f"SSBond record has (proximal == distal): "
+                    f"{pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
+                )
+                _logger.error(mess)
 
         if proximal == distal and chain1_id == chain2_id:
             mess = (
@@ -1302,8 +1298,14 @@ def load_disulfides_from_id(
                 f"{pdb_id} <{proximal} {chain1_id}> <{distal} {chain2_id}>"
             )
 
-            _logger.warning(mess)
+            _logger.error(mess)
             continue
+
+        if verbose:
+            mess = (
+                f"SSBond: {i}: {pdb_id}: {proximal} {chain1_id} - {distal} {chain2_id}"
+            )
+            _logger.info(mess)
 
         new_ss = Initialize_Disulfide_From_Coords(
             ssbond_atom_list,
