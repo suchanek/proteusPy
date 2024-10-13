@@ -207,12 +207,12 @@ class DisulfideViewer(QMainWindow):
 
         # Create sliders for camera control
         self.slider_x = QSlider(Qt.Horizontal)
-        self.slider_x.setRange(-100, 100)
+        self.slider_x.setRange(-180, 180)
         self.slider_x.setValue(0)
         self.slider_x.valueChanged.connect(self.update_camera_position)
 
         self.slider_y = QSlider(Qt.Vertical)
-        self.slider_y.setRange(-100, 100)
+        self.slider_y.setRange(-180, 180)
         self.slider_y.setValue(0)
         self.slider_y.valueChanged.connect(self.update_camera_position)
 
@@ -274,7 +274,6 @@ class DisulfideViewer(QMainWindow):
         self.current_pdb_id = self.current_ss.pdb_id
         self.set_camera_view()
         self.on_pdb_dropdown_change(0)
-        # self.display(self.current_style)
 
     def add_floor(self, plotter, size=15, position=(0, 0, -5)):
         """
@@ -381,8 +380,10 @@ class DisulfideViewer(QMainWindow):
         """
         Update the camera position based on the slider values.
         """
+
         x = self.slider_x.value()
         y = self.slider_y.value()
+
         self.plotter_widget.camera_position = [(x, y, 10), (0, 0, 0), (0, 1, 0)]
         self.plotter_widget.render()
 
@@ -690,7 +691,7 @@ def main():
     The main entry point of the application.
     """
 
-    pdb = Load_PDB_SS(subset=True, verbose=True)
+    pdb = Load_PDB_SS(subset=False, verbose=True)
     if pdb is not None:
         ss_list = sorted(pdb.SSList, key=lambda ss: ss.pdb_id)
         app = QApplication(sys.argv)

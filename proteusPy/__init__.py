@@ -149,6 +149,6 @@ from .vector3D import (
     rms_difference,
 )
 
-# print(f"ProteusPy {__version__}")
+print(f"ProteusPy {__version__} initialized.")
 
 # end of file

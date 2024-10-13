@@ -143,14 +143,7 @@ init(autoreset=True)
 _logger = create_logger("DisulfideClass_Analysis")
 
 configure_master_logger("DisulfidClass_Analysis.log")
-
-# set_logger_level("proteusPy.ssparser", "WARNING")
-# set_logger_level("proteusPy.DisulfideList", "WARNING")
-
-# toggle_stream_handler("proteusPy.ssparser", False)
-# toggle_stream_handler("proteusPy.DisulfideList", False)
-
-# toggle_stream_handler("proteusPy.DisulfideList", False)
+set_logger_level("DisulfideClass_Analysis", "INFO")
 
 
 def get_args():
@@ -486,8 +479,6 @@ def analyze_classes(
 
     if octant:
         print("Analyzing octant classes.")
-        # plot_classes_vs_cutoff(loader, cutoff + 0.25 * cutoff, 50)
-
         analyze_classes_threaded(
             loader,
             do_graph=do_graph,
@@ -524,41 +515,6 @@ def octant_classes_vs_cutoff(loader: DisulfideLoader, cutoff):
 
     class_df = loader.tclass.filter_eightclass_by_percentage(cutoff)
     return class_df.shape[0]
-
-
-def plot_eightclass_vs_cutoff(loader: DisulfideLoader, cutoff, steps, verbose=False):
-    """
-    Plot the total percentage and number of members for each class against the cutoff value.
-
-    :param cutoff: Percent cutoff value for filtering the classes.
-    :return: None
-    """
-
-    _cutoff = np.linspace(0, cutoff, steps)
-    tot_list = []
-    members_list = []
-
-    for c in _cutoff:
-        class_df = loader.tclass.filter_eightclass_by_percentage(c)
-        tot = class_df["percentage"].sum()
-        tot_list.append(tot)
-        members_list.append(class_df.shape[0])
-        if verbose:
-            print(
-                f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
-            )
-
-    _, ax1 = plt.subplots()
-
-    ax2 = ax1.twinx()
-    ax1.plot(_cutoff, tot_list, label="Total percentage", color="blue")
-    ax2.plot(_cutoff, members_list, label="Number of members", color="red")
-
-    ax1.set_xlabel("Cutoff")
-    ax1.set_ylabel("Total percentage", color="blue")
-    ax2.set_ylabel("Number of members", color="red")
-
-    plt.show()
 
 
 def update_repository(source_dir, repo_dir, verbose=True, binary=False, octant=False):
