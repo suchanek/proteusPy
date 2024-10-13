@@ -510,7 +510,6 @@ class DisulfideLoader:
 
         plt.show()
 
-    ###
     def plot_binary_to_sixclass_incidence(
         self, theme="light", save=False, savedir=".", verbose=False
     ):
@@ -976,16 +975,27 @@ def Bootstrap_PDB_SS(
 
     if not os.path.exists(_fname) or force is True:
         if verbose:
-            print("Downloading Disulfide Database from Drive...")
+            mess = "Downloading Disulfide Database from Drive..."
+            _logger.info(mess)
         gdown.download(url, str(_fname), quiet=False)
 
     full_path = os.path.join(loadpath, _fname)
+    if verbose:
+        mess = f"Building loader from: {full_path}... "
+        _logger.info(mess)
+
     loader = DisulfideLoader(
         datadir=DATA_DIR, subset=subset, verbose=verbose, cutoff=cutoff
     )
-    loader.save(savepath=DATA_DIR, subset=subset, cutoff=cutoff)
+
+    if loader.TotalDisulfides == 0:
+        mess = "No disulfides loaded!"
+        _logger.error(mess)
+        return None
+
     if verbose:
-        loader.describe()
+        mess = "Done building loader."
+        _logger.info(mess)
 
     return loader
 

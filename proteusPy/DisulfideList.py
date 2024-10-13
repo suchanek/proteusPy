@@ -1021,7 +1021,8 @@ class DisulfideList(UserList):
         """
         Return Disulfide from the list with the maximum energy
 
-        :return: Disulfide with the maximum energy.
+        :return: Disulfide with the maximum energy. This assumes that
+        the comparison is based on the energy attribute.
         """
         sslist = sorted(self.data)
         return sslist[-1]
@@ -1033,29 +1034,15 @@ class DisulfideList(UserList):
 
         :return: SSmin, SSmax
         """
-
-        _min = 99999.9
-        _max = -99999.9
-
         sslist = self.data
-        ssmin = 0
-        ssmax = 0
-        idx = 0
 
-        pbar = tqdm(sslist, ncols=PBAR_COLS)
-        for ss in pbar:
-            dist = ss.ca_distance
+        if not sslist:
+            return None, None
 
-            if dist >= _max:
-                ssmax = idx
-                _max = dist
+        ssmin = min(sslist, key=lambda ss: ss.ca_distance)
+        ssmax = max(sslist, key=lambda ss: ss.ca_distance)
 
-            if dist <= _min:
-                ssmin = idx
-                _min = dist
-            idx += 1
-
-        return sslist[ssmin], sslist[ssmax]
+        return ssmin, ssmax
 
     @property
     def minmax_energy(self):
