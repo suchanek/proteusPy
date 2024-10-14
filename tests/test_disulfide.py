@@ -58,7 +58,6 @@ class TestDisulfide(unittest.TestCase):
         self.assertEqual(result, expected_result)
 
     def test_dihedrals(self):
-        import numpy
         from numpy.testing import assert_allclose
 
         ss1 = self.sslist[0]
@@ -100,14 +99,12 @@ class TestDisulfide(unittest.TestCase):
     def test_load(self):
 
         with tempfile.TemporaryDirectory() as temp_dir:
-            pdb_home = f"{temp_dir}/"
             entry = "5rsa"
 
             sslist = load_disulfides_from_id(entry, pdb_dir=DATA_DIR)
             self.assertTrue(len(sslist) > 0)
 
     def test_compare(self):
-        diff = 1.0
 
         ss1 = self.sslist[0]
 

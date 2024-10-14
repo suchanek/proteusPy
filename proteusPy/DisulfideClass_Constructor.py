@@ -25,7 +25,7 @@ import pandas as pd
 
 from proteusPy.angle_annotation import AngleAnnotation
 from proteusPy.DisulfideList import DisulfideList
-from proteusPy.logger_config import get_logger
+from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
     CLASSOBJ_FNAME,
     DATA_DIR,
@@ -36,7 +36,7 @@ from proteusPy.ProteusGlobals import (
     SS_CONSENSUS_OCT_FILE,
 )
 
-_logger = get_logger(__name__)
+_logger = create_logger(__name__)
 _logger.setLevel("INFO")
 
 merge_cols = [
@@ -403,6 +403,24 @@ class DisulfideClass_Constructor:
         grouped.reset_index(inplace=True)
 
         return grouped
+
+    def filter_class_by_percentage(self, base: int, cutoff: float) -> pd.DataFrame:
+        """
+        Filter the specified class definitions by percentage.
+
+        :param base: An integer specifying the class type to filter (6 or 8)
+        :param cutoff: A numeric value specifying the minimum percentage required for a row to be included in the output
+        :return: A new Pandas DataFrame containing only rows where the percentage is greater than or equal to the cutoff
+        :rtype: pandas.DataFrame
+        """
+        if base == 6:
+            df = self.sixclass_df
+        elif base == 8:
+            df = self.eightclass_df
+        else:
+            raise ValueError("Invalid base. Must be 6 or 8.")
+
+        return df[df["percentage"] >= cutoff].copy()
 
     def filter_sixclass_by_percentage(self, cutoff) -> pd.DataFrame:
         """

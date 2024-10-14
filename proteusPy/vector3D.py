@@ -18,9 +18,9 @@ import math
 
 import numpy as np
 
-from proteusPy.logger_config import get_logger
+from proteusPy.logger_config import create_logger
 
-_logger = get_logger(__name__)
+_logger = create_logger(__name__)
 _logger.setLevel("ERROR")
 
 

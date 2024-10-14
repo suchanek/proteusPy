@@ -5,7 +5,7 @@ depending on the speed of your hardware it can some time to load the full databa
 the disulfides.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2/24/2024
+Last revision: 10/9//2024
 """
 
 # plyint: disable=C0116
@@ -45,8 +45,8 @@ def SSlist_DisplayTest(sslist):
     sslist.display(style="pd")
     sslist.display(style="plain")
 
-    filename = os.path.join(TMP, "overlay.mp4")
-    sslist.display_overlay(movie=True, fname=filename)
+    # filename = os.path.join(TMP, "overlay.mp4")
+    # sslist.display_overlay(movie=True, fname=filename)
 
     filename = os.path.join(TMP, "overlay.png")
     sslist.display_overlay(screenshot=True, fname=filename)
@@ -82,7 +82,6 @@ def main():
 
     # grab the last 12 disulfides
     sslist = DisulfideList([], "last12")
-    print("Getting last 12")
 
     sslist = PDB_SS[:12]
     SSlist_DisplayTest(sslist)

@@ -113,7 +113,7 @@ upload: sdist
 	twine upload -r proteusPy dist/proteusPy-$(VERS)*
 
 tag:
-	git tag $(VERS) -m $(MESS)
+	git tag -a $(VERS) -m $(MESS)
 	@echo $(VERS) > tag.out
 
 commit:
@@ -125,6 +125,7 @@ commit:
 .PHONY: tests
 tests: 
 	pytest .
+	python tests/Test_DisplaySS.py
 	python proteusPy/Disulfide.py
 	python proteusPy/DisulfideLoader.py
 	python proteusPy/DisulfideList.py

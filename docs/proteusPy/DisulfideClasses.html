@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 14.6.1"/>
+    <meta name="generator" content="pdoc 14.7.0"/>
     <title>proteusPy.DisulfideClasses API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
@@ -100,15 +100,6 @@
             </li>
             <li>
                     <a class="function" href="#plot_count_vs_classid">plot_count_vs_classid</a>
-            </li>
-            <li>
-                    <a class="function" href="#plot_binary_to_eightclass_incidence">plot_binary_to_eightclass_incidence</a>
-            </li>
-            <li>
-                    <a class="function" href="#plot_binary_to_sixclass_incidence">plot_binary_to_sixclass_incidence</a>
-            </li>
-            <li>
-                    <a class="function" href="#enumerate_class_fromlist">enumerate_class_fromlist</a>
             </li>
             <li>
                     <a class="function" href="#plot_classes_vs_cutoff">plot_classes_vs_cutoff</a>
@@ -631,103 +622,46 @@ Last Modification: 2/19/24 -egs-</p>
 </span><span id="L-484"><a href="#L-484"><span class="linenos">484</span></a>    <span class="k">return</span> <span class="n">fig</span>
 </span><span id="L-485"><a href="#L-485"><span class="linenos">485</span></a>
 </span><span id="L-486"><a href="#L-486"><span class="linenos">486</span></a>
-</span><span id="L-487"><a href="#L-487"><span class="linenos">487</span></a><span class="k">def</span> <span class="nf">plot_binary_to_eightclass_incidence</span><span class="p">(</span><span class="n">loader</span><span class="p">:</span> <span class="n">DisulfideLoader</span><span class="p">,</span> <span class="n">theme</span><span class="o">=</span><span class="s2">&quot;light&quot;</span><span class="p">):</span>
+</span><span id="L-487"><a href="#L-487"><span class="linenos">487</span></a><span class="k">def</span> <span class="nf">plot_classes_vs_cutoff</span><span class="p">(</span><span class="n">cutoff</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
 </span><span id="L-488"><a href="#L-488"><span class="linenos">488</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-489"><a href="#L-489"><span class="linenos">489</span></a><span class="sd">    Plot the incidence of all sextant Disulfide classes for a given binary class.</span>
+</span><span id="L-489"><a href="#L-489"><span class="linenos">489</span></a><span class="sd">    Plot the total percentage and number of members for each class against the cutoff value.</span>
 </span><span id="L-490"><a href="#L-490"><span class="linenos">490</span></a>
-</span><span id="L-491"><a href="#L-491"><span class="linenos">491</span></a><span class="sd">    :param loader: `proteusPy.DisulfideLoader` object</span>
-</span><span id="L-492"><a href="#L-492"><span class="linenos">492</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-493"><a href="#L-493"><span class="linenos">493</span></a>
-</span><span id="L-494"><a href="#L-494"><span class="linenos">494</span></a>    <span class="n">clslist</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">tclass</span><span class="o">.</span><span class="n">classdf</span><span class="p">[</span><span class="s2">&quot;class_id&quot;</span><span class="p">]</span>
-</span><span id="L-495"><a href="#L-495"><span class="linenos">495</span></a>    <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">clslist</span><span class="p">:</span>
-</span><span id="L-496"><a href="#L-496"><span class="linenos">496</span></a>        <span class="n">eightcls</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">tclass</span><span class="o">.</span><span class="n">binary_to_eight_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
-</span><span id="L-497"><a href="#L-497"><span class="linenos">497</span></a>        <span class="n">df</span> <span class="o">=</span> <span class="n">enumerate_class_fromlist</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">eightcls</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
-</span><span id="L-498"><a href="#L-498"><span class="linenos">498</span></a>        <span class="n">plot_count_vs_class_df</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">theme</span><span class="o">=</span><span class="n">theme</span><span class="p">)</span>
-</span><span id="L-499"><a href="#L-499"><span class="linenos">499</span></a>    <span class="k">return</span>
-</span><span id="L-500"><a href="#L-500"><span class="linenos">500</span></a>
-</span><span id="L-501"><a href="#L-501"><span class="linenos">501</span></a>
-</span><span id="L-502"><a href="#L-502"><span class="linenos">502</span></a><span class="k">def</span> <span class="nf">plot_binary_to_sixclass_incidence</span><span class="p">(</span><span class="n">loader</span><span class="p">:</span> <span class="n">DisulfideLoader</span><span class="p">,</span> <span class="n">theme</span><span class="o">=</span><span class="s2">&quot;light&quot;</span><span class="p">):</span>
-</span><span id="L-503"><a href="#L-503"><span class="linenos">503</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-504"><a href="#L-504"><span class="linenos">504</span></a><span class="sd">    Plot the incidence of all sextant Disulfide classes for a given binary class.</span>
-</span><span id="L-505"><a href="#L-505"><span class="linenos">505</span></a>
-</span><span id="L-506"><a href="#L-506"><span class="linenos">506</span></a><span class="sd">    :param loader: `proteusPy.DisulfideLoader` object</span>
-</span><span id="L-507"><a href="#L-507"><span class="linenos">507</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-508"><a href="#L-508"><span class="linenos">508</span></a>
-</span><span id="L-509"><a href="#L-509"><span class="linenos">509</span></a>    <span class="n">clslist</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">tclass</span><span class="o">.</span><span class="n">classdf</span><span class="p">[</span><span class="s2">&quot;class_id&quot;</span><span class="p">]</span>
-</span><span id="L-510"><a href="#L-510"><span class="linenos">510</span></a>    <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">clslist</span><span class="p">:</span>
-</span><span id="L-511"><a href="#L-511"><span class="linenos">511</span></a>        <span class="n">sixcls</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">tclass</span><span class="o">.</span><span class="n">binary_to_six_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
-</span><span id="L-512"><a href="#L-512"><span class="linenos">512</span></a>        <span class="n">df</span> <span class="o">=</span> <span class="n">enumerate_class_fromlist</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">sixcls</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
-</span><span id="L-513"><a href="#L-513"><span class="linenos">513</span></a>        <span class="n">plot_count_vs_class_df</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">theme</span><span class="o">=</span><span class="n">theme</span><span class="p">)</span>
-</span><span id="L-514"><a href="#L-514"><span class="linenos">514</span></a>    <span class="k">return</span>
-</span><span id="L-515"><a href="#L-515"><span class="linenos">515</span></a>
-</span><span id="L-516"><a href="#L-516"><span class="linenos">516</span></a>
-</span><span id="L-517"><a href="#L-517"><span class="linenos">517</span></a><span class="k">def</span> <span class="nf">enumerate_class_fromlist</span><span class="p">(</span><span class="n">loader</span><span class="p">:</span> <span class="n">DisulfideLoader</span><span class="p">,</span> <span class="n">sslist</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
-</span><span id="L-518"><a href="#L-518"><span class="linenos">518</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-519"><a href="#L-519"><span class="linenos">519</span></a><span class="sd">    Enumerate the classes from a list of class IDs and return a DataFrame with class IDs and their corresponding counts.</span>
+</span><span id="L-491"><a href="#L-491"><span class="linenos">491</span></a><span class="sd">    :param cutoff: Percent cutoff value for filtering the classes.</span>
+</span><span id="L-492"><a href="#L-492"><span class="linenos">492</span></a><span class="sd">    :return: None</span>
+</span><span id="L-493"><a href="#L-493"><span class="linenos">493</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-494"><a href="#L-494"><span class="linenos">494</span></a>
+</span><span id="L-495"><a href="#L-495"><span class="linenos">495</span></a>    <span class="n">_cutoff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">steps</span><span class="p">)</span>
+</span><span id="L-496"><a href="#L-496"><span class="linenos">496</span></a>    <span class="n">tot_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-497"><a href="#L-497"><span class="linenos">497</span></a>    <span class="n">members_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-498"><a href="#L-498"><span class="linenos">498</span></a>
+</span><span id="L-499"><a href="#L-499"><span class="linenos">499</span></a>    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">_cutoff</span><span class="p">:</span>
+</span><span id="L-500"><a href="#L-500"><span class="linenos">500</span></a>        <span class="n">class_df</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">tclass</span><span class="o">.</span><span class="n">filter_sixclass_by_percentage</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</span><span id="L-501"><a href="#L-501"><span class="linenos">501</span></a>        <span class="n">tot</span> <span class="o">=</span> <span class="n">class_df</span><span class="p">[</span><span class="s2">&quot;percentage&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</span><span id="L-502"><a href="#L-502"><span class="linenos">502</span></a>        <span class="n">tot_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tot</span><span class="p">)</span>
+</span><span id="L-503"><a href="#L-503"><span class="linenos">503</span></a>        <span class="n">members_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">class_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span><span id="L-504"><a href="#L-504"><span class="linenos">504</span></a>        <span class="nb">print</span><span class="p">(</span>
+</span><span id="L-505"><a href="#L-505"><span class="linenos">505</span></a>            <span class="sa">f</span><span class="s2">&quot;Cutoff: </span><span class="si">{</span><span class="n">c</span><span class="si">:</span><span class="s2">5.3</span><span class="si">}</span><span class="s2"> accounts for </span><span class="si">{</span><span class="n">tot</span><span class="si">:</span><span class="s2">7.2f</span><span class="si">}</span><span class="s2">% and is </span><span class="si">{</span><span class="n">class_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">5</span><span class="si">}</span><span class="s2"> members long.&quot;</span>
+</span><span id="L-506"><a href="#L-506"><span class="linenos">506</span></a>        <span class="p">)</span>
+</span><span id="L-507"><a href="#L-507"><span class="linenos">507</span></a>
+</span><span id="L-508"><a href="#L-508"><span class="linenos">508</span></a>    <span class="n">_</span><span class="p">,</span> <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+</span><span id="L-509"><a href="#L-509"><span class="linenos">509</span></a>
+</span><span id="L-510"><a href="#L-510"><span class="linenos">510</span></a>    <span class="n">ax2</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+</span><span id="L-511"><a href="#L-511"><span class="linenos">511</span></a>    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">_cutoff</span><span class="p">,</span> <span class="n">tot_list</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Total percentage&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
+</span><span id="L-512"><a href="#L-512"><span class="linenos">512</span></a>    <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">_cutoff</span><span class="p">,</span> <span class="n">members_list</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Number of members&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+</span><span id="L-513"><a href="#L-513"><span class="linenos">513</span></a>
+</span><span id="L-514"><a href="#L-514"><span class="linenos">514</span></a>    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Cutoff&quot;</span><span class="p">)</span>
+</span><span id="L-515"><a href="#L-515"><span class="linenos">515</span></a>    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Total percentage&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
+</span><span id="L-516"><a href="#L-516"><span class="linenos">516</span></a>    <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of members&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+</span><span id="L-517"><a href="#L-517"><span class="linenos">517</span></a>
+</span><span id="L-518"><a href="#L-518"><span class="linenos">518</span></a>    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</span><span id="L-519"><a href="#L-519"><span class="linenos">519</span></a>
 </span><span id="L-520"><a href="#L-520"><span class="linenos">520</span></a>
-</span><span id="L-521"><a href="#L-521"><span class="linenos">521</span></a><span class="sd">    :param loader: An instance of DisulfideLoader used to load the classes.</span>
-</span><span id="L-522"><a href="#L-522"><span class="linenos">522</span></a><span class="sd">    :param sslist: A list of class IDs to enumerate.</span>
-</span><span id="L-523"><a href="#L-523"><span class="linenos">523</span></a><span class="sd">    :param base: The base value for the enumeration, by default 8.</span>
-</span><span id="L-524"><a href="#L-524"><span class="linenos">524</span></a><span class="sd">    :return: A DataFrame with columns &quot;class_id&quot; and &quot;count&quot; representing the class IDs and their corresponding counts.</span>
-</span><span id="L-525"><a href="#L-525"><span class="linenos">525</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-526"><a href="#L-526"><span class="linenos">526</span></a>    <span class="n">x</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-527"><a href="#L-527"><span class="linenos">527</span></a>    <span class="n">y</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-528"><a href="#L-528"><span class="linenos">528</span></a>
-</span><span id="L-529"><a href="#L-529"><span class="linenos">529</span></a>    <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">sslist</span><span class="p">:</span>
-</span><span id="L-530"><a href="#L-530"><span class="linenos">530</span></a>        <span class="k">if</span> <span class="bp">cls</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-531"><a href="#L-531"><span class="linenos">531</span></a>            <span class="n">_y</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">tclass</span><span class="o">.</span><span class="n">sslist_from_classid</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="n">base</span><span class="p">)</span>
-</span><span id="L-532"><a href="#L-532"><span class="linenos">532</span></a>            <span class="c1"># it&#39;s possible to have 0 SS in a class</span>
-</span><span id="L-533"><a href="#L-533"><span class="linenos">533</span></a>            <span class="k">if</span> <span class="n">_y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-534"><a href="#L-534"><span class="linenos">534</span></a>                <span class="c1"># only append if we have both.</span>
-</span><span id="L-535"><a href="#L-535"><span class="linenos">535</span></a>                <span class="n">x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
-</span><span id="L-536"><a href="#L-536"><span class="linenos">536</span></a>                <span class="n">y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_y</span><span class="p">))</span>
-</span><span id="L-537"><a href="#L-537"><span class="linenos">537</span></a>
-</span><span id="L-538"><a href="#L-538"><span class="linenos">538</span></a>    <span class="n">sslist_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;class_id&quot;</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span><span class="p">])</span>
-</span><span id="L-539"><a href="#L-539"><span class="linenos">539</span></a>    <span class="n">sslist_df</span><span class="p">[</span><span class="s2">&quot;class_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
-</span><span id="L-540"><a href="#L-540"><span class="linenos">540</span></a>    <span class="n">sslist_df</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
-</span><span id="L-541"><a href="#L-541"><span class="linenos">541</span></a>    <span class="k">return</span> <span class="n">sslist_df</span>
-</span><span id="L-542"><a href="#L-542"><span class="linenos">542</span></a>
-</span><span id="L-543"><a href="#L-543"><span class="linenos">543</span></a>
-</span><span id="L-544"><a href="#L-544"><span class="linenos">544</span></a><span class="k">def</span> <span class="nf">plot_classes_vs_cutoff</span><span class="p">(</span><span class="n">cutoff</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
-</span><span id="L-545"><a href="#L-545"><span class="linenos">545</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-546"><a href="#L-546"><span class="linenos">546</span></a><span class="sd">    Plot the total percentage and number of members for each class against the cutoff value.</span>
-</span><span id="L-547"><a href="#L-547"><span class="linenos">547</span></a>
-</span><span id="L-548"><a href="#L-548"><span class="linenos">548</span></a><span class="sd">    :param cutoff: Percent cutoff value for filtering the classes.</span>
-</span><span id="L-549"><a href="#L-549"><span class="linenos">549</span></a><span class="sd">    :return: None</span>
-</span><span id="L-550"><a href="#L-550"><span class="linenos">550</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-551"><a href="#L-551"><span class="linenos">551</span></a>
-</span><span id="L-552"><a href="#L-552"><span class="linenos">552</span></a>    <span class="n">_cutoff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">steps</span><span class="p">)</span>
-</span><span id="L-553"><a href="#L-553"><span class="linenos">553</span></a>    <span class="n">tot_list</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-554"><a href="#L-554"><span class="linenos">554</span></a>    <span class="n">members_list</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-555"><a href="#L-555"><span class="linenos">555</span></a>
-</span><span id="L-556"><a href="#L-556"><span class="linenos">556</span></a>    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">_cutoff</span><span class="p">:</span>
-</span><span id="L-557"><a href="#L-557"><span class="linenos">557</span></a>        <span class="n">class_df</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">tclass</span><span class="o">.</span><span class="n">filter_sixclass_by_percentage</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
-</span><span id="L-558"><a href="#L-558"><span class="linenos">558</span></a>        <span class="n">tot</span> <span class="o">=</span> <span class="n">class_df</span><span class="p">[</span><span class="s2">&quot;percentage&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-</span><span id="L-559"><a href="#L-559"><span class="linenos">559</span></a>        <span class="n">tot_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tot</span><span class="p">)</span>
-</span><span id="L-560"><a href="#L-560"><span class="linenos">560</span></a>        <span class="n">members_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">class_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-</span><span id="L-561"><a href="#L-561"><span class="linenos">561</span></a>        <span class="nb">print</span><span class="p">(</span>
-</span><span id="L-562"><a href="#L-562"><span class="linenos">562</span></a>            <span class="sa">f</span><span class="s2">&quot;Cutoff: </span><span class="si">{</span><span class="n">c</span><span class="si">:</span><span class="s2">5.3</span><span class="si">}</span><span class="s2"> accounts for </span><span class="si">{</span><span class="n">tot</span><span class="si">:</span><span class="s2">7.2f</span><span class="si">}</span><span class="s2">% and is </span><span class="si">{</span><span class="n">class_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">5</span><span class="si">}</span><span class="s2"> members long.&quot;</span>
-</span><span id="L-563"><a href="#L-563"><span class="linenos">563</span></a>        <span class="p">)</span>
-</span><span id="L-564"><a href="#L-564"><span class="linenos">564</span></a>
-</span><span id="L-565"><a href="#L-565"><span class="linenos">565</span></a>    <span class="n">_</span><span class="p">,</span> <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-</span><span id="L-566"><a href="#L-566"><span class="linenos">566</span></a>
-</span><span id="L-567"><a href="#L-567"><span class="linenos">567</span></a>    <span class="n">ax2</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
-</span><span id="L-568"><a href="#L-568"><span class="linenos">568</span></a>    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">_cutoff</span><span class="p">,</span> <span class="n">tot_list</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Total percentage&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
-</span><span id="L-569"><a href="#L-569"><span class="linenos">569</span></a>    <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">_cutoff</span><span class="p">,</span> <span class="n">members_list</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Number of members&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
-</span><span id="L-570"><a href="#L-570"><span class="linenos">570</span></a>
-</span><span id="L-571"><a href="#L-571"><span class="linenos">571</span></a>    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Cutoff&quot;</span><span class="p">)</span>
-</span><span id="L-572"><a href="#L-572"><span class="linenos">572</span></a>    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Total percentage&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
-</span><span id="L-573"><a href="#L-573"><span class="linenos">573</span></a>    <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of members&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
-</span><span id="L-574"><a href="#L-574"><span class="linenos">574</span></a>
-</span><span id="L-575"><a href="#L-575"><span class="linenos">575</span></a>    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</span><span id="L-576"><a href="#L-576"><span class="linenos">576</span></a>
-</span><span id="L-577"><a href="#L-577"><span class="linenos">577</span></a>
-</span><span id="L-578"><a href="#L-578"><span class="linenos">578</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="L-579"><a href="#L-579"><span class="linenos">579</span></a>    <span class="kn">import</span> <span class="nn">doctest</span>
-</span><span id="L-580"><a href="#L-580"><span class="linenos">580</span></a>
-</span><span id="L-581"><a href="#L-581"><span class="linenos">581</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
-</span><span id="L-582"><a href="#L-582"><span class="linenos">582</span></a>
-</span><span id="L-583"><a href="#L-583"><span class="linenos">583</span></a><span class="c1"># end of file</span>
+</span><span id="L-521"><a href="#L-521"><span class="linenos">521</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="L-522"><a href="#L-522"><span class="linenos">522</span></a>    <span class="kn">import</span> <span class="nn">doctest</span>
+</span><span id="L-523"><a href="#L-523"><span class="linenos">523</span></a>
+</span><span id="L-524"><a href="#L-524"><span class="linenos">524</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</span><span id="L-525"><a href="#L-525"><span class="linenos">525</span></a>
+</span><span id="L-526"><a href="#L-526"><span class="linenos">526</span></a><span class="c1"># end of file</span>
 </span></pre></div>
 
 
@@ -1668,140 +1602,6 @@ input 'cls' string.</p>
 
 
                 </section>
-                <section id="plot_binary_to_eightclass_incidence">
-                            <input id="plot_binary_to_eightclass_incidence-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">plot_binary_to_eightclass_incidence</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">loader</span><span class="p">:</span> <span class="n"><a href="DisulfideLoader.html#DisulfideLoader">proteusPy.DisulfideLoader.DisulfideLoader</a></span>, </span><span class="param"><span class="n">theme</span><span class="o">=</span><span class="s1">&#39;light&#39;</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="plot_binary_to_eightclass_incidence-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#plot_binary_to_eightclass_incidence"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="plot_binary_to_eightclass_incidence-488"><a href="#plot_binary_to_eightclass_incidence-488"><span class="linenos">488</span></a><span class="k">def</span> <span class="nf">plot_binary_to_eightclass_incidence</span><span class="p">(</span><span class="n">loader</span><span class="p">:</span> <span class="n">DisulfideLoader</span><span class="p">,</span> <span class="n">theme</span><span class="o">=</span><span class="s2">&quot;light&quot;</span><span class="p">):</span>
-</span><span id="plot_binary_to_eightclass_incidence-489"><a href="#plot_binary_to_eightclass_incidence-489"><span class="linenos">489</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="plot_binary_to_eightclass_incidence-490"><a href="#plot_binary_to_eightclass_incidence-490"><span class="linenos">490</span></a><span class="sd">    Plot the incidence of all sextant Disulfide classes for a given binary class.</span>
-</span><span id="plot_binary_to_eightclass_incidence-491"><a href="#plot_binary_to_eightclass_incidence-491"><span class="linenos">491</span></a>
-</span><span id="plot_binary_to_eightclass_incidence-492"><a href="#plot_binary_to_eightclass_incidence-492"><span class="linenos">492</span></a><span class="sd">    :param loader: `proteusPy.DisulfideLoader` object</span>
-</span><span id="plot_binary_to_eightclass_incidence-493"><a href="#plot_binary_to_eightclass_incidence-493"><span class="linenos">493</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="plot_binary_to_eightclass_incidence-494"><a href="#plot_binary_to_eightclass_incidence-494"><span class="linenos">494</span></a>
-</span><span id="plot_binary_to_eightclass_incidence-495"><a href="#plot_binary_to_eightclass_incidence-495"><span class="linenos">495</span></a>    <span class="n">clslist</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">tclass</span><span class="o">.</span><span class="n">classdf</span><span class="p">[</span><span class="s2">&quot;class_id&quot;</span><span class="p">]</span>
-</span><span id="plot_binary_to_eightclass_incidence-496"><a href="#plot_binary_to_eightclass_incidence-496"><span class="linenos">496</span></a>    <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">clslist</span><span class="p">:</span>
-</span><span id="plot_binary_to_eightclass_incidence-497"><a href="#plot_binary_to_eightclass_incidence-497"><span class="linenos">497</span></a>        <span class="n">eightcls</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">tclass</span><span class="o">.</span><span class="n">binary_to_eight_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
-</span><span id="plot_binary_to_eightclass_incidence-498"><a href="#plot_binary_to_eightclass_incidence-498"><span class="linenos">498</span></a>        <span class="n">df</span> <span class="o">=</span> <span class="n">enumerate_class_fromlist</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">eightcls</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
-</span><span id="plot_binary_to_eightclass_incidence-499"><a href="#plot_binary_to_eightclass_incidence-499"><span class="linenos">499</span></a>        <span class="n">plot_count_vs_class_df</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">theme</span><span class="o">=</span><span class="n">theme</span><span class="p">)</span>
-</span><span id="plot_binary_to_eightclass_incidence-500"><a href="#plot_binary_to_eightclass_incidence-500"><span class="linenos">500</span></a>    <span class="k">return</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Plot the incidence of all sextant Disulfide classes for a given binary class.</p>
-
-<h6 id="parameters">Parameters</h6>
-
-<ul>
-<li><strong>loader</strong>:  <code><a href="DisulfideLoader.html">proteusPy.DisulfideLoader</a></code> object</li>
-</ul>
-</div>
-
-
-                </section>
-                <section id="plot_binary_to_sixclass_incidence">
-                            <input id="plot_binary_to_sixclass_incidence-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">plot_binary_to_sixclass_incidence</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">loader</span><span class="p">:</span> <span class="n"><a href="DisulfideLoader.html#DisulfideLoader">proteusPy.DisulfideLoader.DisulfideLoader</a></span>, </span><span class="param"><span class="n">theme</span><span class="o">=</span><span class="s1">&#39;light&#39;</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="plot_binary_to_sixclass_incidence-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#plot_binary_to_sixclass_incidence"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="plot_binary_to_sixclass_incidence-503"><a href="#plot_binary_to_sixclass_incidence-503"><span class="linenos">503</span></a><span class="k">def</span> <span class="nf">plot_binary_to_sixclass_incidence</span><span class="p">(</span><span class="n">loader</span><span class="p">:</span> <span class="n">DisulfideLoader</span><span class="p">,</span> <span class="n">theme</span><span class="o">=</span><span class="s2">&quot;light&quot;</span><span class="p">):</span>
-</span><span id="plot_binary_to_sixclass_incidence-504"><a href="#plot_binary_to_sixclass_incidence-504"><span class="linenos">504</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="plot_binary_to_sixclass_incidence-505"><a href="#plot_binary_to_sixclass_incidence-505"><span class="linenos">505</span></a><span class="sd">    Plot the incidence of all sextant Disulfide classes for a given binary class.</span>
-</span><span id="plot_binary_to_sixclass_incidence-506"><a href="#plot_binary_to_sixclass_incidence-506"><span class="linenos">506</span></a>
-</span><span id="plot_binary_to_sixclass_incidence-507"><a href="#plot_binary_to_sixclass_incidence-507"><span class="linenos">507</span></a><span class="sd">    :param loader: `proteusPy.DisulfideLoader` object</span>
-</span><span id="plot_binary_to_sixclass_incidence-508"><a href="#plot_binary_to_sixclass_incidence-508"><span class="linenos">508</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="plot_binary_to_sixclass_incidence-509"><a href="#plot_binary_to_sixclass_incidence-509"><span class="linenos">509</span></a>
-</span><span id="plot_binary_to_sixclass_incidence-510"><a href="#plot_binary_to_sixclass_incidence-510"><span class="linenos">510</span></a>    <span class="n">clslist</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">tclass</span><span class="o">.</span><span class="n">classdf</span><span class="p">[</span><span class="s2">&quot;class_id&quot;</span><span class="p">]</span>
-</span><span id="plot_binary_to_sixclass_incidence-511"><a href="#plot_binary_to_sixclass_incidence-511"><span class="linenos">511</span></a>    <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">clslist</span><span class="p">:</span>
-</span><span id="plot_binary_to_sixclass_incidence-512"><a href="#plot_binary_to_sixclass_incidence-512"><span class="linenos">512</span></a>        <span class="n">sixcls</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">tclass</span><span class="o">.</span><span class="n">binary_to_six_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
-</span><span id="plot_binary_to_sixclass_incidence-513"><a href="#plot_binary_to_sixclass_incidence-513"><span class="linenos">513</span></a>        <span class="n">df</span> <span class="o">=</span> <span class="n">enumerate_class_fromlist</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">sixcls</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
-</span><span id="plot_binary_to_sixclass_incidence-514"><a href="#plot_binary_to_sixclass_incidence-514"><span class="linenos">514</span></a>        <span class="n">plot_count_vs_class_df</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">theme</span><span class="o">=</span><span class="n">theme</span><span class="p">)</span>
-</span><span id="plot_binary_to_sixclass_incidence-515"><a href="#plot_binary_to_sixclass_incidence-515"><span class="linenos">515</span></a>    <span class="k">return</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Plot the incidence of all sextant Disulfide classes for a given binary class.</p>
-
-<h6 id="parameters">Parameters</h6>
-
-<ul>
-<li><strong>loader</strong>:  <code><a href="DisulfideLoader.html">proteusPy.DisulfideLoader</a></code> object</li>
-</ul>
-</div>
-
-
-                </section>
-                <section id="enumerate_class_fromlist">
-                            <input id="enumerate_class_fromlist-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">enumerate_class_fromlist</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">loader</span><span class="p">:</span> <span class="n"><a href="DisulfideLoader.html#DisulfideLoader">proteusPy.DisulfideLoader.DisulfideLoader</a></span>, </span><span class="param"><span class="n">sslist</span>, </span><span class="param"><span class="n">base</span><span class="o">=</span><span class="mi">8</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="enumerate_class_fromlist-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#enumerate_class_fromlist"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="enumerate_class_fromlist-518"><a href="#enumerate_class_fromlist-518"><span class="linenos">518</span></a><span class="k">def</span> <span class="nf">enumerate_class_fromlist</span><span class="p">(</span><span class="n">loader</span><span class="p">:</span> <span class="n">DisulfideLoader</span><span class="p">,</span> <span class="n">sslist</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
-</span><span id="enumerate_class_fromlist-519"><a href="#enumerate_class_fromlist-519"><span class="linenos">519</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="enumerate_class_fromlist-520"><a href="#enumerate_class_fromlist-520"><span class="linenos">520</span></a><span class="sd">    Enumerate the classes from a list of class IDs and return a DataFrame with class IDs and their corresponding counts.</span>
-</span><span id="enumerate_class_fromlist-521"><a href="#enumerate_class_fromlist-521"><span class="linenos">521</span></a>
-</span><span id="enumerate_class_fromlist-522"><a href="#enumerate_class_fromlist-522"><span class="linenos">522</span></a><span class="sd">    :param loader: An instance of DisulfideLoader used to load the classes.</span>
-</span><span id="enumerate_class_fromlist-523"><a href="#enumerate_class_fromlist-523"><span class="linenos">523</span></a><span class="sd">    :param sslist: A list of class IDs to enumerate.</span>
-</span><span id="enumerate_class_fromlist-524"><a href="#enumerate_class_fromlist-524"><span class="linenos">524</span></a><span class="sd">    :param base: The base value for the enumeration, by default 8.</span>
-</span><span id="enumerate_class_fromlist-525"><a href="#enumerate_class_fromlist-525"><span class="linenos">525</span></a><span class="sd">    :return: A DataFrame with columns &quot;class_id&quot; and &quot;count&quot; representing the class IDs and their corresponding counts.</span>
-</span><span id="enumerate_class_fromlist-526"><a href="#enumerate_class_fromlist-526"><span class="linenos">526</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="enumerate_class_fromlist-527"><a href="#enumerate_class_fromlist-527"><span class="linenos">527</span></a>    <span class="n">x</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="enumerate_class_fromlist-528"><a href="#enumerate_class_fromlist-528"><span class="linenos">528</span></a>    <span class="n">y</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="enumerate_class_fromlist-529"><a href="#enumerate_class_fromlist-529"><span class="linenos">529</span></a>
-</span><span id="enumerate_class_fromlist-530"><a href="#enumerate_class_fromlist-530"><span class="linenos">530</span></a>    <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">sslist</span><span class="p">:</span>
-</span><span id="enumerate_class_fromlist-531"><a href="#enumerate_class_fromlist-531"><span class="linenos">531</span></a>        <span class="k">if</span> <span class="bp">cls</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="enumerate_class_fromlist-532"><a href="#enumerate_class_fromlist-532"><span class="linenos">532</span></a>            <span class="n">_y</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">tclass</span><span class="o">.</span><span class="n">sslist_from_classid</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="n">base</span><span class="p">)</span>
-</span><span id="enumerate_class_fromlist-533"><a href="#enumerate_class_fromlist-533"><span class="linenos">533</span></a>            <span class="c1"># it&#39;s possible to have 0 SS in a class</span>
-</span><span id="enumerate_class_fromlist-534"><a href="#enumerate_class_fromlist-534"><span class="linenos">534</span></a>            <span class="k">if</span> <span class="n">_y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="enumerate_class_fromlist-535"><a href="#enumerate_class_fromlist-535"><span class="linenos">535</span></a>                <span class="c1"># only append if we have both.</span>
-</span><span id="enumerate_class_fromlist-536"><a href="#enumerate_class_fromlist-536"><span class="linenos">536</span></a>                <span class="n">x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
-</span><span id="enumerate_class_fromlist-537"><a href="#enumerate_class_fromlist-537"><span class="linenos">537</span></a>                <span class="n">y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_y</span><span class="p">))</span>
-</span><span id="enumerate_class_fromlist-538"><a href="#enumerate_class_fromlist-538"><span class="linenos">538</span></a>
-</span><span id="enumerate_class_fromlist-539"><a href="#enumerate_class_fromlist-539"><span class="linenos">539</span></a>    <span class="n">sslist_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;class_id&quot;</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span><span class="p">])</span>
-</span><span id="enumerate_class_fromlist-540"><a href="#enumerate_class_fromlist-540"><span class="linenos">540</span></a>    <span class="n">sslist_df</span><span class="p">[</span><span class="s2">&quot;class_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
-</span><span id="enumerate_class_fromlist-541"><a href="#enumerate_class_fromlist-541"><span class="linenos">541</span></a>    <span class="n">sslist_df</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
-</span><span id="enumerate_class_fromlist-542"><a href="#enumerate_class_fromlist-542"><span class="linenos">542</span></a>    <span class="k">return</span> <span class="n">sslist_df</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Enumerate the classes from a list of class IDs and return a DataFrame with class IDs and their corresponding counts.</p>
-
-<h6 id="parameters">Parameters</h6>
-
-<ul>
-<li><strong>loader</strong>:  An instance of DisulfideLoader used to load the classes.</li>
-<li><strong>sslist</strong>:  A list of class IDs to enumerate.</li>
-<li><strong>base</strong>:  The base value for the enumeration, by default 8.</li>
-</ul>
-
-<h6 id="returns">Returns</h6>
-
-<blockquote>
-  <p>A DataFrame with columns "class_id" and "count" representing the class IDs and their corresponding counts.</p>
-</blockquote>
-</div>
-
-
-                </section>
                 <section id="plot_classes_vs_cutoff">
                             <input id="plot_classes_vs_cutoff-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
@@ -1813,38 +1613,38 @@ input 'cls' string.</p>
 
     </div>
     <a class="headerlink" href="#plot_classes_vs_cutoff"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="plot_classes_vs_cutoff-545"><a href="#plot_classes_vs_cutoff-545"><span class="linenos">545</span></a><span class="k">def</span> <span class="nf">plot_classes_vs_cutoff</span><span class="p">(</span><span class="n">cutoff</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
-</span><span id="plot_classes_vs_cutoff-546"><a href="#plot_classes_vs_cutoff-546"><span class="linenos">546</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="plot_classes_vs_cutoff-547"><a href="#plot_classes_vs_cutoff-547"><span class="linenos">547</span></a><span class="sd">    Plot the total percentage and number of members for each class against the cutoff value.</span>
-</span><span id="plot_classes_vs_cutoff-548"><a href="#plot_classes_vs_cutoff-548"><span class="linenos">548</span></a>
-</span><span id="plot_classes_vs_cutoff-549"><a href="#plot_classes_vs_cutoff-549"><span class="linenos">549</span></a><span class="sd">    :param cutoff: Percent cutoff value for filtering the classes.</span>
-</span><span id="plot_classes_vs_cutoff-550"><a href="#plot_classes_vs_cutoff-550"><span class="linenos">550</span></a><span class="sd">    :return: None</span>
-</span><span id="plot_classes_vs_cutoff-551"><a href="#plot_classes_vs_cutoff-551"><span class="linenos">551</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="plot_classes_vs_cutoff-552"><a href="#plot_classes_vs_cutoff-552"><span class="linenos">552</span></a>
-</span><span id="plot_classes_vs_cutoff-553"><a href="#plot_classes_vs_cutoff-553"><span class="linenos">553</span></a>    <span class="n">_cutoff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">steps</span><span class="p">)</span>
-</span><span id="plot_classes_vs_cutoff-554"><a href="#plot_classes_vs_cutoff-554"><span class="linenos">554</span></a>    <span class="n">tot_list</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="plot_classes_vs_cutoff-555"><a href="#plot_classes_vs_cutoff-555"><span class="linenos">555</span></a>    <span class="n">members_list</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="plot_classes_vs_cutoff-556"><a href="#plot_classes_vs_cutoff-556"><span class="linenos">556</span></a>
-</span><span id="plot_classes_vs_cutoff-557"><a href="#plot_classes_vs_cutoff-557"><span class="linenos">557</span></a>    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">_cutoff</span><span class="p">:</span>
-</span><span id="plot_classes_vs_cutoff-558"><a href="#plot_classes_vs_cutoff-558"><span class="linenos">558</span></a>        <span class="n">class_df</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">tclass</span><span class="o">.</span><span class="n">filter_sixclass_by_percentage</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
-</span><span id="plot_classes_vs_cutoff-559"><a href="#plot_classes_vs_cutoff-559"><span class="linenos">559</span></a>        <span class="n">tot</span> <span class="o">=</span> <span class="n">class_df</span><span class="p">[</span><span class="s2">&quot;percentage&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-</span><span id="plot_classes_vs_cutoff-560"><a href="#plot_classes_vs_cutoff-560"><span class="linenos">560</span></a>        <span class="n">tot_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tot</span><span class="p">)</span>
-</span><span id="plot_classes_vs_cutoff-561"><a href="#plot_classes_vs_cutoff-561"><span class="linenos">561</span></a>        <span class="n">members_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">class_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-</span><span id="plot_classes_vs_cutoff-562"><a href="#plot_classes_vs_cutoff-562"><span class="linenos">562</span></a>        <span class="nb">print</span><span class="p">(</span>
-</span><span id="plot_classes_vs_cutoff-563"><a href="#plot_classes_vs_cutoff-563"><span class="linenos">563</span></a>            <span class="sa">f</span><span class="s2">&quot;Cutoff: </span><span class="si">{</span><span class="n">c</span><span class="si">:</span><span class="s2">5.3</span><span class="si">}</span><span class="s2"> accounts for </span><span class="si">{</span><span class="n">tot</span><span class="si">:</span><span class="s2">7.2f</span><span class="si">}</span><span class="s2">% and is </span><span class="si">{</span><span class="n">class_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">5</span><span class="si">}</span><span class="s2"> members long.&quot;</span>
-</span><span id="plot_classes_vs_cutoff-564"><a href="#plot_classes_vs_cutoff-564"><span class="linenos">564</span></a>        <span class="p">)</span>
-</span><span id="plot_classes_vs_cutoff-565"><a href="#plot_classes_vs_cutoff-565"><span class="linenos">565</span></a>
-</span><span id="plot_classes_vs_cutoff-566"><a href="#plot_classes_vs_cutoff-566"><span class="linenos">566</span></a>    <span class="n">_</span><span class="p">,</span> <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-</span><span id="plot_classes_vs_cutoff-567"><a href="#plot_classes_vs_cutoff-567"><span class="linenos">567</span></a>
-</span><span id="plot_classes_vs_cutoff-568"><a href="#plot_classes_vs_cutoff-568"><span class="linenos">568</span></a>    <span class="n">ax2</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
-</span><span id="plot_classes_vs_cutoff-569"><a href="#plot_classes_vs_cutoff-569"><span class="linenos">569</span></a>    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">_cutoff</span><span class="p">,</span> <span class="n">tot_list</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Total percentage&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
-</span><span id="plot_classes_vs_cutoff-570"><a href="#plot_classes_vs_cutoff-570"><span class="linenos">570</span></a>    <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">_cutoff</span><span class="p">,</span> <span class="n">members_list</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Number of members&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
-</span><span id="plot_classes_vs_cutoff-571"><a href="#plot_classes_vs_cutoff-571"><span class="linenos">571</span></a>
-</span><span id="plot_classes_vs_cutoff-572"><a href="#plot_classes_vs_cutoff-572"><span class="linenos">572</span></a>    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Cutoff&quot;</span><span class="p">)</span>
-</span><span id="plot_classes_vs_cutoff-573"><a href="#plot_classes_vs_cutoff-573"><span class="linenos">573</span></a>    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Total percentage&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
-</span><span id="plot_classes_vs_cutoff-574"><a href="#plot_classes_vs_cutoff-574"><span class="linenos">574</span></a>    <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of members&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
-</span><span id="plot_classes_vs_cutoff-575"><a href="#plot_classes_vs_cutoff-575"><span class="linenos">575</span></a>
-</span><span id="plot_classes_vs_cutoff-576"><a href="#plot_classes_vs_cutoff-576"><span class="linenos">576</span></a>    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="plot_classes_vs_cutoff-488"><a href="#plot_classes_vs_cutoff-488"><span class="linenos">488</span></a><span class="k">def</span> <span class="nf">plot_classes_vs_cutoff</span><span class="p">(</span><span class="n">cutoff</span><span class="p">,</span> <span class="n">steps</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
+</span><span id="plot_classes_vs_cutoff-489"><a href="#plot_classes_vs_cutoff-489"><span class="linenos">489</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="plot_classes_vs_cutoff-490"><a href="#plot_classes_vs_cutoff-490"><span class="linenos">490</span></a><span class="sd">    Plot the total percentage and number of members for each class against the cutoff value.</span>
+</span><span id="plot_classes_vs_cutoff-491"><a href="#plot_classes_vs_cutoff-491"><span class="linenos">491</span></a>
+</span><span id="plot_classes_vs_cutoff-492"><a href="#plot_classes_vs_cutoff-492"><span class="linenos">492</span></a><span class="sd">    :param cutoff: Percent cutoff value for filtering the classes.</span>
+</span><span id="plot_classes_vs_cutoff-493"><a href="#plot_classes_vs_cutoff-493"><span class="linenos">493</span></a><span class="sd">    :return: None</span>
+</span><span id="plot_classes_vs_cutoff-494"><a href="#plot_classes_vs_cutoff-494"><span class="linenos">494</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="plot_classes_vs_cutoff-495"><a href="#plot_classes_vs_cutoff-495"><span class="linenos">495</span></a>
+</span><span id="plot_classes_vs_cutoff-496"><a href="#plot_classes_vs_cutoff-496"><span class="linenos">496</span></a>    <span class="n">_cutoff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">steps</span><span class="p">)</span>
+</span><span id="plot_classes_vs_cutoff-497"><a href="#plot_classes_vs_cutoff-497"><span class="linenos">497</span></a>    <span class="n">tot_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="plot_classes_vs_cutoff-498"><a href="#plot_classes_vs_cutoff-498"><span class="linenos">498</span></a>    <span class="n">members_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="plot_classes_vs_cutoff-499"><a href="#plot_classes_vs_cutoff-499"><span class="linenos">499</span></a>
+</span><span id="plot_classes_vs_cutoff-500"><a href="#plot_classes_vs_cutoff-500"><span class="linenos">500</span></a>    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">_cutoff</span><span class="p">:</span>
+</span><span id="plot_classes_vs_cutoff-501"><a href="#plot_classes_vs_cutoff-501"><span class="linenos">501</span></a>        <span class="n">class_df</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">tclass</span><span class="o">.</span><span class="n">filter_sixclass_by_percentage</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</span><span id="plot_classes_vs_cutoff-502"><a href="#plot_classes_vs_cutoff-502"><span class="linenos">502</span></a>        <span class="n">tot</span> <span class="o">=</span> <span class="n">class_df</span><span class="p">[</span><span class="s2">&quot;percentage&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</span><span id="plot_classes_vs_cutoff-503"><a href="#plot_classes_vs_cutoff-503"><span class="linenos">503</span></a>        <span class="n">tot_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tot</span><span class="p">)</span>
+</span><span id="plot_classes_vs_cutoff-504"><a href="#plot_classes_vs_cutoff-504"><span class="linenos">504</span></a>        <span class="n">members_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">class_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span><span id="plot_classes_vs_cutoff-505"><a href="#plot_classes_vs_cutoff-505"><span class="linenos">505</span></a>        <span class="nb">print</span><span class="p">(</span>
+</span><span id="plot_classes_vs_cutoff-506"><a href="#plot_classes_vs_cutoff-506"><span class="linenos">506</span></a>            <span class="sa">f</span><span class="s2">&quot;Cutoff: </span><span class="si">{</span><span class="n">c</span><span class="si">:</span><span class="s2">5.3</span><span class="si">}</span><span class="s2"> accounts for </span><span class="si">{</span><span class="n">tot</span><span class="si">:</span><span class="s2">7.2f</span><span class="si">}</span><span class="s2">% and is </span><span class="si">{</span><span class="n">class_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">5</span><span class="si">}</span><span class="s2"> members long.&quot;</span>
+</span><span id="plot_classes_vs_cutoff-507"><a href="#plot_classes_vs_cutoff-507"><span class="linenos">507</span></a>        <span class="p">)</span>
+</span><span id="plot_classes_vs_cutoff-508"><a href="#plot_classes_vs_cutoff-508"><span class="linenos">508</span></a>
+</span><span id="plot_classes_vs_cutoff-509"><a href="#plot_classes_vs_cutoff-509"><span class="linenos">509</span></a>    <span class="n">_</span><span class="p">,</span> <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+</span><span id="plot_classes_vs_cutoff-510"><a href="#plot_classes_vs_cutoff-510"><span class="linenos">510</span></a>
+</span><span id="plot_classes_vs_cutoff-511"><a href="#plot_classes_vs_cutoff-511"><span class="linenos">511</span></a>    <span class="n">ax2</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+</span><span id="plot_classes_vs_cutoff-512"><a href="#plot_classes_vs_cutoff-512"><span class="linenos">512</span></a>    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">_cutoff</span><span class="p">,</span> <span class="n">tot_list</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Total percentage&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
+</span><span id="plot_classes_vs_cutoff-513"><a href="#plot_classes_vs_cutoff-513"><span class="linenos">513</span></a>    <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">_cutoff</span><span class="p">,</span> <span class="n">members_list</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Number of members&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+</span><span id="plot_classes_vs_cutoff-514"><a href="#plot_classes_vs_cutoff-514"><span class="linenos">514</span></a>
+</span><span id="plot_classes_vs_cutoff-515"><a href="#plot_classes_vs_cutoff-515"><span class="linenos">515</span></a>    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Cutoff&quot;</span><span class="p">)</span>
+</span><span id="plot_classes_vs_cutoff-516"><a href="#plot_classes_vs_cutoff-516"><span class="linenos">516</span></a>    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Total percentage&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
+</span><span id="plot_classes_vs_cutoff-517"><a href="#plot_classes_vs_cutoff-517"><span class="linenos">517</span></a>    <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Number of members&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
+</span><span id="plot_classes_vs_cutoff-518"><a href="#plot_classes_vs_cutoff-518"><span class="linenos">518</span></a>
+</span><span id="plot_classes_vs_cutoff-519"><a href="#plot_classes_vs_cutoff-519"><span class="linenos">519</span></a>    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </span></pre></div>
 
 

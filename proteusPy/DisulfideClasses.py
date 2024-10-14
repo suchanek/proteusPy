@@ -484,63 +484,6 @@ def plot_count_vs_classid(df, cls=None, title="title", theme="light"):
     return fig
 
 
-def plot_binary_to_eightclass_incidence(loader: DisulfideLoader, theme="light"):
-    """
-    Plot the incidence of all sextant Disulfide classes for a given binary class.
-
-    :param loader: `proteusPy.DisulfideLoader` object
-    """
-
-    clslist = loader.tclass.classdf["class_id"]
-    for cls in clslist:
-        eightcls = loader.tclass.binary_to_eight_class(cls)
-        df = enumerate_class_fromlist(loader, eightcls, base=8)
-        plot_count_vs_class_df(df, cls, theme=theme)
-    return
-
-
-def plot_binary_to_sixclass_incidence(loader: DisulfideLoader, theme="light"):
-    """
-    Plot the incidence of all sextant Disulfide classes for a given binary class.
-
-    :param loader: `proteusPy.DisulfideLoader` object
-    """
-
-    clslist = loader.tclass.classdf["class_id"]
-    for cls in clslist:
-        sixcls = loader.tclass.binary_to_six_class(cls)
-        df = enumerate_class_fromlist(loader, sixcls, base=6)
-        plot_count_vs_class_df(df, cls, theme=theme)
-    return
-
-
-def enumerate_class_fromlist(loader: DisulfideLoader, sslist, base=8):
-    """
-    Enumerate the classes from a list of class IDs and return a DataFrame with class IDs and their corresponding counts.
-
-    :param loader: An instance of DisulfideLoader used to load the classes.
-    :param sslist: A list of class IDs to enumerate.
-    :param base: The base value for the enumeration, by default 8.
-    :return: A DataFrame with columns "class_id" and "count" representing the class IDs and their corresponding counts.
-    """
-    x = []
-    y = []
-
-    for cls in sslist:
-        if cls is not None:
-            _y = loader.tclass.sslist_from_classid(cls, base=base)
-            # it's possible to have 0 SS in a class
-            if _y is not None:
-                # only append if we have both.
-                x.append(cls)
-                y.append(len(_y))
-
-    sslist_df = pd.DataFrame(columns=["class_id", "count"])
-    sslist_df["class_id"] = x
-    sslist_df["count"] = y
-    return sslist_df
-
-
 def plot_classes_vs_cutoff(cutoff, steps, loader):
     """
     Plot the total percentage and number of members for each class against the cutoff value.

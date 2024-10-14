@@ -7,7 +7,7 @@ The module provides the implmentation and interface for the [DisulfideList](#Dis
 object, used extensively by Disulfide class.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 8/23/2024 -egs-
+Last revision: 10/09/2024 -egs-
 """
 
 # pylint: disable=c0103
@@ -30,6 +30,7 @@ import copy
 import logging
 import os
 from collections import UserList
+from itertools import combinations
 from pathlib import Path
 
 import numpy as np
@@ -48,11 +49,11 @@ from proteusPy.atoms import (
     SPEC_POWER,
     SPECULARITY,
 )
-from proteusPy.logger_config import get_logger
+from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, PDB_DIR, WINSIZE
-from proteusPy.utility import get_jet_colormap, grid_dimensions
+from proteusPy.utility import get_jet_colormap, get_theme, grid_dimensions
 
-_logger = get_logger(__name__)
+_logger = create_logger(__name__)
 
 
 # Set the figure sizes and axis limits.
@@ -153,14 +154,20 @@ class DisulfideList(UserList):
     >>> subset.display_overlay()
     """
 
-    def __init__(self, iterable, pid: str, res=-1.0, quiet=True, fast=False):
+    def __init__(self, iterable, pid: str = "nil", res=-1.0, quiet=True, fast=False):
         """
-        Initialize the DisulfideList
+        Initialize the DisulfideList.
 
-        :param iterable: an iterable e.g. []
+        :param iterable: An iterable of disulfide bonds.
         :type iterable: iterable
-        :param id: Name for the list
-        :type id: str
+        :param pid: Name for the list, default is "nil".
+        :type pid: str
+        :param res: Resolution, default is -1.0. If -1, the average resolution is used.
+        :type res: float
+        :param quiet: If True, suppress output, default is True.
+        :type quiet: bool
+        :param fast: If True, enable fast mode, default is False.
+        :type fast: bool
 
         Example:
         >>> from proteusPy import DisulfideList, Disulfide
@@ -186,14 +193,11 @@ class DisulfideList(UserList):
 
         if not fast:
             if res == -1:
-                resolutions = [
-                    ss.resolution for ss in iterable if ss.resolution is not None
-                ]
-                self.res = sum(resolutions) / len(resolutions) if resolutions else -1.0
+                self._res = self.average_resolution
             else:
-                self.res = res
+                self._res = res
         else:
-            self.res = res
+            self._res = res
 
     def __getitem__(self, item):
         """
@@ -258,6 +262,21 @@ class DisulfideList(UserList):
         return pl
 
     @property
+    def average_ca_distance(self):
+        """
+        Return the Average energy (kcal/mol) for the Disulfides in the list.
+
+        :return: Average energy (kcal/mol) between all atoms in the list
+        """
+        sslist = self.data
+        tot = len(sslist)
+        if tot == 0:
+            return 0.0
+
+        total_dist = sum(ss.ca_distance for ss in sslist)
+        return total_dist / tot
+
+    @property
     def average_distance(self):
         """
         Return the Average distance (Å) between the atoms in the list.
@@ -284,18 +303,14 @@ class DisulfideList(UserList):
         Return the Average energy (kcal/mol) for the Disulfides in the list.
 
         :return: Average energy (kcal/mol) between all atoms in the list
-
         """
         sslist = self.data
         tot = len(sslist)
         if tot == 0:
             return 0.0
 
-        total = 0.0
-        for ss1 in sslist:
-            total += ss1.energy
-
-        return total / tot
+        total_energy = sum(ss.energy for ss in sslist)
+        return total_energy / tot
 
     @property
     def average_conformation(self):
@@ -328,6 +343,27 @@ class DisulfideList(UserList):
         return sum(resolutions) / len(resolutions) if resolutions else -1.0
 
     @property
+    def resolution(self) -> float:
+        """
+        Compute and return the average structure resolution for the given list.
+
+        :return: Average resolution (A)
+        """
+        return self._res
+
+    @resolution.setter
+    def resolution(self, value: float):
+        """
+        Set the average structure resolution for the given list.
+
+        :param value: The new resolution value to set.
+        :type value: float
+        """
+        if not isinstance(value, float):
+            raise TypeError("Resolution must be a float.")
+        self._res = value
+
+    @property
     def average_torsion_distance(self):
         """
         Return the average distance in torsion space (degrees), between all pairs in the
@@ -337,16 +373,13 @@ class DisulfideList(UserList):
         """
         sslist = self.data
         total = 0
-        cnt = 1
+        cnt = 0
 
-        for ss1 in sslist:
-            for ss2 in sslist:
-                if ss2 == ss1:
-                    continue
-                total += ss1.torsion_distance(ss2)
-                cnt += 1
+        for ss1, ss2 in combinations(sslist, 2):
+            total += ss1.torsion_distance(ss2)
+            cnt += 1
 
-        return total / cnt
+        return float(total / cnt) if cnt > 0 else 0
 
     def build_distance_df(self) -> pd.DataFrame:
         """
@@ -363,7 +396,11 @@ class DisulfideList(UserList):
         total_length = len(sslist)
         update_interval = max(1, total_length // 20)  # 5% of the list length
 
-        pbar = tqdm(sslist, ncols=PBAR_COLS, leave=False)
+        if self.quiet:
+            pbar = sslist
+        else:
+            pbar = tqdm(sslist, ncols=PBAR_COLS, leave=False)
+
         for ss in pbar:
             new_row = {
                 "source": ss.pdb_id,
@@ -377,10 +414,9 @@ class DisulfideList(UserList):
             rows.append(new_row)
             i += 1
 
-            if i % update_interval == 0 or i == total_length - 1:
-                pbar.update(update_interval)
-
-        pbar.close()
+            if not self.quiet:
+                if i % update_interval == 0 or i == total_length - 1:
+                    pbar.update(update_interval)
 
         # create the dataframe from the list of dictionaries
         SS_df = pd.DataFrame(rows, columns=Distance_DF_Cols)
@@ -497,6 +533,41 @@ class DisulfideList(UserList):
 
         return tor_stats, dist_stats
 
+    def describe(self):
+        """
+        Prints out relevant attributes of the given disulfideList.
+
+        :param disulfideList: A list of disulfide objects.
+        :param list_name: The name of the list.
+        """
+        name = self.pdb_id
+        avg_distance = self.average_ca_distance
+        avg_energy = self.average_energy
+        avg_resolution = self.average_resolution
+        list_length = len(self.data)
+
+        if list_length == 0:
+            avg_bondangle = 0
+            avg_bondlength = 0
+        else:
+            total_bondangle = 0
+            total_bondlength = 0
+
+            for ss in self.data:
+                total_bondangle += ss.bond_angle_ideality
+                total_bondlength += ss.bond_length_ideality
+
+            avg_bondangle = total_bondangle / list_length
+            avg_bondlength = total_bondlength / list_length
+
+        print(f"DisulfideList: {name}")
+        print(f"Length: {list_length}")
+        print(f"Average energy: {avg_energy:.2f} kcal/mol")
+        print(f"Average CA distance: {avg_distance:.2f} Å")
+        print(f"Average Resolution: {avg_resolution:.2f} Å")
+        print(f"Bond angle deviation: {avg_bondangle:.2f}°")
+        print(f"Bond length deviation: {avg_bondlength:.2f} Å")
+
     def display(self, style="sb", light="Auto", panelsize=512):
         """
         Display the Disulfide list in the specific rendering style.
@@ -510,6 +581,8 @@ class DisulfideList(UserList):
             - 'plain' - boring single color
         :light: If True, light background, if False, dark
         """
+        # from proteusPy.utility import get_theme
+
         pid = self.pdb_id
         ssbonds = self.data
         tot_ss = len(ssbonds)  # number off ssbonds
@@ -518,12 +591,21 @@ class DisulfideList(UserList):
 
         avg_enrg = self.average_energy
         avg_dist = self.average_distance
-        resolution = self.resolution
+        resolution = self.average_resolution
 
-        if light:
+        if light == "light":
             pv.set_plot_theme("document")
-        else:
+        elif light == "dark":
             pv.set_plot_theme("dark")
+        else:
+            _theme = get_theme()
+            if _theme == "light":
+                pv.set_plot_theme("document")
+            elif _theme == "dark":
+                pv.set_plot_theme("dark")
+                _logger.info("Dark mode detected.")
+            else:
+                pv.set_plot_theme("document")
 
         title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
 
@@ -730,12 +812,15 @@ class DisulfideList(UserList):
         :param light: Background color, defaults to True for White. False for Dark.
         """
 
+        # from proteusPy.utility import get_theme
+
         pid = self.pdb_id
+
         ssbonds = self.data
         tot_ss = len(ssbonds)  # number off ssbonds
         avg_enrg = self.average_energy
         avg_dist = self.average_distance
-        resolution = self.resolution
+        resolution = self.average_resolution
 
         res = 100
 
@@ -748,10 +833,19 @@ class DisulfideList(UserList):
 
         title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
 
-        if light:
+        if light == "light":
             pv.set_plot_theme("document")
-        else:
+        elif light == "dark":
             pv.set_plot_theme("dark")
+        else:
+            _theme = get_theme()
+            if _theme == "light":
+                pv.set_plot_theme("document")
+            elif _theme == "dark":
+                pv.set_plot_theme("dark")
+                _logger.info("Dark mode detected.")
+            else:
+                pv.set_plot_theme("document")
 
         if movie:
             pl = pv.Plotter(window_size=WINSIZE, off_screen=True)
@@ -918,22 +1012,6 @@ class DisulfideList(UserList):
         """
         self.pdb_id = value
 
-    @property
-    def resolution(self):
-        """
-        Resolution of the parent sturcture (A)
-        """
-        return self.res
-
-    @resolution.setter
-    def resolution(self, value):
-        """
-        Set the resolution of the list
-
-        :param value: Resolution (A)
-        """
-        self.res = value
-
     def TorsionGraph(
         self, display=True, save=False, fname="ss_torsions.png", light="Auto"
     ):
@@ -990,7 +1068,8 @@ class DisulfideList(UserList):
         """
         Return Disulfide from the list with the maximum energy
 
-        :return: Disulfide with the maximum energy.
+        :return: Disulfide with the maximum energy. This assumes that
+        the comparison is based on the energy attribute.
         """
         sslist = sorted(self.data)
         return sslist[-1]
@@ -1002,29 +1081,15 @@ class DisulfideList(UserList):
 
         :return: SSmin, SSmax
         """
-
-        _min = 99999.9
-        _max = -99999.9
-
         sslist = self.data
-        ssmin = 0
-        ssmax = 0
-        idx = 0
 
-        pbar = tqdm(sslist, ncols=PBAR_COLS)
-        for ss in pbar:
-            dist = ss.ca_distance
+        if not sslist:
+            return None, None
 
-            if dist >= _max:
-                ssmax = idx
-                _max = dist
+        ssmin = min(sslist, key=lambda ss: ss.ca_distance)
+        ssmax = max(sslist, key=lambda ss: ss.ca_distance)
 
-            if dist <= _min:
-                ssmin = idx
-                _min = dist
-            idx += 1
-
-        return sslist[ssmin], sslist[ssmax]
+        return ssmin, ssmax
 
     @property
     def minmax_energy(self):
@@ -1037,33 +1102,29 @@ class DisulfideList(UserList):
         sslist = sorted(self.data)
         return sslist[0], sslist[-1]
 
-    def nearest_neighbors(
-        self,
-        chi1: float,
-        chi2: float,
-        chi3: float,
-        chi4: float,
-        chi5: float,
-        cutoff: float,
-    ):
+    def nearest_neighbors(self, cutoff: float, *args):
         """
-        Given a torsional array of chi1-chi5,
+        Find all neighbor Disulfides within the given angle cutoff of the input Disulfide.
 
-        :param chi1: Chi1 (degrees)
-        :param chi2: Chi2 (degrees)
-        :param chi3: Chi3 (degrees)
-        :param chi4: Chi4 (degrees)
-        :param chi5: Chi5 (degrees)
         :param cutoff: Distance cutoff, degrees
-        :return: DisulfideList of neighbors
+        :param args: Either 5 individual angles (chi1, chi2, chi3, chi4, chi5) or a list of 5 angles
+        :return: DisulfideList of neighbors within the cutoff
         """
+        if len(args) == 1 and isinstance(args[0], list) and len(args[0]) == 5:
+            chi1, chi2, chi3, chi4, chi5 = args[0]
+        elif len(args) == 5:
+            chi1, chi2, chi3, chi4, chi5 = args
+        else:
+            raise ValueError(
+                "You must provide either 5 individual angles or a list of 5 angles."
+            )
 
         sslist = self.data
-        modelss = proteusPy.Disulfide("model")
-
-        modelss.build_model(chi1, chi2, chi3, chi4, chi5)
-        res = DisulfideList([], "neighbors")
+        modelss = proteusPy.Disulfide("model", torsions=[chi1, chi2, chi3, chi4, chi5])
         res = modelss.torsion_neighbors(sslist, cutoff)
+
+        resname = f"Neighbors within {cutoff:.2f}° of [{', '.join(f'{angle:.2f}' for angle in modelss.dihedrals)}]"
+        res.pdb_id = resname
 
         return res
 
@@ -1077,18 +1138,11 @@ class DisulfideList(UserList):
         :return: DisulfideList of neighbors
         """
 
-        chi1 = ss.chi1
-        chi2 = ss.chi2
-        chi3 = ss.chi3
-        chi4 = ss.chi4
-        chi5 = ss.chi5
-
         sslist = self.data
-        modelss = proteusPy.Disulfide("model")
+        res = ss.torsion_neighbors(sslist, cutoff)
 
-        modelss.build_model(chi1, chi2, chi3, chi4, chi5)
-        res = DisulfideList([], "neighbors")
-        res = modelss.torsion_neighbors(sslist, cutoff)
+        resname = f"{ss.name} neighbors within {cutoff}°"
+        res.pdb_id = resname
 
         return res
 
@@ -1120,6 +1174,13 @@ class DisulfideList(UserList):
 
     def validate_ss(self, value):
         """Return the Disulfide object if it is a Disulfide, otherwise raise an error"""
+        from proteusPy.Disulfide import Disulfide
+
+        if value is None:
+            raise ValueError("The value cannot be None.")
+
+        if not isinstance(value, Disulfide):
+            raise TypeError("The value must be an instance of Disulfide.")
         return value
 
     def create_deviation_dataframe(self):
@@ -1140,19 +1201,29 @@ class DisulfideList(UserList):
             "Ca_Distance": [],
         }
 
-        for ss in tqdm(disulfide_list, desc="Processing..."):
-            pdb_id = ss.pdb_id
-            resolution = ss.resolution
-            ca_distance = ss.ca_distance
-            angle_deviation = ss.bond_angle_ideality
-            distance_deviation = ss.bond_length_ideality
+        # Collect data in batches
+        pdb_ids = []
+        resolutions = []
+        ss_names = []
+        angle_deviations = []
+        bondlength_deviations = []
+        ca_distances = []
 
-            data["PDB_ID"].append(pdb_id)
-            data["Resolution"].append(resolution)
-            data["SS_Name"].append(ss.name)
-            data["Angle_Deviation"].append(angle_deviation)
-            data["Bondlength_Deviation"].append(distance_deviation)
-            data["Ca_Distance"].append(ca_distance)
+        for ss in tqdm(disulfide_list, desc="Processing..."):
+            pdb_ids.append(ss.pdb_id)
+            resolutions.append(ss.resolution)
+            ss_names.append(ss.name)
+            angle_deviations.append(ss.bond_angle_ideality)
+            bondlength_deviations.append(ss.bond_length_ideality)
+            ca_distances.append(ss.ca_distance)
+
+        # Extend the data dictionary in one go
+        data["PDB_ID"].extend(pdb_ids)
+        data["Resolution"].extend(resolutions)
+        data["SS_Name"].extend(ss_names)
+        data["Angle_Deviation"].extend(angle_deviations)
+        data["Bondlength_Deviation"].extend(bondlength_deviations)
+        data["Ca_Distance"].extend(ca_distances)
 
         df = pd.DataFrame(data)
         return df
@@ -1208,7 +1279,7 @@ def load_disulfides_from_id(
     structure_fname = os.path.join(pdb_dir, f"pdb{pdb_id}.ent")
 
     if verbose:
-        mess = f"-> load_disulfide_from_id() - Parsing structure: {pdb_id}:"
+        mess = f"Parsing structure: {pdb_id}:"
         _logger.info(mess)
 
     SSList = DisulfideList([], pdb_id, resolution)
@@ -1224,12 +1295,12 @@ def load_disulfides_from_id(
         _logger.warning(mess)
         return None
 
+    if quiet:
+        _logger.setLevel(logging.ERROR)
+
     if verbose:
         mess = f"{pdb_id} has {num_ssbonds} SSBonds, found: {errors} errors"
         _logger.info(mess)
-
-    if quiet:
-        _logger.setLevel(logging.ERROR)
 
     resolution = ssbond_atom_list["resolution"]
     for pair in ssbond_atom_list["pairs"]:
@@ -1249,9 +1320,20 @@ def load_disulfides_from_id(
 
         if proximal == distal:
             if verbose:
-                mess = f"SSBond record has (proximal == distal):\
-                {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
-                _logger.info(mess)
+                mess = (
+                    f"SSBond record has (proximal == distal): "
+                    f"{pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
+                )
+                _logger.error(mess)
+
+        if proximal == distal and chain1_id == chain2_id:
+            mess = (
+                f"SSBond record has self reference, skipping: "
+                f"{pdb_id} <{proximal} {chain1_id}> <{distal} {chain2_id}>"
+            )
+
+            _logger.error(mess)
+            continue
 
         if verbose:
             mess = (
@@ -1275,17 +1357,17 @@ def load_disulfides_from_id(
         )
 
         if new_ss is not None:
-
             SSList.append(new_ss)
             if verbose:
                 mess = f"Initialized Disulfide: {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
                 _logger.info(mess)
         else:
-            mess = f"Cannot initialize Disulfide: {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
-            _logger.ERROR(mess)
+            mess = f"Cannot initialize Disulfide: {pdb_id} <{proximal} {chain1_id}> <{distal} {chain2_id}>"
+            _logger.error(mess)
 
         i += 1
 
+    # restore default logging level
     if quiet:
         _logger.setLevel(logging.WARNING)
 
