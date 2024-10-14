@@ -2512,7 +2512,7 @@ It represents the core of the current implementation of <em>proteusPy</em>.</p>
 </span><span id="L-2131"><a href="#L-2131"><span class="linenos">2131</span></a><span class="sd">        the lowest and highest energies, and then find the nearest conformational neighbors.</span>
 </span><span id="L-2132"><a href="#L-2132"><span class="linenos">2132</span></a><span class="sd">        Finally, we display the neighbors overlaid against a common reference frame.</span>
 </span><span id="L-2133"><a href="#L-2133"><span class="linenos">2133</span></a>
-</span><span id="L-2134"><a href="#L-2134"><span class="linenos">2134</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy import Load_PDB_SS, DisulfideList, Disulfide, get_macos_theme</span>
+</span><span id="L-2134"><a href="#L-2134"><span class="linenos">2134</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy import Load_PDB_SS, DisulfideList, Disulfide</span>
 </span><span id="L-2135"><a href="#L-2135"><span class="linenos">2135</span></a><span class="sd">        &gt;&gt;&gt; light = get_theme()</span>
 </span><span id="L-2136"><a href="#L-2136"><span class="linenos">2136</span></a><span class="sd">        &gt;&gt;&gt; PDB_SS = Load_PDB_SS(verbose=False, subset=True)</span>
 </span><span id="L-2137"><a href="#L-2137"><span class="linenos">2137</span></a><span class="sd">        &gt;&gt;&gt; ss_list = DisulfideList([], &#39;tmp&#39;)</span>
@@ -4892,7 +4892,7 @@ It represents the core of the current implementation of <em>proteusPy</em>.</p>
 </span><span id="Disulfide-2132"><a href="#Disulfide-2132"><span class="linenos">2132</span></a><span class="sd">        the lowest and highest energies, and then find the nearest conformational neighbors.</span>
 </span><span id="Disulfide-2133"><a href="#Disulfide-2133"><span class="linenos">2133</span></a><span class="sd">        Finally, we display the neighbors overlaid against a common reference frame.</span>
 </span><span id="Disulfide-2134"><a href="#Disulfide-2134"><span class="linenos">2134</span></a>
-</span><span id="Disulfide-2135"><a href="#Disulfide-2135"><span class="linenos">2135</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy import Load_PDB_SS, DisulfideList, Disulfide, get_macos_theme</span>
+</span><span id="Disulfide-2135"><a href="#Disulfide-2135"><span class="linenos">2135</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy import Load_PDB_SS, DisulfideList, Disulfide</span>
 </span><span id="Disulfide-2136"><a href="#Disulfide-2136"><span class="linenos">2136</span></a><span class="sd">        &gt;&gt;&gt; light = get_theme()</span>
 </span><span id="Disulfide-2137"><a href="#Disulfide-2137"><span class="linenos">2137</span></a><span class="sd">        &gt;&gt;&gt; PDB_SS = Load_PDB_SS(verbose=False, subset=True)</span>
 </span><span id="Disulfide-2138"><a href="#Disulfide-2138"><span class="linenos">2138</span></a><span class="sd">        &gt;&gt;&gt; ss_list = DisulfideList([], &#39;tmp&#39;)</span>
@@ -7920,7 +7920,7 @@ determine their torsional similarity via a 5-Dimensional Euclidean distance metr
 </span><span id="Disulfide.torsion_neighbors-2132"><a href="#Disulfide.torsion_neighbors-2132"><span class="linenos">2132</span></a><span class="sd">        the lowest and highest energies, and then find the nearest conformational neighbors.</span>
 </span><span id="Disulfide.torsion_neighbors-2133"><a href="#Disulfide.torsion_neighbors-2133"><span class="linenos">2133</span></a><span class="sd">        Finally, we display the neighbors overlaid against a common reference frame.</span>
 </span><span id="Disulfide.torsion_neighbors-2134"><a href="#Disulfide.torsion_neighbors-2134"><span class="linenos">2134</span></a>
-</span><span id="Disulfide.torsion_neighbors-2135"><a href="#Disulfide.torsion_neighbors-2135"><span class="linenos">2135</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy import Load_PDB_SS, DisulfideList, Disulfide, get_macos_theme</span>
+</span><span id="Disulfide.torsion_neighbors-2135"><a href="#Disulfide.torsion_neighbors-2135"><span class="linenos">2135</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy import Load_PDB_SS, DisulfideList, Disulfide</span>
 </span><span id="Disulfide.torsion_neighbors-2136"><a href="#Disulfide.torsion_neighbors-2136"><span class="linenos">2136</span></a><span class="sd">        &gt;&gt;&gt; light = get_theme()</span>
 </span><span id="Disulfide.torsion_neighbors-2137"><a href="#Disulfide.torsion_neighbors-2137"><span class="linenos">2137</span></a><span class="sd">        &gt;&gt;&gt; PDB_SS = Load_PDB_SS(verbose=False, subset=True)</span>
 </span><span id="Disulfide.torsion_neighbors-2138"><a href="#Disulfide.torsion_neighbors-2138"><span class="linenos">2138</span></a><span class="sd">        &gt;&gt;&gt; ss_list = DisulfideList([], &#39;tmp&#39;)</span>
@@ -7977,7 +7977,7 @@ the lowest and highest energies, and then find the nearest conformational neighb
 Finally, we display the neighbors overlaid against a common reference frame.</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">proteusPy</span> <span class="kn">import</span> <span class="n">Load_PDB_SS</span><span class="p">,</span> <span class="n">DisulfideList</span><span class="p">,</span> <span class="n">Disulfide</span><span class="p">,</span> <span class="n">get_macos_theme</span>
+<pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">proteusPy</span> <span class="kn">import</span> <span class="n">Load_PDB_SS</span><span class="p">,</span> <span class="n">DisulfideList</span><span class="p">,</span> <span class="n">Disulfide</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">light</span> <span class="o">=</span> <span class="n">get_theme</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">PDB_SS</span> <span class="o">=</span> <span class="n">Load_PDB_SS</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ss_list</span> <span class="o">=</span> <span class="n">DisulfideList</span><span class="p">([],</span> <span class="s1">&#39;tmp&#39;</span><span class="p">)</span>

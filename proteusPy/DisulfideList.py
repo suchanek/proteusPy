@@ -30,6 +30,7 @@ import copy
 import logging
 import os
 from collections import UserList
+from itertools import combinations
 from pathlib import Path
 
 import numpy as np
@@ -261,6 +262,21 @@ class DisulfideList(UserList):
         return pl
 
     @property
+    def average_ca_distance(self):
+        """
+        Return the Average energy (kcal/mol) for the Disulfides in the list.
+
+        :return: Average energy (kcal/mol) between all atoms in the list
+        """
+        sslist = self.data
+        tot = len(sslist)
+        if tot == 0:
+            return 0.0
+
+        total_dist = sum(ss.ca_distance for ss in sslist)
+        return total_dist / tot
+
+    @property
     def average_distance(self):
         """
         Return the Average distance (Å) between the atoms in the list.
@@ -287,18 +303,14 @@ class DisulfideList(UserList):
         Return the Average energy (kcal/mol) for the Disulfides in the list.
 
         :return: Average energy (kcal/mol) between all atoms in the list
-
         """
         sslist = self.data
         tot = len(sslist)
         if tot == 0:
             return 0.0
 
-        total = 0.0
-        for ss1 in sslist:
-            total += ss1.energy
-
-        return total / tot
+        total_energy = sum(ss.energy for ss in sslist)
+        return total_energy / tot
 
     @property
     def average_conformation(self):
@@ -361,16 +373,13 @@ class DisulfideList(UserList):
         """
         sslist = self.data
         total = 0
-        cnt = 1
+        cnt = 0
 
-        for ss1 in sslist:
-            for ss2 in sslist:
-                if ss2 == ss1:
-                    continue
-                total += ss1.torsion_distance(ss2)
-                cnt += 1
+        for ss1, ss2 in combinations(sslist, 2):
+            total += ss1.torsion_distance(ss2)
+            cnt += 1
 
-        return total / cnt
+        return float(total / cnt) if cnt > 0 else 0
 
     def build_distance_df(self) -> pd.DataFrame:
         """
@@ -387,7 +396,11 @@ class DisulfideList(UserList):
         total_length = len(sslist)
         update_interval = max(1, total_length // 20)  # 5% of the list length
 
-        pbar = tqdm(sslist, ncols=PBAR_COLS, leave=False)
+        if self.quiet:
+            pbar = sslist
+        else:
+            pbar = tqdm(sslist, ncols=PBAR_COLS, leave=False)
+
         for ss in pbar:
             new_row = {
                 "source": ss.pdb_id,
@@ -401,10 +414,9 @@ class DisulfideList(UserList):
             rows.append(new_row)
             i += 1
 
-            if i % update_interval == 0 or i == total_length - 1:
-                pbar.update(update_interval)
-
-        pbar.close()
+            if not self.quiet:
+                if i % update_interval == 0 or i == total_length - 1:
+                    pbar.update(update_interval)
 
         # create the dataframe from the list of dictionaries
         SS_df = pd.DataFrame(rows, columns=Distance_DF_Cols)
@@ -520,6 +532,41 @@ class DisulfideList(UserList):
         dist_stats = pd.DataFrame(dist_stats, columns=dist_cols)
 
         return tor_stats, dist_stats
+
+    def describe(self):
+        """
+        Prints out relevant attributes of the given disulfideList.
+
+        :param disulfideList: A list of disulfide objects.
+        :param list_name: The name of the list.
+        """
+        name = self.pdb_id
+        avg_distance = self.average_ca_distance
+        avg_energy = self.average_energy
+        avg_resolution = self.average_resolution
+        list_length = len(self.data)
+
+        if list_length == 0:
+            avg_bondangle = 0
+            avg_bondlength = 0
+        else:
+            total_bondangle = 0
+            total_bondlength = 0
+
+            for ss in self.data:
+                total_bondangle += ss.bond_angle_ideality
+                total_bondlength += ss.bond_length_ideality
+
+            avg_bondangle = total_bondangle / list_length
+            avg_bondlength = total_bondlength / list_length
+
+        print(f"DisulfideList: {name}")
+        print(f"Length: {list_length}")
+        print(f"Average energy: {avg_energy:.2f} kcal/mol")
+        print(f"Average CA distance: {avg_distance:.2f} Å")
+        print(f"Average Resolution: {avg_resolution:.2f} Å")
+        print(f"Bond angle deviation: {avg_bondangle:.2f}°")
+        print(f"Bond length deviation: {avg_bondlength:.2f} Å")
 
     def display(self, style="sb", light="Auto", panelsize=512):
         """

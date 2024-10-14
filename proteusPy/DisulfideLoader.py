@@ -4,7 +4,7 @@ the analysis and modeling of protein structures, with an emphasis on disulfide b
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
 Author: Eric G. Suchanek, PhD
-Last revision: 9/11/2024
+Last revision: 10/14/2024
 """
 
 # pylint: disable=C0301
@@ -210,22 +210,23 @@ class DisulfideLoader:
         raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
 
     @property
-    def Average_Resolution(self) -> float:
+    def average_resolution(self) -> float:
         """
         Compute and return the average structure resolution for the given list.
 
         :return: Average resolution (A)
         """
-        res = 0.0
-        cnt = 1
         sslist = self.SSList
+        valid_resolutions = [
+            ss.resolution
+            for ss in sslist
+            if ss.resolution is not None and ss.resolution != -1.0
+        ]
 
-        for ss in sslist:
-            _res = ss.resolution
-            if _res is not None and res != -1.0:
-                res += _res
-                cnt += 1
-        return res / cnt
+        if not valid_resolutions:
+            return -1.0  # or return None if you prefer
+
+        return sum(valid_resolutions) / len(valid_resolutions)
 
     def build_ss_from_idlist(self, idlist) -> DisulfideList:
         """
@@ -269,7 +270,7 @@ class DisulfideLoader:
             disulfide_dict[disulfide.pdb_id].append(index)
         return disulfide_dict
 
-    def extract_class(self, clsid, verbose=False) -> DisulfideList:
+    def extract_class(self, clsid, base=8, verbose=False) -> DisulfideList:
         """
         Return the list of disulfides corresponding to the input `clsid`.
 
@@ -283,7 +284,10 @@ class DisulfideLoader:
         if "0" in clsid:
             eightorbin = self.tclass.classdf
         else:
-            eightorbin = self.tclass.eightclass_df
+            if base == 8:
+                eightorbin = self.tclass.eightclass_df
+            elif base == 6:
+                eightorbin = self.tclass.sixclass_df
 
         tot_classes = eightorbin.shape[0]
         class_disulfides = DisulfideList([], clsid, quiet=True)
@@ -335,24 +339,7 @@ class DisulfideLoader:
     def describe(self) -> None:
         """
         Display information about the Disulfide database contained in `self`.
-
-        Example:<br>
-
-        ```python
-        from proteusPy import Load_PDB_SS
-        PDB_SS = Load_PDB_SS(verbose=False, subset=False)
-        PDB_SS.describe()
-             =========== RCSB Disulfide Database Summary ==============
-                 =========== Built: 2024-02-12 17:48:13 ==============
-        PDB IDs present:                    35818
-        Disulfides loaded:                  120494
-        Average structure resolution:       2.34 Å
-        Lowest Energy Disulfide:            2q7q_75D_140D
-        Highest Energy Disulfide:           1toz_456A_467A
-        Cα distance cutoff:                 8.00 Å
-        Total RAM Used:                     30.72 GB.
-            ================= proteusPy: 0.91 =======================
-        ```
+        :return: None
         """
         vers = self.version
         tot = self.TotalDisulfides
@@ -362,7 +349,7 @@ class DisulfideLoader:
             + sys.getsizeof(self.SSDict)
             + sys.getsizeof(self.TorsionDF)
         ) / (1024 * 1024)
-        res = self.Average_Resolution
+        res = self.average_resolution
         cutoff = self.cutoff
         timestr = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.timestamp))
         ssMin, ssMax = self.SSList.minmax_energy
@@ -998,6 +985,7 @@ def Bootstrap_PDB_SS(
         _logger.info(mess)
 
     return loader
+
 
 
 if __name__ == "__main__":

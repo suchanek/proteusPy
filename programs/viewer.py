@@ -207,12 +207,12 @@ class DisulfideViewer(QMainWindow):
 
         # Create sliders for camera control
         self.slider_x = QSlider(Qt.Horizontal)
-        self.slider_x.setRange(-180, 180)
+        self.slider_x.setRange(-80, 80)
         self.slider_x.setValue(0)
         self.slider_x.valueChanged.connect(self.update_camera_position)
 
         self.slider_y = QSlider(Qt.Vertical)
-        self.slider_y.setRange(-180, 180)
+        self.slider_y.setRange(-80, 80)
         self.slider_y.setValue(0)
         self.slider_y.valueChanged.connect(self.update_camera_position)
 
@@ -297,6 +297,7 @@ class DisulfideViewer(QMainWindow):
         :type style: str
         """
         self.current_style = style
+        self.checkbox_single.setChecked(True)  # Ensure the "Single" checkbox is checked
         self.display()
 
     def on_pdb_textbox_enter(self):
@@ -384,7 +385,7 @@ class DisulfideViewer(QMainWindow):
         x = self.slider_x.value()
         y = self.slider_y.value()
 
-        self.plotter_widget.camera_position = [(x, y, 10), (0, 0, 0), (0, 1, 0)]
+        self.plotter_widget.camera_position = [(x, y, 10), (0, 0, 0), (0, -1, 0)]
         self.plotter_widget.render()
 
     def toggle_theme(self):
@@ -607,17 +608,12 @@ class DisulfideViewer(QMainWindow):
             self.display_overlay(plotter)
             # self.display_list(style=style, light=light)
 
-        # self.add_floor(plotter)
-
         # Set perspective projection
         plotter.camera.SetParallelProjection(False)  # False for perspective
         plotter.reset_camera()
         plotter.render()
 
-    def display_overlay(
-        self,
-        pl,
-    ):
+    def display_overlay(self, pl):
         """
         Display all disulfides in the list overlaid in stick mode against
         a common coordinate frames. This allows us to see all of the disulfides
@@ -683,6 +679,7 @@ class DisulfideViewer(QMainWindow):
             )
 
         self.set_camera_view()
+        
         return pl
 
 
