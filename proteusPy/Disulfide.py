@@ -2131,7 +2131,7 @@ class Disulfide:
         the lowest and highest energies, and then find the nearest conformational neighbors.
         Finally, we display the neighbors overlaid against a common reference frame.
 
-        >>> from proteusPy import Load_PDB_SS, DisulfideList, Disulfide, get_macos_theme
+        >>> from proteusPy import Load_PDB_SS, DisulfideList, Disulfide
         >>> light = get_theme()
         >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
         >>> ss_list = DisulfideList([], 'tmp')
