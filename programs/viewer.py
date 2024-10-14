@@ -23,6 +23,8 @@ Functions:
     main: The main entry point of the application.
 """
 
+# pylint: disable=W0212
+
 import os
 import sys
 
@@ -207,12 +209,12 @@ class DisulfideViewer(QMainWindow):
 
         # Create sliders for camera control
         self.slider_x = QSlider(Qt.Horizontal)
-        self.slider_x.setRange(-80, 80)
+        self.slider_x.setRange(-100, 100)
         self.slider_x.setValue(0)
         self.slider_x.valueChanged.connect(self.update_camera_position)
 
         self.slider_y = QSlider(Qt.Vertical)
-        self.slider_y.setRange(-80, 80)
+        self.slider_y.setRange(-100, 100)
         self.slider_y.setValue(0)
         self.slider_y.valueChanged.connect(self.update_camera_position)
 
@@ -375,7 +377,6 @@ class DisulfideViewer(QMainWindow):
         """
         self.single = state == Qt.Checked
         self.display(self)  # Use the current style
-        # self.on_pdb_dropdown_change(0)
 
     def update_camera_position(self):
         """
@@ -523,7 +524,6 @@ class DisulfideViewer(QMainWindow):
         :param light: If True, light background, if False, dark
         """
         sslist = self.current_sslist
-        pid = sslist.pdb_id
         ssbonds = sslist.data
         tot_ss = len(ssbonds)  # number of ssbonds
         rows, cols = grid_dimensions(tot_ss)
@@ -679,7 +679,7 @@ class DisulfideViewer(QMainWindow):
             )
 
         self.set_camera_view()
-        
+
         return pl
 
 
