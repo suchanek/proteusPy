@@ -10,6 +10,7 @@ Copyright (c)2024 Eric G. Suchanek, PhD, all rights reserved
 # pylint: disable=c0413
 # pylint: disable=c0415
 # pylint: disable=w1514
+# pylint: disable=w0718
 
 import copy
 import datetime
@@ -34,7 +35,7 @@ from tqdm.contrib.logging import logging_redirect_tqdm
 
 from proteusPy import Disulfide, DisulfideList, __version__
 from proteusPy.DisulfideExceptions import DisulfideIOException
-from proteusPy.logger_config import get_logger
+from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
     MODEL_DIR,
     PDB_DIR,
@@ -43,7 +44,7 @@ from proteusPy.ProteusGlobals import (
     SS_PICKLE_FILE,
 )
 
-_logger = get_logger(__name__)
+_logger = create_logger(__name__)
 
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
@@ -931,62 +932,12 @@ def Extract_Disulfides_From_List(
     return
 
 
-def get_macos_theme():
-    """
-    Determine the display theme for a macOS computer using AppleScript.
-
-    Returns:
-    :return str: 'light' if the theme is light, 'dark' if the theme is dark, and None otherwise
-
-    Example:
-    >>> get_macos_theme()
-    True
-    """
-    if platform.system() != "Darwin":
-        # Not running on macOS
-        return None
-
-    try:
-        # AppleScript to get the appearance setting
-        script = """
-        tell application "System Events"
-            tell appearance preferences
-                if (dark mode) then
-                    return "dark"
-                else
-                    return "light"
-                end if
-            end tell
-        end tell
-        """
-        # Run the AppleScript
-        result = subprocess.run(
-            ["osascript", "-e", script],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            check=True,
-        )
-
-        # Check the output
-        if result.returncode == 0:
-            theme = result.stdout.strip().lower()
-            if theme in ["dark", "light"]:
-                return theme
-            return None
-        return None
-
-    except Exception:
-        # In case of any exception, return 'none'
-        return None
-
-
 def get_theme():
     """
     Determine the display theme for the current operating system.
 
     Returns:
-    :return str: 'light' if the theme is light, 'dark' if the theme is dark, and None otherwise
+    :return str: 'light' if the theme is light, 'dark' if the theme is dark, and 'light' otherwise
 
     Example:
     >>> get_theme()
@@ -1072,11 +1023,11 @@ def get_theme():
 
         except Exception:
             # In case of any exception, return None
-            return None
+            return "light"
 
     else:
         # Unsupported OS
-        return None
+        return "light"
 
 
 # functions to calculate statistics and filter disulfide lists via pandas
@@ -1202,35 +1153,6 @@ def load_list_from_file(filename):
     with open(filename, "rb") as file:
         loaded_list = pickle.load(file)
     return loaded_list
-
-
-def set_logger_level_for_module(pkg_name, level=""):
-    """
-    Set the logging level for all loggers within a specified package.
-
-    This function iterates through all registered loggers and sets the logging
-    level for those that belong to the specified package.
-
-    :param pkg_name: The name of the package for which to set the logging level.
-    :type pkg_name: str
-    :param level: The logging level to set (e.g., 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL').
-                  If not specified, the logging level will not be changed.
-    :type level: str, optional
-    :return: A list of logger names that were found and had their levels set.
-    :rtype: list
-    """
-    logger_dict = logging.Logger.manager.loggerDict
-    registered_loggers = [
-        name
-        for name, logger in logger_dict.items()
-        if isinstance(logger, logging.Logger) and name.startswith(pkg_name)
-    ]
-    for logger_name in registered_loggers:
-        logger = logging.getLogger(logger_name)
-        if level:
-            logger.setLevel(level)
-
-    return registered_loggers
 
 
 if __name__ == "__main__":

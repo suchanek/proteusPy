@@ -115,6 +115,8 @@ setup(
         "imageio[ffmpeg]",
         "colorama",
         "Biopython",
+        "pyvistaqt",
+        "pyqt5",
     ],
     source="https://github.com/suchanek/proteusPy/",
     project_urls={

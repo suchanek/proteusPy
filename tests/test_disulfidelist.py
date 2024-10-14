@@ -1,11 +1,12 @@
 import pytest
 
-from proteusPy import DisulfideList, load_disulfides_from_id
+from proteusPy import Disulfide, DisulfideList, load_disulfides_from_id
 from proteusPy.ProteusGlobals import DATA_DIR
 
 # plyint: disable=C0103
 # plyint: disable=C0116
 # plyint: disable=C0114
+# plyint: disable=W0621
 
 
 @pytest.fixture
@@ -52,30 +53,32 @@ def test_average_conformation(pdb_5rsa):
     )
 
 
+def test_insert_bad_entry(disulfide_list):
+    item1 = "badstring"
+    with pytest.raises(TypeError):
+        disulfide_list.insert(0, item1)
+
+
 def test_insert_at_beginning(disulfide_list):
-    disulfide_list.insert(0, "item1")
-    assert disulfide_list.data == ["item1"]
+    item1 = Disulfide("item1")
+    disulfide_list.insert(0, item1)
+    assert disulfide_list[0].name == "item1"
 
 
 def test_insert_at_end(disulfide_list):
-    disulfide_list.insert(0, "item1")
-    disulfide_list.insert(1, "item2")
-    assert disulfide_list.data == ["item1", "item2"]
+    item1 = Disulfide("item1")
+    item2 = Disulfide("item2")
+    disulfide_list.insert(0, item1)
+    disulfide_list.insert(1, item2)
+    assert disulfide_list.data == [item1, item2]
 
 
 def test_insert_in_middle(disulfide_list):
-    disulfide_list.insert(0, "item1")
-    disulfide_list.insert(1, "item3")
-    disulfide_list.insert(1, "item2")
-    assert disulfide_list.data == ["item1", "item2", "item3"]
+    item1 = Disulfide("item1")
+    item2 = Disulfide("item2")
+    item3 = Disulfide("item3")
 
-
-def test_insert_into_empty_list(disulfide_list):
-    disulfide_list.insert(0, "item1")
-    assert disulfide_list.data == ["item1"]
-
-
-def test_insert_with_negative_index(disulfide_list):
-    disulfide_list.insert(0, "item1")
-    disulfide_list.insert(-1, "item2")
-    assert disulfide_list.data == ["item2", "item1"]
+    disulfide_list.append(item1)
+    disulfide_list.append(item2)
+    disulfide_list.append(item3)
+    assert disulfide_list.data == [item1, item2, item3]

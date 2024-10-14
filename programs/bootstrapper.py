@@ -9,7 +9,7 @@ import argparse
 from proteusPy import Bootstrap_PDB_SS, DisulfideLoader, get_logger
 from proteusPy.ProteusGlobals import DATA_DIR
 
-_logger = get_logger(__name__)
+_logger = create_logger(__name__)
 
 __version__ = "0.1.0"
 

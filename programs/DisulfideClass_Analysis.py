@@ -88,11 +88,8 @@ Author: Eric G. Suchanek, PhD. Last Modified: 8/27/2024
 # plyint: disable=C0103
 
 import argparse
-import cProfile
-import io
 import os
 import pickle
-import pstats
 import shutil
 import threading
 import time
@@ -105,12 +102,17 @@ import pandas as pd
 from colorama import Fore, Style, init
 from tqdm import tqdm
 
-from proteusPy import Disulfide, DisulfideList, DisulfideLoader, Load_PDB_SS
+from proteusPy import (
+    Disulfide,
+    DisulfideList,
+    DisulfideLoader,
+    Load_PDB_SS,
+    configure_master_logger,
+    create_logger,
+    set_logger_level,
+    toggle_stream_handler,
+)
 from proteusPy.ProteusGlobals import SS_CONSENSUS_BIN_FILE, SS_CONSENSUS_OCT_FILE
-
-# Initialize colorama
-init(autoreset=True)
-
 
 HOME_DIR = Path.home()
 PDB = Path(os.getenv("PDB", HOME_DIR / "pdb"))
@@ -133,8 +135,15 @@ MAMBAFORGE_DIR = HOME_DIR / Path("mambaforge/envs")
 
 VENV_DIR = Path("lib/python3.11/site-packages/proteusPy/data")
 
-
 PBAR_COLS = 78
+
+# Initialize colorama
+init(autoreset=True)
+
+_logger = create_logger("DisulfideClass_Analysis")
+
+configure_master_logger("DisulfidClass_Analysis.log")
+set_logger_level("DisulfideClass_Analysis", "INFO")
 
 
 def get_args():
@@ -195,7 +204,7 @@ def get_args():
         "-g",
         "--graph",
         help="Create class graphs.",
-        default=False,
+        default=True,
         action=argparse.BooleanOptionalAction,
     )
     parser.add_argument(
@@ -283,12 +292,22 @@ def task(
             bar_format="{l_bar}%s{bar}{r_bar}%s" % (Fore.YELLOW, Style.RESET_ALL),
         )
 
-        fname = os.path.join(save_dir, f"{prefix}_{cls}.png")
+        fname = Path(save_dir) / f"{prefix}_{cutoff}_{cls}_{len(ss_list)}.png"
 
         class_disulfides_array = np.empty(len(ss_list), dtype=object)
         update_freq = 20
         for idx, ssid in enumerate(ss_list):
-            class_disulfides_array[idx] = loader[ssid]
+            _ss = loader[ssid]
+            if _ss is None:
+                _mess = f"Error: Disulfide {ssid} not found."
+                _logger.error(_mess)
+                continue
+
+            try:
+                class_disulfides_array[idx] = loader[ssid]
+            except Exception as e:
+                _logger.error(f"Error: {e}")
+
             if (idx + 1) % update_freq == 0 or (idx + 1) == len(ss_list):
                 remaining = len(ss_list) - (idx + 1)
                 task_pbar.update(update_freq if remaining >= update_freq else remaining)
@@ -321,7 +340,7 @@ def analyze_classes_threaded(
     num_threads=6,
     verbose=False,
     do_octant=True,
-    prefix="ss_class",
+    prefix="ss",
 ) -> DisulfideList:
     """
     Analyze the six classes of disulfide bonds.
@@ -460,8 +479,6 @@ def analyze_classes(
 
     if octant:
         print("Analyzing octant classes.")
-        # plot_classes_vs_cutoff(loader, cutoff + 0.25 * cutoff, 50)
-
         analyze_classes_threaded(
             loader,
             do_graph=do_graph,
@@ -469,7 +486,7 @@ def analyze_classes(
             verbose=verbose,
             num_threads=threads,
             do_octant=True,
-            prefix="ss_class_oct",
+            prefix="ss_oct",
         )
 
     if binary:
@@ -482,7 +499,7 @@ def analyze_classes(
             verbose=verbose,
             num_threads=threads,
             do_octant=False,
-            prefix="ss_class_bin",
+            prefix="ss_bin",
         )
 
     return
@@ -498,41 +515,6 @@ def octant_classes_vs_cutoff(loader: DisulfideLoader, cutoff):
 
     class_df = loader.tclass.filter_eightclass_by_percentage(cutoff)
     return class_df.shape[0]
-
-
-def plot_eightclass_vs_cutoff(loader: DisulfideLoader, cutoff, steps, verbose=False):
-    """
-    Plot the total percentage and number of members for each class against the cutoff value.
-
-    :param cutoff: Percent cutoff value for filtering the classes.
-    :return: None
-    """
-
-    _cutoff = np.linspace(0, cutoff, steps)
-    tot_list = []
-    members_list = []
-
-    for c in _cutoff:
-        class_df = loader.tclass.filter_eightclass_by_percentage(c)
-        tot = class_df["percentage"].sum()
-        tot_list.append(tot)
-        members_list.append(class_df.shape[0])
-        if verbose:
-            print(
-                f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
-            )
-
-    _, ax1 = plt.subplots()
-
-    ax2 = ax1.twinx()
-    ax1.plot(_cutoff, tot_list, label="Total percentage", color="blue")
-    ax2.plot(_cutoff, members_list, label="Number of members", color="red")
-
-    ax1.set_xlabel("Cutoff")
-    ax1.set_ylabel("Total percentage", color="blue")
-    ax2.set_ylabel("Number of members", color="red")
-
-    plt.show()
 
 
 def update_repository(source_dir, repo_dir, verbose=True, binary=False, octant=False):

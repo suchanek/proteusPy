@@ -4,7 +4,7 @@ the analysis and modeling of protein structures, with an emphasis on disulfide b
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
 Author: Eric G. Suchanek, PhD
-Last revision: 9/11/2024
+Last revision: 10/14/2024
 """
 
 # pylint: disable=C0301
@@ -31,7 +31,7 @@ from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideClass_Constructor import DisulfideClass_Constructor
 from proteusPy.DisulfideExceptions import DisulfideException, DisulfideParseWarning
 from proteusPy.DisulfideList import DisulfideList
-from proteusPy.logger_config import get_logger
+from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
     LOADER_ALL_URL,
@@ -42,7 +42,7 @@ from proteusPy.ProteusGlobals import (
     SS_PICKLE_FILE,
 )
 
-_logger = get_logger(__name__)
+_logger = create_logger(__name__)
 
 try:
     # Check if running in Jupyter
@@ -210,22 +210,23 @@ class DisulfideLoader:
         raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
 
     @property
-    def Average_Resolution(self) -> float:
+    def average_resolution(self) -> float:
         """
         Compute and return the average structure resolution for the given list.
 
         :return: Average resolution (A)
         """
-        res = 0.0
-        cnt = 1
         sslist = self.SSList
+        valid_resolutions = [
+            ss.resolution
+            for ss in sslist
+            if ss.resolution is not None and ss.resolution != -1.0
+        ]
 
-        for ss in sslist:
-            _res = ss.resolution
-            if _res is not None and res != -1.0:
-                res += _res
-                cnt += 1
-        return res / cnt
+        if not valid_resolutions:
+            return -1.0  # or return None if you prefer
+
+        return sum(valid_resolutions) / len(valid_resolutions)
 
     def build_ss_from_idlist(self, idlist) -> DisulfideList:
         """
@@ -235,10 +236,10 @@ class DisulfideLoader:
         :return: DisulfideList
         """
         res = DisulfideList([], "RCSB_list")
-        for k, v in self.SSDict.items():
-            if k in idlist:
-                for value in v:
-                    res.append(self.SSList[value])
+        for pdbid, sslist in self.SSDict.items():
+            if pdbid in idlist:
+                for ssid in sslist:
+                    res.append(self.SSList[ssid])
         return res
 
     def copy(self):
@@ -269,7 +270,7 @@ class DisulfideLoader:
             disulfide_dict[disulfide.pdb_id].append(index)
         return disulfide_dict
 
-    def extract_class(self, clsid, verbose=False) -> DisulfideList:
+    def extract_class(self, clsid, base=8, verbose=False) -> DisulfideList:
         """
         Return the list of disulfides corresponding to the input `clsid`.
 
@@ -278,20 +279,23 @@ class DisulfideLoader:
         :return: The list of disulfide bonds from the class.
         """
 
-        sixorbin = None
+        eightorbin = None
 
         if "0" in clsid:
-            sixorbin = self.tclass.classdf
+            eightorbin = self.tclass.classdf
         else:
-            sixorbin = self.tclass.eightclass_df
+            if base == 8:
+                eightorbin = self.tclass.eightclass_df
+            elif base == 6:
+                eightorbin = self.tclass.sixclass_df
 
-        tot_classes = sixorbin.shape[0]
+        tot_classes = eightorbin.shape[0]
         class_disulfides = DisulfideList([], clsid, quiet=True)
 
         if verbose:
-            _pbar = tqdm(sixorbin.iterrows(), total=tot_classes, leave=True)
+            _pbar = tqdm(eightorbin.iterrows(), total=tot_classes, leave=True)
         else:
-            _pbar = sixorbin.iterrows()
+            _pbar = eightorbin.iterrows()
 
         for idx, row in _pbar:
             _cls = row["class_id"]
@@ -325,7 +329,7 @@ class DisulfideLoader:
 
     def get_by_name(self, name) -> Disulfide:
         """
-        Returns the Disulfide with the given name from the list.
+        Return the Disulfide with the given name from the list.
         """
         for ss in self.SSList.data:
             if ss.name == name:
@@ -334,25 +338,8 @@ class DisulfideLoader:
 
     def describe(self) -> None:
         """
-        Provides information about the Disulfide database contained in `self`.
-
-        Example:<br>
-
-        ```python
-        from proteusPy import Load_PDB_SS
-        PDB_SS = Load_PDB_SS(verbose=False, subset=False)
-        PDB_SS.describe()
-             =========== RCSB Disulfide Database Summary ==============
-                 =========== Built: 2024-02-12 17:48:13 ==============
-        PDB IDs present:                    35818
-        Disulfides loaded:                  120494
-        Average structure resolution:       2.34 Å
-        Lowest Energy Disulfide:            2q7q_75D_140D
-        Highest Energy Disulfide:           1toz_456A_467A
-        Cα distance cutoff:                 8.00 Å
-        Total RAM Used:                     30.72 GB.
-            ================= proteusPy: 0.91 =======================
-        ```
+        Display information about the Disulfide database contained in `self`.
+        :return: None
         """
         vers = self.version
         tot = self.TotalDisulfides
@@ -362,7 +349,7 @@ class DisulfideLoader:
             + sys.getsizeof(self.SSDict)
             + sys.getsizeof(self.TorsionDF)
         ) / (1024 * 1024)
-        res = self.Average_Resolution
+        res = self.average_resolution
         cutoff = self.cutoff
         timestr = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.timestamp))
         ssMin, ssMax = self.SSList.minmax_energy
@@ -405,7 +392,13 @@ class DisulfideLoader:
 
         """
 
-        ssbonds = self[pdbid]
+        try:
+            ssbonds = self[pdbid]
+        except KeyError:
+            mess = f"! Cannot find key {pdbid} in SSBond DB"
+            _logger.error(mess)
+            return
+
         ssbonds.display_overlay()
         return
 
@@ -504,7 +497,6 @@ class DisulfideLoader:
 
         plt.show()
 
-    ###
     def plot_binary_to_sixclass_incidence(
         self, theme="light", save=False, savedir=".", verbose=False
     ):
@@ -593,7 +585,7 @@ class DisulfideLoader:
 
         _title = f"Binary Class: {title}"
         _labels = {}
-
+        _prefix = "None"
         if base == 8:
             _labels = {"class_id": "Octant Class ID", "count": "Count"}
             _prefix = "Octant"
@@ -648,6 +640,8 @@ class DisulfideLoader:
         :param theme: A string representing the theme of the plot. Anything other than `light` is in `plotly_dark`.
         :return: None
         """
+
+        _title = f"Binary Class: {title}"
 
         if base == 8:
             _title = f"Octant Class: {title}"
@@ -968,18 +962,30 @@ def Bootstrap_PDB_SS(
 
     if not os.path.exists(_fname) or force is True:
         if verbose:
-            print("Downloading Disulfide Database from Drive...")
+            mess = "Downloading Disulfide Database from Drive..."
+            _logger.info(mess)
         gdown.download(url, str(_fname), quiet=False)
 
     full_path = os.path.join(loadpath, _fname)
+    if verbose:
+        mess = f"Building loader from: {full_path}... "
+        _logger.info(mess)
+
     loader = DisulfideLoader(
         datadir=DATA_DIR, subset=subset, verbose=verbose, cutoff=cutoff
     )
-    loader.save(savepath=DATA_DIR, subset=subset, cutoff=cutoff)
+
+    if loader.TotalDisulfides == 0:
+        mess = "No disulfides loaded!"
+        _logger.error(mess)
+        return None
+
     if verbose:
-        loader.describe()
+        mess = "Done building loader."
+        _logger.info(mess)
 
     return loader
+
 
 
 if __name__ == "__main__":

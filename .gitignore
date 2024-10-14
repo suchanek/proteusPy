@@ -16,4 +16,4 @@ proteusPy/proteusPy.egg-info/*
 proteus_logo_sb.png
 *.mp4
 *.out
-
+*.log
