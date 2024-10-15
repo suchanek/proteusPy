@@ -7,14 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.97.10] - 2024-10-14
+
 ### Added
 
-- Disulfide viewer development, improvement
-- Additional analytics
+- DisulfideList.describe() - prints a summary of the input ``DisulfideList``
+- Improvement in internal logging. The function ``configure_master_logger`` sets up a file logger that can be used to collect info, warning and error output. This is particularly useful when running the ``DisulfideExtractor_mp.py``
 
 ### Changed
 
-- No major changes to functionality expected
+- Disulfide viewer development continues
+- Continued code optimizations
 
 ### Deprecated
 

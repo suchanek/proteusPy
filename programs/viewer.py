@@ -25,12 +25,14 @@ Functions:
 
 # pylint: disable=W0212
 
+import logging
 import os
 import sys
 
 import numpy as np
 import pyvista as pv
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QFont
 
 # pylint: disable=E0611
 from PyQt5.QtWidgets import (
@@ -46,7 +48,9 @@ from PyQt5.QtWidgets import (
     QMainWindow,
     QMessageBox,
     QPushButton,
+    QSizePolicy,
     QSlider,
+    QSpacerItem,
     QVBoxLayout,
     QWidget,
 )
@@ -56,6 +60,8 @@ from proteusPy import (
     BOND_RADIUS,
     DisulfideList,
     Load_PDB_SS,
+    configure_master_logger,
+    create_logger,
     get_jet_colormap,
     get_theme,
     grid_dimensions,
@@ -64,6 +70,11 @@ from proteusPy import (
 os.environ["QT_IM_MODULE"] = "qtvirtualkeyboard"
 
 _version = 1.0
+
+_logger = create_logger(__name__, log_level=logging.INFO)
+
+configure_master_logger("viewer.py")
+_logger.info("Starting Disulfide Viewer...")
 
 
 class DisulfideViewer(QMainWindow):
@@ -111,9 +122,10 @@ class DisulfideViewer(QMainWindow):
 
         # Set up the main window
         self._version = _version
-        self.pdb_label = QLabel("PDB ID:")
         self.setWindowTitle("proteusPy Disulfide Viewer")
         self.setGeometry(100, 100, winsize[0], winsize[1])
+        self.timer = None
+        self.current_frame = 0
 
         # Validate and store the list of disulfides
         self.ss_list = ss_list
@@ -124,12 +136,10 @@ class DisulfideViewer(QMainWindow):
 
         # Create a dictionary where keys are pdb_id and values are lists of disulfides
         # with that pdb_id
-
         self.current_sslist = DisulfideList([], "sublist")
 
-        # populate the dictionary with key pdb_id and values list of disulfides
+        # Populate the dictionary with key pdb_id and values list of disulfides
         # for that pdb_id
-
         self.ss_dict = {}
         for ss in self.ss_list:
             if ss.pdb_id not in self.ss_dict:
@@ -177,24 +187,47 @@ class DisulfideViewer(QMainWindow):
         self.button_reset = QPushButton("Reset Camera")
         self.button_reset.clicked.connect(self.set_camera_view)
 
+        # Create a font object with increased size
+        font = QFont()
+        font.setPointSize(14)  # Set the desired font size
+
+        # Group the PDB controls
+        pdb_groupbox = QGroupBox("PDB Controls")
+        pdb_groupbox.setFont(font)  # Set the font for the groupbox label
+        pdb_layout = QVBoxLayout()
+        pdb_layout.addWidget(self.pdb_textbox)
+        pdb_layout.addWidget(self.pdb_dropdown)
+        pdb_layout.addWidget(self.dropdown)
+        pdb_groupbox.setLayout(pdb_layout)
+
         # Group the buttons with a label
         button_group = QGroupBox("Rendering Styles")
+        button_group.setFont(font)  # Set the font for the groupbox label
         button_layout = QVBoxLayout()
         button_layout.addWidget(self.button_cpk)
         button_layout.addWidget(self.button_sb)
         button_layout.addWidget(self.button_bs)
         button_layout.addWidget(self.button_pd)
         button_layout.addWidget(self.checkbox_single)  # Add single/multiple checkbox
+
+        self.button_spin = QPushButton("Spin Camera")
+        self.button_spin.clicked.connect(self.spin_camera)
+
+        button_layout.addWidget(self.button_spin)  # Add spin camera button
+
         # button_layout.addWidget(self.button_cov)
         button_group.setLayout(button_layout)
 
         # Layout for the main controls
         control_layout = QVBoxLayout()
         control_layout.addWidget(button_group)  # Add button group
-        control_layout.addWidget(self.pdb_label)  # Add PDB label
-        control_layout.addWidget(self.pdb_textbox)  # Add PDB ID text box
-        control_layout.addWidget(self.pdb_dropdown)  # Add PDB ID dropdown
-        control_layout.addWidget(self.dropdown)  # Add Disulfides dropdown
+        control_layout.addSpacerItem(
+            QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        )  # Add spacer
+        control_layout.addWidget(pdb_groupbox)  # Add PDB groupbox
+        control_layout.addSpacerItem(
+            QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        )  # Add spacer
         control_layout.addWidget(self.button_theme)  # Add theme toggle button
         control_layout.addWidget(self.button_reset)  # Add Reset button
         control_layout.addStretch(1)
@@ -218,13 +251,16 @@ class DisulfideViewer(QMainWindow):
         self.slider_y.setValue(0)
         self.slider_y.valueChanged.connect(self.update_camera_position)
 
+        self.button_spin = QPushButton("Spin Camera")
+        self.button_spin.clicked.connect(self.spin_camera)
+
         # Main layout combining controls and visualization
         main_layout = QHBoxLayout()
         main_layout.addWidget(control_widget)
         main_layout.addWidget(self.plotter_widget, 1)
         main_layout.addWidget(self.slider_y)  # Add vertical slider
 
-        # Set the central widgetxf
+        # Set the central widget
         container = QWidget()
         container.setLayout(main_layout)
 
@@ -258,9 +294,40 @@ class DisulfideViewer(QMainWindow):
         Sets the camera to a specific view where the x-axis is pointed down and the
         y-axis into the screen.
         """
-        camera_position = [(0, 0, 10), (0, 0, 0), (-1, 0, 0)]  # Example values
+        camera_position = [(0, 0, 10), (0, 0, 0), (0, 1, 0)]  # Example values
         self.plotter_widget.camera_position = camera_position
         self.plotter_widget.reset_camera()
+
+    def spin_camera(self, duration=5, n_frames=150):
+        """
+        Spins the camera around the z-axis in an orbital path.
+
+        :param duration: Duration of the spin in seconds.
+        :param n_frames: Number of frames for the animation.
+        """
+        # Define the circular path around the z-axis
+        theta = np.linspace(0, 2 * np.pi, n_frames)
+        path = np.c_[np.cos(theta), np.sin(theta), np.zeros_like(theta)]
+        duration = 5
+
+        # Function to update the camera position
+        def update_camera():
+            self.plotter_widget.camera_position = path[self.current_frame]
+            self.current_frame = (self.current_frame + 1) % n_frames
+
+        # Create a QTimer to update the camera position
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(update_camera)
+        self.current_frame = 0
+
+        # Function to stop the timer after the duration
+        def stop_timer():
+            self.timer.stop()
+
+        # Start the timer
+        interval = int(duration * 1000 / n_frames)
+        self.timer.start(interval)
+        QTimer.singleShot(duration * 1000, stop_timer)
 
     def reset(self):
         """
@@ -563,10 +630,14 @@ class DisulfideViewer(QMainWindow):
             winsize (tuple): The window size for rendering.
         """
         style = self.current_style
-        camera_position = [(0, 0, 10), (0, 0, 0), (-1, 0, 0)]  # Example values
+        camera_position = [(0, 0, 10), (0, 0, 0), (0, 1, 0)]  # Example values
 
         plotter = self.plotter_widget  # Use QtInteractor as the plotter
         self.plotter_widget.camera_position = camera_position
+
+        # Set the camera up vector
+        plotter.camera_set = True
+        plotter.camera.view_up = (0, 1, 0)
 
         plotter.clear()
         plotter.add_axes()
