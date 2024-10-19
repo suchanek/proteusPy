@@ -32,7 +32,6 @@ import sys
 import numpy as np
 import pyvista as pv
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QFont
 
 # pylint: disable=E0611
 from PyQt5.QtWidgets import (
@@ -66,6 +65,10 @@ from proteusPy import (
     get_theme,
     grid_dimensions,
 )
+from proteusPy.ProteusGlobals import DATA_DIR
+
+# from PyQt5.QtGui import QFont
+
 
 os.environ["QT_IM_MODULE"] = "qtvirtualkeyboard"
 
@@ -188,12 +191,12 @@ class DisulfideViewer(QMainWindow):
         self.button_reset.clicked.connect(self.set_camera_view)
 
         # Create a font object with increased size
-        font = QFont()
-        font.setPointSize(14)  # Set the desired font size
+        # font = QFont()
+        # font.setPointSize(14)  # Set the desired font size
 
         # Group the PDB controls
         pdb_groupbox = QGroupBox("PDB Controls")
-        pdb_groupbox.setFont(font)  # Set the font for the groupbox label
+        # pdb_groupbox.setFont(font)  # Set the font for the groupbox label
         pdb_layout = QVBoxLayout()
         pdb_layout.addWidget(self.pdb_textbox)
         pdb_layout.addWidget(self.pdb_dropdown)
@@ -202,7 +205,7 @@ class DisulfideViewer(QMainWindow):
 
         # Group the buttons with a label
         button_group = QGroupBox("Rendering Styles")
-        button_group.setFont(font)  # Set the font for the groupbox label
+        # button_group.setFont(font)  # Set the font for the groupbox label
         button_layout = QVBoxLayout()
         button_layout.addWidget(self.button_cpk)
         button_layout.addWidget(self.button_sb)
@@ -758,17 +761,33 @@ def main():
     """
     The main entry point of the application.
     """
+    _logger.info(f"{DATA_DIR}")
 
-    pdb = Load_PDB_SS(subset=False, verbose=True)
+    pdb = Load_PDB_SS(subset=False, verbose=True, loadpath="/app/data")
     if pdb is not None:
+        print("Loaded database...")
         ss_list = sorted(pdb.SSList, key=lambda ss: ss.pdb_id)
         app = QApplication(sys.argv)
+        _logger.info(
+            f"Loaded {len(ss_list)} disulfides from the database. Launching viewer"
+        )
         viewer = DisulfideViewer(ss_list)
         viewer.show()
         sys.exit(app.exec_())
     else:
-        print("Unable to load database!")
-        sys.exit(1)
+        print("Reloading...")
+        pdb = Load_PDB_SS(subset=False, verbose=True)
+        if pdb is None:
+            print("Unable to load database!")
+            sys.exit(1)
+        ss_list = sorted(pdb.SSList, key=lambda ss: ss.pdb_id)
+        app = QApplication(sys.argv)
+        _logger.info(
+            f"Loaded {len(ss_list)} disulfides from the database. Launching viewer"
+        )
+        viewer = DisulfideViewer(ss_list)
+        viewer.show()
+        sys.exit(app.exec_())
 
 
 if __name__ == "__main__":

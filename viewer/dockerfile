@@ -1,0 +1,76 @@
+# Use the Miniconda3 image as a base
+FROM continuumio/miniconda3
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the current directory contents into the container at /app
+COPY . /app
+COPY ./data /app/data
+
+# Update package lists and install system packages, including dbus
+RUN apt-get update && apt-get install -y \
+    xfce4 \
+    xfce4-goodies \
+    tightvncserver \
+    x11-xserver-utils \
+    dbus-x11 \
+    dconf-cli \
+    build-essential \
+    qt5-qmake \
+    qtbase5-dev \
+    libqt5gui5 \
+    libqt5webkit5-dev \
+    libqt5opengl5-dev \
+    libxcb-xinerama0 \
+    libegl1-mesa \
+    libgl1-mesa-glx \
+    libxkbcommon-x11-0 \
+    libglu1-mesa \
+    libxrender1 \
+    libsm6 \
+    libxext6 \
+    xvfb \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install required conda packages and create environment
+RUN conda create --name proteusPy python=3.11 -y && \
+    conda install -n proteusPy -c conda-forge \
+    vtk=9.2.6 \
+    pyqt=5 -y && \
+    conda clean -a -y
+
+# Activate the environment and install additional Python packages
+RUN /bin/bash -c "source activate proteusPy && pip install proteusPy pyvistaqt"
+
+# Install Jupyter kernel for the environment
+RUN /bin/bash -c "source activate proteusPy && python -m ipykernel install --user --name proteusPy --display-name 'proteusPy'"
+
+# Expose port for external access (for VNC)
+EXPOSE 5901
+
+# Create a non-root user with home directory
+RUN useradd -ms /bin/bash vncuser
+
+# Set USER environment variable and configure X11
+ENV USER=vncuser
+ENV QT_QPA_PLATFORM=vnc
+ENV DISPLAY=:1
+ENV QT_X11_NO_MITSHM=1
+ENV DBUS_SESSION_BUS_ADDRESS="unix:path=/run/dbus/system_bus_socket"
+
+# Switch to non-root user
+USER vncuser
+
+# Set home directory for vncuser
+WORKDIR /home/vncuser
+
+# Set up VNC password and permissions
+RUN mkdir -p ~/.vnc && \
+    echo "password" | vncpasswd -f > ~/.vnc/passwd && \
+    chmod 600 ~/.vnc/passwd
+
+# Start dbus and VNC server, wait for initialization, and run the viewer application
+# CMD ["/bin/bash", "-c", "source activate proteusPy && mkdir -p /run/dbus && dbus-launch --exit-with-session tightvncserver :1 -geometry 1280x800 -depth 24 && sleep 10 && python /app/viewerd.py"]
+
+CMD ["/bin/bash", "-c", "source activate proteusPy && mkdir -p /run/dbus && dbus-launch --exit-with-session tightvncserver :1 -geometry 1280x800 -depth 24 && sleep 10 && xvfb-run -a python /app/simple_app.py"]
