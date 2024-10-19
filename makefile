@@ -105,10 +105,12 @@ bld:  docs sdist
 sdist: proteusPy/_version.py
 	python setup.py sdist
 
+.PHONY: docs
 docs: proteusPy/_version.py
 	pdoc -o docs --math --logo "./logo.png" ./proteusPy
 
 # normally i push to PyPi via github action
+.PHONY: upload
 upload: sdist
 	twine upload -r proteusPy dist/proteusPy-$(VERS)*
 
