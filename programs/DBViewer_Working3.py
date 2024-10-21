@@ -6,13 +6,14 @@ Last revision: 1/14/2024
 
 import sys
 import time
-import pyvista as pv
+
 import panel as pn
+import pyvista as pv
 
 import proteusPy
 from proteusPy.Disulfide import Disulfide
-from proteusPy.DisulfideLoader import Load_PDB_SS
 from proteusPy.DisulfideList import DisulfideList
+from proteusPy.DisulfideLoader import Load_PDB_SS
 
 pn.extension("vtk", sizing_mode="stretch_width", template="fast")
 
@@ -60,7 +61,6 @@ rcsb_ss_widget = pn.widgets.Select(
 shadows_checkbox = pn.widgets.Checkbox(name="Shadows", value=False)
 
 # rcsb_selector_widget = pn.widgets.Select(name="RCSB ID", value=_rcsid, options=RCSB_list)
-
 
 rcsb_selector_widget = pn.widgets.AutocompleteInput(
     name="RCSB ID (start typing)",
@@ -128,8 +128,9 @@ def set_state(event):
     ss_state["style"] = styles_group.value
     ss_state["defaultss"] = rcsb_ss_widget.value
     print("--> Set state.")
-    print_state(ss_state)
+    # print_state(ss_state)
     pn.state.cache["ss_state"] = ss_state
+    click_plot(None)
 
 
 def print_state():
@@ -174,24 +175,25 @@ def load_data():
     RCSB_list = sorted(_PDB_SS.IDList)
     print(f"--> Load Data: {len(RCSB_list)}")
     # set_state(event=None)
-    return _PDB_SS
+    
 
+    vers = PDB_SS.version
+    tot = PDB_SS.TotalDisulfides
+    pdbs = len(PDB_SS.SSDict)
 
-if "data" in pn.state.cache:
-    PDB_SS = pn.state.cache["data"]
-    # vers = PDB_SS.version
-    # tot = PDB_SS.TotalDisulfides
-    # pdbs = len(PDB_SS.SSDict)
-    # pn.state.template.param.update(title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, V{vers}")
-else:
-    PDB_SS = pn.state.cache["data"] = load_data()
-    set_widgets_defaults()
     pn.state.template.param.update(
         title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, V{vers}"
     )
     _boot = True
+    return _PDB_SS
 
-PDB_SS = pn.state.as_cached("data", load_data)
+if "data" in pn.state.cache:
+        PDB_SS = pn.state.cache["data"]
+else:
+    PDB_SS = pn.state.cache["data"] = load_data()
+    set_widgets_defaults()
+    
+# PDB_SS = pn.state.as_cached("data", load_data)
 # ss_state = load_state()
 # print(f'--> found state: {ss_state}')
 
@@ -209,30 +211,18 @@ def get_theme() -> str:
 
 
 def click_plot(event):
-    """Force a re-render of the currently selected disulfide. Removes the pane
-    and re-adds it to the panel.
+    """Force a re-render of the currently selected disulfide. Reuses the existing plotter."""
+    global render_win, plotter
 
-    Returns:
-        None
-    """
-    global render_win, app
-    # global vtkpan
+    # Reuse the existing plotter and re-render the scene
+    plotter = render_ss()  # Reuse the existing plotter
 
-    plotter = render_ss()
-    vtkpan = pn.pane.VTK(
-        plotter.ren_win,
-        margin=0,
-        sizing_mode="stretch_both",
-        orientation_widget=orientation_widget,
-        enable_keybindings=enable_keybindings,
-        min_height=500,
-    )
-
-    render_win[0] = vtkpan
+    # Update the vtkpan and trigger a refresh
+    vtkpan.object = plotter.ren_win
     vtkpan.param.trigger("object")
 
-    # this position is dependent on the vtk panel position in the render_win pane!
-    print(f"RenderWin: {render_win}")
+    # Log for debugging
+    print(f"RenderWin updated: {render_win}")
 
 
 # Widgets
@@ -256,7 +246,7 @@ def update_single(click):
     else:
         styles_group.disabled = False
     ## plotter = pv.Plotter()
-    ## click_plot(click)
+    click_plot(click)
 
 
 # Callbacks
@@ -326,54 +316,37 @@ def get_ss_id(event):
     rcsb_ss_widget.value = event.new
 
 
-def render_ss(clk=True):
-    global PDB_SS
+def render_ss():
     global plotter
-    # global vtkpan
-    global render_win
 
     light = True
-
     styles = {"Split Bonds": "sb", "CPK": "cpk", "Ball and Stick": "bs"}
 
+    # Determine the theme
     theme = get_theme()
     if theme == "dark":
-        print("--> Dark")
         light = False
 
-    ss = Disulfide()
-    plotter.clear()
-
+    # Retrieve the selected disulfide
     ss_id = rcsb_ss_widget.value
-
     ss = PDB_SS[ss_id]
+
     if ss is None:
         update_output(f"Cannot find ss_id {ss_id}! Returning!")
         return
 
-    style = styles[styles_group.value]
-    single = single_checkbox.value
-    # shadows = shadows_checkbox.value
-
+    # Update the UI
     update_title(ss)
     update_info(ss)
     update_output(ss)
 
-    plotter = ss.plot(
-        plotter, single=single, style=style, shadows=False, light=light
-    )
-    vtkpan = pn.pane.VTK(
-        plotter.ren_win,
-        margin=0,
-        sizing_mode="stretch_both",
-        orientation_widget=orientation_widget,
-        enable_keybindings=enable_keybindings,
-        min_height=500,
-    )
+    # Reuse and clear the existing plotter before rendering
+    # plotter.clear()
+    style = styles[styles_group.value]
+    single = single_checkbox.value
 
-    vtkpan.param.trigger("object")
-
-    return plotter
+    # Render the structure in the plotter
+    return ss.plot(plotter, single=single, style=style, shadows=False, light=light)
 
 
 def on_theme_change(event):
@@ -399,31 +372,4 @@ pn.bind(update_single, click=styles_group)
 render_win = pn.Column(vtkpan)
 render_win.servable()
 
-
-"""
-
-# Instantiate the template with widgets displayed in the sidebar
-app = pn.template.FastListTemplate(
-    title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, V{vers}",
-    #sidebar=[ss_styles, ss_props],
-)
-# Append a layout to the main area, to demonstrate the list-like API
-app.main.append(
-    pn.Row(
-        render_win,
-    )
-)
-app.servable();
-
-
-app = pn.panel(
-    pn.Column(
-        "This example demonstrates the use of **VTK and pyvista** to display a *scene*",
-        pn.Row(
-            render_win
-        ), min_height=500
-    )
-)
-
-app.servable()
-"""
+# end of file
