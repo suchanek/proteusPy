@@ -42,12 +42,11 @@ enable_keybindings = True
 
 # globals
 ss_state = {}
-vers = tot = pdbs = 0
 RCSB_list = []
+PDB_SS = None
 
-# PDB_SS = Load_PDB_SS(verbose=True, subset=False)
 
-# a few widgets
+# Widgets
 styles_group = pn.widgets.RadioBoxGroup(
     name="Rending Style",
     options=["Split Bonds", "CPK", "Ball and Stick"],
@@ -58,10 +57,6 @@ single_checkbox = pn.widgets.Checkbox(name="Single View", value=True)
 rcsb_ss_widget = pn.widgets.Select(
     name="Disulfide", value=_default_ss, options=_ssidlist
 )
-# not used atm
-shadows_checkbox = pn.widgets.Checkbox(name="Shadows", value=False)
-
-# rcsb_selector_widget = pn.widgets.Select(name="RCSB ID", value=_rcsid, options=RCSB_list)
 
 rcsb_selector_widget = pn.widgets.AutocompleteInput(
     name="RCSB ID (start typing)",
@@ -71,17 +66,14 @@ rcsb_selector_widget = pn.widgets.AutocompleteInput(
     options=RCSB_list,
 )
 
-
-button = pn.widgets.Button(name="Refresh", button_type="primary")
-
 # controls on sidebar
 ss_props = pn.WidgetBox(
     "# Disulfide Selection", rcsb_selector_widget, rcsb_ss_widget
 ).servable(target="sidebar")
 
-ss_styles = pn.WidgetBox(
-    "# Rendering Styles", styles_group, single_checkbox, button
-).servable(target="sidebar")
+ss_styles = pn.WidgetBox("# Rendering Styles", styles_group, single_checkbox).servable(
+    target="sidebar"
+)
 
 # markdown panels for various text outputs
 title_md = pn.pane.Markdown("Title")
@@ -91,10 +83,6 @@ db_md = pn.pane.Markdown("Database Info goes here")
 info_md = pn.pane.Markdown("SS Info")
 ss_info = pn.WidgetBox("# Disulfide Info", info_md).servable(target="sidebar")
 db_info = pn.Column("### RCSB Database Info", db_md)
-
-# pn.state.template.param.update(
-#    title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, {vers}"
-# )
 
 # default selections
 ss_state_default = {
@@ -106,6 +94,24 @@ ss_state_default = {
     "ssid_list": "['2q7q_75D_140D', '2q7q_81D_113D', '2q7q_88D_171D', '2q7q_90D_138D', \
         '2q7q_91D_135D','2q7q_98D_129D']",
 }
+
+
+def set_window_title():
+    """
+    Sets the window title using values from the ss_state dictionary.
+    """
+
+    global PDB_SS
+
+    tot = PDB_SS.TotalDisulfides
+    pdbs = len(PDB_SS.SSDict)
+    vers = PDB_SS.version
+
+    pn.state.template.param.update(
+        title=f"RCSB Disulfide Browser: {tot} Disulfides, {pdbs} Structures, {vers}"
+    )
+    print(f"--> Set Window Title: {tot:,} Disulfides, {pdbs:,} Structures, {vers}")
+    return
 
 
 def set_widgets_defaults():
@@ -141,6 +147,7 @@ def set_state(event):
     print("--> Set state.")
     # print_state(ss_state)
     pn.state.cache["ss_state"] = ss_state
+    set_window_title()
     click_plot(None)
 
 
@@ -177,6 +184,16 @@ def load_state():
     return _ss_state
 
 
+def set_camera_view(plotter):
+    """
+    Sets the camera to a specific view where the x-axis is pointed down and the
+    y-axis into the screen.
+    """
+    camera_position = [(0, 0, 10), (0, 0, 0), (0, 1, 0)]  # Example values
+    # plotter.camera_position = camera_position
+    plotter.reset_camera()
+
+
 def plot(pl, ss, single=True, style="sb", light=True, shadows=False) -> pv.Plotter:
     """
     Return the pyVista Plotter object for the Disulfide bond in the specific rendering style.
@@ -210,6 +227,7 @@ def plot(pl, ss, single=True, style="sb", light=True, shadows=False) -> pv.Plott
 
     new_pl.enable_anti_aliasing("msaa")
     new_pl.clear()
+    set_camera_view(new_pl)
 
     if single is True:
         ss._render(
@@ -219,7 +237,7 @@ def plot(pl, ss, single=True, style="sb", light=True, shadows=False) -> pv.Plott
             spec=SPECULARITY,
             specpow=SPEC_POWER,
         )
-        new_pl.reset_camera()
+        # new_pl.reset_camera()
     else:
         new_pl.subplot(0, 0)
 
@@ -265,35 +283,32 @@ def plot(pl, ss, single=True, style="sb", light=True, shadows=False) -> pv.Plott
         )
 
         new_pl.link_views()
-        new_pl.reset_camera()
+    new_pl.reset_camera()
     return new_pl
 
 
+@pn.cache()
 def load_data():
     global vers, tot, pdbs, RCSB_list
 
     loader = Load_PDB_SS(verbose=True, subset=False)  # Load some data
-    vers = loader.version
-    tot = loader.TotalDisulfides
-    pdbs = len(loader.SSDict)
+    
     RCSB_list = sorted(loader.IDList)
     print(f"--> Load Data: {len(RCSB_list)}")
     # set_state(event=None)
-
-    pn.state.template.param.update(
-        title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, {vers}"
-    )
+    set_window_title()
+    
+    pn.state.cache["data"] = loader
     return loader
 
 
 if "data" in pn.state.cache:
     PDB_SS = pn.state.cache["data"]
-    set_widgets_defaults()
-
-
 else:
-    PDB_SS = pn.state.cache["data"] = load_data()
-    set_widgets_defaults()
+    PDB_SS = load_data()
+
+set_window_title()
+set_widgets_defaults()
 
 # PDB_SS = pn.state.as_cached("data", load_data)
 # ss_state = load_state()
@@ -314,7 +329,7 @@ def get_theme() -> str:
 
 def click_plot(event):
     """Force a re-render of the currently selected disulfide. Reuses the existing plotter."""
-    global render_win, plotter
+    global plotter
 
     # Reuse the existing plotter and re-render the scene
     plotter = render_ss()  # Reuse the existing plotter
@@ -322,9 +337,7 @@ def click_plot(event):
     # Update the vtkpan and trigger a refresh
     vtkpan.object = plotter.ren_win
     vtkpan.param.trigger("object")
-
-    # Log for debugging
-    print(f"RenderWin updated: {render_win}")
+    plotter.render()
 
 
 def update_single(click):
@@ -381,8 +394,19 @@ def update_info(ss):
     enrg = ss.energy
     name = ss.name
     resolution = ss.resolution
+    prox_sec = ss.proximal_secondary  # Assuming these attributes exist
+    dist_sec = ss.distal_secondary  # Assuming these attributes exist
 
-    info_string = f"### {name}  \n**Resolution:** {resolution:.2f} Å  \n**Energy:** {enrg:.2f} kcal/mol  \n**Cα distance:** {ss.ca_distance:.2f} Å  \n**Cβ distance:** {ss.cb_distance:.2f} Å  \n**Torsion Length:** {ss.torsion_length:.2f}°"
+    info_string = f"""
+    ### {name}
+    **Resolution:** {resolution:.2f} Å  
+    **Energy:** {enrg:.2f} kcal/mol  
+    **Cα distance:** {ss.ca_distance:.2f} Å  
+    **Cβ distance:** {ss.cb_distance:.2f} Å  
+    **Torsion Length:** {ss.torsion_length:.2f}°  
+    **Proximal Secondary:** {prox_sec}  
+    **Distal Secondary:** {dist_sec}
+    """
     info_md.object = info_string
 
 
@@ -391,7 +415,13 @@ def update_output(ss):
     name = ss.name
     resolution = ss.resolution
 
-    info_string = f"**Cα-Cα:** {ss.ca_distance:.2f} Å **Cβ-Cβ:** {ss.cb_distance:.2f} Å **Torsion Length:** {ss.torsion_length:.2f}° **Resolution:** {resolution:.2f} Å **Energy:** {enrg:.2f} kcal/mol"
+    info_string = f"""
+    **Cα-Cα:** {ss.ca_distance:.2f} Å  
+    **Cβ-Cβ:** {ss.cb_distance:.2f} Å  
+    **Torsion Length:** {ss.torsion_length:.2f}°  
+    **Resolution:** {resolution:.2f} Å  
+    **Energy:** {enrg:.2f} kcal/mol
+    """
     output_md.object = info_string
 
 
@@ -465,8 +495,9 @@ pn.bind(get_ss_idlist, rcs_id=rcsb_selector_widget)
 pn.bind(update_single, click=styles_group)
 
 pn.state.template.param.update(
-    title=f"RCSB Disulfide Browser: {tot:,} Disulfides, {pdbs:,} Structures, {vers}"
+    title=f"RCSB Disulfide Browser: {PDB_SS.TotalDisulfides} Disulfides, {len(PDB_SS.SSDict)} Structures, {PDB_SS.version}"
 )
+
 render_win = pn.Column(vtkpan)
 render_win.servable()
 
