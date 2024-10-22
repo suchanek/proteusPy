@@ -9,6 +9,8 @@ Last revision: 10/22/2024
 # pylint: disable=C0103 # wrong variable name
 # pylint: disable=W0212 # access to a protected member _render of a client class
 
+import logging
+
 import panel as pn
 import pyvista as pv
 
@@ -49,7 +51,7 @@ _single = True
 configure_master_logger("DBViewer.log")
 
 # create a local logger
-_logger = create_logger("DBViewer")
+_logger = create_logger("DBViewer", log_level=logging.WARNING)
 mess = f"RCSB Disulfide Browser v{_vers}"
 _logger.info(mess)
 
