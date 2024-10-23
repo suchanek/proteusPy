@@ -1,0 +1,12 @@
+name: proteusPy
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - vtk=9.2.6
+  - panel
+  - bokeh
+  - pyvista
+  - pip
+  - pip:
+    - proteusPy

@@ -8,7 +8,7 @@ Last revision: 10/22/2024
 # pylint: disable=C0413 # wrong import order
 # pylint: disable=C0103 # wrong variable name
 # pylint: disable=W0212 # access to a protected member _render of a client class
-
+# pylint: disable=W0613 # unused argument
 import logging
 
 import panel as pn
@@ -52,8 +52,8 @@ configure_master_logger("DBViewer.log")
 
 # create a local logger
 _logger = create_logger("DBViewer", log_level=logging.WARNING)
-mess = f"RCSB Disulfide Browser v{_vers}"
-_logger.info(mess)
+_mess = f"RCSB Disulfide Browser v{_vers}"
+_logger.info(_mess)
 
 # globals
 ss_state = {}
@@ -210,6 +210,8 @@ def set_camera_view(plotter):
     Sets the camera to a specific view where the x-axis is pointed down and the
     y-axis into the screen.
     """
+    global plotter
+
     # camera_position = [(0, 0, 10), (0, 0, 0), (0, 1, 0)]  # Example values
     # plotter.camera_position = camera_position
     plotter.reset_camera()
@@ -309,13 +311,15 @@ def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
 
 @pn.cache()
 def load_data():
+    """Load the data from the RCSB database and return the DisulfideLoader object."""
     global RCSB_list, PDB_SS
 
     PDB_SS = Load_PDB_SS(verbose=True, subset=False)  # Load some data
 
     RCSB_list = sorted(PDB_SS.IDList)
-    _logger.info(f"--> Load Data: {len(RCSB_list)}")
-    # set_state(event=None)
+    mess = f"--> Load Data: {len(RCSB_list)}"
+    _logger.info(mess)
+
     set_window_title()
 
     pn.state.cache["data"] = PDB_SS
@@ -347,6 +351,8 @@ def click_plot(event):
     """Force a re-render of the currently selected disulfide. Reuses the existing plotter."""
 
     # Reuse the existing plotter and re-render the scene
+    global plotter
+
     plotter = render_ss()  # Reuse the existing plotter
 
     # Update the vtkpan and trigger a refresh
@@ -390,11 +396,14 @@ def get_ss_idlist(event) -> list:
     if sslist:
         idlist = [ss.name for ss in sslist]
         rcsb_ss_widget.options = idlist
-    _logger.debug(f"--> get_ss_idlist |{rcs_id}| |{idlist}|")
+        mess = f"--> get_ss_idlist |{rcs_id}| |{idlist}|"
+        _logger.debug(mess)
+
     return idlist
 
 
 def update_title(ss):
+    """Update the title of the disulfide bond in the markdown pane."""
     name = ss.name
 
     title = f"## {name}"
@@ -402,6 +411,7 @@ def update_title(ss):
 
 
 def update_info(ss):
+    """Update the information of the disulfide bond in the markdown pane."""
     enrg = ss.energy
     name = ss.name
     resolution = ss.resolution
@@ -422,6 +432,7 @@ def update_info(ss):
 
 
 def update_output(ss):
+    """Update the disufide bond statistics in the info markdown pane."""
     info_string = f"""
     **Cα-Cα:** {ss.ca_distance:.2f} Å  
     **Cβ-Cβ:** {ss.cb_distance:.2f} Å  
@@ -433,19 +444,21 @@ def update_output(ss):
 
 
 def get_ss(event) -> Disulfide:
-    global PDB_SS
+    """Get the currently selected Disulfide"""
     ss_id = event.new
     ss = Disulfide(PDB_SS[ss_id])
     return ss
 
 
 def get_ss_id(event):
+    """Return the name of the currently selected Disulfide"""
     rcsb_ss_widget.value = event.new
 
 
 def render_ss():
-    global plotter
-
+    """
+    Render the currently selected disulfide with the current plotter.
+    """
     light = True
     styles = {"Split Bonds": "sb", "CPK": "cpk", "Ball and Stick": "bs"}
 
@@ -467,8 +480,6 @@ def render_ss():
     update_info(ss)
     update_output(ss)
 
-    # Reuse and clear the existing plotter before rendering
-    # plotter.clear()
     style = styles[styles_group.value]
     single = single_checkbox.value
 
@@ -477,8 +488,10 @@ def render_ss():
 
 
 def on_theme_change(event):
+    """Handle a theme change event."""
     selected_theme = event.obj.theme
-    _logger.info(f"--> Theme Change: {selected_theme}")
+    mess = f"--> Theme Change: {selected_theme}"
+    _logger.info(mess)
 
 
 rcsb_selector_widget.param.watch(get_ss_idlist, "value")
