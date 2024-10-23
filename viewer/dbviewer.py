@@ -311,7 +311,9 @@ def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
 def load_data():
     global RCSB_list, PDB_SS
 
-    PDB_SS = Load_PDB_SS(verbose=True, subset=False)  # Load some data
+    PDB_SS = Load_PDB_SS(
+        verbose=True, subset=False, loadpath="/app/data"
+    )  # Load some data
 
     RCSB_list = sorted(PDB_SS.IDList)
     _logger.info(f"--> Load Data: {len(RCSB_list)}")
