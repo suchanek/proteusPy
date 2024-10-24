@@ -2,11 +2,15 @@ name: proteusPy
 channels:
   - conda-forge
 dependencies:
+  - numpy
+  - matplotlib
+  - pandas
   - python=3.11
   - vtk=9.2.6
   - panel
   - bokeh
-  - pyvista
+  - pyvista[all]
+  - nodejs
   - pip
   - pip:
     - proteusPy

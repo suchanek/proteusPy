@@ -1,4 +1,5 @@
 include README.md
+include CHANGELOG.md
 include proteusPy/data/pdb5rsa.ent
 include proteusPy/data/ss_completed.txt
 include proteusPy/data/ss_query.json

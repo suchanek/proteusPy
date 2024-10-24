@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  dbviewer:
+  rcsb_viewer:
     build: .
     ports:
       - "5006:5006"
