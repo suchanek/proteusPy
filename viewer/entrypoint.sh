@@ -15,7 +15,7 @@ export DISPLAY=:99
 echo "DISPLAY set to $DISPLAY"
 
 # Run the Panel application
-panel serve dbviewer.py \
+panel serve rcsb_viewer.py \
     --address 0.0.0.0 \
     --port 5006 \
     --allow-websocket-origin=* \

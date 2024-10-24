@@ -27,23 +27,18 @@ ENV PATH="/opt/conda/envs/proteusPy/bin:$PATH"
 # Set environment variables for PyVista to ensure offscreen rendering
 ENV PYVISTA_OFF_SCREEN=true
 
-# Add a non-root user for enhanced security
-RUN useradd -m appuser
-
 # Set the working directory in the container
 WORKDIR /app
 
 # Copy the current directory contents into the container at /app
 COPY . /app
 
-# Change ownership of the /app directory to the non-root user
-RUN chown -R appuser:appuser /app
-
-# Copy the entrypoint.sh script into the container
+# Copy the entrypoint.sh script into the container and make it executable
 COPY entrypoint.sh /app/entrypoint.sh
 
-# Make entrypoint.sh executable
-RUN chmod +x /app/entrypoint.sh
+# Add a non-root user for enhanced security
+# Change ownership of the /app directory to the non-root user and make entrypoint.sh executable
+RUN useradd -m appuser && chown -R appuser:appuser /app && chmod +x /app/entrypoint.sh
 
 # Switch to the non-root user
 USER appuser

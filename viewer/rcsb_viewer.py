@@ -9,10 +9,15 @@ Last revision: 10/22/2024
 # pylint: disable=C0103 # wrong variable name
 # pylint: disable=W0212 # access to a protected member _render of a client class
 # pylint: disable=W0613 # unused argument
+# pylint: disable=W0603 # Using the global statement
+# pylint: disable=W0602 # Using the global statement
+# pylint: disable=W0612 # Unused variable 'event'
 
 
 import logging
+import os
 
+import numpy as np
 import panel as pn
 import pyvista as pv
 
@@ -20,15 +25,18 @@ from proteusPy import (
     Disulfide,
     DisulfideList,
     Load_PDB_SS,
-    configure_master_logger,
     create_logger,
+    get_jet_colormap,
 )
-from proteusPy.atoms import BOND_COLOR, BS_SCALE, SPEC_POWER, SPECULARITY
+from proteusPy.atoms import BOND_COLOR, BOND_RADIUS, BS_SCALE, SPEC_POWER, SPECULARITY
 from proteusPy.ProteusGlobals import WINSIZE
+
+# Set PyVista to use offscreen rendering if the environment variable is set
+if os.getenv("PYVISTA_OFF_SCREEN", "false").lower() == "true":
+    pv.OFF_SCREEN = True
 
 pn.extension("vtk", sizing_mode="stretch_width", template="fast")
 
-_vers = 0.8
 
 # defaults for the UI
 
@@ -50,10 +58,12 @@ _single = True
 
 # Set up logging
 # configure a master logger. This will create ~/logs/DBViewer.log
-configure_master_logger("DBViewer.log")
+
+root_logger = logging.getLogger()
+root_logger.handlers.clear()
 
 # create a local logger
-_logger = create_logger("DBViewer", log_level=logging.WARNING)
+_logger = create_logger("DBViewer", log_level=logging.INFO)
 
 # globals
 ss_state = {}
@@ -124,7 +134,7 @@ def set_window_title():
 
     mess = f"Set Window Title: {win_title}"
 
-    _logger.info(mess)
+    _logger.debug(mess)
     return
 
 
@@ -173,7 +183,7 @@ def set_state(event):
     ss_state["single"] = single_checkbox.value
     ss_state["style"] = styles_group.value
     ss_state["defaultss"] = rcsb_ss_widget.value
-    _logger.info("--> Set state.")
+    _logger.debug("--> Set state.")
     pn.state.cache["ss_state"] = ss_state
     click_plot(None)
 
@@ -199,20 +209,20 @@ def load_state():
         rcsb_ss_widget.value = _default_ss
 
     else:
-        _logger.info("Setting widgets.")
+        _logger.debug("Setting widgets.")
         set_widgets_defaults()
 
     return _ss_state
 
 
-def set_camera_view(plotter):
+def set_camera_view(theplotter):
     """
     Sets the camera to a specific view where the x-axis is pointed down and the
     y-axis into the screen.
     """
     # camera_position = [(0, 0, 10), (0, 0, 0), (0, 1, 0)]  # Example values
     # plotter.camera_position = camera_position
-    plotter.reset_camera()
+    theplotter.reset_camera()
 
 
 def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
@@ -309,15 +319,19 @@ def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
 
 @pn.cache()
 def load_data():
+    """Load the disulfide database"""
     global RCSB_list, PDB_SS
 
-    PDB_SS = Load_PDB_SS(
-        verbose=True, subset=False, loadpath="/app/data"
-    )  # Load some data
+    message = "Loading RCSB Disulfide Database"
+    _logger.info(message)
+
+    PDB_SS = Load_PDB_SS(verbose=True, subset=False, loadpath="/app/data")
 
     RCSB_list = sorted(PDB_SS.IDList)
-    _logger.info(f"--> Load Data: {len(RCSB_list)}")
-    # set_state(event=None)
+
+    message = f"Loaded: {len(RCSB_list)}"
+    _logger.info(message)
+
     set_window_title()
 
     pn.state.cache["data"] = PDB_SS
@@ -349,6 +363,8 @@ def click_plot(event):
     """Force a re-render of the currently selected disulfide. Reuses the existing plotter."""
 
     # Reuse the existing plotter and re-render the scene
+    global plotter
+
     plotter = render_ss()  # Reuse the existing plotter
 
     # Update the vtkpan and trigger a refresh
@@ -428,6 +444,7 @@ def update_info(ss):
 
 
 def update_output(ss):
+    """Update the disulfide bond info in the markdown pane."""
     info_string = f"""
     **Cα-Cα:** {ss.ca_distance:.2f} Å  
     **Cβ-Cβ:** {ss.cb_distance:.2f} Å  
@@ -490,7 +507,94 @@ def render_ss():
 def on_theme_change(event):
     """Handle a theme change event."""
     selected_theme = event.obj.theme
-    _logger.info(f"--> Theme Change: {selected_theme}")
+    _logger.debug(f"--> Theme Change: {selected_theme}")
+
+
+def display_overlay(
+    sslist,
+    pl,
+    screenshot=False,
+    movie=False,
+    verbose=False,
+    fname="ss_overlay.png",
+    light="Auto",
+):
+    """
+    Display all disulfides in the list overlaid in stick mode against
+    a common coordinate frames. This allows us to see all of the disulfides
+    at one time in a single view. Colors vary smoothy between bonds.
+
+    :param screenshot: Save a screenshot, defaults to False
+    :param movie: Save a movie, defaults to False
+    :param verbose: Verbosity, defaults to True
+    :param fname: Filename to save for the movie or screenshot, defaults to 'ss_overlay.png'
+    :param light: Background color, defaults to True for White. False for Dark.
+    """
+
+    # from proteusPy.utility import get_theme
+
+    pid = sslist.pdb_id
+
+    ssbonds = sslist.data
+    tot_ss = len(ssbonds)  # number off ssbonds
+
+    res = 100
+
+    if tot_ss > 100:
+        res = 60
+    if tot_ss > 200:
+        res = 30
+    if tot_ss > 300:
+        res = 8
+
+    pl.clear()
+    pl.enable_anti_aliasing("msaa")
+    pl.add_axes()
+
+    mycol = np.zeros(shape=(tot_ss, 3))
+    mycol = get_jet_colormap(tot_ss)
+
+    # scale the overlay bond radii down so that we can see the individual elements better
+    # maximum 90% reduction
+
+    brad = BOND_RADIUS if tot_ss < 10 else BOND_RADIUS * 0.75
+    brad = brad if tot_ss < 25 else brad * 0.8
+    brad = brad if tot_ss < 50 else brad * 0.7
+    brad = brad if tot_ss < 100 else brad * 0.5
+
+    # print(f'Brad: {brad}')
+
+    for i, ss in zip(range(tot_ss), ssbonds):
+        color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
+        ss._render(
+            pl,
+            style="plain",
+            bondcolor=color,
+            translate=False,
+            bond_radius=brad,
+            res=res,
+        )
+
+    pl.reset_camera()
+
+    if screenshot:
+        pl.show(auto_close=False)  # allows for manipulation
+        pl.screenshot(fname)
+
+    elif movie:
+        if verbose:
+            print(f" -> display_overlay(): Saving mp4 animation to: {fname}")
+
+        pl.open_movie(fname)
+        path = pl.generate_orbital_path(n_points=360)
+        pl.orbit_on_path(path, write_frames=True)
+        pl.close()
+
+        if verbose:
+            print(f" -> display_overlay(): Saved mp4 animation to: {fname}")
+
+    pl.show()
+    return pl
 
 
 rcsb_selector_widget.param.watch(get_ss_idlist, "value")
@@ -514,9 +618,6 @@ pn.bind(get_ss_idlist, rcs_id=rcsb_selector_widget)
 pn.bind(update_single, click=styles_group)
 
 set_window_title()
-# pn.state.template.param.update(
-#    title=f"RCSB Disulfide Browser: {PDB_SS.TotalDisulfides} Disulfides, {len(PDB_SS.SSDict)} Structures, {PDB_SS.version}"
-# )
 
 render_win = pn.Column(vtkpan)
 render_win.servable()
