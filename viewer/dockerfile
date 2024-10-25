@@ -2,7 +2,15 @@
 FROM continuumio/miniconda3
 
 # Set environment variables to prevent interactive prompts during package installations
-ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=noninteractive \
+    PATH="/opt/conda/envs/proteusPy/bin:$PATH" \
+    PYVISTA_OFF_SCREEN=true
+
+# Copy the current directory contents into the container at /app
+COPY . /app
+
+# Copy the environment.yml file first for better layer caching
+COPY environment.yml /tmp/environment.yml
 
 # Install system dependencies including libgl1, xvfb, xauth, libxrender1, and libxext6
 RUN apt-get update && \
@@ -11,33 +19,16 @@ RUN apt-get update && \
         xvfb \
         xauth \
         libxrender1 \
-        libxext6 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy the environment.yml file first for better layer caching
-COPY environment.yml /tmp/environment.yml
-
-# Create the Conda environment from environment.yml
-RUN conda env create -f /tmp/environment.yml && \
+        libxext6 && \
+    rm -rf /var/lib/apt/lists/* && \
+    conda env create -f /tmp/environment.yml && \
     conda clean -a -y
-
-# Set the PATH to include the Conda environment's binary directory
-ENV PATH="/opt/conda/envs/proteusPy/bin:$PATH"
-
-# Set environment variables for PyVista to ensure offscreen rendering
-ENV PYVISTA_OFF_SCREEN=true
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /app
-
-# Copy the entrypoint.sh script into the container and make it executable
-COPY entrypoint.sh /app/entrypoint.sh
-
-# Add a non-root user for enhanced security
-# Change ownership of the /app directory to the non-root user and make entrypoint.sh executable
+# Add a non-root user for enhanced security and
+# change ownership of the /app directory to the non-root user and make entrypoint.sh executable
 RUN useradd -m appuser && chown -R appuser:appuser /app && chmod +x /app/entrypoint.sh
 
 # Switch to the non-root user

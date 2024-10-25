@@ -355,7 +355,7 @@ def click_plot(event):
 
     # Update the vtkpan and trigger a refresh
     vtkpan.object = plotter.ren_win
-    vtkpan.param.trigger("object")
+    # vtkpan.param.trigger("object")
     plotter.render()
 
 

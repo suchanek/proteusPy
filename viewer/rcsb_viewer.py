@@ -9,10 +9,7 @@ Last revision: 10/22/2024
 # pylint: disable=C0103 # wrong variable name
 # pylint: disable=W0212 # access to a protected member _render of a client class
 # pylint: disable=W0613 # unused argument
-# pylint: disable=W0603 # Using the global statement
-# pylint: disable=W0602 # Using the global statement
-# pylint: disable=W0612 # Unused variable 'event'
-
+# pylint: disable=W0603 # Using global for variable
 
 import logging
 import os
@@ -25,6 +22,7 @@ from proteusPy import (
     Disulfide,
     DisulfideList,
     Load_PDB_SS,
+    configure_master_logger,
     create_logger,
     get_jet_colormap,
 )
@@ -37,6 +35,7 @@ if os.getenv("PYVISTA_OFF_SCREEN", "false").lower() == "true":
 
 pn.extension("vtk", sizing_mode="stretch_width", template="fast")
 
+_vers = 0.8
 
 # defaults for the UI
 
@@ -58,9 +57,7 @@ _single = True
 
 # Set up logging
 # configure a master logger. This will create ~/logs/DBViewer.log
-
-root_logger = logging.getLogger()
-root_logger.handlers.clear()
+configure_master_logger("DBViewer.log")
 
 # create a local logger
 _logger = create_logger("DBViewer", log_level=logging.INFO)
@@ -215,14 +212,14 @@ def load_state():
     return _ss_state
 
 
-def set_camera_view(theplotter):
+def set_camera_view(plotter):
     """
     Sets the camera to a specific view where the x-axis is pointed down and the
     y-axis into the screen.
     """
     # camera_position = [(0, 0, 10), (0, 0, 0), (0, 1, 0)]  # Example values
     # plotter.camera_position = camera_position
-    theplotter.reset_camera()
+    plotter.reset_camera()
 
 
 def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
@@ -319,21 +316,19 @@ def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
 
 @pn.cache()
 def load_data():
-    """Load the disulfide database"""
+    """Load the RCSB Disulfide Database and return the object."""
     global RCSB_list, PDB_SS
 
     message = "Loading RCSB Disulfide Database"
     _logger.info(message)
-
-    PDB_SS = Load_PDB_SS(verbose=True, subset=False, loadpath="/app/data")
+    PDB_SS = Load_PDB_SS(
+        verbose=True, subset=False, loadpath="/app/data"
+    )  # Load some data
 
     RCSB_list = sorted(PDB_SS.IDList)
-
-    message = f"Loaded: {len(RCSB_list)}"
+    message = f"Loaded RCSB Disulfide Database: {len(RCSB_list)} entries"
     _logger.info(message)
-
     set_window_title()
-
     pn.state.cache["data"] = PDB_SS
     return PDB_SS
 
@@ -363,13 +358,11 @@ def click_plot(event):
     """Force a re-render of the currently selected disulfide. Reuses the existing plotter."""
 
     # Reuse the existing plotter and re-render the scene
-    global plotter
-
     plotter = render_ss()  # Reuse the existing plotter
 
     # Update the vtkpan and trigger a refresh
     vtkpan.object = plotter.ren_win
-    vtkpan.param.trigger("object")
+    # vtkpan.param.trigger("object")
     plotter.render()
 
 
@@ -444,7 +437,7 @@ def update_info(ss):
 
 
 def update_output(ss):
-    """Update the disulfide bond info in the markdown pane."""
+    """Update the output of the disulfide bond in the markdown pane."""
     info_string = f"""
     **Cα-Cα:** {ss.ca_distance:.2f} Å  
     **Cβ-Cβ:** {ss.cb_distance:.2f} Å  
@@ -507,7 +500,8 @@ def render_ss():
 def on_theme_change(event):
     """Handle a theme change event."""
     selected_theme = event.obj.theme
-    _logger.debug(f"--> Theme Change: {selected_theme}")
+    message = f"Theme Change: {selected_theme}"
+    _logger.debug(message)
 
 
 def display_overlay(
@@ -530,10 +524,6 @@ def display_overlay(
     :param fname: Filename to save for the movie or screenshot, defaults to 'ss_overlay.png'
     :param light: Background color, defaults to True for White. False for Dark.
     """
-
-    # from proteusPy.utility import get_theme
-
-    pid = sslist.pdb_id
 
     ssbonds = sslist.data
     tot_ss = len(ssbonds)  # number off ssbonds
@@ -618,6 +608,9 @@ pn.bind(get_ss_idlist, rcs_id=rcsb_selector_widget)
 pn.bind(update_single, click=styles_group)
 
 set_window_title()
+# pn.state.template.param.update(
+#    title=f"RCSB Disulfide Browser: {PDB_SS.TotalDisulfides} Disulfides, {len(PDB_SS.SSDict)} Structures, {PDB_SS.version}"
+# )
 
 render_win = pn.Column(vtkpan)
 render_win.servable()
