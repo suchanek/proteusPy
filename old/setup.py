@@ -22,7 +22,11 @@ This code is in beta.
 Eric G. Suchanek, PhD., suchanek@mac.com
 """
 
+# pylint: disable=E0011
+# pylint: disable=W0611
+
 import sys
+from pathlib import Path
 
 try:
     from setuptools import Command, Extension, setup
@@ -34,7 +38,7 @@ except ImportError:
 
 if "bdist_wheel" in sys.argv:
     try:
-        import wheel  # noqa: F401
+        import wheel  # pylint: disable=E0011
     except ImportError:
         sys.exit(
             "We need both setuptools AND wheel packages installed "
@@ -50,14 +54,12 @@ def can_import(module_name):
         return None
 
 
-from pathlib import Path
-
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
 # Get the version from the version file
 version = {}
-with open("proteusPy/version.py") as fp:
+with open("proteusPy/_version.py") as fp:
     exec(fp.read(), version)
 
 
@@ -74,15 +76,17 @@ setup(
     requires_python="^3.11",
     packages=["proteusPy"],
     keywords="proteusPy suchanek disulfide",
+    tests_require=["pytest"],
+    test_suite="tests",
+    setup_requires=["pytest-runner", "wheel"],
     install_requires=[
         "numpy",
         "matplotlib",
-        "pandas==2.2.1",
+        "pandas",
         "pyvista[all]",
         "traitlets==5.9.0",
         "jupyter",
-        "jupyter_server<2.0",
-        "jupyterlab<4.0",
+        "jupyter_server",
         "seaborn",
         "pillow",
         "tqdm",
@@ -100,13 +104,19 @@ setup(
         "grpcio",
         "pip",
         "wget",
-        "vtk",
+        "vtk==9.2.6",
         "kaleido",
         "plotly_express",
         "trame-jupyter-extension",
         "jupyter_contrib_nbextensions",
         "ipywidgets",
+        "pymolpy3",
+        "pympler",
         "imageio[ffmpeg]",
+        "colorama",
+        "Biopython",
+        "pyvistaqt",
+        "pyqt5",
     ],
     source="https://github.com/suchanek/proteusPy/",
     project_urls={
@@ -124,23 +134,24 @@ setup(
         "Topic :: Scientific/Engineering",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "Topic :: Scientific/Engineering :: Chemistry",
-        "Programming Language :: Python :: 3.11",
     ],
-    include_package_data=True,
     package_data={
         "proteusPy": [
-            "data/*.txt",
-            "data/*.py",
-            "data/*.json",
-            "data/*.csv",
-            "data/SS_consensus_class_sext.pkl",
+            "data/pdb5rsa.ent",
+            "data/ss_completed.txt",
+            "data/ss_query.json",
+            "data/ss_ids.txt",
+            "data/SS_consensus_class_oct.pkl",
+            "data/SS_consensus_class_32.pkl",
+            "data/2q7q_seqsim.csv",
+            "data/PDB_SS_class_definitions.csv",
         ]
     },
     exclude_package_data={
         "proteusPy": [
             "data/PDB_all_ss.pkl",
             "data/PDB_SS_ALL_LOADER.pkl",
-            "data/PDB_all_ss_dict.pkl",
+            "data/PDB_SS_SUBSET_LOADER.pkl",
         ]
     },
     zip_safe=False,

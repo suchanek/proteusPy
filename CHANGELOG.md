@@ -5,11 +5,23 @@ All notable changes to the ``proteusPy`` project will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [V0.97.11]
+
+### Added
+
+- Docker image for the pyVista renderer. This lives under proteusPy/viewer and is deployed on Docker hub under ``egsuchanek/rcsb_viewer``. The standalone versions lives in ``proteusPy/programs/DBViewer.py`` launch with: ``panel serve path_to_DBViewer.py --autoreload &``
+
+
+### Issues
+
+- I cannot get the QT5 viewer to build under Windows. The pyQt5 library won't install.
+
+
 ## [V0.97.10]
 
 ### Added
 
-- Disulfide viewer development, improvement
+- Disulfide QT5 viewer development, improvement
 - ``DisulfideList.display()`` added to provide a summary of the input DisulfideList
 - Additional analytics
 

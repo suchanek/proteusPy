@@ -900,6 +900,7 @@ def Load_PDB_SS(
                 cutoff=cutoff,
             )
             loader.save(savepath=loadpath, subset=True, cutoff=cutoff)
+            return loader
         else:
             if verbose:
                 print(f"-> load_PDB_SS(): Reading {_fname_sub}... ")
@@ -917,6 +918,9 @@ def Load_PDB_SS(
                 cutoff=cutoff,
             )
             loader.save(savepath=loadpath, subset=False, cutoff=cutoff)
+            if verbose:
+                print(f"-> load_PDB_SS(): Done Saving {_fname_all}... ")
+            return loader
         else:
             if verbose:
                 print(f"-> load_PDB_SS(): Reading {_fname_all}... ")
@@ -927,7 +931,7 @@ def Load_PDB_SS(
             if verbose:
                 print(f"-> load_PDB_SS(): Done Reading {_fname_all}... ")
 
-        return loader
+    return loader
 
 
 def Bootstrap_PDB_SS(
