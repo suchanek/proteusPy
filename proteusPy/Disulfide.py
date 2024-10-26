@@ -2144,6 +2144,7 @@ class Disulfide:
         self.n_next_prox = n_next_prox.copy()
         self.c_prev_dist = c_prev_dist.copy()
         self.n_next_dist = n_next_dist.copy()
+        self._compute_local_coords()
 
     def set_name(self, namestr="Disulfide") -> None:
         """
@@ -2256,6 +2257,27 @@ class Disulfide:
 
         res = [ss for ss in others if self.torsion_distance(ss) <= cutoff]
         return DisulfideList(res, "neighbors")
+
+    def translate(self, translation_vector: Vector3D):
+        """Translate the Disulfide object by the given vector."""
+
+        self.n_prox -= translation_vector
+        self.ca_prox -= translation_vector
+        self.c_prox -= translation_vector
+        self.o_prox -= translation_vector
+        self.cb_prox -= translation_vector
+        self.sg_prox -= translation_vector
+        self.sg_dist -= translation_vector
+        self.cb_dist -= translation_vector
+        self.ca_dist -= translation_vector
+        self.n_dist -= translation_vector
+        self.c_dist -= translation_vector
+        self.o_dist -= translation_vector
+
+        self.c_prev_prox -= translation_vector
+        self.n_next_prox -= translation_vector
+        self.c_prev_dist -= translation_vector
+        self.n_next_dist -= translation_vector
 
 
 # Class defination ends

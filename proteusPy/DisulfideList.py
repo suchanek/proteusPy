@@ -533,6 +533,19 @@ class DisulfideList(UserList):
 
         return tor_stats, dist_stats
 
+    @property
+    def center_of_mass(self):
+        """
+        Calculate the center of mass for the Disulfide list
+        """
+        sslist = self.data
+        tot = len(sslist)
+        if tot == 0:
+            return 0.0
+
+        total_cofmass = sum(ss.cofmass for ss in sslist)
+        return total_cofmass / tot
+
     def describe(self):
         """
         Prints out relevant attributes of the given disulfideList.

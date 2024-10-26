@@ -6,9 +6,6 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PATH="/opt/conda/envs/proteusPy/bin:$PATH" \
     PYVISTA_OFF_SCREEN=true
 
-# Copy the current directory contents into the container at /app
-COPY . /app
-
 # Copy the environment.yml file first for better layer caching
 COPY environment.yml /tmp/environment.yml
 
@@ -27,9 +24,20 @@ RUN apt-get update && \
 # Set the working directory in the container
 WORKDIR /app
 
-# Add a non-root user for enhanced security and
-# change ownership of the /app directory to the non-root user and make entrypoint.sh executable
-RUN useradd -m appuser && chown -R appuser:appuser /app && chmod +x /app/entrypoint.sh
+# Copy the current directory contents into the container at /app
+COPY . /app
+
+# Add a non-root user for enhanced security
+RUN useradd -m appuser
+
+# Create a writable directory for Matplotlib cache and set ownership
+RUN mkdir -p /tmp/matplotlib && chown -R appuser:appuser /tmp/matplotlib
+
+# Set the MPLCONFIGDIR environment variable
+ENV MPLCONFIGDIR=/tmp/matplotlib
+
+# Change ownership of the /app directory to the non-root user and make entrypoint.sh executable
+RUN chown -R appuser:appuser /app && chmod +x /app/entrypoint.sh
 
 # Switch to the non-root user
 USER appuser
@@ -37,5 +45,5 @@ USER appuser
 # Expose port 5006 for the Bokeh server
 EXPOSE 5006
 
-# Set the entrypoint to the entrypoint.sh script
+# Set the entrypoint to the entrypoint script
 ENTRYPOINT ["/app/entrypoint.sh"]
