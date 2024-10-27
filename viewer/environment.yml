@@ -6,11 +6,11 @@ dependencies:
   - matplotlib
   - pandas
   - python=3.11
-  - vtk=9.2.6
+  - vtk=9.3.0
   - panel
   - bokeh
   - pyvista[all]
   - nodejs
   - pip
   - pip:
-    - proteusPy==0.97.11.dev5
+    - proteusPy==0.97.12.dev0

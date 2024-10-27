@@ -22,6 +22,7 @@ from proteusPy import (
     Disulfide,
     DisulfideList,
     Load_PDB_SS,
+    configure_master_logger,
     create_logger,
     get_jet_colormap,
 )
@@ -35,6 +36,11 @@ if os.getenv("PYVISTA_OFF_SCREEN", "false").lower() == "true":
 pn.extension("vtk", sizing_mode="stretch_width", template="fast")
 
 _vers = 0.90
+
+_logger = create_logger("dbviewer", log_level=logging.INFO)
+
+configure_master_logger("dbviewer.py")
+_logger.info("Starting Panel Disulfide Viewer...")
 
 # defaults for the UI
 
@@ -87,14 +93,53 @@ rcsb_selector_widget = pn.widgets.AutocompleteInput(
     options=RCSB_list,
 )
 
+# Create the "Reset Camera" button
+reset_camera_button = pn.widgets.Button(name="Reset Camera", button_type="primary")
+
+
+def reset_camera(event):
+    """
+    Sets the camera to a specific view where the x-axis is pointed down and the
+    y-axis into the screen.
+    """
+    global vtkpan, plotter
+
+    camera_position = [(0, 0, 10), (0, 0, 0), (0, 1, 0)]  # Example values
+    plotter.camera_position = camera_position
+    mess = f"Reset Camera: {plotter.camera_position}"
+    _logger.info(mess)
+
+    plotter.render()
+    plotter.reset_camera()
+    vtkpan = pn.pane.VTK(
+        plotter.ren_win,
+        margin=0,
+        sizing_mode="stretch_both",
+        orientation_widget=True,
+        enable_keybindings=True,
+        min_height=500,
+    )
+
+    vtkpan.object = plotter.ren_win
+
+
+# Define the reset_camera function
+def Oreset_camera(event):
+    plotter.camera_position = "iso"
+    plotter.render()
+
+
+# Bind the reset_camera function to the button click event
+reset_camera_button.on_click(reset_camera)
+
 # controls on sidebar
 ss_props = pn.WidgetBox(
     "# Disulfide Selection", rcsb_selector_widget, rcsb_ss_widget
 ).servable(target="sidebar")
 
-ss_styles = pn.WidgetBox("# Rendering Styles", styles_group, single_checkbox).servable(
-    target="sidebar"
-)
+ss_styles = pn.WidgetBox(
+    "# Rendering Styles", styles_group, single_checkbox, reset_camera_button
+).servable(target="sidebar")
 
 # markdown panels for various text outputs
 title_md = pn.pane.Markdown("Title")
@@ -227,6 +272,8 @@ def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
     # enrg = ss.energy
     # title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Cα: {ss.ca_distance:.2f} Å Cβ: {ss.cb_distance:.2f} Å Tors: {ss.torsion_length:.2f}°"
 
+    _logger.info(f"Enetering plot: {ss.name}")
+
     if light:
         pv.set_plot_theme("document")
     else:
@@ -239,19 +286,16 @@ def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
     plotter.clear()
 
     if single:
-        ss._render(
-            plotter,
-            style=style,
-            bs_scale=BS_SCALE,
-            spec=SPECULARITY,
-            specpow=SPEC_POWER,
-        )
+        ss._render(plotter, style=style)
     else:
         pdbid = ss.pdb_id
         sslist = PDB_SS[pdbid]
         display_overlay(sslist, plotter)
 
+    _logger.info(f"Camera position before: {plotter.camera_position}")
     plotter.reset_camera()
+    _logger.info(f"Camera position: {plotter.camera_position}")
+    plotter.render()
     return plotter
 
 
