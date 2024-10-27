@@ -98,7 +98,7 @@ setup(
         "grpcio",
         "pip",
         "wget",
-        "vtk==9.2.6",
+        "vtk==9.3.0",
         "kaleido",
         "plotly_express",
         "pympler",

@@ -489,6 +489,8 @@ def display_overlay(
     brad = brad if tot_ss < 100 else brad * 0.5
 
     # print(f'Brad: {brad}')
+    center_of_mass = sslist.center_of_mass
+    # sslist.translate(center_of_mass)
 
     for i, ss in zip(range(tot_ss), ssbonds):
         color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
@@ -496,10 +498,11 @@ def display_overlay(
             pl,
             style="plain",
             bondcolor=color,
-            translate=True,
+            translate=False,
             bond_radius=brad,
             res=res,
         )
+    pl.add_camera3d_widget()
 
     pl.reset_camera()
     return pl

@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
-- All Biopython references will be ultimately removed.
+- Biopython references will be ultimately removed.
 
 ### Fixed
 
