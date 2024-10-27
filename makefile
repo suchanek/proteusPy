@@ -68,7 +68,7 @@ devclean: .
 install: sdist
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	@echo "Installing additional..."
-	@$(CONDA) install vtk==9.2.6 -y
+	$(CONDA) install vtk==9.3.0 -y
 
 	@echo "Installing proteusPy..."
 	@pip install . -q
@@ -79,7 +79,7 @@ install: sdist
 
 install_dev: sdist
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	@$(CONDA) install vtk==9.2.6 -y
+	$(CONDA) install vtk==9.3.0 -y
 	
 	pip install . -q
 	pip install pdoc twine black pytest build -q

@@ -426,12 +426,8 @@ class Disulfide:
 
         for i, bond in enumerate(bond_conn):
             if all_atoms:
-                if i > 10 and missing is True:  # skip missing atoms
+                if i > 10 and missing:  # skip missing atoms
                     continue
-
-            # get the indices for the origin and destination atoms
-            # orig = bond[0]
-            # dest = bond[1]
 
             orig, dest = bond
             col = bond_split_colors[i]
@@ -576,7 +572,7 @@ class Disulfide:
             )
 
         model = self.modelled
-        coords = self._internal_coords()
+        coords = self.internal_coords
         if translate:
             coords -= self.cofmass
 
@@ -682,7 +678,7 @@ class Disulfide:
             """
 
         _bradius = bond_radius
-        coords = self._internal_coords()
+        coords = self.internal_coords
         missing_atoms = self.missing_atoms
         clen = coords.shape[0]
 
@@ -1036,7 +1032,7 @@ class Disulfide:
         :return: np.array(3, 2): Array containing the min, max for X, Y, and Z respectively.
         Does not currently take the atom's radius into account.
         """
-        coords = self.internal_coords
+        coords = self.internal_coords()
 
         xmin, ymin, zmin = coords.min(axis=0)
         xmax, ymax, zmax = coords.max(axis=0)
@@ -1150,8 +1146,20 @@ class Disulfide:
         :return: 3D array for the geometric center of mass
         """
 
-        res = self._internal_coords()
-        return res.mean(axis=0)
+        res = self.internal_coords.mean(axis=0)
+        return res
+
+    @property
+    def coord_cofmass(self) -> np.array:
+        """
+        Return the geometric center of mass for the global coordinates of
+        the given Disulfide. Missing atoms are not included.
+
+        :return: 3D array for the geometric center of mass
+        """
+
+        res = self.coords.mean(axis=0)
+        return res
 
     def copy(self):
         """
@@ -1284,7 +1292,7 @@ class Disulfide:
             else:
                 pv.set_plot_theme("document")
 
-        if single is True:
+        if single:
             _pl = pv.Plotter(window_size=winsize)
             _pl.add_title(title=title, font_size=FONTSIZE)
             _pl.enable_anti_aliasing("msaa")
@@ -1298,7 +1306,7 @@ class Disulfide:
                 specpow=SPEC_POWER,
             )
             _pl.reset_camera()
-            if shadows is True:
+            if shadows:
                 _pl.enable_shadows()
             _pl.show()
 
@@ -1358,7 +1366,7 @@ class Disulfide:
 
             pl.link_views()
             pl.reset_camera()
-            if shadows is True:
+            if shadows:
                 pl.enable_shadows()
             pl.show()
         return
@@ -1398,7 +1406,7 @@ class Disulfide:
         """
 
         # Get internal coordinates of both objects
-        ic1 = self._internal_coords()
+        ic1 = self.internal_coords
         ic2 = other._internal_coords()
 
         # Compute the sum of squared differences between corresponding internal coordinates
@@ -1508,6 +1516,71 @@ class Disulfide:
                     self._n_next_prox.get_array(),
                     self._c_prev_dist.get_array(),
                     self._n_next_dist.get_array(),
+                )
+            )
+        return res_array
+
+    @property
+    def coords(self) -> np.array:
+        """
+        Return the coordinates for the Disulfide as an array.
+
+        :return: Array containing the coordinates, [16][3].
+        """
+        return self._coords()
+
+    def _coords(self) -> np.array:
+        """
+        Return the coordinates for the Disulfide as an array.
+        If there are missing atoms the extra atoms for the proximal
+        and distal N and C are set to [0,0,0]. This is needed for the center of
+        mass calculations, used when rendering.
+
+        :return: Array containing the coordinates, [16][3].
+        """
+
+        # if we don't have the prior and next atoms we initialize those
+        # atoms to the origin so as to not effect the center of mass calculations
+        if self.missing_atoms:
+            res_array = np.array(
+                (
+                    self.n_prox.get_array(),
+                    self.ca_prox.get_array(),
+                    self.c_prox.get_array(),
+                    self.o_prox.get_array(),
+                    self.cb_prox.get_array(),
+                    self.sg_prox.get_array(),
+                    self.n_dist.get_array(),
+                    self.ca_dist.get_array(),
+                    self.c_dist.get_array(),
+                    self.o_dist.get_array(),
+                    self.cb_dist.get_array(),
+                    self.sg_dist.get_array(),
+                    [0, 0, 0],
+                    [0, 0, 0],
+                    [0, 0, 0],
+                    [0, 0, 0],
+                )
+            )
+        else:
+            res_array = np.array(
+                (
+                    self.n_prox.get_array(),
+                    self.ca_prox.get_array(),
+                    self.c_prox.get_array(),
+                    self.o_prox.get_array(),
+                    self.cb_prox.get_array(),
+                    self.sg_prox.get_array(),
+                    self.n_dist.get_array(),
+                    self.ca_dist.get_array(),
+                    self.c_dist.get_array(),
+                    self.o_dist.get_array(),
+                    self.cb_dist.get_array(),
+                    self.sg_dist.get_array(),
+                    self.c_prev_prox.get_array(),
+                    self.n_next_prox.get_array(),
+                    self.c_prev_dist.get_array(),
+                    self.n_next_dist.get_array(),
                 )
             )
         return res_array
@@ -1637,7 +1710,7 @@ class Disulfide:
 
         pl.clear()
 
-        if single is True:
+        if single:
             pl = pv.Plotter(window_size=WINSIZE)
             # pl.add_title(title=title, font_size=FONTSIZE)
             pl.enable_anti_aliasing("msaa")
@@ -1651,7 +1724,7 @@ class Disulfide:
                 specpow=SPEC_POWER,
             )
             pl.reset_camera()
-            if shadows is True:
+            if shadows:
                 pl.enable_shadows()
         else:
             pl = pv.Plotter(shape=(2, 2))
@@ -1705,7 +1778,7 @@ class Disulfide:
 
             pl.link_views()
             pl.reset_camera()
-            if shadows == True:
+            if shadows:
                 pl.enable_shadows()
         return pl
 
@@ -2261,23 +2334,24 @@ class Disulfide:
     def translate(self, translation_vector: Vector3D):
         """Translate the Disulfide object by the given vector."""
 
-        self.n_prox -= translation_vector
-        self.ca_prox -= translation_vector
-        self.c_prox -= translation_vector
-        self.o_prox -= translation_vector
-        self.cb_prox -= translation_vector
-        self.sg_prox -= translation_vector
-        self.sg_dist -= translation_vector
-        self.cb_dist -= translation_vector
-        self.ca_dist -= translation_vector
-        self.n_dist -= translation_vector
-        self.c_dist -= translation_vector
-        self.o_dist -= translation_vector
+        self.n_prox += translation_vector
+        self.ca_prox += translation_vector
+        self.c_prox += translation_vector
+        self.o_prox += translation_vector
+        self.cb_prox += translation_vector
+        self.sg_prox += translation_vector
+        self.sg_dist += translation_vector
+        self.cb_dist += translation_vector
+        self.ca_dist += translation_vector
+        self.n_dist += translation_vector
+        self.c_dist += translation_vector
+        self.o_dist += translation_vector
 
-        self.c_prev_prox -= translation_vector
-        self.n_next_prox -= translation_vector
-        self.c_prev_dist -= translation_vector
-        self.n_next_dist -= translation_vector
+        self.c_prev_prox += translation_vector
+        self.n_next_prox += translation_vector
+        self.c_prev_dist += translation_vector
+        self.n_next_dist += translation_vector
+        self._compute_local_coords()
 
 
 # Class defination ends

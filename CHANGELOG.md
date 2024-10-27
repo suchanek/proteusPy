@@ -1,6 +1,6 @@
-# Changelog for proteusPy
+# proteusPy Changelog
 
-All notable changes to the ``proteusPy`` project will be documented in this file.
+Notable changes to the ``proteusPy`` project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Docker image for the pyVista renderer. This lives under proteusPy/viewer and is deployed on Docker hub under ``egsuchanek/rcsb_viewer``. The standalone versions lives in ``proteusPy/programs/DBViewer.py`` launch with: ``panel serve path_to_DBViewer.py --autoreload &``
+- ``DisulfideList.center_of_mass`` - returns the ``Vector3D`` center of mass for the list.
+- ``DisulfideList.translate()`` - subtracts the input ``Vector3D`` object from the list, destructively modifying the coordinates. Used primarily in rendering functions to center the list at ``Vector3D([0,0,0])``.
+- ``Disulfide.translate()`` - translates the input Disulfide by the input ``Vector3D``.
+- 
 
 
 ### Issues

@@ -1050,6 +1050,19 @@ class DisulfideList(UserList):
             display=display, save=save, fname=fname, light=light
         )
 
+    def translate(self, translation_vector) -> None:
+        """
+        Translate the DisulfideList by the given translation vector.
+        Note: The translation is a vector SUBTRACTION, not addition.
+        This is used primarily to move a list to its geometric center of mass
+        and is a destructive operation, in the sense that it updates the list in place.
+
+        :param translation_vector: The translation vector to apply.
+        :type translation_vector: Vector3D
+        """
+        for ss in self.data:
+            ss.translate(translation_vector)
+
     def insert(self, index, item):
         """
         Insert a Disulfide into the list at the specified index
