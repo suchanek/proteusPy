@@ -546,7 +546,6 @@ def display_overlay(
             bond_radius=brad,
             res=res,
         )
-    pl.add_camera3d_widget()
 
     pl.reset_camera()
     return pl
