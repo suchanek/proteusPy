@@ -272,6 +272,7 @@ def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
     # enrg = ss.energy
     # title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Cα: {ss.ca_distance:.2f} Å Cβ: {ss.cb_distance:.2f} Å Tors: {ss.torsion_length:.2f}°"
 
+    global plotter
     _logger.info(f"Enetering plot: {ss.name}")
 
     if light:
@@ -282,20 +283,34 @@ def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
     # Create a new plotter with the desired shape
 
     # pl.enable_anti_aliasing("msaa")
-    plotter = pv.Plotter(window_size=WINSIZE)
-    plotter.clear()
 
     if single:
+        plotter = pv.Plotter(window_size=WINSIZE)
+        plotter.clear()
         ss._render(plotter, style=style)
     else:
+        plotter = pv.Plotter(shape=(2, 2), window_size=WINSIZE)
+        plotter.clear()
+
         pdbid = ss.pdb_id
         sslist = PDB_SS[pdbid]
-        display_overlay(sslist, plotter)
+        # display_overlay(sslist, plotter)
+        plotter.subplot(0, 0)
+        ss._render(plotter, style="cpk")
 
-    _logger.info(f"Camera position before: {plotter.camera_position}")
+        plotter.subplot(0, 1)
+        ss._render(plotter, style="bs")
+
+        plotter.subplot(1, 0)
+        ss._render(plotter, style="sb")
+
+        plotter.subplot(1, 1)
+        ss._render(plotter, style="pd")
+
+        plotter.link_views()
+
     plotter.reset_camera()
-    _logger.info(f"Camera position: {plotter.camera_position}")
-    plotter.render()
+    # plotter.render()
     return plotter
 
 

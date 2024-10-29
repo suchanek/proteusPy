@@ -26,7 +26,7 @@ from proteusPy import (
     create_logger,
     get_jet_colormap,
 )
-from proteusPy.atoms import BOND_COLOR, BOND_RADIUS, BS_SCALE, SPEC_POWER, SPECULARITY
+from proteusPy.atoms import BOND_RADIUS
 from proteusPy.ProteusGlobals import WINSIZE
 
 # Set PyVista to use offscreen rendering if the environment variable is set
@@ -224,91 +224,34 @@ def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
         * 'plain' - boring single color
     :param light: If True, light background, if False, dark
     """
-    # src = ss.pdb_id
-    # enrg = ss.energy
-    # title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Cα: {ss.ca_distance:.2f} Å Cβ: {ss.cb_distance:.2f} Å Tors: {ss.torsion_length:.2f}°"
 
     if light:
         pv.set_plot_theme("document")
     else:
         pv.set_plot_theme("dark")
 
-    # Create a new plotter with the desired shape
+    pl.enable_anti_aliasing("msaa")
+    pl.clear()
+
     if single:
-        new_pl = pv.Plotter(window_size=WINSIZE)
-
+        ss._render(pl, style=style)
     else:
-        new_pl = pv.Plotter(shape=(2, 2), window_size=WINSIZE)
+        pl.subplot(0, 0)
+        ss._render(pl, style="cpk")
 
-    new_pl.enable_anti_aliasing("msaa")
-    new_pl.clear()
-    new_pl.reset_camera()
+        pl.subplot(0, 1)
+        ss._render(pl, style="bs")
 
-    if single is True:
-        ss._render(
-            new_pl,
-            style=style,
-            bs_scale=BS_SCALE,
-            spec=SPECULARITY,
-            specpow=SPEC_POWER,
-        )
-    else:
-        new_pl.subplot(0, 0)
+        pl.subplot(1, 0)
+        ss._render(pl, style="sb")
 
-        ss._render(
-            new_pl,
-            style="cpk",
-            bondcolor=BOND_COLOR,
-            bs_scale=BS_SCALE,
-            spec=SPECULARITY,
-            specpow=SPEC_POWER,
-        )
+        pl.subplot(1, 1)
+        ss._render(pl, style="pd")
 
-        new_pl.subplot(0, 1)
+        pl.link_views()
 
-        ss._render(
-            new_pl,
-            style="pd",
-            bondcolor=BOND_COLOR,
-            bs_scale=BS_SCALE,
-            spec=SPECULARITY,
-            specpow=SPEC_POWER,
-        )
-
-        new_pl.subplot(1, 0)
-
-        ss._render(
-            new_pl,
-            style="sb",
-            bondcolor=BOND_COLOR,
-            bs_scale=BS_SCALE,
-            spec=SPECULARITY,
-            specpow=SPEC_POWER,
-        )
-
-        new_pl.subplot(1, 1)
-        ss._render(
-            pl,
-            style="pd",
-            bondcolor=BOND_COLOR,
-            bs_scale=BS_SCALE,
-            spec=SPECULARITY,
-            specpow=SPEC_POWER,
-        )
-        new_pl.subplot(1, 1)
-        ss._render(
-            pl,
-            style="pd",
-            bondcolor=BOND_COLOR,
-            bs_scale=BS_SCALE,
-            spec=SPECULARITY,
-            specpow=SPEC_POWER,
-        )
-
-        new_pl.link_views()
-
-    new_pl.reset_camera()
-    return new_pl
+    pl.reset_camera()
+    return pl
 
 
 @pn.cache()
@@ -360,7 +303,7 @@ def click_plot(event):
     # Update the vtkpan and trigger a refresh
     vtkpan.object = plotter.ren_win
     # vtkpan.param.trigger("object")
-    plotter.render()
+    # plotter.render()
 
 
 def update_single(click):
@@ -486,6 +429,13 @@ def render_ss():
     style = styles[styles_group.value]
     single = single_checkbox.value
 
+    # Create a new plotter with the desired shape
+    if single:
+        plotter = pv.Plotter(window_size=WINSIZE)
+
+    else:
+        plotter = pv.Plotter(shape=(2, 2), window_size=WINSIZE)
+
     # Render the structure in the plotter
     return plot(plotter, ss, single=single, style=style, light=light)
 
@@ -493,8 +443,25 @@ def render_ss():
 def on_theme_change(event):
     """Handle a theme change event."""
     selected_theme = event.obj.theme
-    message = f"Theme Change: {selected_theme}"
-    _logger.debug(message)
+    light = selected_theme != "dark"
+
+    _logger.debug(f"Theme Change: {selected_theme}")
+
+    # Apply the new theme to the plotter immediately
+    apply_theme_to_plotter(plotter, light=light)
+
+    # Refresh the VTK pane to reflect the theme change
+    vtkpan.object = plotter.ren_win
+    # vtkpan.param.trigger("object")  # Force an immediate update
+
+
+def apply_theme_to_plotter(plotter, light=True):
+    """Apply the current theme to the plotter."""
+    if light:
+        pv.set_plot_theme("document")
+    else:
+        pv.set_plot_theme("dark")
+    plotter.render()
 
 
 def display_overlay(
