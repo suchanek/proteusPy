@@ -8,6 +8,7 @@ Last revision: 10/22/2024
 # pylint: disable=C0413 # wrong import order
 # pylint: disable=C0103 # wrong variable name
 # pylint: disable=W0212 # access to a protected member _render of a client class
+# pylint: disable=W0612 # unused variable
 # pylint: disable=W0613 # unused argument
 # pylint: disable=W0603 # Using global for variable
 
@@ -35,7 +36,15 @@ if os.getenv("PYVISTA_OFF_SCREEN", "false").lower() == "true":
 
 pn.extension("vtk", sizing_mode="stretch_width", template="fast")
 
-_vers = 0.8
+_vers = 0.90
+
+_logger = create_logger("dbviewer", log_level=logging.INFO)
+
+configure_master_logger("dbviewer.py")
+_logger.info(f"Starting Panel Disulfide Viewer v{_vers}.")
+
+current_theme = pn.config.theme
+_logger.info(f"Current Theme: {current_theme}")
 
 # defaults for the UI
 
@@ -56,9 +65,6 @@ _style = "Split Bonds"
 _single = True
 
 # Set up logging
-# configure a master logger. This will create ~/logs/DBViewer.log
-configure_master_logger("DBViewer.log")
-
 # create a local logger
 _logger = create_logger("DBViewer", log_level=logging.INFO)
 
@@ -66,7 +72,6 @@ _logger = create_logger("DBViewer", log_level=logging.INFO)
 ss_state = {}
 RCSB_list = []
 PDB_SS = None
-
 
 # Widgets
 styles_group = pn.widgets.RadioBoxGroup(
@@ -87,6 +92,39 @@ rcsb_selector_widget = pn.widgets.AutocompleteInput(
     placeholder="Search Here",
     options=RCSB_list,
 )
+
+# Create the "Reset Camera" button
+# reset_camera_button = pn.widgets.Button(name="Reset Camera", button_type="primary")
+
+
+def reset_camera(event):
+    """
+    Sets the camera to a specific view where the x-axis is pointed down and the
+    y-axis into the screen.
+    """
+    global vtkpan, plotter
+
+    camera_position = [(0, 0, 10), (0, 0, 0), (0, 1, 0)]  # Example values
+    plotter.camera_position = camera_position
+    mess = f"Reset Camera: {plotter.camera_position}"
+    _logger.info(mess)
+
+    plotter.render()
+    plotter.reset_camera()
+    vtkpan = pn.pane.VTK(
+        plotter.ren_win,
+        margin=0,
+        sizing_mode="stretch_both",
+        orientation_widget=True,
+        enable_keybindings=True,
+        min_height=500,
+    )
+
+    vtkpan.object = plotter.ren_win
+
+
+# Bind the reset_camera function to the button click event
+# reset_camera_button.on_click(reset_camera)
 
 # controls on sidebar
 ss_props = pn.WidgetBox(
@@ -114,6 +152,7 @@ ss_state_default = {
     "defaultss": "2q7q_75D_140D",
     "ssid_list": "['2q7q_75D_140D', '2q7q_81D_113D', '2q7q_88D_171D', '2q7q_90D_138D', \
         '2q7q_91D_135D','2q7q_98D_129D']",
+    "theme": "default",
 }
 
 
@@ -126,12 +165,12 @@ def set_window_title():
     pdbs = len(PDB_SS.SSDict)
     vers = PDB_SS.version
 
-    win_title = f"RCSB Disulfide Browser: {tot:,} Disulfides {pdbs:,} Structures {vers}"
+    win_title = f"RCSB Disulfide Browser v{_vers}: {tot:,} Disulfides {pdbs:,} Structures {vers}"
     pn.state.template.param.update(title=win_title)
 
     mess = f"Set Window Title: {win_title}"
-
     _logger.debug(mess)
+
     return
 
 
@@ -179,36 +218,11 @@ def set_state(event):
     ss_state["single"] = single_checkbox.value
     ss_state["style"] = styles_group.value
     ss_state["defaultss"] = rcsb_ss_widget.value
-    _logger.debug("--> Set state.")
+    ss_state["theme"] = get_theme()
+
+    _logger.info("Set state.")
     pn.state.cache["ss_state"] = ss_state
     click_plot(None)
-
-
-def load_state():
-    """
-    Load the state variables from the cache, update the interface.
-    """
-    # global _ssidlist, _rcsid, _style, _single, _default_ss
-    _ss_state = {}
-
-    if "ss_state" in pn.state.cache:
-        _ss_state = pn.state.cache["ss_state"]
-        _ssidlist = _ss_state["ssid_list"]
-        _rcsid = _ss_state["rcsid"]
-        _style = _ss_state["style"]
-        _single = _ss_state["single"]
-        _default_ss = _ss_state["defaultss"]
-
-        styles_group.value = _style
-        single_checkbox.value = _single
-        rcsb_selector_widget.value = _rcsid
-        rcsb_ss_widget.value = _default_ss
-
-    else:
-        _logger.debug("Setting widgets.")
-        set_widgets_defaults()
-
-    return _ss_state
 
 
 def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
@@ -224,34 +238,48 @@ def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
         * 'plain' - boring single color
     :param light: If True, light background, if False, dark
     """
+    # src = ss.pdb_id
+    # enrg = ss.energy
+    # title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Cα: {ss.ca_distance:.2f} Å Cβ: {ss.cb_distance:.2f} Å Tors: {ss.torsion_length:.2f}°"
+
+    global plotter
+    _logger.debug(f"Entering plot: {ss.name}")
 
     if light:
         pv.set_plot_theme("document")
     else:
         pv.set_plot_theme("dark")
 
-    pl.enable_anti_aliasing("msaa")
-    pl.clear()
+    # Create a new plotter with the desired shape
 
     if single:
-        ss._render(pl, style=style)
+        plotter = pv.Plotter(window_size=WINSIZE)
+        plotter.clear()
+        ss._render(plotter, style=style)
     else:
-        pl.subplot(0, 0)
-        ss._render(pl, style="cpk")
+        plotter = pv.Plotter(shape=(2, 2), window_size=WINSIZE)
+        plotter.clear()
 
-        pl.subplot(0, 1)
-        ss._render(pl, style="bs")
+        pdbid = ss.pdb_id
+        sslist = PDB_SS[pdbid]
+        # display_overlay(sslist, plotter)
 
-        pl.subplot(1, 0)
-        ss._render(pl, style="sb")
+        plotter.subplot(0, 0)
+        ss._render(plotter, style="cpk")
 
-        pl.subplot(1, 1)
-        ss._render(pl, style="pd")
+        plotter.subplot(0, 1)
+        ss._render(plotter, style="bs")
 
-        pl.link_views()
+        plotter.subplot(1, 0)
+        ss._render(plotter, style="sb")
 
-    pl.reset_camera()
-    return pl
+        plotter.subplot(1, 1)
+        ss._render(plotter, style="pd")
+
+        plotter.link_views()
+
+    plotter.reset_camera()
+    return plotter
 
 
 @pn.cache()
@@ -261,13 +289,14 @@ def load_data():
 
     message = "Loading RCSB Disulfide Database"
     _logger.info(message)
-    PDB_SS = Load_PDB_SS(
-        verbose=True, subset=False, loadpath="/app/data"
-    )  # Load some data
+
+    PDB_SS = Load_PDB_SS(verbose=True, loadpath="/app/data/", subset=False)
 
     RCSB_list = sorted(PDB_SS.IDList)
+
     message = f"Loaded RCSB Disulfide Database: {len(RCSB_list)} entries"
     _logger.info(message)
+
     set_window_title()
     pn.state.cache["data"] = PDB_SS
     return PDB_SS
@@ -283,15 +312,12 @@ set_widgets_defaults()
 
 
 def get_theme() -> str:
-    """Returns the current theme: 'default' or 'dark'
+    """Return the current theme: 'default' or 'dark'
 
     Returns:
         str: The current theme
     """
-    args = pn.state.session_args
-    if "theme" in args and args["theme"][0] == b"dark":
-        return "dark"
-    return "default"
+    return pn.config.theme
 
 
 def click_plot(event):
@@ -299,11 +325,10 @@ def click_plot(event):
 
     # Reuse the existing plotter and re-render the scene
     plotter = render_ss()  # Reuse the existing plotter
-
+    plotter.reset_camera()
     # Update the vtkpan and trigger a refresh
     vtkpan.object = plotter.ren_win
-    # vtkpan.param.trigger("object")
-    # plotter.render()
+    plotter.render()
 
 
 def update_single(click):
@@ -321,6 +346,7 @@ def update_single(click):
         styles_group.disabled = True
     else:
         styles_group.disabled = False
+
     click_plot(click)
 
 
@@ -341,8 +367,9 @@ def get_ss_idlist(event) -> list:
     if sslist:
         idlist = [ss.name for ss in sslist]
         rcsb_ss_widget.options = idlist
-        mess = f"--> get_ss_idlist |{rcs_id}| |{idlist}|"
+        mess = f"get_ss_idlist |{rcs_id}| |{idlist}|"
         _logger.debug(mess)
+
     return idlist
 
 
@@ -386,7 +413,6 @@ def update_output(ss):
 
 def get_ss(event) -> Disulfide:
     """Get the currently selected Disulfide"""
-    # global PDB_SS
     ss_id = event.new
     ss = Disulfide(PDB_SS[ss_id])
     return ss
@@ -429,39 +455,29 @@ def render_ss():
     style = styles[styles_group.value]
     single = single_checkbox.value
 
-    # Create a new plotter with the desired shape
-    if single:
-        plotter = pv.Plotter(window_size=WINSIZE)
-
-    else:
-        plotter = pv.Plotter(shape=(2, 2), window_size=WINSIZE)
-
     # Render the structure in the plotter
     return plot(plotter, ss, single=single, style=style, light=light)
 
 
 def on_theme_change(event):
-    """Handle a theme change event."""
-    selected_theme = event.obj.theme
-    light = selected_theme != "dark"
+    """
+    Callback function to handle theme changes.
+    """
+    global ss_state
+    ss_state = pn.state.cache["ss_state"]
+    new_theme = event.new
+    ss_state["theme"] = new_theme
+    pn.state.cache["ss_state"] = ss_state
 
-    _logger.debug(f"Theme Change: {selected_theme}")
-
-    # Apply the new theme to the plotter immediately
-    apply_theme_to_plotter(plotter, light=light)
-
-    # Refresh the VTK pane to reflect the theme change
-    vtkpan.object = plotter.ren_win
-    # vtkpan.param.trigger("object")  # Force an immediate update
-
-
-def apply_theme_to_plotter(plotter, light=True):
-    """Apply the current theme to the plotter."""
-    if light:
-        pv.set_plot_theme("document")
+    # Add your logic to handle the theme change here
+    print(f"Theme changed to: {new_theme}")
+    # Example: Update the plotter or other components based on the new theme
+    if new_theme == "dark":
+        plotter.set_background("black")
     else:
-        pv.set_plot_theme("dark")
+        plotter.set_background("white")
     plotter.render()
+    vtkpan.object = plotter.ren_win  # Update the VTK pane object
 
 
 def display_overlay(
@@ -510,6 +526,8 @@ def display_overlay(
     brad = brad if tot_ss < 100 else brad * 0.5
 
     # print(f'Brad: {brad}')
+    center_of_mass = sslist.center_of_mass
+    # sslist.translate(center_of_mass)
 
     for i, ss in zip(range(tot_ss), ssbonds):
         color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
@@ -523,7 +541,6 @@ def display_overlay(
         )
 
     pl.reset_camera()
-    pl.show()
     return pl
 
 

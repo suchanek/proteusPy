@@ -8,6 +8,7 @@ Last revision: 10/22/2024
 # pylint: disable=C0413 # wrong import order
 # pylint: disable=C0103 # wrong variable name
 # pylint: disable=W0212 # access to a protected member _render of a client class
+# pylint: disable=W0612 # unused variable
 # pylint: disable=W0613 # unused argument
 # pylint: disable=W0603 # Using global for variable
 
@@ -26,7 +27,7 @@ from proteusPy import (
     create_logger,
     get_jet_colormap,
 )
-from proteusPy.atoms import BOND_COLOR, BOND_RADIUS, BS_SCALE, SPEC_POWER, SPECULARITY
+from proteusPy.atoms import BOND_RADIUS
 from proteusPy.ProteusGlobals import WINSIZE
 
 # Set PyVista to use offscreen rendering if the environment variable is set
@@ -40,7 +41,10 @@ _vers = 0.90
 _logger = create_logger("dbviewer", log_level=logging.INFO)
 
 configure_master_logger("dbviewer.py")
-_logger.info("Starting Panel Disulfide Viewer...")
+_logger.info(f"Starting Panel Disulfide Viewer v{_vers}.")
+
+current_theme = pn.config.theme
+_logger.info(f"Current Theme: {current_theme}")
 
 # defaults for the UI
 
@@ -61,9 +65,6 @@ _style = "Split Bonds"
 _single = True
 
 # Set up logging
-# configure a master logger. This will create ~/logs/DBViewer.log
-# configure_master_logger("DBViewer.log")
-
 # create a local logger
 _logger = create_logger("DBViewer", log_level=logging.INFO)
 
@@ -71,7 +72,6 @@ _logger = create_logger("DBViewer", log_level=logging.INFO)
 ss_state = {}
 RCSB_list = []
 PDB_SS = None
-
 
 # Widgets
 styles_group = pn.widgets.RadioBoxGroup(
@@ -94,7 +94,7 @@ rcsb_selector_widget = pn.widgets.AutocompleteInput(
 )
 
 # Create the "Reset Camera" button
-reset_camera_button = pn.widgets.Button(name="Reset Camera", button_type="primary")
+# reset_camera_button = pn.widgets.Button(name="Reset Camera", button_type="primary")
 
 
 def reset_camera(event):
@@ -123,23 +123,17 @@ def reset_camera(event):
     vtkpan.object = plotter.ren_win
 
 
-# Define the reset_camera function
-def Oreset_camera(event):
-    plotter.camera_position = "iso"
-    plotter.render()
-
-
 # Bind the reset_camera function to the button click event
-reset_camera_button.on_click(reset_camera)
+# reset_camera_button.on_click(reset_camera)
 
 # controls on sidebar
 ss_props = pn.WidgetBox(
     "# Disulfide Selection", rcsb_selector_widget, rcsb_ss_widget
 ).servable(target="sidebar")
 
-ss_styles = pn.WidgetBox(
-    "# Rendering Styles", styles_group, single_checkbox, reset_camera_button
-).servable(target="sidebar")
+ss_styles = pn.WidgetBox("# Rendering Styles", styles_group, single_checkbox).servable(
+    target="sidebar"
+)
 
 # markdown panels for various text outputs
 title_md = pn.pane.Markdown("Title")
@@ -158,6 +152,7 @@ ss_state_default = {
     "defaultss": "2q7q_75D_140D",
     "ssid_list": "['2q7q_75D_140D', '2q7q_81D_113D', '2q7q_88D_171D', '2q7q_90D_138D', \
         '2q7q_91D_135D','2q7q_98D_129D']",
+    "theme": "default",
 }
 
 
@@ -170,7 +165,7 @@ def set_window_title():
     pdbs = len(PDB_SS.SSDict)
     vers = PDB_SS.version
 
-    win_title = f"RCSB Disulfide Browser: {tot:,} Disulfides {pdbs:,} Structures {vers}"
+    win_title = f"RCSB Disulfide Browser v{_vers}: {tot:,} Disulfides {pdbs:,} Structures {vers}"
     pn.state.template.param.update(title=win_title)
 
     mess = f"Set Window Title: {win_title}"
@@ -223,36 +218,11 @@ def set_state(event):
     ss_state["single"] = single_checkbox.value
     ss_state["style"] = styles_group.value
     ss_state["defaultss"] = rcsb_ss_widget.value
-    _logger.debug("--> Set state.")
+    ss_state["theme"] = get_theme()
+
+    _logger.info("Set state.")
     pn.state.cache["ss_state"] = ss_state
     click_plot(None)
-
-
-def load_state():
-    """
-    Load the state variables from the cache, update the interface.
-    """
-    # global _ssidlist, _rcsid, _style, _single, _default_ss
-    _ss_state = {}
-
-    if "ss_state" in pn.state.cache:
-        _ss_state = pn.state.cache["ss_state"]
-        _ssidlist = _ss_state["ssid_list"]
-        _rcsid = _ss_state["rcsid"]
-        _style = _ss_state["style"]
-        _single = _ss_state["single"]
-        _default_ss = _ss_state["defaultss"]
-
-        styles_group.value = _style
-        single_checkbox.value = _single
-        rcsb_selector_widget.value = _rcsid
-        rcsb_ss_widget.value = _default_ss
-
-    else:
-        _logger.debug("Setting widgets.")
-        set_widgets_defaults()
-
-    return _ss_state
 
 
 def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
@@ -273,7 +243,7 @@ def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
     # title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Cα: {ss.ca_distance:.2f} Å Cβ: {ss.cb_distance:.2f} Å Tors: {ss.torsion_length:.2f}°"
 
     global plotter
-    _logger.info(f"Enetering plot: {ss.name}")
+    _logger.debug(f"Entering plot: {ss.name}")
 
     if light:
         pv.set_plot_theme("document")
@@ -281,8 +251,6 @@ def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
         pv.set_plot_theme("dark")
 
     # Create a new plotter with the desired shape
-
-    # pl.enable_anti_aliasing("msaa")
 
     if single:
         plotter = pv.Plotter(window_size=WINSIZE)
@@ -295,6 +263,7 @@ def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
         pdbid = ss.pdb_id
         sslist = PDB_SS[pdbid]
         # display_overlay(sslist, plotter)
+
         plotter.subplot(0, 0)
         ss._render(plotter, style="cpk")
 
@@ -310,7 +279,6 @@ def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
         plotter.link_views()
 
     plotter.reset_camera()
-    # plotter.render()
     return plotter
 
 
@@ -344,15 +312,12 @@ set_widgets_defaults()
 
 
 def get_theme() -> str:
-    """Returns the current theme: 'default' or 'dark'
+    """Return the current theme: 'default' or 'dark'
 
     Returns:
         str: The current theme
     """
-    args = pn.state.session_args
-    if "theme" in args and args["theme"][0] == b"dark":
-        return "dark"
-    return "default"
+    return pn.config.theme
 
 
 def click_plot(event):
@@ -402,7 +367,7 @@ def get_ss_idlist(event) -> list:
     if sslist:
         idlist = [ss.name for ss in sslist]
         rcsb_ss_widget.options = idlist
-        mess = f"--> get_ss_idlist |{rcs_id}| |{idlist}|"
+        mess = f"get_ss_idlist |{rcs_id}| |{idlist}|"
         _logger.debug(mess)
 
     return idlist
@@ -495,11 +460,24 @@ def render_ss():
 
 
 def on_theme_change(event):
-    """Handle a theme change event."""
-    selected_theme = event.obj.theme
-    message = f"Theme Change: {selected_theme}"
-    _logger.debug(message)
-    click_plot(None)
+    """
+    Callback function to handle theme changes.
+    """
+    global ss_state
+    ss_state = pn.state.cache["ss_state"]
+    new_theme = event.new
+    ss_state["theme"] = new_theme
+    pn.state.cache["ss_state"] = ss_state
+
+    # Add your logic to handle the theme change here
+    print(f"Theme changed to: {new_theme}")
+    # Example: Update the plotter or other components based on the new theme
+    if new_theme == "dark":
+        plotter.set_background("black")
+    else:
+        plotter.set_background("white")
+    plotter.render()
+    vtkpan.object = plotter.ren_win  # Update the VTK pane object
 
 
 def display_overlay(
