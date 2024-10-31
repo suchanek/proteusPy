@@ -13,4 +13,4 @@ dependencies:
   - nodejs
   - pip
   - pip:
-    - proteusPy==0.97.13.dev0
+    - proteusPy==0.97.14.dev0

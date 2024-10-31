@@ -8,6 +8,7 @@ Last revision: 10/22/2024
 # pylint: disable=C0413 # wrong import order
 # pylint: disable=C0103 # wrong variable name
 # pylint: disable=W0212 # access to a protected member _render of a client class
+# pylint: disable=W0602 # Using global for variable
 # pylint: disable=W0612 # unused variable
 # pylint: disable=W0613 # unused argument
 # pylint: disable=W0603 # Using global for variable
@@ -20,12 +21,14 @@ import panel as pn
 import pyvista as pv
 
 from proteusPy import (
+    FONTSIZE,
     Disulfide,
     DisulfideList,
     Load_PDB_SS,
     configure_master_logger,
     create_logger,
     get_jet_colormap,
+    grid_dimensions,
 )
 from proteusPy.atoms import BOND_RADIUS
 from proteusPy.ProteusGlobals import WINSIZE
@@ -36,15 +39,15 @@ if os.getenv("PYVISTA_OFF_SCREEN", "false").lower() == "true":
 
 pn.extension("vtk", sizing_mode="stretch_width", template="fast")
 
-_vers = 0.90
+_vers = 0.91
 
-_logger = create_logger("dbviewer", log_level=logging.INFO)
+_logger = create_logger("rcsb_viewer", log_level=logging.INFO)
 
-configure_master_logger("dbviewer.py")
-_logger.info(f"Starting Panel Disulfide Viewer v{_vers}.")
+configure_master_logger("rcsb_viewer.log")
+_logger.info("Starting Panel Disulfide Viewer v%s.", _vers)
 
 current_theme = pn.config.theme
-_logger.info(f"Current Theme: {current_theme}")
+_logger.info("Current Theme: %s", current_theme)
 
 # defaults for the UI
 
@@ -93,6 +96,22 @@ rcsb_selector_widget = pn.widgets.AutocompleteInput(
     options=RCSB_list,
 )
 
+# controls on sidebar
+ss_props = pn.WidgetBox(
+    "# Disulfide Selection", rcsb_selector_widget, rcsb_ss_widget
+).servable(target="sidebar")
+
+
+# Replace single checkbox with a selector widget
+view_selector = pn.widgets.Select(
+    name="View Mode", options=["Single View", "Overlay", "List"], value="Single View"
+)
+
+# Modify the layout to use the new selector instead of the checkbox
+ss_styles = pn.WidgetBox("# Display Style", styles_group, view_selector).servable(
+    target="sidebar"
+)
+
 # Create the "Reset Camera" button
 # reset_camera_button = pn.widgets.Button(name="Reset Camera", button_type="primary")
 
@@ -126,14 +145,31 @@ def reset_camera(event):
 # Bind the reset_camera function to the button click event
 # reset_camera_button.on_click(reset_camera)
 
-# controls on sidebar
-ss_props = pn.WidgetBox(
-    "# Disulfide Selection", rcsb_selector_widget, rcsb_ss_widget
-).servable(target="sidebar")
 
-ss_styles = pn.WidgetBox("# Rendering Styles", styles_group, single_checkbox).servable(
-    target="sidebar"
-)
+# Adjust the update_single function to handle the different view options
+def update_view(click):
+    """
+    Adjust the rendering style radio box depending on the state of the view mode selector.
+    Returns:
+        None
+    """
+    global styles_group
+
+    _logger.info("Update View")
+
+    selected_view = view_selector.value
+    if selected_view == "Single View":
+        styles_group.disabled = False
+    elif selected_view == "Overlay":
+        styles_group.disabled = True
+    elif selected_view == "List":
+        styles_group.disabled = False
+
+    click_plot(click)
+
+
+# Update references to `single_checkbox` to `view_selector` in callbacks
+view_selector.param.watch(update_view, "value")
 
 # markdown panels for various text outputs
 title_md = pn.pane.Markdown("Title")
@@ -191,6 +227,7 @@ def set_widgets_defaults():
     """
     global RCSB_list
 
+    _logger.info("Setting widget defaults.")
     styles_group.value = "Split Bonds"
     single_checkbox.value = True
 
@@ -212,6 +249,8 @@ def set_state(event):
     """
     global ss_state
 
+    _logger.info("Set state.")
+
     ss_state["rcsb_list"] = RCSB_list.copy()
     ss_state["rcsid"] = _rcsid_default
     ss_state["ssid_list"] = _ssidlist.copy()
@@ -220,12 +259,11 @@ def set_state(event):
     ss_state["defaultss"] = rcsb_ss_widget.value
     ss_state["theme"] = get_theme()
 
-    _logger.info("Set state.")
     pn.state.cache["ss_state"] = ss_state
     click_plot(None)
 
 
-def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
+def plot(pl, ss, style="sb", light=True, panelsize=512) -> pv.Plotter:
     """
     Return the pyVista Plotter object for the Disulfide bond in the specific rendering style.
 
@@ -238,31 +276,28 @@ def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
         * 'plain' - boring single color
     :param light: If True, light background, if False, dark
     """
-    # src = ss.pdb_id
-    # enrg = ss.energy
-    # title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Cα: {ss.ca_distance:.2f} Å Cβ: {ss.cb_distance:.2f} Å Tors: {ss.torsion_length:.2f}°"
+    global plotter, vtkpan
 
-    global plotter
-    _logger.debug(f"Entering plot: {ss.name}")
+    _logger.debug("Entering plot: %s", ss.name)
+
+    mode = view_selector.value
 
     if light:
         pv.set_plot_theme("document")
     else:
         pv.set_plot_theme("dark")
 
-    # Create a new plotter with the desired shape
-
-    if single:
+    if mode == "Single View":
+        _logger.info("Single View")
         plotter = pv.Plotter(window_size=WINSIZE)
         plotter.clear()
         ss._render(plotter, style=style)
-    else:
+        # vtkpan.object = plotter.ren_win
+
+    elif mode == "Overlay":
+        _logger.info("Overlay")
         plotter = pv.Plotter(shape=(2, 2), window_size=WINSIZE)
         plotter.clear()
-
-        pdbid = ss.pdb_id
-        sslist = PDB_SS[pdbid]
-        # display_overlay(sslist, plotter)
 
         plotter.subplot(0, 0)
         ss._render(plotter, style="cpk")
@@ -277,6 +312,30 @@ def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
         ss._render(plotter, style="pd")
 
         plotter.link_views()
+        plotter.reset_camera()
+        # vtkpan.object = plotter.ren_win
+    else:
+        _logger.info("List")
+        pdbid = ss.pdb_id
+        sslist = PDB_SS[pdbid]
+        tot_ss = len(sslist)  # number off ssbonds
+        rows, cols = grid_dimensions(tot_ss)
+        winsize = (panelsize * cols, panelsize * rows)
+
+        avg_enrg = sslist.average_energy
+        avg_dist = sslist.average_distance
+        resolution = sslist.average_resolution
+
+        title = f"<{pdbid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
+
+        plotter = pv.Plotter(window_size=winsize, shape=(rows, cols))
+        plotter.clear()
+        plotter = sslist._render(plotter, style)
+        plotter.enable_anti_aliasing("msaa")
+        plotter.add_title(title=title, font_size=FONTSIZE)
+        plotter.link_views()
+        plotter.reset_camera()
+        # vtkpan.object = plotter.ren_win
 
     plotter.reset_camera()
     return plotter
@@ -287,10 +346,9 @@ def load_data():
     """Load the RCSB Disulfide Database and return the object."""
     global RCSB_list, PDB_SS
 
-    message = "Loading RCSB Disulfide Database"
-    _logger.info(message)
+    _logger.info("Loading RCSB Disulfide Database")
 
-    PDB_SS = Load_PDB_SS(verbose=True, loadpath="/app/data/", subset=False)
+    PDB_SS = Load_PDB_SS(verbose=True, subset=False, loadpath="/app/data")
 
     RCSB_list = sorted(PDB_SS.IDList)
 
@@ -324,11 +382,12 @@ def click_plot(event):
     """Force a re-render of the currently selected disulfide. Reuses the existing plotter."""
 
     # Reuse the existing plotter and re-render the scene
+    global plotter
+
     plotter = render_ss()  # Reuse the existing plotter
     plotter.reset_camera()
     # Update the vtkpan and trigger a refresh
     vtkpan.object = plotter.ren_win
-    plotter.render()
 
 
 def update_single(click):
@@ -451,12 +510,10 @@ def render_ss():
     update_output(ss)
 
     # Reuse and clear the existing plotter before rendering
-    # plotter.clear()
     style = styles[styles_group.value]
-    single = single_checkbox.value
 
     # Render the structure in the plotter
-    return plot(plotter, ss, single=single, style=style, light=light)
+    return plot(plotter, ss, style=style, light=light)
 
 
 def on_theme_change(event):

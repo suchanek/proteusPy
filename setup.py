@@ -113,6 +113,7 @@ setup(
         "trame-jupyter-extension",
         "jupyter_contrib_nbextensions",
         "pyvista[all]",
+        "watchfiles",
     ],
     extras_require={
         "dev": [
@@ -154,6 +155,7 @@ setup(
             "data/ss_query.json",
             "data/ss_ids.txt",
             "data/SS_consensus_class_oct.pkl",
+            "data/SS_consensus_class_sext.pkl",
             "data/SS_consensus_class_32.pkl",
             "data/2q7q_seqsim.csv",
             "data/PDB_SS_class_definitions.csv",
