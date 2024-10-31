@@ -10,6 +10,9 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Print env variables
         run: env
 
@@ -58,8 +61,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: ../../viewer
-          file: ../../viewer/dockerfile
+          context: ./viewer
+          file: ./viewer/dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USER }}/rcsb_viewer:latest
           
