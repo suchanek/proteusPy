@@ -11,10 +11,10 @@ jobs:
         run: env
 
       - name: Print Docker User (masked)
-        run: echo "DOCKER_USER is set to ${{ secrets.DOCKER_USER:0:3 }}***"
+        run: echo "DOCKER_USER is set to ${{ secrets.DOCKER_USER}}"
 
       - name: Check Docker PAT (masked)
-        run: echo "DOCKER_PAT is set to ${{ secrets.DOCKER_PAT:0:3 }}***"
+        run: echo "DOCKER_PAT is set to ${{ secrets.DOCKER_PAT}}***"
 
       - name: Verify Docker User
         run: |
