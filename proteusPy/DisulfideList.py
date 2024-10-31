@@ -259,8 +259,8 @@ class DisulfideList(UserList):
                         specpow=SPEC_POWER,
                     )
                 i += 1
-            if i >= tot_ss:
-                break
+                if i >= tot_ss:
+                    break
         return pl
 
     @property
