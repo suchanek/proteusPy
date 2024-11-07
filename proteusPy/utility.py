@@ -1019,7 +1019,7 @@ def get_theme():
                     return "dark"
                 else:
                     return "light"
-            return None
+            return "light"
 
         except Exception:
             # In case of any exception, return None

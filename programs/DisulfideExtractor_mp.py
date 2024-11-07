@@ -121,11 +121,12 @@ if not DATA_DIR.is_dir():
 good_pdb_fpath = DATA_DIR / GOOD_PDB_FILE
 
 ent_files = glob.glob(str(PDB_DIR / "*.ent"))
-pdb_id_list = [Path(f).stem[3:7] for f in ent_files]
-
 num_ent_files = len(ent_files)
 
-__version__ = "2.1.0"
+pdb_id_list = [Path(f).stem[3:7] for f in ent_files]
+
+
+__version__ = "2.2.0"
 
 
 def parse_arguments():
@@ -176,7 +177,7 @@ def parse_arguments():
         "-v",
         action="store_true",
         help="Enable verbose output",
-        default=False,
+        default=True,
     )
     parser.add_argument(
         "--cutoff",
@@ -343,7 +344,7 @@ def do_build(verbose, full, subset, cutoff):
         )
         PDB_SS.save(savepath=DATA_DIR, subset=subset, cutoff=cutoff)
 
-    if subset:
+    elif subset:
         if verbose:
             print(
                 f"Building the packed loader for the Disulfide subset with cutoff: {cutoff}..."
@@ -355,6 +356,9 @@ def do_build(verbose, full, subset, cutoff):
             cutoff=cutoff,
         )
         PDB_SS.save(savepath=DATA_DIR, subset=subset, cutoff=cutoff)
+    else:
+        print("Error: No valid build option selected.")
+        sys.exit(1)
 
     PDB_SS.describe()
 

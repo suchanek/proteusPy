@@ -64,10 +64,11 @@ devclean: .
 
 	
 # activate the package before running!
+
 install: sdist
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	@echo "Installing additional..."
-	@$(CONDA) install vtk==9.2.6 -y
+	$(CONDA) install vtk==9.2.6 -y
 
 	@echo "Installing proteusPy..."
 	@pip install . -q
@@ -78,7 +79,7 @@ install: sdist
 
 install_dev: sdist
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	@$(CONDA) install vtk==9.2.6 -y
+	$(CONDA) install vtk==9.2.6 -y
 	
 	pip install . -q
 	pip install pdoc twine black pytest build -q
@@ -105,10 +106,12 @@ bld:  docs sdist
 sdist: proteusPy/_version.py
 	python setup.py sdist
 
+.PHONY: docs
 docs: proteusPy/_version.py
 	pdoc -o docs --math --logo "./logo.png" ./proteusPy
 
 # normally i push to PyPi via github action
+.PHONY: upload
 upload: sdist
 	twine upload -r proteusPy dist/proteusPy-$(VERS)*
 
@@ -128,7 +131,6 @@ tests:
 	python tests/Test_DisplaySS.py
 	python proteusPy/Disulfide.py
 	python proteusPy/DisulfideLoader.py
-	python proteusPy/DisulfideList.py
 	python proteusPy/DisulfideClasses.py
 
 # end of file

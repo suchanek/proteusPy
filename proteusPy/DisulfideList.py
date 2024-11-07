@@ -259,6 +259,8 @@ class DisulfideList(UserList):
                         specpow=SPEC_POWER,
                     )
                 i += 1
+                if i >= tot_ss:
+                    break
         return pl
 
     @property
@@ -532,6 +534,19 @@ class DisulfideList(UserList):
         dist_stats = pd.DataFrame(dist_stats, columns=dist_cols)
 
         return tor_stats, dist_stats
+
+    @property
+    def center_of_mass(self):
+        """
+        Calculate the center of mass for the Disulfide list
+        """
+        sslist = self.data
+        tot = len(sslist)
+        if tot == 0:
+            return 0.0
+
+        total_cofmass = sum(ss.cofmass for ss in sslist)
+        return total_cofmass / tot
 
     def describe(self):
         """
@@ -1036,6 +1051,19 @@ class DisulfideList(UserList):
         self.display_torsion_statistics(
             display=display, save=save, fname=fname, light=light
         )
+
+    def translate(self, translation_vector) -> None:
+        """
+        Translate the DisulfideList by the given translation vector.
+        Note: The translation is a vector SUBTRACTION, not addition.
+        This is used primarily to move a list to its geometric center of mass
+        and is a destructive operation, in the sense that it updates the list in place.
+
+        :param translation_vector: The translation vector to apply.
+        :type translation_vector: Vector3D
+        """
+        for ss in self.data:
+            ss.translate(translation_vector)
 
     def insert(self, index, item):
         """
