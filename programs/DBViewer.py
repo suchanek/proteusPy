@@ -103,7 +103,7 @@ ss_props = pn.WidgetBox(
 
 # Replace single checkbox with a selector widget
 view_selector = pn.widgets.Select(
-    name="View Mode", options=["Single View", "Overlay", "List"], value="Single View"
+    name="View Mode", options=["Single View", "Multiview", "List"], value="Single View"
 )
 
 # Modify the layout to use the new selector instead of the checkbox
@@ -159,7 +159,7 @@ def update_view(click):
     selected_view = view_selector.value
     if selected_view == "Single View":
         styles_group.disabled = False
-    elif selected_view == "Overlay":
+    elif selected_view == "Multiview":
         styles_group.disabled = True
     elif selected_view == "List":
         styles_group.disabled = False
@@ -293,8 +293,8 @@ def plot(pl, ss, style="sb", light=True, panelsize=512) -> pv.Plotter:
         ss._render(plotter, style=style)
         # vtkpan.object = plotter.ren_win
 
-    elif mode == "Overlay":
-        _logger.info("Overlay")
+    elif mode == "Multiview":
+        _logger.info("Multiview")
         plotter = pv.Plotter(shape=(2, 2), window_size=WINSIZE)
         plotter.clear()
 
