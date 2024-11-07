@@ -13,15 +13,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Print env variables
-        run: env
-
-      - name: Print Docker User (masked)
-        run: echo "DOCKER_USER is set to ${{ secrets.DOCKER_USER}}"
-
-      - name: Check Docker PAT (masked)
-        run: echo "DOCKER_PAT is set to ${{ secrets.DOCKER_PAT}}***"
-
       - name: Verify Docker User
         run: |
           if [ -z "${{ secrets.DOCKER_USER }}" ]; then
@@ -51,12 +42,6 @@ jobs:
         with:
           version: latest
           driver: docker-container
-
-      - name: Print current working directory
-        run: pwd
-
-      - name: List files in the current directory
-        run: ls -alh
 
       - name: Build and push
         uses: docker/build-push-action@v6
