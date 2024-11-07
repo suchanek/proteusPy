@@ -18,10 +18,10 @@ endif
 
 CONDA = mamba
 
-MESS = $(VERS)
+#MESS = $(VERS)
 #MESS = "proteusPy: A Python Package for Protein Structure and Disulfide Bond Modeling and Analysis"
 
-# MESS = f"{$VERS}: Biopython removal"
+MESS = "0.97.14 Disulfide Viewer programs functional"
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
 
