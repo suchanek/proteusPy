@@ -62,6 +62,13 @@ version = {}
 with open("proteusPy/_version.py") as fp:
     exec(fp.read(), version)
 
+# Function to read the requirements.txt file
+def read_requirements():
+    with open('requirements.txt') as req_file:
+        return req_file.read().splitlines()
+
+# Read the requirements from requirements.txt
+requirements = read_requirements()
 
 setup(
     name="proteusPy",
@@ -79,42 +86,7 @@ setup(
     tests_require=["pytest"],
     test_suite="tests",
     setup_requires=["pytest-runner", "wheel"],
-    install_requires=[
-        "numpy",
-        "matplotlib",
-        "pandas",
-        "traitlets==5.9.0",
-        "seaborn",
-        "pillow",
-        "tqdm",
-        "plotly",
-        "datetime",
-        "openai",
-        "panel",
-        "scikit-learn",
-        "gdown",
-        "nodejs",
-        "pytube",
-        "grpcio",
-        "pip",
-        "wget",
-        "vtk==9.2.6",
-        "kaleido",
-        "plotly_express",
-        "pympler",
-        "imageio[ffmpeg]",
-        "colorama",
-        "jupyter",
-        "notebook",
-        "nbconvert",
-        "ipykernel",
-        "ipywidgets",
-        "jupyter_bokeh",
-        "trame-jupyter-extension",
-        "jupyter_contrib_nbextensions",
-        "pyvista[all]",
-        "watchfiles",
-    ],
+    install_requires=requirements,
     extras_require={
         "dev": [
             "pytest",
