@@ -1,7 +1,7 @@
 """
 RCSB Disulfide Bond Database Browser
 Author: Eric G. Suchanek, PhD
-Last revision: 10/22/2024
+Last revision: 11/7/2024
 """
 
 # pylint: disable=C0301 # line too long
@@ -39,7 +39,7 @@ if os.getenv("PYVISTA_OFF_SCREEN", "false").lower() == "true":
 
 pn.extension("vtk", sizing_mode="stretch_width", template="fast")
 
-_vers = 0.91
+_vers = 0.92
 
 _logger = create_logger("rcsb_viewer", log_level=logging.INFO)
 
@@ -104,7 +104,7 @@ ss_props = pn.WidgetBox(
 
 # Replace single checkbox with a selector widget
 view_selector = pn.widgets.Select(
-    name="View Mode", options=["Single View", "Overlay", "List"], value="Single View"
+    name="View Mode", options=["Single View", "Multiview", "List"], value="Single View"
 )
 
 # Modify the layout to use the new selector instead of the checkbox
@@ -160,7 +160,7 @@ def update_view(click):
     selected_view = view_selector.value
     if selected_view == "Single View":
         styles_group.disabled = False
-    elif selected_view == "Overlay":
+    elif selected_view == "Multiview":
         styles_group.disabled = True
     elif selected_view == "List":
         styles_group.disabled = False
@@ -294,8 +294,8 @@ def plot(pl, ss, style="sb", light=True, panelsize=512) -> pv.Plotter:
         ss._render(plotter, style=style)
         # vtkpan.object = plotter.ren_win
 
-    elif mode == "Overlay":
-        _logger.info("Overlay")
+    elif mode == "Multiview":
+        _logger.info("Multiview")
         plotter = pv.Plotter(shape=(2, 2), window_size=WINSIZE)
         plotter.clear()
 
@@ -348,7 +348,7 @@ def load_data():
 
     _logger.info("Loading RCSB Disulfide Database")
 
-    PDB_SS = Load_PDB_SS(verbose=True, subset=False, loadpath="/app/data")
+    PDB_SS = Load_PDB_SS(verbose=True, subset=False)
 
     RCSB_list = sorted(PDB_SS.IDList)
 
