@@ -24,7 +24,7 @@ logging.basicConfig(level=logging.CRITICAL)
 
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
-
+_logger = logging.getLogger(__name__)
 
 from ._version import __version__
 from .angle_annotation import AngleAnnotation, plot_angle
@@ -149,6 +149,6 @@ from .vector3D import (
     rms_difference,
 )
 
-print(f"ProteusPy {__version__} initialized.")
+_logger.info(f"ProteusPy {__version__} initialized.")
 
 # end of file

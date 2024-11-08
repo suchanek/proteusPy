@@ -8,6 +8,7 @@ Last revision: 10/22/2024
 # pylint: disable=C0413 # wrong import order
 # pylint: disable=C0103 # wrong variable name
 # pylint: disable=W0212 # access to a protected member _render of a client class
+# pylint: disable=W0602 # Using global for variable
 # pylint: disable=W0612 # unused variable
 # pylint: disable=W0613 # unused argument
 # pylint: disable=W0603 # Using global for variable
@@ -17,6 +18,7 @@ import os
 
 import numpy as np
 import panel as pn
+import param
 import pyvista as pv
 
 from proteusPy import (
@@ -38,11 +40,11 @@ if os.getenv("PYVISTA_OFF_SCREEN", "false").lower() == "true":
 
 pn.extension("vtk", sizing_mode="stretch_width", template="fast")
 
-_vers = 0.90
+_vers = 0.92
 
-_logger = create_logger("dbviewer", log_level=logging.INFO)
+_logger = create_logger("rcsb_viewer", log_level=logging.INFO)
 
-configure_master_logger("dbviewer.py")
+configure_master_logger("rcsb_viewer.log")
 _logger.info("Starting Panel Disulfide Viewer v%s.", _vers)
 
 current_theme = pn.config.theme
@@ -600,6 +602,48 @@ def display_overlay(
     return pl
 
 
+class ReloadableApp(param.Parameterized):
+    reload_trigger = param.Integer(default=0)
+
+    def __init__(self, **params):
+        super().__init__(**params)
+        self.reload_pane = pn.pane.HTML("", width=0, height=0, visible=False)
+        self.param.watch(self.update_reload_script, "reload_trigger")
+
+    def update_reload_script(self, event):
+        if event.new > 0:
+            pn.state.js_code("window.location.reload();")
+
+    def force_reload(self):
+        self.reload_trigger += 1
+
+    def servable(self):
+        return self.reload_pane
+
+
+# Instantiate ReloadableApp
+reloadable_app = ReloadableApp().servable()
+
+
+def trigger_reload(event=None):
+    reload_script = pn.pane.HTML(
+        "<script>window.location.reload();</script>", width=0, height=0
+    )
+    pn.state.location.reload_script = (
+        reload_script  # Dynamically add to `pn.state.location`
+    )
+
+
+# Create a Reload button
+reload_button = pn.widgets.Button(name="Reload Page", button_type="primary")
+
+# Bind the reload_button to trigger_reload function
+reload_button.on_click(lambda event: trigger_reload())
+
+# Add the button to your layout (e.g., in the sidebar or main area)
+# Here, we'll add it to the sidebar alongside existing widgets
+ss_props.append(reload_button)
+
 rcsb_selector_widget.param.watch(get_ss_idlist, "value")
 rcsb_ss_widget.param.watch(set_state, "value")
 styles_group.param.watch(set_state, "value")
@@ -622,7 +666,7 @@ pn.bind(update_single, click=styles_group)
 
 set_window_title()
 
-render_win = pn.Column(vtkpan)
+render_win = pn.Column(vtkpan, reloadable_app)
 render_win.servable()
 
 # end of file
