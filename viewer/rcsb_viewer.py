@@ -348,7 +348,7 @@ def load_data():
 
     _logger.info("Loading RCSB Disulfide Database")
 
-    PDB_SS = Load_PDB_SS(verbose=True, subset=False)
+    PDB_SS = Load_PDB_SS(verbose=True, subset=False, datadir="/app/data")
 
     RCSB_list = sorted(PDB_SS.IDList)
 
