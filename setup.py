@@ -86,7 +86,7 @@ setup(
     keywords="proteusPy suchanek disulfide",
     tests_require=["pytest"],
     test_suite="tests",
-    setup_requires=["pytest-runner", "wheel"],
+    setup_requires=["setuptools", "pytest-runner", "wheel"],
     install_requires=requirements,
     extras_require={
         "dev": [
@@ -95,6 +95,7 @@ setup(
             "coverage",
             "twine",
             "pdoc",
+            "wheel",
         ],
         "bio": [
             "Biopython",
@@ -102,6 +103,17 @@ setup(
         "pyqt5": [
             "pyqt5",
             "pyvistaqt",
+        ],
+        "all": [
+            "pytest",
+            "pre-commit",
+            "coverage",
+            "twine",
+            "pdoc",
+            "Biopython",
+            "pyqt5",
+            "pyvistaqt",
+            "wheel",
         ],
     },
     source="https://github.com/suchanek/proteusPy/",

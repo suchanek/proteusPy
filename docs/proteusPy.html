@@ -58,7 +58,7 @@
   <li><a href="#usage">Usage</a>
   <ul>
     <li><a href="#quickstart">Quickstart</a></li>
-    <li><a href="#visualizing-disulfides-with-pyvista">Visualizing Disulfides with pyVista</a></li>
+    <li><a href="#visualizing-the-disulfide-database">Visualizing the Disulfide Database</a></li>
     <li><a href="#performance">Performance</a></li>
     <li><a href="#contributingreporting">Contributing/Reporting</a></li>
     <li><a href="#citing-proteuspy">Citing proteusPy</a></li>
@@ -109,8 +109,7 @@ proteusPy    </h1>
 <img src="https://github.com/suchanek/proteusPy/actions/workflows/pytest.yml/badge.svg" alt="Testing" />
 <a href="https://joss.theoj.org/papers/45de839b48a550d6ab955c5fbbc508f2"><img src="https://joss.theoj.org/papers/45de839b48a550d6ab955c5fbbc508f2/status.svg" alt="status" /></a>
 <a href="https://doi.org/10.5281/zenodo.13241499"><img src="https://zenodo.org/badge/575657091.svg" alt="DOI" /></a>
-<a href="https://suchanek.github.io/proteusPy/proteusPy.html"><img src="https://img.shields.io/badge/API%20Documentation-8A2BE2" alt="API Docs" /></a>
-<a href="http://makeapullrequest.com"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs" /></a></p>
+<a href="https://suchanek.github.io/proteusPy/proteusPy.html"><img src="https://img.shields.io/badge/API%20Documentation-8A2BE2" alt="API Docs" /></a></p>
 
 <h1 id="summary">Summary</h1>
 
@@ -194,7 +193,7 @@ proteusPy    </h1>
 
 <h1 id="testing">Testing</h1>
 
-<p>I currently have <code>pytest</code> and docstring testing for the modules in place. To run them <code>cd</code> into the repository and run:</p>
+<p><code>pytest</code> and docstring testing for the modules in place. To run them <code>cd</code> into the repository and run:</p>
 
 <div class="pdoc-code codehilite">
 <pre><span></span><code><span class="gp">$ </span>make<span class="w"> </span>tests
@@ -240,7 +239,7 @@ proteusPy    </h1>
 <li><a href="https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py">DisulfideDownloader.py</a>: Downloads the raw RCSB structure files. The download consists of over 35,000 .ent files and took about twelve hours on a 200Mb internet connection. It is necessary to have these files locally to build the database. The download is about 35GB in size.</li>
 <li><a href="https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideExtractor_mp.py">DisulfideExtractor_mp.py</a>: Extracts the disulfides and creates the database loaders. This program is fully multi-processing, and one can specify the number of cores to use for the extract. The downloaded PDB files must be in $PDB/good. On my 14 core MacbookPro M3 Max the extraction of over 36,000 files and creation of the Disulfide loaders takes a bit over two minutes. This is in contrast to the initial single threaded version present in the initial release, which takes almost an hour to run!</li>
 <li><a href="https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideClass_Analysis.py">DisulfideClass_Analysis.py</a>: Extracts consensus structures for the binary, sextant and octant classes. Each consensus class is the average structure in torsional space for that class. The number of members of each class is determined by the <code>cutoff</code> chosen at the time of program run. These can be found in the <code>DATA_DIR</code> directory. This analysis is ongoing.</li>
-<li><a href="https://github.com/suchanek/proteusPy/blob/master/programs/viewer.py">viewer.py</a>: A simple PyQt5 viewer to examine disulfides in the database. This is under active development. Currently not working under Linux since I can't seem to get PyQt5 to build.</li>
+<li><a href="https://github.com/suchanek/proteusPy/blob/master/programs/qt5viewer.py">qt5viewer.py</a>: A simple PyQt5 viewer to examine disulfides in the database. This is under active development. Currently not working under Linux since I can't seem to get PyQt5 to build.</li>
 </ul>
 
 <p>The first time one loads the database via <a href="https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html#Load_PDB_SS">Load_PDB_SS()</a> the system download full DisulfideList object. Once downloaded the <code>DisulfideLoader</code> is initialized, the binary, sextant and octant classdicts built, and the loaders saved.</p>
@@ -254,22 +253,35 @@ proteusPy    </h1>
 </code></pre>
 </div>
 
-<p>and open <code>notebooks/Analysis_2q7q.ipynb</code>. This notebook looks at the disulfide bond with the lowest energy in the entire database. There are several other notebooks in this directory that illustrate using the program. Some of these reflect active development work so may not be 'fully baked'.</p>
+<p>and open <a href="https://github.com/suchanek/proteusPy/blob/master/notebooks/Analysis_2q7q.ipynb">Analysis_2q7q.ipynb</a>. This notebook looks at the disulfide bond with the lowest energy in the entire database. There are several other notebooks in this directory that illustrate using the program. Some of these reflect active development work so may not be 'fully baked'.</p>
 
-<h2 id="visualizing-disulfides-with-pyvista">Visualizing Disulfides with pyVista</h2>
+<h2 id="visualizing-the-disulfide-database">Visualizing the Disulfide Database</h2>
 
-<p>PyVista is an excellent 3D visualization framework and I've used it for the Disulfide visualization engine. It uses the VTK library on the backend and provides high-level access to 3D rendering. The menu strip provided in the Disulfide visualization windows allows the user to turn borders, rulers, bounding boxes on and off and reset the orientations. Please try them out! There is also a button for <em>local</em> vs <em>server</em> rendering. <em>Local</em> rendering is usually much smoother. To manipulate:</p>
+<p><code><a href="">proteusPy</a></code> now has three distinct ways of visualizing the Disulfides in the database. I'll describe these briefly below:</p>
 
-<ul>
-<li>Click and drag your mouse to rotate</li>
-<li>Use the mouse wheel to zoom (3 finger zoom on trackpad)</li>
-</ul>
+<p>1) PyVista (built-in) - <code><a href="">proteusPy</a></code> utilizes the excellent PyVista library for visualization and manipulation of the Disulfides within the database. These routines are readily accessible from within the Jupyter notebook environment. It uses the VTK library on the backend and provides high-level access to 3D rendering. The menu strip provided in the Disulfide visualization windows allows the user to turn borders, rulers, bounding boxes on and off and reset the orientations. Please try them out! There is also a button for <em>local</em> vs <em>server</em> rendering. <em>Local</em> rendering is usually much smoother. To manipulate:
+     - Click and drag your mouse to rotate
+     - Use the mouse wheel to zoom (3 finger zoom on trackpad)</p>
+
+<p>2) <a href="https://github.com/suchanek/proteusPy/blob/master/programs/rcsb_viewer">rcsb_viewer.py</a> - This is a <code>panel</code>-based program to display the database interactively. Launch as shown, (replace the path with your own path):</p>
+
+<p><div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">$ </span>panel<span class="w"> </span>serve<span class="w"> </span>~/repos/proteusPy/programs/DBViewer.py<span class="w"> </span>--show<span class="w"> </span>--autoreload
+</code></pre>
+</div></p>
+
+<p>3) rcsb_viewer - <code>Docker</code> version. I've created a <code>Docker</code> image of the viewer. It's available on <code>DockerHub</code> at egsuchanek/rcsb_viewer:latest. To run, just execute:</p>
+
+<p><div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">  $ </span>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w">  </span>-p<span class="w"> </span><span class="m">5006</span>:5006<span class="w">  </span>--restart<span class="w"> </span>unless-stopped<span class="w"> </span>egsuchanek/rcsb_viewer:latest
+</code></pre>
+</div></p>
 
 <h2 id="performance">Performance</h2>
 
 <ul>
 <li>Manipulating and searching through long lists of disulfides can take time. I've added progress bars for many of these operations.</li>
-<li>Rendering many disulfides in <strong>pyvista</strong> can also take time to load and may be slow to display in real time, depending on your hardware. I added optimization to reduce cylinder complexity as a function of total cylinders rendered, but it can still be less than perfect. The faster your GPU the better!</li>
+<li>Rendering many disulfides in <code>pyvista</code> can also take time to load and may be slow to display in real time, depending on your hardware. I added optimization to reduce cylinder complexity as a function of total cylinders rendered, but it can still be less than perfect. The faster your GPU the better!</li>
 </ul>
 
 <h2 id="contributingreporting">Contributing/Reporting</h2>
@@ -309,7 +321,6 @@ proteusPy    </h1>
 <li><a href="https://joss.theoj.org/papers/10.21105/joss.06169">proteusPy: A Python Package for Protein Structure and Disulfide Bond Modeling and Analysis</a></li>
 <li><a href="https://doi.org/10.1021/bi00368a023">Computer-aided Strategies for Protein Design</a></li>
 <li><a href="https://doi.org/10.1021/bi00368a024">An engineered intersubunit disulfide enhances the stability and DNA binding of the N-terminal domain of .lambda. repressor</a></li>
-<li><a href="https://doi.org/10.1016/0092-8674(92)90140-8">Introduction of intersubunit disulfide bonds in the membrane-distal region of the influenza hemagglutinin abolishes membrane fusion activity</a></li>
 <li><a href="http://dx.doi.org/10.1111/j.1538-7836.2010.03894.x">Analysis of disulfide bonds in protein structures</a></li>
 </ul>
 </div>
