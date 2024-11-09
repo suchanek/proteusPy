@@ -612,7 +612,7 @@ class ReloadableApp(param.Parameterized):
 
     def update_reload_script(self, event):
         if event.new > 0:
-            pn.state.js_code("window.location.reload();")
+            self.reload_pane.object = "<script>window.location.reload();</script>"
 
     def force_reload(self):
         self.reload_trigger += 1
@@ -622,16 +622,12 @@ class ReloadableApp(param.Parameterized):
 
 
 # Instantiate ReloadableApp
-reloadable_app = ReloadableApp().servable()
+reloadable_app = ReloadableApp()
 
 
 def trigger_reload(event=None):
-    reload_script = pn.pane.HTML(
-        "<script>window.location.reload();</script>", width=0, height=0
-    )
-    pn.state.location.reload_script = (
-        reload_script  # Dynamically add to `pn.state.location`
-    )
+    _logger.info("Reloading the page.")
+    reloadable_app.force_reload()
 
 
 # Create a Reload button
@@ -666,7 +662,7 @@ pn.bind(update_single, click=styles_group)
 
 set_window_title()
 
-render_win = pn.Column(vtkpan, reloadable_app)
+render_win = pn.Column(vtkpan, reloadable_app.servable())
 render_win.servable()
 
 # end of file
