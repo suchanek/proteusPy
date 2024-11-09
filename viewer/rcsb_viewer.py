@@ -1,7 +1,7 @@
 """
 RCSB Disulfide Bond Database Browser
 Author: Eric G. Suchanek, PhD
-Last revision: 11/7/2024
+Last revision: 10/22/2024
 """
 
 # pylint: disable=C0301 # line too long
@@ -18,6 +18,7 @@ import os
 
 import numpy as np
 import panel as pn
+import param
 import pyvista as pv
 
 from proteusPy import (
@@ -348,7 +349,7 @@ def load_data():
 
     _logger.info("Loading RCSB Disulfide Database")
 
-    PDB_SS = Load_PDB_SS(verbose=True, subset=False, datadir="/app/data")
+    PDB_SS = Load_PDB_SS(verbose=True, subset=False, loadpath="/app/data")
 
     RCSB_list = sorted(PDB_SS.IDList)
 
@@ -601,6 +602,44 @@ def display_overlay(
     return pl
 
 
+class ReloadableApp(param.Parameterized):
+    reload_trigger = param.Integer(default=0)
+
+    def __init__(self, **params):
+        super().__init__(**params)
+        self.reload_pane = pn.pane.HTML("", width=0, height=0, visible=False)
+        self.param.watch(self.update_reload_script, "reload_trigger")
+
+    def update_reload_script(self, event):
+        if event.new > 0:
+            self.reload_pane.object = "<script>window.location.reload();</script>"
+
+    def force_reload(self):
+        self.reload_trigger += 1
+
+    def servable(self):
+        return self.reload_pane
+
+
+# Instantiate ReloadableApp
+reloadable_app = ReloadableApp()
+
+
+def trigger_reload(event=None):
+    _logger.info("Reloading the page.")
+    reloadable_app.force_reload()
+
+
+# Create a Reload button
+reload_button = pn.widgets.Button(name="Reload Page", button_type="primary")
+
+# Bind the reload_button to trigger_reload function
+reload_button.on_click(lambda event: trigger_reload())
+
+# Add the button to your layout (e.g., in the sidebar or main area)
+# Here, we'll add it to the sidebar alongside existing widgets
+ss_props.append(reload_button)
+
 rcsb_selector_widget.param.watch(get_ss_idlist, "value")
 rcsb_ss_widget.param.watch(set_state, "value")
 styles_group.param.watch(set_state, "value")
@@ -623,7 +662,7 @@ pn.bind(update_single, click=styles_group)
 
 set_window_title()
 
-render_win = pn.Column(vtkpan)
+render_win = pn.Column(vtkpan, reloadable_app.servable())
 render_win.servable()
 
 # end of file
