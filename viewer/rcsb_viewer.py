@@ -1,7 +1,7 @@
 """
 RCSB Disulfide Bond Database Browser
 Author: Eric G. Suchanek, PhD
-Last revision: 10/22/2024
+Last revision: 11/8/2024
 """
 
 # pylint: disable=C0301 # line too long
@@ -69,13 +69,25 @@ _style = "Split Bonds"
 _single = True
 
 # Set up logging
-# create a local logger
-_logger = create_logger("DBViewer", log_level=logging.INFO)
+_logger = create_logger("Viewer", log_level=logging.INFO)
 
 # globals
 ss_state = {}
 RCSB_list = []
 PDB_SS = None
+
+# default selections
+ss_state_default = {
+    "single": "True",
+    "style": "sb",
+    "rcsb_list": "['2q7q']",
+    "rcsid": "2q7q",
+    "defaultss": "2q7q_75D_140D",
+    "ssid_list": "['2q7q_75D_140D', '2q7q_81D_113D', '2q7q_88D_171D', '2q7q_90D_138D', \
+        '2q7q_91D_135D','2q7q_98D_129D']",
+    "theme": "default",
+}
+
 
 # Widgets
 styles_group = pn.widgets.RadioBoxGroup(
@@ -113,39 +125,6 @@ ss_styles = pn.WidgetBox("# Display Style", styles_group, view_selector).servabl
     target="sidebar"
 )
 
-# Create the "Reset Camera" button
-# reset_camera_button = pn.widgets.Button(name="Reset Camera", button_type="primary")
-
-
-def reset_camera(event):
-    """
-    Sets the camera to a specific view where the x-axis is pointed down and the
-    y-axis into the screen.
-    """
-    global vtkpan, plotter
-
-    camera_position = [(0, 0, 10), (0, 0, 0), (0, 1, 0)]  # Example values
-    plotter.camera_position = camera_position
-    mess = f"Reset Camera: {plotter.camera_position}"
-    _logger.info(mess)
-
-    plotter.render()
-    plotter.reset_camera()
-    vtkpan = pn.pane.VTK(
-        plotter.ren_win,
-        margin=0,
-        sizing_mode="stretch_both",
-        orientation_widget=True,
-        enable_keybindings=True,
-        min_height=500,
-    )
-
-    vtkpan.object = plotter.ren_win
-
-
-# Bind the reset_camera function to the button click event
-# reset_camera_button.on_click(reset_camera)
-
 
 # Adjust the update_single function to handle the different view options
 def update_view(click):
@@ -179,18 +158,6 @@ db_md = pn.pane.Markdown("Database Info goes here")
 
 info_md = pn.pane.Markdown("SS Info")
 ss_info = pn.WidgetBox("# Disulfide Info", info_md).servable(target="sidebar")
-
-# default selections
-ss_state_default = {
-    "single": "True",
-    "style": "sb",
-    "rcsb_list": "['2q7q']",
-    "rcsid": "2q7q",
-    "defaultss": "2q7q_75D_140D",
-    "ssid_list": "['2q7q_75D_140D', '2q7q_81D_113D', '2q7q_88D_171D', '2q7q_90D_138D', \
-        '2q7q_91D_135D','2q7q_98D_129D']",
-    "theme": "default",
-}
 
 
 def set_window_title():
@@ -603,6 +570,28 @@ def display_overlay(
 
 
 class ReloadableApp(param.Parameterized):
+    """
+    A class to handle programmatically reloading the Panel app.
+
+    This class uses a hidden HTML pane to inject JavaScript that reloads the page
+    when the `reload_trigger` parameter is incremented. It provides a method to
+    force a reload and a method to make the hidden pane servable.
+
+    :param reload_trigger: A parameter that triggers the reload when incremented.
+    :type reload_trigger: param.Integer
+    :param reload_pane: A hidden HTML pane used to inject the reload script.
+    :type reload_pane: pn.pane.HTML
+
+    Methods
+    -------
+    update_reload_script(event):
+        Updates the reload pane with a JavaScript reload script.
+    force_reload():
+        Increments the reload_trigger to force a page reload.
+    servable():
+        Returns the hidden reload pane to include in the layout.
+    """
+
     reload_trigger = param.Integer(default=0)
 
     def __init__(self, **params):
@@ -611,13 +600,28 @@ class ReloadableApp(param.Parameterized):
         self.param.watch(self.update_reload_script, "reload_trigger")
 
     def update_reload_script(self, event):
+        """
+        Updates the reload pane with a JavaScript reload script.
+
+        :param event: The event that triggers the update.
+        :type event: param.parameterized.Event
+        """
         if event.new > 0:
             self.reload_pane.object = "<script>window.location.reload();</script>"
 
     def force_reload(self):
+        """
+        Increments the reload_trigger to force a page reload.
+        """
         self.reload_trigger += 1
 
     def servable(self):
+        """
+        Returns the hidden reload pane to include in the layout.
+
+        :return: The hidden reload pane.
+        :rtype: pn.pane.HTML
+        """
         return self.reload_pane
 
 
