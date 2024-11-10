@@ -41,7 +41,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GitHub_pat }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -59,7 +59,6 @@ jobs:
           file: ./viewer/Dockerfile
           push: true
           tags: |
-            ${{ steps.meta.outputs.tags }}
             ${{ secrets.DOCKER_USER }}/rcsb_viewer:latest
             ghcr.io/${{ github.repository_owner }}/rcsb_viewer:latest
           labels: ${{ steps.meta.outputs.labels }}
