@@ -40,7 +40,7 @@ if os.getenv("PYVISTA_OFF_SCREEN", "false").lower() == "true":
 
 pn.extension("vtk", sizing_mode="stretch_width", template="fast")
 
-_vers = 0.92
+_vers = 0.93d
 
 _logger = create_logger("rcsb_viewer", log_level=logging.INFO)
 

@@ -1,13 +1,15 @@
 """
 RCSB Disulfide Bond Database Browser
 Author: Eric G. Suchanek, PhD
-Last revision: 10/22/2024
+Last revision: 11/8/2024
 """
 
 # pylint: disable=C0301 # line too long
 # pylint: disable=C0413 # wrong import order
 # pylint: disable=C0103 # wrong variable name
 # pylint: disable=W0212 # access to a protected member _render of a client class
+# pylint: disable=W0602 # Using global for variable
+# pylint: disable=W0612 # unused variable
 # pylint: disable=W0613 # unused argument
 # pylint: disable=W0603 # Using global for variable
 
@@ -16,26 +18,40 @@ import os
 
 import numpy as np
 import panel as pn
+import param
 import pyvista as pv
 
 from proteusPy import (
+    BOND_RADIUS,
+    FONTSIZE,
+    WINSIZE,
     Disulfide,
     DisulfideList,
     Load_PDB_SS,
     configure_master_logger,
     create_logger,
     get_jet_colormap,
+    get_theme,
+    grid_dimensions,
 )
-from proteusPy.atoms import BOND_COLOR, BOND_RADIUS, BS_SCALE, SPEC_POWER, SPECULARITY
-from proteusPy.ProteusGlobals import WINSIZE
+from proteusPy.ProteusGlobals import DATA_DIR
+
+_vers = 0.94
 
 # Set PyVista to use offscreen rendering if the environment variable is set
+# needed in Docker.
 if os.getenv("PYVISTA_OFF_SCREEN", "false").lower() == "true":
     pv.OFF_SCREEN = True
 
 pn.extension("vtk", sizing_mode="stretch_width", template="fast")
 
-_vers = 0.8
+_logger = create_logger("rcsb_viewer", log_level=logging.INFO)
+
+configure_master_logger("rcsb_viewer.log")
+_logger.info("Starting Panel Disulfide Viewer v%s.", _vers)
+
+current_theme = get_theme()
+_logger.info("Current Theme: %s", current_theme)
 
 # defaults for the UI
 
@@ -56,17 +72,31 @@ _style = "Split Bonds"
 _single = True
 
 # Set up logging
-# configure a master logger. This will create ~/logs/DBViewer.log
-configure_master_logger("DBViewer.log")
-
-# create a local logger
-_logger = create_logger("DBViewer", log_level=logging.INFO)
+_logger = create_logger("rcsb_viewer", log_level=logging.INFO)
 
 # globals
 ss_state = {}
 RCSB_list = []
 PDB_SS = None
 
+# default selections
+ss_state_default = {
+    "single": True,  # corrected Boolean type
+    "style": "Split Bonds",
+    "rcsb_list": ["2q7q"],
+    "rcsid": "2q7q",
+    "defaultss": "2q7q_75D_140D",
+    "ssid_list": [
+        "2q7q_75D_140D",
+        "2q7q_81D_113D",
+        "2q7q_88D_171D",
+        "2q7q_90D_138D",
+        "2q7q_91D_135D",
+        "2q7q_98D_129D",
+    ],
+    "theme": current_theme,
+    "view_mode": "Single View",  # added default for view_selector
+}
 
 # Widgets
 styles_group = pn.widgets.RadioBoxGroup(
@@ -75,7 +105,6 @@ styles_group = pn.widgets.RadioBoxGroup(
     inline=False,
 )
 
-single_checkbox = pn.widgets.Checkbox(name="Single View", value=True)
 rcsb_ss_widget = pn.widgets.Select(
     name="Disulfide", value=_default_ss, options=_ssidlist
 )
@@ -93,9 +122,43 @@ ss_props = pn.WidgetBox(
     "# Disulfide Selection", rcsb_selector_widget, rcsb_ss_widget
 ).servable(target="sidebar")
 
-ss_styles = pn.WidgetBox("# Rendering Styles", styles_group, single_checkbox).servable(
+
+# Replace single checkbox with a selector widget
+view_selector = pn.widgets.Select(
+    name="View Mode", options=["Single View", "Multiview", "List"], value="Single View"
+)
+
+# Modify the layout
+ss_styles = pn.WidgetBox("# Display Style", styles_group, view_selector).servable(
     target="sidebar"
 )
+
+
+# Adjust the update_single function to handle the different view options
+def update_view(click):
+    """
+    Adjust the rendering style radio box depending on the state of the view mode selector.
+    Returns:
+        None
+    """
+    global styles_group
+
+    _logger.info("Update View")
+
+    selected_view = view_selector.value
+    match selected_view:
+        case "Single View":
+            styles_group.disabled = False
+        case "Multiview":
+            styles_group.disabled = True
+        case "List":
+            styles_group.disabled = False
+
+    click_plot(click)
+
+
+# Update references to `single_checkbox` to `view_selector` in callbacks
+view_selector.param.watch(update_view, "value")
 
 # markdown panels for various text outputs
 title_md = pn.pane.Markdown("Title")
@@ -104,17 +167,6 @@ db_md = pn.pane.Markdown("Database Info goes here")
 
 info_md = pn.pane.Markdown("SS Info")
 ss_info = pn.WidgetBox("# Disulfide Info", info_md).servable(target="sidebar")
-
-# default selections
-ss_state_default = {
-    "single": "True",
-    "style": "sb",
-    "rcsb_list": "['2q7q']",
-    "rcsid": "2q7q",
-    "defaultss": "2q7q_75D_140D",
-    "ssid_list": "['2q7q_75D_140D', '2q7q_81D_113D', '2q7q_88D_171D', '2q7q_90D_138D', \
-        '2q7q_91D_135D','2q7q_98D_129D']",
-}
 
 
 def set_window_title():
@@ -126,13 +178,11 @@ def set_window_title():
     pdbs = len(PDB_SS.SSDict)
     vers = PDB_SS.version
 
-    win_title = f"RCSB Disulfide Browser: {tot:,} Disulfides {pdbs:,} Structures {vers}"
+    win_title = f"RCSB Disulfide Browser v{_vers}: {tot:,} Disulfides {pdbs:,} Structures {vers}"
     pn.state.template.param.update(title=win_title)
 
     mess = f"Set Window Title: {win_title}"
-
     _logger.debug(mess)
-    return
 
 
 def set_widgets_defaults():
@@ -152,8 +202,8 @@ def set_widgets_defaults():
     """
     global RCSB_list
 
+    _logger.info("Setting widget defaults.")
     styles_group.value = "Split Bonds"
-    single_checkbox.value = True
 
     # Ensure the RCSB list is correctly populated from loaded data
     if not RCSB_list:
@@ -167,51 +217,42 @@ def set_widgets_defaults():
     return ss_state_default
 
 
-def set_state(event):
-    """
-    Set the ss_state dict to the state variables and UI interaface. Push to cache.
-    """
-    global ss_state
+def set_state(event=None):
+    """Set the state of the application based on the current widget values."""
 
-    ss_state["rcsb_list"] = RCSB_list.copy()
-    ss_state["rcsid"] = _rcsid_default
-    ss_state["ssid_list"] = _ssidlist.copy()
-    ss_state["single"] = single_checkbox.value
-    ss_state["style"] = styles_group.value
-    ss_state["defaultss"] = rcsb_ss_widget.value
-    _logger.debug("--> Set state.")
+    global ss_state
+    ss_state = {
+        "rcsb_list": RCSB_list.copy(),
+        "rcsid": rcsb_selector_widget.value,
+        "ssid_list": _ssidlist.copy(),
+        "style": styles_group.value,
+        "defaultss": rcsb_ss_widget.value,
+        "theme": get_theme(),
+        "view_mode": view_selector.value,  # Added view mode state
+    }
     pn.state.cache["ss_state"] = ss_state
+    _logger.info("Set state: %s", ss_state["rcsid"])
     click_plot(None)
 
 
-def load_state():
-    """
-    Load the state variables from the cache, update the interface.
-    """
-    # global _ssidlist, _rcsid, _style, _single, _default_ss
-    _ss_state = {}
+def set_widgets_from_state():
+    """Set the widgets based on the state cache."""
 
+    global ss_state
     if "ss_state" in pn.state.cache:
-        _ss_state = pn.state.cache["ss_state"]
-        _ssidlist = _ss_state["ssid_list"]
-        _rcsid = _ss_state["rcsid"]
-        _style = _ss_state["style"]
-        _single = _ss_state["single"]
-        _default_ss = _ss_state["defaultss"]
+        ss_state = pn.state.cache["ss_state"]
+        _logger.info("Setting widgets from state.")
 
-        styles_group.value = _style
-        single_checkbox.value = _single
-        rcsb_selector_widget.value = _rcsid
-        rcsb_ss_widget.value = _default_ss
-
+        rcsb_selector_widget.value = ss_state["rcsid"]
+        rcsb_ss_widget.value = ss_state["defaultss"]
+        styles_group.value = ss_state["style"]
+        view_selector.value = ss_state["view_mode"]  # Set view mode from cache
     else:
-        _logger.debug("Setting widgets.")
+        # Fallback to default values if cache is empty
         set_widgets_defaults()
 
-    return _ss_state
 
-
-def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
+def plot(pl, ss, style="sb", light=True, panelsize=512) -> pv.Plotter:
     """
     Return the pyVista Plotter object for the Disulfide bond in the specific rendering style.
 
@@ -224,91 +265,74 @@ def plot(pl, ss, single=True, style="sb", light=True) -> pv.Plotter:
         * 'plain' - boring single color
     :param light: If True, light background, if False, dark
     """
-    # src = ss.pdb_id
-    # enrg = ss.energy
-    # title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Cα: {ss.ca_distance:.2f} Å Cβ: {ss.cb_distance:.2f} Å Tors: {ss.torsion_length:.2f}°"
+    global plotter, vtkpan
+
+    _logger.debug("Entering plot: %s", ss.name)
+
+    mode = view_selector.value
 
     if light:
         pv.set_plot_theme("document")
     else:
         pv.set_plot_theme("dark")
 
-    # Create a new plotter with the desired shape
-    if single:
-        new_pl = pv.Plotter(window_size=WINSIZE)
+    if mode == "Single View":
+        _logger.info("Single View")
+        plotter = pv.Plotter(window_size=WINSIZE)
+        plotter.clear()
+        ss._render(plotter, style=style)
+        # vtkpan.object = plotter.ren_win
 
+    elif mode == "Multiview":
+        _logger.info("Multiview")
+        plotter = pv.Plotter(shape=(2, 2), window_size=WINSIZE)
+        plotter.clear()
+
+        plotter.subplot(0, 0)
+        ss._render(plotter, style="cpk")
+
+        plotter.subplot(0, 1)
+        ss._render(plotter, style="bs")
+
+        plotter.subplot(1, 0)
+        ss._render(plotter, style="sb")
+
+        plotter.subplot(1, 1)
+        ss._render(plotter, style="pd")
+
+        plotter.link_views()
+        plotter.reset_camera()
+        # vtkpan.object = plotter.ren_win
     else:
-        new_pl = pv.Plotter(shape=(2, 2), window_size=WINSIZE)
+        _logger.info("List")
+        pdbid = ss.pdb_id
+        sslist = PDB_SS[pdbid]
+        tot_ss = len(sslist)  # number off ssbonds
+        rows, cols = grid_dimensions(tot_ss)
+        winsize = (panelsize * cols, panelsize * rows)
 
-    new_pl.enable_anti_aliasing("msaa")
-    new_pl.clear()
-    new_pl.reset_camera()
+        avg_enrg = sslist.average_energy
+        avg_dist = sslist.average_distance
+        resolution = sslist.average_resolution
 
-    if single is True:
-        ss._render(
-            new_pl,
-            style=style,
-            bs_scale=BS_SCALE,
-            spec=SPECULARITY,
-            specpow=SPEC_POWER,
-        )
-    else:
-        new_pl.subplot(0, 0)
+        title = f"<{pdbid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
 
-        ss._render(
-            new_pl,
-            style="cpk",
-            bondcolor=BOND_COLOR,
-            bs_scale=BS_SCALE,
-            spec=SPECULARITY,
-            specpow=SPEC_POWER,
-        )
+        plotter = pv.Plotter(window_size=winsize, shape=(rows, cols))
+        plotter.clear()
+        plotter = sslist._render(plotter, style)
+        plotter.enable_anti_aliasing("msaa")
+        plotter.add_title(title=title, font_size=FONTSIZE)
+        plotter.link_views()
+        plotter.reset_camera()
+        # vtkpan.object = plotter.ren_win
 
-        new_pl.subplot(0, 1)
+    plotter.reset_camera()
+    return plotter
 
-        ss._render(
-            new_pl,
-            style="pd",
-            bondcolor=BOND_COLOR,
-            bs_scale=BS_SCALE,
-            spec=SPECULARITY,
-            specpow=SPEC_POWER,
-        )
 
-        new_pl.subplot(1, 0)
-
-        ss._render(
-            new_pl,
-            style="sb",
-            bondcolor=BOND_COLOR,
-            bs_scale=BS_SCALE,
-            spec=SPECULARITY,
-            specpow=SPEC_POWER,
-        )
-
-        new_pl.subplot(1, 1)
-        ss._render(
-            pl,
-            style="pd",
-            bondcolor=BOND_COLOR,
-            bs_scale=BS_SCALE,
-            spec=SPECULARITY,
-            specpow=SPEC_POWER,
-        )
-        new_pl.subplot(1, 1)
-        ss._render(
-            pl,
-            style="pd",
-            bondcolor=BOND_COLOR,
-            bs_scale=BS_SCALE,
-            spec=SPECULARITY,
-            specpow=SPEC_POWER,
-        )
-
-        new_pl.link_views()
-
-    new_pl.reset_camera()
-    return new_pl
+def is_running_in_docker():
+    """Check if the application is running inside a Docker container."""
+    return os.getenv("DOCKER_RUNNING", "false").lower() == "true"
 
 
 @pn.cache()
@@ -316,15 +340,19 @@ def load_data():
     """Load the RCSB Disulfide Database and return the object."""
     global RCSB_list, PDB_SS
 
-    message = "Loading RCSB Disulfide Database"
-    _logger.info(message)
-    PDB_SS = Load_PDB_SS(
-        verbose=True, subset=False, loadpath="/app/data"
-    )  # Load some data
+    _logger.info("Loading RCSB Disulfide Database")
+
+    # Determine the loadpath based on the environment
+    if is_running_in_docker():
+        loadpath = "/app/data"
+    else:
+        loadpath = DATA_DIR
+
+    PDB_SS = Load_PDB_SS(verbose=True, subset=False, loadpath=loadpath)
 
     RCSB_list = sorted(PDB_SS.IDList)
-    message = f"Loaded RCSB Disulfide Database: {len(RCSB_list)} entries"
-    _logger.info(message)
+
+    _logger.info("Loaded RCSB Disulfide Database: %d entries", len(RCSB_list))
     set_window_title()
     pn.state.cache["data"] = PDB_SS
     return PDB_SS
@@ -339,46 +367,25 @@ set_window_title()
 set_widgets_defaults()
 
 
-def get_theme() -> str:
-    """Returns the current theme: 'default' or 'dark'
+def get_panel_theme() -> str:
+    """Return the current theme: 'default' or 'dark'
 
     Returns:
         str: The current theme
     """
-    args = pn.state.session_args
-    if "theme" in args and args["theme"][0] == b"dark":
-        return "dark"
-    return "default"
+    return pn.config.theme
 
 
 def click_plot(event):
     """Force a re-render of the currently selected disulfide. Reuses the existing plotter."""
 
     # Reuse the existing plotter and re-render the scene
-    plotter = render_ss()  # Reuse the existing plotter
+    global plotter
 
+    plotter = render_ss()  # Reuse the existing plotter
+    plotter.reset_camera()
     # Update the vtkpan and trigger a refresh
     vtkpan.object = plotter.ren_win
-    # vtkpan.param.trigger("object")
-    plotter.render()
-
-
-def update_single(click):
-    """
-    Toggle the rendering style radio box depending on the state of the
-    Single View checkbox.
-
-    Returns:
-        None
-    """
-    global styles_group
-
-    single_checked = single_checkbox.value
-    if single_checked is not True:
-        styles_group.disabled = True
-    else:
-        styles_group.disabled = False
-    click_plot(click)
 
 
 # Callbacks
@@ -398,8 +405,9 @@ def get_ss_idlist(event) -> list:
     if sslist:
         idlist = [ss.name for ss in sslist]
         rcsb_ss_widget.options = idlist
-        mess = f"--> get_ss_idlist |{rcs_id}| |{idlist}|"
+        mess = f"get_ss_idlist |{rcs_id}| |{idlist}|"
         _logger.debug(mess)
+
     return idlist
 
 
@@ -443,7 +451,6 @@ def update_output(ss):
 
 def get_ss(event) -> Disulfide:
     """Get the currently selected Disulfide"""
-    # global PDB_SS
     ss_id = event.new
     ss = Disulfide(PDB_SS[ss_id])
     return ss
@@ -452,6 +459,7 @@ def get_ss(event) -> Disulfide:
 def get_ss_id(event):
     """Return the name of the currently selected Disulfide"""
     rcsb_ss_widget.value = event.new
+    set_state(event)
 
 
 def render_ss():
@@ -464,7 +472,7 @@ def render_ss():
     styles = {"Split Bonds": "sb", "CPK": "cpk", "Ball and Stick": "bs"}
 
     # Determine the theme
-    theme = get_theme()
+    theme = get_panel_theme()
     if theme == "dark":
         light = False
 
@@ -482,19 +490,29 @@ def render_ss():
     update_output(ss)
 
     # Reuse and clear the existing plotter before rendering
-    # plotter.clear()
     style = styles[styles_group.value]
-    single = single_checkbox.value
 
     # Render the structure in the plotter
-    return plot(plotter, ss, single=single, style=style, light=light)
+    return plot(plotter, ss, style=style, light=light)
 
 
 def on_theme_change(event):
-    """Handle a theme change event."""
-    selected_theme = event.obj.theme
-    message = f"Theme Change: {selected_theme}"
-    _logger.debug(message)
+    """
+    Callback function to handle theme changes.
+    """
+    global ss_state
+    ss_state = pn.state.cache["ss_state"]
+    new_theme = event.new
+    ss_state["theme"] = new_theme
+    pn.state.cache["ss_state"] = ss_state
+
+    _logger.info("Theme changed to: %s", new_theme)
+    if new_theme == "dark":
+        plotter.set_background("black")
+    else:
+        plotter.set_background("white")
+    plotter.render()
+    vtkpan.object = plotter.ren_win  # Update the VTK pane object
 
 
 def display_overlay(
@@ -543,6 +561,8 @@ def display_overlay(
     brad = brad if tot_ss < 100 else brad * 0.5
 
     # print(f'Brad: {brad}')
+    center_of_mass = sslist.center_of_mass
+    # sslist.translate(center_of_mass)
 
     for i, ss in zip(range(tot_ss), ssbonds):
         color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
@@ -556,14 +576,88 @@ def display_overlay(
         )
 
     pl.reset_camera()
-    pl.show()
     return pl
 
+
+class ReloadableApp(param.Parameterized):
+    """
+    A class to handle programmatically reloading the Panel app.
+
+    This class uses a hidden HTML pane to inject JavaScript that reloads the page
+    when the `reload_trigger` parameter is incremented. It provides a method to
+    force a reload and a method to make the hidden pane servable.
+
+    :param reload_trigger: A parameter that triggers the reload when incremented.
+    :type reload_trigger: param.Integer
+    :param reload_pane: A hidden HTML pane used to inject the reload script.
+    :type reload_pane: pn.pane.HTML
+
+    Methods
+    -------
+    update_reload_script(event):
+        Updates the reload pane with a JavaScript reload script.
+    force_reload():
+        Increments the reload_trigger to force a page reload.
+    servable():
+        Returns the hidden reload pane to include in the layout.
+    """
+
+    reload_trigger = param.Integer(default=0)
+
+    def __init__(self, **params):
+        super().__init__(**params)
+        self.reload_pane = pn.pane.HTML("", width=0, height=0, visible=False)
+        self.param.watch(self.update_reload_script, "reload_trigger")
+
+    def update_reload_script(self, event):
+        """
+        Updates the reload pane with a JavaScript reload script.
+
+        :param event: The event that triggers the update.
+        :type event: param.parameterized.Event
+        """
+        if event.new > 0:
+            self.reload_pane.object = "<script>window.location.reload();</script>"
+
+    def force_reload(self):
+        """
+        Increments the reload_trigger to force a page reload.
+        """
+        self.reload_trigger += 1
+
+    def servable(self):
+        """
+        Returns the hidden reload pane to include in the layout.
+
+        :return: The hidden reload pane.
+        :rtype: pn.pane.HTML
+        """
+        return self.reload_pane
+
+
+# Instantiate ReloadableApp
+reloadable_app = ReloadableApp()
+
+
+def trigger_reload(event=None):
+    """Force a page reload by incrementing the reload_trigger parameter."""
+    _logger.info("Reloading the page.")
+    reloadable_app.force_reload()
+
+
+# Create a Reload button
+reload_button = pn.widgets.Button(name="Reload Page", button_type="primary")
+
+# Bind the reload_button to trigger_reload function
+reload_button.on_click(lambda event: trigger_reload())
+
+# Add the button to your layout (e.g., in the sidebar or main area)
+# Here, we'll add it to the sidebar alongside existing widgets
+ss_props.append(reload_button)
 
 rcsb_selector_widget.param.watch(get_ss_idlist, "value")
 rcsb_ss_widget.param.watch(set_state, "value")
 styles_group.param.watch(set_state, "value")
-single_checkbox.param.watch(update_single, "value")
 
 plotter = pv.Plotter()
 plotter = render_ss()
@@ -578,11 +672,17 @@ vtkpan = pn.pane.VTK(
 )
 
 pn.bind(get_ss_idlist, rcs_id=rcsb_selector_widget)
-pn.bind(update_single, click=styles_group)
 
+if "data" in pn.state.cache:
+    PDB_SS = pn.state.cache["data"]
+else:
+    PDB_SS = load_data()
+
+# Set window title and initialize widgets from cache or defaults
 set_window_title()
+set_widgets_from_state()
 
-render_win = pn.Column(vtkpan)
+render_win = pn.Column(vtkpan, reloadable_app.servable())
 render_win.servable()
 
 # end of file
