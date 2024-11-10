@@ -36,7 +36,7 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PAT }}
 
-      - name: Log in to the Container registry
+      - name: Log in to the GitHub Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
           registry: ghcr.io
@@ -49,21 +49,24 @@ jobs:
         with:
           images: |
             egsuchanek/rcsb_viewer
-            ghcr.io/${{ github.repository }}
+            ghcr.io/${{ github.repository_owner }}/rcsb_viewer
 
       - name: Build and push Docker images
         id: push
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        uses: docker/build-push-action@v4
         with:
           context: ./viewer
           file: ./viewer/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            egsuchanek/rcsb_viewer:latest
+            ghcr.io/${{ github.repository_owner }}/rcsb_viewer:latest
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
+          subject-name: ghcr.io/${{ github.repository_owner }}/rcsb_viewer
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
