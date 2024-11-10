@@ -42,7 +42,6 @@ jobs:
         with:
           images: |
             egsuchanek/rcsb_viewer
-            ghcr.io/${{ github.repository_owner }}/rcsb_viewer
 
       - name: Build and push Docker images
         id: push
