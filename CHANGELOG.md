@@ -5,6 +5,14 @@ Notable changes to the ``proteusPy`` project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [V0.97.15] - 2024-11-10
+
+### Added
+
+- Unified the disulfide viewers such that the rcsb_viewer.py program will work either stand-alone or in Docker.
+- Added workflows to build the Docker images on GitHub and Docker Hub
+- Made pyqt5 an optional install, pip install proteusPy[pyqt5] adds it back.
+
 ## [V0.97.11]
 
 ### Added

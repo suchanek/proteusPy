@@ -14,7 +14,7 @@ on:
   push:
     branches:
       - master
-      - 0.97.14.dev0
+      - 0.97.16.dev0
   release:
     types: [published]
 
