@@ -60,7 +60,7 @@ jobs:
           push: true
           tags: |
             ${{ steps.meta.outputs.tags }}
-            egsuchanek/rcsb_viewer:latest
+            ${{ secrets.DOCKER_USER }}/rcsb_viewer:latest
             ghcr.io/${{ github.repository_owner }}/rcsb_viewer:latest
           labels: ${{ steps.meta.outputs.labels }}
 
