@@ -4,7 +4,8 @@ FROM continuumio/miniconda3
 # Set environment variables to prevent interactive prompts during package installations
 ENV DEBIAN_FRONTEND=noninteractive \
     PATH="/opt/conda/envs/proteusPy/bin:$PATH" \
-    PYVISTA_OFF_SCREEN=true
+    PYVISTA_OFF_SCREEN=true \
+    DOCKER_RUNNING=true
 
 # Copy the environment.yml file first for better layer caching
 COPY environment.yml /tmp/environment.yml
