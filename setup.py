@@ -17,7 +17,6 @@ proteusPy documentation, linked to from:
 
 http://suchanek.github.io/proteusPy/
 
-This code is in beta.
 
 Eric G. Suchanek, PhD., suchanek@mac.com
 """
@@ -63,6 +62,15 @@ with open("proteusPy/_version.py") as fp:
     exec(fp.read(), version)
 
 
+# Function to read the requirements.txt file
+def read_requirements():
+    with open("requirements.txt") as req_file:
+        return req_file.read().splitlines()
+
+
+# Read the requirements from requirements.txt
+requirements = read_requirements()
+
 setup(
     name="proteusPy",
     version=version["__version__"],
@@ -78,43 +86,8 @@ setup(
     keywords="proteusPy suchanek disulfide",
     tests_require=["pytest"],
     test_suite="tests",
-    setup_requires=["pytest-runner", "wheel"],
-    install_requires=[
-        "numpy",
-        "matplotlib",
-        "pandas",
-        "traitlets==5.9.0",
-        "seaborn",
-        "pillow",
-        "tqdm",
-        "plotly",
-        "datetime",
-        "openai",
-        "panel",
-        "scikit-learn",
-        "gdown",
-        "nodejs",
-        "pytube",
-        "grpcio",
-        "pip",
-        "wget",
-        "vtk==9.2.6",
-        "kaleido",
-        "plotly_express",
-        "pympler",
-        "imageio[ffmpeg]",
-        "colorama",
-        "jupyter",
-        "notebook",
-        "nbconvert",
-        "ipykernel",
-        "ipywidgets",
-        "jupyter_bokeh",
-        "trame-jupyter-extension",
-        "jupyter_contrib_nbextensions",
-        "pyvista[all]",
-        "watchfiles",
-    ],
+    setup_requires=["setuptools", "pytest-runner", "wheel"],
+    install_requires=requirements,
     extras_require={
         "dev": [
             "pytest",
@@ -122,6 +95,7 @@ setup(
             "coverage",
             "twine",
             "pdoc",
+            "wheel",
         ],
         "bio": [
             "Biopython",
@@ -129,6 +103,17 @@ setup(
         "pyqt5": [
             "pyqt5",
             "pyvistaqt",
+        ],
+        "all": [
+            "pytest",
+            "pre-commit",
+            "coverage",
+            "twine",
+            "pdoc",
+            "Biopython",
+            "pyqt5",
+            "pyvistaqt",
+            "wheel",
         ],
     },
     source="https://github.com/suchanek/proteusPy/",

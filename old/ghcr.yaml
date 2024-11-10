@@ -1,0 +1,61 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+# GitHub recommends pinning actions to a commit SHA.
+# To get a newer version, you will need to update the SHA.
+# You can also reference a tag or branch, but the action may change without warning.
+
+name: Publish Docker image
+
+on:
+  push:
+    branches:
+      - 0.97.14.dev0
+      - master
+  release:
+    types: [published]
+
+jobs:
+  push_to_registries:
+    name: Push Docker image to multiple registries
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PAT }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: egsuchanek/rcsb_viewer
+
+      - name: Build and push Docker images
+        id: push
+        uses: docker/build-push-action@v4
+        with:
+          context: ./viewer
+          file: ./viewer/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USER }}/rcsb_viewer:latest
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ${{ github.repository_owner }}/rcsb_viewer
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true

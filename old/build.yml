@@ -1,0 +1,53 @@
+name: Docker Build Cloud
+
+on:
+  push:
+    branches:
+      - 0.97.14.dev0
+      - master
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Verify Docker User
+        run: |
+          if [ -z "${{ secrets.DOCKER_USER }}" ]; then
+            echo "DOCKER_USER is not set"
+            exit 1
+          else
+            echo "DOCKER_USER is set"
+          fi
+
+      - name: Verify Docker PAT
+        run: |
+          if [ -z "${{ secrets.DOCKER_PAT }}" ]; then
+            echo "DOCKER_PAT is not set"
+            exit 1
+          else
+            echo "DOCKER_PAT is set"
+          fi
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PAT }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          version: latest
+          driver: docker-container
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./viewer
+          file: ./viewer/dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USER }}/rcsb_viewer:latest
+          

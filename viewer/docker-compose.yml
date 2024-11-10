@@ -9,3 +9,4 @@ services:
       - .:/app
     environment:
       - PYTHONUNBUFFERED=1
+      - DOCKER_RUNNING=true

@@ -5,7 +5,7 @@ set -e
 ~/miniforge3/condabin/conda activate ppydev
 
 # Get the full path to the DBViewer.py file
-DBVIEWER_PATH="~/respos/proteusPy/programs/DBViewer.py"
+DBVIEWER_PATH="~/repos/proteusPy/programs/DBViewer.py"
 
 # Run the Panel application without attempting to open the URL
 panel serve "$DBVIEWER_PATH" \
