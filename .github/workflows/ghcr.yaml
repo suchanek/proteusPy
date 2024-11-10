@@ -10,13 +10,13 @@
 name: Publish Docker image
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
       - 0.97.14.dev0
   release:
     types: [published]
-  workflow_dispatch:
 
 jobs:
   push_to_ghcr:
@@ -49,7 +49,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./viewer
-          file: ./viewer/Dockerfile
+          file: ./viewer/dockerfile
           push: true
           tags: |
             ${{ steps.meta.outputs.tags }}
