@@ -6,7 +6,8 @@ on:
       - master
   release:
     types: [published]
-
+  workflow_dispatch:
+  
 jobs:
   docker:
     runs-on: ubuntu-latest
