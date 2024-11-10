@@ -32,7 +32,7 @@ from proteusPy import (
     grid_dimensions,
 )
 from proteusPy.atoms import BOND_RADIUS
-from proteusPy.ProteusGlobals import WINSIZE
+from proteusPy.ProteusGlobals import DATA_DIR, WINSIZE
 
 # Set PyVista to use offscreen rendering if the environment variable is set
 if os.getenv("PYVISTA_OFF_SCREEN", "false").lower() == "true":
@@ -309,6 +309,11 @@ def plot(pl, ss, style="sb", light=True, panelsize=512) -> pv.Plotter:
     return plotter
 
 
+def is_running_in_docker():
+    """Check if the application is running inside a Docker container."""
+    return os.getenv("DOCKER_RUNNING", "false").lower() == "true"
+
+
 @pn.cache()
 def load_data():
     """Load the RCSB Disulfide Database and return the object."""
@@ -316,7 +321,13 @@ def load_data():
 
     _logger.info("Loading RCSB Disulfide Database")
 
-    PDB_SS = Load_PDB_SS(verbose=True, subset=False, loadpath="/app/data")
+    # Determine the loadpath based on the environment
+    if is_running_in_docker():
+        loadpath = "/app/data"
+    else:
+        loadpath = DATA_DIR
+
+    PDB_SS = Load_PDB_SS(verbose=True, subset=False, loadpath=loadpath)
 
     RCSB_list = sorted(PDB_SS.IDList)
 
