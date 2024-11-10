@@ -18,8 +18,8 @@ on:
     types: [published]
 
 jobs:
-  push_to_ghcr:
-    name: Push Docker image to GitHub Container Registry
+  push_to_registries:
+    name: Push Docker image to multiple registries
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -30,18 +30,17 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
         with:
-          registry: ghcr.io
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PAT }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: ghcr.io/${{ github.repository_owner }}/rcsb_viewer
+          images: egsuchanek/rcsb_viewer
 
       - name: Build and push Docker images
         id: push
@@ -51,13 +50,12 @@ jobs:
           file: ./viewer/Dockerfile
           push: true
           tags: |
-            ${{ steps.meta.outputs.tags }}
-            ghcr.io/${{ github.repository_owner }}/rcsb_viewer:latest
+            ${{ secrets.DOCKER_USER }}/rcsb_viewer:latest
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-name: ghcr.io/${{ github.repository_owner }}/rcsb_viewer
+          subject-name: ${{ github.repository_owner }}/rcsb_viewer
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
