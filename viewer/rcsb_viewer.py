@@ -36,7 +36,7 @@ from proteusPy import (
 )
 from proteusPy.ProteusGlobals import DATA_DIR
 
-_vers = 0.94
+_vers = "0.95d"
 
 # Set PyVista to use offscreen rendering if the environment variable is set
 # needed in Docker.
