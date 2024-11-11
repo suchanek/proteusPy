@@ -10,7 +10,13 @@ on:
   
 jobs:
   docker:
+    name: Build and push Docker image to Docker Hub
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -68,4 +74,3 @@ jobs:
           subject-name: docker.io/${{ secrets.DOCKER_USER }}/rcsb_viewer  # Corrected subject-name
           subject-digest: ${{ steps.push.outputs.digest }}  # Referenced digest output
           push-to-registry: true
-          
