@@ -54,10 +54,18 @@ jobs:
           driver: docker-container
 
       - name: Build and push
+        id: push  # Added id to reference outputs
         uses: docker/build-push-action@v6
         with:
           context: ./viewer
           file: ./viewer/dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USER }}/rcsb_viewer:latest
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: docker.io/${{ secrets.DOCKER_USER }}/rcsb_viewer  # Corrected subject-name
+          subject-digest: ${{ steps.push.outputs.digest }}  # Referenced digest output
+          push-to-registry: true
           
