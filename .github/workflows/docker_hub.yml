@@ -15,7 +15,7 @@ permissions:
   attestations: write
 
 jobs:
-  docker:
+  push_to_dockerhub:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -58,7 +58,7 @@ jobs:
           version: latest
           driver: docker-container
 
-      - name: Build and push
+      - name: Build and push to Docker Hub
         id: push
         uses: docker/build-push-action@v6
         with:
