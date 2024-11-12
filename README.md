@@ -131,13 +131,19 @@ and open [Analysis_2q7q.ipynb](https://github.com/suchanek/proteusPy/blob/master
      - Click and drag your mouse to rotate
      - Use the mouse wheel to zoom (3 finger zoom on trackpad)
 
-2) [rcsb_viewer.py](https://github.com/suchanek/proteusPy/blob/master/programs/rcsb_viewer) - This is a `panel`-based program to display the database interactively. Launch as shown, (replace the path with your own path):
+2) [rcsb_viewer.py](https://github.com/suchanek/proteusPy/blob/master/viewer/rcsb_viewer.py) - This is a `panel`-based program to display the database interactively. Launch as shown, (replace the path with your own path):
 
    ```console
-   $ panel serve ~/repos/proteusPy/programs/rcsb_viewer.py --show --autoreload
+   $ panel serve ~/repos/proteusPy/viewer/rcsb_viewer.py --show --autoreload
    ```
 
-3) rcsb_viewer - `Docker` version. I've created a `Docker` image of the viewer. It's available on `DockerHub` at `egsuchanek/rcsb_viewer:latest`, as well as on GitHub at: `ghcr.io/suchanek/rcsb_viewer` To run, just execute:
+3) rcsb_viewer - `Docker` version. I've created a `Docker` image of the viewer. It's available on `DockerHub` at `egsuchanek/rcsb_viewer:latest`, as well as on GitHub at: `ghcr.io/suchanek/rcsb_viewer`. It's possible to build the image by going into the `viewer` directory and executing:
+
+  ```console
+  $ docker build -t rcsb_viewer .
+  ```
+
+To run, just execute:
   
   ```console
     $ docker run -d  -p 5006:5006  --restart unless-stopped egsuchanek/rcsb_viewer:latest
