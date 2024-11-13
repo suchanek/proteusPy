@@ -179,8 +179,11 @@ class DisulfideLoader:
 
         if isinstance(item, int):
             if item < 0 or item >= self.TotalDisulfides:
-                mess = f"DisulfideLoader(): Index {item} out of range 0-{self.TotalDisulfides - 1}"
-                _logger.error(mess)
+                _logger.error(
+                    "DisulfideLoader(): Index %d out of range 0-%d",
+                    item,
+                    self.TotalDisulfides - 1,
+                )
             else:
                 return self.SSList[item]
 
@@ -224,7 +227,7 @@ class DisulfideLoader:
         ]
 
         if not valid_resolutions:
-            return -1.0  # or return None if you prefer
+            return -1.0
 
         return sum(valid_resolutions) / len(valid_resolutions)
 
@@ -362,7 +365,7 @@ class DisulfideLoader:
         print(f"Lowest Energy Disulfide:            {ssMin.name}")
         print(f"Highest Energy Disulfide:           {ssMax.name}")
         print(f"Cα distance cutoff:                 {cutoff:.2f} Å")
-        print(f"Total RAM Used:                     {ram:.2f} GB.")
+        print(f"Total RAM Used:                     {ram:.2f} MB.")
         print(f"    ================= proteusPy: {vers} =======================")
 
     def display_overlay(self, pdbid) -> None:
