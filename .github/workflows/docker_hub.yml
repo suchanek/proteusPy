@@ -61,7 +61,7 @@ jobs:
       - name: Build and push to Docker Hub
         id: push
         run: |
-          docker buildx build --builder cloud-egsuchanek-rcsbviewer --platform linux/amd64,linux/arm64 \
+          docker buildx build --platform linux/amd64,linux/arm64 \
             -f viewer/dockerfile -t ${{ secrets.DOCKER_USER }}/rcsb_viewer --push viewer/
 
 
