@@ -133,5 +133,9 @@ tests:
 	python proteusPy/DisulfideLoader.py
 	python proteusPy/DisulfideClasses.py
 
+.PHONY: docker
+docker:
+	docker buildx build --builder cloud-egsuchanek-rcsbviewer --platform linux/amd64,linux/arm64 -f viewer/dockerfile -t egsuchanek/rcsb_viewer --push viewer/
+
 # end of file
 
