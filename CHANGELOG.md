@@ -5,6 +5,26 @@ Notable changes to the ``proteusPy`` project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [V0.97.16] - 2024-11-22
+
+### Added
+
+- One can now access a disulfide by name directly from the loader with:
+
+  ```
+    pdb = Load_PDB_SS()
+    ss = pdb["2q7q_75D_140D"]
+  ```
+  In prior versions one would need to use the loader.get_by_name() function.
+
+### Removed
+
+- Removed the ``programs/rcsb_viewer.py`` program. The viewer now lives only in the ``viewer`` directory and can be invoked directly from the command line with:
+
+```console
+$panel serve ~/repos/proteusPy/viewer/rcsb_viewer.py --show
+```
+
 ## [V0.97.15] - 2024-11-10
 
 ### Added
