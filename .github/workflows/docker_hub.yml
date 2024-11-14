@@ -1,4 +1,4 @@
-name: Docker Build Cloud
+name: Push to Docker Hub
 
 on:
   workflow_dispatch:
@@ -7,9 +7,15 @@ on:
       - master
   release:
     types: [published]
-  
+
+permissions:
+  id-token: write  # Enables OIDC token creation for attestation
+  contents: read
+  packages: write
+  attestations: write
+
 jobs:
-  docker:
+  push_to_dockerhub:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -39,7 +45,6 @@ jobs:
         with:
           images: ${{ secrets.DOCKER_USER }}/rcsb_viewer
   
-
       - name: Log in to Docker Hub
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
@@ -53,11 +58,21 @@ jobs:
           version: latest
           driver: docker-container
 
-      - name: Build and push
+      - name: Build and push to Docker Hub
+        id: push
         uses: docker/build-push-action@v6
         with:
           context: ./viewer
           file: ./viewer/dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USER }}/rcsb_viewer:latest
-          
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            ${{ secrets.DOCKER_USER }}/rcsb_viewer:latest
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: docker.io/${{ secrets.DOCKER_USER }}/rcsb_viewer
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true

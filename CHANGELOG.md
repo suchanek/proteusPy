@@ -5,6 +5,26 @@ Notable changes to the ``proteusPy`` project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [V0.97.16] - 2024-11-22
+
+### Added
+
+- One can now access a disulfide by name directly from the loader with:
+
+  ```
+    pdb = Load_PDB_SS()
+    ss = pdb["2q7q_75D_140D"]
+  ```
+  In prior versions one would need to use the loader.get_by_name() function.
+
+### Removed
+
+- Removed the ``programs/rcsb_viewer.py`` program. The viewer now lives only in the ``viewer`` directory and can be invoked directly from the command line with:
+
+```console
+$panel serve ~/repos/proteusPy/viewer/rcsb_viewer.py --show
+```
+
 ## [V0.97.15] - 2024-11-10
 
 ### Added
@@ -18,17 +38,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Renderers:
-  - Docker image for the pyVista renderer. This lives under proteusPy/viewer and is deployed on Docker hub under ``egsuchanek/rcsb_viewer``. 
+  - Docker image for the pyVista renderer. This lives under proteusPy/viewer and is deployed on Docker hub under ``egsuchanek/rcsb_viewer``.
 Launch with: ``docker -d -p 5006:5006 egsuchanek/rcsb_viewer:latest. Works under MacOSX and Linux.
   - The standalone Panel-based version lives in ``proteusPy/programs/DBViewer.py``. Launch with: ``panel serve path_to_DBViewer.py --autoreload &``
-  - PyQt5 version. This lives in ``proteusPy/programs/QT5Viewer.py``. It is the most advanced version, but I'm unable to build under Linux. My intent was to 
-deploy this via Docker, but can't get PyQt5 to build currently.
+  - PyQt5 version. This lives in ``proteusPy/programs/QT5Viewer.py``. It is the most advanced version, but I'm unable to build under Linux. My intent was to deploy this via Docker, but can't get PyQt5 to build currently.
 
 - ``DisulfideList.center_of_mass`` - returns the ``Vector3D`` center of mass for the list.
 - ``DisulfideList.translate()`` - adds the input ``Vector3D`` object from the list, destructively modifying the coordinates. Used primarily in rendering functions to center the list at ``Vector3D([0,0,0])``.
 - ``Disulfide.translate()`` - translates the input Disulfide by the input ``Vector3D``.
-- 
-
 
 ### Issues
 

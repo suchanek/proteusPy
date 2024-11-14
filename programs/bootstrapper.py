@@ -6,7 +6,7 @@ builds the proteusPy database.
 
 import argparse
 
-from proteusPy import Bootstrap_PDB_SS, DisulfideLoader, get_logger
+from proteusPy import Bootstrap_PDB_SS, DisulfideLoader, create_logger
 from proteusPy.ProteusGlobals import DATA_DIR
 
 _logger = create_logger(__name__)
