@@ -201,7 +201,6 @@ class DisulfideLoader:
 
         except KeyError as e:
             res = self.SSList.get_by_name(item)  # full disulfide name
-            _logger.error("DisulfideLoader(): Cannot find key %s in SSBond dict!", item)
         return res
 
     def __setitem__(self, index, item):
