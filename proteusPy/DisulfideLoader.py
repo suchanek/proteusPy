@@ -179,26 +179,29 @@ class DisulfideLoader:
 
         if isinstance(item, int):
             if item < 0 or item >= self.TotalDisulfides:
-                mess = f"DisulfideLoader(): Index {item} out of range 0-{self.TotalDisulfides - 1}"
-                _logger.error(mess)
+                _logger.error(
+                    "DisulfideLoader(): Index %d out of range 0-%d",
+                    item,
+                    self.TotalDisulfides - 1,
+                )
             else:
                 return self.SSList[item]
 
         try:
             # PDB_SS['4yys'] return a list of SS
             indices = self.SSDict[item]
-            res = DisulfideList([], item)
-            sslist = self.SSList
-            for ind in indices:
-                res.append(sslist[ind])
-            # res.resolution = res[0].resolution
-
-        except KeyError:
-            try:
+            if indices:
+                res = DisulfideList([], item)
+                sslist = self.SSList
+                for ind in indices:
+                    res.append(sslist[ind])
+            else:
+                # try to find the full disulfide name
                 res = self.SSList.get_by_name(item)  # full disulfide name
-            except:
-                mess = f"DisulfideLoader(): Cannot find key {item} in SSBond dict!"
-                raise DisulfideException(mess)
+
+        except KeyError as e:
+            res = self.SSList.get_by_name(item)  # full disulfide name
+            _logger.error("DisulfideLoader(): Cannot find key %s in SSBond dict!", item)
         return res
 
     def __setitem__(self, index, item):
@@ -224,7 +227,7 @@ class DisulfideLoader:
         ]
 
         if not valid_resolutions:
-            return -1.0  # or return None if you prefer
+            return -1.0
 
         return sum(valid_resolutions) / len(valid_resolutions)
 
@@ -362,7 +365,7 @@ class DisulfideLoader:
         print(f"Lowest Energy Disulfide:            {ssMin.name}")
         print(f"Highest Energy Disulfide:           {ssMax.name}")
         print(f"Cα distance cutoff:                 {cutoff:.2f} Å")
-        print(f"Total RAM Used:                     {ram:.2f} GB.")
+        print(f"Total RAM Used:                     {ram:.2f} MB.")
         print(f"    ================= proteusPy: {vers} =======================")
 
     def display_overlay(self, pdbid) -> None:
@@ -395,8 +398,7 @@ class DisulfideLoader:
         try:
             ssbonds = self[pdbid]
         except KeyError:
-            mess = f"! Cannot find key {pdbid} in SSBond DB"
-            _logger.error(mess)
+            _logger.error("Cannot find key %s in SSBond DB" % pdbid)
             return
 
         ssbonds.display_overlay()
@@ -625,7 +627,7 @@ class DisulfideLoader:
             fname = os.path.join(savedir, f"{title}_{_prefix}.png")
 
             if verbose:
-                _logger.info(f"Saving {title} plot to {fname}")
+                _logger.info("Saving %s plot to %s", title, fname)
             fig.write_image(fname, "png")
         else:
             fig.show()
@@ -779,7 +781,7 @@ class DisulfideLoader:
 
         _fname = os.path.join(savepath, fname)
         if self.verbose:
-            _logger.info(f"Writing {_fname}... ")
+            _logger.info(f"Writing %s...", _fname)
 
         with open(str(_fname), "wb+") as f:
             pickle.dump(self, f)
@@ -966,30 +968,25 @@ def Bootstrap_PDB_SS(
 
     if not os.path.exists(_fname) or force is True:
         if verbose:
-            mess = "Downloading Disulfide Database from Drive..."
-            _logger.info(mess)
+            _logger.info("Downloading Disulfide Database from Drive...")
         gdown.download(url, str(_fname), quiet=False)
 
     full_path = os.path.join(loadpath, _fname)
     if verbose:
-        mess = f"Building loader from: {full_path}... "
-        _logger.info(mess)
+        _logger.info("Building loader from: %s...", full_path)
 
     loader = DisulfideLoader(
         datadir=DATA_DIR, subset=subset, verbose=verbose, cutoff=cutoff
     )
 
     if loader.TotalDisulfides == 0:
-        mess = "No disulfides loaded!"
-        _logger.error(mess)
+        _logger.error("No disulfides loaded!")
         return None
 
     if verbose:
-        mess = "Done building loader."
-        _logger.info(mess)
+        _logger.info("Done building loader.")
 
     return loader
-
 
 
 if __name__ == "__main__":

@@ -23,7 +23,6 @@ import pyvista as pv
 
 from proteusPy import (
     BOND_RADIUS,
-    FONTSIZE,
     WINSIZE,
     Disulfide,
     DisulfideList,
@@ -36,7 +35,7 @@ from proteusPy import (
 )
 from proteusPy.ProteusGlobals import DATA_DIR
 
-_vers = 0.94
+_vers = "0.95"
 
 # Set PyVista to use offscreen rendering if the environment variable is set
 # needed in Docker.
@@ -51,7 +50,7 @@ configure_master_logger("rcsb_viewer.log")
 _logger.info("Starting Panel Disulfide Viewer v%s.", _vers)
 
 current_theme = get_theme()
-_logger.info("Current Theme: %s", current_theme)
+_logger.debug("Current Theme: %s", current_theme)
 
 # defaults for the UI
 
@@ -143,7 +142,7 @@ def update_view(click):
     """
     global styles_group
 
-    _logger.info("Update View")
+    _logger.debug("Update View")
 
     selected_view = view_selector.value
     match selected_view:
@@ -153,7 +152,7 @@ def update_view(click):
             styles_group.disabled = True
         case "List":
             styles_group.disabled = False
-
+    # set_state()
     click_plot(click)
 
 
@@ -202,7 +201,7 @@ def set_widgets_defaults():
     """
     global RCSB_list
 
-    _logger.info("Setting widget defaults.")
+    _logger.debug("Setting widget defaults.")
     styles_group.value = "Split Bonds"
 
     # Ensure the RCSB list is correctly populated from loaded data
@@ -231,7 +230,7 @@ def set_state(event=None):
         "view_mode": view_selector.value,  # Added view mode state
     }
     pn.state.cache["ss_state"] = ss_state
-    _logger.info("Set state: %s", ss_state["rcsid"])
+    _logger.info("Set state: %s", ss_state["view_mode"])
     click_plot(None)
 
 
@@ -241,7 +240,7 @@ def set_widgets_from_state():
     global ss_state
     if "ss_state" in pn.state.cache:
         ss_state = pn.state.cache["ss_state"]
-        _logger.info("Setting widgets from state.")
+        _logger.debug("Setting widgets from state.")
 
         rcsb_selector_widget.value = ss_state["rcsid"]
         rcsb_ss_widget.value = ss_state["defaultss"]
@@ -277,14 +276,13 @@ def plot(pl, ss, style="sb", light=True, panelsize=512) -> pv.Plotter:
         pv.set_plot_theme("dark")
 
     if mode == "Single View":
-        _logger.info("Single View")
+        _logger.debug("Single View")
         plotter = pv.Plotter(window_size=WINSIZE)
         plotter.clear()
         ss._render(plotter, style=style)
-        # vtkpan.object = plotter.ren_win
 
     elif mode == "Multiview":
-        _logger.info("Multiview")
+        _logger.debug("Multiview")
         plotter = pv.Plotter(shape=(2, 2), window_size=WINSIZE)
         plotter.clear()
 
@@ -302,29 +300,20 @@ def plot(pl, ss, style="sb", light=True, panelsize=512) -> pv.Plotter:
 
         plotter.link_views()
         plotter.reset_camera()
-        # vtkpan.object = plotter.ren_win
     else:
-        _logger.info("List")
+        _logger.debug("List")
         pdbid = ss.pdb_id
         sslist = PDB_SS[pdbid]
         tot_ss = len(sslist)  # number off ssbonds
         rows, cols = grid_dimensions(tot_ss)
         winsize = (panelsize * cols, panelsize * rows)
 
-        avg_enrg = sslist.average_energy
-        avg_dist = sslist.average_distance
-        resolution = sslist.average_resolution
-
-        title = f"<{pdbid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
-
         plotter = pv.Plotter(window_size=winsize, shape=(rows, cols))
         plotter.clear()
         plotter = sslist._render(plotter, style)
         plotter.enable_anti_aliasing("msaa")
-        plotter.add_title(title=title, font_size=FONTSIZE)
         plotter.link_views()
         plotter.reset_camera()
-        # vtkpan.object = plotter.ren_win
 
     plotter.reset_camera()
     return plotter
@@ -506,7 +495,7 @@ def on_theme_change(event):
     ss_state["theme"] = new_theme
     pn.state.cache["ss_state"] = ss_state
 
-    _logger.info("Theme changed to: %s", new_theme)
+    _logger.debug("Theme changed to: %s", new_theme)
     if new_theme == "dark":
         plotter.set_background("black")
     else:
@@ -641,7 +630,7 @@ reloadable_app = ReloadableApp()
 
 def trigger_reload(event=None):
     """Force a page reload by incrementing the reload_trigger parameter."""
-    _logger.info("Reloading the page.")
+    _logger.debug("Reloading the page.")
     reloadable_app.force_reload()
 
 
@@ -657,6 +646,7 @@ ss_props.append(reload_button)
 
 rcsb_selector_widget.param.watch(get_ss_idlist, "value")
 rcsb_ss_widget.param.watch(set_state, "value")
+view_selector.param.watch(set_state, "value")
 styles_group.param.watch(set_state, "value")
 
 plotter = pv.Plotter()
@@ -673,10 +663,10 @@ vtkpan = pn.pane.VTK(
 
 pn.bind(get_ss_idlist, rcs_id=rcsb_selector_widget)
 
-if "data" in pn.state.cache:
-    PDB_SS = pn.state.cache["data"]
-else:
-    PDB_SS = load_data()
+# if "data" in pn.state.cache:
+#    PDB_SS = pn.state.cache["data"]
+# else:
+#    PDB_SS = load_data()
 
 # Set window title and initialize widgets from cache or defaults
 set_window_title()
