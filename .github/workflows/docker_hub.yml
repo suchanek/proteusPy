@@ -60,9 +60,17 @@ jobs:
 
       - name: Build and push to Docker Hub
         id: push
-        run: |
-          docker buildx build --platform linux/amd64,linux/arm64 \
-            -f viewer/dockerfile -t ${{ secrets.DOCKER_USER }}/rcsb_viewer --push viewer/
+        uses: docker/build-push-action@v4
+        with:
+          context: ./viewer
+          file: ./viewer/dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            docker.io/${{ secrets.DOCKER_USER }}/rcsb_viewer:latest
+            docker.io/${{ secrets.DOCKER_USER }}/rcsb_viewer:${{ github.sha }}
+          labels: ${{ steps.meta.outputs.labels }}
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
