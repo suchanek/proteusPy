@@ -49,7 +49,8 @@ jobs:
             -t ghcr.io/${{ github.repository_owner }}/rcsb_viewer:latest \
             -t ghcr.io/${{ github.repository_owner }}/rcsb_viewer:${{ github.sha }} \
             --label ${{ steps.meta.outputs.labels }} \
-            --push viewer/
+            --push \
+            viewer/
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
