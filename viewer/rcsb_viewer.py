@@ -337,6 +337,7 @@ def load_data():
     else:
         loadpath = DATA_DIR
 
+    _logger.info("Loading RCSB Disulfide Database from: %s", loadpath)  # noqa
     PDB_SS = Load_PDB_SS(verbose=True, subset=False, loadpath=loadpath)
 
     RCSB_list = sorted(PDB_SS.IDList)
