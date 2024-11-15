@@ -45,12 +45,12 @@ jobs:
         id: push
         run: |
           docker buildx build viewer/ \
+            --push \
             --platform linux/amd64,linux/arm64 \
             -f viewer/dockerfile \
             -t ghcr.io/${{ github.repository_owner }}/rcsb_viewer:latest \
             -t ghcr.io/${{ github.repository_owner }}/rcsb_viewer:${{ github.sha }} \
-            --label ${{ steps.meta.outputs.labels }} \
-            --push
+            --label ${{ steps.meta.outputs.labels }}
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
