@@ -38,7 +38,7 @@ jobs:
       - name: Build and push to GitHub Container Registry
         id: push
         run: |
-          docker buildx build --platform linux/amd64,linux/arm64 windows/amd64 \
+          docker buildx build --platform linux/amd64,linux/arm64 \
             -f viewer/dockerfile \
             -t ghcr.io/${{ github.repository_owner }}/rcsb_viewer:latest \
             -t ghcr.io/${{ github.repository_owner }}/rcsb_viewer:${{ github.sha }} \
