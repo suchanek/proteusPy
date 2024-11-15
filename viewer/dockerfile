@@ -1,6 +1,10 @@
 # Use the Miniconda3 image as a base
 FROM continuumio/miniconda3
 
+LABEL org.opencontainers.image.source=https://github.com/suchanek/proteusPy
+LABEL org.opencontainers.image.description="RCSB Disulfide Viewer"
+LABEL org.opencontainers.image.licenses=BSD-3-Clause
+
 # Set environment variables to prevent interactive prompts during package installations
 ENV DEBIAN_FRONTEND=noninteractive \
     PATH="/opt/conda/envs/proteusPy/bin:$PATH" \

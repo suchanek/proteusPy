@@ -43,22 +43,19 @@ jobs:
       
       - name: Build and push to GitHub Container Registry
         id: push
-        uses: docker/build-push-action@v4
-        with:
-          context: ./viewer
-          file: ./viewer/dockerfile
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: |
-            ${{ steps.meta.outputs.tags }}
-            ghcr.io/${{ github.repository_owner }}/rcsb_viewer:latest
-            ghcr.io/${{ github.repository_owner }}/rcsb_viewer:${{ github.sha }}
-          labels: ${{ steps.meta.outputs.labels }}
+        run: |
+          docker buildx build viewer/ \
+            --push \
+            --platform linux/amd64,linux/arm64 \
+            -f viewer/dockerfile \
+            -t ghcr.io/${{ github.repository_owner }}/rcsb_viewer:latest \
+            -t ghcr.io/${{ github.repository_owner }}/rcsb_viewer:${{ github.sha }} \
+            --label ${{ steps.meta.outputs.labels }}
             
+
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
         with:
           subject-name: ghcr.io/${{ github.repository_owner }}/rcsb_viewer
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
-        
