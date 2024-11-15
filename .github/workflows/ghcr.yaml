@@ -50,9 +50,9 @@ jobs:
             -f viewer/dockerfile \
             -t ghcr.io/${{ github.repository_owner }}/rcsb_viewer:latest \
             -t ghcr.io/${{ github.repository_owner }}/rcsb_viewer:${{ github.sha }} \
-            --label ${{ steps.meta.outputs.labels }}
-            --label org.opencontainers.image.source=https://github.com/suchanek/proteusPy
-            --label org.opencontainers.image.description="RCSB Disulfide Viewer"
+            --label ${{ steps.meta.outputs.labels }} \
+            --label org.opencontainers.image.source=https://github.com/suchanek/proteusPy \
+            --label org.opencontainers.image.description="RCSB Disulfide Viewer" \
             --label org.opencontainers.image.licenses=BSD-3-Clause
 
       - name: Generate artifact attestation
