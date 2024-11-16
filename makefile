@@ -81,7 +81,7 @@ install_dev: sdist
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	$(CONDA) install vtk==9.2.6 -y
 	
-	pip install . -q
+	pip install .
 	pip install pdoc twine black pytest build -q
 	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
 	@echo "Installation finished!"
@@ -135,19 +135,30 @@ tests:
 
 .PHONY: docker
 docker: viewer/rcsb_viewer.py viewer/dockerfile
-	docker build -t rcsb_viewer viewer/ --no-cache
+	docker build -t rcsb_viewer viewer/
 
-.PHONY: docker_hub
-docker_hub: .
+.PHONY: docker_dockerhub
+docker_dockerhub: viewer/rcsb_viewer.py viewer/dockerfile
 	docker buildx build viewer/ --platform linux/arm64,linux/amd64 \
-	 -f viewer/dockerfile \
-	 -t docker.io/egsuchanek/rcsb_viewer:latest --push --no-cache
+		-f viewer/dockerfile \
+		-t docker.io/egsuchanek/rcsb_viewer:latest \
+		-t docker.io/egsuchanek/rcsb_viewer:$(VERS) \
+		--push
 
+docker_github: viewer/rcsb_viewer.py viewer/dockerfile
+	docker buildx build viewer/ --platform linux/arm64,linux/amd64 \
+		-f viewer/dockerfile \
+		-t ghcr.io/suchanek/rcsb_viewer:latest \
+		-t ghcr.io/suchanek/rcsb_viewer:$(VERS) \
+		--push
 
-.PHONY: docker_github
-docker_github: docker
-	docker tag rcsb_viewer:latest ghcr.io/suchanek/rcsb_viewer:latest
-	docker push ghcr.io/suchanek/rcsb_viewer:latest 
+.PHONEY: docker_all
+docker_all: docker docker_dockerhub docker_github
+
+.PHONY: docker_run
+docker_run:
+	docker run -d  -p 5006:5006  --restart unless-stopped rcsb_viewer:latest
+
 
 # end of file
 
