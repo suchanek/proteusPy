@@ -135,7 +135,7 @@ tests:
 
 .PHONY: docker
 docker: viewer/rcsb_viewer.py viewer/dockerfile
-	docker build -t rcsb_viewer:latest viewer/ --no-cache
+	docker build -t rcsb_viewer viewer/ --no-cache
 
 .PHONY: docker_hub
 docker_hub: .

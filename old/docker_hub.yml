@@ -61,13 +61,22 @@ jobs:
           install: true
 
       - name: Build and push to Docker Hub
-        run: |
-          docker buildx build viewer/ --platform linux/arm64,linux/amd64 \
-            -f viewer/dockerfile \
-            -t docker.io/${{ secrets.DOCKER_USER }}/rcsb_viewer:latest \
-            -t docker.io/${{ secrets.DOCKER_USER }}/rcsb_viewer:${{ github.sha }} \
-            -l ${{ steps.meta.outputs.labels }} \
-            --push
+        id: push
+        uses: docker/build-push-action@v4
+        with:
+          context: ./viewer
+          file: ./viewer/dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            docker.io/${{ secrets.DOCKER_USER }}/rcsb_viewer:latest
+            docker.io/${{ secrets.DOCKER_USER }}/rcsb_viewer:${{ github.sha }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # For pull requests, export results to the build cache.
+          # Otherwise, push to a registry.
+          outputs: ${{ github.event_name == 'pull_request' && 'type=cacheonly' || 'type=registry' }}
+ 
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
