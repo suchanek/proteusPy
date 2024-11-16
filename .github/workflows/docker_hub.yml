@@ -66,7 +66,7 @@ jobs:
             -f viewer/dockerfile \
             -t docker.io/${{ secrets.DOCKER_USER }}/rcsb_viewer:latest \
             -t docker.io/${{ secrets.DOCKER_USER }}/rcsb_viewer:${{ github.sha }} \
-            -l ${{ steps.meta.outputs.labels }} \
+            --l ${{ steps.meta.outputs.labels }} \
             --push
 
       - name: Generate artifact attestation
