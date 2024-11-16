@@ -6,33 +6,27 @@ LABEL org.opencontainers.image.description="RCSB Disulfide Viewer"
 LABEL org.opencontainers.image.licenses=BSD-3-Clause
 
 # Set environment variables to prevent interactive prompts during package installations
+# Set the MPLCONFIGDIR environment variable
 ENV DEBIAN_FRONTEND=noninteractive \
     PATH="/opt/conda/envs/proteusPy/bin:$PATH" \
     PYVISTA_OFF_SCREEN=true \
     DOCKER_RUNNING=true \
     MPLCONFIGDIR=/tmp/matplotlib
 
-# Install system dependencies
+# Copy the environment.yml file first for better layer caching
+COPY environment.yml /tmp/environment.yml
+
+# Install system dependencies including libgl1, xvfb, xauth, libxrender1, and libxext6
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         libgl1-mesa-glx \
-        mesa-utils \
-        libegl1-mesa \
         xvfb \
         xauth \
         libxrender1 \
         libxext6 && \
-    rm -rf /var/lib/apt/lists/*
-
-# Copy the environment.yml file for better caching
-COPY environment.yml /tmp/environment.yml
-
-# Create the conda environment
-RUN conda env create -f /tmp/environment.yml && \
+    rm -rf /var/lib/apt/lists/* && \
+    conda env create -f /tmp/environment.yml && \
     conda clean -a -y
-
-# Activate the environment during image build for testing purposes
-RUN echo "source activate proteusPy" > ~/.bashrc
 
 # Set the working directory in the container
 WORKDIR /app
@@ -40,12 +34,11 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . /app
 
-# Fix permissions and prepare Matplotlib cache
-RUN useradd -m appuser && \
-    mkdir -p /tmp/matplotlib && \
-    chown -R appuser:appuser /tmp/matplotlib && \
-    chown -R appuser:appuser /app && \
-    chmod +x /app/entrypoint.sh
+# Add a non-root user for enhanced security
+# Create a writable directory for Matplotlib cache and set ownership
+# Change ownership of the /app directory to the non-root user and make entrypoint.sh executable
+
+RUN useradd -m appuser && mkdir -p /tmp/matplotlib && chown -R appuser:appuser /tmp/matplotlib && chown -R appuser:appuser /app && chmod +x /app/entrypoint.sh
 
 # Switch to the non-root user
 USER appuser
