@@ -206,6 +206,13 @@ def parse_arguments():
         help="ppydev or proteusPy",
         default="ppydev",
     )
+    parser.add_argument(
+        "--gamma",
+        "-g",
+        type=float,
+        help="Sg cutoff distance",
+        default="ppydev",
+    )
 
     return parser.parse_args()
 
@@ -213,7 +220,17 @@ def parse_arguments():
 def extract_disulfides_chunk(args):
     "This is a single thread, processing one chunk of the multiprocessing extraction process."
 
-    (start_idx, end_idx, sslist, pdbdir, dist_cutoff, verbose, quiet, pbar_index) = args
+    (
+        start_idx,
+        end_idx,
+        sslist,
+        pdbdir,
+        dist_cutoff,
+        verbose,
+        quiet,
+        pbar_index,
+        sg_cutoff,
+    ) = args
 
     result_list = []
 
@@ -239,6 +256,7 @@ def extract_disulfides_chunk(args):
             quiet=quiet,
             pdb_dir=pdbdir,
             cutoff=dist_cutoff,
+            sg_cutoff=sg_cutoff,
         )
 
         if len(_sslist) > 0:
@@ -251,7 +269,7 @@ def extract_disulfides_chunk(args):
     return result_list
 
 
-def do_extract(verbose, full, cutoff, nthreads=8):
+def do_extract(verbose, full, cutoff, sg_cutoff=3, nthreads=8):
     """
     Extracts the disulfides from the PDB files using multiprocessing.
 
@@ -292,6 +310,7 @@ def do_extract(verbose, full, cutoff, nthreads=8):
             verbose,
             True,
             i,
+            sg_cutoff,
         )
         for i in range(nthreads)
     ]
@@ -321,7 +340,7 @@ def do_extract(verbose, full, cutoff, nthreads=8):
             pickle.dump(res_list, f)
 
 
-def do_build(verbose, full, subset, cutoff):
+def do_build(verbose, full, subset, cutoff, sg_cutoff):
     """
     Load and save a ```proteusPy.DisulfideLoader``` object
     to a .pkl file.
@@ -341,6 +360,7 @@ def do_build(verbose, full, subset, cutoff):
             subset=False,
             verbose=verbose,
             cutoff=cutoff,
+            sg_cutoff=sg_cutoff,
         )
         PDB_SS.save(savepath=DATA_DIR, subset=subset, cutoff=cutoff)
 
@@ -354,6 +374,7 @@ def do_build(verbose, full, subset, cutoff):
             subset=True,
             verbose=verbose,
             cutoff=cutoff,
+            sg_cutoff=sg_cutoff,
         )
         PDB_SS.save(savepath=DATA_DIR, subset=subset, cutoff=cutoff)
     else:
@@ -385,6 +406,7 @@ def do_stuff(
     threads=8,
     forge="miniforge3",
     env="ppydev",
+    sg_cutoff=-1.0,
 ):
     """
     Main entrypoint for the proteusPy Disulfide database extraction and creation workflow.
@@ -429,7 +451,7 @@ def do_stuff(
                 print("Building master loader since cutoff is negative.")
             else:
                 print(f"Building with cutoff: {cutoff}")
-        do_build(_verbose, _full, _subset, cutoff)
+        do_build(_verbose, _full, _subset, cutoff, sg_cutoff)
 
     if _update is True:
         if verbose:
@@ -467,14 +489,13 @@ def main():
     args = parse_arguments()
 
     # set_logging_level_for_all_handlers(logging.ERROR)
-
     # toggle_stream_handler("proteusPy.ssparser", False)
 
     # set_logging_level_for_all_handlers(logging.ERROR)
     # disable_stream_handlers_for_namespace("proteusPy")
 
-    mess = f"Starting DisulfideExtractor at time {datetime.datetime.now()}"
-    _logger.info(mess)
+    mess2 = f"Starting DisulfideExtractor at time {datetime.datetime.now()}"
+    _logger.info(mess2)
 
     mess = (
         f"proteusPy DisulfideExtractor v{__version__}\n"
@@ -484,6 +505,7 @@ def main():
         f"Repo data directory:       {REPO_DATA}\n"
         f"Number of .ent files:      {num_ent_files}\n"
         f"Using cutoff:              {args.cutoff}\n"
+        f"Using Sg cutoff:           {args.gamma}\n"
         f"Extract:                   {args.extract}\n"
         f"Build:                     {args.build}\n"
         f"Update:                    {args.update}\n"
@@ -509,6 +531,7 @@ def main():
         threads=args.threads,
         forge=args.forge,
         env=args.env,
+        sg_cutoff=args.gamma,
     )
 
     end = time.time()

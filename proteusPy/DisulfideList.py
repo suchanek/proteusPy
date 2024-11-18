@@ -77,6 +77,7 @@ Torsion_DF_Cols = [
     "energy",
     "ca_distance",
     "cb_distance",
+    "sg_distance",
     "phi_prox",
     "psi_prox",
     "phi_dist",
@@ -93,6 +94,7 @@ Distance_DF_Cols = [
     "energy",
     "ca_distance",
     "cb_distance",
+    "sg_distance",
 ]
 
 
@@ -412,6 +414,7 @@ class DisulfideList(UserList):
                 "energy": ss.energy,
                 "ca_distance": ss.ca_distance,
                 "cb_distance": ss.cb_distance,
+                "sg_distance": ss.sg_distance,
             }
             rows.append(new_row)
             i += 1
@@ -942,7 +945,7 @@ class DisulfideList(UserList):
         :return: DisulfideList containing disulfides with the given distance.
         """
 
-        reslist = DisulfideList([], f"filtered by distance < {distance:.2f}")
+        reslist = []
         sslist = self.data
 
         # if distance is -1.0, return the entire list
@@ -955,7 +958,32 @@ class DisulfideList(UserList):
             if ss.ca_distance < distance and ss.ca_distance > minimum
         ]
 
-        return reslist
+        return DisulfideList(reslist, f"filtered by distance < {distance:.2f}")
+
+    def filter_by_sg_distance(self, distance: float = 2.2, minimum: float = 1.0):
+        """
+        Return a DisulfideList filtered by to between the maxium Sg distance and
+        the minimum, which defaults to 2.0A.
+
+        :param distance: Distance in Å
+        :param minimum: Distance in Å
+        :return: DisulfideList containing disulfides with the given distance.
+        """
+
+        reslist = []
+        sslist = self.data
+
+        # if distance is -1.0, return the entire list
+        if distance == -1.0:
+            return sslist.copy()
+
+        reslist = [
+            ss
+            for ss in sslist
+            if ss.sg_distance < distance and ss.sg_distance > minimum
+        ]
+
+        return DisulfideList(reslist, f"filtered by Sg distance < {distance:.2f}")
 
     def get_by_name(self, name):
         """
@@ -1266,19 +1294,21 @@ def load_disulfides_from_id(
     quiet=True,
     dbg=False,
     cutoff=-1.0,
+    sg_cutoff=-1.0,
 ) -> DisulfideList:
     """
-    Loads the Disulfides by PDB ID and returns a ```DisulfideList``` of Disulfide objects.
+    Loads the Disulfides by PDB ID and returns a DisulfideList of Disulfide objects.
     Assumes the file is downloaded in the pdb_dir path.
 
-    *NB:* Requires EGS-Modified BIO.parse_pdb_header.py from https://github.com/suchanek/biopython
-
-    :param pdb_id: the name of the PDB entry.
-    :param pdb_dir: path to the PDB files, defaults to MODEL_DIR - this is: PDB_DIR/good and are
-    the pre-parsed PDB files that have been scanned by the DisulfideDownloader program.
-    :param model_numb: model number to use, defaults to 0 for single structure files.
-    :param verbose: print info while parsing
-    :return: a list of Disulfide objects initialized from the file.
+    :param pdb_id: The name of the PDB entry.
+    :param pdb_dir: Path to the PDB files, defaults to MODEL_DIR. This is: PDB_DIR/good and are
+                    the pre-parsed PDB files that have been scanned by the DisulfideDownloader program.
+    :param verbose: Print info while parsing.
+    :param quiet: Suppress non-error logging output.
+    :param dbg: Enable debug logging.
+    :param cutoff: Distance cutoff for filtering disulfides.
+    :param sg_cutoff: SG distance cutoff for filtering disulfides.
+    :return: A DisulfideList of Disulfide objects initialized from the file.
 
     Example:
 
@@ -1301,6 +1331,7 @@ def load_disulfides_from_id(
     chain1_id = chain2_id = ""
     ssbond_atom_list = {}
     num_ssbonds = 0
+    delta = 0
     errors = 0
     resolution = -1.0
 
@@ -1399,8 +1430,30 @@ def load_disulfides_from_id(
     if quiet:
         _logger.setLevel(logging.WARNING)
 
+    num_ssbonds = len(SSList)
+
     if cutoff > 0:
         SSList = SSList.filter_by_distance(cutoff)
+        delta = num_ssbonds - len(SSList)
+        if delta:
+            _logger.error(
+                "Filtered %d SSBonds to %d SSBonds by Ca distance, pdbid: {pdbid}, delta is: %d",
+                num_ssbonds,
+                len(SSList),
+                delta,
+            )
+        num_ssbonds = len(SSList)
+
+    if sg_cutoff > 0:
+        SSList = SSList.filter_by_sg_distance(cutoff)
+        delta = num_ssbonds - len(SSList)
+        if delta:
+            _logger.error(
+                "Filtered %d SSBonds to %d SSBonds by Sg distance, pdbid: {pdbid}, delta is: %d",
+                num_ssbonds,
+                len(SSList),
+                delta,
+            )
 
     return copy.deepcopy(SSList)
 

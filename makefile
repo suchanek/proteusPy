@@ -21,7 +21,7 @@ CONDA = mamba
 #MESS = $(VERS)
 #MESS = "proteusPy: A Python Package for Protein Structure and Disulfide Bond Modeling and Analysis"
 
-MESS = "0.97.14 Disulfide Viewer programs functional"
+MESS = "0.97.16"
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
 
@@ -159,6 +159,9 @@ docker_all: docker docker_dockerhub docker_github
 docker_run:
 	docker run -d  -p 5006:5006  --restart unless-stopped rcsb_viewer:latest
 
+.PHONY: docker_purge
+docker_purge:
+	docker system prune -a -y
 
 # end of file
 

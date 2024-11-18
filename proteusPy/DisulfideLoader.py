@@ -29,7 +29,7 @@ import plotly_express as px
 from proteusPy import __version__
 from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideClass_Constructor import DisulfideClass_Constructor
-from proteusPy.DisulfideExceptions import DisulfideException, DisulfideParseWarning
+from proteusPy.DisulfideExceptions import DisulfideParseWarning
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
@@ -86,6 +86,7 @@ class DisulfideLoader:
         quiet: bool = True,
         subset: bool = False,
         cutoff: float = -1.0,
+        sg_cutoff: float = -1.0,
     ) -> None:
         """
         Initializing the class initiates loading either the entire Disulfide dataset,
@@ -105,6 +106,7 @@ class DisulfideLoader:
         self._quiet = quiet
         self.tclass = None  # disulfideClass_constructor to manage classes
         self.cutoff = cutoff  # distance cutoff used to bulid the database
+        self.sg_cutoff = sg_cutoff  # distance cutoff used to bulid the database
         self.verbose = verbose
         self.timestamp = time.time()
         self.version = __version__
@@ -353,6 +355,7 @@ class DisulfideLoader:
         ) / (1024 * 1024)
         res = self.average_resolution
         cutoff = self.cutoff
+        sg_cutoff = self.sg_cutoff
         timestr = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.timestamp))
         ssMin, ssMax = self.SSList.minmax_energy
 
@@ -364,6 +367,7 @@ class DisulfideLoader:
         print(f"Lowest Energy Disulfide:            {ssMin.name}")
         print(f"Highest Energy Disulfide:           {ssMax.name}")
         print(f"Cα distance cutoff:                 {cutoff:.2f} Å")
+        print(f"Sg distance cutoff:                 {sg_cutoff:.2f} Å")
         print(f"Total RAM Used:                     {ram:.2f} MB.")
         print(f"    ================= proteusPy: {vers} =======================")
 
@@ -397,7 +401,7 @@ class DisulfideLoader:
         try:
             ssbonds = self[pdbid]
         except KeyError:
-            _logger.error("Cannot find key %s in SSBond DB" % pdbid)
+            _logger.error("Cannot find key %s in SSBond DB", pdbid)
             return
 
         ssbonds.display_overlay()
@@ -780,7 +784,7 @@ class DisulfideLoader:
 
         _fname = os.path.join(savepath, fname)
         if self.verbose:
-            _logger.info(f"Writing %s...", _fname)
+            _logger.info("Writing %s...", _fname)
 
         with open(str(_fname), "wb+") as f:
             pickle.dump(self, f)
