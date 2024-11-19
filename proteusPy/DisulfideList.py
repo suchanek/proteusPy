@@ -960,10 +960,10 @@ class DisulfideList(UserList):
 
         return DisulfideList(reslist, f"filtered by distance < {distance:.2f}")
 
-    def filter_by_sg_distance(self, distance: float = 2.2, minimum: float = 1.0):
+    def filter_by_sg_distance(self, distance: float = -1.0, minimum: float = 1.0):
         """
         Return a DisulfideList filtered by to between the maxium Sg distance and
-        the minimum, which defaults to 2.0A.
+        the minimum, which defaults to 1.0A.
 
         :param distance: Distance in Å
         :param minimum: Distance in Å
@@ -984,6 +984,27 @@ class DisulfideList(UserList):
         ]
 
         return DisulfideList(reslist, f"filtered by Sg distance < {distance:.2f}")
+
+    def filter_by_bond_ideality(self, angle: float = -1.0):
+        """
+        Return a DisulfideList filtered by bond angle ideality between the maxium angle
+        and the minimum, which defaults to 0.0°.
+
+        :param angle: Angle in degrees
+        :param minimum: Angle in degrees
+        :return: DisulfideList containing disulfides with the given angle.
+        """
+
+        reslist = []
+        sslist = self.data
+
+        # if angle is -1.0, return the entire list
+        if angle == -1.0:
+            return sslist.copy()
+
+        reslist = [ss for ss in sslist if ss.bond_angle_ideality < angle]
+
+        return DisulfideList(reslist, f"filtered by bond angle < {angle:.2f}")
 
     def get_by_name(self, name):
         """

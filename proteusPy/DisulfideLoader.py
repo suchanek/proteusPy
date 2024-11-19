@@ -112,6 +112,7 @@ class DisulfideLoader:
         self.version = __version__
 
         _pickleFile = picklefile
+        old_length = new_length = 0
 
         full_path = os.path.join(datadir, _pickleFile)
         if self.verbose and not self.quiet:
@@ -126,8 +127,19 @@ class DisulfideLoader:
 
             with open(full_path, "rb") as f:
                 sslist = pickle.load(f)
-                filt = sslist.filter_by_distance(cutoff)
-                filt = sslist.filter_by_sg_distance(sg_cutoff)
+                old_length = len(sslist)
+
+                filt = DisulfideList(sslist.filter_by_distance(cutoff), "filtered")
+
+                new_length = len(filt)
+                if self.verbose and not self.quiet:
+                    _logger.info(f"Filtering Ca: old: {old_length}, new: {new_length}")
+
+                old_length = new_length
+                filt = filt.filter_by_sg_distance(sg_cutoff)
+                new_length = len(filt)
+                if self.verbose and not self.quiet:
+                    _logger.info(f"Filtering SG: old: {old_length}, new: {new_length}")
 
                 if subset:
                     self.SSList = DisulfideList(filt[:5000], "SUBSET_PDB_SS")
