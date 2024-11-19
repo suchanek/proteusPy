@@ -137,8 +137,8 @@ tests:
 docker: viewer/rcsb_viewer.py viewer/dockerfile
 	docker build -t rcsb_viewer viewer/
 
-.PHONY: docker_dockerhub
-docker_dockerhub: viewer/rcsb_viewer.py viewer/dockerfile
+.PHONY: docker_hub
+docker_hub: viewer/rcsb_viewer.py viewer/dockerfile
 	docker buildx build viewer/ --platform linux/arm64,linux/amd64 \
 		-f viewer/dockerfile \
 		-t docker.io/egsuchanek/rcsb_viewer:latest \
