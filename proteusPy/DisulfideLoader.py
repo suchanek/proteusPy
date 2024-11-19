@@ -127,6 +127,7 @@ class DisulfideLoader:
             with open(full_path, "rb") as f:
                 sslist = pickle.load(f)
                 filt = sslist.filter_by_distance(cutoff)
+                filt = sslist.filter_by_sg_distance(sg_cutoff)
 
                 if subset:
                     self.SSList = DisulfideList(filt[:5000], "SUBSET_PDB_SS")

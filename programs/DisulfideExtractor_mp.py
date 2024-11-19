@@ -269,7 +269,7 @@ def extract_disulfides_chunk(args):
     return result_list
 
 
-def do_extract(verbose, full, cutoff, sg_cutoff=3, nthreads=8):
+def do_extract(verbose, full, cutoff=-1.0, sg_cutoff=-1.0, nthreads=8):
     """
     Extracts the disulfides from the PDB files using multiprocessing.
 
@@ -435,12 +435,13 @@ def do_stuff(
 
     if _extract is True:
         if verbose:
-            print(f"Extracting with cutoff: {cutoff}")
+            print(f"Extracting with cutoffs: Ca: {cutoff}, Sg: {sg_cutoff}")
 
         do_extract(
             verbose=_verbose,
             full=_full,
             cutoff=cutoff,
+            sg_cutoff=sg_cutoff,
             nthreads=_threads,
         )
         print("\n")
@@ -450,7 +451,7 @@ def do_stuff(
             if _master:
                 print("Building master loader since cutoff is negative.")
             else:
-                print(f"Building with cutoff: {cutoff}")
+                print(f"Building with Ca cutoff: {cutoff}, Sg cutoff: {sg_cutoff}")
         do_build(_verbose, _full, _subset, cutoff, sg_cutoff)
 
     if _update is True:
@@ -504,8 +505,8 @@ def main():
         f"Module data directory:     {MODULE_DATA}\n"
         f"Repo data directory:       {REPO_DATA}\n"
         f"Number of .ent files:      {num_ent_files}\n"
-        f"Using cutoff:              {args.cutoff}\n"
-        f"Using Sg cutoff:           {args.gamma}\n"
+        f"Ca cutoff:                 {args.cutoff}\n"
+        f"Sg cutoff:                 {args.gamma}\n"
         f"Extract:                   {args.extract}\n"
         f"Build:                     {args.build}\n"
         f"Update:                    {args.update}\n"

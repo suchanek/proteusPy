@@ -50,7 +50,7 @@ configure_master_logger("rcsb_viewer.log")
 _logger.info("Starting Panel Disulfide Viewer v%s.", _vers)
 
 current_theme = get_theme()
-_logger.debug("Current Theme: %s", current_theme)
+_logger.info("Current Theme: %s", current_theme)
 
 # defaults for the UI
 
@@ -164,8 +164,9 @@ title_md = pn.pane.Markdown("Title")
 output_md = pn.pane.Markdown("Output goes here")
 db_md = pn.pane.Markdown("Database Info goes here")
 
+
 info_md = pn.pane.Markdown("SS Info")
-ss_info = pn.WidgetBox("# Disulfide Info", info_md).servable(target="sidebar")
+ss_info = pn.Column("# Disulfide Info", info_md).servable(target="sidebar")
 
 
 def set_window_title():
@@ -414,15 +415,14 @@ def update_info(ss):
     """Update the information of the disulfide bond in the markdown pane."""
 
     info_string = f"""
-    ### {ss.name}
-    **Resolution:** {ss.resolution:.2f} Å  
+    ### {ss.name}, {ss.resolution:.2f} Å
     **Energy:** {ss.energy:.2f} kcal/mol  
     **Cα distance:** {ss.ca_distance:.2f} Å  
-    **Cβ distance:** {ss.cb_distance:.2f} Å  
+    **Sγ distance:** {ss.sg_distance:.2f} Å  
     **Torsion Length:** {ss.torsion_length:.2f}°  
     **Rho:** {ss.rho:.2f}°  
-    **Proximal Secondary:** {ss.proximal_secondary}  
-    **Distal Secondary:** {ss.distal_secondary}
+    **Secondary:** {ss.proximal_secondary} - {ss.distal_secondary}
+    
     """
     info_md.object = info_string
 

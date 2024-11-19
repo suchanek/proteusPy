@@ -935,7 +935,7 @@ class DisulfideList(UserList):
         else:
             self.data.extend(self.validate_ss(item) for item in other)
 
-    def filter_by_distance(self, distance: float, minimum: float = 2.0):
+    def filter_by_distance(self, distance: float = -1.0, minimum: float = 2.0):
         """
         Return a DisulfideList filtered by to between the maxium Ca distance and
         the minimum, which defaults to 2.0A.
@@ -1437,21 +1437,23 @@ def load_disulfides_from_id(
         delta = num_ssbonds - len(SSList)
         if delta:
             _logger.error(
-                "Filtered %d SSBonds to %d SSBonds by Ca distance, pdbid: {pdbid}, delta is: %d",
+                "Filtered %d -> %d SSBonds by Ca distance, %s, delta is: %d",
                 num_ssbonds,
                 len(SSList),
+                pdb_id,
                 delta,
             )
         num_ssbonds = len(SSList)
 
     if sg_cutoff > 0:
-        SSList = SSList.filter_by_sg_distance(cutoff)
+        SSList = SSList.filter_by_sg_distance(sg_cutoff)
         delta = num_ssbonds - len(SSList)
         if delta:
             _logger.error(
-                "Filtered %d SSBonds to %d SSBonds by Sg distance, pdbid: {pdbid}, delta is: %d",
+                "Filtered %d -> %d SSBonds by Sg distance, %s, delta is: %d",
                 num_ssbonds,
                 len(SSList),
+                pdb_id,
                 delta,
             )
 
