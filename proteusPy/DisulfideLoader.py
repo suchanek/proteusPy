@@ -7,6 +7,8 @@ Author: Eric G. Suchanek, PhD
 Last revision: 10/14/2024
 """
 
+# Cα N, Cα, Cβ, C', Sγ Å ° ρ
+
 # pylint: disable=C0301
 # pylint: disable=W1203
 # pylint: disable=C0103
@@ -25,6 +27,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plotly_express as px
+from pympler import asizeof
 
 from proteusPy import __version__
 from proteusPy.Disulfide import Disulfide
@@ -353,19 +356,21 @@ class DisulfideLoader:
                 return ss  # or ss.copy() !!!
         return None
 
-    def describe(self) -> None:
+    def describe(self, quick=True) -> None:
         """
-        Display information about the Disulfide database contained in `self`.
+        Display information about the Disulfide database contained in `self`. if `quick` is False
+        then display the total RAM used by the object. This takes some time to compute; approximately
+        30 seconds on a 2024 MacBook Pro. M3 Max.
+        :param quick: If True, don't display the RAM used by the `DisulfideLoader` object.
         :return: None
         """
         vers = self.version
         tot = self.TotalDisulfides
         pdbs = len(self.SSDict)
-        ram = (
-            sys.getsizeof(self.SSList)
-            + sys.getsizeof(self.SSDict)
-            + sys.getsizeof(self.TorsionDF)
-        ) / (1024 * 1024)
+        ram = 0
+        if not quick:
+            ram = asizeof.asizeof(self) / (1024 * 1024 * 1024)
+
         res = self.average_resolution
         cutoff = self.cutoff
         sg_cutoff = self.sg_cutoff
@@ -380,8 +385,9 @@ class DisulfideLoader:
         print(f"Lowest Energy Disulfide:            {ssMin.name}")
         print(f"Highest Energy Disulfide:           {ssMax.name}")
         print(f"Cα distance cutoff:                 {cutoff:.2f} Å")
-        print(f"Sg distance cutoff:                 {sg_cutoff:.2f} Å")
-        print(f"Total RAM Used:                     {ram:.2f} MB.")
+        print(f"Sγ distance cutoff:                 {sg_cutoff:.2f} Å")
+        if not quick:
+            print(f"Total RAM Used:                     {ram:.2f} GB.")
         print(f"    ================= proteusPy: {vers} =======================")
 
     def display_overlay(self, pdbid) -> None:
