@@ -27,13 +27,15 @@ from proteusPy import (
     Disulfide,
     DisulfideList,
     Load_PDB_SS,
-    configure_master_logger,
+    __version__,
     create_logger,
     get_jet_colormap,
     get_theme,
     grid_dimensions,
 )
 from proteusPy.ProteusGlobals import DATA_DIR
+
+proteus_vers = __version__
 
 _vers = "0.95"
 
@@ -46,8 +48,8 @@ pn.extension("vtk", sizing_mode="stretch_width", template="fast")
 
 _logger = create_logger("rcsb_viewer", log_level=logging.INFO)
 
-configure_master_logger("rcsb_viewer.log")
-_logger.info("Starting Panel Disulfide Viewer v%s.", _vers)
+# configure_master_logger("rcsb_viewer.log")
+_logger.info("Starting RCSB Disulfide Viewer v%s, proteusPy v%s", _vers, proteus_vers)
 
 current_theme = get_theme()
 _logger.debug("Current Theme: %s", current_theme)
@@ -418,11 +420,10 @@ def update_info(ss):
     **Resolution:** {ss.resolution:.2f} Å  
     **Energy:** {ss.energy:.2f} kcal/mol  
     **Cα distance:** {ss.ca_distance:.2f} Å  
-    **Cβ distance:** {ss.cb_distance:.2f} Å  
+    **Sg distance:** {ss.sg_distance:.2f} Å  
     **Torsion Length:** {ss.torsion_length:.2f}°  
     **Rho:** {ss.rho:.2f}°  
-    **Proximal Secondary:** {ss.proximal_secondary}  
-    **Distal Secondary:** {ss.distal_secondary}
+    **Secondary:** {ss.proximal_secondary} / {ss.distal_secondary} 
     """
     info_md.object = info_string
 
