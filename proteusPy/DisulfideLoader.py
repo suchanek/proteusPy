@@ -135,13 +135,13 @@ class DisulfideLoader:
                 filt = DisulfideList(sslist.filter_by_distance(cutoff), "filtered")
 
                 new_length = len(filt)
-                if self.verbose and not self.quiet:
+                if self.verbose:
                     _logger.info(f"Filtering Ca: old: {old_length}, new: {new_length}")
 
                 old_length = new_length
                 filt = filt.filter_by_sg_distance(sg_cutoff)
                 new_length = len(filt)
-                if self.verbose and not self.quiet:
+                if self.verbose:
                     _logger.info(f"Filtering SG: old: {old_length}, new: {new_length}")
 
                 if subset:
@@ -219,6 +219,9 @@ class DisulfideLoader:
 
         except KeyError as e:
             res = self.SSList.get_by_name(item)  # full disulfide name
+
+        if not res:
+            _logger.error("DisulfideLoader(): Cannot find key %s in SSBond DB", item)
         return res
 
     def __setitem__(self, index, item):

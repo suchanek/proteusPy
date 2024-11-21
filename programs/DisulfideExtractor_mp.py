@@ -211,7 +211,7 @@ def parse_arguments():
         "-g",
         type=float,
         help="Sg cutoff distance",
-        default="ppydev",
+        default=-1.0,
     )
 
     return parser.parse_args()
@@ -455,10 +455,6 @@ def do_stuff(
         do_build(_verbose, _full, _subset, cutoff, sg_cutoff)
 
     if _update is True:
-        if verbose:
-            print(f"Copying SS files from: {DATA_DIR} to {REPO_DATA}")
-
-        # update_repo(DATA_DIR, REPO_DATA)
 
         if _forge == "miniforge3":
             venv_dir = MINIFORGE_DIR / _env / VENV_DIR
