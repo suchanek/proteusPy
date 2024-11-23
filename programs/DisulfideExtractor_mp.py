@@ -65,6 +65,7 @@ from proteusPy.ProteusGlobals import (
 configure_master_logger("DisulfideExtractor.log")
 set_logger_level("proteusPy.ssparser", "ERROR")
 set_logger_level("proteusPy.DisulfideList", "INFO")
+# set_logger_level("proteusPy.DisulfideLoader", "INFO")
 
 # Disable the stream handlers for the following namespaces.
 # This will suppress the output to the console.
@@ -202,6 +203,7 @@ def parse_arguments():
     )
     parser.add_argument(
         "--env",
+        "-n",
         type=str,
         help="ppydev or proteusPy",
         default="ppydev",
@@ -353,7 +355,7 @@ def do_build(verbose, full, subset, cutoff, sg_cutoff):
     if full:
         if verbose:
             print(
-                f"Building the compressed loader for the full dataset with cutoff: {cutoff}..."
+                f"Building the compressed loader for the full dataset with cutoffs: Cα: {cutoff}Å, Sγ: {sg_cutoff}Å"
             )
         PDB_SS = DisulfideLoader(
             datadir=DATA_DIR,
@@ -362,12 +364,14 @@ def do_build(verbose, full, subset, cutoff, sg_cutoff):
             cutoff=cutoff,
             sg_cutoff=sg_cutoff,
         )
-        PDB_SS.save(savepath=DATA_DIR, subset=subset, cutoff=cutoff)
+        PDB_SS.save(
+            savepath=DATA_DIR, subset=subset, cutoff=cutoff, sg_cutoff=sg_cutoff
+        )
 
     elif subset:
         if verbose:
             print(
-                f"Building the packed loader for the Disulfide subset with cutoff: {cutoff}..."
+                f"Building the packed loader for the Disulfide subset with cutoffs: {cutoff}, {sg_cutoff}..."
             )
         PDB_SS = DisulfideLoader(
             datadir=DATA_DIR,
@@ -376,7 +380,9 @@ def do_build(verbose, full, subset, cutoff, sg_cutoff):
             cutoff=cutoff,
             sg_cutoff=sg_cutoff,
         )
-        PDB_SS.save(savepath=DATA_DIR, subset=subset, cutoff=cutoff)
+        PDB_SS.save(
+            savepath=DATA_DIR, subset=subset, cutoff=cutoff, sg_cutoff=sg_cutoff
+        )
     else:
         print("Error: No valid build option selected.")
         sys.exit(1)
@@ -434,9 +440,6 @@ def do_stuff(
     _master = bool(_cutoff < 0.0)
 
     if _extract is True:
-        if verbose:
-            print(f"Extracting with cutoffs: Ca: {cutoff}, Sg: {sg_cutoff}")
-
         do_extract(
             verbose=_verbose,
             full=_full,
@@ -501,8 +504,8 @@ def main():
         f"Module data directory:     {MODULE_DATA}\n"
         f"Repo data directory:       {REPO_DATA}\n"
         f"Number of .ent files:      {num_ent_files}\n"
-        f"Ca cutoff:                 {args.cutoff}\n"
-        f"Sg cutoff:                 {args.gamma}\n"
+        f"Cα cutoff:                 {args.cutoff}\n"
+        f"Sγ cutoff:                 {args.gamma}\n"
         f"Extract:                   {args.extract}\n"
         f"Build:                     {args.build}\n"
         f"Update:                    {args.update}\n"
