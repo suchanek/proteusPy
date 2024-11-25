@@ -359,7 +359,7 @@ class DisulfideLoader:
                 return ss  # or ss.copy() !!!
         return None
 
-    def describe(self, quick=True) -> None:
+    def describe(self, memusg=False) -> None:
         """
         Display information about the Disulfide database contained in `self`. if `quick` is False
         then display the total RAM used by the object. This takes some time to compute; approximately
@@ -371,7 +371,7 @@ class DisulfideLoader:
         tot = self.TotalDisulfides
         pdbs = len(self.SSDict)
         ram = 0
-        if not quick:
+        if memusg:
             ram = asizeof.asizeof(self) / (1024 * 1024 * 1024)
 
         res = self.average_resolution
@@ -389,7 +389,7 @@ class DisulfideLoader:
         print(f"Highest Energy Disulfide:           {ssMax.name}")
         print(f"Cα distance cutoff:                 {cutoff:.2f} Å")
         print(f"Sγ distance cutoff:                 {sg_cutoff:.2f} Å")
-        if not quick:
+        if memusg:
             print(f"Total RAM Used:                     {ram:.2f} GB.")
         print(f"    ================= proteusPy: {vers} =======================")
 
