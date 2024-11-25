@@ -1276,6 +1276,7 @@ class DisulfideList(UserList):
             "Angle_Deviation": [],
             "Bondlength_Deviation": [],
             "Ca_Distance": [],
+            "Sg_Distance": [],
         }
 
         # Collect data in batches
@@ -1285,6 +1286,7 @@ class DisulfideList(UserList):
         angle_deviations = []
         bondlength_deviations = []
         ca_distances = []
+        sg_distances = []
 
         for ss in tqdm(disulfide_list, desc="Processing..."):
             pdb_ids.append(ss.pdb_id)
@@ -1293,6 +1295,7 @@ class DisulfideList(UserList):
             angle_deviations.append(ss.bond_angle_ideality)
             bondlength_deviations.append(ss.bond_length_ideality)
             ca_distances.append(ss.ca_distance)
+            sg_distances.append(ss.sg_distance)
 
         # Extend the data dictionary in one go
         data["PDB_ID"].extend(pdb_ids)
@@ -1301,6 +1304,7 @@ class DisulfideList(UserList):
         data["Angle_Deviation"].extend(angle_deviations)
         data["Bondlength_Deviation"].extend(bondlength_deviations)
         data["Ca_Distance"].extend(ca_distances)
+        data["Sg_Distance"].extend(sg_distances)
 
         df = pd.DataFrame(data)
         return df
