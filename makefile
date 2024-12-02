@@ -8,7 +8,7 @@ ifeq ($(OS),Windows_NT)
     VERS := $(shell python -c "exec(open('proteusPy/_version.py').read()); print(__version__)")
 	RM = del
 else 
-	VERS = $(shell python get_version.py)
+	VERS = $(shell python proteusPy/get_version.py)
 	RM = rm
 
 endif
@@ -18,14 +18,9 @@ endif
 
 CONDA = mamba
 
-#MESS = $(VERS)
-#MESS = "proteusPy: A Python Package for Protein Structure and Disulfide Bond Modeling and Analysis"
-
-MESS = "0.97.14 Disulfide Viewer programs functional"
+MESS = "0.97.16"
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
-
-PHONY = .
 
 vers: .
 	@echo "Version = $(VERS)"
@@ -33,7 +28,7 @@ vers: .
 newvers: .
 	@echo "Current version number is: $(VERS)"	
 	@echo "Enter new version number: "
-	@read VERS; echo "__version__ = \"$$VERS\"" > proteusPy/version.py
+	@read VERS; echo "__version__ = \"$$VERS\"" > proteusPy/_version.py
 	@echo "New version number is: $(VERS)"
 	@echo "Enter a new message: "
 	@read MESS
@@ -64,8 +59,8 @@ devclean: .
 
 	
 # activate the package before running!
-
-install: sdist
+.PHONY: install
+install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	@echo "Installing additional..."
 	$(CONDA) install vtk==9.2.6 -y
@@ -81,7 +76,7 @@ install_dev: sdist
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	$(CONDA) install vtk==9.2.6 -y
 	
-	pip install . -q
+	pip install .
 	pip install pdoc twine black pytest build -q
 	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
 	@echo "Installation finished!"
@@ -97,17 +92,24 @@ jup_dev: .
 	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
 
 # package development targets
-
-format: .
+.PHONY: format
+format:
 	black proteusPy
 
 bld:  docs sdist
+	@echo "Building $(VERS)..."
+	@echo "Building binary distribution..."
+	@python setup.py bdist_wheel
+	@echo "Building documentation..."
+	@pdoc -o docs --math --logo "./logo.png" ./proteusPy
+	@echo "Building done."
 
 sdist: proteusPy/_version.py
+	@echo "Building source distribution..."
 	python setup.py sdist
 
-.PHONY: docs
-docs: proteusPy/_version.py
+docs: $(wildcard proteusPy/**/*.py)
+	@echo "Building documentation..."
 	pdoc -o docs --math --logo "./logo.png" ./proteusPy
 
 # normally i push to PyPi via github action
@@ -115,15 +117,15 @@ docs: proteusPy/_version.py
 upload: sdist
 	twine upload -r proteusPy dist/proteusPy-$(VERS)*
 
+.PHONY: tag
 tag:
 	git tag -a $(VERS) -m $(MESS)
 	@echo $(VERS) > tag.out
 
+.PHONY: commit
 commit:
 	git commit -a -m $(MESS)
 	git push origin
-
-# run the tests
 
 .PHONY: tests
 tests: 
@@ -132,6 +134,34 @@ tests:
 	python proteusPy/Disulfide.py
 	python proteusPy/DisulfideLoader.py
 	python proteusPy/DisulfideClasses.py
+
+docker: viewer/rcsb_viewer.py viewer/dockerfile
+	docker build -t rcsb_viewer viewer/ --no-cache
+
+docker_hub: viewer/rcsb_viewer.py viewer/dockerfile
+	docker buildx build viewer/ --platform linux/arm64,linux/amd64 \
+		-f viewer/dockerfile \
+		-t docker.io/egsuchanek/rcsb_viewer:latest \
+		-t docker.io/egsuchanek/rcsb_viewer:$(VERS) \
+		--push
+
+docker_github: viewer/rcsb_viewer.py viewer/dockerfile
+	docker buildx build viewer/ --platform linux/arm64,linux/amd64 \
+		-f viewer/dockerfile \
+		-t ghcr.io/suchanek/rcsb_viewer:latest \
+		-t ghcr.io/suchanek/rcsb_viewer:$(VERS) \
+		--push
+
+.PHONEY: docker_all
+docker_all: docker docker_dockerhub docker_github
+
+.PHONY: docker_run
+docker_run:
+	docker run -d  -p 5006:5006  --restart unless-stopped rcsb_viewer:latest
+
+.PHONY: docker_purge
+docker_purge:
+	docker system prune -a
 
 # end of file
 

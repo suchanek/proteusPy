@@ -1,0 +1,61 @@
+name: Push to GitHub Container Registry
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  release:
+    types: [published]
+
+permissions:
+  id-token: write  # Enables OIDC token creation for attestation
+  contents: read
+  packages: write
+  attestations: write
+
+jobs:
+  push_to_ghcr:
+    name: Push Docker image to GitHub Container Registry
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/rcsb_viewer
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          version: latest
+          driver: docker-container
+      
+      - name: Build and push to GitHub Container Registry
+        id: push
+        run: |
+          docker buildx build viewer/ \
+            --push \
+            --platform linux/amd64,linux/arm64 \
+            -f viewer/dockerfile \
+            -t ghcr.io/${{ github.repository_owner }}/rcsb_viewer:latest \
+            -t ghcr.io/${{ github.repository_owner }}/rcsb_viewer:${{ github.sha }} \
+            --label ${{ steps.meta.outputs.labels }}
+            
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ghcr.io/${{ github.repository_owner }}/rcsb_viewer
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true

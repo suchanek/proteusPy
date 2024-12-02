@@ -65,6 +65,7 @@ from proteusPy.ProteusGlobals import (
 configure_master_logger("DisulfideExtractor.log")
 set_logger_level("proteusPy.ssparser", "ERROR")
 set_logger_level("proteusPy.DisulfideList", "INFO")
+# set_logger_level("proteusPy.DisulfideLoader", "INFO")
 
 # Disable the stream handlers for the following namespaces.
 # This will suppress the output to the console.
@@ -202,9 +203,17 @@ def parse_arguments():
     )
     parser.add_argument(
         "--env",
+        "-n",
         type=str,
         help="ppydev or proteusPy",
         default="ppydev",
+    )
+    parser.add_argument(
+        "--gamma",
+        "-g",
+        type=float,
+        help="Sg cutoff distance",
+        default=-1.0,
     )
 
     return parser.parse_args()
@@ -213,7 +222,17 @@ def parse_arguments():
 def extract_disulfides_chunk(args):
     "This is a single thread, processing one chunk of the multiprocessing extraction process."
 
-    (start_idx, end_idx, sslist, pdbdir, dist_cutoff, verbose, quiet, pbar_index) = args
+    (
+        start_idx,
+        end_idx,
+        sslist,
+        pdbdir,
+        dist_cutoff,
+        verbose,
+        quiet,
+        pbar_index,
+        sg_cutoff,
+    ) = args
 
     result_list = []
 
@@ -239,6 +258,7 @@ def extract_disulfides_chunk(args):
             quiet=quiet,
             pdb_dir=pdbdir,
             cutoff=dist_cutoff,
+            sg_cutoff=sg_cutoff,
         )
 
         if len(_sslist) > 0:
@@ -251,7 +271,7 @@ def extract_disulfides_chunk(args):
     return result_list
 
 
-def do_extract(verbose, full, cutoff, nthreads=8):
+def do_extract(verbose, full, cutoff=-1.0, sg_cutoff=-1.0, nthreads=8):
     """
     Extracts the disulfides from the PDB files using multiprocessing.
 
@@ -292,6 +312,7 @@ def do_extract(verbose, full, cutoff, nthreads=8):
             verbose,
             True,
             i,
+            sg_cutoff,
         )
         for i in range(nthreads)
     ]
@@ -321,7 +342,7 @@ def do_extract(verbose, full, cutoff, nthreads=8):
             pickle.dump(res_list, f)
 
 
-def do_build(verbose, full, subset, cutoff):
+def do_build(verbose, full, subset, cutoff, sg_cutoff):
     """
     Load and save a ```proteusPy.DisulfideLoader``` object
     to a .pkl file.
@@ -334,28 +355,34 @@ def do_build(verbose, full, subset, cutoff):
     if full:
         if verbose:
             print(
-                f"Building the compressed loader for the full dataset with cutoff: {cutoff}..."
+                f"Building the compressed loader for the full dataset with cutoffs: Cα: {cutoff}Å, Sγ: {sg_cutoff}Å"
             )
         PDB_SS = DisulfideLoader(
             datadir=DATA_DIR,
             subset=False,
             verbose=verbose,
             cutoff=cutoff,
+            sg_cutoff=sg_cutoff,
         )
-        PDB_SS.save(savepath=DATA_DIR, subset=subset, cutoff=cutoff)
+        PDB_SS.save(
+            savepath=DATA_DIR, subset=subset, cutoff=cutoff, sg_cutoff=sg_cutoff
+        )
 
     elif subset:
         if verbose:
             print(
-                f"Building the packed loader for the Disulfide subset with cutoff: {cutoff}..."
+                f"Building the packed loader for the Disulfide subset with cutoffs: {cutoff}, {sg_cutoff}..."
             )
         PDB_SS = DisulfideLoader(
             datadir=DATA_DIR,
             subset=True,
             verbose=verbose,
             cutoff=cutoff,
+            sg_cutoff=sg_cutoff,
         )
-        PDB_SS.save(savepath=DATA_DIR, subset=subset, cutoff=cutoff)
+        PDB_SS.save(
+            savepath=DATA_DIR, subset=subset, cutoff=cutoff, sg_cutoff=sg_cutoff
+        )
     else:
         print("Error: No valid build option selected.")
         sys.exit(1)
@@ -385,6 +412,7 @@ def do_stuff(
     threads=8,
     forge="miniforge3",
     env="ppydev",
+    sg_cutoff=-1.0,
 ):
     """
     Main entrypoint for the proteusPy Disulfide database extraction and creation workflow.
@@ -412,13 +440,11 @@ def do_stuff(
     _master = bool(_cutoff < 0.0)
 
     if _extract is True:
-        if verbose:
-            print(f"Extracting with cutoff: {cutoff}")
-
         do_extract(
             verbose=_verbose,
             full=_full,
             cutoff=cutoff,
+            sg_cutoff=sg_cutoff,
             nthreads=_threads,
         )
         print("\n")
@@ -428,14 +454,10 @@ def do_stuff(
             if _master:
                 print("Building master loader since cutoff is negative.")
             else:
-                print(f"Building with cutoff: {cutoff}")
-        do_build(_verbose, _full, _subset, cutoff)
+                print(f"Building with Ca cutoff: {cutoff}, Sg cutoff: {sg_cutoff}")
+        do_build(_verbose, _full, _subset, cutoff, sg_cutoff)
 
     if _update is True:
-        if verbose:
-            print(f"Copying SS files from: {DATA_DIR} to {REPO_DATA}")
-
-        # update_repo(DATA_DIR, REPO_DATA)
 
         if _forge == "miniforge3":
             venv_dir = MINIFORGE_DIR / _env / VENV_DIR
@@ -467,14 +489,13 @@ def main():
     args = parse_arguments()
 
     # set_logging_level_for_all_handlers(logging.ERROR)
-
     # toggle_stream_handler("proteusPy.ssparser", False)
 
     # set_logging_level_for_all_handlers(logging.ERROR)
     # disable_stream_handlers_for_namespace("proteusPy")
 
-    mess = f"Starting DisulfideExtractor at time {datetime.datetime.now()}"
-    _logger.info(mess)
+    mess2 = f"Starting DisulfideExtractor at time {datetime.datetime.now()}"
+    _logger.info(mess2)
 
     mess = (
         f"proteusPy DisulfideExtractor v{__version__}\n"
@@ -483,7 +504,8 @@ def main():
         f"Module data directory:     {MODULE_DATA}\n"
         f"Repo data directory:       {REPO_DATA}\n"
         f"Number of .ent files:      {num_ent_files}\n"
-        f"Using cutoff:              {args.cutoff}\n"
+        f"Cα cutoff:                 {args.cutoff}\n"
+        f"Sγ cutoff:                 {args.gamma}\n"
         f"Extract:                   {args.extract}\n"
         f"Build:                     {args.build}\n"
         f"Update:                    {args.update}\n"
@@ -509,6 +531,7 @@ def main():
         threads=args.threads,
         forge=args.forge,
         env=args.env,
+        sg_cutoff=args.gamma,
     )
 
     end = time.time()

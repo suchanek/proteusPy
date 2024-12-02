@@ -7,16 +7,18 @@ Author: Eric G. Suchanek, PhD
 Last revision: 10/14/2024
 """
 
+# Cα N, Cα, Cβ, C', Sγ Å ° ρ
+
 # pylint: disable=C0301
 # pylint: disable=W1203
 # pylint: disable=C0103
 # pylint: disable=W0612
 
+# Cα N, Cα, Cβ, C', Sγ Å ° ρ
 
 import copy
 import os
 import pickle
-import sys
 import time
 import urllib
 
@@ -25,11 +27,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plotly_express as px
+from pympler import asizeof
 
 from proteusPy import __version__
 from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideClass_Constructor import DisulfideClass_Constructor
-from proteusPy.DisulfideExceptions import DisulfideException, DisulfideParseWarning
+from proteusPy.DisulfideExceptions import DisulfideParseWarning
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
@@ -86,6 +89,7 @@ class DisulfideLoader:
         quiet: bool = True,
         subset: bool = False,
         cutoff: float = -1.0,
+        sg_cutoff: float = -1.0,
     ) -> None:
         """
         Initializing the class initiates loading either the entire Disulfide dataset,
@@ -105,11 +109,13 @@ class DisulfideLoader:
         self._quiet = quiet
         self.tclass = None  # disulfideClass_constructor to manage classes
         self.cutoff = cutoff  # distance cutoff used to bulid the database
+        self.sg_cutoff = sg_cutoff  # distance cutoff used to bulid the database
         self.verbose = verbose
         self.timestamp = time.time()
         self.version = __version__
 
         _pickleFile = picklefile
+        old_length = new_length = 0
 
         full_path = os.path.join(datadir, _pickleFile)
         if self.verbose and not self.quiet:
@@ -124,7 +130,19 @@ class DisulfideLoader:
 
             with open(full_path, "rb") as f:
                 sslist = pickle.load(f)
-                filt = sslist.filter_by_distance(cutoff)
+                old_length = len(sslist)
+
+                filt = DisulfideList(sslist.filter_by_distance(cutoff), "filtered")
+
+                new_length = len(filt)
+                if self.verbose:
+                    _logger.info(f"Filtering Cα: old: {old_length}, new: {new_length}")
+
+                old_length = new_length
+                filt = filt.filter_by_sg_distance(sg_cutoff)
+                new_length = len(filt)
+                if self.verbose:
+                    _logger.info(f"Filtering Sγ: old: {old_length}, new: {new_length}")
 
                 if subset:
                     self.SSList = DisulfideList(filt[:5000], "SUBSET_PDB_SS")
@@ -201,6 +219,9 @@ class DisulfideLoader:
 
         except KeyError as e:
             res = self.SSList.get_by_name(item)  # full disulfide name
+
+        if not res:
+            _logger.error("DisulfideLoader(): Cannot find key %s in SSBond DB", item)
         return res
 
     def __setitem__(self, index, item):
@@ -338,21 +359,24 @@ class DisulfideLoader:
                 return ss  # or ss.copy() !!!
         return None
 
-    def describe(self) -> None:
+    def describe(self, memusg=False) -> None:
         """
-        Display information about the Disulfide database contained in `self`.
+        Display information about the Disulfide database contained in `self`. if `quick` is False
+        then display the total RAM used by the object. This takes some time to compute; approximately
+        30 seconds on a 2024 MacBook Pro. M3 Max.
+        :param quick: If True, don't display the RAM used by the `DisulfideLoader` object.
         :return: None
         """
         vers = self.version
         tot = self.TotalDisulfides
         pdbs = len(self.SSDict)
-        ram = (
-            sys.getsizeof(self.SSList)
-            + sys.getsizeof(self.SSDict)
-            + sys.getsizeof(self.TorsionDF)
-        ) / (1024 * 1024)
+        ram = 0
+        if memusg:
+            ram = asizeof.asizeof(self) / (1024 * 1024 * 1024)
+
         res = self.average_resolution
         cutoff = self.cutoff
+        sg_cutoff = self.sg_cutoff
         timestr = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.timestamp))
         ssMin, ssMax = self.SSList.minmax_energy
 
@@ -364,7 +388,9 @@ class DisulfideLoader:
         print(f"Lowest Energy Disulfide:            {ssMin.name}")
         print(f"Highest Energy Disulfide:           {ssMax.name}")
         print(f"Cα distance cutoff:                 {cutoff:.2f} Å")
-        print(f"Total RAM Used:                     {ram:.2f} MB.")
+        print(f"Sγ distance cutoff:                 {sg_cutoff:.2f} Å")
+        if memusg:
+            print(f"Total RAM Used:                     {ram:.2f} GB.")
         print(f"    ================= proteusPy: {vers} =======================")
 
     def display_overlay(self, pdbid) -> None:
@@ -397,7 +423,7 @@ class DisulfideLoader:
         try:
             ssbonds = self[pdbid]
         except KeyError:
-            _logger.error("Cannot find key %s in SSBond DB" % pdbid)
+            _logger.error("Cannot find key %s in SSBond DB", pdbid)
             return
 
         ssbonds.display_overlay()
@@ -759,17 +785,19 @@ class DisulfideLoader:
         sslist_df["count"] = y
         return sslist_df
 
-    def save(self, savepath=DATA_DIR, subset=False, cutoff=-1.0):
+    def save(self, savepath=DATA_DIR, subset=False, cutoff=-1.0, sg_cutoff=-1.0):
         """
         Save a copy of the fully instantiated Loader to the specified file.
 
         :param savepath: Path to save the file, defaults to DATA_DIR
         :param fname: Filename, defaults to LOADER_FNAME
         :param verbose: Verbosity, defaults to False
-        :param cutoff: Distance cutoff used to build the database, -1 means no cutoff.
+        :param cutoff: Ca-Ca Distance cutoff used to build the database, -1 means no cutoff.
+        :param sg_cutoff: Sg-Sg Distance cutoff used to build the database, -1 means no cutoff.
         """
         self.version = __version__
         self.cutoff = cutoff
+        self.sg_cutoff = sg_cutoff
 
         fname = None
 
@@ -780,7 +808,7 @@ class DisulfideLoader:
 
         _fname = os.path.join(savepath, fname)
         if self.verbose:
-            _logger.info(f"Writing %s...", _fname)
+            _logger.info("Writing %s...", _fname)
 
         with open(str(_fname), "wb+") as f:
             pickle.dump(self, f)
@@ -801,6 +829,7 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False):
     """
 
     fname = None
+    _fname = None
 
     if subset:
         fname = LOADER_SUBSET_FNAME
@@ -870,7 +899,12 @@ def Download_PDB_SS_GitHub(loadpath=DATA_DIR, verbose=True, subset=False):
 
 
 def Load_PDB_SS(
-    loadpath=DATA_DIR, verbose=False, subset=False, cutoff=8.0, force=False
+    loadpath=DATA_DIR,
+    verbose=False,
+    subset=False,
+    cutoff=8.0,
+    sg_cutoff=3.0,
+    force=False,
 ) -> DisulfideLoader:
     """
     Load the fully instantiated Disulfide database from the specified file. Use the
@@ -878,8 +912,13 @@ def Load_PDB_SS(
     used to load the built database.*
 
     :param loadpath: Path from which to load, defaults to DATA_DIR
+    :type loadpath: str
     :param verbose: Verbosity, defaults to False
+    :type verbose: bool
     :param subset: If True, load the subset DB, otherwise load the full database
+    :type subset: bool
+    :return: The loaded Disulfide database
+    :rtype: DisulfideList
     """
     # normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy
     # distribution. In that case we need to download the files for all disulfides and the subset
@@ -892,51 +931,79 @@ def Load_PDB_SS(
     _fname_all = os.path.join(loadpath, LOADER_FNAME)
 
     if subset:
+        _logger.info(f"Reading Disulfide subset loader: {_fname_sub}... ")
+
         if not os.path.exists(_fname_sub) or force is True:
+            _logger.info(f"Creating subset loader: {_fname_sub}... ")
+
             loader = Bootstrap_PDB_SS(
                 loadpath=loadpath,
                 verbose=verbose,
                 subset=True,
                 force=force,
                 cutoff=cutoff,
+                sg_cutoff=sg_cutoff,
             )
-            loader.save(savepath=loadpath, subset=True, cutoff=cutoff)
+            loader.save(
+                savepath=loadpath,
+                subset=True,
+                cutoff=cutoff,
+                sg_cutoff=sg_cutoff,
+            )
             return loader
-        else:
-            if verbose:
-                print(f"-> load_PDB_SS(): Reading {_fname_sub}... ")
 
-            with open(_fname_sub, "rb") as f:
-                subloader = pickle.load(f)
-            return subloader
+        if verbose:
+            print(f"-> load_PDB_SS(): Reading {_fname_sub}... ")
+            _logger.info(f"Reading disulfides from: {_fname_sub}... ")
+
+        with open(_fname_sub, "rb") as f:
+            subloader = pickle.load(f)
+        return subloader
     else:
+        _logger.info(f"Reading disulfides from: {_fname_all}... ")
         if not os.path.exists(_fname_all) or force is True:
+            _logger.info(f"Creating full loader: {_fname_all}... ")
+
             loader = Bootstrap_PDB_SS(
                 loadpath=loadpath,
                 verbose=verbose,
                 subset=False,
                 force=force,
                 cutoff=cutoff,
+                sg_cutoff=sg_cutoff,
             )
-            loader.save(savepath=loadpath, subset=False, cutoff=cutoff)
+            loader.save(
+                savepath=loadpath,
+                subset=False,
+                cutoff=cutoff,
+                sg_cutoff=sg_cutoff,
+            )
             if verbose:
                 print(f"-> load_PDB_SS(): Done Saving {_fname_all}... ")
+                _logger.info(f"Done saving disulfides to: {_fname_all}... ")
             return loader
-        else:
-            if verbose:
-                print(f"-> load_PDB_SS(): Reading {_fname_all}... ")
 
-            with open(_fname_all, "rb") as f:
-                loader = pickle.load(f)
+        if verbose:
+            print(f"-> load_PDB_SS(): Reading {_fname_all}... ")
+            _logger.info(f"Reading disulfides from: {_fname_all}... ")
 
-            if verbose:
-                print(f"-> load_PDB_SS(): Done Reading {_fname_all}... ")
+        with open(_fname_all, "rb") as f:
+            loader = pickle.load(f)
+
+        if verbose:
+            print(f"-> load_PDB_SS(): Done Reading {_fname_all}... ")
+            _logger.info(f"Done reading disulfides from: {_fname_all}... ")
 
     return loader
 
 
 def Bootstrap_PDB_SS(
-    loadpath=DATA_DIR, cutoff=8.0, verbose=False, subset=False, force=False
+    loadpath=DATA_DIR,
+    cutoff=-1.0,
+    sg_cutoff=-1.0,
+    verbose=False,
+    subset=False,
+    force=False,
 ):
     """
     Download and instantiate the disulfide databases from Google Drive.
@@ -975,7 +1042,11 @@ def Bootstrap_PDB_SS(
         _logger.info("Building loader from: %s...", full_path)
 
     loader = DisulfideLoader(
-        datadir=DATA_DIR, subset=subset, verbose=verbose, cutoff=cutoff
+        datadir=DATA_DIR,
+        subset=subset,
+        verbose=verbose,
+        cutoff=cutoff,
+        sg_cutoff=sg_cutoff,
     )
 
     if loader.TotalDisulfides == 0:

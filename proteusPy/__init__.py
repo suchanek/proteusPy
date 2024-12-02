@@ -16,9 +16,6 @@ __pdoc__ = {
 
 import logging
 
-import matplotlib.pyplot as plt
-import numpy as np
-
 # Set the default logger level to CRITICAL
 logging.basicConfig(level=logging.CRITICAL)
 

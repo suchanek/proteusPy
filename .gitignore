@@ -6,6 +6,7 @@
 .vscode
 .eggs
 build/
+dist/
 data/*.png
 data/Nclasses/*
 data/classes/*
