@@ -88,6 +88,7 @@ Torsion_DF_Cols = [
     "energy",
     "ca_distance",
     "cb_distance",
+    "sg_distance",
     "phi_prox",
     "psi_prox",
     "phi_dist",
@@ -195,6 +196,7 @@ class Disulfide:
         self.distal_secondary = "Nosecondary"
         self.ca_distance = _FLOAT_INIT
         self.cb_distance = _FLOAT_INIT
+        self.sg_distance = _FLOAT_INIT
         self.torsion_array = np.array(
             (_ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT)
         )
@@ -1032,7 +1034,7 @@ class Disulfide:
         :return: np.array(3, 2): Array containing the min, max for X, Y, and Z respectively.
         Does not currently take the atom's radius into account.
         """
-        coords = self.internal_coords()
+        coords = self.internal_coords
 
         xmin, ymin, zmin = coords.min(axis=0)
         xmax, ymax, zmax = coords.max(axis=0)
@@ -1276,7 +1278,7 @@ class Disulfide:
         src = self.pdb_id
         enrg = self.energy
 
-        title = f"{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Cβ: {self.cb_distance:.2f} Å Tors: {self.torsion_length:.2f}°"
+        title = f"{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Cβ: {self.cb_distance:.2f} Å, Sg: {self.sg_distance:.2f} Å Tors: {self.torsion_length:.2f}°"
 
         if light == "light":
             pv.set_plot_theme("document")
@@ -1788,9 +1790,10 @@ class Disulfide:
         """
         s1 = self.repr_ss_info()
         s2 = self.repr_ss_ca_dist()
+        s2b = self.repr_ss_sg_dist()
         s3 = self.repr_ss_conformation()
         s4 = self.repr_ss_torsion_length()
-        res = f"{s1} \n{s3} \n{s2} \n{s4}>"
+        res = f"{s1} \n{s3} \n{s2} \n{s2b} \n{s4}>"
         print(res)
 
     def pprint_all(self) -> None:
@@ -1801,12 +1804,14 @@ class Disulfide:
         s2 = self.repr_ss_coords()
         s3 = self.repr_ss_local_coords()
         s4 = self.repr_ss_conformation()
-        s5 = self.repr_chain_ids()
+        s4b = self.repr_phipsi()
         s6 = self.repr_ss_ca_dist()
+        s6b = self.repr_ss_cb_dist()
+        s6c = self.repr_ss_sg_dist()
         s7 = self.repr_ss_torsion_length()
         s8 = self.repr_ss_secondary_structure()
 
-        res = f"{s1} {s2} {s5} {s3} {s4}\n {s6}\n {s7}\n {s8}>"
+        res = f"{s1} {s2} {s3} {s4}\n {s4b}\n {s6}\n {s6b}\n {s6c}\n {s7}\n {s8}>"
 
         print(res)
 
@@ -1864,6 +1869,13 @@ class Disulfide:
         s1 = f"Cβ Distance: {self.cb_distance:.2f} Å"
         return s1
 
+    def repr_ss_sg_dist(self) -> str:
+        """
+        Representation for Disulfide Ca distance
+        """
+        s1 = f"Sγ Distance: {self.sg_distance:.2f} Å"
+        return s1
+
     def repr_ss_torsion_length(self) -> str:
         """
         Representation for Disulfide torsion length
@@ -1878,6 +1890,13 @@ class Disulfide:
         s1 = f"Proximal secondary: {self.proximal_secondary} Distal secondary: {self.distal_secondary}"
         return s1
 
+    def repr_phipsi(self) -> str:
+        """
+        Representation for Disulfide phi psi angles
+        """
+        s1 = f"PhiProx: {self.phiprox:.2f}° PsiProx: {self.psiprox:.2f}°, PhiDist: {self.phidist:.2f}° PsiDist: {self.psidist:.2f}°"
+        return s1
+
     def repr_all(self) -> str:
         """
         Return a string representation for all Disulfide information
@@ -1888,13 +1907,13 @@ class Disulfide:
         s2 = self.repr_ss_coords()
         s3 = self.repr_ss_local_coords()
         s4 = self.repr_ss_conformation()
-        s5 = self.repr_chain_ids()
+        s4b = self.repr_phipsi()
         s6 = self.repr_ss_ca_dist()
         s8 = self.repr_ss_cb_dist()
         s7 = self.repr_ss_torsion_length()
         s9 = self.repr_ss_secondary_structure()
 
-        res = f"{s1} {s2} {s5} {s3} {s4} {s6} {s7} {s8} {s9}>"
+        res = f"{s1} {s2} {s3} {s4} {s4b} {s6} {s7} {s8} {s9}>"
         return res
 
     def repr_compact(self) -> str:
@@ -2013,7 +2032,7 @@ class Disulfide:
         name = self.name
         enrg = self.energy
 
-        title = f"{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Cβ: {self.cb_distance:.2f} Å, Tors: {self.torsion_length:.2f}"
+        title = f"{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Cβ: {self.cb_distance:.2f} Å, Sγ: {self.sg_distance:.2f} Å, Tors: {self.torsion_length:.2f}"
 
         if light == "Light":
             pv.set_plot_theme("document")
@@ -2539,6 +2558,8 @@ def Initialize_Disulfide_From_Coords(
 
     if len(prevprox_atom_list) != 0:
         cprev_prox = prevprox_atom_list[1]
+        new_ss.phiprox = calc_dihedral(cprev_prox, n1, ca1, c1)
+
     else:
         cprev_prox = Vector3D(-1.0, -1.0, -1.0)
         new_ss.missing_atoms = True
@@ -2550,6 +2571,7 @@ def Initialize_Disulfide_From_Coords(
     if len(prevdist_atom_list) != 0:
         # list is N, C
         cprev_dist = prevdist_atom_list[1]
+        new_ss.phidist = calc_dihedral(cprev_dist, n2, ca2, c2)
     else:
         cprev_dist = nnext_dist = Vector3D(-1.0, -1.0, -1.0)
         new_ss.missing_atoms = True
@@ -2560,7 +2582,6 @@ def Initialize_Disulfide_From_Coords(
 
     if len(nextprox_atom_list) != 0:
         nnext_prox = nextprox_atom_list[0]
-        new_ss.phiprox = calc_dihedral(cprev_prox, n1, ca1, c1)
         new_ss.psiprox = calc_dihedral(n1, ca1, c1, nnext_prox)
     else:
         nnext_prox = Vector3D(-1.0, -1.0, -1.0)
@@ -2571,7 +2592,6 @@ def Initialize_Disulfide_From_Coords(
 
     if len(nextdist_atom_list) != 0:
         nnext_dist = nextdist_atom_list[0]
-        new_ss.phidist = calc_dihedral(cprev_dist, n2, ca2, c2)
         new_ss.psidist = calc_dihedral(n2, ca2, c2, nnext_dist)
     else:
         nnext_dist = Vector3D(-1.0, -1.0, -1.0)
@@ -2608,6 +2628,8 @@ def Initialize_Disulfide_From_Coords(
     new_ss.chi5 = calc_dihedral(sg2, cb2, ca2, n2)
     new_ss.ca_distance = distance3d(new_ss.ca_prox, new_ss.ca_dist)
     new_ss.cb_distance = distance3d(new_ss.cb_prox, new_ss.cb_dist)
+    new_ss.sg_distance = distance3d(new_ss.sg_prox, new_ss.sg_dist)
+
     new_ss.torsion_array = np.array(
         (new_ss.chi1, new_ss.chi2, new_ss.chi3, new_ss.chi4, new_ss.chi5)
     )

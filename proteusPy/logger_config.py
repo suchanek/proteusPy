@@ -1,27 +1,15 @@
 """
 This module provides utility functions for configuring and managing loggers 
-within the proteusPy package.
+within the proteusPy package. The functions are used within the package to
+convey logging information at a fine-grained level. The functions are completely
+independent of the application and can be used in any Python project.
 
-Functions:
-    create_logger(name): Returns a logger with the specified name, configured to use a shared 
-    StreamHandler.
-    set_logger_level(name, level): Sets the logging level for the logger with the 
-    specified name.
-    toggle_stream_handler(name, enable): Enables or disables the StreamHandler for the logger 
-    with the specified name.
-
-Example usage:
-    logger = create_logger("example_logger")
-    logger.info("This is an info message")
-    set_logger_level("example_logger", "ERROR")
-    logger.info("This info message will not be shown")
-    logger.error("This is an error message")
-    toggle_stream_handler("example_logger", False)
-    logger.info("This info message will not be shown in the console")
+Author: Eric G. Suchanek, PhD
+Last updated 2024-11-19 -egs-
 """
 
 import logging
-import os
+from pathlib import Path
 
 
 def set_logging_level_for_all_handlers(log_level: int):
@@ -79,14 +67,13 @@ def configure_master_logger(
         backup_count (int): Number of backup files to keep.
     """
     # Expand user path
-    file_path = os.path.expanduser(file_path)
+    file_path = Path(file_path).expanduser()
 
     # Ensure the directory exists
-    if not os.path.exists(file_path):
-        os.makedirs(file_path)
+    file_path.mkdir(parents=True, exist_ok=True)
 
     # Full path to the log file
-    full_log_file_path = os.path.join(file_path, log_file)
+    full_log_file_path = file_path / log_file
 
     root_logger = logging.getLogger()
 
@@ -123,12 +110,6 @@ def create_logger(
     :type name: str
     :param log_level: The logging level, defaults to logging.INFO
     :type log_level: int, optional
-    :param log_dir: Directory where log files will be stored, defaults to current directory
-    :type log_dir: Optional[str], optional
-    :param max_bytes: Maximum size in bytes before a log file is rotated, defaults to 1,000,000
-    :type max_bytes: int, optional
-    :param backup_count: Number of backup files to keep, defaults to 5
-    :type backup_count: int, optional
     :return: Configured logger instance.
     :rtype: logging.Logger
     """

@@ -71,7 +71,9 @@ LOADER_SUBSET_MASTER_URL = (
 )
 LOADER_ALL_URL = "https://drive.google.com/uc?id=1igF-sppLPaNsBaUS7nkb13vtOGZZmsFp"
 LOADER_SUBSET_URL = "https://drive.google.com/uc?id=1puy9pxrClFks0KN9q5PPV_ONKvL-hg33"
-SS_LIST_URL = "https://drive.google.com/uc?id=1H_Yn8DifsCCilifNicpkcjOQDAGbNGSU"
+# SS_LIST_URL = "https://drive.google.com/uc?id=1H_Yn8DifsCCilifNicpkcjOQDAGbNGSU"
+# SS_LIST_URL="https://drive.google.com/file/uc?id=1-B-uODacYHVEAYtWQhp-s2M4SEWGllM"
+SS_LIST_URL = "https://drive.google.com/uc?id=1-B-uODacYHVEAYtWQhp-s2M4SEWGllM-"
 
 SS_CLASS_DEFINITIONS = """
 Idx,chi1_s,chi2_s,chi3_s,chi4_s,chi5_s,class_id,SS_Classname,FXN
