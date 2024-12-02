@@ -8,7 +8,7 @@ ifeq ($(OS),Windows_NT)
     VERS := $(shell python -c "exec(open('proteusPy/_version.py').read()); print(__version__)")
 	RM = del
 else 
-	VERS = $(shell python get_version.py)
+	VERS = $(shell python proteusPy/get_version.py)
 	RM = rm
 
 endif
@@ -18,14 +18,9 @@ endif
 
 CONDA = mamba
 
-#MESS = $(VERS)
-#MESS = "proteusPy: A Python Package for Protein Structure and Disulfide Bond Modeling and Analysis"
-
 MESS = "0.97.16"
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
-
-PHONY = .
 
 vers: .
 	@echo "Version = $(VERS)"
@@ -33,7 +28,7 @@ vers: .
 newvers: .
 	@echo "Current version number is: $(VERS)"	
 	@echo "Enter new version number: "
-	@read VERS; echo "__version__ = \"$$VERS\"" > proteusPy/version.py
+	@read VERS; echo "__version__ = \"$$VERS\"" > proteusPy/_version.py
 	@echo "New version number is: $(VERS)"
 	@echo "Enter a new message: "
 	@read MESS
@@ -64,8 +59,8 @@ devclean: .
 
 	
 # activate the package before running!
-
-install: sdist
+.PHONY: install
+install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	@echo "Installing additional..."
 	$(CONDA) install vtk==9.2.6 -y
@@ -97,17 +92,24 @@ jup_dev: .
 	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
 
 # package development targets
-
-format: .
+.PHONY: format
+format:
 	black proteusPy
 
 bld:  docs sdist
+	@echo "Building $(VERS)..."
+	@echo "Building binary distribution..."
+	@python setup.py bdist_wheel
+	@echo "Building documentation..."
+	@pdoc -o docs --math --logo "./logo.png" ./proteusPy
+	@echo "Building done."
 
 sdist: proteusPy/_version.py
+	@echo "Building source distribution..."
 	python setup.py sdist
 
-.PHONY: docs
-docs: proteusPy/_version.py
+docs: $(wildcard proteusPy/**/*.py)
+	@echo "Building documentation..."
 	pdoc -o docs --math --logo "./logo.png" ./proteusPy
 
 # normally i push to PyPi via github action
@@ -115,15 +117,15 @@ docs: proteusPy/_version.py
 upload: sdist
 	twine upload -r proteusPy dist/proteusPy-$(VERS)*
 
+.PHONY: tag
 tag:
 	git tag -a $(VERS) -m $(MESS)
 	@echo $(VERS) > tag.out
 
+.PHONY: commit
 commit:
 	git commit -a -m $(MESS)
 	git push origin
-
-# run the tests
 
 .PHONY: tests
 tests: 
@@ -133,11 +135,9 @@ tests:
 	python proteusPy/DisulfideLoader.py
 	python proteusPy/DisulfideClasses.py
 
-.PHONY: docker
 docker: viewer/rcsb_viewer.py viewer/dockerfile
 	docker build -t rcsb_viewer viewer/ --no-cache
 
-.PHONY: docker_hub
 docker_hub: viewer/rcsb_viewer.py viewer/dockerfile
 	docker buildx build viewer/ --platform linux/arm64,linux/amd64 \
 		-f viewer/dockerfile \
@@ -161,7 +161,7 @@ docker_run:
 
 .PHONY: docker_purge
 docker_purge:
-	docker system prune -a -y
+	docker system prune -a
 
 # end of file
 
