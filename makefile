@@ -153,7 +153,7 @@ docker_github: viewer/rcsb_viewer.py viewer/dockerfile
 		--push
 
 .PHONEY: docker_all
-docker_all: docker docker_dockerhub docker_github
+docker_all: docker docker_hub docker_github
 
 .PHONY: docker_run
 docker_run:
