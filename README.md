@@ -31,7 +31,7 @@
 
 # Installation
 
-It's simplest to clone the repo via GitHub since it contains all of the notebooks, data and test programs. Installation includes installing my Biopython fork which is required to rebuild the database (this is not needed generally). I highly recommend using Miniforge since it includes mamba. The installation instructions below assume a clean install with no package manager or compiler installed.
+It's simplest to clone the repo via GitHub since it contains all of the notebooks, data and test programs. I highly recommend using Miniforge since it includes mamba. The installation instructions below assume a clean install with no package manager or compiler installed.
 
 ## MacOS/Linux
 
@@ -87,7 +87,7 @@ Once the package is installed it's possible to load, visualize and analyze the D
 - Analyze
 - Visualize
 
-A simple example is shown below:
+A simple example to display the lowest energy disulfide in the database is shown below:
 
 ```python
 import proteusPy
@@ -137,7 +137,7 @@ and open [Analysis_2q7q.ipynb](https://github.com/suchanek/proteusPy/blob/master
    $ panel serve ~/repos/proteusPy/viewer/rcsb_viewer.py --show --autoreload
    ```
 
-3) rcsb_viewer - `Docker` version. I've created a `Docker` image of the viewer. It's available on `DockerHub` at `egsuchanek/rcsb_viewer:latest`, as well as on GitHub at: `ghcr.io/suchanek/rcsb_viewer`. It's possible to build the image by going into the `viewer` directory and executing:
+3) rcsb_viewer - `Docker` version. I've created a `Docker` image of the viewer. It's available on `DockerHub` at `egsuchanek/rcsb_viewer:latest`, as well as on GitHub at: `ghcr.io/suchanek/rcsb_viewer`. It's possible to build the image for MacOS or Linux by going into the `viewer` directory and executing:
 
   ```console
   $ docker build -t rcsb_viewer .
@@ -148,6 +148,26 @@ To run, just execute:
   ```console
     $ docker run -d  -p 5006:5006  --restart unless-stopped egsuchanek/rcsb_viewer:latest
   ```
+
+## Pymol Integration
+
+I have integrated ``proteusPy`` with the wonderful visualization program ``Pymol`` in order to visualize Disulfides within the context of their parent protein. To use this feature one must have ``Pymol`` installed on the local machine:
+
+  ```console
+  $ brew install pymol
+  ```
+
+To visualize the lowest energy structure in the database:
+
+```python
+from proteusPy import Load_PDB_SS, display_ss_pymol
+
+pdb = Load_PDB_SS(verbose=True, subset=False, cutoff=8.0)
+display_ss_pymol('2q7q', chain='D', proximal=75, distal=140, ray=False, solvent=True, sas=True, fname='2q7q.png')
+
+```
+
+This will display disulfide 75-140 in chain D and save an image to file 2q7q.png. Hit the return key to close the window.
 
 ## Performance
 

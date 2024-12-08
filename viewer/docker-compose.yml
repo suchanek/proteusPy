@@ -5,6 +5,7 @@ services:
     build: .
     ports:
       - "5006:5006"
+    restart: always
     volumes:
       - .:/app
     environment:

@@ -16,9 +16,9 @@ endif
 # mamba is better than conda. Install it with 'conda install mamba -n base -c conda-forge'
 # or use conda instead of mamba.
 
-CONDA = mamba
+CONDA = conda
 
-MESS = "0.97.16"
+MESS = "0.98.0"
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
 
