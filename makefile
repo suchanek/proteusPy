@@ -8,7 +8,7 @@ ifeq ($(OS),Windows_NT)
     VERS := $(shell python -c "exec(open('proteusPy/_version.py').read()); print(__version__)")
 	RM = del
 else 
-	VERS = $(shell python proteusPy/get_version.py)
+	VERS = $(shell python get_version.py)
 	RM = rm
 
 endif
