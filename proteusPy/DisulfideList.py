@@ -227,7 +227,7 @@ class DisulfideList(UserList):
     # Rendering engine calculates and instantiates all bond
     # cylinders and atomic sphere meshes. Called by all high level routines
 
-    def _render(self, pl, style) -> pv.Plotter:
+    def _render(self, pl, style, res=100) -> pv.Plotter:
         """
         Display a window showing the list of disulfides in the given style.
         :param style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd'
@@ -241,6 +241,14 @@ class DisulfideList(UserList):
         # pl = pv.Plotter(window_size=winsize, shape=(rows, cols))
 
         i = 0
+        res = 100
+
+        if tot_ss > 30:
+            res = 60
+        if tot_ss > 60:
+            res = 30
+        if tot_ss > 100:
+            res = 12
 
         for r in range(rows):
             for c in range(cols):
@@ -255,10 +263,7 @@ class DisulfideList(UserList):
                     ss._render(
                         pl,
                         style=style,
-                        bondcolor=BOND_COLOR,
-                        bs_scale=BS_SCALE,
-                        spec=SPECULARITY,
-                        specpow=SPEC_POWER,
+                        res=res,
                     )
                 i += 1
                 if i >= tot_ss:
