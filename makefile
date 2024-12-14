@@ -157,7 +157,7 @@ docker_all: docker docker_hub docker_github
 
 .PHONY: docker_run
 docker_run:
-	docker run -d  -p 5006:5006  --restart unless-stopped rcsb_viewer:latest
+	docker run -d  -p 5006:5006  --name rcsb_viewer --restart unless-stopped rcsb_viewer:latest
 
 .PHONY: docker_purge
 docker_purge:

@@ -1,11 +1,10 @@
-version: '3.8'
-
 services:
   rcsb_viewer:
     build: .
     ports:
       - "5006:5006"
     restart: always
+    container_name: rcsb_viewer
     volumes:
       - .:/app
     environment:

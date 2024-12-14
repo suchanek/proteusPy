@@ -253,7 +253,7 @@ def set_widgets_from_state():
         set_widgets_defaults()
 
 
-def plot(pl, ss, style="sb", light=True, panelsize=512) -> pv.Plotter:
+def plot(pl, ss, style="sb", light=True, panelsize=512, verbose=True) -> pv.Plotter:
     """
     Return the pyVista Plotter object for the Disulfide bond in the specific rendering style.
 
@@ -306,6 +306,8 @@ def plot(pl, ss, style="sb", light=True, panelsize=512) -> pv.Plotter:
         _logger.debug("List")
         pdbid = ss.pdb_id
         sslist = PDB_SS[pdbid]
+        if verbose:
+            sslist.quiet = False
         tot_ss = len(sslist)  # number off ssbonds
         rows, cols = grid_dimensions(tot_ss)
         winsize = (panelsize * cols, panelsize * rows)
@@ -420,7 +422,7 @@ def update_info(ss):
     **Resolution:** {ss.resolution:.2f} Å  
     **Energy:** {ss.energy:.2f} kcal/mol  
     **Cα distance:** {ss.ca_distance:.2f} Å  
-    **Sg distance:** {ss.sg_distance:.2f} Å  
+    **Sγ distance:** {ss.sg_distance:.2f} Å  
     **Torsion Length:** {ss.torsion_length:.2f}°  
     **Rho:** {ss.rho:.2f}°  
     **Secondary:** {ss.proximal_secondary} / {ss.distal_secondary} 

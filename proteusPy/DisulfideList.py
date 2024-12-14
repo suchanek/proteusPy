@@ -41,14 +41,7 @@ from plotly.subplots import make_subplots
 
 import proteusPy
 from proteusPy import Disulfide
-from proteusPy.atoms import (
-    BOND_COLOR,
-    BOND_RADIUS,
-    BS_SCALE,
-    FONTSIZE,
-    SPEC_POWER,
-    SPECULARITY,
-)
+from proteusPy.atoms import BOND_RADIUS, FONTSIZE
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, PDB_DIR, WINSIZE
 from proteusPy.utility import get_jet_colormap, get_theme, grid_dimensions
@@ -240,34 +233,36 @@ class DisulfideList(UserList):
         # winsize = (panelsize * cols, panelsize * rows)
         # pl = pv.Plotter(window_size=winsize, shape=(rows, cols))
 
-        i = 0
         res = 100
 
         if tot_ss > 30:
             res = 60
         if tot_ss > 60:
             res = 30
-        if tot_ss > 100:
+        if tot_ss > 90:
             res = 12
 
-        for r in range(rows):
-            for c in range(cols):
-                pl.subplot(r, c)
-                if i < tot_ss:
-                    # ss = Disulfide()
-                    ss = ssList[i]
-                    src = ss.pdb_id
-                    enrg = ss.energy
-                    title = f"{src} {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°"
-                    pl.add_title(title=title, font_size=FONTSIZE)
-                    ss._render(
-                        pl,
-                        style=style,
-                        res=res,
-                    )
-                i += 1
-                if i >= tot_ss:
-                    break
+        total_plots = rows * cols
+        for idx in range(min(tot_ss, total_plots)):
+            if not self.quiet:
+                if idx % 10 == 0:
+                    _logger.info("Rendering %d of %d bonds.", idx + 1, tot_ss)
+
+            r = idx // cols
+            c = idx % cols
+            pl.subplot(r, c)
+
+            ss = ssList[idx]
+            src = ss.pdb_id
+            enrg = ss.energy
+            title = f"{src} {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°"
+            pl.add_title(title=title, font_size=FONTSIZE)
+            ss._render(
+                pl,
+                style=style,
+                res=res,
+            )
+
         return pl
 
     @property
