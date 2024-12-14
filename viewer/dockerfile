@@ -31,7 +31,7 @@ COPY environment.yml /tmp/environment.yml
 RUN conda env create -f /tmp/environment.yml && \
     conda clean -a -y
 
-# Activate the environment during image build for testing purposes
+# Update the login bash profile to activate the environment with interactive access.
 RUN echo "source activate proteusPy" > ~/.bashrc
 
 # Set the working directory in the container
