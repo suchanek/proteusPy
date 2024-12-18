@@ -59,6 +59,7 @@
   <ul>
     <li><a href="#quickstart">Quickstart</a></li>
     <li><a href="#visualizing-the-disulfide-database">Visualizing the Disulfide Database</a></li>
+    <li><a href="#pymol-integration">Pymol Integration</a></li>
     <li><a href="#performance">Performance</a></li>
     <li><a href="#contributingreporting">Contributing/Reporting</a></li>
     <li><a href="#citing-proteuspy">Citing proteusPy</a></li>
@@ -142,7 +143,7 @@ proteusPy    </h1>
 
 <h1 id="installation">Installation</h1>
 
-<p>It's simplest to clone the repo via GitHub since it contains all of the notebooks, data and test programs. Installation includes installing my Biopython fork which is required to rebuild the database (this is not needed generally). I highly recommend using Miniforge since it includes mamba. The installation instructions below assume a clean install with no package manager or compiler installed.</p>
+<p>It's simplest to clone the repo via GitHub since it contains all of the notebooks, data and test programs. I highly recommend using Miniforge since it includes mamba. The installation instructions below assume a clean install with no package manager or compiler installed.</p>
 
 <h2 id="macoslinux">MacOS/Linux</h2>
 
@@ -215,7 +216,7 @@ proteusPy    </h1>
 <li>Visualize</li>
 </ul>
 
-<p>A simple example is shown below:</p>
+<p>A simple example to display the lowest energy disulfide in the database is shown below:</p>
 
 <div class="pdoc-code codehilite">
 <pre><span></span><code><span class="kn">import</span> <span class="nn">proteusPy</span>
@@ -272,7 +273,7 @@ proteusPy    </h1>
 </code></pre>
 </div></p>
 
-<p>3) rcsb_viewer - <code>Docker</code> version. I've created a <code>Docker</code> image of the viewer. It's available on <code>DockerHub</code> at <code>egsuchanek/rcsb_viewer:latest</code>, as well as on GitHub at: <code>ghcr.io/suchanek/rcsb_viewer</code>. It's possible to build the image by going into the <code>viewer</code> directory and executing:</p>
+<p>3) rcsb_viewer - <code>Docker</code> version. I've created a <code>Docker</code> image of the viewer. It's available on <code>DockerHub</code> at <code>egsuchanek/rcsb_viewer:latest</code>, as well as on GitHub at: <code>ghcr.io/suchanek/rcsb_viewer</code>. It's possible to build the image for MacOS or Linux by going into the <code>viewer</code> directory and executing:</p>
 
 <p><div class="pdoc-code codehilite">
 <pre><span></span><code><span class="gp">$ </span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>rcsb_viewer<span class="w"> </span>.
@@ -285,6 +286,27 @@ proteusPy    </h1>
 <pre><span></span><code><span class="gp">  $ </span>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w">  </span>-p<span class="w"> </span><span class="m">5006</span>:5006<span class="w">  </span>--restart<span class="w"> </span>unless-stopped<span class="w"> </span>egsuchanek/rcsb_viewer:latest
 </code></pre>
 </div></p>
+
+<h2 id="pymol-integration">Pymol Integration</h2>
+
+<p>I have integrated <code><a href="">proteusPy</a></code> with the wonderful visualization program <code>Pymol</code> in order to visualize Disulfides within the context of their parent protein. To use this feature one must have <code>Pymol</code> installed on the local machine:</p>
+
+<p><div class="pdoc-code codehilite">
+<pre><span></span><code><span class="gp">$ </span>brew<span class="w"> </span>install<span class="w"> </span>pymol
+</code></pre>
+</div></p>
+
+<p>To visualize the lowest energy structure in the database:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="kn">from</span> <span class="nn">proteusPy</span> <span class="kn">import</span> <span class="n">Load_PDB_SS</span><span class="p">,</span> <span class="n">display_ss_pymol</span>
+
+<span class="n">pdb</span> <span class="o">=</span> <span class="n">Load_PDB_SS</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">8.0</span><span class="p">)</span>
+<span class="n">display_ss_pymol</span><span class="p">(</span><span class="s1">&#39;2q7q&#39;</span><span class="p">,</span> <span class="n">chain</span><span class="o">=</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="n">proximal</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span> <span class="n">distal</span><span class="o">=</span><span class="mi">140</span><span class="p">,</span> <span class="n">ray</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">solvent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sas</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s1">&#39;2q7q.png&#39;</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>This will display disulfide 75-140 in chain D and save an image to file 2q7q.png. Hit the return key to close the window.</p>
 
 <h2 id="performance">Performance</h2>
 

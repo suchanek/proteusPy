@@ -229,10 +229,6 @@ class DisulfideList(UserList):
         ssList = self.data
         tot_ss = len(ssList)  # number off ssbonds
         rows, cols = grid_dimensions(tot_ss)
-
-        # winsize = (panelsize * cols, panelsize * rows)
-        # pl = pv.Plotter(window_size=winsize, shape=(rows, cols))
-
         res = 100
 
         if tot_ss > 30:
@@ -245,7 +241,7 @@ class DisulfideList(UserList):
         total_plots = rows * cols
         for idx in range(min(tot_ss, total_plots)):
             if not self.quiet:
-                if idx % 10 == 0:
+                if idx % 5 == 0:
                     _logger.info("Rendering %d of %d bonds.", idx + 1, tot_ss)
 
             r = idx // cols

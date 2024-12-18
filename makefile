@@ -1,6 +1,6 @@
-# Makefile for proteusPy
+# Makefile for proteusPy and associated programs
 # Author: Eric G. Suchanek, PhD
-# Last revision: 8/23/24 -egs-
+# Last revision: 2024-12-17 19:05:22 -egs-
 
 
 # assumes file VERSION contains only the version number
@@ -135,9 +135,12 @@ tests:
 	python proteusPy/DisulfideLoader.py
 	python proteusPy/DisulfideClasses.py
 
+# Assumes Docker is installed and running
+
 docker: viewer/rcsb_viewer.py viewer/dockerfile
 	docker build -t rcsb_viewer viewer/ --no-cache
 
+# you have to setup the docker  cloud builder to user buildx
 docker_hub: viewer/rcsb_viewer.py viewer/dockerfile
 	docker buildx build viewer/ --platform linux/arm64,linux/amd64 \
 		-f viewer/dockerfile \

@@ -120,7 +120,7 @@ rcsb_selector_widget = pn.widgets.AutocompleteInput(
 
 # controls on sidebar
 ss_props = pn.WidgetBox(
-    "# Disulfide Selection", rcsb_selector_widget, rcsb_ss_widget
+    "## Disulfide Selection", rcsb_selector_widget, rcsb_ss_widget
 ).servable(target="sidebar")
 
 
@@ -130,7 +130,7 @@ view_selector = pn.widgets.Select(
 )
 
 # Modify the layout
-ss_styles = pn.WidgetBox("# Display Style", styles_group, view_selector).servable(
+ss_styles = pn.WidgetBox("## Display Style", styles_group, view_selector).servable(
     target="sidebar"
 )
 
@@ -162,12 +162,13 @@ def update_view(click):
 view_selector.param.watch(update_view, "value")
 
 # markdown panels for various text outputs
-title_md = pn.pane.Markdown("Title")
-output_md = pn.pane.Markdown("Output goes here")
-db_md = pn.pane.Markdown("Database Info goes here")
-
+title_md = pn.pane.Markdown("Title", dedent=True, renderer="markdown")
+output_md = pn.pane.Markdown("Output goes here", dedent=True, renderer="markdown")
+db_md = pn.pane.Markdown("Database Info goes here", dedent=True, renderer="markdown")
 info_md = pn.pane.Markdown("SS Info")
-ss_info = pn.WidgetBox("# Disulfide Info", info_md).servable(target="sidebar")
+
+ss_info = pn.WidgetBox("## Disulfide Info", info_md).servable(target="sidebar")
+# db_info = pn.WidgetBox("## Database Info", db_md).servable(target="sidebar")
 
 
 def set_window_title():
@@ -179,7 +180,7 @@ def set_window_title():
     pdbs = len(PDB_SS.SSDict)
     vers = PDB_SS.version
 
-    win_title = f"RCSB Disulfide Browser v{_vers}: {tot:,} Disulfides {pdbs:,} Structures {vers}"
+    win_title = f"RCSB Disulfide Browser v{_vers}. SS: {tot:,}. Structures: {pdbs:,}. DB: {vers}. proteusPy: {proteus_vers}"
     pn.state.template.param.update(title=win_title)
 
     mess = f"Set Window Title: {win_title}"
@@ -414,6 +415,9 @@ def update_title(ss):
     title_md.object = title
 
 
+from textwrap import dedent
+
+
 def update_info(ss):
     """Update the information of the disulfide bond in the markdown pane."""
 
@@ -430,10 +434,25 @@ def update_info(ss):
     info_md.object = info_string
 
 
+def update_db_info(pdb):
+    """Update the information of the disulfide bond in the markdown pane."""
+
+    tot = pdb.TotalDisulfides
+    pdbs = len(pdb.SSDict)
+    vers = pdb.version
+    res = pdb.SSList.average_resolution
+
+    info_string = f"""**Version:** {vers}
+    **Structures:** {pdbs}
+    **Average Resolution:** {res:.2f} Å  
+    **Total Disulfides:** {tot}
+    """
+    db_md.object = info_string
+
+
 def update_output(ss):
     """Update the output of the disulfide bond in the markdown pane."""
-    info_string = f"""
-    **Cα-Cα:** {ss.ca_distance:.2f} Å  
+    info_string = f"""**Cα-Cα:** {ss.ca_distance:.2f} Å  
     **Cβ-Cβ:** {ss.cb_distance:.2f} Å  
     **Torsion Length:** {ss.torsion_length:.2f}°  
     **Resolution:** {ss.resolution:.2f} Å  
@@ -481,6 +500,7 @@ def render_ss():
     update_title(ss)
     update_info(ss)
     update_output(ss)
+    update_db_info(PDB_SS)
 
     # Reuse and clear the existing plotter before rendering
     style = styles[styles_group.value]
@@ -667,16 +687,88 @@ vtkpan = pn.pane.VTK(
 
 pn.bind(get_ss_idlist, rcs_id=rcsb_selector_widget)
 
-# if "data" in pn.state.cache:
-#    PDB_SS = pn.state.cache["data"]
-# else:
-#    PDB_SS = load_data()
-
 # Set window title and initialize widgets from cache or defaults
+menu_items = [("Save As", "a"), ("Option B", "b"), None, ("Help", "help")]
+
+menu_button = pn.widgets.MenuButton(
+    name="File", items=menu_items, button_type="primary"
+)
+
+
+# Define the menu items
+file_items = [("Open", "open"), ("Save", "save"), ("Exit", "exit")]
+help_items = [("About", "about"), ("Documentation", "documentation")]
+
+
+# Define the handler function
+def handle_selection(event):
+    item = event.new
+    _logger.info("Selected item: %s", item)
+    if item == "open":
+        _logger.info("Open file dialog")
+        # Add your code to handle opening a file
+    elif item == "save":
+        _logger.info("Save file dialog")
+        # Add your code to handle saving a file
+    elif item == "exit":
+        _logger.info("Exit application")
+        # Add your code to handle exiting the application
+    elif item == "about":
+        _logger.info("Show about dialog")
+        # Add your code to show the about dialog
+    elif item == "documentation":
+        _logger("Show documentation")
+        # Add your code to show the documentation
+
+
+# Create the menu buttons and connect the handler
+file_menu_button = pn.widgets.MenuButton(
+    name="File", icon="file", items=file_items, width=75, button_type="light"
+)
+
+
+help_menu_button = pn.widgets.MenuButton(
+    name="🧏🏻‍♂️ Help", items=help_items, width=100, button_type="light"
+)
+file_menu_button.param.watch(handle_selection, "value")
+
+# Create the file menu
+file_menu = pn.Row(
+    file_menu_button,
+    help_menu_button,
+    styles={"border-bottom": "1px solid black"},
+)
+
+
+pn.bind(handle_selection, file_menu_button.param.clicked)
+# pn.Column(menu_button, pn.bind(handle_selection, menu_button.param.clicked), height=200)
+
+
+# Function to save the current window state to a file
+def save_as_file():
+    """Save the current window state to a file."""
+    _logger.info("Saving the current state...")
+    screenshot_path = os.path.join(os.getcwd(), "disulfide_viewer_screenshot.png")
+    try:
+        plotter.screenshot(screenshot_path)
+        _logger.info(f"Saved screenshot to {screenshot_path}")
+        pn.state.notifications.success(f"File saved to {screenshot_path}")
+    except Exception as e:
+        _logger.error(f"Failed to save file: {e}")
+        pn.state.notifications.error("Failed to save the file.")
+
+
+# Add the menu bar to the layout
+# layout = pn.Column(menu_bar, render_win)
+
+# Make the application servable
+# layout.servable(title="RCSB Disulfide Bond Database Browser")
+
+
 set_window_title()
 set_widgets_from_state()
 
-render_win = pn.Column(vtkpan, reloadable_app.servable())
+render_win = pn.Column(file_menu, vtkpan, reloadable_app.servable())
 render_win.servable()
 
 # end of file
