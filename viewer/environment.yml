@@ -12,6 +12,3 @@ dependencies:
   - pyvista[all]
   - nodejs
   - pip
-  - pip:
-    - proteusPy
-

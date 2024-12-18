@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.98] - 2024-12-14
+
+### Added
+
+- Dynamic resolution for the rcsb_viewer List view.
+- ``DisulfideList`` code optimization
+
+
 ## [v0.97.10] - 2024-10-14
 
 ### Added

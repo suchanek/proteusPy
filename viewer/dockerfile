@@ -12,6 +12,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     DOCKER_RUNNING=true \
     MPLCONFIGDIR=/tmp/matplotlib
 
+
 # Install system dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -30,6 +31,8 @@ COPY environment.yml /tmp/environment.yml
 # Create the conda environment
 RUN conda env create -f /tmp/environment.yml && \
     conda clean -a -y
+
+RUN /opt/conda/envs/proteusPy/bin/pip install --verbose proteusPy==0.98.1
 
 # Update the login bash profile to activate the environment with interactive access.
 RUN echo "source activate proteusPy" > ~/.bashrc
