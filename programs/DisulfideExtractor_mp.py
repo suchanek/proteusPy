@@ -541,6 +541,7 @@ def main():
     hours, remainder = divmod(elapsed_time.total_seconds(), 3600)
     minutes, seconds = divmod(remainder, 60)
     mess = f"Processing completed in {int(hours)}h:{int(minutes)}m:{int(seconds)}"
+    print(mess)
 
 
 if __name__ == "__main__":
