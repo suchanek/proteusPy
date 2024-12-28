@@ -1,7 +1,7 @@
 """
 RCSB Disulfide Bond Database Browser
 Author: Eric G. Suchanek, PhD
-Last revision: 11/8/2024
+Last revision: 2024-12-28 16:57:13 -egs-
 """
 
 # pylint: disable=C0301 # line too long
@@ -15,6 +15,8 @@ Last revision: 11/8/2024
 
 import logging
 import os
+from datetime import datetime
+from pathlib import Path
 
 import numpy as np
 import panel as pn
@@ -37,10 +39,13 @@ from proteusPy.ProteusGlobals import DATA_DIR
 
 proteus_vers = __version__
 
-_vers = "0.99"
+_vers = "0.99.1"
 
 # Set PyVista to use offscreen rendering if the environment variable is set
 # needed in Docker.
+
+pv.OFF_SCREEN = True
+
 if os.getenv("PYVISTA_OFF_SCREEN", "false").lower() == "true":
     pv.OFF_SCREEN = True
 
@@ -79,6 +84,12 @@ _logger = create_logger("rcsb_viewer", log_level=logging.INFO)
 ss_state = {}
 RCSB_list = []
 PDB_SS = None
+
+HOME = Path.home()
+
+SAVE_PATH = HOME / "Pictures" / "proteusPy"
+SAVE_PATH.mkdir(parents=True, exist_ok=True)
+_logger.debug("Save Path: %s", SAVE_PATH)
 
 # default selections
 ss_state_default = {
@@ -126,7 +137,14 @@ ss_props = pn.WidgetBox(
 
 # Replace single checkbox with a selector widget
 view_selector = pn.widgets.Select(
-    name="View Mode", options=["Single View", "Multiview", "List"], value="Single View"
+    name="View Mode",
+    options=[
+        "Single View",
+        "Multiview",
+        "List",
+        "Overlay",
+    ],
+    value="Single View",
 )
 
 # Modify the layout
@@ -154,6 +172,8 @@ def update_view(click):
             styles_group.disabled = True
         case "List":
             styles_group.disabled = False
+        case "Overlay":
+            styles_group.disabled = True
     # set_state()
     click_plot(click)
 
@@ -168,7 +188,6 @@ db_md = pn.pane.Markdown("Database Info goes here", dedent=True, renderer="markd
 info_md = pn.pane.Markdown("SS Info")
 
 ss_info = pn.WidgetBox("## Disulfide Info", info_md).servable(target="sidebar")
-# db_info = pn.WidgetBox("## Database Info", db_md).servable(target="sidebar")
 
 
 def set_window_title():
@@ -180,7 +199,7 @@ def set_window_title():
     pdbs = len(PDB_SS.SSDict)
     vers = PDB_SS.version
 
-    win_title = f"RCSB Disulfide Browser v{_vers}. SS: {tot:,}. Structures: {pdbs:,}. DB: {vers}. proteusPy: {proteus_vers}"
+    win_title = f"RCSB Disulfide Browser v{_vers}, SS: {tot:,}, Structures: {pdbs:,}, DB: {vers}, proteusPy: {proteus_vers}"
     pn.state.template.param.update(title=win_title)
 
     mess = f"Set Window Title: {win_title}"
@@ -302,8 +321,8 @@ def plot(pl, ss, style="sb", light=True, panelsize=512, verbose=True) -> pv.Plot
         ss._render(plotter, style="pd")
 
         plotter.link_views()
-        plotter.reset_camera()
-    else:
+
+    elif mode == "List":
         _logger.debug("List")
         pdbid = ss.pdb_id
         sslist = PDB_SS[pdbid]
@@ -318,7 +337,14 @@ def plot(pl, ss, style="sb", light=True, panelsize=512, verbose=True) -> pv.Plot
         plotter = sslist._render(plotter, style)
         plotter.enable_anti_aliasing("msaa")
         plotter.link_views()
-        plotter.reset_camera()
+    else:
+        plotter = pv.Plotter(window_size=WINSIZE)
+        plotter.clear()
+        _logger.debug("Overlay")
+        pdbid = ss.pdb_id
+        sslist = PDB_SS[pdbid]
+
+        plotter = display_overlay(sslist, plotter, verbose=verbose)
 
     plotter.reset_camera()
     return plotter
@@ -415,9 +441,6 @@ def update_title(ss):
     title_md.object = title
 
 
-from textwrap import dedent
-
-
 def update_info(ss):
     """Update the information of the disulfide bond in the markdown pane."""
 
@@ -427,7 +450,7 @@ def update_info(ss):
     **Energy:** {ss.energy:.2f} kcal/mol  
     **Cα distance:** {ss.ca_distance:.2f} Å  
     **Sγ distance:** {ss.sg_distance:.2f} Å  
-    **Torsion Length:** {ss.torsion_length:.2f}°  
+    **Torsion Length:** {ss.torsion_length:.2f}°
     **Rho:** {ss.rho:.2f}°  
     **Secondary:** {ss.proximal_secondary} / {ss.distal_secondary} 
     """
@@ -549,14 +572,16 @@ def display_overlay(
     ssbonds = sslist.data
     tot_ss = len(ssbonds)  # number off ssbonds
 
-    res = 100
+    res = 0
 
-    if tot_ss > 100:
+    if tot_ss > 50:
         res = 60
-    if tot_ss > 200:
+    elif tot_ss > 40:
         res = 30
-    if tot_ss > 300:
-        res = 8
+    elif tot_ss > 30:
+        res = 16
+    else:
+        res = 100  # Default resolution if tot_ss is 30 or less
 
     pl.clear()
     pl.enable_anti_aliasing("msaa")
@@ -573,9 +598,7 @@ def display_overlay(
     brad = brad if tot_ss < 50 else brad * 0.7
     brad = brad if tot_ss < 100 else brad * 0.5
 
-    # print(f'Brad: {brad}')
     center_of_mass = sslist.center_of_mass
-    # sslist.translate(center_of_mass)
 
     for i, ss in zip(range(tot_ss), ssbonds):
         color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
@@ -673,7 +696,7 @@ rcsb_ss_widget.param.watch(set_state, "value")
 view_selector.param.watch(set_state, "value")
 styles_group.param.watch(set_state, "value")
 
-plotter = pv.Plotter()
+plotter = pv.Plotter(off_screen=True)
 plotter = render_ss()
 
 vtkpan = pn.pane.VTK(
@@ -687,38 +710,24 @@ vtkpan = pn.pane.VTK(
 
 pn.bind(get_ss_idlist, rcs_id=rcsb_selector_widget)
 
+
 # Set window title and initialize widgets from cache or defaults
-menu_items = [("Save As", "a"), ("Option B", "b"), None, ("Help", "help")]
-
-menu_button = pn.widgets.MenuButton(
-    name="File", items=menu_items, button_type="primary"
-)
-
 
 # Define the menu items
-file_items = [("Open", "open"), ("Save", "save"), ("Exit", "exit")]
+file_items = [("Save", "save")]
 help_items = [("About", "about"), ("Documentation", "documentation")]
 
 
 # Define the handler function
-def handle_selection(event):
-    item = event.new
+def handle_file_menu(event):
+    """Handle the file menu items."""
+    _logger.info(f"File menu item selected: {event}")
+    item = event
     _logger.info("Selected item: %s", item)
-    if item == "open":
-        _logger.info("Open file dialog")
-        # Add your code to handle opening a file
-    elif item == "save":
+    if item == "save":
         _logger.info("Save file dialog")
+        save_as_file()
         # Add your code to handle saving a file
-    elif item == "exit":
-        _logger.info("Exit application")
-        # Add your code to handle exiting the application
-    elif item == "about":
-        _logger.info("Show about dialog")
-        # Add your code to show the about dialog
-    elif item == "documentation":
-        _logger("Show documentation")
-        # Add your code to show the documentation
 
 
 # Create the menu buttons and connect the handler
@@ -726,49 +735,125 @@ file_menu_button = pn.widgets.MenuButton(
     name="File", icon="file", items=file_items, width=75, button_type="light"
 )
 
-
 help_menu_button = pn.widgets.MenuButton(
-    name="🧏🏻‍♂️ Help", items=help_items, width=100, button_type="light"
+    name="🧏🏻‍♂️ Help", items=help_items, width=125, button_type="light"
 )
-file_menu_button.param.watch(handle_selection, "value")
 
-# Create the file menu
-file_menu = pn.Row(
+
+def show_about_dialog():
+    """Shows the about dialog."""
+    return pn.pane.Alert(
+        """
+        RCSB Disulfide Bond Database Browser
+        Version: 0.99.1
+        """
+    )
+
+
+def show_documentation_dialog():
+    """Shows the documentation dialog."""
+    return pn.pane.Alert(
+        """
+        Documentation
+        """
+    )
+
+
+def handle_help_menu(event):
+    """Handle the help menu items."""
+    _logger.info(f"Help menu item selected: {event}")
+    item = event
+    if item == "about":
+        _logger.info("Show about dialog")
+        show_about_dialog()
+        # Add your code to show the about dialog
+    elif item == "documentation":
+        show_documentation_dialog()
+        _logger.info("Show documentation")
+
+
+# Create the menus
+
+menu = pn.Row(
     file_menu_button,
     help_menu_button,
     styles={"border-bottom": "1px solid black"},
 )
 
+file_menu_button.on_click(lambda event: handle_file_menu("save"))
+help_menu_button.on_click(lambda event: handle_help_menu(event.new))
 
-pn.bind(handle_selection, file_menu_button.param.clicked)
-# pn.Column(menu_button, pn.bind(handle_selection, menu_button.param.clicked), height=200)
+# the only way i can get the handler to work is to bind it to the button directly like this
+# we don't actually use the fmenu or hmenu columns
+
+fmenu = pn.Column(
+    file_menu_button,
+    pn.bind(handle_file_menu, file_menu_button.param.clicked),
+)
+
+hmenu = pn.Column(
+    help_menu_button,
+    pn.bind(handle_help_menu, help_menu_button.param.clicked),
+)
+
+
+def create_filename(pdbid, disulfide=None, mode=None):
+    """
+    Create a filename based on the pdbid, specific disulfide selected, mode, and a date and timestamp.
+
+    :param pdbid: The PDB ID.
+    :param disulfide: The specific disulfide selected (optional).
+    :param mode: The mode (optional).
+    :return: The generated filename.
+    """
+    # Get the current date and time
+    now = datetime.now()
+    timestamp = now.strftime("%Y%m%d_%H%M%S")
+
+    # Base filename with pdbid and timestamp
+    filename = f"{pdbid}_{timestamp}"
+
+    # Append disulfide information if mode is not LIST or OVERLAY
+    if mode not in ["LIST", "OVERLAY"] and disulfide:
+        filename = f"{pdbid}_{disulfide}_{timestamp}"
+    else:
+        filename = f"{pdbid}_{timestamp}"
+
+    # Add file extension
+    filename += ".png"
+
+    return filename
 
 
 # Function to save the current window state to a file
 def save_as_file():
     """Save the current window state to a file."""
-    _logger.info("Saving the current state...")
-    screenshot_path = os.path.join(os.getcwd(), "disulfide_viewer_screenshot.png")
+
+    global ss_state
+
+    fname = create_filename(
+        ss_state["rcsid"], ss_state["defaultss"], ss_state["view_mode"]
+    )
+    screenshot_path = SAVE_PATH / fname
+
+    _logger.info("Saving the current view to file %s", str(screenshot_path))
     try:
-        plotter.screenshot(screenshot_path)
-        _logger.info(f"Saved screenshot to {screenshot_path}")
-        pn.state.notifications.success(f"File saved to {screenshot_path}")
+        plotter.add_light(
+            pv.Light(position=(10, 10, 10), focal_point=(0, 0, 0), intensity=1.0)
+        )
+        plotter.add_light(
+            pv.Light(position=(-10, -10, 10), focal_point=(0, 0, 0), intensity=0.5)
+        )
+        plotter.screenshot(str(screenshot_path))
+        _logger.info("Saved screenshot to %s", screenshot_path)
     except Exception as e:
-        _logger.error(f"Failed to save file: {e}")
-        pn.state.notifications.error("Failed to save the file.")
-
-
-# Add the menu bar to the layout
-# layout = pn.Column(menu_bar, render_win)
-
-# Make the application servable
-# layout.servable(title="RCSB Disulfide Bond Database Browser")
+        _logger.error("Failed to save file: %s, error: %s", screenshot_path, e)
 
 
 set_window_title()
 set_widgets_from_state()
 
-render_win = pn.Column(file_menu, vtkpan, reloadable_app.servable())
+render_win = pn.Column(menu, vtkpan, reloadable_app.servable())
 render_win.servable()
 
 # end of file

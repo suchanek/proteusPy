@@ -422,32 +422,6 @@ class DisulfideClass_Constructor:
 
         return df[df["percentage"] >= cutoff].copy()
 
-    def filter_sixclass_by_percentage(self, cutoff) -> pd.DataFrame:
-        """
-        Filter the six-class definitions by percentage.
-
-        :param df: A Pandas DataFrame with an 'percentage' column to filter by
-        :param cutoff: A numeric value specifying the minimum percentage required for a row to be included in the output
-        :return: A new Pandas DataFrame containing only rows where the percentage is greater than or equal to the cutoff
-        :rtype: pandas.DataFrame
-        """
-        df = self.sixclass_df
-
-        return df[df["percentage"] >= cutoff].copy()
-
-    def filter_eightclass_by_percentage(self, cutoff) -> pd.DataFrame:
-        """
-        Filter the six-class definitions by percentage.
-
-        :param df: A Pandas DataFrame with an 'percentage' column to filter by
-        :param cutoff: A numeric value specifying the minimum percentage required for a row to be included in the output
-        :return: A new Pandas DataFrame containing only rows where the percentage is greater than or equal to the cutoff
-        :rtype: pandas.DataFrame
-        """
-        df = self.eightclass_df
-
-        return df[df["percentage"] >= cutoff].copy()
-
     def get_sixth_quadrant(self, angle_deg):
         """
         Return the sextant in which an angle in degrees lies if the area is described by dividing a unit circle into 6 equal segments.
@@ -543,13 +517,13 @@ class DisulfideClass_Constructor:
         _fname = f"{savepath}{fname}"
 
         if self.verbose:
-            print(f"-> DisulfideClass_Constructor.save(): Writing {_fname}... ")
+            _logger.info(f"Writing %s", _fname)
 
         with open(_fname, "wb+") as f:
             pickle.dump(self, f)
 
         if self.verbose:
-            print("-> DisulfideLoader.save(): Done.")
+            _logger.info("Done.")
 
     def six_class_to_binary(self, cls_str):
         """

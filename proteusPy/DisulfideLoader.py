@@ -499,12 +499,7 @@ class DisulfideLoader:
         members_list = []
 
         for c in _cutoff:
-            if base == 8:
-                class_df = self.tclass.filter_eightclass_by_percentage(c)
-            elif base == 6:
-                class_df = self.tclass.filter_sixclass_by_percentage(c)
-            else:
-                class_df = self.tclass.filter_eightclass_by_percentage(c)
+            class_df = self.tclass.filter_class_by_percentage(base, c)
             tot = class_df["percentage"].sum()
             tot_list.append(tot)
             members_list.append(class_df.shape[0])
