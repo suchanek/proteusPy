@@ -133,7 +133,7 @@ BINARY.mkdir(parents=True, exist_ok=True)
 MINIFORGE_DIR = HOME_DIR / Path("miniforge3/envs")
 MAMBAFORGE_DIR = HOME_DIR / Path("mambaforge/envs")
 
-VENV_DIR = Path("lib/python3.11/site-packages/proteusPy/data")
+VENV_DIR = Path("lib/python3.12/site-packages/proteusPy/data")
 
 PBAR_COLS = 78
 
@@ -226,7 +226,7 @@ def get_args():
         "--update",
         help="Update repository with the consensus classes.",
         action=argparse.BooleanOptionalAction,
-        default=True,
+        default=False,
     )
 
     args = parser.parse_args()
