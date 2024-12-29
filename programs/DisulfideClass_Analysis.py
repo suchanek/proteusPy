@@ -1,4 +1,5 @@
 # pylint: disable=C0301
+# Last modification: 2024-12-28 19:36:28 -egs-
 
 """
 Disulfide class consensus structure extraction using `proteusPy.Disulfide` package. Disulfide

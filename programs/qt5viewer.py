@@ -241,6 +241,7 @@ class DisulfideViewer(QMainWindow):
         # self.plotter_widget.setMinimumSize(*winsize)
 
         # Create sliders for camera control
+        """
         self.slider_x = QSlider(Qt.Horizontal)
         self.slider_x.setRange(-100, 100)
         self.slider_x.setValue(0)
@@ -250,6 +251,7 @@ class DisulfideViewer(QMainWindow):
         self.slider_y.setRange(-100, 100)
         self.slider_y.setValue(0)
         self.slider_y.valueChanged.connect(self.update_camera_position)
+        """
 
         self.button_spin = QPushButton("Spin Camera")
         self.button_spin.clicked.connect(self.spin_camera)
@@ -258,7 +260,7 @@ class DisulfideViewer(QMainWindow):
         main_layout = QHBoxLayout()
         main_layout.addWidget(control_widget)
         main_layout.addWidget(self.plotter_widget, 1)
-        main_layout.addWidget(self.slider_y)  # Add vertical slider
+        # main_layout.addWidget(self.slider_y)  # Add vertical slider
 
         # Set the central widget
         container = QWidget()
@@ -266,7 +268,7 @@ class DisulfideViewer(QMainWindow):
 
         bottom_layout = QVBoxLayout()
         bottom_layout.addWidget(container)
-        bottom_layout.addWidget(self.slider_x)  # Add horizontal slider
+        # bottom_layout.addWidget(self.slider_x)  # Add horizontal slider
 
         main_container = QWidget()
         main_container.setLayout(bottom_layout)
@@ -705,11 +707,11 @@ class DisulfideViewer(QMainWindow):
 
         res = 100
 
-        if tot_ss > 100:
+        if tot_ss > 20:
             res = 60
-        if tot_ss > 200:
+        if tot_ss > 30:
             res = 30
-        if tot_ss > 300:
+        if tot_ss > 50:
             res = 8
 
         title = (

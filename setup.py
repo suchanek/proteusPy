@@ -61,15 +61,8 @@ version = {}
 with open("proteusPy/_version.py") as fp:
     exec(fp.read(), version)
 
-
-# Function to read the requirements.txt file
-def read_requirements():
-    with open("requirements.txt") as req_file:
-        return req_file.read().splitlines()
-
-
-# Read the requirements from requirements.txt
-requirements = read_requirements()
+with open("requirements.txt") as fid:
+    requirements = [l.strip() for l in fid.readlines()]
 
 setup(
     name="proteusPy",
@@ -123,7 +116,7 @@ setup(
         "Tracker": "https://github.com/suchanek/proteusPy/issues",
     },
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Release",
         "License :: OSI Approved :: BSD License",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
