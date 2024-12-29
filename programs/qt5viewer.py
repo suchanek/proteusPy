@@ -31,6 +31,23 @@ import sys
 
 import numpy as np
 import pyvista as pv
+
+
+def can_import(module_name):
+    """Check we can import the requested module."""
+    try:
+        return __import__(module_name)
+    except ImportError:
+        return None
+
+
+# Check if PyQt5 is installed
+if can_import("PyQt5") is None:
+    sys.exit(
+        "This program requires PyQt5 to be installed. "
+        "Please install it using: pip install proteusPy[pyqt5]"
+    )
+
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QFont
 
