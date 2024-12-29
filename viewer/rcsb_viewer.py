@@ -721,7 +721,7 @@ help_items = [("About", "about"), ("Documentation", "documentation")]
 # Define the handler function
 def handle_file_menu(event):
     """Handle the file menu items."""
-    _logger.info(f"File menu item selected: {event}")
+    _logger.info(f"File menu item selected: %s", event)  # noqa
     item = event
     _logger.info("Selected item: %s", item)
     if item == "save":
@@ -761,7 +761,7 @@ def show_documentation_dialog():
 
 def handle_help_menu(event):
     """Handle the help menu items."""
-    _logger.info(f"Help menu item selected: {event}")
+    _logger.info(f"Help menu item selected: %s", event)  # noqa
     item = event
     if item == "about":
         _logger.info("Show about dialog")
