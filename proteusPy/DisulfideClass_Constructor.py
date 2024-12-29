@@ -125,20 +125,24 @@ class DisulfideClass_Constructor:
         self.build_yourself(loader)
 
     def load_class_dict(self, fname=Path(DATA_DIR) / SS_CLASS_DICT_FILE) -> dict:
+        """Load the class dictionary from the specified file."""
         with open(fname, "rb") as f:
             self.classdict = pickle.load(f)
 
     def load_consensus_file(self, fname=Path(DATA_DIR) / SS_CONSENSUS_OCT_FILE):
+        """Load the consensus file from the specified file."""
         with open(fname, "rb") as f:
             res = pickle.load(f)
         return res
 
     def build_class_df(self, class_df, group_df):
+        """Build a new DataFrame from the input DataFrames."""
         ss_id_col = group_df["ss_id"]
         result_df = pd.concat([class_df, ss_id_col], axis=1)
         return result_df
 
     def list_binary_classes(self):
+        """List the binary classes."""
         for k, v in enumerate(self.classdict):
             print(f"Class: |{k}|, |{v}|")
 
@@ -150,15 +154,6 @@ class DisulfideClass_Constructor:
         :param classid: Class ID, e.g. '+RHStaple'
         :return: DisulfideList of class members
         """
-        try:
-            # Check if running in Jupyter
-            shell = get_ipython().__class__.__name__  # type: ignore
-            if shell == "ZMQInteractiveShell":
-                from tqdm.notebook import tqdm  # type: ignore
-            else:
-                from tqdm import tqdm
-        except NameError:
-            from tqdm import tqdm
 
         res = DisulfideList([], classid)
 
@@ -251,7 +246,7 @@ class DisulfideClass_Constructor:
         None
         """
         # import proteusPy
-        from proteusPy import __version__ as version
+        from proteusPy import __version__ as version  # pylint: disable=C0415
 
         self.version = version
 
@@ -509,9 +504,7 @@ class DisulfideClass_Constructor:
 
         :param savepath: Path to save the file, defaults to DATA_DIR
         """
-
-        # self.version = version
-
+        _fname = None
         fname = CLASSOBJ_FNAME
 
         _fname = f"{savepath}{fname}"
@@ -527,7 +520,7 @@ class DisulfideClass_Constructor:
 
     def six_class_to_binary(self, cls_str):
         """
-        Transforms a string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees
+        Return a string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees
         into a string of 5 characters, where each character is either '1' if the corresponding input character represents a
         negative angle or '2' if it represents a positive angle.
 
@@ -544,7 +537,7 @@ class DisulfideClass_Constructor:
 
     def eight_class_to_binary(self, cls_str):
         """
-        Transforms a string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees
+        Return a string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees
         into a string of 5 characters, where each character is either '1' if the corresponding input character represents a
         negative angle or '2' if it represents a positive angle.
 
@@ -557,6 +550,33 @@ class DisulfideClass_Constructor:
                 output_str += "2"
             elif char in ["5", "6", "7", "8"]:
                 output_str += "0"
+        return output_str
+
+    def class_to_binary(self, cls_str, base):
+        """
+        Return a string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees
+        into a string of 5 characters, where each character is either '0' if the corresponding input character represents a
+        negative angle or '2' if it represents a positive angle.
+
+        :param cls_str (str): A string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees.
+        :param base (int): The base of the ordinal section (6 or 8).
+        :return str: A string of length 5, where each character is either '0' or '2', representing the sign of the corresponding input angle.
+        """
+        if base not in [6, 8]:
+            raise ValueError("Base must be either 6 or 8")
+
+        output_str = ""
+        for char in cls_str:
+            if base == 6:
+                if char in ["1", "2", "3"]:
+                    output_str += "2"
+                elif char in ["4", "5", "6"]:
+                    output_str += "0"
+            elif base == 8:
+                if char in ["1", "2", "3", "4"]:
+                    output_str += "2"
+                elif char in ["5", "6", "7", "8"]:
+                    output_str += "0"
         return output_str
 
     def plot_class_chart(self, classes: int) -> None:

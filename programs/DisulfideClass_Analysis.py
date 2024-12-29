@@ -306,7 +306,7 @@ def task(
             try:
                 class_disulfides_array[idx] = loader[ssid]
             except Exception as e:
-                _logger.error(f"Error: {e}")
+                _logger.error(f"Error: %s", e)
 
             if (idx + 1) % update_freq == 0 or (idx + 1) == len(ss_list):
                 remaining = len(ss_list) - (idx + 1)
@@ -513,7 +513,7 @@ def octant_classes_vs_cutoff(loader: DisulfideLoader, cutoff):
     :return: None
     """
 
-    class_df = loader.tclass.filter_eightclass_by_percentage(cutoff)
+    class_df = loader.tclass.filter_class_by_percentage(8, cutoff)
     return class_df.shape[0]
 
 
