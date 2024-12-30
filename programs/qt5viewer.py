@@ -450,9 +450,13 @@ class DisulfideViewer(QMainWindow):
         Parameters:
             index (int): The index of the selected item in the dropdown.
         """
-        self.current_ss = self.ss_list[index]
-        self.statusBar().showMessage(f"Displaying: {self.current_ss.name}")
-        self.display(self)  # Use the current style
+        selected_name = self.dropdown.currentText()
+        self.current_ss = next(
+            (ss for ss in self.ss_list if ss.name == selected_name), None
+        )
+        if self.current_ss is not None:
+            self.display()
+            self.statusBar().showMessage(f"Displaying: {self.current_ss.name}")
 
     def on_checkbox_single_change(self, state):
         """
