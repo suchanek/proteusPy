@@ -147,5 +147,10 @@ setup(
             "data/PDB_SS_SUBSET_LOADER.pkl",
         ]
     },
+    entry_points={
+        "console_scripts": [
+            "proteusPy.qt5viewer = proteusPy.qt5viewer:main",
+        ]
+    },
     zip_safe=False,
 )

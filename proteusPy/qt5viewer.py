@@ -24,6 +24,8 @@ Functions:
 """
 
 # pylint: disable=W0212
+# pylint: disable=E0401
+# pylint: disable=C0413
 
 import logging
 import os
@@ -60,13 +62,11 @@ from PyQt5.QtWidgets import (
     QFileDialog,
     QGroupBox,
     QHBoxLayout,
-    QLabel,
     QLineEdit,
     QMainWindow,
     QMessageBox,
     QPushButton,
     QSizePolicy,
-    QSlider,
     QSpacerItem,
     QVBoxLayout,
     QWidget,
@@ -81,7 +81,6 @@ from proteusPy import (
     create_logger,
     get_jet_colormap,
     get_theme,
-    grid_dimensions,
 )
 
 os.environ["QT_IM_MODULE"] = "qtvirtualkeyboard"
@@ -168,14 +167,12 @@ class DisulfideViewer(QMainWindow):
         self.button_sb = QPushButton("SB")
         self.button_bs = QPushButton("BS")
         self.button_pd = QPushButton("PD")
-        # self.button_cov = QPushButton("COV")
 
         # Connect buttons to methods with style tracking
         self.button_cpk.clicked.connect(lambda: self.update_style("cpk"))
         self.button_sb.clicked.connect(lambda: self.update_style("sb"))
         self.button_bs.clicked.connect(lambda: self.update_style("bs"))
         self.button_pd.clicked.connect(lambda: self.update_style("pd"))
-        # self.button_cov.clicked.connect(lambda: self.update_style("cov"))
 
         # Create a text box for entering PDB IDs
         self.pdb_textbox = QLineEdit()
@@ -414,17 +411,20 @@ class DisulfideViewer(QMainWindow):
             index (int): The index of the selected item in the PDB ID dropdown.
         """
         pdb_id = self.pdb_dropdown.currentText()
-        disulfides = self.ss_dict.get(pdb_id, [])
 
         self.dropdown.clear()
+        self.pdb_textbox.setText(pdb_id)
+
+        disulfides = self.ss_dict.get(pdb_id, [])
+
         if disulfides:
             self.dropdown.addItems([ss.name for ss in disulfides])
             self.current_ss = disulfides[0]
             self.current_sslist = DisulfideList(list(disulfides), "sublist")
             self.statusBar().showMessage(f"Displaying: {self.current_ss.name}")
             self.display()
-
-        self.pdb_textbox.setText(pdb_id)
+        else:
+            self.statusBar().showMessage(f"No Disulfides: {pdb_id}")
 
     def update_pdb_selection(self, pdb_id):
         """
@@ -434,14 +434,11 @@ class DisulfideViewer(QMainWindow):
         :type pdb_id: str
         """
         self.current_pdb_id = pdb_id
-        ### ...
         disulfides = self.ss_dict.get(pdb_id, [])
 
         self.current_sslist = DisulfideList(list(disulfides), "sublist2")
         self.dropdown.clear()
         self.dropdown.addItems([ss.name for ss in self.ss_list])
-        # Trigger the dropdown change event to update the display
-        # self.on_dropdown_change(0)
 
     def on_dropdown_change(self, index):
         """
@@ -601,47 +598,6 @@ class DisulfideViewer(QMainWindow):
             new_plotter_widget  # Update the reference to the new plotter widget
         )
 
-    def display_list(self, style="sb", light="Auto", panelsize=512):
-        """
-        Display the Disulfide list in the specific rendering style.
-
-        :param style:  Rendering style: One of:
-            - 'sb' - split bonds
-            - 'bs' - ball and stick
-            - 'cpk' - CPK style
-            - 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
-            - 'plain' - boring single color
-        :param light: If True, light background, if False, dark
-        """
-        sslist = self.current_sslist
-        ssbonds = sslist.data
-        tot_ss = len(ssbonds)  # number of ssbonds
-        rows, cols = grid_dimensions(tot_ss)
-        winsize = (panelsize * cols, panelsize * rows)
-
-        self.new_plotter(rows, cols)
-
-        pl = self.plotter_widget
-
-        avg_enrg = sslist.average_energy
-        avg_dist = sslist.average_distance
-        resolution = sslist.resolution
-
-        if light:
-            pv.set_plot_theme("document")
-        else:
-            pv.set_plot_theme("dark")
-
-        title = f"{resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
-
-        pl = sslist._render(pl, style)
-        pl.enable_anti_aliasing("msaa")
-        self.setWindowTitle(f"{self.current_ss.name}: {title}")
-
-        # pl.add_title(title=title, font_size=FONTSIZE)
-        pl.link_views()
-        pl.reset_camera()
-
     def display(self, light="Auto", shadows=False):
         """
         Renders the current disulfide bond using the specified style.
@@ -700,7 +656,6 @@ class DisulfideViewer(QMainWindow):
             self.current_ss._render(plotter, style=style)
         else:
             self.display_overlay(plotter)
-            # self.display_list(style=style, light=light)
 
         # Set perspective projection
         plotter.camera.SetParallelProjection(False)  # False for perspective
