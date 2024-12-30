@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - qt5viewer.py moved into the package as a callable module
 
 ``proteusPy.qt5viewer`` from command line will launch the program
-- 
+
 
 ### Changed
 
