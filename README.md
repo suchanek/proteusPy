@@ -125,7 +125,7 @@ and open [Analysis_2q7q.ipynb](https://github.com/suchanek/proteusPy/blob/master
 
 ## Visualizing the Disulfide Database
 
-`proteusPy` now has three distinct ways of visualizing the Disulfides in the database. I'll describe these briefly below:
+`proteusPy` now has three ways of visualizing the Disulfides in the database. I'll describe these briefly below:
 
 1) PyVista (built-in) - `proteusPy` utilizes the excellent PyVista library for visualization and manipulation of the Disulfides within the database. These routines are readily accessible from within the Jupyter notebook environment. It uses the VTK library on the backend and provides high-level access to 3D rendering. The menu strip provided in the Disulfide visualization windows allows the user to turn borders, rulers, bounding boxes on and off and reset the orientations. Please try them out! There is also a button for *local* vs *server* rendering. *Local* rendering is usually much smoother. To manipulate:
      - Click and drag your mouse to rotate
@@ -137,7 +137,7 @@ and open [Analysis_2q7q.ipynb](https://github.com/suchanek/proteusPy/blob/master
    $ panel serve ~/repos/proteusPy/viewer/rcsb_viewer.py --show --autoreload
    ```
 
-3) rcsb_viewer - `Docker` version. I've created a `Docker` image of the viewer. It's available on `DockerHub` at `egsuchanek/rcsb_viewer:latest`, as well as on GitHub at: `ghcr.io/suchanek/rcsb_viewer`. It's possible to build the image for MacOS or Linux by going into the `viewer` directory and executing:
+3) rcsb_viewer `Docker` version -  I've created a `Docker` image of the viewer. It's available on `DockerHub` at `egsuchanek/rcsb_viewer:latest`, as well as on GitHub at: `ghcr.io/suchanek/rcsb_viewer`. It's possible to build the image for MacOS or Linux by going into the `viewer` directory and executing:
 
   ```console
   $ docker build -t rcsb_viewer .
@@ -148,6 +148,19 @@ To run, just execute:
   ```console
     $ docker run -d  -p 5006:5006  --restart unless-stopped egsuchanek/rcsb_viewer:latest
   ```
+
+4) [qt5_viewer.py](https://github.com/suchanek/proteusPy/blob/master/proteusPy/qt5_viewer.py) - I have added a pyqt5-based viewer into proteusPy itself. This is similar to the ``Panel`` program but uses ``pyqt5`` for rendering. This works under Macos and Windows, but can't run under Linux due to the inability to install pyqt5. If you'd like to try it out under MacOS or Windows install proteusPy as above. After installation install the pyqt5 libraries with:
+
+```console
+  $ pip install proteusPy[pyqt5]
+  ```
+
+To launch the program simply type:
+
+```console
+  $ proteusPy.qt5_viewer
+  ```
+
 
 ## Pymol Integration
 
