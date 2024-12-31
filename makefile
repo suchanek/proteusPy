@@ -18,7 +18,7 @@ endif
 
 CONDA = conda
 
-MESS = "0.98.1"
+MESS = "0.98.2 release"
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
 
@@ -142,6 +142,7 @@ docker: viewer/rcsb_viewer.py viewer/dockerfile
 
 # you have to setup the docker  cloud builder to user buildx
 docker_hub: viewer/rcsb_viewer.py viewer/dockerfile
+	docker buildx use cloud-egsuchanek-rcsbviewer
 	docker buildx build viewer/ --platform linux/arm64,linux/amd64 \
 		-f viewer/dockerfile \
 		-t docker.io/egsuchanek/rcsb_viewer:latest \
@@ -149,6 +150,7 @@ docker_hub: viewer/rcsb_viewer.py viewer/dockerfile
 		--push
 
 docker_github: viewer/rcsb_viewer.py viewer/dockerfile
+	docker buildx use cloud-egsuchanek-rcsbviewer
 	docker buildx build viewer/ --platform linux/arm64,linux/amd64 \
 		-f viewer/dockerfile \
 		-t ghcr.io/suchanek/rcsb_viewer:latest \

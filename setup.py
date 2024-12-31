@@ -116,7 +116,7 @@ setup(
         "Tracker": "https://github.com/suchanek/proteusPy/issues",
     },
     classifiers=[
-        "Development Status :: 5 - Release",
+        "Development Status :: 4 - Beta",
         "License :: OSI Approved :: BSD License",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
