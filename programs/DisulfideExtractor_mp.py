@@ -17,7 +17,7 @@ utilizes multiprocessing to speed up the extraction process.
 * Subset: Only extract and process the first 1000 Disulfides found in the PDB directory.
 
 Author: Eric G. Suchanek, PhD.
-Last revision: 10/12/24 -egs-
+Last revision: 2025-01-01 09:17:35 -egs-
 """
 
 import argparse
@@ -127,7 +127,7 @@ num_ent_files = len(ent_files)
 pdb_id_list = [Path(f).stem[3:7] for f in ent_files]
 
 
-__version__ = "2.2.0"
+__version__ = "2.3.0"
 
 
 def parse_arguments():
@@ -494,8 +494,7 @@ def main():
     # set_logging_level_for_all_handlers(logging.ERROR)
     # disable_stream_handlers_for_namespace("proteusPy")
 
-    mess2 = f"Starting DisulfideExtractor at time {datetime.datetime.now()}"
-    _logger.info(mess2)
+    _logger.info("Starting DisulfideExtractor at time %s", datetime.datetime.now())
 
     mess = (
         f"proteusPy DisulfideExtractor v{__version__}\n"
@@ -540,15 +539,13 @@ def main():
 
     hours, remainder = divmod(elapsed_time.total_seconds(), 3600)
     minutes, seconds = divmod(remainder, 60)
-    mess = f"Processing completed in {int(hours)}h:{int(minutes)}m:{int(seconds)}"
-    print(mess)
+    print(f"Processing completed in {int(hours)}h:{int(minutes)}m:{int(seconds)}")
 
 
 if __name__ == "__main__":
     main()
 
-    mess = f"Finished DisulfideExtraction at time {datetime.datetime.now()}"
-    print(mess)
+    print(f"Finished DisulfideExtraction at time %s", datetime.datetime.now())
 
 
 # End of file
