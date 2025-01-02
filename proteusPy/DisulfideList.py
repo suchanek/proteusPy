@@ -906,7 +906,7 @@ class DisulfideList(UserList):
                 if verbose:
                     print(f" -> display_overlay(): Saved image to: {fname}")
             except RuntimeError as e:
-                print(f"Error saving screenshot: {e}")
+                _logger.error(f"Error saving screenshot: {e}")
 
         elif movie:
             if verbose:
