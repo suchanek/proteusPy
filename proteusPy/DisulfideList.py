@@ -900,9 +900,13 @@ class DisulfideList(UserList):
 
         if screenshot:
             pl.show(auto_close=False)  # allows for manipulation
-            pl.screenshot(fname)
-            if verbose:
-                print(f" -> display_overlay(): Saved image to: {fname}")
+            # Take the screenshot after ensuring the plotter is still active
+            try:
+                pl.screenshot(fname)
+                if verbose:
+                    print(f" -> display_overlay(): Saved image to: {fname}")
+            except RuntimeError as e:
+                print(f"Error saving screenshot: {e}")
 
         elif movie:
             if verbose:
