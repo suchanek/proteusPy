@@ -194,10 +194,6 @@ class DisulfideViewer(QMainWindow):
         self.dropdown.addItems([ss.name for ss in self.ss_list])
         self.dropdown.currentIndexChanged.connect(self.on_dropdown_change)
 
-        # Create a button to toggle themes
-        self.button_theme = QPushButton("Toggle Theme")
-        self.button_theme.clicked.connect(self.toggle_theme)
-
         # Create a checkbox for single/multiple display
         self.checkbox_single = QCheckBox("Single")
         self.checkbox_single.setChecked(True)
@@ -251,7 +247,7 @@ class DisulfideViewer(QMainWindow):
         control_layout.addSpacerItem(
             QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
         )  # Add spacer
-        control_layout.addWidget(self.button_theme)  # Add theme toggle button
+
         control_layout.addWidget(self.button_reset)  # Add Reset button
         control_layout.addStretch(1)
 
@@ -546,16 +542,6 @@ class DisulfideViewer(QMainWindow):
         # Set the camera position and up vector
         self.plotter_widget.camera_position = [(xpos, ypos, zpos), (0, 0, 0), (0, 1, 0)]
         self.plotter_widget.render()
-
-    def toggle_theme(self):
-        """
-        Toggle between light and dark themes.
-        """
-        if self.current_theme == "dark":
-            self.current_theme = "light"
-        else:
-            self.current_theme = "dark"
-        self.apply_theme()
 
     def apply_theme(self):
         """
