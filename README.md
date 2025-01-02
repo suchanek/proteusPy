@@ -125,7 +125,7 @@ and open [Analysis_2q7q.ipynb](https://github.com/suchanek/proteusPy/blob/master
 
 ## Visualizing the Disulfide Database
 
-`proteusPy` now has three ways of visualizing the Disulfides in the database. I'll describe these briefly below:
+`proteusPy` now has four ways of visualizing the Disulfides in the database. I'll describe these briefly below:
 
 1) PyVista (built-in) - `proteusPy` utilizes the excellent PyVista library for visualization and manipulation of the Disulfides within the database. These routines are readily accessible from within the Jupyter notebook environment. It uses the VTK library on the backend and provides high-level access to 3D rendering. The menu strip provided in the Disulfide visualization windows allows the user to turn borders, rulers, bounding boxes on and off and reset the orientations. Please try them out! There is also a button for *local* vs *server* rendering. *Local* rendering is usually much smoother. To manipulate:
      - Click and drag your mouse to rotate

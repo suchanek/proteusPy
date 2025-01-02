@@ -836,13 +836,13 @@ class DisulfideList(UserList):
         avg_dist = self.average_distance
         resolution = self.average_resolution
 
-        res = 100
+        res = 64
 
-        if tot_ss > 100:
-            res = 60
-        if tot_ss > 200:
-            res = 30
-        if tot_ss > 300:
+        if tot_ss > 30:
+            res = 48
+        if tot_ss > 60:
+            res = 16
+        if tot_ss > 90:
             res = 8
 
         title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
@@ -901,6 +901,8 @@ class DisulfideList(UserList):
         if screenshot:
             pl.show(auto_close=False)  # allows for manipulation
             pl.screenshot(fname)
+            if verbose:
+                print(f" -> display_overlay(): Saved image to: {fname}")
 
         elif movie:
             if verbose:
