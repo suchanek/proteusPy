@@ -112,3 +112,10 @@ Idx,chi1_s,chi2_s,chi3_s,chi4_s,chi5_s,class_id,SS_Classname,FXN
 """
 
 CLASSOBJ_FNAME = "PDB_CLASS_OBJ.pkl"
+
+# Default cutoffs for the database from analysis. These are 95% confidence
+# intervals for Ca and Sg distances. The cutoffs are used to filter the database
+# for the most statistically reliable disulfide bonds.
+
+CA_CUTOFF = 6.71
+SG_CUTOFF = 2.12

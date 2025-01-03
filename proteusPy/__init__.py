@@ -70,7 +70,6 @@ from .DisulfideLoader import (
     Bootstrap_PDB_SS,
     DisulfideLoader,
     Download_PDB_SS,
-    Download_PDB_SS_GitHub,
     Load_PDB_SS,
 )
 from .logger_config import (
