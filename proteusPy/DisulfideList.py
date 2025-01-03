@@ -7,7 +7,7 @@ The module provides the implmentation and interface for the [DisulfideList](#Dis
 object, used extensively by Disulfide class.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 10/09/2024 -egs-
+Last revision: 2025-01-03 17:03:02 -egs-
 """
 
 # pylint: disable=c0103
@@ -53,7 +53,7 @@ _logger = create_logger(__name__)
 DPI = 220
 WIDTH = 6.0
 HEIGHT = 6.0
-TORMIN = -179.0
+TORMIN = -179.9
 TORMAX = 180.0
 
 
@@ -810,7 +810,7 @@ class DisulfideList(UserList):
         self,
         screenshot=False,
         movie=False,
-        verbose=True,
+        verbose=False,
         fname="ss_overlay.png",
         light="Auto",
     ):
@@ -883,7 +883,10 @@ class DisulfideList(UserList):
         brad = brad if tot_ss < 100 else brad * 0.6
 
         # print(f'Brad: {brad}')
-        pbar = tqdm(range(tot_ss), ncols=PBAR_COLS)
+        if verbose:
+            pbar = tqdm(range(tot_ss), ncols=PBAR_COLS)
+        else:
+            pbar = range(tot_ss)
 
         for i, ss in zip(pbar, ssbonds):
             color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
@@ -1176,14 +1179,19 @@ class DisulfideList(UserList):
         Return the Disulfides with the minimum and maximum energies
         from the DisulfideList.
 
-        :return: Disulfide with the given ID
+        :return: Disulfides with minimum and maximum energies
         """
-        sslist = sorted(self.data)
+        sslist = self.data
+
+        if not sslist:
+            return None, None
+
+        sslist = sorted(sslist, key=lambda ss: ss.energy)
         return sslist[0], sslist[-1]
 
     def nearest_neighbors(self, cutoff: float, *args):
         """
-        Find all neighbor Disulfides within the given angle cutoff of the input Disulfide.
+        Return all Disulfides within the given angle cutoff of the input Disulfide.
 
         :param cutoff: Distance cutoff, degrees
         :param args: Either 5 individual angles (chi1, chi2, chi3, chi4, chi5) or a list of 5 angles
@@ -1209,8 +1217,8 @@ class DisulfideList(UserList):
 
     def nearest_neighbors_ss(self, ss, cutoff: float):
         """
-        Given an input Disulfide and overall torsional cutoff, return
-        the list of Disulfides within the cutoff
+        Return the list of Disulfides within the torsional cutoff
+        of the input Disulfide.
 
         :param ss: Disulfide to compare to
         :param cutoff: Distance cutoff, degrees

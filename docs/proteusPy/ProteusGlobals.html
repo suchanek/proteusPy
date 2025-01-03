@@ -143,6 +143,12 @@
             <li>
                     <a class="variable" href="#CLASSOBJ_FNAME">CLASSOBJ_FNAME</a>
             </li>
+            <li>
+                    <a class="variable" href="#CA_CUTOFF">CA_CUTOFF</a>
+            </li>
+            <li>
+                    <a class="variable" href="#SG_CUTOFF">SG_CUTOFF</a>
+            </li>
     </ul>
 
 
@@ -284,6 +290,13 @@ Last revision: 8/3/24 -egs-</p>
 </span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="s2">&quot;&quot;&quot;</span>
 </span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>
 </span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="n">CLASSOBJ_FNAME</span> <span class="o">=</span> <span class="s2">&quot;PDB_CLASS_OBJ.pkl&quot;</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="c1"># Default cutoffs for the database from analysis. These are 95% confidence</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="c1"># intervals for Ca and Sg distances. The cutoffs are used to filter the database</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="c1"># for the most statistically reliable disulfide bonds.</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="n">CA_CUTOFF</span> <span class="o">=</span> <span class="mf">6.71</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="n">SG_CUTOFF</span> <span class="o">=</span> <span class="mf">2.12</span>
 </span></pre></div>
 
 
@@ -646,6 +659,30 @@ Last revision: 8/3/24 -egs-</p>
         
     </div>
     <a class="headerlink" href="#CLASSOBJ_FNAME"></a>
+    
+    
+
+                </section>
+                <section id="CA_CUTOFF">
+                    <div class="attr variable">
+            <span class="name">CA_CUTOFF</span>        =
+<span class="default_value">6.71</span>
+
+        
+    </div>
+    <a class="headerlink" href="#CA_CUTOFF"></a>
+    
+    
+
+                </section>
+                <section id="SG_CUTOFF">
+                    <div class="attr variable">
+            <span class="name">SG_CUTOFF</span>        =
+<span class="default_value">2.12</span>
+
+        
+    </div>
+    <a class="headerlink" href="#SG_CUTOFF"></a>
     
     
 

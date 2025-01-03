@@ -20,7 +20,6 @@ import copy
 import os
 import pickle
 import time
-import urllib
 
 import gdown
 import matplotlib.pyplot as plt
@@ -36,11 +35,13 @@ from proteusPy.DisulfideExceptions import DisulfideParseWarning
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
+    CA_CUTOFF,
     DATA_DIR,
     LOADER_ALL_URL,
     LOADER_FNAME,
     LOADER_SUBSET_FNAME,
     LOADER_SUBSET_URL,
+    SG_CUTOFF,
     SS_LIST_URL,
     SS_PICKLE_FILE,
 )
@@ -69,7 +70,7 @@ class DisulfideLoader:
     name.
 
     The class can also render Disulfides overlaid on a common coordinate system to a pyVista
-    window using the [display_overlay()](#DisulfideLoader.display_overlay) method. See below for examples.\n
+    window using the [display_overlay()](#DisulfideLoader.display_overlay) method. See below for examples.
 
     Important note: For typical usage one will access the database via the `Load_PDB_SS()` function.
     The difference is that the latter function loads the compressed database from its single
@@ -99,6 +100,7 @@ class DisulfideLoader:
         different data directory and file names for the pickle files. These different
         directories are normally established with the proteusPy.Extract_Disulfides
         function.
+
         """
 
         self.SSList = DisulfideList([], "ALL_PDB_SS")
@@ -136,14 +138,17 @@ class DisulfideLoader:
 
                 new_length = len(filt)
                 if self.verbose:
-                    _logger.info(f"Filtering Cα: old: {old_length}, new: {new_length}")
+                    _logger.info(
+                        "Filtering Cα: old: %d, new: %d", old_length, new_length
+                    )
 
                 old_length = new_length
                 filt = filt.filter_by_sg_distance(sg_cutoff)
                 new_length = len(filt)
                 if self.verbose:
-                    _logger.info(f"Filtering Sγ: old: {old_length}, new: {new_length}")
-
+                    _logger.info(
+                        "Filtering Sγ: old: %d, new: %d", old_length, new_length
+                    )
                 if subset:
                     self.SSList = DisulfideList(filt[:5000], "SUBSET_PDB_SS")
                 else:
@@ -152,11 +157,11 @@ class DisulfideLoader:
                 self.TotalDisulfides = len(self.SSList)
 
         except FileNotFoundError as e:
-            _logger.error(f"File not found: {full_path}")
+            _logger.error("File not found: %s", full_path)
             raise e
 
         except Exception as e:
-            _logger.error(f"An error occurred while loading the file: {full_path}")
+            _logger.error("An error occurred while loading the file: %s", full_path)
             raise e
 
         self.SSDict = self.create_disulfide_dict()
@@ -393,7 +398,7 @@ class DisulfideLoader:
             print(f"Total RAM Used:                     {ram:.2f} GB.")
         print(f"    ================= proteusPy: {vers} =======================")
 
-    def display_overlay(self, pdbid) -> None:
+    def display_overlay(self, pdbid, verbose=False) -> None:
         """
         Display all disulfides for a given PDB ID overlaid in stick mode against
         a common coordinate frame. This allows us to see all of the disulfides
@@ -413,10 +418,10 @@ class DisulfideLoader:
         Display the Disulfides from the PDB ID ```4yys```, overlaid onto
         a common reference (the proximal disulfides).
 
-        >>> PDB_SS.display_overlay('4yys')
+        >>> PDB_SS.display_overlay('4yys', verbose=False)
 
         You can also slice the loader and display as an overly.
-        >>> PDB_SS[:8].display_overlay()
+        >>> PDB_SS[:8].display_overlay(verbose=False)
 
         """
 
@@ -426,7 +431,7 @@ class DisulfideLoader:
             _logger.error("Cannot find key %s in SSBond DB", pdbid)
             return
 
-        ssbonds.display_overlay()
+        ssbonds.display_overlay(verbose=verbose)
         return
 
     def getTorsions(self, pdbID=None) -> pd.DataFrame:
@@ -453,9 +458,9 @@ class DisulfideLoader:
                 sel = self.TorsionDF["source"] == pdbID
                 res_df = self.TorsionDF[sel]
                 return res_df.copy()
-            except KeyError:
+            except KeyError as e:
                 mess = f"! Cannot find key {pdbID} in SSBond DB"
-                raise DisulfideParseWarning(mess)
+                raise DisulfideParseWarning(mess) from e
         else:
             return copy.deepcopy(self.TorsionDF)
 
@@ -844,61 +849,12 @@ def Download_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False):
     return
 
 
-def Download_PDB_SS_GitHub(loadpath=DATA_DIR, verbose=True, subset=False):
-    """
-    Download the databases from Github. Note: if you change the database these sizes will
-    need to be changed!
-
-    :param loadpath: Path from which to load, defaults to DATA_DIR
-    :param verbose: Verbosity, defaults to True
-    """
-
-    _good1 = 0  # all data
-    _good2 = 0  # subset data
-
-    _fname_sub = os.path.join(loadpath, LOADER_SUBSET_FNAME)
-    _fname_all = os.path.join(loadpath, LOADER_FNAME)
-
-    _all_length = 340371775
-    _subset_length = 9636086
-
-    if verbose:
-        print("--> DisulfideLoader: Downloading Disulfide Database from GitHub...")
-
-    _, headers = urllib.request.urlretrieve(
-        "https://github.com/suchanek/proteusPy/raw/master/data/PDB_SS_ALL_LOADER.pkl",
-        _fname_all,
-    )
-    num_bytes = headers.get("content-length")
-    if num_bytes == _all_length:
-        _good1 = 1
-    else:
-        print(f"--> Read: {num_bytes}, expecting: {_all_length}")
-
-    if subset:
-        if verbose:
-            print(
-                "--> DisulfideLoader: Downloading Disulfide Subset Database from GitHub..."
-            )
-
-        _, headers = urllib.request.urlretrieve(
-            "https://github.com/suchanek/proteusPy/raw/master/data/PDB_SS_SUBSET_LOADER.pkl",
-            _fname_sub,
-        )
-        num_bytes = headers.get("content-length")
-        if num_bytes == _subset_length:
-            _good2 = 1
-        else:
-            print(f"--> Read: {num_bytes}, expecting: {_subset_length}")
-    return _good1 + _good2
-
-
 def Load_PDB_SS(
     loadpath=DATA_DIR,
     verbose=False,
     subset=False,
-    cutoff=-1.0,
-    sg_cutoff=-1.0,
+    cutoff=CA_CUTOFF,
+    sg_cutoff=SG_CUTOFF,
     force=False,
 ) -> DisulfideLoader:
     """
@@ -914,6 +870,16 @@ def Load_PDB_SS(
     :type subset: bool
     :return: The loaded Disulfide database
     :rtype: DisulfideList
+
+    Example:
+    >>> from proteusPy import Load_PDB_SS, create_logger
+    >>> import logging
+    >>> _logger = create_logger("testing")
+    >>> _logger.setLevel(logging.WARNING)
+    >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
+    >>> PDB_SS[0]
+    <Disulfide 6dmb_203A_226A, Source: 6dmb, Resolution: 3.0 Å>
+
     """
     # normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy
     # distribution. In that case we need to download the files for all disulfides and the subset
@@ -926,10 +892,12 @@ def Load_PDB_SS(
     _fname_all = os.path.join(loadpath, LOADER_FNAME)
 
     if subset:
-        _logger.info(f"Reading Disulfide subset loader: {_fname_sub}... ")
+        if verbose:
+            _logger.info(f"Reading Disulfide subset loader: {_fname_sub}... ")
 
         if not os.path.exists(_fname_sub) or force is True:
-            _logger.info(f"Creating subset loader: {_fname_sub}... ")
+            if verbose:
+                _logger.info(f"Creating subset loader: {_fname_sub}... ")
 
             loader = Bootstrap_PDB_SS(
                 loadpath=loadpath,
@@ -948,16 +916,23 @@ def Load_PDB_SS(
             return loader
 
         if verbose:
-            print(f"-> load_PDB_SS(): Reading {_fname_sub}... ")
-            _logger.info(f"Reading disulfides from: {_fname_sub}... ")
+            _logger.info("Reading disulfides from: %s...", _fname_sub)
 
         with open(_fname_sub, "rb") as f:
             subloader = pickle.load(f)
         return subloader
     else:
-        _logger.info(f"Reading disulfides from: {_fname_all}... ")
+        if verbose:
+            _logger.info(f"Reading disulfides from: {_fname_all}... ")
         if not os.path.exists(_fname_all) or force is True:
-            _logger.info(f"Creating full loader: {_fname_all}... ")
+            _logger.info(
+                _logger.info(
+                    "Creating full loader: %s with cutoffs: %s, %s...",
+                    _fname_all,
+                    cutoff,
+                    sg_cutoff,
+                )
+            )
 
             loader = Bootstrap_PDB_SS(
                 loadpath=loadpath,
@@ -973,21 +948,25 @@ def Load_PDB_SS(
                 cutoff=cutoff,
                 sg_cutoff=sg_cutoff,
             )
-            if verbose:
-                print(f"-> load_PDB_SS(): Done Saving {_fname_all}... ")
-                _logger.info(f"Done saving disulfides to: {_fname_all}... ")
+
             return loader
 
         if verbose:
-            print(f"-> load_PDB_SS(): Reading {_fname_all}... ")
-            _logger.info(f"Reading disulfides from: {_fname_all}... ")
+            _logger.info("Reading disulfides from: %s...", _fname_all)
 
-        with open(_fname_all, "rb") as f:
-            loader = pickle.load(f)
+        try:
+            with open(_fname_all, "rb") as f:
+                loader = pickle.load(f)
+        except FileNotFoundError as e:
+            _logger.error("File not found: %s", _fname_all)
+            raise e
+        except Exception as e:
+            _logger.error("An error occurred while loading the file: %s", _fname_all)
+            raise e
 
         if verbose:
-            print(f"-> load_PDB_SS(): Done Reading {_fname_all}... ")
-            _logger.info(f"Done reading disulfides from: {_fname_all}... ")
+            message = f"Loaded {len(loader.SSList)} disulfides from {len(loader.SSDict)} PDBs."
+            _logger.info(message)
 
     return loader
 
@@ -1010,8 +989,10 @@ def Bootstrap_PDB_SS(
 
     :param loadpath: Path from which to load the data, defaults to DATA_DIR
     :type loadpath: str
-    :param cutoff: Cutoff value for disulfide loading, defaults to 8.0
+    :param cutoff: Cutoff value for disulfide loading, defaults to -1.0 (no filtering)
     :type cutoff: float
+    :param sg_cutoff: Cutoff value for disulfide loading, defaults to -1.0 (no filtering)
+    :type sg_cutoff: float
     :param verbose: Flag to enable verbose logging, defaults to False
     :type verbose: bool
     :param subset: Flag to indicate whether to load a subset of the data, defaults to False
@@ -1034,7 +1015,12 @@ def Bootstrap_PDB_SS(
 
     full_path = os.path.join(loadpath, _fname)
     if verbose:
-        _logger.info("Building loader from: %s...", full_path)
+        _logger.info(
+            "Building loader from: %s with cutoffs %f, %f...",
+            full_path,
+            cutoff,
+            sg_cutoff,
+        )
 
     loader = DisulfideLoader(
         datadir=DATA_DIR,
