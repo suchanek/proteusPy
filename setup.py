@@ -18,7 +18,8 @@ proteusPy documentation, linked to from:
 http://suchanek.github.io/proteusPy/
 
 
-Eric G. Suchanek, PhD., suchanek@mac.com
+Author: Eric G. Suchanek, PhD., suchanek@mac.com
+Last Modification: 2025-01-04 14:51:52
 """
 
 # pylint: disable=E0011
@@ -121,7 +122,6 @@ setup(
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
         "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Topic :: Scientific/Engineering",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
@@ -150,6 +150,7 @@ setup(
     entry_points={
         "console_scripts": [
             "proteusPy.qt5viewer = proteusPy.qt5viewer:main",
+            "proteusPy.DisulfideExtractor = proteusPy.DisulfideExtractor_mp:main",
         ]
     },
     zip_safe=False,
