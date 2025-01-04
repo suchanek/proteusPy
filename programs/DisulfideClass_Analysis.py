@@ -104,6 +104,8 @@ from colorama import Fore, Style, init
 from tqdm import tqdm
 
 from proteusPy import (
+    SS_CONSENSUS_BIN_FILE,
+    SS_CONSENSUS_OCT_FILE,
     Disulfide,
     DisulfideList,
     DisulfideLoader,
@@ -113,7 +115,6 @@ from proteusPy import (
     set_logger_level,
     toggle_stream_handler,
 )
-from proteusPy.ProteusGlobals import SS_CONSENSUS_BIN_FILE, SS_CONSENSUS_OCT_FILE
 
 HOME_DIR = Path.home()
 PDB = Path(os.getenv("PDB", HOME_DIR / "pdb"))
@@ -344,7 +345,7 @@ def analyze_classes_threaded(
     prefix="ss",
 ) -> DisulfideList:
     """
-    Analyze the six classes of disulfide bonds.
+    Analyze the classes of disulfide bonds.
 
     :param loader: The ``proteusPy.DisulfideLoader`` object.
     :param do_graph: Whether or not to display torsion statistics graphs. Default is True.
@@ -359,7 +360,6 @@ def analyze_classes_threaded(
     save_dir = None
 
     if do_octant:
-        # class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_OCT_FILE)
         class_filename = DATA_DIR / SS_CONSENSUS_OCT_FILE
         save_dir = OCTANT
         eight_or_bin = loader.tclass.eightclass_df
@@ -371,7 +371,6 @@ def analyze_classes_threaded(
                 f"--> analyze_eight_classes(): Expecting {pix} graphs for the octant classes."
             )
     else:
-        # class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_BIN_FILE)
         class_filename = Path(DATA_DIR) / SS_CONSENSUS_BIN_FILE
         save_dir = BINARY
         eight_or_bin = loader.tclass.classdf
