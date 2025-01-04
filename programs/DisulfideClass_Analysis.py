@@ -1,5 +1,6 @@
 # pylint: disable=C0301
-# Last modification: 2024-12-28 19:36:28 -egs-
+# pylint: disable=C0103
+# Last modification: 2025-01-04 12:38:52 -egs-
 
 """
 Disulfide class consensus structure extraction using `proteusPy.Disulfide` package. Disulfide
@@ -97,7 +98,6 @@ import time
 from datetime import timedelta
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from colorama import Fore, Style, init
@@ -113,7 +113,6 @@ from proteusPy import (
     configure_master_logger,
     create_logger,
     set_logger_level,
-    toggle_stream_handler,
 )
 
 HOME_DIR = Path.home()
@@ -307,8 +306,8 @@ def task(
 
             try:
                 class_disulfides_array[idx] = loader[ssid]
-            except Exception as e:
-                _logger.error(f"Error: %s", e)
+            except KeyError as e:
+                _logger.error("Error: %s", e)
 
             if (idx + 1) % update_freq == 0 or (idx + 1) == len(ss_list):
                 remaining = len(ss_list) - (idx + 1)
@@ -326,7 +325,7 @@ def task(
 
         avg_conformation = class_disulfides.average_conformation
 
-        ssname = f"{cls}_avg"
+        ssname = f"{cls}"
         exemplar = Disulfide(ssname, torsions=avg_conformation)
         result_list.append(exemplar)
         overall_pbar.update(1)
@@ -339,7 +338,7 @@ def analyze_classes_threaded(
     loader: DisulfideLoader,
     do_graph=False,
     cutoff=0.0,
-    num_threads=6,
+    num_threads=8,
     verbose=False,
     do_octant=True,
     prefix="ss",
@@ -351,16 +350,15 @@ def analyze_classes_threaded(
     :param do_graph: Whether or not to display torsion statistics graphs. Default is True.
     :param cutoff: The cutoff percentage for each class. If the percentage of disulfides for a class is below
                    this value, the class will be skipped. Default is 0.1.
-    :param num_threads: Number of threads to use for processing. Default is 4.
+    :param num_threads: Number of threads to use for processing. Default is 8.
 
     :return: A list of disulfide bonds, where each disulfide bond represents the average conformation for a class.
     """
-    # global OCTANT, BINARY
 
     save_dir = None
 
     if do_octant:
-        class_filename = DATA_DIR / SS_CONSENSUS_OCT_FILE
+        class_filename = Path(DATA_DIR) / SS_CONSENSUS_OCT_FILE
         save_dir = OCTANT
         eight_or_bin = loader.tclass.eightclass_df
         tot_classes = eight_or_bin.shape[0]
@@ -538,8 +536,6 @@ def update_repository(source_dir, repo_dir, verbose=True, binary=False, octant=F
 
         shutil.copy(source, dest)
 
-    return
-
 
 def main():
     """
@@ -584,11 +580,11 @@ def main():
         f"Loading PDB SS data...\n"
     )
 
-    PDB_SS = Load_PDB_SS(verbose=False, subset=False)
-    PDB_SS.describe()
+    pdb_ss = Load_PDB_SS(verbose=False, subset=False)
+    pdb_ss.describe()
 
     analyze_classes(
-        PDB_SS,
+        pdb_ss,
         binary,
         octant,
         threads=threads,

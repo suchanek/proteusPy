@@ -5,9 +5,12 @@ License: BSD\n
 Copyright (c)2024 Eric G. Suchanek, PhD, all rights reserved
 """
 
-# Last modification 7/25/24 -egs-
+# Last modification 2025-01-04 12:40:28 -egs-
+
 # pylint: disable=c0103
+# pylint: disable=c0302
 # pylint: disable=c0413
+# pylint: disable=c0412
 # pylint: disable=c0415
 # pylint: disable=w1514
 # pylint: disable=w0718
@@ -281,7 +284,7 @@ def image_to_ascii_art(fname, nwidth):
     :param nwidth: Output width in characters.
     """
     from PIL import Image
-    from sklearn.preprocessing import minmax_scale
+    from sklearn.preprocessing import minmax_scale  # type: ignore
 
     # Open the image file
     image = Image.open(fname)
@@ -319,7 +322,7 @@ def image_to_ascii_art(fname, nwidth):
     print(ascii_art)
 
 
-def generate_vector_dataframe(base=3):
+def generate_vector_dataframe(base=2):
     """
     Generate a pandas DataFrame containing all combinations for a vector of length 5
     with a given base.
