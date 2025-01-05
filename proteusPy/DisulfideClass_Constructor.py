@@ -34,6 +34,7 @@ from proteusPy.ProteusGlobals import (
     SS_CLASS_DEFINITIONS,
     SS_CLASS_DICT_FILE,
     SS_CONSENSUS_OCT_FILE,
+    SS_CONSENSUS_BIN_FILE,
 )
 
 _logger = create_logger(__name__)
@@ -118,19 +119,65 @@ class DisulfideClass_Constructor:
         self.classdf = None
         self.sixclass_df = None
         self.eightclass_df = None
+        self.consensus_binary_list = None
+        self.consensus_oct_list = None
 
         if self.verbose:
             _logger.info("Building SS classes...")
-
         self.build_yourself(loader)
+
+        if self.verbose:
+            _logger.info("Loading binary consensus structure list from %s", SS_CONSENSUS_BIN_FILE)
+        self.consensus_binary_list = self.load_consensus_file(oct=False)
+
+        if self.verbose:
+            _logger.info("Loading octant consensus structure list from %s", SS_CONSENSUS_OCT_FILE)
+        self.consensus_oct_list = self.load_consensus_file(oct=True)
+
+    # overload __getitem__ to handle slicing and indexing, and access by name
+    def __getitem__(self, item: str):
+        """
+        Implements indexing and slicing to retrieve DisulfideList objects from the
+        DisulfideLoader. Supports:
+
+        - Return a DisulfideList given the input Class ID string. Works with Binary and
+        Octant classes.
+
+        Raises DisulfideException on invalid indices or names.
+        """
+        disulfides = None
+
+        if isinstance(item, int):
+            raise ValueError("Integer indexing not supported. Use a string key.")
+        
+        elif isinstance(item, str):
+            if "0" in item:
+                # binary class
+                classdict = self.classdict
+            else:
+                # octant class
+                classdict = self.eightclass_dict
+            
+            try:
+                disulfides = classdict[item]
+                return disulfides
+            except KeyError as e:
+                _logger.error("DisulfideLoader(): Cannot find key <%s> in SSBond DB", item)
 
     def load_class_dict(self, fname=Path(DATA_DIR) / SS_CLASS_DICT_FILE) -> dict:
         """Load the class dictionary from the specified file."""
         with open(fname, "rb") as f:
             self.classdict = pickle.load(f)
 
-    def load_consensus_file(self, fname=Path(DATA_DIR) / SS_CONSENSUS_OCT_FILE):
+    def load_consensus_file(self, fpath=Path(DATA_DIR), oct=True) -> DisulfideList:
         """Load the consensus file from the specified file."""
+        
+        res = None
+        if oct:
+            fname = fpath / SS_CONSENSUS_OCT_FILE
+        else:
+            fname = fpath / SS_CONSENSUS_BIN_FILE
+
         with open(fname, "rb") as f:
             res = pickle.load(f)
         return res
@@ -140,11 +187,20 @@ class DisulfideClass_Constructor:
         ss_id_col = group_df["ss_id"]
         result_df = pd.concat([class_df, ss_id_col], axis=1)
         return result_df
-
-    def list_binary_classes(self):
-        """List the binary classes."""
-        for k, v in enumerate(self.classdict):
-            print(f"Class: |{k}|, |{v}|")
+    
+    def list_classes(self, base=2):
+        """List the Disulfide classes."""
+        if base == 2:
+            for k, v in enumerate(self.classdict):
+                print(f"Class: |{k}|, |{v}|")
+        elif base == 6:
+            for k, v in enumerate(self.sixclass_dict):
+                print(f"Class: |{k}|, |{v}|")
+        elif base == 8:
+            for k, v in enumerate(self.eightclass_dict):
+                print(f"Class: |{k}|, |{v}|")
+        else:
+            raise ValueError("Invalid base. Must be 2, 6, or 8.")
 
     def from_class(self, loader, classid: str) -> DisulfideList:
         """
@@ -275,7 +331,7 @@ class DisulfideClass_Constructor:
             inplace=True,
         )
 
-        classdict = dict(zip(merged["SS_Classname"], merged["ss_id"]))
+        classdict = dict(zip(merged["class_id"], merged["ss_id"]))
         self.classdict = classdict
         self.classdf = merged.copy()
 
@@ -284,12 +340,14 @@ class DisulfideClass_Constructor:
 
         grouped_sixclass = self.create_six_classes(tors_df)
         self.sixclass_df = grouped_sixclass.copy()
+        self.sixclass_dict = dict(zip(grouped_sixclass["class_id"], grouped_sixclass["ss_id"]))
 
         if self.verbose:
             _logger.info("Creating eightfold SS classes...")
 
         grouped_eightclass = self.create_eight_classes(tors_df)
         self.eightclass_df = grouped_eightclass.copy()
+        self.eightclass_dict = dict(zip(grouped_eightclass["class_id"], grouped_eightclass["ss_id"]))
 
         if self.verbose:
             _logger.info("Initialization complete.")
@@ -496,6 +554,7 @@ class DisulfideClass_Constructor:
             return None
         elif len(filtered_df) > 1:
             raise ValueError(f"Multiple rows found for class_id '{cls}'")
+        
         return filtered_df.iloc[0]["ss_id"]
 
     def save(self, savepath=DATA_DIR) -> None:

@@ -1136,6 +1136,7 @@ class Disulfide:
         self._compute_rho()
         self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
         self.cb_distance = distance3d(self.cb_prox, self.cb_dist)
+        self.sg_distance = distance3d(self.sg_prox, self.sg_dist)
         self.torsion_array = np.array([chi1, chi2, chi3, chi4, chi5])
         self.missing_atoms = True
         self.modelled = True
