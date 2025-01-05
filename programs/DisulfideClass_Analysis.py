@@ -100,19 +100,17 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import proteusPy as pp
+
 from colorama import Fore, Style, init
 from tqdm import tqdm
+
 
 from proteusPy import (
     SS_CONSENSUS_BIN_FILE,
     SS_CONSENSUS_OCT_FILE,
-    Disulfide,
-    DisulfideList,
-    DisulfideLoader,
-    Load_PDB_SS,
-    configure_master_logger,
-    create_logger,
-    set_logger_level,
+    CA_CUTOFF,
+    SG_CUTOFF,
 )
 
 HOME_DIR = Path.home()
@@ -141,10 +139,10 @@ PBAR_COLS = 78
 # Initialize colorama
 init(autoreset=True)
 
-_logger = create_logger("DisulfideClass_Analysis")
+_logger = pp.create_logger("DisulfideClass_Analysis")
 
-configure_master_logger("DisulfidClass_Analysis.log")
-set_logger_level("DisulfideClass_Analysis", "INFO")
+pp.configure_master_logger("DisulfidClass_Analysis.log")
+pp.set_logger_level("DisulfideClass_Analysis", "INFO")
 
 
 def get_args():
@@ -236,12 +234,12 @@ def get_args():
 
 # task definition
 def task(
-    loader: DisulfideLoader,
+    loader: pp.DisulfideLoader,
     overall_pbar: tqdm,
     eight_or_bin: pd.DataFrame,
     start_idx: int,
     end_idx: int,
-    result_list: DisulfideList,
+    result_list: pp.DisulfideList,
     pbar: tqdm,
     total_ss: int,
     cutoff: float,
@@ -271,7 +269,6 @@ def task(
     """
 
     for idx in range(start_idx, end_idx):
-
         row = eight_or_bin.iloc[idx]
         cls = row["class_id"]
         ss_list = row["ss_id"]
@@ -314,7 +311,7 @@ def task(
                 task_pbar.update(update_freq if remaining >= update_freq else remaining)
         task_pbar.close()
 
-        class_disulfides = DisulfideList(
+        class_disulfides = pp.DisulfideList(
             list(class_disulfides_array), cls, quiet=True, fast=True
         )
 
@@ -335,14 +332,14 @@ def task(
 
 
 def analyze_classes_threaded(
-    loader: DisulfideLoader,
+    loader: pp.DisulfideLoader,
     do_graph=False,
     cutoff=0.0,
     num_threads=8,
     verbose=False,
     do_octant=True,
     prefix="ss",
-) -> DisulfideList:
+) -> pp.DisulfideList:
     """
     Analyze the classes of disulfide bonds.
 
@@ -362,7 +359,7 @@ def analyze_classes_threaded(
         save_dir = OCTANT
         eight_or_bin = loader.tclass.eightclass_df
         tot_classes = eight_or_bin.shape[0]
-        res_list = DisulfideList([], "SS_8class_Avg_SS")
+        res_list = pp.DisulfideList([], "SS_8class_Avg_SS")
         pix = octant_classes_vs_cutoff(loader, cutoff)
         if verbose:
             print(
@@ -373,7 +370,7 @@ def analyze_classes_threaded(
         save_dir = BINARY
         eight_or_bin = loader.tclass.classdf
         tot_classes = eight_or_bin.shape[0]
-        res_list = DisulfideList([], "SS_32class_Avg_SS")
+        res_list = pp.DisulfideList([], "SS_32class_Avg_SS")
         pix = 32
 
     total_ss = len(loader.SSList)
@@ -444,7 +441,7 @@ def analyze_classes_threaded(
 
 
 def analyze_classes(
-    loader: DisulfideLoader,
+    loader: pp.DisulfideLoader,
     binary: bool,
     octant: bool,
     threads: int = 4,
@@ -503,7 +500,7 @@ def analyze_classes(
     return
 
 
-def octant_classes_vs_cutoff(loader: DisulfideLoader, cutoff):
+def octant_classes_vs_cutoff(loader: pp.DisulfideLoader, cutoff):
     """
     Return number of members for the octant class for a given cutoff value.
 
@@ -580,7 +577,8 @@ def main():
         f"Loading PDB SS data...\n"
     )
 
-    pdb_ss = Load_PDB_SS(verbose=False, subset=False)
+    pdb_ss = pp.Load_PDB_SS(verbose=True, subset=False, cutoff=CA_CUTOFF, sg_cutoff=SG_CUTOFF)
+    #pdb_ss = pp.DisulfideLoader(verbose=True, subset=False, cutoff=, sg_cutoff=-1)
     pdb_ss.describe()
 
     analyze_classes(

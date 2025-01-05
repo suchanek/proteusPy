@@ -139,15 +139,16 @@ class DisulfideLoader:
                 new_length = len(filt)
                 if self.verbose:
                     _logger.info(
-                        "Filtering Cα: old: %d, new: %d", old_length, new_length
+                        "Filtering with Cα cutoff %f: old: %d, new: %d", cutoff, old_length, new_length
                     )
 
                 old_length = new_length
                 filt = filt.filter_by_sg_distance(sg_cutoff)
                 new_length = len(filt)
+
                 if self.verbose:
                     _logger.info(
-                        "Filtering Sγ: old: %d, new: %d", old_length, new_length
+                        "Filtering Sγ: cutoff %f: old: %d, new: %d", sg_cutoff, old_length, new_length
                     )
                 if subset:
                     self.SSList = DisulfideList(filt[:5000], "SUBSET_PDB_SS")
@@ -155,6 +156,16 @@ class DisulfideLoader:
                     self.SSList = DisulfideList(filt, "ALL_PDB_SS")
 
                 self.TotalDisulfides = len(self.SSList)
+            
+                self.SSDict = self.create_disulfide_dict()
+                self.IDList = list(self.SSDict.keys())
+
+                self.TorsionDF = self.SSList.torsion_df
+                self.TotalDisulfides = len(self.SSList)
+                self.tclass = DisulfideClass_Constructor(self, self.verbose)
+
+            if self.verbose and not self.quiet:
+                _logger.info("Initialization complete.")
 
         except FileNotFoundError as e:
             _logger.error("File not found: %s", full_path)
@@ -164,17 +175,7 @@ class DisulfideLoader:
             _logger.error("An error occurred while loading the file: %s", full_path)
             raise e
 
-        self.SSDict = self.create_disulfide_dict()
-        self.IDList = list(self.SSDict.keys())
-
-        self.TorsionDF = sslist.torsion_df
-        self.TotalDisulfides = len(self.SSList)
-
-        self.tclass = DisulfideClass_Constructor(self, self.verbose)
-
-        if self.verbose and not self.quiet:
-            _logger.info("Initialization complete.")
-
+        
     # overload __getitem__ to handle slicing and indexing, and access by name
     def __getitem__(self, item):
         """
