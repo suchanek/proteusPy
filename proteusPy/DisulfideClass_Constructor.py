@@ -140,8 +140,8 @@ class DisulfideClass_Constructor:
         Implements indexing and slicing to retrieve DisulfideList objects from the
         DisulfideLoader. Supports:
 
-        - Return a DisulfideList given the input Class ID string. Works with Binary and
-        Octant classes.
+        - Return a DisulfideList given the input Class ID string. Works with Binary
+        classes.
 
         Raises DisulfideException on invalid indices or names.
         """
@@ -151,12 +151,7 @@ class DisulfideClass_Constructor:
             raise ValueError("Integer indexing not supported. Use a string key.")
         
         elif isinstance(item, str):
-            if "0" in item:
-                # binary class
-                classdict = self.classdict
-            else:
-                # octant class
-                classdict = self.eightclass_dict
+            classdict = self.classdict
             
             try:
                 disulfides = classdict[item]
@@ -189,7 +184,14 @@ class DisulfideClass_Constructor:
         return result_df
     
     def list_classes(self, base=2):
-        """List the Disulfide classes."""
+        """
+        List the Disulfide structural classes.
+        
+        :param self: The instance of the DisulfideClass_Constructor class.
+        :type self: DisulfideClass_Constructor
+        :return: A list of disulfide structural classes.
+        :rtype: list
+        """
         if base == 2:
             for k, v in enumerate(self.classdict):
                 print(f"Class: |{k}|, |{v}|")
@@ -335,17 +337,17 @@ class DisulfideClass_Constructor:
         self.classdict = classdict
         self.classdf = merged.copy()
 
-        if self.verbose:
-            _logger.info("Creating sixfold SS classes...")
+        #if self.verbose:
+        #    _logger.info("Creating sixfold SS classes...")
 
-        grouped_sixclass = self.create_six_classes(tors_df)
-        self.sixclass_df = grouped_sixclass.copy()
-        self.sixclass_dict = dict(zip(grouped_sixclass["class_id"], grouped_sixclass["ss_id"]))
+        #grouped_sixclass = self.create_classes(tors_df, 6)
+        #self.sixclass_df = grouped_sixclass.copy()
+        #self.sixclass_dict = dict(zip(grouped_sixclass["class_id"], grouped_sixclass["ss_id"]))
 
         if self.verbose:
             _logger.info("Creating eightfold SS classes...")
 
-        grouped_eightclass = self.create_eight_classes(tors_df)
+        grouped_eightclass = self.create_classes(tors_df, 8)
         self.eightclass_df = grouped_eightclass.copy()
         self.eightclass_dict = dict(zip(grouped_eightclass["class_id"], grouped_eightclass["ss_id"]))
 
@@ -383,7 +385,7 @@ class DisulfideClass_Constructor:
 
         return grouped
 
-    def create_six_classes(self, df) -> pd.DataFrame:
+    def create_classes(self, df, base=8) -> pd.DataFrame:
         """
         Create a new DataFrame from the input with a 6-class encoding for input 'chi' values.
 
@@ -402,16 +404,19 @@ class DisulfideClass_Constructor:
         """
 
         _df = pd.DataFrame()
-        # create the chi_t columns for each chi column
-        for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
-            _df[col_name + "_t"] = df[col_name].apply(self.get_sixth_quadrant)
+        if base == 6:
+            for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
+                _df[col_name + "_t"] = df[col_name].apply(self.get_sixth_quadrant)
+        elif base == 8:
+            for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
+                _df[col_name + "_t"] = df[col_name].apply(self.get_eighth_quadrant)
+        else:
+            raise ValueError("Base must be either 6 or 8")
 
-        # create the class_id column
         df["class_id"] = _df[["chi1_t", "chi2_t", "chi3_t", "chi4_t", "chi5_t"]].apply(
             lambda x: "".join(x), axis=1
         )
 
-        # group the DataFrame by class_id and return the grouped data
         grouped = df.groupby("class_id").agg({"ss_id": "unique"})
         grouped["count"] = grouped["ss_id"].apply(lambda x: len(x))
         grouped["incidence"] = grouped["count"] / len(df)
@@ -576,40 +581,6 @@ class DisulfideClass_Constructor:
 
         if self.verbose:
             _logger.info("Done.")
-
-    def six_class_to_binary(self, cls_str):
-        """
-        Return a string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees
-        into a string of 5 characters, where each character is either '1' if the corresponding input character represents a
-        negative angle or '2' if it represents a positive angle.
-
-        :param cls_str (str): A string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees.
-        :return str: A string of length 5, where each character is either '0' or '2', representing the sign of the corresponding input angle.
-        """
-        output_str = ""
-        for char in cls_str:
-            if char in ["1", "2", "3"]:
-                output_str += "2"
-            elif char in ["4", "5", "6"]:
-                output_str += "0"
-        return output_str
-
-    def eight_class_to_binary(self, cls_str):
-        """
-        Return a string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees
-        into a string of 5 characters, where each character is either '1' if the corresponding input character represents a
-        negative angle or '2' if it represents a positive angle.
-
-        :param cls_str (str): A string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees.
-        :return str: A string of length 5, where each character is either '0' or '2', representing the sign of the corresponding input angle.
-        """
-        output_str = ""
-        for char in cls_str:
-            if char in ["1", "2", "3", "4"]:
-                output_str += "2"
-            elif char in ["5", "6", "7", "8"]:
-                output_str += "0"
-        return output_str
 
     def class_to_binary(self, cls_str, base):
         """
