@@ -18,7 +18,7 @@ endif
 
 CONDA = conda
 
-MESS = "0.98.2 release"
+MESS = "0.98.2.dev1"
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
 
