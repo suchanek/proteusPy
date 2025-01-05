@@ -105,7 +105,7 @@ class DisulfideList(UserList):
     Examples:
     >>> from proteusPy import Disulfide, DisulfideLoader, DisulfideList, Load_PDB_SS
 
-    Instantiate some variables. Note: the list is initialized with an iterable and a name (optional)
+    Instantiate some variables. Note: the list is initialifzed with an iterable and a name (optional)
 
     >>> SS = Disulfide('tmp')
 
