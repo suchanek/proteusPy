@@ -11,12 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - ``DisulfideExtractor_mp.py`` moved into the package as a callable module.
 
-``proteusPy.DisulfideExtractor`` from command line will launch the program
+  ``proteusPy.DisulfideExtractor`` from command line will launch the program
+
+- Incorporated consensus structures into the ``DisulfideClass_Constructor`` object. This presumes these have been generated. The consensus structures are created through the program ``DisulfideClass_Analysis.py``.
 
 ### Changed
 
 - Corrected an error in ``DisulfideLoader`` that failed to initialize the torsion dataframe properly after filtering.
 - Change to setup.py - 2q7q_seqsim.csv was not being included
+
+### Fixed
+
+- Sg_distance was not being calculated with ``Disulfide.build_yourself()``
+- There was a subtle error in the ``DisulfideLoader`` initialization that led to internal database inconsistencies after filtering. This has been corrected.
 
 ## [v0.98.2] - 2024-12-30
 
