@@ -323,7 +323,7 @@ def task(
         avg_conformation = class_disulfides.average_conformation
 
         ssname = f"{cls}"
-        exemplar = Disulfide(ssname, torsions=avg_conformation)
+        exemplar = pp.Disulfide(ssname, torsions=avg_conformation)
         result_list.append(exemplar)
         overall_pbar.update(1)
 
