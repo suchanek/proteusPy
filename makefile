@@ -18,7 +18,7 @@ endif
 
 CONDA = conda
 
-MESS = "0.98.2.dev1"
+MESS = "0.98.3.dev0"
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
 
@@ -166,7 +166,7 @@ docker_run:
 
 .PHONY: docker_purge
 docker_purge:
-	docker system prune -a
+	docker system prune -a -y
 
 # end of file
 
