@@ -2356,7 +2356,7 @@ class Disulfide:
 
         >>> tot = low_energy_neighbors.length
         >>> print(f'Neighbors: {tot}')
-        Neighbors: 9
+        Neighbors: 8
         >>> low_energy_neighbors.display_overlay(light="auto")
 
         """
