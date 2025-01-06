@@ -100,24 +100,18 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import proteusPy as pp
-
 from colorama import Fore, Style, init
 from tqdm import tqdm
 
-
-from proteusPy import (
-    SS_CONSENSUS_BIN_FILE,
-    SS_CONSENSUS_OCT_FILE,
-    CA_CUTOFF,
-    SG_CUTOFF,
-)
+import proteusPy as pp
+from proteusPy import CA_CUTOFF, SG_CUTOFF, SS_CONSENSUS_BIN_FILE, SS_CONSENSUS_OCT_FILE
 
 HOME_DIR = Path.home()
 PDB = Path(os.getenv("PDB", HOME_DIR / "pdb"))
 
 DATA_DIR = PDB / "data"
 SAVE_DIR = HOME_DIR / "Documents" / "proteusPyDocs" / "classes"
+MODULE_DIR = HOME_DIR / "repos" / "proteusPy" / "proteusPy" / "data"
 REPO_DIR = HOME_DIR / "repos" / "proteusPy" / "data"
 
 OCTANT = SAVE_DIR / "octant"
@@ -520,7 +514,7 @@ def update_repository(source_dir, repo_dir, verbose=True, binary=False, octant=F
         dest = Path(repo_dir) / SS_CONSENSUS_BIN_FILE
 
         if verbose:
-            print(f"Copying {source} to {dest}")
+            print(f"Copying binary consensus classes from: {source} to {dest}")
 
         shutil.copy(source, dest)
 
@@ -529,7 +523,7 @@ def update_repository(source_dir, repo_dir, verbose=True, binary=False, octant=F
         dest = Path(repo_dir) / SS_CONSENSUS_OCT_FILE
 
         if verbose:
-            print(f"Copying consensus structures from {source} to {dest}")
+            print(f"Copying octant consensus structures from {source} to {dest}")
 
         shutil.copy(source, dest)
 
@@ -577,8 +571,31 @@ def main():
         f"Loading PDB SS data...\n"
     )
 
-    pdb_ss = pp.Load_PDB_SS(verbose=True, subset=False, cutoff=CA_CUTOFF, sg_cutoff=SG_CUTOFF)
-    #pdb_ss = pp.DisulfideLoader(verbose=True, subset=False, cutoff=, sg_cutoff=-1)
+    if do_update:
+        print("Updating repository with consensus classes.")
+        update_repository(DATA_DIR, REPO_DIR, binary=True, octant=False)
+        update_repository(DATA_DIR, MODULE_DIR, binary=True, octant=False)
+
+        update_repository(DATA_DIR, REPO_DIR, binary=False, octant=True)
+        update_repository(DATA_DIR, MODULE_DIR, binary=False, octant=True)
+
+        if forge == "miniforge3":
+            venv_dir = MINIFORGE_DIR / env / VENV_DIR
+        else:
+            venv_dir = MAMBAFORGE_DIR / env / VENV_DIR
+
+        if verbose:
+            print(f"Copying consensus SS class files from: {DATA_DIR} to {venv_dir}")
+
+        update_repository(DATA_DIR, venv_dir, binary=True, octant=False)
+        update_repository(DATA_DIR, venv_dir, binary=False, octant=True)
+
+        return
+
+    pdb_ss = pp.Load_PDB_SS(
+        verbose=True, subset=False, cutoff=CA_CUTOFF, sg_cutoff=SG_CUTOFF
+    )
+    # pdb_ss = pp.DisulfideLoader(verbose=True, subset=False, cutoff=, sg_cutoff=-1)
     pdb_ss.describe()
 
     analyze_classes(
@@ -589,20 +606,6 @@ def main():
         do_graph=do_graph,
         cutoff=cutoff,
     )
-
-    if do_update:
-        print("Updating repository with consensus classes.")
-        update_repository(DATA_DIR, REPO_DIR, binary=binary, octant=octant)
-
-        if forge == "miniforge3":
-            venv_dir = MINIFORGE_DIR / env / VENV_DIR
-        else:
-            venv_dir = MAMBAFORGE_DIR / env / VENV_DIR
-
-        if verbose:
-            print(f"Copying SS files from: {DATA_DIR} to {venv_dir}")
-
-        update_repository(DATA_DIR, venv_dir, binary=binary, octant=octant)
 
 
 if __name__ == "__main__":

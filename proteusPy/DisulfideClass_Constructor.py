@@ -2,7 +2,7 @@
 DisulfideBond Class Analysis Dictionary creation
 Author: Eric G. Suchanek, PhD.
 License: BSD
-Last Modification: 2/19/24 -egs-
+Last Modification: 2025-01-05 20:37:38 -egs-
 
 Disulfide Class creation and manipulation. Binary classes using the +/- formalism of Hogg et al. 
 (Biochem, 2006, 45, 7429-7433), are created for all 32 possible classes from the Disulfides 
@@ -110,7 +110,6 @@ class DisulfideClass_Constructor:
     |      22202 | +RHHook        | UNK        |     593 |  0.00491313 |
     |      22220 | ±RHSpiral      | UNK        |    2544 |  0.0210776  |
     |      22222 | +RHSpiral      | UNK        |    3665 |  0.0303653  |
-
     """
 
     def __init__(self, loader, verbose=True) -> None:
@@ -123,16 +122,14 @@ class DisulfideClass_Constructor:
         self.consensus_oct_list = None
 
         if self.verbose:
-            _logger.info("Building SS classes...")
-        self.build_yourself(loader)
-
-        if self.verbose:
             _logger.info("Loading binary consensus structure list from %s", SS_CONSENSUS_BIN_FILE)
         self.consensus_binary_list = self.load_consensus_file(oct=False)
 
         if self.verbose:
             _logger.info("Loading octant consensus structure list from %s", SS_CONSENSUS_OCT_FILE)
         self.consensus_oct_list = self.load_consensus_file(oct=True)
+
+        self.build_classes(loader)
 
     # overload __getitem__ to handle slicing and indexing, and access by name
     def __getitem__(self, item: str):
@@ -209,7 +206,7 @@ class DisulfideClass_Constructor:
         Return a list of disulfides corresponding to the input BINARY class ID
         string.
 
-        :param classid: Class ID, e.g. '+RHStaple'
+        :param classid: Class ID, e.g. '00200'
         :return: DisulfideList of class members
         """
 
@@ -290,23 +287,20 @@ class DisulfideClass_Constructor:
         class_strings = ["".join(combination) for combination in class_combinations]
         return class_strings
 
-    def build_yourself(self, loader) -> None:
+    def build_classes(self, loader) -> None:
         """
         Build the internal structures needed for the binary and six-fold disulfide structural classes
         based on dihedral angle rules.
 
-        Parameters
-        ----------
-        loader: DisulfideLoader object
-
-        Returns
-        -------
-        None
+        :param loader: The DisulfideLoader object containing the data.
+        :type loader: DisulfideLoader
+        :return: None
+        :rtype: None
         """
-        # import proteusPy
-        from proteusPy import __version__ as version  # pylint: disable=C0415
 
-        self.version = version
+        from proteusPy import __version__
+
+        self.version = __version__
 
         tors_df = loader.getTorsions()
 

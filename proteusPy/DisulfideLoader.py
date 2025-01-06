@@ -139,7 +139,10 @@ class DisulfideLoader:
                 new_length = len(filt)
                 if self.verbose:
                     _logger.info(
-                        "Filtering with Cα cutoff %f: old: %d, new: %d", cutoff, old_length, new_length
+                        "Filtering with Cα cutoff %f: old: %d, new: %d",
+                        cutoff,
+                        old_length,
+                        new_length,
                     )
 
                 old_length = new_length
@@ -148,7 +151,10 @@ class DisulfideLoader:
 
                 if self.verbose:
                     _logger.info(
-                        "Filtering Sγ: cutoff %f: old: %d, new: %d", sg_cutoff, old_length, new_length
+                        "Filtering Sγ: cutoff %f: old: %d, new: %d",
+                        sg_cutoff,
+                        old_length,
+                        new_length,
                     )
                 if subset:
                     self.SSList = DisulfideList(filt[:5000], "SUBSET_PDB_SS")
@@ -156,7 +162,7 @@ class DisulfideLoader:
                     self.SSList = DisulfideList(filt, "ALL_PDB_SS")
 
                 self.TotalDisulfides = len(self.SSList)
-            
+
                 self.SSDict = self.create_disulfide_dict()
                 self.IDList = list(self.SSDict.keys())
 
@@ -164,8 +170,8 @@ class DisulfideLoader:
                 self.TotalDisulfides = len(self.SSList)
                 self.tclass = DisulfideClass_Constructor(self, self.verbose)
 
-            if self.verbose and not self.quiet:
-                _logger.info("Initialization complete.")
+            if self.verbose:
+                _logger.info("Loader initialization complete.")
 
         except FileNotFoundError as e:
             _logger.error("File not found: %s", full_path)
@@ -175,7 +181,6 @@ class DisulfideLoader:
             _logger.error("An error occurred while loading the file: %s", full_path)
             raise e
 
-        
     # overload __getitem__ to handle slicing and indexing, and access by name
     def __getitem__(self, item):
         """
@@ -310,40 +315,26 @@ class DisulfideLoader:
 
         eightorbin = None
 
-        if "0" in clsid:
-            eightorbin = self.tclass.classdf
+        if base == 8:
+            eightorbin = self.tclass.eightclass_dict
+        elif base == 2:
+            eightorbin = self.tclass.classdict
         else:
-            if base == 8:
-                eightorbin = self.tclass.eightclass_df
-            elif base == 6:
-                eightorbin = self.tclass.sixclass_df
+            raise ValueError("Invalid base value.")
 
-        tot_classes = eightorbin.shape[0]
+        ss_ids = eightorbin[clsid]
+
+        tot_ss = len(eightorbin)
         class_disulfides = DisulfideList([], clsid, quiet=True)
 
         if verbose:
-            _pbar = tqdm(eightorbin.iterrows(), total=tot_classes, leave=True)
+            _pbar = tqdm(range(tot_ss), total=tot_ss, leave=True)
         else:
-            _pbar = eightorbin.iterrows()
+            _pbar = range(tot_ss)
 
-        for idx, row in _pbar:
-            _cls = row["class_id"]
-            if _cls == clsid:
-                ss_list = row["ss_id"]
-                if verbose:
-                    pbar = tqdm(ss_list, leave=True)
-                else:
-                    pbar = ss_list
-
-                for ssid in pbar:
-                    class_disulfides.append(self[ssid])
-
-                if verbose:
-                    pbar.set_postfix({"Done": ""})
-                break
-
-            if verbose:
-                _pbar.set_postfix({"Cnt": idx})
+        for idx in _pbar:
+            ssid = ss_ids[idx]
+            class_disulfides.append(self[ssid])
 
         return class_disulfides
 
@@ -460,7 +451,8 @@ class DisulfideLoader:
                 res_df = self.TorsionDF[sel]
                 return res_df.copy()
             except KeyError as e:
-                mess = f"! Cannot find key {pdbID} in SSBond DB"
+                mess = f"Cannot find key {pdbID} in SSBond DB"
+                _logger.error(mess)
                 raise DisulfideParseWarning(mess) from e
         else:
             return copy.deepcopy(self.TorsionDF)
@@ -524,37 +516,6 @@ class DisulfideLoader:
         ax2.set_ylabel("Number of members", color="red")
 
         plt.show()
-
-    def plot_binary_to_sixclass_incidence(
-        self, theme="light", save=False, savedir=".", verbose=False
-    ):
-        """
-        Plot the incidence of all sextant Disulfide classes for a given binary class.
-
-        :param loader: `proteusPy.DisulfideLoader` object
-        """
-
-        if verbose:
-            _logger.setLevel("INFO")
-
-        clslist = self.tclass.classdf["class_id"]
-        for cls in clslist:
-            sixcls = self.tclass.binary_to_six_class(cls)
-            df = self.enumerate_class_fromlist(sixcls, base=6)
-            self.plot_count_vs_class_df(
-                df,
-                title=cls,
-                theme=theme,
-                save=save,
-                savedir=savedir,
-                base=6,
-                verbose=verbose,
-            )
-        if verbose:
-            _logger.info("Graph generation complete.")
-            _logger.setLevel("WARNING")
-
-        return
 
     def plot_binary_to_eightclass_incidence(
         self,
@@ -669,18 +630,16 @@ class DisulfideLoader:
         :return: None
         """
 
-        _title = f"Binary Class: {title}"
+        _title = None
 
         if base == 8:
             _title = f"Octant Class: {title}"
-        elif base == 6:
-            _title = f"Sextant Class: {title}"
+        elif base == 2:
+            _title = f"Binary Class: {title}"
+        else:
+            raise ValueError("Invalid base value.")
 
-        df = (
-            self.tclass.classdf
-            if base == 2
-            else self.tclass.sixclass_df if base == 6 else self.tclass.eightclass_df
-        )
+        df = self.tclass.classdf if base == 2 else self.tclass.eightclass_df
 
         if cls is None:
             fig = px.line(df, x="class_id", y="count", title=_title)
@@ -884,90 +843,39 @@ def Load_PDB_SS(
     """
     # normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy
     # distribution. In that case we need to download the files for all disulfides and the subset
-    # from the GitHub.
-
-    _good1 = False  # all data
-    _good2 = False  # subset data
+    # from my Google Drive. This is a one-time operation.
 
     _fname_sub = os.path.join(loadpath, LOADER_SUBSET_FNAME)
     _fname_all = os.path.join(loadpath, LOADER_FNAME)
+    _fpath = _fname_sub if subset else _fname_all
 
-    if subset:
+    if not os.path.exists(_fpath) or force is True:
         if verbose:
-            _logger.info(f"Reading Disulfide subset loader: {_fname_sub}... ")
+            _logger.info(f"Bootstrapping new loader: {str(_fpath)}... ")
 
-        if not os.path.exists(_fname_sub) or force is True:
-            if verbose:
-                _logger.info(f"Creating subset loader: {_fname_sub}... ")
+        loader = Bootstrap_PDB_SS(
+            loadpath=loadpath,
+            verbose=verbose,
+            subset=subset,
+            force=force,
+            cutoff=cutoff,
+            sg_cutoff=sg_cutoff,
+        )
+        loader.save(
+            savepath=loadpath,
+            subset=subset,
+            cutoff=cutoff,
+            sg_cutoff=sg_cutoff,
+        )
+        return loader
 
-            loader = Bootstrap_PDB_SS(
-                loadpath=loadpath,
-                verbose=verbose,
-                subset=True,
-                force=force,
-                cutoff=cutoff,
-                sg_cutoff=sg_cutoff,
-            )
-            loader.save(
-                savepath=loadpath,
-                subset=True,
-                cutoff=cutoff,
-                sg_cutoff=sg_cutoff,
-            )
-            return loader
+    if verbose:
+        _logger.info("Reading disulfides from: %s...", _fpath)
 
-        if verbose:
-            _logger.info("Reading disulfides from: %s...", _fname_sub)
-
-        with open(_fname_sub, "rb") as f:
-            subloader = pickle.load(f)
-        return subloader
-    else:
-        if verbose:
-            _logger.info(f"Reading disulfides from: {_fname_all}... ")
-        if not os.path.exists(_fname_all) or force is True:
-            _logger.info(
-                _logger.info(
-                    "Creating full loader: %s with cutoffs: %s, %s...",
-                    _fname_all,
-                    cutoff,
-                    sg_cutoff,
-                )
-            )
-
-            loader = Bootstrap_PDB_SS(
-                loadpath=loadpath,
-                verbose=verbose,
-                subset=False,
-                force=force,
-                cutoff=cutoff,
-                sg_cutoff=sg_cutoff,
-            )
-            loader.save(
-                savepath=loadpath,
-                subset=False,
-                cutoff=cutoff,
-                sg_cutoff=sg_cutoff,
-            )
-
-            return loader
-
-        if verbose:
-            _logger.info("Reading disulfides from: %s...", _fname_all)
-
-        try:
-            with open(_fname_all, "rb") as f:
-                loader = pickle.load(f)
-        except FileNotFoundError as e:
-            _logger.error("File not found: %s", _fname_all)
-            raise e
-        except Exception as e:
-            _logger.error("An error occurred while loading the file: %s", _fname_all)
-            raise e
-
-        if verbose:
-            message = f"Loaded {len(loader.SSList)} disulfides from {len(loader.SSDict)} PDBs."
-            _logger.info(message)
+    with open(_fpath, "rb") as f:
+        loader = pickle.load(f)
+    if verbose:
+        _logger.info("Done reading disulfides from: %s...", _fpath)
 
     return loader
 

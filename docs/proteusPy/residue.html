@@ -103,15 +103,15 @@
 </span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="c1"># Last Modification: 07/10/2024</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="c1">#</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="kn">import</span> <span class="nn">numpy</span>  <span class="c1"># type: ignore</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>  <span class="c1"># type: ignore</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a>
-</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="kn">from</span> <span class="nn">proteusPy.turtle3D</span> <span class="kn">import</span> <span class="n">Turtle3D</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="kn">from</span> <span class="nn">proteusPy.vector3D</span> <span class="kn">import</span> <span class="n">Vector3D</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">proteusPy.turtle3D</span><span class="w"> </span><span class="kn">import</span> <span class="n">Turtle3D</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">proteusPy.vector3D</span><span class="w"> </span><span class="kn">import</span> <span class="n">Vector3D</span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a>
 </span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="c1"># @todo investigate distal N atom position</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>
 </span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a>
-</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="k">def</span> <span class="nf">build_residue</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">):</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="k">def</span><span class="w"> </span><span class="nf">build_residue</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">):</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="sd">    build residue requires the turtle to be in orientation #2</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="sd">    (at Ca, headed to C, with N on left), and returns coordinates</span>
@@ -140,7 +140,7 @@
 </span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>    <span class="k">return</span> <span class="n">n</span><span class="p">,</span> <span class="n">ca</span><span class="p">,</span> <span class="n">cb</span><span class="p">,</span> <span class="n">c</span>
 </span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>
-</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="k">def</span> <span class="nf">get_backbone_from_chain</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">resnumb</span><span class="p">):</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_backbone_from_chain</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">resnumb</span><span class="p">):</span>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="sd">    Retrieve the backbone atom positions (N, Ca, C, O) for the given chain and residue number.</span>
 </span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>
@@ -164,7 +164,7 @@
 </span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>    <span class="k">return</span> <span class="n">n</span><span class="p">,</span> <span class="n">ca</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">o</span>
 </span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>
 </span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="k">def</span> <span class="nf">to_alpha</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">,</span> <span class="n">phi</span><span class="p">):</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="k">def</span><span class="w"> </span><span class="nf">to_alpha</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">,</span> <span class="n">phi</span><span class="p">):</span>
 </span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="sd">    Move the Turtle3D from backbone nitrogen to alpha carbon.  Turtle</span>
 </span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="sd">    begins at nitrogen, headed towards alpha carbon,</span>
@@ -182,7 +182,7 @@
 </span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>    <span class="k">return</span> <span class="n">Vector3D</span><span class="p">(</span><span class="n">turtle</span><span class="o">.</span><span class="n">getPosition</span><span class="p">())</span>
 </span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>
 </span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="k">def</span> <span class="nf">to_carbonyl</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="k">def</span><span class="w"> </span><span class="nf">to_carbonyl</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
 </span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="sd">    Move turtle from alpha carbon to carbonyl carbon. Turtle begins in</span>
 </span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="sd">    orientation #2 (at alpha carbon, headed towards carbonyl carbon, with</span>
@@ -200,7 +200,7 @@
 </span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>    <span class="k">return</span> <span class="n">Vector3D</span><span class="p">(</span><span class="n">turtle</span><span class="o">.</span><span class="n">getPosition</span><span class="p">())</span>
 </span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>
 </span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="k">def</span> <span class="nf">to_nitrogen</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">,</span> <span class="n">omega</span><span class="p">):</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="k">def</span><span class="w"> </span><span class="nf">to_nitrogen</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">,</span> <span class="n">omega</span><span class="p">):</span>
 </span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="sd">    Turtle begins at carbonyl carbon, headed towards nitrogen of</span>
 </span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="sd">    second residue, with alpha carbon of first residue on left side.</span>
@@ -219,7 +219,7 @@
 </span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>    <span class="k">return</span> <span class="n">Vector3D</span><span class="p">(</span><span class="n">turtle</span><span class="o">.</span><span class="n">getPosition</span><span class="p">())</span>
 </span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>
 </span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>
-</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="k">def</span> <span class="nf">add_oxygen</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">):</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="k">def</span><span class="w"> </span><span class="nf">add_oxygen</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">):</span>
 </span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a><span class="sd">    Return the position of the carbonyl oxygen assuming the Turtle3D</span>
 </span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="sd">    begins at carbonyl carbon, headed towards nitrogen of</span>
@@ -234,7 +234,7 @@
 </span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>    <span class="k">return</span> <span class="n">Vector3D</span><span class="p">(</span><span class="n">turtle</span><span class="o">.</span><span class="n">to_global</span><span class="p">(</span><span class="n">loc</span><span class="p">))</span>
 </span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>
 </span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>
-</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a><span class="k">def</span> <span class="nf">to_oxygen</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">):</span>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a><span class="k">def</span><span class="w"> </span><span class="nf">to_oxygen</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">):</span>
 </span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a><span class="sd">    Return the position of the carbonyl oxygen assuming the Turtle3D</span>
 </span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a><span class="sd">    begins at carbonyl carbon, headed towards nitrogen of</span>
@@ -268,7 +268,7 @@
 
     </div>
     <a class="headerlink" href="#build_residue"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="build_residue-18"><a href="#build_residue-18"><span class="linenos">18</span></a><span class="k">def</span> <span class="nf">build_residue</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="build_residue-18"><a href="#build_residue-18"><span class="linenos">18</span></a><span class="k">def</span><span class="w"> </span><span class="nf">build_residue</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">):</span>
 </span><span id="build_residue-19"><a href="#build_residue-19"><span class="linenos">19</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="build_residue-20"><a href="#build_residue-20"><span class="linenos">20</span></a><span class="sd">    build residue requires the turtle to be in orientation #2</span>
 </span><span id="build_residue-21"><a href="#build_residue-21"><span class="linenos">21</span></a><span class="sd">    (at Ca, headed to C, with N on left), and returns coordinates</span>
@@ -319,7 +319,7 @@ Returns: <Vector> n, ca, cb, c</p>
 
     </div>
     <a class="headerlink" href="#get_backbone_from_chain"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="get_backbone_from_chain-47"><a href="#get_backbone_from_chain-47"><span class="linenos">47</span></a><span class="k">def</span> <span class="nf">get_backbone_from_chain</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">resnumb</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="get_backbone_from_chain-47"><a href="#get_backbone_from_chain-47"><span class="linenos">47</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_backbone_from_chain</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">resnumb</span><span class="p">):</span>
 </span><span id="get_backbone_from_chain-48"><a href="#get_backbone_from_chain-48"><span class="linenos">48</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="get_backbone_from_chain-49"><a href="#get_backbone_from_chain-49"><span class="linenos">49</span></a><span class="sd">    Retrieve the backbone atom positions (N, Ca, C, O) for the given chain and residue number.</span>
 </span><span id="get_backbone_from_chain-50"><a href="#get_backbone_from_chain-50"><span class="linenos">50</span></a>
@@ -365,7 +365,7 @@ Returns: <Vector> n, ca, c, o atomic coordinates</p>
 
     </div>
     <a class="headerlink" href="#to_alpha"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="to_alpha-71"><a href="#to_alpha-71"><span class="linenos">71</span></a><span class="k">def</span> <span class="nf">to_alpha</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">,</span> <span class="n">phi</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="to_alpha-71"><a href="#to_alpha-71"><span class="linenos">71</span></a><span class="k">def</span><span class="w"> </span><span class="nf">to_alpha</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">,</span> <span class="n">phi</span><span class="p">):</span>
 </span><span id="to_alpha-72"><a href="#to_alpha-72"><span class="linenos">72</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="to_alpha-73"><a href="#to_alpha-73"><span class="linenos">73</span></a><span class="sd">    Move the Turtle3D from backbone nitrogen to alpha carbon.  Turtle</span>
 </span><span id="to_alpha-74"><a href="#to_alpha-74"><span class="linenos">74</span></a><span class="sd">    begins at nitrogen, headed towards alpha carbon,</span>
@@ -408,7 +408,7 @@ Returns: Position of the modeled Ca. <Vector></p>
 
     </div>
     <a class="headerlink" href="#to_carbonyl"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="to_carbonyl-89"><a href="#to_carbonyl-89"><span class="linenos"> 89</span></a><span class="k">def</span> <span class="nf">to_carbonyl</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="to_carbonyl-89"><a href="#to_carbonyl-89"><span class="linenos"> 89</span></a><span class="k">def</span><span class="w"> </span><span class="nf">to_carbonyl</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">,</span> <span class="n">psi</span><span class="p">):</span>
 </span><span id="to_carbonyl-90"><a href="#to_carbonyl-90"><span class="linenos"> 90</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="to_carbonyl-91"><a href="#to_carbonyl-91"><span class="linenos"> 91</span></a><span class="sd">    Move turtle from alpha carbon to carbonyl carbon. Turtle begins in</span>
 </span><span id="to_carbonyl-92"><a href="#to_carbonyl-92"><span class="linenos"> 92</span></a><span class="sd">    orientation #2 (at alpha carbon, headed towards carbonyl carbon, with</span>
@@ -450,7 +450,7 @@ Returns: Position of the modeled C atom. <Vector></p>
 
     </div>
     <a class="headerlink" href="#to_nitrogen"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="to_nitrogen-107"><a href="#to_nitrogen-107"><span class="linenos">107</span></a><span class="k">def</span> <span class="nf">to_nitrogen</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">,</span> <span class="n">omega</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="to_nitrogen-107"><a href="#to_nitrogen-107"><span class="linenos">107</span></a><span class="k">def</span><span class="w"> </span><span class="nf">to_nitrogen</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">,</span> <span class="n">omega</span><span class="p">):</span>
 </span><span id="to_nitrogen-108"><a href="#to_nitrogen-108"><span class="linenos">108</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="to_nitrogen-109"><a href="#to_nitrogen-109"><span class="linenos">109</span></a><span class="sd">    Turtle begins at carbonyl carbon, headed towards nitrogen of</span>
 </span><span id="to_nitrogen-110"><a href="#to_nitrogen-110"><span class="linenos">110</span></a><span class="sd">    second residue, with alpha carbon of first residue on left side.</span>
@@ -494,7 +494,7 @@ Returns: Position of the modeled C atom. <Vector></p>
 
     </div>
     <a class="headerlink" href="#add_oxygen"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="add_oxygen-126"><a href="#add_oxygen-126"><span class="linenos">126</span></a><span class="k">def</span> <span class="nf">add_oxygen</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="add_oxygen-126"><a href="#add_oxygen-126"><span class="linenos">126</span></a><span class="k">def</span><span class="w"> </span><span class="nf">add_oxygen</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">):</span>
 </span><span id="add_oxygen-127"><a href="#add_oxygen-127"><span class="linenos">127</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="add_oxygen-128"><a href="#add_oxygen-128"><span class="linenos">128</span></a><span class="sd">    Return the position of the carbonyl oxygen assuming the Turtle3D</span>
 </span><span id="add_oxygen-129"><a href="#add_oxygen-129"><span class="linenos">129</span></a><span class="sd">    begins at carbonyl carbon, headed towards nitrogen of</span>
@@ -532,7 +532,7 @@ second residue, with alpha carbon of first residue on left side.</p>
 
     </div>
     <a class="headerlink" href="#to_oxygen"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="to_oxygen-141"><a href="#to_oxygen-141"><span class="linenos">141</span></a><span class="k">def</span> <span class="nf">to_oxygen</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="to_oxygen-141"><a href="#to_oxygen-141"><span class="linenos">141</span></a><span class="k">def</span><span class="w"> </span><span class="nf">to_oxygen</span><span class="p">(</span><span class="n">turtle</span><span class="p">:</span> <span class="n">Turtle3D</span><span class="p">):</span>
 </span><span id="to_oxygen-142"><a href="#to_oxygen-142"><span class="linenos">142</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="to_oxygen-143"><a href="#to_oxygen-143"><span class="linenos">143</span></a><span class="sd">    Return the position of the carbonyl oxygen assuming the Turtle3D</span>
 </span><span id="to_oxygen-144"><a href="#to_oxygen-144"><span class="linenos">144</span></a><span class="sd">    begins at carbonyl carbon, headed towards nitrogen of</span>

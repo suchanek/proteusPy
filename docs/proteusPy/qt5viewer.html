@@ -280,15 +280,15 @@ and save or export the visualized scenes.</p>
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="c1"># pylint: disable=E0401</span>
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="c1"># pylint: disable=C0413</span>
 </span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>
-</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="kn">import</span> <span class="nn">logging</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="kn">import</span> <span class="nn">os</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="kn">import</span> <span class="nn">sys</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>
-</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="kn">import</span> <span class="nn">pyvista</span> <span class="k">as</span> <span class="nn">pv</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">pyvista</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pv</span>
 </span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>
 </span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>
-</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="k">def</span> <span class="nf">can_import</span><span class="p">(</span><span class="n">module_name</span><span class="p">):</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="k">def</span><span class="w"> </span><span class="nf">can_import</span><span class="p">(</span><span class="n">module_name</span><span class="p">):</span>
 </span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Check we can import the requested module.&quot;&quot;&quot;</span>
 </span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>    <span class="k">try</span><span class="p">:</span>
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>        <span class="k">return</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
@@ -303,11 +303,11 @@ and save or export the visualized scenes.</p>
 </span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>        <span class="s2">&quot;Please install it using: pip install proteusPy[pyqt5]&quot;</span>
 </span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>    <span class="p">)</span>
 </span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="kn">import</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QTimer</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="kn">from</span> <span class="nn">PyQt5.QtGui</span> <span class="kn">import</span> <span class="n">QFont</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">PyQt5.QtCore</span><span class="w"> </span><span class="kn">import</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QTimer</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">PyQt5.QtGui</span><span class="w"> </span><span class="kn">import</span> <span class="n">QFont</span>
 </span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>
 </span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="c1"># pylint: disable=E0611</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="kn">import</span> <span class="p">(</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">PyQt5.QtWidgets</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
 </span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>    <span class="n">QAction</span><span class="p">,</span>
 </span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>    <span class="n">QApplication</span><span class="p">,</span>
 </span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>    <span class="n">QCheckBox</span><span class="p">,</span>
@@ -325,9 +325,9 @@ and save or export the visualized scenes.</p>
 </span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>    <span class="n">QVBoxLayout</span><span class="p">,</span>
 </span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>    <span class="n">QWidget</span><span class="p">,</span>
 </span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="p">)</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="kn">from</span> <span class="nn">pyvistaqt</span> <span class="kn">import</span> <span class="n">QtInteractor</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">pyvistaqt</span><span class="w"> </span><span class="kn">import</span> <span class="n">QtInteractor</span>
 </span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="kn">from</span> <span class="nn">proteusPy</span> <span class="kn">import</span> <span class="p">(</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">proteusPy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
 </span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>    <span class="n">BOND_RADIUS</span><span class="p">,</span>
 </span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>    <span class="n">DisulfideList</span><span class="p">,</span>
 </span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>    <span class="n">Load_PDB_SS</span><span class="p">,</span>
@@ -347,7 +347,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting Disulfide Viewer...&quot;</span><span class="p">)</span>
 </span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>
 </span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="k">class</span> <span class="nc">DisulfideViewer</span><span class="p">(</span><span class="n">QMainWindow</span><span class="p">):</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DisulfideViewer</span><span class="p">(</span><span class="n">QMainWindow</span><span class="p">):</span>
 </span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="sd">    A PyQt5-based application for viewing molecular structures with support for</span>
 </span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="sd">    multiple disulfide bonds and various rendering styles.</span>
@@ -361,7 +361,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="sd">        with that pdb_id.</span>
 </span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ss_list</span><span class="p">,</span> <span class="n">winsize</span><span class="o">=</span><span class="p">(</span><span class="mi">1200</span><span class="p">,</span> <span class="mi">800</span><span class="p">)):</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ss_list</span><span class="p">,</span> <span class="n">winsize</span><span class="o">=</span><span class="p">(</span><span class="mi">1200</span><span class="p">,</span> <span class="mi">800</span><span class="p">)):</span>
 </span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="sd">        Initializes the MolecularViewer application.</span>
 </span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>
@@ -557,7 +557,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-308"><a href="#L-308"><span class="linenos">308</span></a>        <span class="c1"># Initial display</span>
 </span><span id="L-309"><a href="#L-309"><span class="linenos">309</span></a>        <span class="c1"># self.display()  # Set a default view with current style</span>
 </span><span id="L-310"><a href="#L-310"><span class="linenos">310</span></a>
-</span><span id="L-311"><a href="#L-311"><span class="linenos">311</span></a>    <span class="k">def</span> <span class="nf">update_sliders_from_camera</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-311"><a href="#L-311"><span class="linenos">311</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_sliders_from_camera</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-312"><a href="#L-312"><span class="linenos">312</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-313"><a href="#L-313"><span class="linenos">313</span></a><span class="sd">        Updates the slider values to match the camera&#39;s position.</span>
 </span><span id="L-314"><a href="#L-314"><span class="linenos">314</span></a>
@@ -597,7 +597,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-348"><a href="#L-348"><span class="linenos">348</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">slider_y</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">y_angle</span><span class="p">))</span>
 </span><span id="L-349"><a href="#L-349"><span class="linenos">349</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">slider_y</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 </span><span id="L-350"><a href="#L-350"><span class="linenos">350</span></a>
-</span><span id="L-351"><a href="#L-351"><span class="linenos">351</span></a>    <span class="k">def</span> <span class="nf">set_camera_view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-351"><a href="#L-351"><span class="linenos">351</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_camera_view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-352"><a href="#L-352"><span class="linenos">352</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-353"><a href="#L-353"><span class="linenos">353</span></a><span class="sd">        Sets the camera to a specific view where the x-axis is pointed down and the</span>
 </span><span id="L-354"><a href="#L-354"><span class="linenos">354</span></a><span class="sd">        y-axis into the screen, and resets the x and y sliders to their default values.</span>
@@ -611,7 +611,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-362"><a href="#L-362"><span class="linenos">362</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">slider_x</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mi">180</span><span class="p">)</span>  <span class="c1"># Assuming the default value is 180</span>
 </span><span id="L-363"><a href="#L-363"><span class="linenos">363</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">slider_y</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mi">180</span><span class="p">)</span>  <span class="c1"># Assuming the default value is 180</span>
 </span><span id="L-364"><a href="#L-364"><span class="linenos">364</span></a>
-</span><span id="L-365"><a href="#L-365"><span class="linenos">365</span></a>    <span class="k">def</span> <span class="nf">spin_camera</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">n_frames</span><span class="o">=</span><span class="mi">150</span><span class="p">):</span>
+</span><span id="L-365"><a href="#L-365"><span class="linenos">365</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">spin_camera</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">n_frames</span><span class="o">=</span><span class="mi">150</span><span class="p">):</span>
 </span><span id="L-366"><a href="#L-366"><span class="linenos">366</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-367"><a href="#L-367"><span class="linenos">367</span></a><span class="sd">        Spins the camera around the z-axis in an orbital path.</span>
 </span><span id="L-368"><a href="#L-368"><span class="linenos">368</span></a>
@@ -624,7 +624,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-375"><a href="#L-375"><span class="linenos">375</span></a>        <span class="n">duration</span> <span class="o">=</span> <span class="mi">5</span>
 </span><span id="L-376"><a href="#L-376"><span class="linenos">376</span></a>
 </span><span id="L-377"><a href="#L-377"><span class="linenos">377</span></a>        <span class="c1"># Function to update the camera position</span>
-</span><span id="L-378"><a href="#L-378"><span class="linenos">378</span></a>        <span class="k">def</span> <span class="nf">update_camera</span><span class="p">():</span>
+</span><span id="L-378"><a href="#L-378"><span class="linenos">378</span></a>        <span class="k">def</span><span class="w"> </span><span class="nf">update_camera</span><span class="p">():</span>
 </span><span id="L-379"><a href="#L-379"><span class="linenos">379</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">plotter_widget</span><span class="o">.</span><span class="n">camera_position</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_frame</span><span class="p">]</span>
 </span><span id="L-380"><a href="#L-380"><span class="linenos">380</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">current_frame</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_frame</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">n_frames</span>
 </span><span id="L-381"><a href="#L-381"><span class="linenos">381</span></a>
@@ -634,7 +634,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-385"><a href="#L-385"><span class="linenos">385</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_frame</span> <span class="o">=</span> <span class="mi">0</span>
 </span><span id="L-386"><a href="#L-386"><span class="linenos">386</span></a>
 </span><span id="L-387"><a href="#L-387"><span class="linenos">387</span></a>        <span class="c1"># Function to stop the timer after the duration</span>
-</span><span id="L-388"><a href="#L-388"><span class="linenos">388</span></a>        <span class="k">def</span> <span class="nf">stop_timer</span><span class="p">():</span>
+</span><span id="L-388"><a href="#L-388"><span class="linenos">388</span></a>        <span class="k">def</span><span class="w"> </span><span class="nf">stop_timer</span><span class="p">():</span>
 </span><span id="L-389"><a href="#L-389"><span class="linenos">389</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 </span><span id="L-390"><a href="#L-390"><span class="linenos">390</span></a>
 </span><span id="L-391"><a href="#L-391"><span class="linenos">391</span></a>        <span class="c1"># Start the timer</span>
@@ -642,7 +642,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-393"><a href="#L-393"><span class="linenos">393</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>
 </span><span id="L-394"><a href="#L-394"><span class="linenos">394</span></a>        <span class="n">QTimer</span><span class="o">.</span><span class="n">singleShot</span><span class="p">(</span><span class="n">duration</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">stop_timer</span><span class="p">)</span>
 </span><span id="L-395"><a href="#L-395"><span class="linenos">395</span></a>
-</span><span id="L-396"><a href="#L-396"><span class="linenos">396</span></a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-396"><a href="#L-396"><span class="linenos">396</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-397"><a href="#L-397"><span class="linenos">397</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-398"><a href="#L-398"><span class="linenos">398</span></a><span class="sd">        Resets all widgets and data structures to their default state.</span>
 </span><span id="L-399"><a href="#L-399"><span class="linenos">399</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -657,7 +657,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-408"><a href="#L-408"><span class="linenos">408</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">set_camera_view</span><span class="p">()</span>
 </span><span id="L-409"><a href="#L-409"><span class="linenos">409</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">on_pdb_dropdown_change</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </span><span id="L-410"><a href="#L-410"><span class="linenos">410</span></a>
-</span><span id="L-411"><a href="#L-411"><span class="linenos">411</span></a>    <span class="k">def</span> <span class="nf">add_floor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotter</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">)):</span>
+</span><span id="L-411"><a href="#L-411"><span class="linenos">411</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_floor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotter</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">)):</span>
 </span><span id="L-412"><a href="#L-412"><span class="linenos">412</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-413"><a href="#L-413"><span class="linenos">413</span></a><span class="sd">        Adds a simple plane beneath the disulfide bond to act as a &#39;floor&#39;.</span>
 </span><span id="L-414"><a href="#L-414"><span class="linenos">414</span></a>
@@ -671,7 +671,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-422"><a href="#L-422"><span class="linenos">422</span></a>        <span class="n">floor</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">Plane</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">i_size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">j_size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
 </span><span id="L-423"><a href="#L-423"><span class="linenos">423</span></a>        <span class="n">plotter</span><span class="o">.</span><span class="n">add_mesh</span><span class="p">(</span><span class="n">floor</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;lightgrey&quot;</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
 </span><span id="L-424"><a href="#L-424"><span class="linenos">424</span></a>
-</span><span id="L-425"><a href="#L-425"><span class="linenos">425</span></a>    <span class="k">def</span> <span class="nf">update_style</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">):</span>
+</span><span id="L-425"><a href="#L-425"><span class="linenos">425</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_style</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">):</span>
 </span><span id="L-426"><a href="#L-426"><span class="linenos">426</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-427"><a href="#L-427"><span class="linenos">427</span></a><span class="sd">        Updates the current rendering style and refreshes the visualization.</span>
 </span><span id="L-428"><a href="#L-428"><span class="linenos">428</span></a>
@@ -682,7 +682,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-433"><a href="#L-433"><span class="linenos">433</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">checkbox_single</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># Ensure the &quot;Single&quot; checkbox is checked</span>
 </span><span id="L-434"><a href="#L-434"><span class="linenos">434</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
 </span><span id="L-435"><a href="#L-435"><span class="linenos">435</span></a>
-</span><span id="L-436"><a href="#L-436"><span class="linenos">436</span></a>    <span class="k">def</span> <span class="nf">on_pdb_textbox_enter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-436"><a href="#L-436"><span class="linenos">436</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">on_pdb_textbox_enter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-437"><a href="#L-437"><span class="linenos">437</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-438"><a href="#L-438"><span class="linenos">438</span></a><span class="sd">        Handles the event when the user presses Enter in the PDB ID text box.</span>
 </span><span id="L-439"><a href="#L-439"><span class="linenos">439</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -700,7 +700,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-451"><a href="#L-451"><span class="linenos">451</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_sslist</span> <span class="o">=</span> <span class="n">DisulfideList</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">disulfides</span><span class="p">),</span> <span class="s2">&quot;sub&quot;</span><span class="p">)</span>
 </span><span id="L-452"><a href="#L-452"><span class="linenos">452</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">pdb_dropdown</span><span class="o">.</span><span class="n">setCurrentText</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">)</span>
 </span><span id="L-453"><a href="#L-453"><span class="linenos">453</span></a>
-</span><span id="L-454"><a href="#L-454"><span class="linenos">454</span></a>    <span class="k">def</span> <span class="nf">on_pdb_dropdown_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+</span><span id="L-454"><a href="#L-454"><span class="linenos">454</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">on_pdb_dropdown_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
 </span><span id="L-455"><a href="#L-455"><span class="linenos">455</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-456"><a href="#L-456"><span class="linenos">456</span></a><span class="sd">        Handles the event when the PDB ID dropdown selection changes.</span>
 </span><span id="L-457"><a href="#L-457"><span class="linenos">457</span></a>
@@ -723,7 +723,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-474"><a href="#L-474"><span class="linenos">474</span></a>        <span class="k">else</span><span class="p">:</span>
 </span><span id="L-475"><a href="#L-475"><span class="linenos">475</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">statusBar</span><span class="p">()</span><span class="o">.</span><span class="n">showMessage</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No Disulfides: </span><span class="si">{</span><span class="n">pdb_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span><span id="L-476"><a href="#L-476"><span class="linenos">476</span></a>
-</span><span id="L-477"><a href="#L-477"><span class="linenos">477</span></a>    <span class="k">def</span> <span class="nf">update_pdb_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdb_id</span><span class="p">):</span>
+</span><span id="L-477"><a href="#L-477"><span class="linenos">477</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_pdb_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdb_id</span><span class="p">):</span>
 </span><span id="L-478"><a href="#L-478"><span class="linenos">478</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-479"><a href="#L-479"><span class="linenos">479</span></a><span class="sd">        Updates the current PDB selection and refreshes the disulfide dropdown.</span>
 </span><span id="L-480"><a href="#L-480"><span class="linenos">480</span></a>
@@ -737,7 +737,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-488"><a href="#L-488"><span class="linenos">488</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dropdown</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 </span><span id="L-489"><a href="#L-489"><span class="linenos">489</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dropdown</span><span class="o">.</span><span class="n">addItems</span><span class="p">([</span><span class="n">ss</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ss_list</span><span class="p">])</span>
 </span><span id="L-490"><a href="#L-490"><span class="linenos">490</span></a>
-</span><span id="L-491"><a href="#L-491"><span class="linenos">491</span></a>    <span class="k">def</span> <span class="nf">on_dropdown_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+</span><span id="L-491"><a href="#L-491"><span class="linenos">491</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">on_dropdown_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
 </span><span id="L-492"><a href="#L-492"><span class="linenos">492</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-493"><a href="#L-493"><span class="linenos">493</span></a><span class="sd">        Handles the event when the dropdown selection changes.</span>
 </span><span id="L-494"><a href="#L-494"><span class="linenos">494</span></a>
@@ -752,7 +752,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-503"><a href="#L-503"><span class="linenos">503</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">statusBar</span><span class="p">()</span><span class="o">.</span><span class="n">showMessage</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Displaying: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_ss</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span><span id="L-504"><a href="#L-504"><span class="linenos">504</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
 </span><span id="L-505"><a href="#L-505"><span class="linenos">505</span></a>
-</span><span id="L-506"><a href="#L-506"><span class="linenos">506</span></a>    <span class="k">def</span> <span class="nf">on_checkbox_single_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+</span><span id="L-506"><a href="#L-506"><span class="linenos">506</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">on_checkbox_single_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
 </span><span id="L-507"><a href="#L-507"><span class="linenos">507</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-508"><a href="#L-508"><span class="linenos">508</span></a><span class="sd">        Handles the event when the single/multiple checkbox state changes.</span>
 </span><span id="L-509"><a href="#L-509"><span class="linenos">509</span></a>
@@ -762,7 +762,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-513"><a href="#L-513"><span class="linenos">513</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">single</span> <span class="o">=</span> <span class="n">state</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">Checked</span>
 </span><span id="L-514"><a href="#L-514"><span class="linenos">514</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>  <span class="c1"># Use the current style</span>
 </span><span id="L-515"><a href="#L-515"><span class="linenos">515</span></a>
-</span><span id="L-516"><a href="#L-516"><span class="linenos">516</span></a>    <span class="k">def</span> <span class="nf">update_camera_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-516"><a href="#L-516"><span class="linenos">516</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_camera_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-517"><a href="#L-517"><span class="linenos">517</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-518"><a href="#L-518"><span class="linenos">518</span></a><span class="sd">        Update the camera position based on the slider values.</span>
 </span><span id="L-519"><a href="#L-519"><span class="linenos">519</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -792,7 +792,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-543"><a href="#L-543"><span class="linenos">543</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plotter_widget</span><span class="o">.</span><span class="n">camera_position</span> <span class="o">=</span> <span class="p">[(</span><span class="n">xpos</span><span class="p">,</span> <span class="n">ypos</span><span class="p">,</span> <span class="n">zpos</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
 </span><span id="L-544"><a href="#L-544"><span class="linenos">544</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plotter_widget</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
 </span><span id="L-545"><a href="#L-545"><span class="linenos">545</span></a>
-</span><span id="L-546"><a href="#L-546"><span class="linenos">546</span></a>    <span class="k">def</span> <span class="nf">apply_theme</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-546"><a href="#L-546"><span class="linenos">546</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">apply_theme</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-547"><a href="#L-547"><span class="linenos">547</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-548"><a href="#L-548"><span class="linenos">548</span></a><span class="sd">        Apply the current theme to the plotter widget.</span>
 </span><span id="L-549"><a href="#L-549"><span class="linenos">549</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -804,7 +804,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-555"><a href="#L-555"><span class="linenos">555</span></a>        <span class="c1"># Render the plotter to apply the changes</span>
 </span><span id="L-556"><a href="#L-556"><span class="linenos">556</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plotter_widget</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
 </span><span id="L-557"><a href="#L-557"><span class="linenos">557</span></a>
-</span><span id="L-558"><a href="#L-558"><span class="linenos">558</span></a>    <span class="k">def</span> <span class="nf">create_menubar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-558"><a href="#L-558"><span class="linenos">558</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_menubar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-559"><a href="#L-559"><span class="linenos">559</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-560"><a href="#L-560"><span class="linenos">560</span></a><span class="sd">        Creates the menubar</span>
 </span><span id="L-561"><a href="#L-561"><span class="linenos">561</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -829,7 +829,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-580"><a href="#L-580"><span class="linenos">580</span></a>        <span class="n">reset_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">)</span>
 </span><span id="L-581"><a href="#L-581"><span class="linenos">581</span></a>        <span class="n">reset_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">reset_action</span><span class="p">)</span>
 </span><span id="L-582"><a href="#L-582"><span class="linenos">582</span></a>
-</span><span id="L-583"><a href="#L-583"><span class="linenos">583</span></a>    <span class="k">def</span> <span class="nf">save_screenshot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-583"><a href="#L-583"><span class="linenos">583</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">save_screenshot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-584"><a href="#L-584"><span class="linenos">584</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-585"><a href="#L-585"><span class="linenos">585</span></a><span class="sd">        Save the current scene as a screenshot</span>
 </span><span id="L-586"><a href="#L-586"><span class="linenos">586</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -844,7 +844,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-595"><a href="#L-595"><span class="linenos">595</span></a>        <span class="k">if</span> <span class="n">file_path</span><span class="p">:</span>
 </span><span id="L-596"><a href="#L-596"><span class="linenos">596</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">plotter_widget</span><span class="o">.</span><span class="n">screenshot</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
 </span><span id="L-597"><a href="#L-597"><span class="linenos">597</span></a>
-</span><span id="L-598"><a href="#L-598"><span class="linenos">598</span></a>    <span class="k">def</span> <span class="nf">export_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-598"><a href="#L-598"><span class="linenos">598</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">export_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="L-599"><a href="#L-599"><span class="linenos">599</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-600"><a href="#L-600"><span class="linenos">600</span></a><span class="sd">        Export the current scene as an HTML file</span>
 </span><span id="L-601"><a href="#L-601"><span class="linenos">601</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -859,7 +859,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-610"><a href="#L-610"><span class="linenos">610</span></a>        <span class="k">if</span> <span class="n">file_path</span><span class="p">:</span>
 </span><span id="L-611"><a href="#L-611"><span class="linenos">611</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">plotter_widget</span><span class="o">.</span><span class="n">export_html</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
 </span><span id="L-612"><a href="#L-612"><span class="linenos">612</span></a>
-</span><span id="L-613"><a href="#L-613"><span class="linenos">613</span></a>    <span class="k">def</span> <span class="nf">add_custom_lights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
+</span><span id="L-613"><a href="#L-613"><span class="linenos">613</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_custom_lights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
 </span><span id="L-614"><a href="#L-614"><span class="linenos">614</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-615"><a href="#L-615"><span class="linenos">615</span></a><span class="sd">        Adds custom lighting to the plotter for enhanced visualization.</span>
 </span><span id="L-616"><a href="#L-616"><span class="linenos">616</span></a>
@@ -884,7 +884,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-635"><a href="#L-635"><span class="linenos">635</span></a>        <span class="n">plotter</span><span class="o">.</span><span class="n">add_light</span><span class="p">(</span><span class="n">light2</span><span class="p">)</span>
 </span><span id="L-636"><a href="#L-636"><span class="linenos">636</span></a>        <span class="n">plotter</span><span class="o">.</span><span class="n">add_light</span><span class="p">(</span><span class="n">light3</span><span class="p">)</span>
 </span><span id="L-637"><a href="#L-637"><span class="linenos">637</span></a>
-</span><span id="L-638"><a href="#L-638"><span class="linenos">638</span></a>    <span class="k">def</span> <span class="nf">new_plotter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+</span><span id="L-638"><a href="#L-638"><span class="linenos">638</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">new_plotter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 </span><span id="L-639"><a href="#L-639"><span class="linenos">639</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-640"><a href="#L-640"><span class="linenos">640</span></a><span class="sd">        Create a new QtInteractor with the specified number of rows and columns.</span>
 </span><span id="L-641"><a href="#L-641"><span class="linenos">641</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -904,7 +904,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-655"><a href="#L-655"><span class="linenos">655</span></a>            <span class="n">new_plotter_widget</span>  <span class="c1"># Update the reference to the new plotter widget</span>
 </span><span id="L-656"><a href="#L-656"><span class="linenos">656</span></a>        <span class="p">)</span>
 </span><span id="L-657"><a href="#L-657"><span class="linenos">657</span></a>
-</span><span id="L-658"><a href="#L-658"><span class="linenos">658</span></a>    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="s2">&quot;Auto&quot;</span><span class="p">,</span> <span class="n">shadows</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+</span><span id="L-658"><a href="#L-658"><span class="linenos">658</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="s2">&quot;Auto&quot;</span><span class="p">,</span> <span class="n">shadows</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 </span><span id="L-659"><a href="#L-659"><span class="linenos">659</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-660"><a href="#L-660"><span class="linenos">660</span></a><span class="sd">        Renders the current disulfide bond using the specified style.</span>
 </span><span id="L-661"><a href="#L-661"><span class="linenos">661</span></a>
@@ -968,7 +968,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-719"><a href="#L-719"><span class="linenos">719</span></a>        <span class="n">plotter</span><span class="o">.</span><span class="n">reset_camera</span><span class="p">()</span>
 </span><span id="L-720"><a href="#L-720"><span class="linenos">720</span></a>        <span class="n">plotter</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
 </span><span id="L-721"><a href="#L-721"><span class="linenos">721</span></a>
-</span><span id="L-722"><a href="#L-722"><span class="linenos">722</span></a>    <span class="k">def</span> <span class="nf">display_overlay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pl</span><span class="p">):</span>
+</span><span id="L-722"><a href="#L-722"><span class="linenos">722</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">display_overlay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pl</span><span class="p">):</span>
 </span><span id="L-723"><a href="#L-723"><span class="linenos">723</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-724"><a href="#L-724"><span class="linenos">724</span></a><span class="sd">        Display all disulfides in the list overlaid in stick mode against</span>
 </span><span id="L-725"><a href="#L-725"><span class="linenos">725</span></a><span class="sd">        a common coordinate frames. This allows us to see all of the disulfides</span>
@@ -1038,7 +1038,7 @@ and save or export the visualized scenes.</p>
 </span><span id="L-789"><a href="#L-789"><span class="linenos">789</span></a>        <span class="k">return</span> <span class="n">pl</span>
 </span><span id="L-790"><a href="#L-790"><span class="linenos">790</span></a>
 </span><span id="L-791"><a href="#L-791"><span class="linenos">791</span></a>
-</span><span id="L-792"><a href="#L-792"><span class="linenos">792</span></a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+</span><span id="L-792"><a href="#L-792"><span class="linenos">792</span></a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
 </span><span id="L-793"><a href="#L-793"><span class="linenos">793</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-794"><a href="#L-794"><span class="linenos">794</span></a><span class="sd">    The main entry point of the application.</span>
 </span><span id="L-795"><a href="#L-795"><span class="linenos">795</span></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -1072,7 +1072,7 @@ and save or export the visualized scenes.</p>
 
     </div>
     <a class="headerlink" href="#can_import"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="can_import-43"><a href="#can_import-43"><span class="linenos">43</span></a><span class="k">def</span> <span class="nf">can_import</span><span class="p">(</span><span class="n">module_name</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="can_import-43"><a href="#can_import-43"><span class="linenos">43</span></a><span class="k">def</span><span class="w"> </span><span class="nf">can_import</span><span class="p">(</span><span class="n">module_name</span><span class="p">):</span>
 </span><span id="can_import-44"><a href="#can_import-44"><span class="linenos">44</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Check we can import the requested module.&quot;&quot;&quot;</span>
 </span><span id="can_import-45"><a href="#can_import-45"><span class="linenos">45</span></a>    <span class="k">try</span><span class="p">:</span>
 </span><span id="can_import-46"><a href="#can_import-46"><span class="linenos">46</span></a>        <span class="k">return</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
@@ -1097,7 +1097,7 @@ and save or export the visualized scenes.</p>
 
     </div>
     <a class="headerlink" href="#DisulfideViewer"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer-102"><a href="#DisulfideViewer-102"><span class="linenos">102</span></a><span class="k">class</span> <span class="nc">DisulfideViewer</span><span class="p">(</span><span class="n">QMainWindow</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer-102"><a href="#DisulfideViewer-102"><span class="linenos">102</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DisulfideViewer</span><span class="p">(</span><span class="n">QMainWindow</span><span class="p">):</span>
 </span><span id="DisulfideViewer-103"><a href="#DisulfideViewer-103"><span class="linenos">103</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-104"><a href="#DisulfideViewer-104"><span class="linenos">104</span></a><span class="sd">    A PyQt5-based application for viewing molecular structures with support for</span>
 </span><span id="DisulfideViewer-105"><a href="#DisulfideViewer-105"><span class="linenos">105</span></a><span class="sd">    multiple disulfide bonds and various rendering styles.</span>
@@ -1111,7 +1111,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-113"><a href="#DisulfideViewer-113"><span class="linenos">113</span></a><span class="sd">        with that pdb_id.</span>
 </span><span id="DisulfideViewer-114"><a href="#DisulfideViewer-114"><span class="linenos">114</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-115"><a href="#DisulfideViewer-115"><span class="linenos">115</span></a>
-</span><span id="DisulfideViewer-116"><a href="#DisulfideViewer-116"><span class="linenos">116</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ss_list</span><span class="p">,</span> <span class="n">winsize</span><span class="o">=</span><span class="p">(</span><span class="mi">1200</span><span class="p">,</span> <span class="mi">800</span><span class="p">)):</span>
+</span><span id="DisulfideViewer-116"><a href="#DisulfideViewer-116"><span class="linenos">116</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ss_list</span><span class="p">,</span> <span class="n">winsize</span><span class="o">=</span><span class="p">(</span><span class="mi">1200</span><span class="p">,</span> <span class="mi">800</span><span class="p">)):</span>
 </span><span id="DisulfideViewer-117"><a href="#DisulfideViewer-117"><span class="linenos">117</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-118"><a href="#DisulfideViewer-118"><span class="linenos">118</span></a><span class="sd">        Initializes the MolecularViewer application.</span>
 </span><span id="DisulfideViewer-119"><a href="#DisulfideViewer-119"><span class="linenos">119</span></a>
@@ -1307,7 +1307,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-309"><a href="#DisulfideViewer-309"><span class="linenos">309</span></a>        <span class="c1"># Initial display</span>
 </span><span id="DisulfideViewer-310"><a href="#DisulfideViewer-310"><span class="linenos">310</span></a>        <span class="c1"># self.display()  # Set a default view with current style</span>
 </span><span id="DisulfideViewer-311"><a href="#DisulfideViewer-311"><span class="linenos">311</span></a>
-</span><span id="DisulfideViewer-312"><a href="#DisulfideViewer-312"><span class="linenos">312</span></a>    <span class="k">def</span> <span class="nf">update_sliders_from_camera</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DisulfideViewer-312"><a href="#DisulfideViewer-312"><span class="linenos">312</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_sliders_from_camera</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideViewer-313"><a href="#DisulfideViewer-313"><span class="linenos">313</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-314"><a href="#DisulfideViewer-314"><span class="linenos">314</span></a><span class="sd">        Updates the slider values to match the camera&#39;s position.</span>
 </span><span id="DisulfideViewer-315"><a href="#DisulfideViewer-315"><span class="linenos">315</span></a>
@@ -1347,7 +1347,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-349"><a href="#DisulfideViewer-349"><span class="linenos">349</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">slider_y</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">y_angle</span><span class="p">))</span>
 </span><span id="DisulfideViewer-350"><a href="#DisulfideViewer-350"><span class="linenos">350</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">slider_y</span><span class="o">.</span><span class="n">blockSignals</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 </span><span id="DisulfideViewer-351"><a href="#DisulfideViewer-351"><span class="linenos">351</span></a>
-</span><span id="DisulfideViewer-352"><a href="#DisulfideViewer-352"><span class="linenos">352</span></a>    <span class="k">def</span> <span class="nf">set_camera_view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DisulfideViewer-352"><a href="#DisulfideViewer-352"><span class="linenos">352</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_camera_view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideViewer-353"><a href="#DisulfideViewer-353"><span class="linenos">353</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-354"><a href="#DisulfideViewer-354"><span class="linenos">354</span></a><span class="sd">        Sets the camera to a specific view where the x-axis is pointed down and the</span>
 </span><span id="DisulfideViewer-355"><a href="#DisulfideViewer-355"><span class="linenos">355</span></a><span class="sd">        y-axis into the screen, and resets the x and y sliders to their default values.</span>
@@ -1361,7 +1361,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-363"><a href="#DisulfideViewer-363"><span class="linenos">363</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">slider_x</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mi">180</span><span class="p">)</span>  <span class="c1"># Assuming the default value is 180</span>
 </span><span id="DisulfideViewer-364"><a href="#DisulfideViewer-364"><span class="linenos">364</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">slider_y</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="mi">180</span><span class="p">)</span>  <span class="c1"># Assuming the default value is 180</span>
 </span><span id="DisulfideViewer-365"><a href="#DisulfideViewer-365"><span class="linenos">365</span></a>
-</span><span id="DisulfideViewer-366"><a href="#DisulfideViewer-366"><span class="linenos">366</span></a>    <span class="k">def</span> <span class="nf">spin_camera</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">n_frames</span><span class="o">=</span><span class="mi">150</span><span class="p">):</span>
+</span><span id="DisulfideViewer-366"><a href="#DisulfideViewer-366"><span class="linenos">366</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">spin_camera</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">n_frames</span><span class="o">=</span><span class="mi">150</span><span class="p">):</span>
 </span><span id="DisulfideViewer-367"><a href="#DisulfideViewer-367"><span class="linenos">367</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-368"><a href="#DisulfideViewer-368"><span class="linenos">368</span></a><span class="sd">        Spins the camera around the z-axis in an orbital path.</span>
 </span><span id="DisulfideViewer-369"><a href="#DisulfideViewer-369"><span class="linenos">369</span></a>
@@ -1374,7 +1374,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-376"><a href="#DisulfideViewer-376"><span class="linenos">376</span></a>        <span class="n">duration</span> <span class="o">=</span> <span class="mi">5</span>
 </span><span id="DisulfideViewer-377"><a href="#DisulfideViewer-377"><span class="linenos">377</span></a>
 </span><span id="DisulfideViewer-378"><a href="#DisulfideViewer-378"><span class="linenos">378</span></a>        <span class="c1"># Function to update the camera position</span>
-</span><span id="DisulfideViewer-379"><a href="#DisulfideViewer-379"><span class="linenos">379</span></a>        <span class="k">def</span> <span class="nf">update_camera</span><span class="p">():</span>
+</span><span id="DisulfideViewer-379"><a href="#DisulfideViewer-379"><span class="linenos">379</span></a>        <span class="k">def</span><span class="w"> </span><span class="nf">update_camera</span><span class="p">():</span>
 </span><span id="DisulfideViewer-380"><a href="#DisulfideViewer-380"><span class="linenos">380</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">plotter_widget</span><span class="o">.</span><span class="n">camera_position</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_frame</span><span class="p">]</span>
 </span><span id="DisulfideViewer-381"><a href="#DisulfideViewer-381"><span class="linenos">381</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">current_frame</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_frame</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">n_frames</span>
 </span><span id="DisulfideViewer-382"><a href="#DisulfideViewer-382"><span class="linenos">382</span></a>
@@ -1384,7 +1384,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-386"><a href="#DisulfideViewer-386"><span class="linenos">386</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_frame</span> <span class="o">=</span> <span class="mi">0</span>
 </span><span id="DisulfideViewer-387"><a href="#DisulfideViewer-387"><span class="linenos">387</span></a>
 </span><span id="DisulfideViewer-388"><a href="#DisulfideViewer-388"><span class="linenos">388</span></a>        <span class="c1"># Function to stop the timer after the duration</span>
-</span><span id="DisulfideViewer-389"><a href="#DisulfideViewer-389"><span class="linenos">389</span></a>        <span class="k">def</span> <span class="nf">stop_timer</span><span class="p">():</span>
+</span><span id="DisulfideViewer-389"><a href="#DisulfideViewer-389"><span class="linenos">389</span></a>        <span class="k">def</span><span class="w"> </span><span class="nf">stop_timer</span><span class="p">():</span>
 </span><span id="DisulfideViewer-390"><a href="#DisulfideViewer-390"><span class="linenos">390</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 </span><span id="DisulfideViewer-391"><a href="#DisulfideViewer-391"><span class="linenos">391</span></a>
 </span><span id="DisulfideViewer-392"><a href="#DisulfideViewer-392"><span class="linenos">392</span></a>        <span class="c1"># Start the timer</span>
@@ -1392,7 +1392,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-394"><a href="#DisulfideViewer-394"><span class="linenos">394</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>
 </span><span id="DisulfideViewer-395"><a href="#DisulfideViewer-395"><span class="linenos">395</span></a>        <span class="n">QTimer</span><span class="o">.</span><span class="n">singleShot</span><span class="p">(</span><span class="n">duration</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">stop_timer</span><span class="p">)</span>
 </span><span id="DisulfideViewer-396"><a href="#DisulfideViewer-396"><span class="linenos">396</span></a>
-</span><span id="DisulfideViewer-397"><a href="#DisulfideViewer-397"><span class="linenos">397</span></a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DisulfideViewer-397"><a href="#DisulfideViewer-397"><span class="linenos">397</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideViewer-398"><a href="#DisulfideViewer-398"><span class="linenos">398</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-399"><a href="#DisulfideViewer-399"><span class="linenos">399</span></a><span class="sd">        Resets all widgets and data structures to their default state.</span>
 </span><span id="DisulfideViewer-400"><a href="#DisulfideViewer-400"><span class="linenos">400</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -1407,7 +1407,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-409"><a href="#DisulfideViewer-409"><span class="linenos">409</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">set_camera_view</span><span class="p">()</span>
 </span><span id="DisulfideViewer-410"><a href="#DisulfideViewer-410"><span class="linenos">410</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">on_pdb_dropdown_change</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </span><span id="DisulfideViewer-411"><a href="#DisulfideViewer-411"><span class="linenos">411</span></a>
-</span><span id="DisulfideViewer-412"><a href="#DisulfideViewer-412"><span class="linenos">412</span></a>    <span class="k">def</span> <span class="nf">add_floor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotter</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">)):</span>
+</span><span id="DisulfideViewer-412"><a href="#DisulfideViewer-412"><span class="linenos">412</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_floor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotter</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">)):</span>
 </span><span id="DisulfideViewer-413"><a href="#DisulfideViewer-413"><span class="linenos">413</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-414"><a href="#DisulfideViewer-414"><span class="linenos">414</span></a><span class="sd">        Adds a simple plane beneath the disulfide bond to act as a &#39;floor&#39;.</span>
 </span><span id="DisulfideViewer-415"><a href="#DisulfideViewer-415"><span class="linenos">415</span></a>
@@ -1421,7 +1421,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-423"><a href="#DisulfideViewer-423"><span class="linenos">423</span></a>        <span class="n">floor</span> <span class="o">=</span> <span class="n">pv</span><span class="o">.</span><span class="n">Plane</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">i_size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">j_size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
 </span><span id="DisulfideViewer-424"><a href="#DisulfideViewer-424"><span class="linenos">424</span></a>        <span class="n">plotter</span><span class="o">.</span><span class="n">add_mesh</span><span class="p">(</span><span class="n">floor</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;lightgrey&quot;</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
 </span><span id="DisulfideViewer-425"><a href="#DisulfideViewer-425"><span class="linenos">425</span></a>
-</span><span id="DisulfideViewer-426"><a href="#DisulfideViewer-426"><span class="linenos">426</span></a>    <span class="k">def</span> <span class="nf">update_style</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">):</span>
+</span><span id="DisulfideViewer-426"><a href="#DisulfideViewer-426"><span class="linenos">426</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_style</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">):</span>
 </span><span id="DisulfideViewer-427"><a href="#DisulfideViewer-427"><span class="linenos">427</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-428"><a href="#DisulfideViewer-428"><span class="linenos">428</span></a><span class="sd">        Updates the current rendering style and refreshes the visualization.</span>
 </span><span id="DisulfideViewer-429"><a href="#DisulfideViewer-429"><span class="linenos">429</span></a>
@@ -1432,7 +1432,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-434"><a href="#DisulfideViewer-434"><span class="linenos">434</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">checkbox_single</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># Ensure the &quot;Single&quot; checkbox is checked</span>
 </span><span id="DisulfideViewer-435"><a href="#DisulfideViewer-435"><span class="linenos">435</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
 </span><span id="DisulfideViewer-436"><a href="#DisulfideViewer-436"><span class="linenos">436</span></a>
-</span><span id="DisulfideViewer-437"><a href="#DisulfideViewer-437"><span class="linenos">437</span></a>    <span class="k">def</span> <span class="nf">on_pdb_textbox_enter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DisulfideViewer-437"><a href="#DisulfideViewer-437"><span class="linenos">437</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">on_pdb_textbox_enter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideViewer-438"><a href="#DisulfideViewer-438"><span class="linenos">438</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-439"><a href="#DisulfideViewer-439"><span class="linenos">439</span></a><span class="sd">        Handles the event when the user presses Enter in the PDB ID text box.</span>
 </span><span id="DisulfideViewer-440"><a href="#DisulfideViewer-440"><span class="linenos">440</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -1450,7 +1450,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-452"><a href="#DisulfideViewer-452"><span class="linenos">452</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_sslist</span> <span class="o">=</span> <span class="n">DisulfideList</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">disulfides</span><span class="p">),</span> <span class="s2">&quot;sub&quot;</span><span class="p">)</span>
 </span><span id="DisulfideViewer-453"><a href="#DisulfideViewer-453"><span class="linenos">453</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">pdb_dropdown</span><span class="o">.</span><span class="n">setCurrentText</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">)</span>
 </span><span id="DisulfideViewer-454"><a href="#DisulfideViewer-454"><span class="linenos">454</span></a>
-</span><span id="DisulfideViewer-455"><a href="#DisulfideViewer-455"><span class="linenos">455</span></a>    <span class="k">def</span> <span class="nf">on_pdb_dropdown_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+</span><span id="DisulfideViewer-455"><a href="#DisulfideViewer-455"><span class="linenos">455</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">on_pdb_dropdown_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
 </span><span id="DisulfideViewer-456"><a href="#DisulfideViewer-456"><span class="linenos">456</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-457"><a href="#DisulfideViewer-457"><span class="linenos">457</span></a><span class="sd">        Handles the event when the PDB ID dropdown selection changes.</span>
 </span><span id="DisulfideViewer-458"><a href="#DisulfideViewer-458"><span class="linenos">458</span></a>
@@ -1473,7 +1473,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-475"><a href="#DisulfideViewer-475"><span class="linenos">475</span></a>        <span class="k">else</span><span class="p">:</span>
 </span><span id="DisulfideViewer-476"><a href="#DisulfideViewer-476"><span class="linenos">476</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">statusBar</span><span class="p">()</span><span class="o">.</span><span class="n">showMessage</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No Disulfides: </span><span class="si">{</span><span class="n">pdb_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span><span id="DisulfideViewer-477"><a href="#DisulfideViewer-477"><span class="linenos">477</span></a>
-</span><span id="DisulfideViewer-478"><a href="#DisulfideViewer-478"><span class="linenos">478</span></a>    <span class="k">def</span> <span class="nf">update_pdb_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdb_id</span><span class="p">):</span>
+</span><span id="DisulfideViewer-478"><a href="#DisulfideViewer-478"><span class="linenos">478</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_pdb_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdb_id</span><span class="p">):</span>
 </span><span id="DisulfideViewer-479"><a href="#DisulfideViewer-479"><span class="linenos">479</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-480"><a href="#DisulfideViewer-480"><span class="linenos">480</span></a><span class="sd">        Updates the current PDB selection and refreshes the disulfide dropdown.</span>
 </span><span id="DisulfideViewer-481"><a href="#DisulfideViewer-481"><span class="linenos">481</span></a>
@@ -1487,7 +1487,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-489"><a href="#DisulfideViewer-489"><span class="linenos">489</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dropdown</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 </span><span id="DisulfideViewer-490"><a href="#DisulfideViewer-490"><span class="linenos">490</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dropdown</span><span class="o">.</span><span class="n">addItems</span><span class="p">([</span><span class="n">ss</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ss_list</span><span class="p">])</span>
 </span><span id="DisulfideViewer-491"><a href="#DisulfideViewer-491"><span class="linenos">491</span></a>
-</span><span id="DisulfideViewer-492"><a href="#DisulfideViewer-492"><span class="linenos">492</span></a>    <span class="k">def</span> <span class="nf">on_dropdown_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+</span><span id="DisulfideViewer-492"><a href="#DisulfideViewer-492"><span class="linenos">492</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">on_dropdown_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
 </span><span id="DisulfideViewer-493"><a href="#DisulfideViewer-493"><span class="linenos">493</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-494"><a href="#DisulfideViewer-494"><span class="linenos">494</span></a><span class="sd">        Handles the event when the dropdown selection changes.</span>
 </span><span id="DisulfideViewer-495"><a href="#DisulfideViewer-495"><span class="linenos">495</span></a>
@@ -1502,7 +1502,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-504"><a href="#DisulfideViewer-504"><span class="linenos">504</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">statusBar</span><span class="p">()</span><span class="o">.</span><span class="n">showMessage</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Displaying: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_ss</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span><span id="DisulfideViewer-505"><a href="#DisulfideViewer-505"><span class="linenos">505</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
 </span><span id="DisulfideViewer-506"><a href="#DisulfideViewer-506"><span class="linenos">506</span></a>
-</span><span id="DisulfideViewer-507"><a href="#DisulfideViewer-507"><span class="linenos">507</span></a>    <span class="k">def</span> <span class="nf">on_checkbox_single_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+</span><span id="DisulfideViewer-507"><a href="#DisulfideViewer-507"><span class="linenos">507</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">on_checkbox_single_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
 </span><span id="DisulfideViewer-508"><a href="#DisulfideViewer-508"><span class="linenos">508</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-509"><a href="#DisulfideViewer-509"><span class="linenos">509</span></a><span class="sd">        Handles the event when the single/multiple checkbox state changes.</span>
 </span><span id="DisulfideViewer-510"><a href="#DisulfideViewer-510"><span class="linenos">510</span></a>
@@ -1512,7 +1512,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-514"><a href="#DisulfideViewer-514"><span class="linenos">514</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">single</span> <span class="o">=</span> <span class="n">state</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">Checked</span>
 </span><span id="DisulfideViewer-515"><a href="#DisulfideViewer-515"><span class="linenos">515</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>  <span class="c1"># Use the current style</span>
 </span><span id="DisulfideViewer-516"><a href="#DisulfideViewer-516"><span class="linenos">516</span></a>
-</span><span id="DisulfideViewer-517"><a href="#DisulfideViewer-517"><span class="linenos">517</span></a>    <span class="k">def</span> <span class="nf">update_camera_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DisulfideViewer-517"><a href="#DisulfideViewer-517"><span class="linenos">517</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_camera_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideViewer-518"><a href="#DisulfideViewer-518"><span class="linenos">518</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-519"><a href="#DisulfideViewer-519"><span class="linenos">519</span></a><span class="sd">        Update the camera position based on the slider values.</span>
 </span><span id="DisulfideViewer-520"><a href="#DisulfideViewer-520"><span class="linenos">520</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -1542,7 +1542,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-544"><a href="#DisulfideViewer-544"><span class="linenos">544</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plotter_widget</span><span class="o">.</span><span class="n">camera_position</span> <span class="o">=</span> <span class="p">[(</span><span class="n">xpos</span><span class="p">,</span> <span class="n">ypos</span><span class="p">,</span> <span class="n">zpos</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
 </span><span id="DisulfideViewer-545"><a href="#DisulfideViewer-545"><span class="linenos">545</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plotter_widget</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
 </span><span id="DisulfideViewer-546"><a href="#DisulfideViewer-546"><span class="linenos">546</span></a>
-</span><span id="DisulfideViewer-547"><a href="#DisulfideViewer-547"><span class="linenos">547</span></a>    <span class="k">def</span> <span class="nf">apply_theme</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DisulfideViewer-547"><a href="#DisulfideViewer-547"><span class="linenos">547</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">apply_theme</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideViewer-548"><a href="#DisulfideViewer-548"><span class="linenos">548</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-549"><a href="#DisulfideViewer-549"><span class="linenos">549</span></a><span class="sd">        Apply the current theme to the plotter widget.</span>
 </span><span id="DisulfideViewer-550"><a href="#DisulfideViewer-550"><span class="linenos">550</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -1554,7 +1554,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-556"><a href="#DisulfideViewer-556"><span class="linenos">556</span></a>        <span class="c1"># Render the plotter to apply the changes</span>
 </span><span id="DisulfideViewer-557"><a href="#DisulfideViewer-557"><span class="linenos">557</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">plotter_widget</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
 </span><span id="DisulfideViewer-558"><a href="#DisulfideViewer-558"><span class="linenos">558</span></a>
-</span><span id="DisulfideViewer-559"><a href="#DisulfideViewer-559"><span class="linenos">559</span></a>    <span class="k">def</span> <span class="nf">create_menubar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DisulfideViewer-559"><a href="#DisulfideViewer-559"><span class="linenos">559</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_menubar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideViewer-560"><a href="#DisulfideViewer-560"><span class="linenos">560</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-561"><a href="#DisulfideViewer-561"><span class="linenos">561</span></a><span class="sd">        Creates the menubar</span>
 </span><span id="DisulfideViewer-562"><a href="#DisulfideViewer-562"><span class="linenos">562</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -1579,7 +1579,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-581"><a href="#DisulfideViewer-581"><span class="linenos">581</span></a>        <span class="n">reset_action</span><span class="o">.</span><span class="n">triggered</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">)</span>
 </span><span id="DisulfideViewer-582"><a href="#DisulfideViewer-582"><span class="linenos">582</span></a>        <span class="n">reset_menu</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">reset_action</span><span class="p">)</span>
 </span><span id="DisulfideViewer-583"><a href="#DisulfideViewer-583"><span class="linenos">583</span></a>
-</span><span id="DisulfideViewer-584"><a href="#DisulfideViewer-584"><span class="linenos">584</span></a>    <span class="k">def</span> <span class="nf">save_screenshot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DisulfideViewer-584"><a href="#DisulfideViewer-584"><span class="linenos">584</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">save_screenshot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideViewer-585"><a href="#DisulfideViewer-585"><span class="linenos">585</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-586"><a href="#DisulfideViewer-586"><span class="linenos">586</span></a><span class="sd">        Save the current scene as a screenshot</span>
 </span><span id="DisulfideViewer-587"><a href="#DisulfideViewer-587"><span class="linenos">587</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -1594,7 +1594,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-596"><a href="#DisulfideViewer-596"><span class="linenos">596</span></a>        <span class="k">if</span> <span class="n">file_path</span><span class="p">:</span>
 </span><span id="DisulfideViewer-597"><a href="#DisulfideViewer-597"><span class="linenos">597</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">plotter_widget</span><span class="o">.</span><span class="n">screenshot</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
 </span><span id="DisulfideViewer-598"><a href="#DisulfideViewer-598"><span class="linenos">598</span></a>
-</span><span id="DisulfideViewer-599"><a href="#DisulfideViewer-599"><span class="linenos">599</span></a>    <span class="k">def</span> <span class="nf">export_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="DisulfideViewer-599"><a href="#DisulfideViewer-599"><span class="linenos">599</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">export_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideViewer-600"><a href="#DisulfideViewer-600"><span class="linenos">600</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-601"><a href="#DisulfideViewer-601"><span class="linenos">601</span></a><span class="sd">        Export the current scene as an HTML file</span>
 </span><span id="DisulfideViewer-602"><a href="#DisulfideViewer-602"><span class="linenos">602</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -1609,7 +1609,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-611"><a href="#DisulfideViewer-611"><span class="linenos">611</span></a>        <span class="k">if</span> <span class="n">file_path</span><span class="p">:</span>
 </span><span id="DisulfideViewer-612"><a href="#DisulfideViewer-612"><span class="linenos">612</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">plotter_widget</span><span class="o">.</span><span class="n">export_html</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
 </span><span id="DisulfideViewer-613"><a href="#DisulfideViewer-613"><span class="linenos">613</span></a>
-</span><span id="DisulfideViewer-614"><a href="#DisulfideViewer-614"><span class="linenos">614</span></a>    <span class="k">def</span> <span class="nf">add_custom_lights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
+</span><span id="DisulfideViewer-614"><a href="#DisulfideViewer-614"><span class="linenos">614</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_custom_lights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
 </span><span id="DisulfideViewer-615"><a href="#DisulfideViewer-615"><span class="linenos">615</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-616"><a href="#DisulfideViewer-616"><span class="linenos">616</span></a><span class="sd">        Adds custom lighting to the plotter for enhanced visualization.</span>
 </span><span id="DisulfideViewer-617"><a href="#DisulfideViewer-617"><span class="linenos">617</span></a>
@@ -1634,7 +1634,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-636"><a href="#DisulfideViewer-636"><span class="linenos">636</span></a>        <span class="n">plotter</span><span class="o">.</span><span class="n">add_light</span><span class="p">(</span><span class="n">light2</span><span class="p">)</span>
 </span><span id="DisulfideViewer-637"><a href="#DisulfideViewer-637"><span class="linenos">637</span></a>        <span class="n">plotter</span><span class="o">.</span><span class="n">add_light</span><span class="p">(</span><span class="n">light3</span><span class="p">)</span>
 </span><span id="DisulfideViewer-638"><a href="#DisulfideViewer-638"><span class="linenos">638</span></a>
-</span><span id="DisulfideViewer-639"><a href="#DisulfideViewer-639"><span class="linenos">639</span></a>    <span class="k">def</span> <span class="nf">new_plotter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+</span><span id="DisulfideViewer-639"><a href="#DisulfideViewer-639"><span class="linenos">639</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">new_plotter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 </span><span id="DisulfideViewer-640"><a href="#DisulfideViewer-640"><span class="linenos">640</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-641"><a href="#DisulfideViewer-641"><span class="linenos">641</span></a><span class="sd">        Create a new QtInteractor with the specified number of rows and columns.</span>
 </span><span id="DisulfideViewer-642"><a href="#DisulfideViewer-642"><span class="linenos">642</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -1654,7 +1654,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-656"><a href="#DisulfideViewer-656"><span class="linenos">656</span></a>            <span class="n">new_plotter_widget</span>  <span class="c1"># Update the reference to the new plotter widget</span>
 </span><span id="DisulfideViewer-657"><a href="#DisulfideViewer-657"><span class="linenos">657</span></a>        <span class="p">)</span>
 </span><span id="DisulfideViewer-658"><a href="#DisulfideViewer-658"><span class="linenos">658</span></a>
-</span><span id="DisulfideViewer-659"><a href="#DisulfideViewer-659"><span class="linenos">659</span></a>    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="s2">&quot;Auto&quot;</span><span class="p">,</span> <span class="n">shadows</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+</span><span id="DisulfideViewer-659"><a href="#DisulfideViewer-659"><span class="linenos">659</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="s2">&quot;Auto&quot;</span><span class="p">,</span> <span class="n">shadows</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 </span><span id="DisulfideViewer-660"><a href="#DisulfideViewer-660"><span class="linenos">660</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-661"><a href="#DisulfideViewer-661"><span class="linenos">661</span></a><span class="sd">        Renders the current disulfide bond using the specified style.</span>
 </span><span id="DisulfideViewer-662"><a href="#DisulfideViewer-662"><span class="linenos">662</span></a>
@@ -1718,7 +1718,7 @@ and save or export the visualized scenes.</p>
 </span><span id="DisulfideViewer-720"><a href="#DisulfideViewer-720"><span class="linenos">720</span></a>        <span class="n">plotter</span><span class="o">.</span><span class="n">reset_camera</span><span class="p">()</span>
 </span><span id="DisulfideViewer-721"><a href="#DisulfideViewer-721"><span class="linenos">721</span></a>        <span class="n">plotter</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
 </span><span id="DisulfideViewer-722"><a href="#DisulfideViewer-722"><span class="linenos">722</span></a>
-</span><span id="DisulfideViewer-723"><a href="#DisulfideViewer-723"><span class="linenos">723</span></a>    <span class="k">def</span> <span class="nf">display_overlay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pl</span><span class="p">):</span>
+</span><span id="DisulfideViewer-723"><a href="#DisulfideViewer-723"><span class="linenos">723</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">display_overlay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pl</span><span class="p">):</span>
 </span><span id="DisulfideViewer-724"><a href="#DisulfideViewer-724"><span class="linenos">724</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer-725"><a href="#DisulfideViewer-725"><span class="linenos">725</span></a><span class="sd">        Display all disulfides in the list overlaid in stick mode against</span>
 </span><span id="DisulfideViewer-726"><a href="#DisulfideViewer-726"><span class="linenos">726</span></a><span class="sd">        a common coordinate frames. This allows us to see all of the disulfides</span>
@@ -1812,7 +1812,7 @@ multiple disulfide bonds and various rendering styles.</p>
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.__init__-116"><a href="#DisulfideViewer.__init__-116"><span class="linenos">116</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ss_list</span><span class="p">,</span> <span class="n">winsize</span><span class="o">=</span><span class="p">(</span><span class="mi">1200</span><span class="p">,</span> <span class="mi">800</span><span class="p">)):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.__init__-116"><a href="#DisulfideViewer.__init__-116"><span class="linenos">116</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ss_list</span><span class="p">,</span> <span class="n">winsize</span><span class="o">=</span><span class="p">(</span><span class="mi">1200</span><span class="p">,</span> <span class="mi">800</span><span class="p">)):</span>
 </span><span id="DisulfideViewer.__init__-117"><a href="#DisulfideViewer.__init__-117"><span class="linenos">117</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.__init__-118"><a href="#DisulfideViewer.__init__-118"><span class="linenos">118</span></a><span class="sd">        Initializes the MolecularViewer application.</span>
 </span><span id="DisulfideViewer.__init__-119"><a href="#DisulfideViewer.__init__-119"><span class="linenos">119</span></a>
@@ -2294,7 +2294,7 @@ multiple disulfide bonds and various rendering styles.</p>
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.update_sliders_from_camera"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.update_sliders_from_camera-312"><a href="#DisulfideViewer.update_sliders_from_camera-312"><span class="linenos">312</span></a>    <span class="k">def</span> <span class="nf">update_sliders_from_camera</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.update_sliders_from_camera-312"><a href="#DisulfideViewer.update_sliders_from_camera-312"><span class="linenos">312</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_sliders_from_camera</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideViewer.update_sliders_from_camera-313"><a href="#DisulfideViewer.update_sliders_from_camera-313"><span class="linenos">313</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.update_sliders_from_camera-314"><a href="#DisulfideViewer.update_sliders_from_camera-314"><span class="linenos">314</span></a><span class="sd">        Updates the slider values to match the camera&#39;s position.</span>
 </span><span id="DisulfideViewer.update_sliders_from_camera-315"><a href="#DisulfideViewer.update_sliders_from_camera-315"><span class="linenos">315</span></a>
@@ -2356,7 +2356,7 @@ multiple disulfide bonds and various rendering styles.</p>
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.set_camera_view"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.set_camera_view-352"><a href="#DisulfideViewer.set_camera_view-352"><span class="linenos">352</span></a>    <span class="k">def</span> <span class="nf">set_camera_view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.set_camera_view-352"><a href="#DisulfideViewer.set_camera_view-352"><span class="linenos">352</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_camera_view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideViewer.set_camera_view-353"><a href="#DisulfideViewer.set_camera_view-353"><span class="linenos">353</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.set_camera_view-354"><a href="#DisulfideViewer.set_camera_view-354"><span class="linenos">354</span></a><span class="sd">        Sets the camera to a specific view where the x-axis is pointed down and the</span>
 </span><span id="DisulfideViewer.set_camera_view-355"><a href="#DisulfideViewer.set_camera_view-355"><span class="linenos">355</span></a><span class="sd">        y-axis into the screen, and resets the x and y sliders to their default values.</span>
@@ -2389,7 +2389,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.spin_camera"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.spin_camera-366"><a href="#DisulfideViewer.spin_camera-366"><span class="linenos">366</span></a>    <span class="k">def</span> <span class="nf">spin_camera</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">n_frames</span><span class="o">=</span><span class="mi">150</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.spin_camera-366"><a href="#DisulfideViewer.spin_camera-366"><span class="linenos">366</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">spin_camera</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">n_frames</span><span class="o">=</span><span class="mi">150</span><span class="p">):</span>
 </span><span id="DisulfideViewer.spin_camera-367"><a href="#DisulfideViewer.spin_camera-367"><span class="linenos">367</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.spin_camera-368"><a href="#DisulfideViewer.spin_camera-368"><span class="linenos">368</span></a><span class="sd">        Spins the camera around the z-axis in an orbital path.</span>
 </span><span id="DisulfideViewer.spin_camera-369"><a href="#DisulfideViewer.spin_camera-369"><span class="linenos">369</span></a>
@@ -2402,7 +2402,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 </span><span id="DisulfideViewer.spin_camera-376"><a href="#DisulfideViewer.spin_camera-376"><span class="linenos">376</span></a>        <span class="n">duration</span> <span class="o">=</span> <span class="mi">5</span>
 </span><span id="DisulfideViewer.spin_camera-377"><a href="#DisulfideViewer.spin_camera-377"><span class="linenos">377</span></a>
 </span><span id="DisulfideViewer.spin_camera-378"><a href="#DisulfideViewer.spin_camera-378"><span class="linenos">378</span></a>        <span class="c1"># Function to update the camera position</span>
-</span><span id="DisulfideViewer.spin_camera-379"><a href="#DisulfideViewer.spin_camera-379"><span class="linenos">379</span></a>        <span class="k">def</span> <span class="nf">update_camera</span><span class="p">():</span>
+</span><span id="DisulfideViewer.spin_camera-379"><a href="#DisulfideViewer.spin_camera-379"><span class="linenos">379</span></a>        <span class="k">def</span><span class="w"> </span><span class="nf">update_camera</span><span class="p">():</span>
 </span><span id="DisulfideViewer.spin_camera-380"><a href="#DisulfideViewer.spin_camera-380"><span class="linenos">380</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">plotter_widget</span><span class="o">.</span><span class="n">camera_position</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_frame</span><span class="p">]</span>
 </span><span id="DisulfideViewer.spin_camera-381"><a href="#DisulfideViewer.spin_camera-381"><span class="linenos">381</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">current_frame</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_frame</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">n_frames</span>
 </span><span id="DisulfideViewer.spin_camera-382"><a href="#DisulfideViewer.spin_camera-382"><span class="linenos">382</span></a>
@@ -2412,7 +2412,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 </span><span id="DisulfideViewer.spin_camera-386"><a href="#DisulfideViewer.spin_camera-386"><span class="linenos">386</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_frame</span> <span class="o">=</span> <span class="mi">0</span>
 </span><span id="DisulfideViewer.spin_camera-387"><a href="#DisulfideViewer.spin_camera-387"><span class="linenos">387</span></a>
 </span><span id="DisulfideViewer.spin_camera-388"><a href="#DisulfideViewer.spin_camera-388"><span class="linenos">388</span></a>        <span class="c1"># Function to stop the timer after the duration</span>
-</span><span id="DisulfideViewer.spin_camera-389"><a href="#DisulfideViewer.spin_camera-389"><span class="linenos">389</span></a>        <span class="k">def</span> <span class="nf">stop_timer</span><span class="p">():</span>
+</span><span id="DisulfideViewer.spin_camera-389"><a href="#DisulfideViewer.spin_camera-389"><span class="linenos">389</span></a>        <span class="k">def</span><span class="w"> </span><span class="nf">stop_timer</span><span class="p">():</span>
 </span><span id="DisulfideViewer.spin_camera-390"><a href="#DisulfideViewer.spin_camera-390"><span class="linenos">390</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 </span><span id="DisulfideViewer.spin_camera-391"><a href="#DisulfideViewer.spin_camera-391"><span class="linenos">391</span></a>
 </span><span id="DisulfideViewer.spin_camera-392"><a href="#DisulfideViewer.spin_camera-392"><span class="linenos">392</span></a>        <span class="c1"># Start the timer</span>
@@ -2445,7 +2445,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.reset"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.reset-397"><a href="#DisulfideViewer.reset-397"><span class="linenos">397</span></a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.reset-397"><a href="#DisulfideViewer.reset-397"><span class="linenos">397</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideViewer.reset-398"><a href="#DisulfideViewer.reset-398"><span class="linenos">398</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.reset-399"><a href="#DisulfideViewer.reset-399"><span class="linenos">399</span></a><span class="sd">        Resets all widgets and data structures to their default state.</span>
 </span><span id="DisulfideViewer.reset-400"><a href="#DisulfideViewer.reset-400"><span class="linenos">400</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -2478,7 +2478,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.add_floor"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.add_floor-412"><a href="#DisulfideViewer.add_floor-412"><span class="linenos">412</span></a>    <span class="k">def</span> <span class="nf">add_floor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotter</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">)):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.add_floor-412"><a href="#DisulfideViewer.add_floor-412"><span class="linenos">412</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_floor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotter</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">)):</span>
 </span><span id="DisulfideViewer.add_floor-413"><a href="#DisulfideViewer.add_floor-413"><span class="linenos">413</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.add_floor-414"><a href="#DisulfideViewer.add_floor-414"><span class="linenos">414</span></a><span class="sd">        Adds a simple plane beneath the disulfide bond to act as a &#39;floor&#39;.</span>
 </span><span id="DisulfideViewer.add_floor-415"><a href="#DisulfideViewer.add_floor-415"><span class="linenos">415</span></a>
@@ -2518,7 +2518,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.update_style"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.update_style-426"><a href="#DisulfideViewer.update_style-426"><span class="linenos">426</span></a>    <span class="k">def</span> <span class="nf">update_style</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.update_style-426"><a href="#DisulfideViewer.update_style-426"><span class="linenos">426</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_style</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style</span><span class="p">):</span>
 </span><span id="DisulfideViewer.update_style-427"><a href="#DisulfideViewer.update_style-427"><span class="linenos">427</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.update_style-428"><a href="#DisulfideViewer.update_style-428"><span class="linenos">428</span></a><span class="sd">        Updates the current rendering style and refreshes the visualization.</span>
 </span><span id="DisulfideViewer.update_style-429"><a href="#DisulfideViewer.update_style-429"><span class="linenos">429</span></a>
@@ -2553,7 +2553,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.on_pdb_textbox_enter"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.on_pdb_textbox_enter-437"><a href="#DisulfideViewer.on_pdb_textbox_enter-437"><span class="linenos">437</span></a>    <span class="k">def</span> <span class="nf">on_pdb_textbox_enter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.on_pdb_textbox_enter-437"><a href="#DisulfideViewer.on_pdb_textbox_enter-437"><span class="linenos">437</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">on_pdb_textbox_enter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideViewer.on_pdb_textbox_enter-438"><a href="#DisulfideViewer.on_pdb_textbox_enter-438"><span class="linenos">438</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.on_pdb_textbox_enter-439"><a href="#DisulfideViewer.on_pdb_textbox_enter-439"><span class="linenos">439</span></a><span class="sd">        Handles the event when the user presses Enter in the PDB ID text box.</span>
 </span><span id="DisulfideViewer.on_pdb_textbox_enter-440"><a href="#DisulfideViewer.on_pdb_textbox_enter-440"><span class="linenos">440</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -2589,7 +2589,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.on_pdb_dropdown_change"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.on_pdb_dropdown_change-455"><a href="#DisulfideViewer.on_pdb_dropdown_change-455"><span class="linenos">455</span></a>    <span class="k">def</span> <span class="nf">on_pdb_dropdown_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.on_pdb_dropdown_change-455"><a href="#DisulfideViewer.on_pdb_dropdown_change-455"><span class="linenos">455</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">on_pdb_dropdown_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
 </span><span id="DisulfideViewer.on_pdb_dropdown_change-456"><a href="#DisulfideViewer.on_pdb_dropdown_change-456"><span class="linenos">456</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.on_pdb_dropdown_change-457"><a href="#DisulfideViewer.on_pdb_dropdown_change-457"><span class="linenos">457</span></a><span class="sd">        Handles the event when the PDB ID dropdown selection changes.</span>
 </span><span id="DisulfideViewer.on_pdb_dropdown_change-458"><a href="#DisulfideViewer.on_pdb_dropdown_change-458"><span class="linenos">458</span></a>
@@ -2633,7 +2633,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.update_pdb_selection"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.update_pdb_selection-478"><a href="#DisulfideViewer.update_pdb_selection-478"><span class="linenos">478</span></a>    <span class="k">def</span> <span class="nf">update_pdb_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdb_id</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.update_pdb_selection-478"><a href="#DisulfideViewer.update_pdb_selection-478"><span class="linenos">478</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_pdb_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pdb_id</span><span class="p">):</span>
 </span><span id="DisulfideViewer.update_pdb_selection-479"><a href="#DisulfideViewer.update_pdb_selection-479"><span class="linenos">479</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.update_pdb_selection-480"><a href="#DisulfideViewer.update_pdb_selection-480"><span class="linenos">480</span></a><span class="sd">        Updates the current PDB selection and refreshes the disulfide dropdown.</span>
 </span><span id="DisulfideViewer.update_pdb_selection-481"><a href="#DisulfideViewer.update_pdb_selection-481"><span class="linenos">481</span></a>
@@ -2671,7 +2671,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.on_dropdown_change"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.on_dropdown_change-492"><a href="#DisulfideViewer.on_dropdown_change-492"><span class="linenos">492</span></a>    <span class="k">def</span> <span class="nf">on_dropdown_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.on_dropdown_change-492"><a href="#DisulfideViewer.on_dropdown_change-492"><span class="linenos">492</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">on_dropdown_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
 </span><span id="DisulfideViewer.on_dropdown_change-493"><a href="#DisulfideViewer.on_dropdown_change-493"><span class="linenos">493</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.on_dropdown_change-494"><a href="#DisulfideViewer.on_dropdown_change-494"><span class="linenos">494</span></a><span class="sd">        Handles the event when the dropdown selection changes.</span>
 </span><span id="DisulfideViewer.on_dropdown_change-495"><a href="#DisulfideViewer.on_dropdown_change-495"><span class="linenos">495</span></a>
@@ -2707,7 +2707,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.on_checkbox_single_change"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.on_checkbox_single_change-507"><a href="#DisulfideViewer.on_checkbox_single_change-507"><span class="linenos">507</span></a>    <span class="k">def</span> <span class="nf">on_checkbox_single_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.on_checkbox_single_change-507"><a href="#DisulfideViewer.on_checkbox_single_change-507"><span class="linenos">507</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">on_checkbox_single_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
 </span><span id="DisulfideViewer.on_checkbox_single_change-508"><a href="#DisulfideViewer.on_checkbox_single_change-508"><span class="linenos">508</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.on_checkbox_single_change-509"><a href="#DisulfideViewer.on_checkbox_single_change-509"><span class="linenos">509</span></a><span class="sd">        Handles the event when the single/multiple checkbox state changes.</span>
 </span><span id="DisulfideViewer.on_checkbox_single_change-510"><a href="#DisulfideViewer.on_checkbox_single_change-510"><span class="linenos">510</span></a>
@@ -2738,7 +2738,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.update_camera_position"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.update_camera_position-517"><a href="#DisulfideViewer.update_camera_position-517"><span class="linenos">517</span></a>    <span class="k">def</span> <span class="nf">update_camera_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.update_camera_position-517"><a href="#DisulfideViewer.update_camera_position-517"><span class="linenos">517</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_camera_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideViewer.update_camera_position-518"><a href="#DisulfideViewer.update_camera_position-518"><span class="linenos">518</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.update_camera_position-519"><a href="#DisulfideViewer.update_camera_position-519"><span class="linenos">519</span></a><span class="sd">        Update the camera position based on the slider values.</span>
 </span><span id="DisulfideViewer.update_camera_position-520"><a href="#DisulfideViewer.update_camera_position-520"><span class="linenos">520</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -2786,7 +2786,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.apply_theme"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.apply_theme-547"><a href="#DisulfideViewer.apply_theme-547"><span class="linenos">547</span></a>    <span class="k">def</span> <span class="nf">apply_theme</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.apply_theme-547"><a href="#DisulfideViewer.apply_theme-547"><span class="linenos">547</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">apply_theme</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideViewer.apply_theme-548"><a href="#DisulfideViewer.apply_theme-548"><span class="linenos">548</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.apply_theme-549"><a href="#DisulfideViewer.apply_theme-549"><span class="linenos">549</span></a><span class="sd">        Apply the current theme to the plotter widget.</span>
 </span><span id="DisulfideViewer.apply_theme-550"><a href="#DisulfideViewer.apply_theme-550"><span class="linenos">550</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -2816,7 +2816,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.create_menubar"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.create_menubar-559"><a href="#DisulfideViewer.create_menubar-559"><span class="linenos">559</span></a>    <span class="k">def</span> <span class="nf">create_menubar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.create_menubar-559"><a href="#DisulfideViewer.create_menubar-559"><span class="linenos">559</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_menubar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideViewer.create_menubar-560"><a href="#DisulfideViewer.create_menubar-560"><span class="linenos">560</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.create_menubar-561"><a href="#DisulfideViewer.create_menubar-561"><span class="linenos">561</span></a><span class="sd">        Creates the menubar</span>
 </span><span id="DisulfideViewer.create_menubar-562"><a href="#DisulfideViewer.create_menubar-562"><span class="linenos">562</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -2859,7 +2859,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.save_screenshot"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.save_screenshot-584"><a href="#DisulfideViewer.save_screenshot-584"><span class="linenos">584</span></a>    <span class="k">def</span> <span class="nf">save_screenshot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.save_screenshot-584"><a href="#DisulfideViewer.save_screenshot-584"><span class="linenos">584</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">save_screenshot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideViewer.save_screenshot-585"><a href="#DisulfideViewer.save_screenshot-585"><span class="linenos">585</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.save_screenshot-586"><a href="#DisulfideViewer.save_screenshot-586"><span class="linenos">586</span></a><span class="sd">        Save the current scene as a screenshot</span>
 </span><span id="DisulfideViewer.save_screenshot-587"><a href="#DisulfideViewer.save_screenshot-587"><span class="linenos">587</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -2892,7 +2892,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.export_scene"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.export_scene-599"><a href="#DisulfideViewer.export_scene-599"><span class="linenos">599</span></a>    <span class="k">def</span> <span class="nf">export_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.export_scene-599"><a href="#DisulfideViewer.export_scene-599"><span class="linenos">599</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">export_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DisulfideViewer.export_scene-600"><a href="#DisulfideViewer.export_scene-600"><span class="linenos">600</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.export_scene-601"><a href="#DisulfideViewer.export_scene-601"><span class="linenos">601</span></a><span class="sd">        Export the current scene as an HTML file</span>
 </span><span id="DisulfideViewer.export_scene-602"><a href="#DisulfideViewer.export_scene-602"><span class="linenos">602</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -2925,7 +2925,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.add_custom_lights"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.add_custom_lights-614"><a href="#DisulfideViewer.add_custom_lights-614"><span class="linenos">614</span></a>    <span class="k">def</span> <span class="nf">add_custom_lights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.add_custom_lights-614"><a href="#DisulfideViewer.add_custom_lights-614"><span class="linenos">614</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_custom_lights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plotter</span><span class="p">):</span>
 </span><span id="DisulfideViewer.add_custom_lights-615"><a href="#DisulfideViewer.add_custom_lights-615"><span class="linenos">615</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.add_custom_lights-616"><a href="#DisulfideViewer.add_custom_lights-616"><span class="linenos">616</span></a><span class="sd">        Adds custom lighting to the plotter for enhanced visualization.</span>
 </span><span id="DisulfideViewer.add_custom_lights-617"><a href="#DisulfideViewer.add_custom_lights-617"><span class="linenos">617</span></a>
@@ -2971,7 +2971,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.new_plotter"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.new_plotter-639"><a href="#DisulfideViewer.new_plotter-639"><span class="linenos">639</span></a>    <span class="k">def</span> <span class="nf">new_plotter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.new_plotter-639"><a href="#DisulfideViewer.new_plotter-639"><span class="linenos">639</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">new_plotter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 </span><span id="DisulfideViewer.new_plotter-640"><a href="#DisulfideViewer.new_plotter-640"><span class="linenos">640</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.new_plotter-641"><a href="#DisulfideViewer.new_plotter-641"><span class="linenos">641</span></a><span class="sd">        Create a new QtInteractor with the specified number of rows and columns.</span>
 </span><span id="DisulfideViewer.new_plotter-642"><a href="#DisulfideViewer.new_plotter-642"><span class="linenos">642</span></a><span class="sd">        &quot;&quot;&quot;</span>
@@ -3009,7 +3009,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.display"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.display-659"><a href="#DisulfideViewer.display-659"><span class="linenos">659</span></a>    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="s2">&quot;Auto&quot;</span><span class="p">,</span> <span class="n">shadows</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.display-659"><a href="#DisulfideViewer.display-659"><span class="linenos">659</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="s2">&quot;Auto&quot;</span><span class="p">,</span> <span class="n">shadows</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 </span><span id="DisulfideViewer.display-660"><a href="#DisulfideViewer.display-660"><span class="linenos">660</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.display-661"><a href="#DisulfideViewer.display-661"><span class="linenos">661</span></a><span class="sd">        Renders the current disulfide bond using the specified style.</span>
 </span><span id="DisulfideViewer.display-662"><a href="#DisulfideViewer.display-662"><span class="linenos">662</span></a>
@@ -3097,7 +3097,7 @@ y-axis into the screen, and resets the x and y sliders to their default values.<
 
     </div>
     <a class="headerlink" href="#DisulfideViewer.display_overlay"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.display_overlay-723"><a href="#DisulfideViewer.display_overlay-723"><span class="linenos">723</span></a>    <span class="k">def</span> <span class="nf">display_overlay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pl</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideViewer.display_overlay-723"><a href="#DisulfideViewer.display_overlay-723"><span class="linenos">723</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">display_overlay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pl</span><span class="p">):</span>
 </span><span id="DisulfideViewer.display_overlay-724"><a href="#DisulfideViewer.display_overlay-724"><span class="linenos">724</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideViewer.display_overlay-725"><a href="#DisulfideViewer.display_overlay-725"><span class="linenos">725</span></a><span class="sd">        Display all disulfides in the list overlaid in stick mode against</span>
 </span><span id="DisulfideViewer.display_overlay-726"><a href="#DisulfideViewer.display_overlay-726"><span class="linenos">726</span></a><span class="sd">        a common coordinate frames. This allows us to see all of the disulfides</span>
@@ -3197,7 +3197,7 @@ at one time in a single view. Colors vary smoothy between bonds.</p>
 
     </div>
     <a class="headerlink" href="#main"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="main-793"><a href="#main-793"><span class="linenos">793</span></a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="main-793"><a href="#main-793"><span class="linenos">793</span></a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
 </span><span id="main-794"><a href="#main-794"><span class="linenos">794</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="main-795"><a href="#main-795"><span class="linenos">795</span></a><span class="sd">    The main entry point of the application.</span>
 </span><span id="main-796"><a href="#main-796"><span class="linenos">796</span></a><span class="sd">    &quot;&quot;&quot;</span>

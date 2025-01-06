@@ -168,16 +168,16 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 </span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="sd">- Import the module and call the desired functions with appropriate arguments.</span>
 </span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>
-</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="kn">import</span> <span class="nn">os</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="kn">import</span> <span class="nn">pickle</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
 </span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="kn">from</span> <span class="nn">proteusPy.logger_config</span> <span class="kn">import</span> <span class="n">create_logger</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="kn">from</span> <span class="nn">proteusPy.vector3D</span> <span class="kn">import</span> <span class="n">Vector3D</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">proteusPy.logger_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_logger</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">proteusPy.vector3D</span><span class="w"> </span><span class="kn">import</span> <span class="n">Vector3D</span>
 </span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>
 </span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="n">_logger</span> <span class="o">=</span> <span class="n">create_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 </span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a>
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>
-</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="k">def</span> <span class="nf">extract_id_from_filename</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="k">def</span><span class="w"> </span><span class="nf">extract_id_from_filename</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 </span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="sd">    Extract the ID from a filename formatted as &#39;pdb{id}.ent&#39;.</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>
@@ -197,7 +197,7 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 </span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">mess</span><span class="p">)</span>
 </span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>
 </span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>
-</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="k">def</span> <span class="nf">parse_helix_record</span><span class="p">(</span><span class="n">record</span><span class="p">):</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_helix_record</span><span class="p">(</span><span class="n">record</span><span class="p">):</span>
 </span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="sd">    Parses a HELIX record from a PDB file to extract information about helices.</span>
 </span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a>
@@ -221,7 +221,7 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 </span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>    <span class="p">}</span>
 </span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>
 </span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="k">def</span> <span class="nf">parse_sheet_record</span><span class="p">(</span><span class="n">record</span><span class="p">):</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_sheet_record</span><span class="p">(</span><span class="n">record</span><span class="p">):</span>
 </span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="sd">    Parses a SHEET record from a PDB file to extract information about beta strands.</span>
 </span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>
@@ -243,7 +243,7 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 </span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a>    <span class="p">}</span>
 </span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>
 </span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="k">def</span> <span class="nf">parse_turn_record</span><span class="p">(</span><span class="n">record</span><span class="p">):</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_turn_record</span><span class="p">(</span><span class="n">record</span><span class="p">):</span>
 </span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="sd">    Parses a TURN record from a PDB file to extract information about turns in the protein structure.</span>
 </span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>
@@ -343,7 +343,7 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 </span><span id="L-198"><a href="#L-198"><span class="linenos">198</span></a><span class="p">}</span>
 </span><span id="L-199"><a href="#L-199"><span class="linenos">199</span></a>
 </span><span id="L-200"><a href="#L-200"><span class="linenos">200</span></a>
-</span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a><span class="k">def</span> <span class="nf">extract_ssbonds_and_atoms</span><span class="p">(</span><span class="n">input_pdb_file</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dbg</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+</span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a><span class="k">def</span><span class="w"> </span><span class="nf">extract_ssbonds_and_atoms</span><span class="p">(</span><span class="n">input_pdb_file</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dbg</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
 </span><span id="L-202"><a href="#L-202"><span class="linenos">202</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-203"><a href="#L-203"><span class="linenos">203</span></a><span class="sd">    Extracts SSBOND, ATOM records, and RESOLUTION from a PDB file.</span>
 </span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a>
@@ -518,7 +518,7 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 </span><span id="L-373"><a href="#L-373"><span class="linenos">373</span></a>                    <span class="p">)</span>
 </span><span id="L-374"><a href="#L-374"><span class="linenos">374</span></a>
 </span><span id="L-375"><a href="#L-375"><span class="linenos">375</span></a>        <span class="c1"># Collect phi/psi related atoms</span>
-</span><span id="L-376"><a href="#L-376"><span class="linenos">376</span></a>        <span class="k">def</span> <span class="nf">get_phipsi_atoms</span><span class="p">(</span><span class="n">chain_id</span><span class="p">,</span> <span class="n">res_seq_num</span><span class="p">):</span>
+</span><span id="L-376"><a href="#L-376"><span class="linenos">376</span></a>        <span class="k">def</span><span class="w"> </span><span class="nf">get_phipsi_atoms</span><span class="p">(</span><span class="n">chain_id</span><span class="p">,</span> <span class="n">res_seq_num</span><span class="p">):</span>
 </span><span id="L-377"><a href="#L-377"><span class="linenos">377</span></a>            <span class="n">phipsi_atoms</span> <span class="o">=</span> <span class="p">{}</span>
 </span><span id="L-378"><a href="#L-378"><span class="linenos">378</span></a>            <span class="k">for</span> <span class="n">offset</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
 </span><span id="L-379"><a href="#L-379"><span class="linenos">379</span></a>                <span class="k">try</span><span class="p">:</span>
@@ -594,7 +594,7 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 </span><span id="L-449"><a href="#L-449"><span class="linenos">449</span></a><span class="c1"># print(result)</span>
 </span><span id="L-450"><a href="#L-450"><span class="linenos">450</span></a>
 </span><span id="L-451"><a href="#L-451"><span class="linenos">451</span></a>
-</span><span id="L-452"><a href="#L-452"><span class="linenos">452</span></a><span class="k">def</span> <span class="nf">get_secondary_structure</span><span class="p">(</span><span class="n">chain_id</span><span class="p">,</span> <span class="n">res_seq_num</span><span class="p">,</span> <span class="n">pdb_data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+</span><span id="L-452"><a href="#L-452"><span class="linenos">452</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_secondary_structure</span><span class="p">(</span><span class="n">chain_id</span><span class="p">,</span> <span class="n">res_seq_num</span><span class="p">,</span> <span class="n">pdb_data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 </span><span id="L-453"><a href="#L-453"><span class="linenos">453</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-454"><a href="#L-454"><span class="linenos">454</span></a><span class="sd">    Determine the secondary structure type for a given chain_id and res_seq_num.</span>
 </span><span id="L-455"><a href="#L-455"><span class="linenos">455</span></a>
@@ -635,7 +635,7 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 </span><span id="L-490"><a href="#L-490"><span class="linenos">490</span></a>    <span class="k">return</span> <span class="s2">&quot;nosecondary&quot;</span>
 </span><span id="L-491"><a href="#L-491"><span class="linenos">491</span></a>
 </span><span id="L-492"><a href="#L-492"><span class="linenos">492</span></a>
-</span><span id="L-493"><a href="#L-493"><span class="linenos">493</span></a><span class="k">def</span> <span class="nf">extract_and_write_ssbonds_and_atoms</span><span class="p">(</span>
+</span><span id="L-493"><a href="#L-493"><span class="linenos">493</span></a><span class="k">def</span><span class="w"> </span><span class="nf">extract_and_write_ssbonds_and_atoms</span><span class="p">(</span>
 </span><span id="L-494"><a href="#L-494"><span class="linenos">494</span></a>    <span class="n">input_pdb_file</span><span class="p">,</span> <span class="n">output_pkl_file</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dbg</span><span class="o">=</span><span class="kc">False</span>
 </span><span id="L-495"><a href="#L-495"><span class="linenos">495</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="L-496"><a href="#L-496"><span class="linenos">496</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -677,7 +677,7 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 </span><span id="L-532"><a href="#L-532"><span class="linenos">532</span></a><span class="c1"># extract_and_write_ssbonds_and_atoms(&quot;path_to_pdb_file.pdb&quot;, &quot;output_file.pkl&quot;, verbos</span>
 </span><span id="L-533"><a href="#L-533"><span class="linenos">533</span></a>
 </span><span id="L-534"><a href="#L-534"><span class="linenos">534</span></a>
-</span><span id="L-535"><a href="#L-535"><span class="linenos">535</span></a><span class="k">def</span> <span class="nf">print_disulfide_bond_info_dict</span><span class="p">(</span><span class="n">ssbond_atom_data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-535"><a href="#L-535"><span class="linenos">535</span></a><span class="k">def</span><span class="w"> </span><span class="nf">print_disulfide_bond_info_dict</span><span class="p">(</span><span class="n">ssbond_atom_data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="L-536"><a href="#L-536"><span class="linenos">536</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-537"><a href="#L-537"><span class="linenos">537</span></a><span class="sd">    Prints the disulfide bond information in a pretty format.</span>
 </span><span id="L-538"><a href="#L-538"><span class="linenos">538</span></a>
@@ -773,7 +773,7 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 </span><span id="L-628"><a href="#L-628"><span class="linenos">628</span></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
 </span><span id="L-629"><a href="#L-629"><span class="linenos">629</span></a>
 </span><span id="L-630"><a href="#L-630"><span class="linenos">630</span></a>
-</span><span id="L-631"><a href="#L-631"><span class="linenos">631</span></a><span class="k">def</span> <span class="nf">get_atom_coordinates</span><span class="p">(</span>
+</span><span id="L-631"><a href="#L-631"><span class="linenos">631</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_atom_coordinates</span><span class="p">(</span>
 </span><span id="L-632"><a href="#L-632"><span class="linenos">632</span></a>    <span class="n">ssbond_dict</span><span class="p">,</span> <span class="n">chain_id</span><span class="p">,</span> <span class="n">res_seq_num</span><span class="p">,</span> <span class="n">atom_name</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
 </span><span id="L-633"><a href="#L-633"><span class="linenos">633</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vector3D</span><span class="p">:</span>
 </span><span id="L-634"><a href="#L-634"><span class="linenos">634</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -808,7 +808,7 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 </span><span id="L-663"><a href="#L-663"><span class="linenos">663</span></a>        <span class="k">return</span> <span class="n">Vector3D</span><span class="p">([])</span>
 </span><span id="L-664"><a href="#L-664"><span class="linenos">664</span></a>
 </span><span id="L-665"><a href="#L-665"><span class="linenos">665</span></a>
-</span><span id="L-666"><a href="#L-666"><span class="linenos">666</span></a><span class="k">def</span> <span class="nf">get_residue_atoms_coordinates</span><span class="p">(</span>
+</span><span id="L-666"><a href="#L-666"><span class="linenos">666</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_residue_atoms_coordinates</span><span class="p">(</span>
 </span><span id="L-667"><a href="#L-667"><span class="linenos">667</span></a>    <span class="n">ssbond_dict</span><span class="p">,</span> <span class="n">chain_id</span><span class="p">,</span> <span class="n">res_seq_num</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
 </span><span id="L-668"><a href="#L-668"><span class="linenos">668</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 </span><span id="L-669"><a href="#L-669"><span class="linenos">669</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -853,7 +853,7 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 </span><span id="L-708"><a href="#L-708"><span class="linenos">708</span></a><span class="c1"># print(&quot;Coordinates:&quot;, coordinates)</span>
 </span><span id="L-709"><a href="#L-709"><span class="linenos">709</span></a>
 </span><span id="L-710"><a href="#L-710"><span class="linenos">710</span></a>
-</span><span id="L-711"><a href="#L-711"><span class="linenos">711</span></a><span class="k">def</span> <span class="nf">get_phipsi_atoms_coordinates</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">chain_id</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+</span><span id="L-711"><a href="#L-711"><span class="linenos">711</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_phipsi_atoms_coordinates</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">chain_id</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 </span><span id="L-712"><a href="#L-712"><span class="linenos">712</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-713"><a href="#L-713"><span class="linenos">713</span></a><span class="sd">    Retrieve the phi/psi atoms based on the input dictionary, chain ID, and key.</span>
 </span><span id="L-714"><a href="#L-714"><span class="linenos">714</span></a>
@@ -885,7 +885,7 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 </span><span id="L-740"><a href="#L-740"><span class="linenos">740</span></a><span class="c1"># )</span>
 </span><span id="L-741"><a href="#L-741"><span class="linenos">741</span></a>
 </span><span id="L-742"><a href="#L-742"><span class="linenos">742</span></a>
-</span><span id="L-743"><a href="#L-743"><span class="linenos">743</span></a><span class="k">def</span> <span class="nf">check_file</span><span class="p">(</span>
+</span><span id="L-743"><a href="#L-743"><span class="linenos">743</span></a><span class="k">def</span><span class="w"> </span><span class="nf">check_file</span><span class="p">(</span>
 </span><span id="L-744"><a href="#L-744"><span class="linenos">744</span></a>    <span class="n">fname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 </span><span id="L-745"><a href="#L-745"><span class="linenos">745</span></a>    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="L-746"><a href="#L-746"><span class="linenos">746</span></a>    <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -932,7 +932,7 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 </span><span id="L-787"><a href="#L-787"><span class="linenos">787</span></a>
 </span><span id="L-788"><a href="#L-788"><span class="linenos">788</span></a>
 </span><span id="L-789"><a href="#L-789"><span class="linenos">789</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="L-790"><a href="#L-790"><span class="linenos">790</span></a>    <span class="kn">import</span> <span class="nn">doctest</span>
+</span><span id="L-790"><a href="#L-790"><span class="linenos">790</span></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">doctest</span>
 </span><span id="L-791"><a href="#L-791"><span class="linenos">791</span></a>
 </span><span id="L-792"><a href="#L-792"><span class="linenos">792</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
 </span><span id="L-793"><a href="#L-793"><span class="linenos">793</span></a>
@@ -952,7 +952,7 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 
     </div>
     <a class="headerlink" href="#extract_id_from_filename"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="extract_id_from_filename-36"><a href="#extract_id_from_filename-36"><span class="linenos">36</span></a><span class="k">def</span> <span class="nf">extract_id_from_filename</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="extract_id_from_filename-36"><a href="#extract_id_from_filename-36"><span class="linenos">36</span></a><span class="k">def</span><span class="w"> </span><span class="nf">extract_id_from_filename</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 </span><span id="extract_id_from_filename-37"><a href="#extract_id_from_filename-37"><span class="linenos">37</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="extract_id_from_filename-38"><a href="#extract_id_from_filename-38"><span class="linenos">38</span></a><span class="sd">    Extract the ID from a filename formatted as &#39;pdb{id}.ent&#39;.</span>
 </span><span id="extract_id_from_filename-39"><a href="#extract_id_from_filename-39"><span class="linenos">39</span></a>
@@ -1001,7 +1001,7 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 
     </div>
     <a class="headerlink" href="#parse_helix_record"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="parse_helix_record-56"><a href="#parse_helix_record-56"><span class="linenos">56</span></a><span class="k">def</span> <span class="nf">parse_helix_record</span><span class="p">(</span><span class="n">record</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="parse_helix_record-56"><a href="#parse_helix_record-56"><span class="linenos">56</span></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_helix_record</span><span class="p">(</span><span class="n">record</span><span class="p">):</span>
 </span><span id="parse_helix_record-57"><a href="#parse_helix_record-57"><span class="linenos">57</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="parse_helix_record-58"><a href="#parse_helix_record-58"><span class="linenos">58</span></a><span class="sd">    Parses a HELIX record from a PDB file to extract information about helices.</span>
 </span><span id="parse_helix_record-59"><a href="#parse_helix_record-59"><span class="linenos">59</span></a>
@@ -1054,7 +1054,7 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 
     </div>
     <a class="headerlink" href="#parse_sheet_record"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="parse_sheet_record-80"><a href="#parse_sheet_record-80"><span class="linenos">80</span></a><span class="k">def</span> <span class="nf">parse_sheet_record</span><span class="p">(</span><span class="n">record</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="parse_sheet_record-80"><a href="#parse_sheet_record-80"><span class="linenos">80</span></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_sheet_record</span><span class="p">(</span><span class="n">record</span><span class="p">):</span>
 </span><span id="parse_sheet_record-81"><a href="#parse_sheet_record-81"><span class="linenos">81</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="parse_sheet_record-82"><a href="#parse_sheet_record-82"><span class="linenos">82</span></a><span class="sd">    Parses a SHEET record from a PDB file to extract information about beta strands.</span>
 </span><span id="parse_sheet_record-83"><a href="#parse_sheet_record-83"><span class="linenos">83</span></a>
@@ -1096,7 +1096,7 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 
     </div>
     <a class="headerlink" href="#parse_turn_record"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="parse_turn_record-102"><a href="#parse_turn_record-102"><span class="linenos">102</span></a><span class="k">def</span> <span class="nf">parse_turn_record</span><span class="p">(</span><span class="n">record</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="parse_turn_record-102"><a href="#parse_turn_record-102"><span class="linenos">102</span></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_turn_record</span><span class="p">(</span><span class="n">record</span><span class="p">):</span>
 </span><span id="parse_turn_record-103"><a href="#parse_turn_record-103"><span class="linenos">103</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="parse_turn_record-104"><a href="#parse_turn_record-104"><span class="linenos">104</span></a><span class="sd">    Parses a TURN record from a PDB file to extract information about turns in the protein structure.</span>
 </span><span id="parse_turn_record-105"><a href="#parse_turn_record-105"><span class="linenos">105</span></a>
@@ -1149,7 +1149,7 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 
     </div>
     <a class="headerlink" href="#extract_ssbonds_and_atoms"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="extract_ssbonds_and_atoms-202"><a href="#extract_ssbonds_and_atoms-202"><span class="linenos">202</span></a><span class="k">def</span> <span class="nf">extract_ssbonds_and_atoms</span><span class="p">(</span><span class="n">input_pdb_file</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dbg</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="extract_ssbonds_and_atoms-202"><a href="#extract_ssbonds_and_atoms-202"><span class="linenos">202</span></a><span class="k">def</span><span class="w"> </span><span class="nf">extract_ssbonds_and_atoms</span><span class="p">(</span><span class="n">input_pdb_file</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dbg</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
 </span><span id="extract_ssbonds_and_atoms-203"><a href="#extract_ssbonds_and_atoms-203"><span class="linenos">203</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="extract_ssbonds_and_atoms-204"><a href="#extract_ssbonds_and_atoms-204"><span class="linenos">204</span></a><span class="sd">    Extracts SSBOND, ATOM records, and RESOLUTION from a PDB file.</span>
 </span><span id="extract_ssbonds_and_atoms-205"><a href="#extract_ssbonds_and_atoms-205"><span class="linenos">205</span></a>
@@ -1324,7 +1324,7 @@ disulfide bonds and atom information from a PDB file and writes it to a .pkl fil
 </span><span id="extract_ssbonds_and_atoms-374"><a href="#extract_ssbonds_and_atoms-374"><span class="linenos">374</span></a>                    <span class="p">)</span>
 </span><span id="extract_ssbonds_and_atoms-375"><a href="#extract_ssbonds_and_atoms-375"><span class="linenos">375</span></a>
 </span><span id="extract_ssbonds_and_atoms-376"><a href="#extract_ssbonds_and_atoms-376"><span class="linenos">376</span></a>        <span class="c1"># Collect phi/psi related atoms</span>
-</span><span id="extract_ssbonds_and_atoms-377"><a href="#extract_ssbonds_and_atoms-377"><span class="linenos">377</span></a>        <span class="k">def</span> <span class="nf">get_phipsi_atoms</span><span class="p">(</span><span class="n">chain_id</span><span class="p">,</span> <span class="n">res_seq_num</span><span class="p">):</span>
+</span><span id="extract_ssbonds_and_atoms-377"><a href="#extract_ssbonds_and_atoms-377"><span class="linenos">377</span></a>        <span class="k">def</span><span class="w"> </span><span class="nf">get_phipsi_atoms</span><span class="p">(</span><span class="n">chain_id</span><span class="p">,</span> <span class="n">res_seq_num</span><span class="p">):</span>
 </span><span id="extract_ssbonds_and_atoms-378"><a href="#extract_ssbonds_and_atoms-378"><span class="linenos">378</span></a>            <span class="n">phipsi_atoms</span> <span class="o">=</span> <span class="p">{}</span>
 </span><span id="extract_ssbonds_and_atoms-379"><a href="#extract_ssbonds_and_atoms-379"><span class="linenos">379</span></a>            <span class="k">for</span> <span class="n">offset</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
 </span><span id="extract_ssbonds_and_atoms-380"><a href="#extract_ssbonds_and_atoms-380"><span class="linenos">380</span></a>                <span class="k">try</span><span class="p">:</span>
@@ -1460,7 +1460,7 @@ The dictionary has the following structure:
 
     </div>
     <a class="headerlink" href="#get_secondary_structure"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="get_secondary_structure-453"><a href="#get_secondary_structure-453"><span class="linenos">453</span></a><span class="k">def</span> <span class="nf">get_secondary_structure</span><span class="p">(</span><span class="n">chain_id</span><span class="p">,</span> <span class="n">res_seq_num</span><span class="p">,</span> <span class="n">pdb_data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="get_secondary_structure-453"><a href="#get_secondary_structure-453"><span class="linenos">453</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_secondary_structure</span><span class="p">(</span><span class="n">chain_id</span><span class="p">,</span> <span class="n">res_seq_num</span><span class="p">,</span> <span class="n">pdb_data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 </span><span id="get_secondary_structure-454"><a href="#get_secondary_structure-454"><span class="linenos">454</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="get_secondary_structure-455"><a href="#get_secondary_structure-455"><span class="linenos">455</span></a><span class="sd">    Determine the secondary structure type for a given chain_id and res_seq_num.</span>
 </span><span id="get_secondary_structure-456"><a href="#get_secondary_structure-456"><span class="linenos">456</span></a>
@@ -1532,7 +1532,7 @@ The dictionary has the following structure:
 
     </div>
     <a class="headerlink" href="#extract_and_write_ssbonds_and_atoms"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="extract_and_write_ssbonds_and_atoms-494"><a href="#extract_and_write_ssbonds_and_atoms-494"><span class="linenos">494</span></a><span class="k">def</span> <span class="nf">extract_and_write_ssbonds_and_atoms</span><span class="p">(</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="extract_and_write_ssbonds_and_atoms-494"><a href="#extract_and_write_ssbonds_and_atoms-494"><span class="linenos">494</span></a><span class="k">def</span><span class="w"> </span><span class="nf">extract_and_write_ssbonds_and_atoms</span><span class="p">(</span>
 </span><span id="extract_and_write_ssbonds_and_atoms-495"><a href="#extract_and_write_ssbonds_and_atoms-495"><span class="linenos">495</span></a>    <span class="n">input_pdb_file</span><span class="p">,</span> <span class="n">output_pkl_file</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dbg</span><span class="o">=</span><span class="kc">False</span>
 </span><span id="extract_and_write_ssbonds_and_atoms-496"><a href="#extract_and_write_ssbonds_and_atoms-496"><span class="linenos">496</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="extract_and_write_ssbonds_and_atoms-497"><a href="#extract_and_write_ssbonds_and_atoms-497"><span class="linenos">497</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1595,7 +1595,7 @@ The dictionary has the following structure:
 
     </div>
     <a class="headerlink" href="#print_disulfide_bond_info_dict"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="print_disulfide_bond_info_dict-536"><a href="#print_disulfide_bond_info_dict-536"><span class="linenos">536</span></a><span class="k">def</span> <span class="nf">print_disulfide_bond_info_dict</span><span class="p">(</span><span class="n">ssbond_atom_data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="print_disulfide_bond_info_dict-536"><a href="#print_disulfide_bond_info_dict-536"><span class="linenos">536</span></a><span class="k">def</span><span class="w"> </span><span class="nf">print_disulfide_bond_info_dict</span><span class="p">(</span><span class="n">ssbond_atom_data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="print_disulfide_bond_info_dict-537"><a href="#print_disulfide_bond_info_dict-537"><span class="linenos">537</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="print_disulfide_bond_info_dict-538"><a href="#print_disulfide_bond_info_dict-538"><span class="linenos">538</span></a><span class="sd">    Prints the disulfide bond information in a pretty format.</span>
 </span><span id="print_disulfide_bond_info_dict-539"><a href="#print_disulfide_bond_info_dict-539"><span class="linenos">539</span></a>
@@ -1740,7 +1740,7 @@ has the following structure:
 
     </div>
     <a class="headerlink" href="#get_atom_coordinates"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="get_atom_coordinates-632"><a href="#get_atom_coordinates-632"><span class="linenos">632</span></a><span class="k">def</span> <span class="nf">get_atom_coordinates</span><span class="p">(</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="get_atom_coordinates-632"><a href="#get_atom_coordinates-632"><span class="linenos">632</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_atom_coordinates</span><span class="p">(</span>
 </span><span id="get_atom_coordinates-633"><a href="#get_atom_coordinates-633"><span class="linenos">633</span></a>    <span class="n">ssbond_dict</span><span class="p">,</span> <span class="n">chain_id</span><span class="p">,</span> <span class="n">res_seq_num</span><span class="p">,</span> <span class="n">atom_name</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
 </span><span id="get_atom_coordinates-634"><a href="#get_atom_coordinates-634"><span class="linenos">634</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Vector3D</span><span class="p">:</span>
 </span><span id="get_atom_coordinates-635"><a href="#get_atom_coordinates-635"><span class="linenos">635</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1809,7 +1809,7 @@ has the following structure:
 
     </div>
     <a class="headerlink" href="#get_residue_atoms_coordinates"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="get_residue_atoms_coordinates-667"><a href="#get_residue_atoms_coordinates-667"><span class="linenos">667</span></a><span class="k">def</span> <span class="nf">get_residue_atoms_coordinates</span><span class="p">(</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="get_residue_atoms_coordinates-667"><a href="#get_residue_atoms_coordinates-667"><span class="linenos">667</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_residue_atoms_coordinates</span><span class="p">(</span>
 </span><span id="get_residue_atoms_coordinates-668"><a href="#get_residue_atoms_coordinates-668"><span class="linenos">668</span></a>    <span class="n">ssbond_dict</span><span class="p">,</span> <span class="n">chain_id</span><span class="p">,</span> <span class="n">res_seq_num</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
 </span><span id="get_residue_atoms_coordinates-669"><a href="#get_residue_atoms_coordinates-669"><span class="linenos">669</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 </span><span id="get_residue_atoms_coordinates-670"><a href="#get_residue_atoms_coordinates-670"><span class="linenos">670</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1878,7 +1878,7 @@ If an atom is not found, None is placed in its position.</li>
 
     </div>
     <a class="headerlink" href="#get_phipsi_atoms_coordinates"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="get_phipsi_atoms_coordinates-712"><a href="#get_phipsi_atoms_coordinates-712"><span class="linenos">712</span></a><span class="k">def</span> <span class="nf">get_phipsi_atoms_coordinates</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">chain_id</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="get_phipsi_atoms_coordinates-712"><a href="#get_phipsi_atoms_coordinates-712"><span class="linenos">712</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_phipsi_atoms_coordinates</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">chain_id</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 </span><span id="get_phipsi_atoms_coordinates-713"><a href="#get_phipsi_atoms_coordinates-713"><span class="linenos">713</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="get_phipsi_atoms_coordinates-714"><a href="#get_phipsi_atoms_coordinates-714"><span class="linenos">714</span></a><span class="sd">    Retrieve the phi/psi atoms based on the input dictionary, chain ID, and key.</span>
 </span><span id="get_phipsi_atoms_coordinates-715"><a href="#get_phipsi_atoms_coordinates-715"><span class="linenos">715</span></a>
@@ -1935,7 +1935,7 @@ If an atom is not found, None is placed in its position.</li>
 
     </div>
     <a class="headerlink" href="#check_file"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="check_file-744"><a href="#check_file-744"><span class="linenos">744</span></a><span class="k">def</span> <span class="nf">check_file</span><span class="p">(</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="check_file-744"><a href="#check_file-744"><span class="linenos">744</span></a><span class="k">def</span><span class="w"> </span><span class="nf">check_file</span><span class="p">(</span>
 </span><span id="check_file-745"><a href="#check_file-745"><span class="linenos">745</span></a>    <span class="n">fname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 </span><span id="check_file-746"><a href="#check_file-746"><span class="linenos">746</span></a>    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="check_file-747"><a href="#check_file-747"><span class="linenos">747</span></a>    <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>

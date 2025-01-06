@@ -194,27 +194,27 @@ Last revision: 2025-01-01 09:17:35 -egs-</p>
 </span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="sd">Last revision: 2025-01-01 09:17:35 -egs-</span>
 </span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>
-</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="kn">import</span> <span class="nn">argparse</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="kn">import</span> <span class="nn">datetime</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="kn">import</span> <span class="nn">glob</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="kn">import</span> <span class="nn">logging</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="kn">import</span> <span class="nn">multiprocessing</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="kn">import</span> <span class="nn">os</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="kn">import</span> <span class="nn">pickle</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="kn">import</span> <span class="nn">sys</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="kn">import</span> <span class="nn">time</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">copy</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">shutil</span><span class="w"> </span><span class="kn">import</span> <span class="n">copy</span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="kn">from</span> <span class="nn">colorama</span> <span class="kn">import</span> <span class="n">Fore</span><span class="p">,</span> <span class="n">Style</span><span class="p">,</span> <span class="n">init</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">colorama</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fore</span><span class="p">,</span> <span class="n">Style</span><span class="p">,</span> <span class="n">init</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="c1"># Initialize colorama</span>
 </span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="n">init</span><span class="p">()</span>
 </span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>
-</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a><span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 </span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a>
-</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="kn">from</span> <span class="nn">proteusPy</span> <span class="kn">import</span> <span class="p">(</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">proteusPy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
 </span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>    <span class="n">DisulfideList</span><span class="p">,</span>
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a>    <span class="n">DisulfideLoader</span><span class="p">,</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>    <span class="n">configure_master_logger</span><span class="p">,</span>
@@ -224,7 +224,7 @@ Last revision: 2025-01-01 09:17:35 -egs-</p>
 </span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>    <span class="n">set_logger_level</span><span class="p">,</span>
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>    <span class="n">toggle_stream_handler</span><span class="p">,</span>
 </span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a><span class="p">)</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="kn">from</span> <span class="nn">proteusPy.ProteusGlobals</span> <span class="kn">import</span> <span class="p">(</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">proteusPy.ProteusGlobals</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
 </span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a>    <span class="n">DATA_DIR</span><span class="p">,</span>
 </span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>    <span class="n">LOADER_FNAME</span><span class="p">,</span>
 </span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>    <span class="n">LOADER_SUBSET_FNAME</span><span class="p">,</span>
@@ -304,7 +304,7 @@ Last revision: 2025-01-01 09:17:35 -egs-</p>
 </span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a><span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;2.3.0&quot;</span>
 </span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>
 </span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>
-</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a><span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">():</span>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_arguments</span><span class="p">():</span>
 </span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a><span class="sd">    Parse command line arguments.</span>
 </span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -393,7 +393,7 @@ Last revision: 2025-01-01 09:17:35 -egs-</p>
 </span><span id="L-219"><a href="#L-219"><span class="linenos">219</span></a>    <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
 </span><span id="L-220"><a href="#L-220"><span class="linenos">220</span></a>
 </span><span id="L-221"><a href="#L-221"><span class="linenos">221</span></a>
-</span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a><span class="k">def</span> <span class="nf">extract_disulfides_chunk</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+</span><span id="L-222"><a href="#L-222"><span class="linenos">222</span></a><span class="k">def</span><span class="w"> </span><span class="nf">extract_disulfides_chunk</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 </span><span id="L-223"><a href="#L-223"><span class="linenos">223</span></a>    <span class="s2">&quot;This is a single thread, processing one chunk of the multiprocessing extraction process.&quot;</span>
 </span><span id="L-224"><a href="#L-224"><span class="linenos">224</span></a>
 </span><span id="L-225"><a href="#L-225"><span class="linenos">225</span></a>    <span class="p">(</span>
@@ -445,7 +445,7 @@ Last revision: 2025-01-01 09:17:35 -egs-</p>
 </span><span id="L-271"><a href="#L-271"><span class="linenos">271</span></a>    <span class="k">return</span> <span class="n">result_list</span>
 </span><span id="L-272"><a href="#L-272"><span class="linenos">272</span></a>
 </span><span id="L-273"><a href="#L-273"><span class="linenos">273</span></a>
-</span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a><span class="k">def</span> <span class="nf">do_extract</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="n">full</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">sg_cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">nthreads</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+</span><span id="L-274"><a href="#L-274"><span class="linenos">274</span></a><span class="k">def</span><span class="w"> </span><span class="nf">do_extract</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="n">full</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">sg_cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">nthreads</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
 </span><span id="L-275"><a href="#L-275"><span class="linenos">275</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-276"><a href="#L-276"><span class="linenos">276</span></a><span class="sd">    Extracts the disulfides from the PDB files using multiprocessing.</span>
 </span><span id="L-277"><a href="#L-277"><span class="linenos">277</span></a>
@@ -516,7 +516,7 @@ Last revision: 2025-01-01 09:17:35 -egs-</p>
 </span><span id="L-342"><a href="#L-342"><span class="linenos">342</span></a>            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">res_list</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 </span><span id="L-343"><a href="#L-343"><span class="linenos">343</span></a>
 </span><span id="L-344"><a href="#L-344"><span class="linenos">344</span></a>
-</span><span id="L-345"><a href="#L-345"><span class="linenos">345</span></a><span class="k">def</span> <span class="nf">do_build</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="n">full</span><span class="p">,</span> <span class="n">subset</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">sg_cutoff</span><span class="p">):</span>
+</span><span id="L-345"><a href="#L-345"><span class="linenos">345</span></a><span class="k">def</span><span class="w"> </span><span class="nf">do_build</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="n">full</span><span class="p">,</span> <span class="n">subset</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">sg_cutoff</span><span class="p">):</span>
 </span><span id="L-346"><a href="#L-346"><span class="linenos">346</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-347"><a href="#L-347"><span class="linenos">347</span></a><span class="sd">    Load and save a ```proteusPy.DisulfideLoader``` object</span>
 </span><span id="L-348"><a href="#L-348"><span class="linenos">348</span></a><span class="sd">    to a .pkl file.</span>
@@ -564,7 +564,7 @@ Last revision: 2025-01-01 09:17:35 -egs-</p>
 </span><span id="L-390"><a href="#L-390"><span class="linenos">390</span></a>    <span class="n">PDB_SS</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
 </span><span id="L-391"><a href="#L-391"><span class="linenos">391</span></a>
 </span><span id="L-392"><a href="#L-392"><span class="linenos">392</span></a>
-</span><span id="L-393"><a href="#L-393"><span class="linenos">393</span></a><span class="k">def</span> <span class="nf">update_repo</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">destdir</span><span class="p">):</span>
+</span><span id="L-393"><a href="#L-393"><span class="linenos">393</span></a><span class="k">def</span><span class="w"> </span><span class="nf">update_repo</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">destdir</span><span class="p">):</span>
 </span><span id="L-394"><a href="#L-394"><span class="linenos">394</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-395"><a href="#L-395"><span class="linenos">395</span></a><span class="sd">    Updates the repository with the latest SS files.</span>
 </span><span id="L-396"><a href="#L-396"><span class="linenos">396</span></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -575,7 +575,7 @@ Last revision: 2025-01-01 09:17:35 -egs-</p>
 </span><span id="L-401"><a href="#L-401"><span class="linenos">401</span></a>    <span class="n">copy</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">datadir</span><span class="p">)</span> <span class="o">/</span> <span class="n">SS_SUBSET_PICKLE_FILE</span><span class="p">,</span> <span class="n">Path</span><span class="p">(</span><span class="n">destdir</span><span class="p">))</span>
 </span><span id="L-402"><a href="#L-402"><span class="linenos">402</span></a>
 </span><span id="L-403"><a href="#L-403"><span class="linenos">403</span></a>
-</span><span id="L-404"><a href="#L-404"><span class="linenos">404</span></a><span class="k">def</span> <span class="nf">do_stuff</span><span class="p">(</span>
+</span><span id="L-404"><a href="#L-404"><span class="linenos">404</span></a><span class="k">def</span><span class="w"> </span><span class="nf">do_stuff</span><span class="p">(</span>
 </span><span id="L-405"><a href="#L-405"><span class="linenos">405</span></a>    <span class="n">extract</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="L-406"><a href="#L-406"><span class="linenos">406</span></a>    <span class="n">build</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="L-407"><a href="#L-407"><span class="linenos">407</span></a>    <span class="n">full</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -646,7 +646,7 @@ Last revision: 2025-01-01 09:17:35 -egs-</p>
 </span><span id="L-472"><a href="#L-472"><span class="linenos">472</span></a>    <span class="k">return</span>
 </span><span id="L-473"><a href="#L-473"><span class="linenos">473</span></a>
 </span><span id="L-474"><a href="#L-474"><span class="linenos">474</span></a>
-</span><span id="L-475"><a href="#L-475"><span class="linenos">475</span></a><span class="k">def</span> <span class="nf">clear_screen</span><span class="p">():</span>
+</span><span id="L-475"><a href="#L-475"><span class="linenos">475</span></a><span class="k">def</span><span class="w"> </span><span class="nf">clear_screen</span><span class="p">():</span>
 </span><span id="L-476"><a href="#L-476"><span class="linenos">476</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-477"><a href="#L-477"><span class="linenos">477</span></a><span class="sd">    Clears the terminal screen.</span>
 </span><span id="L-478"><a href="#L-478"><span class="linenos">478</span></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -656,7 +656,7 @@ Last revision: 2025-01-01 09:17:35 -egs-</p>
 </span><span id="L-482"><a href="#L-482"><span class="linenos">482</span></a>        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;clear&quot;</span><span class="p">)</span>
 </span><span id="L-483"><a href="#L-483"><span class="linenos">483</span></a>
 </span><span id="L-484"><a href="#L-484"><span class="linenos">484</span></a>
-</span><span id="L-485"><a href="#L-485"><span class="linenos">485</span></a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+</span><span id="L-485"><a href="#L-485"><span class="linenos">485</span></a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
 </span><span id="L-486"><a href="#L-486"><span class="linenos">486</span></a>    <span class="s2">&quot;Main entrypoint for the DisulfideExtractor program.&quot;</span>
 </span><span id="L-487"><a href="#L-487"><span class="linenos">487</span></a>    <span class="n">clear_screen</span><span class="p">()</span>
 </span><span id="L-488"><a href="#L-488"><span class="linenos">488</span></a>    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -932,7 +932,7 @@ Last revision: 2025-01-01 09:17:35 -egs-</p>
 
     </div>
     <a class="headerlink" href="#parse_arguments"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="parse_arguments-134"><a href="#parse_arguments-134"><span class="linenos">134</span></a><span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">():</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="parse_arguments-134"><a href="#parse_arguments-134"><span class="linenos">134</span></a><span class="k">def</span><span class="w"> </span><span class="nf">parse_arguments</span><span class="p">():</span>
 </span><span id="parse_arguments-135"><a href="#parse_arguments-135"><span class="linenos">135</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="parse_arguments-136"><a href="#parse_arguments-136"><span class="linenos">136</span></a><span class="sd">    Parse command line arguments.</span>
 </span><span id="parse_arguments-137"><a href="#parse_arguments-137"><span class="linenos">137</span></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -1038,7 +1038,7 @@ Last revision: 2025-01-01 09:17:35 -egs-</p>
 
     </div>
     <a class="headerlink" href="#extract_disulfides_chunk"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="extract_disulfides_chunk-223"><a href="#extract_disulfides_chunk-223"><span class="linenos">223</span></a><span class="k">def</span> <span class="nf">extract_disulfides_chunk</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="extract_disulfides_chunk-223"><a href="#extract_disulfides_chunk-223"><span class="linenos">223</span></a><span class="k">def</span><span class="w"> </span><span class="nf">extract_disulfides_chunk</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 </span><span id="extract_disulfides_chunk-224"><a href="#extract_disulfides_chunk-224"><span class="linenos">224</span></a>    <span class="s2">&quot;This is a single thread, processing one chunk of the multiprocessing extraction process.&quot;</span>
 </span><span id="extract_disulfides_chunk-225"><a href="#extract_disulfides_chunk-225"><span class="linenos">225</span></a>
 </span><span id="extract_disulfides_chunk-226"><a href="#extract_disulfides_chunk-226"><span class="linenos">226</span></a>    <span class="p">(</span>
@@ -1107,7 +1107,7 @@ Last revision: 2025-01-01 09:17:35 -egs-</p>
 
     </div>
     <a class="headerlink" href="#do_extract"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="do_extract-275"><a href="#do_extract-275"><span class="linenos">275</span></a><span class="k">def</span> <span class="nf">do_extract</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="n">full</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">sg_cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">nthreads</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="do_extract-275"><a href="#do_extract-275"><span class="linenos">275</span></a><span class="k">def</span><span class="w"> </span><span class="nf">do_extract</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="n">full</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">sg_cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">nthreads</span><span class="o">=</span><span class="mi">8</span><span class="p">):</span>
 </span><span id="do_extract-276"><a href="#do_extract-276"><span class="linenos">276</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="do_extract-277"><a href="#do_extract-277"><span class="linenos">277</span></a><span class="sd">    Extracts the disulfides from the PDB files using multiprocessing.</span>
 </span><span id="do_extract-278"><a href="#do_extract-278"><span class="linenos">278</span></a>
@@ -1215,7 +1215,7 @@ combined and saved to a pickle file.</p>
 
     </div>
     <a class="headerlink" href="#do_build"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="do_build-346"><a href="#do_build-346"><span class="linenos">346</span></a><span class="k">def</span> <span class="nf">do_build</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="n">full</span><span class="p">,</span> <span class="n">subset</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">sg_cutoff</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="do_build-346"><a href="#do_build-346"><span class="linenos">346</span></a><span class="k">def</span><span class="w"> </span><span class="nf">do_build</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="n">full</span><span class="p">,</span> <span class="n">subset</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">sg_cutoff</span><span class="p">):</span>
 </span><span id="do_build-347"><a href="#do_build-347"><span class="linenos">347</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="do_build-348"><a href="#do_build-348"><span class="linenos">348</span></a><span class="sd">    Load and save a ```proteusPy.DisulfideLoader``` object</span>
 </span><span id="do_build-349"><a href="#do_build-349"><span class="linenos">349</span></a><span class="sd">    to a .pkl file.</span>
@@ -1289,7 +1289,7 @@ to a .pkl file.</p>
 
     </div>
     <a class="headerlink" href="#update_repo"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="update_repo-394"><a href="#update_repo-394"><span class="linenos">394</span></a><span class="k">def</span> <span class="nf">update_repo</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">destdir</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="update_repo-394"><a href="#update_repo-394"><span class="linenos">394</span></a><span class="k">def</span><span class="w"> </span><span class="nf">update_repo</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">destdir</span><span class="p">):</span>
 </span><span id="update_repo-395"><a href="#update_repo-395"><span class="linenos">395</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="update_repo-396"><a href="#update_repo-396"><span class="linenos">396</span></a><span class="sd">    Updates the repository with the latest SS files.</span>
 </span><span id="update_repo-397"><a href="#update_repo-397"><span class="linenos">397</span></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -1317,7 +1317,7 @@ to a .pkl file.</p>
 
     </div>
     <a class="headerlink" href="#do_stuff"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="do_stuff-405"><a href="#do_stuff-405"><span class="linenos">405</span></a><span class="k">def</span> <span class="nf">do_stuff</span><span class="p">(</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="do_stuff-405"><a href="#do_stuff-405"><span class="linenos">405</span></a><span class="k">def</span><span class="w"> </span><span class="nf">do_stuff</span><span class="p">(</span>
 </span><span id="do_stuff-406"><a href="#do_stuff-406"><span class="linenos">406</span></a>    <span class="n">extract</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="do_stuff-407"><a href="#do_stuff-407"><span class="linenos">407</span></a>    <span class="n">build</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="do_stuff-408"><a href="#do_stuff-408"><span class="linenos">408</span></a>    <span class="n">full</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -1418,7 +1418,7 @@ to a .pkl file.</p>
 
     </div>
     <a class="headerlink" href="#clear_screen"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="clear_screen-476"><a href="#clear_screen-476"><span class="linenos">476</span></a><span class="k">def</span> <span class="nf">clear_screen</span><span class="p">():</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="clear_screen-476"><a href="#clear_screen-476"><span class="linenos">476</span></a><span class="k">def</span><span class="w"> </span><span class="nf">clear_screen</span><span class="p">():</span>
 </span><span id="clear_screen-477"><a href="#clear_screen-477"><span class="linenos">477</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="clear_screen-478"><a href="#clear_screen-478"><span class="linenos">478</span></a><span class="sd">    Clears the terminal screen.</span>
 </span><span id="clear_screen-479"><a href="#clear_screen-479"><span class="linenos">479</span></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -1445,7 +1445,7 @@ to a .pkl file.</p>
 
     </div>
     <a class="headerlink" href="#main"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="main-486"><a href="#main-486"><span class="linenos">486</span></a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="main-486"><a href="#main-486"><span class="linenos">486</span></a><span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
 </span><span id="main-487"><a href="#main-487"><span class="linenos">487</span></a>    <span class="s2">&quot;Main entrypoint for the DisulfideExtractor program.&quot;</span>
 </span><span id="main-488"><a href="#main-488"><span class="linenos">488</span></a>    <span class="n">clear_screen</span><span class="p">()</span>
 </span><span id="main-489"><a href="#main-489"><span class="linenos">489</span></a>    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
