@@ -85,8 +85,9 @@ global SAVE_DIR location. Binary analysis takes approximately 20 minutes with oc
 Update 8/28/2024 - multithreading is implemented and runs well up to around 10 threads on a 2023 M3 Max Macbook Pro.
 octant analysis takes around 22 minutes with 6 threads. Binary analysis takes around 25 minutes with 6 threads.
 
-Author: Eric G. Suchanek, PhD. Last Modified: 8/27/2024
+Author: Eric G. Suchanek, PhD. Last Modified: 2025-01-06 19:29:49
 """
+
 # plyint: disable=C0103
 
 import argparse
@@ -133,7 +134,7 @@ PBAR_COLS = 78
 # Initialize colorama
 init(autoreset=True)
 
-_logger = pp.create_logger("DisulfideClass_Analysis")
+_logger = pp.create_logger("__name__")
 
 pp.configure_master_logger("DisulfidClass_Analysis.log")
 pp.set_logger_level("DisulfideClass_Analysis", "INFO")
@@ -573,11 +574,9 @@ def main():
 
     if do_update:
         print("Updating repository with consensus classes.")
-        update_repository(DATA_DIR, REPO_DIR, binary=True, octant=False)
-        update_repository(DATA_DIR, MODULE_DIR, binary=True, octant=False)
 
-        update_repository(DATA_DIR, REPO_DIR, binary=False, octant=True)
-        update_repository(DATA_DIR, MODULE_DIR, binary=False, octant=True)
+        update_repository(DATA_DIR, REPO_DIR, binary=binary, octant=octant)
+        update_repository(DATA_DIR, MODULE_DIR, binary=binary, octant=octant)
 
         if forge == "miniforge3":
             venv_dir = MINIFORGE_DIR / env / VENV_DIR
@@ -585,11 +584,9 @@ def main():
             venv_dir = MAMBAFORGE_DIR / env / VENV_DIR
 
         if verbose:
-            print(f"Copying consensus SS class files from: {DATA_DIR} to {venv_dir}")
+            print(f"Updating environment SS class files from: {DATA_DIR} to {venv_dir}")
 
-        update_repository(DATA_DIR, venv_dir, binary=True, octant=False)
-        update_repository(DATA_DIR, venv_dir, binary=False, octant=True)
-
+        update_repository(DATA_DIR, venv_dir, binary=binary, octant=octant)
         return
 
     pdb_ss = pp.Load_PDB_SS(

@@ -32,7 +32,7 @@ COPY environment.yml /tmp/environment.yml
 RUN conda env create -f /tmp/environment.yml && \
     conda clean -a -y
 
-RUN /opt/conda/envs/proteusPy/bin/pip install proteusPy==0.98.2
+RUN /opt/conda/envs/proteusPy/bin/pip install proteusPy
 
 # Update the login bash profile to activate the environment with interactive access.
 RUN echo "source activate proteusPy" > ~/.bashrc
