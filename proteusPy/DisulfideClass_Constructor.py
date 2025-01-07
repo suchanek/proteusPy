@@ -33,8 +33,8 @@ from proteusPy.ProteusGlobals import (
     PBAR_COLS,
     SS_CLASS_DEFINITIONS,
     SS_CLASS_DICT_FILE,
-    SS_CONSENSUS_OCT_FILE,
     SS_CONSENSUS_BIN_FILE,
+    SS_CONSENSUS_OCT_FILE,
 )
 
 _logger = create_logger(__name__)
@@ -114,19 +114,24 @@ class DisulfideClass_Constructor:
 
     def __init__(self, loader, verbose=True) -> None:
         self.verbose = verbose
-        self.classdict = {}
-        self.classdf = None
+        self.binaryclass_dict = {}
+        self.binaryclass_df = None
         self.sixclass_df = None
         self.eightclass_df = None
+        self.eightclass_dict = {}
         self.consensus_binary_list = None
         self.consensus_oct_list = None
 
         if self.verbose:
-            _logger.info("Loading binary consensus structure list from %s", SS_CONSENSUS_BIN_FILE)
+            _logger.info(
+                "Loading binary consensus structure list from %s", SS_CONSENSUS_BIN_FILE
+            )
         self.consensus_binary_list = self.load_consensus_file(oct=False)
 
         if self.verbose:
-            _logger.info("Loading octant consensus structure list from %s", SS_CONSENSUS_OCT_FILE)
+            _logger.info(
+                "Loading octant consensus structure list from %s", SS_CONSENSUS_OCT_FILE
+            )
         self.consensus_oct_list = self.load_consensus_file(oct=True)
 
         self.build_classes(loader)
@@ -146,24 +151,26 @@ class DisulfideClass_Constructor:
 
         if isinstance(item, int):
             raise ValueError("Integer indexing not supported. Use a string key.")
-        
+
         elif isinstance(item, str):
-            classdict = self.classdict
-            
+            classdict = self.binaryclass_dict
+
             try:
                 disulfides = classdict[item]
                 return disulfides
             except KeyError as e:
-                _logger.error("DisulfideLoader(): Cannot find key <%s> in SSBond DB", item)
+                _logger.error(
+                    "DisulfideLoader(): Cannot find key <%s> in SSBond DB", item
+                )
 
     def load_class_dict(self, fname=Path(DATA_DIR) / SS_CLASS_DICT_FILE) -> dict:
         """Load the class dictionary from the specified file."""
         with open(fname, "rb") as f:
-            self.classdict = pickle.load(f)
+            self.binaryclass_dict = pickle.load(f)
 
     def load_consensus_file(self, fpath=Path(DATA_DIR), oct=True) -> DisulfideList:
         """Load the consensus file from the specified file."""
-        
+
         res = None
         if oct:
             fname = fpath / SS_CONSENSUS_OCT_FILE
@@ -179,22 +186,20 @@ class DisulfideClass_Constructor:
         ss_id_col = group_df["ss_id"]
         result_df = pd.concat([class_df, ss_id_col], axis=1)
         return result_df
-    
+
     def list_classes(self, base=2):
         """
         List the Disulfide structural classes.
-        
+
         :param self: The instance of the DisulfideClass_Constructor class.
         :type self: DisulfideClass_Constructor
         :return: A list of disulfide structural classes.
         :rtype: list
         """
         if base == 2:
-            for k, v in enumerate(self.classdict):
+            for k, v in enumerate(self.binaryclass_dict):
                 print(f"Class: |{k}|, |{v}|")
-        elif base == 6:
-            for k, v in enumerate(self.sixclass_dict):
-                print(f"Class: |{k}|, |{v}|")
+
         elif base == 8:
             for k, v in enumerate(self.eightclass_dict):
                 print(f"Class: |{k}|, |{v}|")
@@ -213,7 +218,7 @@ class DisulfideClass_Constructor:
         res = DisulfideList([], classid)
 
         try:
-            sslist = self.classdict[classid]
+            sslist = self.binaryclass_dict[classid]
             if self.verbose:
                 pbar = tqdm(sslist, ncols=PBAR_COLS)
                 for ssid in pbar:
@@ -328,22 +333,24 @@ class DisulfideClass_Constructor:
         )
 
         classdict = dict(zip(merged["class_id"], merged["ss_id"]))
-        self.classdict = classdict
-        self.classdf = merged.copy()
+        self.binaryclass_dict = classdict
+        self.binaryclass_df = merged.copy()
 
-        #if self.verbose:
+        # if self.verbose:
         #    _logger.info("Creating sixfold SS classes...")
 
-        #grouped_sixclass = self.create_classes(tors_df, 6)
-        #self.sixclass_df = grouped_sixclass.copy()
-        #self.sixclass_dict = dict(zip(grouped_sixclass["class_id"], grouped_sixclass["ss_id"]))
+        # grouped_sixclass = self.create_classes(tors_df, 6)
+        # self.sixclass_df = grouped_sixclass.copy()
+        # self.sixclass_dict = dict(zip(grouped_sixclass["class_id"], grouped_sixclass["ss_id"]))
 
         if self.verbose:
             _logger.info("Creating eightfold SS classes...")
 
         grouped_eightclass = self.create_classes(tors_df, 8)
         self.eightclass_df = grouped_eightclass.copy()
-        self.eightclass_dict = dict(zip(grouped_eightclass["class_id"], grouped_eightclass["ss_id"]))
+        self.eightclass_dict = dict(
+            zip(grouped_eightclass["class_id"], grouped_eightclass["ss_id"])
+        )
 
         if self.verbose:
             _logger.info("Initialization complete.")
@@ -542,18 +549,20 @@ class DisulfideClass_Constructor:
         input 'cls' string in the class description
         """
         if base == 2:
-            df = self.classdf
-        elif base == 6:
-            df = self.sixclass_df
+            df = self.binaryclass_df
         elif base == 8:
             df = self.eightclass_df
+        else:
+            raise ValueError("Invalid base. Must be 2 or 8.")
 
         filtered_df = df[df["class_id"] == cls]
+
         if len(filtered_df) == 0:
             return None
-        elif len(filtered_df) > 1:
+
+        if len(filtered_df) > 1:
             raise ValueError(f"Multiple rows found for class_id '{cls}'")
-        
+
         return filtered_df.iloc[0]["ss_id"]
 
     def save(self, savepath=DATA_DIR) -> None:
@@ -576,7 +585,7 @@ class DisulfideClass_Constructor:
         if self.verbose:
             _logger.info("Done.")
 
-    def class_to_binary(self, cls_str, base):
+    def class_to_binary(self, cls_str, base=8):
         """
         Return a string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees
         into a string of 5 characters, where each character is either '0' if the corresponding input character represents a
