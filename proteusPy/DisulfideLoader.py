@@ -20,6 +20,7 @@ import copy
 import os
 import pickle
 import time
+from pathlib import Path
 
 import gdown
 import matplotlib.pyplot as plt
@@ -37,10 +38,8 @@ from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
     CA_CUTOFF,
     DATA_DIR,
-    LOADER_ALL_URL,
     LOADER_FNAME,
     LOADER_SUBSET_FNAME,
-    LOADER_SUBSET_URL,
     SG_CUTOFF,
     SS_LIST_URL,
     SS_PICKLE_FILE,
@@ -119,7 +118,7 @@ class DisulfideLoader:
         _pickleFile = picklefile
         old_length = new_length = 0
 
-        full_path = os.path.join(datadir, _pickleFile)
+        full_path = Path(datadir) / _pickleFile
         if self.verbose and not self.quiet:
             _logger.info(
                 f"Reading disulfides from: {full_path}... ",
@@ -127,7 +126,7 @@ class DisulfideLoader:
 
         try:
             # Check if the file exists before attempting to open it
-            if not os.path.exists(full_path):
+            if not full_path.exists():
                 raise FileNotFoundError(f"File not found: {full_path}")
 
             with open(full_path, "rb") as f:
@@ -614,7 +613,7 @@ class DisulfideLoader:
         fig.update_layout(autosize=True)
 
         if save:
-            fname = os.path.join(savedir, f"{title}_{_prefix}.png")
+            fname = Path(savedir) / f"{title}_{_prefix}.png"
 
             if verbose:
                 _logger.info("Saving %s plot to %s", title, fname)
@@ -740,7 +739,7 @@ class DisulfideLoader:
         else:
             fname = LOADER_FNAME
 
-        _fname = os.path.join(savepath, fname)
+        _fname = Path(savepath) / fname
         if self.verbose:
             _logger.info("Writing %s...", _fname)
 
@@ -790,11 +789,11 @@ def Load_PDB_SS(
     # distribution. In that case we need to download the files for all disulfides and the subset
     # from my Google Drive. This is a one-time operation.
 
-    _fname_sub = os.path.join(loadpath, LOADER_SUBSET_FNAME)
-    _fname_all = os.path.join(loadpath, LOADER_FNAME)
+    _fname_sub = Path(loadpath) / LOADER_SUBSET_FNAME
+    _fname_all = Path(loadpath) / LOADER_FNAME
     _fpath = _fname_sub if subset else _fname_all
 
-    if not os.path.exists(_fpath) or force is True:
+    if not _fpath.exists() or force is True:
         if verbose:
             _logger.info(f"Bootstrapping new loader: {str(_fpath)}... ")
 
@@ -860,14 +859,14 @@ def Bootstrap_PDB_SS(
     fname = SS_PICKLE_FILE
     url = SS_LIST_URL
 
-    _fname = os.path.join(loadpath, fname)
+    _fname = Path(loadpath) / fname
 
-    if not os.path.exists(_fname) or force is True:
+    if not _fname.exists() or force is True:
         if verbose:
             _logger.info("Downloading Disulfide Database from Drive...")
         gdown.download(url, str(_fname), quiet=False)
 
-    full_path = os.path.join(loadpath, _fname)
+    full_path = Path(loadpath) / _fname
     if verbose:
         _logger.info(
             "Building loader from: %s with cutoffs %f, %f...",
