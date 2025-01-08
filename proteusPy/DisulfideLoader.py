@@ -246,7 +246,7 @@ class DisulfideLoader:
     @property
     def average_resolution(self) -> float:
         """
-        Compute and return the average structure resolution for the given list.
+        Return the average structure resolution for the given list.
 
         :return: Average resolution (A)
         """
@@ -289,11 +289,10 @@ class DisulfideLoader:
         Create a dictionary from a list of disulfide objects where the key is the pdb_id
         and the value is a list of indices of the disulfide objects in the list.
 
-        Parameters:
-        disulfide_list (list): List of disulfide objects.
-
-        Returns:
-        dict: Dictionary with pdb_id as keys and lists of indices as values.
+        :param disulfide_list: List of disulfide objects.
+        :type disulfide_list: list
+        :return: Dictionary with pdb_id as keys and lists of indices as values.
+        :rtype: dict
         """
         disulfide_list = self.SSList
 
@@ -318,7 +317,7 @@ class DisulfideLoader:
         if base == 8:
             eightorbin = self.tclass.eightclass_dict
         elif base == 2:
-            eightorbin = self.tclass.classdict
+            eightorbin = self.tclass.binaryclass_dict
         else:
             raise ValueError("Invalid base value.")
 
@@ -361,7 +360,8 @@ class DisulfideLoader:
         Display information about the Disulfide database contained in `self`. if `quick` is False
         then display the total RAM used by the object. This takes some time to compute; approximately
         30 seconds on a 2024 MacBook Pro. M3 Max.
-        :param quick: If True, don't display the RAM used by the `DisulfideLoader` object.
+
+        :param memusg: If True, don't display the RAM used by the `DisulfideLoader` object.
         :return: None
         """
         vers = self.version
@@ -379,13 +379,13 @@ class DisulfideLoader:
 
         print("    =========== RCSB Disulfide Database Summary ==============")
         print(f"       =========== Built: {timestr} ==============")
-        print(f"PDB IDs present:                    {pdbs}")
-        print(f"Disulfides loaded:                  {tot}")
-        print(f"Average structure resolution:       {res:.2f} Å")
-        print(f"Lowest Energy Disulfide:            {ssMin.name}")
-        print(f"Highest Energy Disulfide:           {ssMax.name}")
-        print(f"Cα distance cutoff:                 {cutoff:.2f} Å")
-        print(f"Sγ distance cutoff:                 {sg_cutoff:.2f} Å")
+        print(f"PDB IDs present:                 {pdbs}")
+        print(f"Disulfides loaded:               {tot}")
+        print(f"Average structure resolution:    {res:.2f} Å")
+        print(f"Lowest Energy Disulfide:         {ssMin.name}")
+        print(f"Highest Energy Disulfide:        {ssMax.name}")
+        print(f"Cα distance cutoff:              {cutoff:.2f} Å")
+        print(f"Sγ distance cutoff:              {sg_cutoff:.2f} Å")
         if memusg:
             print(f"Total RAM Used:                     {ram:.2f} GB.")
         print(f"    ================= proteusPy: {vers} =======================")
@@ -459,7 +459,7 @@ class DisulfideLoader:
 
     def list_binary_classes(self):
         """Enumerate the binary classes"""
-        for k, v in enumerate(self.tclass.classdict):
+        for k, v in enumerate(self.tclass.binaryclass_dict):
             print(f"Class: |{k}|, |{v}|")
 
     @property
@@ -533,7 +533,7 @@ class DisulfideLoader:
         if verbose:
             _logger.setLevel("INFO")
 
-        clslist = self.tclass.classdf["class_id"]
+        clslist = self.tclass.binaryclass_df["class_id"]
         for cls in clslist:
             eightcls = self.tclass.binary_to_eight_class(cls)
             df = self.enumerate_class_fromlist(eightcls, base=8)
@@ -562,13 +562,18 @@ class DisulfideLoader:
         verbose=False,
     ):
         """
-        Plots a line graph of count vs class ID using Plotly for the given disulfide class. The
+        Plot a line graph of count vs class ID using Plotly for the given disulfide class. The
         base selects the class type to plot: 2, 6, or 8, for binary, sextant, or octant classes.
 
         :param df: A pandas DataFrame containing the data to be plotted.
         :param title: A string representing the title of the plot (default is 'title').
         :param theme: A string representing the name of the theme to use. Can be either 'notebook'
         or 'plotly_dark'. Default is 'plotly_dark'.
+        :param save: A boolean flag indicating whether to save the plot to a file. Default is False.
+        :param savedir: A string representing the directory to save the plot to. Default is '.'.
+        :param base: An integer representing the base value for the enumeration. Default is 8.
+        :param verbose: A boolean flag indicating whether to display verbose output. Default is False.
+        :raises ValueError: If an invalid base value is provided, (2 or 8s).
         :return: None
         """
 
@@ -579,14 +584,12 @@ class DisulfideLoader:
             _labels = {"class_id": "Octant Class ID", "count": "Count"}
             _prefix = "Octant"
 
-        elif base == 6:
-            _labels = {"class_id": "Sextant Class ID", "count": "Count"}
-            _prefix = "Sextant"
-
         elif base == 2:
             _labels = {"class_id": "Binary Class ID", "count": "Count"}
             _prefix = "Binary"
-            df = self.tclass.classdf
+            df = self.tclass.binaryclass_df
+        else:
+            raise ValueError("Invalid base. Must be 2 or 8.")
 
         fig = px.line(
             df,
@@ -622,7 +625,7 @@ class DisulfideLoader:
 
     def plot_count_vs_classid(self, cls=None, title="title", theme="light", base=8):
         """
-        Plots a line graph of count vs class ID using Plotly.
+        Plot a line graph of count vs class ID using Plotly.
 
         :param df: A pandas DataFrame containing the data to be plotted.
         :param title: A string representing the title of the plot (default is 'title').
@@ -637,9 +640,9 @@ class DisulfideLoader:
         elif base == 2:
             _title = f"Binary Class: {title}"
         else:
-            raise ValueError("Invalid base value.")
+            raise ValueError("Invalid base. Must be 2 or 8")
 
-        df = self.tclass.classdf if base == 2 else self.tclass.eightclass_df
+        df = self.tclass.binaryclass_df if base == 2 else self.tclass.eightclass_df
 
         if cls is None:
             fig = px.line(df, x="class_id", y="count", title=_title)
@@ -667,7 +670,6 @@ class DisulfideLoader:
         """
         Enumerate the classes from a list of class IDs and return a DataFrame with class IDs and their corresponding counts.
 
-        :param loader: An instance of DisulfideLoader used to load the classes.
         :param sslist: A list of class IDs to enumerate.
         :param base: The base value for the enumeration, by default 8.
         :return: A DataFrame with columns "class_id" and "count" representing the class IDs and their corresponding counts.
@@ -689,37 +691,9 @@ class DisulfideLoader:
         sslist_df["count"] = y
         return sslist_df
 
-    def enumerate_sixclass_fromlist(self, sslist) -> pd.DataFrame:
-        """
-        Enumerates the six-class disulfide bonds from a list of class IDs and
-        returns a DataFrame with class IDs and their corresponding counts.
-
-        :param sslist: A list of eight-class disulfide bond class IDs.
-        :type sslist: list
-        :return: A DataFrame with columns "class_id" and "count" representing the
-        class IDs and their corresponding counts.
-        :rtype: pd.DataFrame
-        """
-        x = []
-        y = []
-
-        for sixcls in sslist:
-            if sixcls is not None:
-                _y = self.tclass.sslist_from_classid(sixcls, base=6)
-                # it's possible to have 0 SS in a class
-                if _y is not None:
-                    # only append if we have both.
-                    x.append(sixcls)
-                    y.append(len(_y))
-
-        sslist_df = pd.DataFrame(columns=["class_id", "count"])
-        sslist_df["class_id"] = x
-        sslist_df["count"] = y
-        return sslist_df
-
     def enumerate_eightclass_fromlist(self, sslist) -> pd.DataFrame:
         """
-        Enumerates the eight-class disulfide bonds from a list of class IDs and
+        Enumerate the eight-class disulfide bonds from a list of class IDs and
         returns a DataFrame with class IDs and their corresponding counts.
 
         :param sslist: A list of eight-class disulfide bond class IDs.
@@ -778,35 +752,6 @@ class DisulfideLoader:
 
 
 # class ends
-
-
-def Download_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False):
-    """
-    Download the databases from my Google Drive.
-
-    :param loadpath: Path from which to load, defaults to DATA_DIR
-    :param verbose: Verbosity, defaults to False
-    """
-
-    fname = None
-    _fname = None
-
-    if subset:
-        fname = LOADER_SUBSET_FNAME
-        url = LOADER_SUBSET_URL
-    else:
-        fname = LOADER_FNAME
-        url = LOADER_ALL_URL
-
-    _fname = os.path.join(loadpath, fname)
-
-    _fname_sub = os.path.join(loadpath, fname)
-    _fname_all = os.path.join(loadpath, fname)
-    if verbose:
-        print("--> DisulfideLoader: Downloading Disulfide Database from Drive...")
-
-    gdown.download(url, str(_fname), quiet=False)
-    return
 
 
 def Load_PDB_SS(
