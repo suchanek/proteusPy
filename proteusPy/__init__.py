@@ -1,6 +1,7 @@
 # Initialization for the proteusPy package
 # Copyright (c) 2024 Eric G. Suchanek, PhD., all rights reserved
 # Subject to the BSD public license.
+# Last updated: 2025-01-07 18:38:30 -egs-
 
 # pylint: disable=C0413
 
@@ -16,11 +17,15 @@ __pdoc__ = {
 
 import logging
 
-# Set the default logger level to CRITICAL
+DEFAULT_LOG_LEVEL = logging.WARNING
+
+# Set the default (global) logger level to CRITICAL
 logging.basicConfig(level=logging.CRITICAL)
 
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
+
+# Create a logger for the package itself. __name__ is the package name, proteusPy
 _logger = logging.getLogger(__name__)
 
 from ._version import __version__
@@ -66,12 +71,7 @@ from .DisulfideExceptions import (
     DisulfideParseWarning,
 )
 from .DisulfideList import DisulfideList, extract_disulfide, load_disulfides_from_id
-from .DisulfideLoader import (
-    Bootstrap_PDB_SS,
-    DisulfideLoader,
-    Download_PDB_SS,
-    Load_PDB_SS,
-)
+from .DisulfideLoader import Bootstrap_PDB_SS, DisulfideLoader, Load_PDB_SS
 from .logger_config import (
     configure_master_logger,
     create_logger,
@@ -165,6 +165,7 @@ from .vector3D import (
     rms_difference,
 )
 
-_logger.info(f"ProteusPy {__version__} initialized.")
+_logger.info("ProteusPy %s initialized ", __version__)
+_logger.setLevel(DEFAULT_LOG_LEVEL)
 
 # end of file
