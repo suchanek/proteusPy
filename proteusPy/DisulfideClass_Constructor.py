@@ -116,7 +116,6 @@ class DisulfideClass_Constructor:
         self.verbose = verbose
         self.binaryclass_dict = {}
         self.binaryclass_df = None
-        self.sixclass_df = None
         self.eightclass_df = None
         self.eightclass_dict = {}
         self.consensus_binary_list = None
@@ -158,7 +157,7 @@ class DisulfideClass_Constructor:
             try:
                 disulfides = classdict[item]
                 return disulfides
-            except KeyError as e:
+            except KeyError:
                 _logger.error(
                     "DisulfideLoader(): Cannot find key <%s> in SSBond DB", item
                 )
@@ -336,13 +335,6 @@ class DisulfideClass_Constructor:
         self.binaryclass_dict = classdict
         self.binaryclass_df = merged.copy()
 
-        # if self.verbose:
-        #    _logger.info("Creating sixfold SS classes...")
-
-        # grouped_sixclass = self.create_classes(tors_df, 6)
-        # self.sixclass_df = grouped_sixclass.copy()
-        # self.sixclass_dict = dict(zip(grouped_sixclass["class_id"], grouped_sixclass["ss_id"]))
-
         if self.verbose:
             _logger.info("Creating eightfold SS classes...")
 
@@ -380,9 +372,9 @@ class DisulfideClass_Constructor:
 
         # Group the DataFrame by the class ID and return the grouped data
         grouped = df.groupby(class_id_column)["ss_id"].unique().reset_index()
-        grouped["count"] = grouped["ss_id"].apply(lambda x: len(x))
-        grouped["incidence"] = grouped["ss_id"].apply(lambda x: len(x) / len(df))
-        grouped["percentage"] = grouped["incidence"].apply(lambda x: 100 * x)
+        grouped["count"] = grouped["ss_id"].apply(len)
+        grouped["incidence"] = grouped["count"] / len(df)
+        grouped["percentage"] = grouped["incidence"] * 100
 
         return grouped
 
@@ -472,9 +464,7 @@ class DisulfideClass_Constructor:
         :return: A new Pandas DataFrame containing only rows where the percentage is greater than or equal to the cutoff
         :rtype: pandas.DataFrame
         """
-        if base == 6:
-            df = self.sixclass_df
-        elif base == 8:
+        if base == 8:
             df = self.eightclass_df
         else:
             raise ValueError("Invalid base. Must be 6 or 8.")
@@ -577,7 +567,7 @@ class DisulfideClass_Constructor:
         _fname = f"{savepath}{fname}"
 
         if self.verbose:
-            _logger.info(f"Writing %s", _fname)
+            _logger.info("Writing %s", _fname)
 
         with open(_fname, "wb+") as f:
             pickle.dump(self, f)
