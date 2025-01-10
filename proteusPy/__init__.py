@@ -70,7 +70,12 @@ from .DisulfideExceptions import (
     DisulfideIOException,
     DisulfideParseWarning,
 )
-from .DisulfideList import DisulfideList, extract_disulfide, load_disulfides_from_id
+from .DisulfideList import (
+    DisulfideList,
+    calculate_torsion_statistics,
+    extract_disulfide,
+    load_disulfides_from_id,
+)
 from .DisulfideLoader import Bootstrap_PDB_SS, DisulfideLoader, Load_PDB_SS
 from .logger_config import (
     configure_master_logger,

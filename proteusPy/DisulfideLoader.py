@@ -3,8 +3,7 @@ This module is part of the proteusPy package, a Python package for
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
-Author: Eric G. Suchanek, PhD
-Last revision: 10/14/2024
+Last revision: 2025-01-07 22:04:58 -egs-
 """
 
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
@@ -17,7 +16,6 @@ Last revision: 10/14/2024
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
 
 import copy
-import os
 import pickle
 import time
 from pathlib import Path
@@ -748,6 +746,34 @@ class DisulfideLoader:
 
         if self.verbose:
             _logger.info("Done saving loader.")
+
+    def plot_disulfides_vs_pdbid(self, cutoff=1):
+        """
+        Plots the number of disulfides versus pdbid.
+
+        :param cutoff: The minimum number of disulfides a PDB ID must have to be included in the plot.
+        :type cutoff: int
+        :return: A tuple containing the list of PDB IDs and the corresponding number of disulfides.
+        :rtype: tuple
+        """
+        pdbids = []
+        num_disulfides = []
+
+        for pdbid, disulfides in self.SSDict.items():
+            if len(disulfides) > cutoff:
+                pdbids.append(pdbid)
+                num_disulfides.append(len(disulfides))
+
+        plt.figure(figsize=(12, 6))
+        plt.bar(pdbids, num_disulfides, color="skyblue")
+        plt.xlabel("PDB ID")
+        plt.ylabel("Number of Disulfides")
+        plt.title(f"Number of Disulfides vs PDB ID with cutoff: {cutoff}")
+        plt.xticks(rotation=90)
+        plt.tight_layout()
+        plt.show()
+
+        return pdbids, num_disulfides
 
 
 # class ends

@@ -460,6 +460,7 @@ class DisulfideList(UserList):
                 "energy": ss.energy,
                 "ca_distance": ss.ca_distance,
                 "cb_distance": ss.cb_distance,
+                "sg_distance": ss.sg_distance,
                 "psiprox": ss.psiprox,
                 "phiprox": ss.phiprox,
                 "phidist": ss.phidist,
@@ -502,37 +503,6 @@ class DisulfideList(UserList):
             else:
                 print(f"Cross chain SS: {ss.repr_compact}:")
         return reslist
-
-    def calculate_torsion_statistics(self):
-        """
-        Calculate and return the torsion and distance statistics for the DisulfideList.
-
-        This method builds a DataFrame containing torsional parameters, Cα-Cα distance,
-        energy, and phi-psi angles for the DisulfideList. It then calculates the mean
-        and standard deviation for the torsional and distance parameters.
-
-        :return: A tuple containing two DataFrames:
-                - tor_stats: DataFrame with mean and standard deviation for torsional parameters.
-                - dist_stats: DataFrame with mean and standard deviation for distance parameters.
-        :rtype: tuple (pd.DataFrame, pd.DataFrame)
-        """
-        df = self.build_torsion_df()
-
-        tor_cols = ["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]
-        dist_cols = ["ca_distance", "cb_distance", "energy"]
-        tor_stats = {}
-        dist_stats = {}
-
-        for col in tor_cols:
-            tor_stats[col] = {"mean": df[col].mean(), "std": df[col].std()}
-
-        for col in dist_cols:
-            dist_stats[col] = {"mean": df[col].mean(), "std": df[col].std()}
-
-        tor_stats = pd.DataFrame(tor_stats, columns=tor_cols)
-        dist_stats = pd.DataFrame(dist_stats, columns=dist_cols)
-
-        return tor_stats, dist_stats
 
     @property
     def center_of_mass(self):
@@ -660,10 +630,13 @@ class DisulfideList(UserList):
         df_subset = df.iloc[:, 4:]
         df_stats = df_subset.describe()
 
-        # print(df_stats.head())
+        tor_vals, dist_vals = calculate_torsion_statistics(self)
 
-        mean_vals = df_stats.loc["mean"].values
-        std_vals = df_stats.loc["std"].values
+        tor_mean_vals = tor_vals.loc["mean"]
+        tor_std_vals = tor_vals.loc["std"]
+
+        dist_mean_vals = dist_vals.loc["mean"]
+        dist_std_vals = dist_vals.loc["std"]
 
         fig = make_subplots(
             rows=2, cols=2, vertical_spacing=0.125, column_widths=[1, 1]
@@ -685,9 +658,9 @@ class DisulfideList(UserList):
         fig.add_trace(
             go.Bar(
                 x=["X1", "X2", "X3", "X4", "X5"],
-                y=mean_vals[:5],
+                y=tor_mean_vals[:5],
                 name="Torsion Angle,(°) ",
-                error_y=dict(type="data", array=std_vals[:5], visible=True),
+                error_y=dict(type="data", array=tor_std_vals, visible=True),
             ),
             row=1,
             col=1,
@@ -696,9 +669,9 @@ class DisulfideList(UserList):
         fig.add_trace(
             go.Bar(
                 x=["rho"],
-                y=[mean_vals[13]],
+                y=[dist_mean_vals[4]],
                 name="ρ, (°)",
-                error_y=dict(type="data", array=[std_vals[13]], visible=True),
+                error_y=dict(type="data", array=[dist_std_vals[4]], visible=True),
             ),
             row=1,
             col=1,
@@ -708,7 +681,7 @@ class DisulfideList(UserList):
         # Cα N, Cα, Cβ, C', Sγ Å °
 
         fig.update_yaxes(
-            title_text="Torsion Angle (°)", range=[-200, 200], row=1, col=1
+            title_text="Torsion Angle (°)", range=[-300, 300], row=1, col=1
         )
         fig.update_yaxes(range=[0, 320], row=2, col=2)
 
@@ -716,11 +689,11 @@ class DisulfideList(UserList):
         fig.add_trace(
             go.Bar(
                 x=["Strain Energy (kcal/mol)"],
-                y=[mean_vals[5]],
+                y=[dist_mean_vals[3]],
                 name="Energy (kcal/mol)",
                 error_y=dict(
                     type="data",
-                    array=[std_vals[5].tolist()],
+                    array=[dist_std_vals[3].tolist()],
                     width=0.25,
                     visible=True,
                 ),
@@ -739,12 +712,16 @@ class DisulfideList(UserList):
         # Add another subplot for the mean values of ca_distance
         fig.add_trace(
             go.Bar(
-                x=["Cα Distance, (Å)", "Cβ Distance, (Å)"],
-                y=[mean_vals[6], mean_vals[7]],
-                name="Cβ Distance (Å)",
+                x=["Cα Distance, (Å)", "Cβ Distance, (Å)", "Sg Distance, (Å)"],
+                y=[dist_mean_vals[0], dist_mean_vals[1], dist_mean_vals[2]],
+                name="Distances (Å)",
                 error_y=dict(
                     type="data",
-                    array=[std_vals[6].tolist(), std_vals[7].tolist()],
+                    array=[
+                        dist_std_vals[0].tolist(),
+                        dist_std_vals[1].tolist(),
+                        dist_std_vals[2].tolist(),
+                    ],
                     width=0.25,
                     visible=True,
                 ),
@@ -760,10 +737,10 @@ class DisulfideList(UserList):
         fig.add_trace(
             go.Bar(
                 x=["Torsion Length, (Å)"],
-                y=[mean_vals[12]],
+                y=[tor_mean_vals[5]],
                 name="Torsion Length, (Å)",
                 error_y=dict(
-                    type="data", array=[std_vals[12]], width=0.25, visible=True
+                    type="data", array=[tor_std_vals[5]], width=0.25, visible=True
                 ),
             ),
             row=2,
@@ -1493,6 +1470,38 @@ def load_disulfides_from_id(
             )
 
     return copy.deepcopy(SSList)
+
+
+def calculate_torsion_statistics(sslist: DisulfideList):
+    """
+    Calculate and return the torsion and distance statistics for the DisulfideList.
+
+    This method builds a DataFrame containing torsional parameters, Cα-Cα distance,
+    energy, and phi-psi angles for the DisulfideList. It then calculates the mean
+    and standard deviation for the torsional and distance parameters.
+
+    :return: A tuple containing two DataFrames:
+            - tor_stats: DataFrame with mean and standard deviation for torsional parameters.
+            - dist_stats: DataFrame with mean and standard deviation for distance parameters.
+    :rtype: tuple (pd.DataFrame, pd.DataFrame)
+    """
+    df = sslist.torsion_df
+
+    tor_cols = ["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]
+    dist_cols = ["ca_distance", "cb_distance", "sg_distance", "energy", "rho"]
+    tor_stats = {}
+    dist_stats = {}
+
+    for col in tor_cols:
+        tor_stats[col] = {"mean": (df[col]).mean(), "std": (df[col]).std()}
+
+    for col in dist_cols:
+        dist_stats[col] = {"mean": df[col].mean(), "std": df[col].std()}
+
+    tor_stats = pd.DataFrame(tor_stats, columns=tor_cols)
+    dist_stats = pd.DataFrame(dist_stats, columns=dist_cols)
+
+    return tor_stats, dist_stats
 
 
 def extract_disulfide(
