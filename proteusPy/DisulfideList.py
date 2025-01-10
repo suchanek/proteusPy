@@ -12,9 +12,11 @@ Last revision: 2025-01-03 17:03:02 -egs-
 
 # pylint: disable=c0103
 # pylint: disable=c0301
+# pylint: disable=c0302
 # pylint: disable=c0415
 # pylint: disable=w0212
 
+# Cα N, Cα, Cβ, C', Sγ Å ° ρ
 
 try:
     # Check if running in Jupyter
@@ -681,7 +683,7 @@ class DisulfideList(UserList):
         # Cα N, Cα, Cβ, C', Sγ Å °
 
         fig.update_yaxes(
-            title_text="Torsion Angle (°)", range=[-300, 300], row=1, col=1
+            title_text="Dihedral Angle (°)", range=[-200, 200], row=1, col=1
         )
         fig.update_yaxes(range=[0, 320], row=2, col=2)
 
@@ -712,7 +714,7 @@ class DisulfideList(UserList):
         # Add another subplot for the mean values of ca_distance
         fig.add_trace(
             go.Bar(
-                x=["Cα Distance, (Å)", "Cβ Distance, (Å)", "Sg Distance, (Å)"],
+                x=["Cα Distance, (Å)", "Cβ Distance, (Å)", "Sγ Distance, (Å)"],
                 y=[dist_mean_vals[0], dist_mean_vals[1], dist_mean_vals[2]],
                 name="Distances (Å)",
                 error_y=dict(
@@ -965,7 +967,7 @@ class DisulfideList(UserList):
             if ss.sg_distance < distance and ss.sg_distance > minimum
         ]
 
-        return DisulfideList(reslist, f"filtered by Sg distance < {distance:.2f}")
+        return DisulfideList(reslist, f"filtered by Sγ distance < {distance:.2f}")
 
     def filter_by_bond_ideality(self, angle: float = -1.0):
         """
@@ -1462,7 +1464,7 @@ def load_disulfides_from_id(
         delta = num_ssbonds - len(SSList)
         if delta:
             _logger.error(
-                "Filtered %d -> %d SSBonds by Sg distance, %s, delta is: %d",
+                "Filtered %d -> %d SSBonds by Sγ distance, %s, delta is: %d",
                 num_ssbonds,
                 len(SSList),
                 pdb_id,
@@ -1472,7 +1474,7 @@ def load_disulfides_from_id(
     return copy.deepcopy(SSList)
 
 
-def calculate_torsion_statistics(sslist: DisulfideList):
+def Ocalculate_torsion_statistics(sslist: DisulfideList):
     """
     Calculate and return the torsion and distance statistics for the DisulfideList.
 
@@ -1494,6 +1496,61 @@ def calculate_torsion_statistics(sslist: DisulfideList):
 
     for col in tor_cols:
         tor_stats[col] = {"mean": (df[col]).mean(), "std": (df[col]).std()}
+
+    for col in dist_cols:
+        dist_stats[col] = {"mean": df[col].mean(), "std": df[col].std()}
+
+    tor_stats = pd.DataFrame(tor_stats, columns=tor_cols)
+    dist_stats = pd.DataFrame(dist_stats, columns=dist_cols)
+
+    return tor_stats, dist_stats
+
+
+def calculate_torsion_statistics(sslist):
+    """
+    Calculate and return the torsion and distance statistics for the DisulfideList.
+
+    This method builds a DataFrame containing torsional parameters, Cα-Cα distance,
+    energy, and phi-psi angles for the DisulfideList. It then calculates the mean
+    and standard deviation for the torsional and distance parameters.
+
+    :return: A tuple containing two DataFrames:
+            - tor_stats: DataFrame with mean and standard deviation for torsional parameters.
+            - dist_stats: DataFrame with mean and standard deviation for distance parameters.
+    :rtype: tuple (pd.DataFrame, pd.DataFrame)
+    """
+    df = sslist.torsion_df
+
+    tor_cols = ["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]
+    dist_cols = ["ca_distance", "cb_distance", "sg_distance", "energy", "rho"]
+    tor_stats = {}
+    dist_stats = {}
+
+    def circular_mean(series):
+        """
+        Calculate the circular mean of a series of angles.
+
+        This function converts the input series of angles from degrees to radians,
+        computes the mean of the sine and cosine of these angles, and then converts
+        the result back to degrees.
+
+        :param series: A sequence of angles in degrees.
+        :type series: array-like
+        :return: The circular mean of the input angles in degrees.
+        :rtype: float
+        """
+        radians = np.deg2rad(series)
+        sin_mean = np.sin(radians).mean()
+        cos_mean = np.cos(radians).mean()
+        return np.rad2deg(np.arctan2(sin_mean, cos_mean))
+
+    for col in tor_cols[:5]:
+        tor_stats[col] = {"mean": circular_mean(df[col]), "std": df[col].std()}
+
+    tor_stats["torsion_length"] = {
+        "mean": df["torsion_length"].mean(),
+        "std": df["torsion_length"].std(),
+    }
 
     for col in dist_cols:
         dist_stats[col] = {"mean": df[col].mean(), "std": df[col].std()}
