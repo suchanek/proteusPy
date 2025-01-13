@@ -183,13 +183,17 @@ class DisulfideLoader:
         """
         Implements indexing and slicing to retrieve DisulfideList objects from the
         DisulfideLoader. Supports:
-
+        
         - Integer indexing to retrieve a single DisulfideList
         - Slicing to retrieve a subset as a DisulfideList
         - Lookup by PDB ID to retrieve all Disulfides for that structure
         - Lookup by full disulfide name
-
-        Raises DisulfideException on invalid indices or names.
+        
+        :param index: The index or key to retrieve the DisulfideList.
+        :type index: int, slice, str
+        :return: A DisulfideList object or a subset of it.
+        :rtype: DisulfideList
+        :raises DisulfideException: If the index or name is invalid.
         """
 
         res = DisulfideList([], "none")
@@ -374,7 +378,7 @@ class DisulfideLoader:
         timestr = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.timestamp))
         ssMin, ssMax = self.SSList.minmax_energy
 
-        print("    =========== RCSB Disulfide Database Summary ==============")
+        print("    =========== RCSB Disulfide Database Summary ============")
         print(f"       =========== Built: {timestr} ==============")
         print(f"PDB IDs present:                 {pdbs}")
         print(f"Disulfides loaded:               {tot}")
@@ -385,7 +389,7 @@ class DisulfideLoader:
         print(f"Sγ distance cutoff:              {sg_cutoff:.2f} Å")
         if memusg:
             print(f"Total RAM Used:                     {ram:.2f} GB.")
-        print(f"    ================= proteusPy: {vers} =======================")
+        print(f"      ============== proteusPy: {vers} ===================")
 
     def display_overlay(self, pdbid, verbose=False) -> None:
         """
