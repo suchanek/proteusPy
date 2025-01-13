@@ -139,6 +139,7 @@ class Disulfide:
     $$\sqrt(\chi_{1}^{2} + \chi_{2}^{2} + \chi_{3}^{2} + \chi_{4}^{2} + \chi_{5}^{2})$$
     * Cα - Cα distance (Å)
     * Cβ - Cβ distance (Å)
+    * Sγ - Sγ distance (Å)
     * The previous C' and next N for both the proximal and distal residues. These are needed
     to calculate the backbone dihedral angles Φ and Ψ.
     * Backbone dihedral angles Φ and Ψ, when possible. Not all structures are complete and
@@ -855,11 +856,11 @@ class Disulfide:
     @property
     def bond_length_ideality(self):
         """
-        Calculate bond lengths for a disulfide bond and compare them to idealized angles.
+        Calculate bond lengths for a disulfide bond and compare them to idealized lengths.
 
         :param np.ndarray atom_coordinates: Array containing coordinates of atoms in the order:
             N1, CA1, C1, O1, CB1, SG1, N2, CA2, C2, O2, CB2, SG2
-        :return: RMS difference between calculated bond angles and idealized bond angles.
+        :return: RMS difference between calculated bond lengths and idealized bond lengths.
         :rtype: float
         """
 
@@ -1030,10 +1031,9 @@ class Disulfide:
         """
         Return the bounding box array for the given disulfide.
 
-        Returns
-        -------
-        :return: np.array(3, 2): Array containing the min, max for X, Y, and Z respectively.
-        Does not currently take the atom's radius into account.
+        :return: np.array
+            Array containing the min, max for X, Y, and Z respectively.
+            Does not currently take the atom's radius into account.
         """
         coords = self.internal_coords
 

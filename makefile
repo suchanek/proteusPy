@@ -2,128 +2,98 @@
 # Author: Eric G. Suchanek, PhD
 # Last revision: 2024-12-17 19:05:22 -egs-
 
-
-# assumes file VERSION contains only the version number
-ifeq ($(OS),Windows_NT) 
-    VERS := $(shell python -c "exec(open('proteusPy/_version.py').read()); print(__version__)")
-	RM = del
-else 
-	VERS = $(shell python get_version.py)
-	RM = rm
-
-endif
-
-# mamba is better than conda. Install it with 'conda install mamba -n base -c conda-forge'
-# or use conda instead of mamba.
-
-CONDA = conda
-
-MESS = "0.98.3.dev0"
+VERS := $(shell python -c "exec(open('proteusPy/_version.py').read()); print(__version__)")
+RM := rm
+CONDA ?= conda
+MESS = "v0.98.31"
 DEVNAME = ppydev
-OUTFILES = sdist.out, bdist.out, docs.out tag.out
 
-vers: .
+.PHONY: all vers newvers nuke pkg dev clean devclean install install_dev jup jup_dev format bld sdist docs upload tag push-tag commit tests docker docker_hub docker_github docker_all docker_run docker_purge
+
+all: clean sdist docs bld
+
+vers:
 	@echo "Version = $(VERS)"
 
-newvers: .
+newvers:
 	@echo "Current version number is: $(VERS)"	
-	@echo "Enter new version number: "
-	@read VERS; echo "__version__ = \"$$VERS\"" > proteusPy/_version.py
-	@echo "New version number is: $(VERS)"
-	@echo "Enter a new message: "
-	@read MESS
+	@python -c "vers=input('Enter new version number: '); open('proteusPy/_version.py', 'w').write(f'__version__ = \"{vers}\"\\n')"
+	@echo "Version number updated."
 
 nuke: clean devclean
-	-@$(RM) $(OUTFILES)
 	-@$(RM) dist/*
 
 pkg:
 	@echo "Starting installation step 1/2..."
 	$(CONDA) create --name proteusPy -y python=3.12 numpy pandas
-	@echo "Step 1 done. Now activate the environment with 'conda activate proteusPy' and run 'make install'"
+	@echo "Step 1 done. Activate the environment with 'conda activate proteusPy' and run 'make install'"
 
 dev:
-	@echo "Building $(DEVNAME)..."
+	@echo "Building development environment $(DEVNAME)..."
 	$(CONDA) create --name $(DEVNAME) -y python=3.12 numpy pandas
-	@echo "Step 1 done. Now activate the environment with 'conda activate $(DEVNAME)' and run 'make install_dev'"
+	@echo "Step 1 done. Activate the environment with 'conda activate $(DEVNAME)' and run 'make install_dev'"
 
-clean: .
-	@echo "Removing proteusPy environment..."
-	-@jupyter kernelspec uninstall proteuspy -y
-	-@$(CONDA) env remove --name proteusPy -y
+clean devclean:
+	@echo "Removing $(if $(filter $@,clean),proteusPy,$(DEVNAME)) environment..."
+	-@jupyter kernelspec uninstall $(if $(filter $@,clean),proteusPy,$(DEVNAME)) -y
+	-@$(CONDA) env remove --name $(if $(filter $@,clean),proteusPy,$(DEVNAME)) -y
 
-devclean: .
-	@echo "Removing $(DEVNAME) environment..."
-	-@jupyter kernelspec uninstall ppydev -y
-	-@$(CONDA) env remove --name $(DEVNAME) -y
-
-	
-# activate the package before running!
-.PHONY: install
 install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	@echo "Installing proteusPy..."
-	@pip install .
-	
-	@echo "Installing jupyter..."
-	@python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
+	pip install .
+	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Installation finished!"
 
 install_dev: sdist
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	
-	pip install .[all] 
+	pip install .[all]
 	pip install pdoc twine black pytest build -q
-	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
-	@echo "Installation finished!"
+	python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
+	@echo "Development environment installation finished!"
 
-jup: .
+define jupyter-setup
 	jupyter contrib nbextension install --sys-prefix
 	jupyter nbextension enable --py --sys-prefix widgetsnbextension
-	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
+	python -m ipykernel install --user --name $(1) --display-name "$(1) ($(VERS))"
+endef
 
-jup_dev: .
-	jupyter contrib nbextension install --sys-prefix
-	jupyter nbextension enable --py --sys-prefix widgetsnbextension
-	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
+jup:
+	$(call jupyter-setup,proteusPy)
 
-# package development targets
-.PHONY: format
+jup_dev:
+	$(call jupyter-setup,ppydev)
+
 format:
 	black proteusPy
 
-bld:  docs sdist
+bld: docs sdist
 	@echo "Building $(VERS)..."
-	@echo "Building binary distribution..."
-	@python setup.py bdist_wheel
-	@echo "Building documentation..."
-	@pdoc -o docs --math --logo "./logo.png" ./proteusPy
-	@echo "Building done."
+	python setup.py bdist_wheel
+	pdoc -o docs --math --logo "./logo.png" ./proteusPy
+	@echo "Build complete."
 
 sdist: proteusPy/_version.py
 	@echo "Building source distribution..."
 	python setup.py sdist
 
 docs: $(wildcard proteusPy/**/*.py)
-	@echo "Building documentation..."
+	@echo "Generating documentation..."
 	pdoc -o docs --math --logo "./logo.png" ./proteusPy
 
-# normally i push to PyPi via github action
-.PHONY: upload
 upload: sdist
 	twine upload -r proteusPy dist/proteusPy-$(VERS)*
 
-.PHONY: tag
 tag:
 	git tag -a $(VERS) -m $(MESS)
 	@echo $(VERS) > tag.out
 
-.PHONY: commit
+push-tag:
+	git push origin $(VERS)
+
 commit:
 	git commit -a -m $(MESS)
 	git push origin
 
-.PHONY: tests
 tests: 
 	pytest .
 	python tests/Test_DisplaySS.py
@@ -131,12 +101,9 @@ tests:
 	python proteusPy/DisulfideLoader.py
 	python proteusPy/DisulfideClasses.py
 
-# Assumes Docker is installed and running
-
 docker: viewer/rcsb_viewer.py viewer/dockerfile
 	docker build -t rcsb_viewer viewer/ --no-cache
 
-# you have to setup the docker  cloud builder to user buildx
 docker_hub: viewer/rcsb_viewer.py viewer/dockerfile
 	docker buildx use cloud-egsuchanek-rcsbviewer
 	docker buildx build viewer/ --platform linux/arm64,linux/amd64 \
@@ -151,18 +118,14 @@ docker_github: viewer/rcsb_viewer.py viewer/dockerfile
 		-f viewer/dockerfile \
 		-t ghcr.io/suchanek/rcsb_viewer:latest \
 		-t ghcr.io/suchanek/rcsb_viewer:$(VERS) \
-		--push
+		--push --no-cache
 
-.PHONEY: docker_all
 docker_all: docker docker_hub docker_github
 
-.PHONY: docker_run
 docker_run:
-	docker run -d  -p 5006:5006  --name rcsb_viewer --restart unless-stopped rcsb_viewer:latest
+	docker run -d -p 5006:5006 --name rcsb_viewer --restart unless-stopped rcsb_viewer:latest
 
-.PHONY: docker_purge
 docker_purge:
 	docker system prune -a -y
 
-# end of file
-
+# End of file
