@@ -379,7 +379,7 @@ class DisulfideLoader:
         ssMin, ssMax = self.SSList.minmax_energy
 
         print("    =========== RCSB Disulfide Database Summary ============")
-        print(f"       =========== Built: {timestr} ==============")
+        print(f"       =========== Built: {timestr} ===========")
         print(f"PDB IDs present:                 {pdbs}")
         print(f"Disulfides loaded:               {tot}")
         print(f"Average structure resolution:    {res:.2f} Å")
