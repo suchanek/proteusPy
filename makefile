@@ -39,12 +39,12 @@ nuke: clean devclean
 
 pkg:
 	@echo "Starting installation step 1/2..."
-	$(CONDA) create --name proteusPy -y python=3.12 numpy pandas matplotlib
+	$(CONDA) create --name proteusPy -y python=3.12 numpy pandas
 	@echo "Step 1 done. Now activate the environment with 'conda activate proteusPy' and run 'make install'"
 
 dev:
 	@echo "Building $(DEVNAME)..."
-	$(CONDA) create --name $(DEVNAME) -y python=3.12 numpy pandas matplotlib
+	$(CONDA) create --name $(DEVNAME) -y python=3.12 numpy pandas
 	@echo "Step 1 done. Now activate the environment with 'conda activate $(DEVNAME)' and run 'make install_dev'"
 
 clean: .
@@ -71,7 +71,6 @@ install:
 
 install_dev: sdist
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	$(CONDA) install vtk==9.2.6 -y
 	
 	pip install .[all] 
 	pip install pdoc twine black pytest build -q
