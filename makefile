@@ -18,7 +18,7 @@ endif
 
 CONDA = conda
 
-MESS = "0.98.2 release"
+MESS = "0.98.3.dev0"
 DEVNAME = ppydev
 OUTFILES = sdist.out, bdist.out, docs.out tag.out
 
@@ -76,7 +76,7 @@ install_dev: sdist
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	$(CONDA) install vtk==9.2.6 -y
 	
-	pip install .
+	pip install .[all] 
 	pip install pdoc twine black pytest build -q
 	python -m ipykernel install --user --name ppydev --display-name "ppydev ($(VERS))"
 	@echo "Installation finished!"
@@ -166,7 +166,7 @@ docker_run:
 
 .PHONY: docker_purge
 docker_purge:
-	docker system prune -a
+	docker system prune -a -y
 
 # end of file
 

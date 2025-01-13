@@ -2,7 +2,7 @@
 DisulfideBond Class Analysis Dictionary creation
 Author: Eric G. Suchanek, PhD.
 License: BSD
-Last Modification: 2/19/24 -egs-
+Last Modification: 2025-01-05 20:37:38 -egs-
 
 Disulfide Class creation and manipulation. Binary classes using the +/- formalism of Hogg et al. 
 (Biochem, 2006, 45, 7429-7433), are created for all 32 possible classes from the Disulfides 
@@ -33,6 +33,7 @@ from proteusPy.ProteusGlobals import (
     PBAR_COLS,
     SS_CLASS_DEFINITIONS,
     SS_CLASS_DICT_FILE,
+    SS_CONSENSUS_BIN_FILE,
     SS_CONSENSUS_OCT_FILE,
 )
 
@@ -109,28 +110,72 @@ class DisulfideClass_Constructor:
     |      22202 | +RHHook        | UNK        |     593 |  0.00491313 |
     |      22220 | ±RHSpiral      | UNK        |    2544 |  0.0210776  |
     |      22222 | +RHSpiral      | UNK        |    3665 |  0.0303653  |
-
     """
 
     def __init__(self, loader, verbose=True) -> None:
         self.verbose = verbose
-        self.classdict = {}
-        self.classdf = None
-        self.sixclass_df = None
+        self.binaryclass_dict = {}
+        self.binaryclass_df = None
         self.eightclass_df = None
+        self.eightclass_dict = {}
+        self.consensus_binary_list = None
+        self.consensus_oct_list = None
 
         if self.verbose:
-            _logger.info("Building SS classes...")
+            _logger.info(
+                "Loading binary consensus structure list from %s", SS_CONSENSUS_BIN_FILE
+            )
+        self.consensus_binary_list = self.load_consensus_file(oct=False)
 
-        self.build_yourself(loader)
+        if self.verbose:
+            _logger.info(
+                "Loading octant consensus structure list from %s", SS_CONSENSUS_OCT_FILE
+            )
+        self.consensus_oct_list = self.load_consensus_file(oct=True)
+
+        self.build_classes(loader)
+
+    # overload __getitem__ to handle slicing and indexing, and access by name
+    def __getitem__(self, item: str):
+        """
+        Implements indexing and slicing to retrieve DisulfideList objects from the
+        DisulfideLoader. Supports:
+
+        - Return a DisulfideList given the input Class ID string. Works with Binary
+        classes.
+
+        Raises DisulfideException on invalid indices or names.
+        """
+        disulfides = None
+
+        if isinstance(item, int):
+            raise ValueError("Integer indexing not supported. Use a string key.")
+
+        elif isinstance(item, str):
+            classdict = self.binaryclass_dict
+
+            try:
+                disulfides = classdict[item]
+                return disulfides
+            except KeyError:
+                _logger.error(
+                    "DisulfideLoader(): Cannot find key <%s> in SSBond DB", item
+                )
 
     def load_class_dict(self, fname=Path(DATA_DIR) / SS_CLASS_DICT_FILE) -> dict:
         """Load the class dictionary from the specified file."""
         with open(fname, "rb") as f:
-            self.classdict = pickle.load(f)
+            self.binaryclass_dict = pickle.load(f)
 
-    def load_consensus_file(self, fname=Path(DATA_DIR) / SS_CONSENSUS_OCT_FILE):
+    def load_consensus_file(self, fpath=Path(DATA_DIR), oct=True) -> DisulfideList:
         """Load the consensus file from the specified file."""
+
+        res = None
+        if oct:
+            fname = fpath / SS_CONSENSUS_OCT_FILE
+        else:
+            fname = fpath / SS_CONSENSUS_BIN_FILE
+
         with open(fname, "rb") as f:
             res = pickle.load(f)
         return res
@@ -141,24 +186,38 @@ class DisulfideClass_Constructor:
         result_df = pd.concat([class_df, ss_id_col], axis=1)
         return result_df
 
-    def list_binary_classes(self):
-        """List the binary classes."""
-        for k, v in enumerate(self.classdict):
-            print(f"Class: |{k}|, |{v}|")
+    def list_classes(self, base=2):
+        """
+        List the Disulfide structural classes.
+
+        :param self: The instance of the DisulfideClass_Constructor class.
+        :type self: DisulfideClass_Constructor
+        :return: A list of disulfide structural classes.
+        :rtype: list
+        """
+        if base == 2:
+            for k, v in enumerate(self.binaryclass_dict):
+                print(f"Class: |{k}|, |{v}|")
+
+        elif base == 8:
+            for k, v in enumerate(self.eightclass_dict):
+                print(f"Class: |{k}|, |{v}|")
+        else:
+            raise ValueError("Invalid base. Must be 2, 6, or 8.")
 
     def from_class(self, loader, classid: str) -> DisulfideList:
         """
         Return a list of disulfides corresponding to the input BINARY class ID
         string.
 
-        :param classid: Class ID, e.g. '+RHStaple'
+        :param classid: Class ID, e.g. '00200'
         :return: DisulfideList of class members
         """
 
         res = DisulfideList([], classid)
 
         try:
-            sslist = self.classdict[classid]
+            sslist = self.binaryclass_dict[classid]
             if self.verbose:
                 pbar = tqdm(sslist, ncols=PBAR_COLS)
                 for ssid in pbar:
@@ -232,23 +291,20 @@ class DisulfideClass_Constructor:
         class_strings = ["".join(combination) for combination in class_combinations]
         return class_strings
 
-    def build_yourself(self, loader) -> None:
+    def build_classes(self, loader) -> None:
         """
         Build the internal structures needed for the binary and six-fold disulfide structural classes
         based on dihedral angle rules.
 
-        Parameters
-        ----------
-        loader: DisulfideLoader object
-
-        Returns
-        -------
-        None
+        :param loader: The DisulfideLoader object containing the data.
+        :type loader: DisulfideLoader
+        :return: None
+        :rtype: None
         """
-        # import proteusPy
-        from proteusPy import __version__ as version  # pylint: disable=C0415
 
-        self.version = version
+        from proteusPy import __version__
+
+        self.version = __version__
 
         tors_df = loader.getTorsions()
 
@@ -275,21 +331,18 @@ class DisulfideClass_Constructor:
             inplace=True,
         )
 
-        classdict = dict(zip(merged["SS_Classname"], merged["ss_id"]))
-        self.classdict = classdict
-        self.classdf = merged.copy()
-
-        if self.verbose:
-            _logger.info("Creating sixfold SS classes...")
-
-        grouped_sixclass = self.create_six_classes(tors_df)
-        self.sixclass_df = grouped_sixclass.copy()
+        classdict = dict(zip(merged["class_id"], merged["ss_id"]))
+        self.binaryclass_dict = classdict
+        self.binaryclass_df = merged.copy()
 
         if self.verbose:
             _logger.info("Creating eightfold SS classes...")
 
-        grouped_eightclass = self.create_eight_classes(tors_df)
+        grouped_eightclass = self.create_classes(tors_df, 8)
         self.eightclass_df = grouped_eightclass.copy()
+        self.eightclass_dict = dict(
+            zip(grouped_eightclass["class_id"], grouped_eightclass["ss_id"])
+        )
 
         if self.verbose:
             _logger.info("Initialization complete.")
@@ -319,13 +372,13 @@ class DisulfideClass_Constructor:
 
         # Group the DataFrame by the class ID and return the grouped data
         grouped = df.groupby(class_id_column)["ss_id"].unique().reset_index()
-        grouped["count"] = grouped["ss_id"].apply(lambda x: len(x))
-        grouped["incidence"] = grouped["ss_id"].apply(lambda x: len(x) / len(df))
-        grouped["percentage"] = grouped["incidence"].apply(lambda x: 100 * x)
+        grouped["count"] = grouped["ss_id"].apply(len)
+        grouped["incidence"] = grouped["count"] / len(df)
+        grouped["percentage"] = grouped["incidence"] * 100
 
         return grouped
 
-    def create_six_classes(self, df) -> pd.DataFrame:
+    def create_classes(self, df, base=8) -> pd.DataFrame:
         """
         Create a new DataFrame from the input with a 6-class encoding for input 'chi' values.
 
@@ -344,16 +397,19 @@ class DisulfideClass_Constructor:
         """
 
         _df = pd.DataFrame()
-        # create the chi_t columns for each chi column
-        for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
-            _df[col_name + "_t"] = df[col_name].apply(self.get_sixth_quadrant)
+        if base == 6:
+            for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
+                _df[col_name + "_t"] = df[col_name].apply(self.get_sixth_quadrant)
+        elif base == 8:
+            for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
+                _df[col_name + "_t"] = df[col_name].apply(self.get_eighth_quadrant)
+        else:
+            raise ValueError("Base must be either 6 or 8")
 
-        # create the class_id column
         df["class_id"] = _df[["chi1_t", "chi2_t", "chi3_t", "chi4_t", "chi5_t"]].apply(
             lambda x: "".join(x), axis=1
         )
 
-        # group the DataFrame by class_id and return the grouped data
         grouped = df.groupby("class_id").agg({"ss_id": "unique"})
         grouped["count"] = grouped["ss_id"].apply(lambda x: len(x))
         grouped["incidence"] = grouped["count"] / len(df)
@@ -408,9 +464,7 @@ class DisulfideClass_Constructor:
         :return: A new Pandas DataFrame containing only rows where the percentage is greater than or equal to the cutoff
         :rtype: pandas.DataFrame
         """
-        if base == 6:
-            df = self.sixclass_df
-        elif base == 8:
+        if base == 8:
             df = self.eightclass_df
         else:
             raise ValueError("Invalid base. Must be 6 or 8.")
@@ -485,17 +539,20 @@ class DisulfideClass_Constructor:
         input 'cls' string in the class description
         """
         if base == 2:
-            df = self.classdf
-        elif base == 6:
-            df = self.sixclass_df
+            df = self.binaryclass_df
         elif base == 8:
             df = self.eightclass_df
+        else:
+            raise ValueError("Invalid base. Must be 2 or 8.")
 
         filtered_df = df[df["class_id"] == cls]
+
         if len(filtered_df) == 0:
             return None
-        elif len(filtered_df) > 1:
+
+        if len(filtered_df) > 1:
             raise ValueError(f"Multiple rows found for class_id '{cls}'")
+
         return filtered_df.iloc[0]["ss_id"]
 
     def save(self, savepath=DATA_DIR) -> None:
@@ -510,7 +567,7 @@ class DisulfideClass_Constructor:
         _fname = f"{savepath}{fname}"
 
         if self.verbose:
-            _logger.info(f"Writing %s", _fname)
+            _logger.info("Writing %s", _fname)
 
         with open(_fname, "wb+") as f:
             pickle.dump(self, f)
@@ -518,41 +575,7 @@ class DisulfideClass_Constructor:
         if self.verbose:
             _logger.info("Done.")
 
-    def six_class_to_binary(self, cls_str):
-        """
-        Return a string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees
-        into a string of 5 characters, where each character is either '1' if the corresponding input character represents a
-        negative angle or '2' if it represents a positive angle.
-
-        :param cls_str (str): A string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees.
-        :return str: A string of length 5, where each character is either '0' or '2', representing the sign of the corresponding input angle.
-        """
-        output_str = ""
-        for char in cls_str:
-            if char in ["1", "2", "3"]:
-                output_str += "2"
-            elif char in ["4", "5", "6"]:
-                output_str += "0"
-        return output_str
-
-    def eight_class_to_binary(self, cls_str):
-        """
-        Return a string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees
-        into a string of 5 characters, where each character is either '1' if the corresponding input character represents a
-        negative angle or '2' if it represents a positive angle.
-
-        :param cls_str (str): A string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees.
-        :return str: A string of length 5, where each character is either '0' or '2', representing the sign of the corresponding input angle.
-        """
-        output_str = ""
-        for char in cls_str:
-            if char in ["1", "2", "3", "4"]:
-                output_str += "2"
-            elif char in ["5", "6", "7", "8"]:
-                output_str += "0"
-        return output_str
-
-    def class_to_binary(self, cls_str, base):
+    def class_to_binary(self, cls_str, base=8):
         """
         Return a string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees
         into a string of 5 characters, where each character is either '0' if the corresponding input character represents a

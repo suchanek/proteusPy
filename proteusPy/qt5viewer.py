@@ -1,11 +1,11 @@
 """
 Disulfide Structure Viewer
 
-This program is a PyQt5-based application for viewing molecular structures with support for
-multiple disulfide bonds and various rendering styles. It uses PyVista for 3D visualization
-and PyQt5 for the graphical user interface. The application allows users to toggle between
-different rendering styles, switch between light and dark themes, and save or export the
-visualized scenes.
+This program is part of the proteusPy package, and is a PyQt5-based application for viewing 
+molecular structures with support for multiple disulfide bonds and various rendering styles. 
+It uses PyVista for 3D visualization and PyQt5 for the graphical user interface. The application 
+allows users to toggle between different rendering styles, switch between light and dark themes, 
+and save or export the visualized scenes.
 
 Modules:
     os: Provides a way of using operating system dependent functionality.
@@ -21,9 +21,13 @@ Classes:
 
 Functions:
     main: The main entry point of the application.
+
+Author:
+    Eric G. Suchanek, PhD.
 """
 
 # pylint: disable=W0212
+# pylint: disable=E0611
 # pylint: disable=E0401
 # pylint: disable=C0413
 
@@ -67,6 +71,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QPushButton,
     QSizePolicy,
+    QSlider,
     QSpacerItem,
     QVBoxLayout,
     QWidget,
@@ -189,10 +194,6 @@ class DisulfideViewer(QMainWindow):
         self.dropdown.addItems([ss.name for ss in self.ss_list])
         self.dropdown.currentIndexChanged.connect(self.on_dropdown_change)
 
-        # Create a button to toggle themes
-        self.button_theme = QPushButton("Toggle Theme")
-        self.button_theme.clicked.connect(self.toggle_theme)
-
         # Create a checkbox for single/multiple display
         self.checkbox_single = QCheckBox("Single")
         self.checkbox_single.setChecked(True)
@@ -200,6 +201,10 @@ class DisulfideViewer(QMainWindow):
 
         self.button_reset = QPushButton("Reset Camera")
         self.button_reset.clicked.connect(self.set_camera_view)
+
+        # self.timer2 = QTimer()
+        # self.timer2.timeout.connect(self.update_sliders_from_camera)
+        # self.timer2.start(100)  # Check every 100 milliseconds
 
         # Create a font object with increased size
         font = QFont()
@@ -242,7 +247,7 @@ class DisulfideViewer(QMainWindow):
         control_layout.addSpacerItem(
             QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
         )  # Add spacer
-        control_layout.addWidget(self.button_theme)  # Add theme toggle button
+
         control_layout.addWidget(self.button_reset)  # Add Reset button
         control_layout.addStretch(1)
 
@@ -255,17 +260,15 @@ class DisulfideViewer(QMainWindow):
         # self.plotter_widget.setMinimumSize(*winsize)
 
         # Create sliders for camera control
-        """
         self.slider_x = QSlider(Qt.Horizontal)
-        self.slider_x.setRange(-100, 100)
-        self.slider_x.setValue(0)
+        self.slider_x.setRange(0, 360)
+        self.slider_x.setValue(180)
         self.slider_x.valueChanged.connect(self.update_camera_position)
 
         self.slider_y = QSlider(Qt.Vertical)
-        self.slider_y.setRange(-100, 100)
-        self.slider_y.setValue(0)
+        self.slider_y.setRange(0, 360)
+        self.slider_y.setValue(180)
         self.slider_y.valueChanged.connect(self.update_camera_position)
-        """
 
         self.button_spin = QPushButton("Spin Camera")
         self.button_spin.clicked.connect(self.spin_camera)
@@ -274,7 +277,7 @@ class DisulfideViewer(QMainWindow):
         main_layout = QHBoxLayout()
         main_layout.addWidget(control_widget)
         main_layout.addWidget(self.plotter_widget, 1)
-        # main_layout.addWidget(self.slider_y)  # Add vertical slider
+        main_layout.addWidget(self.slider_y)  # Add vertical slider
 
         # Set the central widget
         container = QWidget()
@@ -282,7 +285,7 @@ class DisulfideViewer(QMainWindow):
 
         bottom_layout = QVBoxLayout()
         bottom_layout.addWidget(container)
-        # bottom_layout.addWidget(self.slider_x)  # Add horizontal slider
+        bottom_layout.addWidget(self.slider_x)  # Add horizontal slider
 
         main_container = QWidget()
         main_container.setLayout(bottom_layout)
@@ -305,14 +308,59 @@ class DisulfideViewer(QMainWindow):
         # Initial display
         # self.display()  # Set a default view with current style
 
+    def update_sliders_from_camera(self):
+        """
+        Updates the slider values to match the camera's position.
+
+        Parameters:
+            caller: The object that triggered the event.
+            event: The event type (ModifiedEvent).
+        """
+        # Get the current camera position
+        current_position = self.plotter_widget.camera_position[0]
+        current_x = current_position[0]
+        current_y = current_position[1]
+        current_z = current_position[2]
+
+        # Calculate the spherical coordinates
+        distance = np.sqrt(current_x**2 + current_y**2 + current_z**2)
+
+        # Avoid division by zero for atan2
+        x_angle = np.degrees(np.arctan2(current_z, current_x)) if distance > 0 else 0
+        y_angle = (
+            np.degrees(np.arctan2(current_y, np.sqrt(current_x**2 + current_z**2)))
+            if distance > 0
+            else 0
+        )
+
+        # Ensure the angles are within 0-360 degrees
+        x_angle = x_angle % 360
+        y_angle = y_angle % 360
+
+        # Update the sliders only if values differ to avoid unnecessary signals
+        if self.slider_x.value() != int(x_angle):
+            self.slider_x.blockSignals(True)  # Temporarily block signals to avoid loops
+            self.slider_x.setValue(int(x_angle))
+            self.slider_x.blockSignals(False)
+
+        if self.slider_y.value() != int(y_angle):
+            self.slider_y.blockSignals(True)  # Temporarily block signals to avoid loops
+            self.slider_y.setValue(int(y_angle))
+            self.slider_y.blockSignals(False)
+
     def set_camera_view(self):
         """
         Sets the camera to a specific view where the x-axis is pointed down and the
-        y-axis into the screen.
+        y-axis into the screen, and resets the x and y sliders to their default values.
         """
+        # Set the camera position
         camera_position = [(0, 0, 10), (0, 0, 0), (0, 1, 0)]  # Example values
         self.plotter_widget.camera_position = camera_position
         self.plotter_widget.reset_camera()
+
+        # Reset the x and y sliders to their default values
+        self.slider_x.setValue(180)  # Assuming the default value is 180
+        self.slider_y.setValue(180)  # Assuming the default value is 180
 
     def spin_camera(self, duration=5, n_frames=150):
         """
@@ -452,8 +500,8 @@ class DisulfideViewer(QMainWindow):
             (ss for ss in self.ss_list if ss.name == selected_name), None
         )
         if self.current_ss is not None:
-            self.display()
             self.statusBar().showMessage(f"Displaying: {self.current_ss.name}")
+            self.display()
 
     def on_checkbox_single_change(self, state):
         """
@@ -470,21 +518,30 @@ class DisulfideViewer(QMainWindow):
         Update the camera position based on the slider values.
         """
 
-        x = self.slider_x.value()
-        y = self.slider_y.value()
+        x_angle = self.slider_x.value()
+        y_angle = self.slider_y.value()
 
-        self.plotter_widget.camera_position = [(x, y, 10), (0, 0, 0), (0, -1, 0)]
+        # Convert angles to radians
+        x_rad = np.radians(x_angle)
+        y_rad = np.radians(y_angle)
+
+        # Read the current camera position
+        current_position = self.plotter_widget.camera_position[0]
+        current_x = current_position[0]
+        current_y = current_position[1]
+        current_z = current_position[2]
+
+        # Calculate the current distance from the origin
+        distance = np.sqrt(current_x**2 + current_y**2 + current_z**2)
+
+        # Calculate new camera position based on the angles and distance
+        xpos = distance * np.cos(y_rad) * np.cos(x_rad)
+        ypos = distance * np.sin(y_rad)
+        zpos = distance * np.cos(y_rad) * np.sin(x_rad)
+
+        # Set the camera position and up vector
+        self.plotter_widget.camera_position = [(xpos, ypos, zpos), (0, 0, 0), (0, 1, 0)]
         self.plotter_widget.render()
-
-    def toggle_theme(self):
-        """
-        Toggle between light and dark themes.
-        """
-        if self.current_theme == "dark":
-            self.current_theme = "light"
-        else:
-            self.current_theme = "dark"
-        self.apply_theme()
 
     def apply_theme(self):
         """

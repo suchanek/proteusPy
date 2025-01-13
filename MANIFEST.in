@@ -1,5 +1,6 @@
 include README.md
 include CHANGELOG.md
+recursive-include data/ 2q7q_seqsim.csv SS_consensus_class_32.pkl SS_consensus_class_oct.pkl
 include proteusPy/data/pdb5rsa.ent
 include proteusPy/data/ss_completed.txt
 include proteusPy/data/ss_query.json
