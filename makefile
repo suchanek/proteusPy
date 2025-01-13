@@ -62,11 +62,8 @@ devclean: .
 .PHONY: install
 install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	@echo "Installing additional..."
-	$(CONDA) install vtk==9.2.6 -y
-
 	@echo "Installing proteusPy..."
-	@pip install . -q
+	@pip install .
 	
 	@echo "Installing jupyter..."
 	@python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
