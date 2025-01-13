@@ -33,8 +33,6 @@ def SS_DisplayTest(ss: Disulfide):
 
     filename = os.path.join(TMP, "sb3.png")
     ss.screenshot(style="sb", single=False, fname=filename, verbose=True)
-
-    print("--> SS_DisplayTest done.")
     return
 
 
@@ -44,14 +42,6 @@ def SSlist_DisplayTest(sslist):
     sslist.display(style="sb")
     sslist.display(style="pd")
     sslist.display(style="plain")
-
-    # filename = os.path.join(TMP, "overlay.mp4")
-    # sslist.display_overlay(movie=True, fname=filename)
-
-    filename = os.path.join(TMP, "overlay.png")
-    sslist.display_overlay(screenshot=True, fname=filename)
-
-    print("--> SSList_DisplayTest done.")
 
 
 def main():

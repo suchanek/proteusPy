@@ -3,8 +3,7 @@ This module is part of the proteusPy package, a Python package for
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
-Author: Eric G. Suchanek, PhD
-Last revision: 10/14/2024
+Last revision: 2025-01-07 22:04:58 -egs-
 """
 
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
@@ -17,10 +16,9 @@ Last revision: 10/14/2024
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
 
 import copy
-import os
 import pickle
 import time
-import urllib
+from pathlib import Path
 
 import gdown
 import matplotlib.pyplot as plt
@@ -36,11 +34,11 @@ from proteusPy.DisulfideExceptions import DisulfideParseWarning
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
+    CA_CUTOFF,
     DATA_DIR,
-    LOADER_ALL_URL,
     LOADER_FNAME,
     LOADER_SUBSET_FNAME,
-    LOADER_SUBSET_URL,
+    SG_CUTOFF,
     SS_LIST_URL,
     SS_PICKLE_FILE,
 )
@@ -69,7 +67,7 @@ class DisulfideLoader:
     name.
 
     The class can also render Disulfides overlaid on a common coordinate system to a pyVista
-    window using the [display_overlay()](#DisulfideLoader.display_overlay) method. See below for examples.\n
+    window using the [display_overlay()](#DisulfideLoader.display_overlay) method. See below for examples.
 
     Important note: For typical usage one will access the database via the `Load_PDB_SS()` function.
     The difference is that the latter function loads the compressed database from its single
@@ -99,6 +97,7 @@ class DisulfideLoader:
         different data directory and file names for the pickle files. These different
         directories are normally established with the proteusPy.Extract_Disulfides
         function.
+
         """
 
         self.SSList = DisulfideList([], "ALL_PDB_SS")
@@ -117,7 +116,7 @@ class DisulfideLoader:
         _pickleFile = picklefile
         old_length = new_length = 0
 
-        full_path = os.path.join(datadir, _pickleFile)
+        full_path = Path(datadir) / _pickleFile
         if self.verbose and not self.quiet:
             _logger.info(
                 f"Reading disulfides from: {full_path}... ",
@@ -125,7 +124,7 @@ class DisulfideLoader:
 
         try:
             # Check if the file exists before attempting to open it
-            if not os.path.exists(full_path):
+            if not full_path.exists():
                 raise FileNotFoundError(f"File not found: {full_path}")
 
             with open(full_path, "rb") as f:
@@ -136,14 +135,24 @@ class DisulfideLoader:
 
                 new_length = len(filt)
                 if self.verbose:
-                    _logger.info(f"Filtering Cα: old: {old_length}, new: {new_length}")
+                    _logger.info(
+                        "Filtering with Cα cutoff %f: old: %d, new: %d",
+                        cutoff,
+                        old_length,
+                        new_length,
+                    )
 
                 old_length = new_length
                 filt = filt.filter_by_sg_distance(sg_cutoff)
                 new_length = len(filt)
-                if self.verbose:
-                    _logger.info(f"Filtering Sγ: old: {old_length}, new: {new_length}")
 
+                if self.verbose:
+                    _logger.info(
+                        "Filtering Sγ: cutoff %f: old: %d, new: %d",
+                        sg_cutoff,
+                        old_length,
+                        new_length,
+                    )
                 if subset:
                     self.SSList = DisulfideList(filt[:5000], "SUBSET_PDB_SS")
                 else:
@@ -151,37 +160,40 @@ class DisulfideLoader:
 
                 self.TotalDisulfides = len(self.SSList)
 
+                self.SSDict = self.create_disulfide_dict()
+                self.IDList = list(self.SSDict.keys())
+
+                self.TorsionDF = self.SSList.torsion_df
+                self.TotalDisulfides = len(self.SSList)
+                self.tclass = DisulfideClass_Constructor(self, self.verbose)
+
+            if self.verbose:
+                _logger.info("Loader initialization complete.")
+
         except FileNotFoundError as e:
-            _logger.error(f"File not found: {full_path}")
+            _logger.error("File not found: %s", full_path)
             raise e
 
         except Exception as e:
-            _logger.error(f"An error occurred while loading the file: {full_path}")
+            _logger.error("An error occurred while loading the file: %s", full_path)
             raise e
-
-        self.SSDict = self.create_disulfide_dict()
-        self.IDList = list(self.SSDict.keys())
-
-        self.TorsionDF = sslist.torsion_df
-        self.TotalDisulfides = len(self.SSList)
-
-        self.tclass = DisulfideClass_Constructor(self, self.verbose)
-
-        if self.verbose and not self.quiet:
-            _logger.info("Initialization complete.")
 
     # overload __getitem__ to handle slicing and indexing, and access by name
     def __getitem__(self, item):
         """
         Implements indexing and slicing to retrieve DisulfideList objects from the
         DisulfideLoader. Supports:
-
+        
         - Integer indexing to retrieve a single DisulfideList
         - Slicing to retrieve a subset as a DisulfideList
         - Lookup by PDB ID to retrieve all Disulfides for that structure
         - Lookup by full disulfide name
-
-        Raises DisulfideException on invalid indices or names.
+        
+        :param index: The index or key to retrieve the DisulfideList.
+        :type index: int, slice, str
+        :return: A DisulfideList object or a subset of it.
+        :rtype: DisulfideList
+        :raises DisulfideException: If the index or name is invalid.
         """
 
         res = DisulfideList([], "none")
@@ -235,7 +247,7 @@ class DisulfideLoader:
     @property
     def average_resolution(self) -> float:
         """
-        Compute and return the average structure resolution for the given list.
+        Return the average structure resolution for the given list.
 
         :return: Average resolution (A)
         """
@@ -278,11 +290,10 @@ class DisulfideLoader:
         Create a dictionary from a list of disulfide objects where the key is the pdb_id
         and the value is a list of indices of the disulfide objects in the list.
 
-        Parameters:
-        disulfide_list (list): List of disulfide objects.
-
-        Returns:
-        dict: Dictionary with pdb_id as keys and lists of indices as values.
+        :param disulfide_list: List of disulfide objects.
+        :type disulfide_list: list
+        :return: Dictionary with pdb_id as keys and lists of indices as values.
+        :rtype: dict
         """
         disulfide_list = self.SSList
 
@@ -304,40 +315,26 @@ class DisulfideLoader:
 
         eightorbin = None
 
-        if "0" in clsid:
-            eightorbin = self.tclass.classdf
+        if base == 8:
+            eightorbin = self.tclass.eightclass_dict
+        elif base == 2:
+            eightorbin = self.tclass.binaryclass_dict
         else:
-            if base == 8:
-                eightorbin = self.tclass.eightclass_df
-            elif base == 6:
-                eightorbin = self.tclass.sixclass_df
+            raise ValueError("Invalid base value.")
 
-        tot_classes = eightorbin.shape[0]
+        ss_ids = eightorbin[clsid]
+
+        tot_ss = len(eightorbin)
         class_disulfides = DisulfideList([], clsid, quiet=True)
 
         if verbose:
-            _pbar = tqdm(eightorbin.iterrows(), total=tot_classes, leave=True)
+            _pbar = tqdm(range(tot_ss), total=tot_ss, leave=True)
         else:
-            _pbar = eightorbin.iterrows()
+            _pbar = range(tot_ss)
 
-        for idx, row in _pbar:
-            _cls = row["class_id"]
-            if _cls == clsid:
-                ss_list = row["ss_id"]
-                if verbose:
-                    pbar = tqdm(ss_list, leave=True)
-                else:
-                    pbar = ss_list
-
-                for ssid in pbar:
-                    class_disulfides.append(self[ssid])
-
-                if verbose:
-                    pbar.set_postfix({"Done": ""})
-                break
-
-            if verbose:
-                _pbar.set_postfix({"Cnt": idx})
+        for idx in _pbar:
+            ssid = ss_ids[idx]
+            class_disulfides.append(self[ssid])
 
         return class_disulfides
 
@@ -364,7 +361,8 @@ class DisulfideLoader:
         Display information about the Disulfide database contained in `self`. if `quick` is False
         then display the total RAM used by the object. This takes some time to compute; approximately
         30 seconds on a 2024 MacBook Pro. M3 Max.
-        :param quick: If True, don't display the RAM used by the `DisulfideLoader` object.
+
+        :param memusg: If True, don't display the RAM used by the `DisulfideLoader` object.
         :return: None
         """
         vers = self.version
@@ -380,20 +378,20 @@ class DisulfideLoader:
         timestr = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.timestamp))
         ssMin, ssMax = self.SSList.minmax_energy
 
-        print("    =========== RCSB Disulfide Database Summary ==============")
+        print("    =========== RCSB Disulfide Database Summary ============")
         print(f"       =========== Built: {timestr} ==============")
-        print(f"PDB IDs present:                    {pdbs}")
-        print(f"Disulfides loaded:                  {tot}")
-        print(f"Average structure resolution:       {res:.2f} Å")
-        print(f"Lowest Energy Disulfide:            {ssMin.name}")
-        print(f"Highest Energy Disulfide:           {ssMax.name}")
-        print(f"Cα distance cutoff:                 {cutoff:.2f} Å")
-        print(f"Sγ distance cutoff:                 {sg_cutoff:.2f} Å")
+        print(f"PDB IDs present:                 {pdbs}")
+        print(f"Disulfides loaded:               {tot}")
+        print(f"Average structure resolution:    {res:.2f} Å")
+        print(f"Lowest Energy Disulfide:         {ssMin.name}")
+        print(f"Highest Energy Disulfide:        {ssMax.name}")
+        print(f"Cα distance cutoff:              {cutoff:.2f} Å")
+        print(f"Sγ distance cutoff:              {sg_cutoff:.2f} Å")
         if memusg:
             print(f"Total RAM Used:                     {ram:.2f} GB.")
-        print(f"    ================= proteusPy: {vers} =======================")
+        print(f"      ============== proteusPy: {vers} ===================")
 
-    def display_overlay(self, pdbid) -> None:
+    def display_overlay(self, pdbid, verbose=False) -> None:
         """
         Display all disulfides for a given PDB ID overlaid in stick mode against
         a common coordinate frame. This allows us to see all of the disulfides
@@ -413,10 +411,10 @@ class DisulfideLoader:
         Display the Disulfides from the PDB ID ```4yys```, overlaid onto
         a common reference (the proximal disulfides).
 
-        >>> PDB_SS.display_overlay('4yys')
+        >>> PDB_SS.display_overlay('4yys', verbose=False)
 
         You can also slice the loader and display as an overly.
-        >>> PDB_SS[:8].display_overlay()
+        >>> PDB_SS[:8].display_overlay(verbose=False)
 
         """
 
@@ -426,7 +424,7 @@ class DisulfideLoader:
             _logger.error("Cannot find key %s in SSBond DB", pdbid)
             return
 
-        ssbonds.display_overlay()
+        ssbonds.display_overlay(verbose=verbose)
         return
 
     def getTorsions(self, pdbID=None) -> pd.DataFrame:
@@ -453,15 +451,16 @@ class DisulfideLoader:
                 sel = self.TorsionDF["source"] == pdbID
                 res_df = self.TorsionDF[sel]
                 return res_df.copy()
-            except KeyError:
-                mess = f"! Cannot find key {pdbID} in SSBond DB"
-                raise DisulfideParseWarning(mess)
+            except KeyError as e:
+                mess = f"Cannot find key {pdbID} in SSBond DB"
+                _logger.error(mess)
+                raise DisulfideParseWarning(mess) from e
         else:
             return copy.deepcopy(self.TorsionDF)
 
     def list_binary_classes(self):
         """Enumerate the binary classes"""
-        for k, v in enumerate(self.tclass.classdict):
+        for k, v in enumerate(self.tclass.binaryclass_dict):
             print(f"Class: |{k}|, |{v}|")
 
     @property
@@ -519,37 +518,6 @@ class DisulfideLoader:
 
         plt.show()
 
-    def plot_binary_to_sixclass_incidence(
-        self, theme="light", save=False, savedir=".", verbose=False
-    ):
-        """
-        Plot the incidence of all sextant Disulfide classes for a given binary class.
-
-        :param loader: `proteusPy.DisulfideLoader` object
-        """
-
-        if verbose:
-            _logger.setLevel("INFO")
-
-        clslist = self.tclass.classdf["class_id"]
-        for cls in clslist:
-            sixcls = self.tclass.binary_to_six_class(cls)
-            df = self.enumerate_class_fromlist(sixcls, base=6)
-            self.plot_count_vs_class_df(
-                df,
-                title=cls,
-                theme=theme,
-                save=save,
-                savedir=savedir,
-                base=6,
-                verbose=verbose,
-            )
-        if verbose:
-            _logger.info("Graph generation complete.")
-            _logger.setLevel("WARNING")
-
-        return
-
     def plot_binary_to_eightclass_incidence(
         self,
         theme="light",
@@ -566,7 +534,7 @@ class DisulfideLoader:
         if verbose:
             _logger.setLevel("INFO")
 
-        clslist = self.tclass.classdf["class_id"]
+        clslist = self.tclass.binaryclass_df["class_id"]
         for cls in clslist:
             eightcls = self.tclass.binary_to_eight_class(cls)
             df = self.enumerate_class_fromlist(eightcls, base=8)
@@ -595,13 +563,18 @@ class DisulfideLoader:
         verbose=False,
     ):
         """
-        Plots a line graph of count vs class ID using Plotly for the given disulfide class. The
+        Plot a line graph of count vs class ID using Plotly for the given disulfide class. The
         base selects the class type to plot: 2, 6, or 8, for binary, sextant, or octant classes.
 
         :param df: A pandas DataFrame containing the data to be plotted.
         :param title: A string representing the title of the plot (default is 'title').
         :param theme: A string representing the name of the theme to use. Can be either 'notebook'
         or 'plotly_dark'. Default is 'plotly_dark'.
+        :param save: A boolean flag indicating whether to save the plot to a file. Default is False.
+        :param savedir: A string representing the directory to save the plot to. Default is '.'.
+        :param base: An integer representing the base value for the enumeration. Default is 8.
+        :param verbose: A boolean flag indicating whether to display verbose output. Default is False.
+        :raises ValueError: If an invalid base value is provided, (2 or 8s).
         :return: None
         """
 
@@ -612,14 +585,12 @@ class DisulfideLoader:
             _labels = {"class_id": "Octant Class ID", "count": "Count"}
             _prefix = "Octant"
 
-        elif base == 6:
-            _labels = {"class_id": "Sextant Class ID", "count": "Count"}
-            _prefix = "Sextant"
-
         elif base == 2:
             _labels = {"class_id": "Binary Class ID", "count": "Count"}
             _prefix = "Binary"
-            df = self.tclass.classdf
+            df = self.tclass.binaryclass_df
+        else:
+            raise ValueError("Invalid base. Must be 2 or 8.")
 
         fig = px.line(
             df,
@@ -644,7 +615,7 @@ class DisulfideLoader:
         fig.update_layout(autosize=True)
 
         if save:
-            fname = os.path.join(savedir, f"{title}_{_prefix}.png")
+            fname = Path(savedir) / f"{title}_{_prefix}.png"
 
             if verbose:
                 _logger.info("Saving %s plot to %s", title, fname)
@@ -655,7 +626,7 @@ class DisulfideLoader:
 
     def plot_count_vs_classid(self, cls=None, title="title", theme="light", base=8):
         """
-        Plots a line graph of count vs class ID using Plotly.
+        Plot a line graph of count vs class ID using Plotly.
 
         :param df: A pandas DataFrame containing the data to be plotted.
         :param title: A string representing the title of the plot (default is 'title').
@@ -663,18 +634,16 @@ class DisulfideLoader:
         :return: None
         """
 
-        _title = f"Binary Class: {title}"
+        _title = None
 
         if base == 8:
             _title = f"Octant Class: {title}"
-        elif base == 6:
-            _title = f"Sextant Class: {title}"
+        elif base == 2:
+            _title = f"Binary Class: {title}"
+        else:
+            raise ValueError("Invalid base. Must be 2 or 8")
 
-        df = (
-            self.tclass.classdf
-            if base == 2
-            else self.tclass.sixclass_df if base == 6 else self.tclass.eightclass_df
-        )
+        df = self.tclass.binaryclass_df if base == 2 else self.tclass.eightclass_df
 
         if cls is None:
             fig = px.line(df, x="class_id", y="count", title=_title)
@@ -702,7 +671,6 @@ class DisulfideLoader:
         """
         Enumerate the classes from a list of class IDs and return a DataFrame with class IDs and their corresponding counts.
 
-        :param loader: An instance of DisulfideLoader used to load the classes.
         :param sslist: A list of class IDs to enumerate.
         :param base: The base value for the enumeration, by default 8.
         :return: A DataFrame with columns "class_id" and "count" representing the class IDs and their corresponding counts.
@@ -724,37 +692,9 @@ class DisulfideLoader:
         sslist_df["count"] = y
         return sslist_df
 
-    def enumerate_sixclass_fromlist(self, sslist) -> pd.DataFrame:
-        """
-        Enumerates the six-class disulfide bonds from a list of class IDs and
-        returns a DataFrame with class IDs and their corresponding counts.
-
-        :param sslist: A list of eight-class disulfide bond class IDs.
-        :type sslist: list
-        :return: A DataFrame with columns "class_id" and "count" representing the
-        class IDs and their corresponding counts.
-        :rtype: pd.DataFrame
-        """
-        x = []
-        y = []
-
-        for sixcls in sslist:
-            if sixcls is not None:
-                _y = self.tclass.sslist_from_classid(sixcls, base=6)
-                # it's possible to have 0 SS in a class
-                if _y is not None:
-                    # only append if we have both.
-                    x.append(sixcls)
-                    y.append(len(_y))
-
-        sslist_df = pd.DataFrame(columns=["class_id", "count"])
-        sslist_df["class_id"] = x
-        sslist_df["count"] = y
-        return sslist_df
-
     def enumerate_eightclass_fromlist(self, sslist) -> pd.DataFrame:
         """
-        Enumerates the eight-class disulfide bonds from a list of class IDs and
+        Enumerate the eight-class disulfide bonds from a list of class IDs and
         returns a DataFrame with class IDs and their corresponding counts.
 
         :param sslist: A list of eight-class disulfide bond class IDs.
@@ -801,7 +741,7 @@ class DisulfideLoader:
         else:
             fname = LOADER_FNAME
 
-        _fname = os.path.join(savepath, fname)
+        _fname = Path(savepath) / fname
         if self.verbose:
             _logger.info("Writing %s...", _fname)
 
@@ -811,94 +751,44 @@ class DisulfideLoader:
         if self.verbose:
             _logger.info("Done saving loader.")
 
+    def plot_disulfides_vs_pdbid(self, cutoff=1):
+        """
+        Plots the number of disulfides versus pdbid.
+
+        :param cutoff: The minimum number of disulfides a PDB ID must have to be included in the plot.
+        :type cutoff: int
+        :return: A tuple containing the list of PDB IDs and the corresponding number of disulfides.
+        :rtype: tuple
+        """
+        pdbids = []
+        num_disulfides = []
+
+        for pdbid, disulfides in self.SSDict.items():
+            if len(disulfides) > cutoff:
+                pdbids.append(pdbid)
+                num_disulfides.append(len(disulfides))
+
+        plt.figure(figsize=(12, 6))
+        plt.bar(pdbids, num_disulfides, color="skyblue")
+        plt.xlabel("PDB ID")
+        plt.ylabel("Number of Disulfides")
+        plt.title(f"Number of Disulfides vs PDB ID with cutoff: {cutoff}")
+        plt.xticks(rotation=90)
+        plt.tight_layout()
+        plt.show()
+
+        return pdbids, num_disulfides
+
 
 # class ends
-
-
-def Download_PDB_SS(loadpath=DATA_DIR, verbose=False, subset=False):
-    """
-    Download the databases from my Google Drive.
-
-    :param loadpath: Path from which to load, defaults to DATA_DIR
-    :param verbose: Verbosity, defaults to False
-    """
-
-    fname = None
-    _fname = None
-
-    if subset:
-        fname = LOADER_SUBSET_FNAME
-        url = LOADER_SUBSET_URL
-    else:
-        fname = LOADER_FNAME
-        url = LOADER_ALL_URL
-
-    _fname = os.path.join(loadpath, fname)
-
-    _fname_sub = os.path.join(loadpath, fname)
-    _fname_all = os.path.join(loadpath, fname)
-    if verbose:
-        print("--> DisulfideLoader: Downloading Disulfide Database from Drive...")
-
-    gdown.download(url, str(_fname), quiet=False)
-    return
-
-
-def Download_PDB_SS_GitHub(loadpath=DATA_DIR, verbose=True, subset=False):
-    """
-    Download the databases from Github. Note: if you change the database these sizes will
-    need to be changed!
-
-    :param loadpath: Path from which to load, defaults to DATA_DIR
-    :param verbose: Verbosity, defaults to True
-    """
-
-    _good1 = 0  # all data
-    _good2 = 0  # subset data
-
-    _fname_sub = os.path.join(loadpath, LOADER_SUBSET_FNAME)
-    _fname_all = os.path.join(loadpath, LOADER_FNAME)
-
-    _all_length = 340371775
-    _subset_length = 9636086
-
-    if verbose:
-        print("--> DisulfideLoader: Downloading Disulfide Database from GitHub...")
-
-    _, headers = urllib.request.urlretrieve(
-        "https://github.com/suchanek/proteusPy/raw/master/data/PDB_SS_ALL_LOADER.pkl",
-        _fname_all,
-    )
-    num_bytes = headers.get("content-length")
-    if num_bytes == _all_length:
-        _good1 = 1
-    else:
-        print(f"--> Read: {num_bytes}, expecting: {_all_length}")
-
-    if subset:
-        if verbose:
-            print(
-                "--> DisulfideLoader: Downloading Disulfide Subset Database from GitHub..."
-            )
-
-        _, headers = urllib.request.urlretrieve(
-            "https://github.com/suchanek/proteusPy/raw/master/data/PDB_SS_SUBSET_LOADER.pkl",
-            _fname_sub,
-        )
-        num_bytes = headers.get("content-length")
-        if num_bytes == _subset_length:
-            _good2 = 1
-        else:
-            print(f"--> Read: {num_bytes}, expecting: {_subset_length}")
-    return _good1 + _good2
 
 
 def Load_PDB_SS(
     loadpath=DATA_DIR,
     verbose=False,
     subset=False,
-    cutoff=-1.0,
-    sg_cutoff=-1.0,
+    cutoff=CA_CUTOFF,
+    sg_cutoff=SG_CUTOFF,
     force=False,
 ) -> DisulfideLoader:
     """
@@ -914,80 +804,52 @@ def Load_PDB_SS(
     :type subset: bool
     :return: The loaded Disulfide database
     :rtype: DisulfideList
+
+    Example:
+    >>> from proteusPy import Load_PDB_SS, create_logger
+    >>> import logging
+    >>> _logger = create_logger("testing")
+    >>> _logger.setLevel(logging.WARNING)
+    >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
+    >>> PDB_SS[0]
+    <Disulfide 6dmb_203A_226A, Source: 6dmb, Resolution: 3.0 Å>
+
     """
     # normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy
     # distribution. In that case we need to download the files for all disulfides and the subset
-    # from the GitHub.
+    # from my Google Drive. This is a one-time operation.
 
-    _good1 = False  # all data
-    _good2 = False  # subset data
+    _fname_sub = Path(loadpath) / LOADER_SUBSET_FNAME
+    _fname_all = Path(loadpath) / LOADER_FNAME
+    _fpath = _fname_sub if subset else _fname_all
 
-    _fname_sub = os.path.join(loadpath, LOADER_SUBSET_FNAME)
-    _fname_all = os.path.join(loadpath, LOADER_FNAME)
-
-    if subset:
-        _logger.info(f"Reading Disulfide subset loader: {_fname_sub}... ")
-
-        if not os.path.exists(_fname_sub) or force is True:
-            _logger.info(f"Creating subset loader: {_fname_sub}... ")
-
-            loader = Bootstrap_PDB_SS(
-                loadpath=loadpath,
-                verbose=verbose,
-                subset=True,
-                force=force,
-                cutoff=cutoff,
-                sg_cutoff=sg_cutoff,
-            )
-            loader.save(
-                savepath=loadpath,
-                subset=True,
-                cutoff=cutoff,
-                sg_cutoff=sg_cutoff,
-            )
-            return loader
-
+    if not _fpath.exists() or force is True:
         if verbose:
-            print(f"-> load_PDB_SS(): Reading {_fname_sub}... ")
-            _logger.info(f"Reading disulfides from: {_fname_sub}... ")
+            _logger.info(f"Bootstrapping new loader: {str(_fpath)}... ")
 
-        with open(_fname_sub, "rb") as f:
-            subloader = pickle.load(f)
-        return subloader
-    else:
-        _logger.info(f"Reading disulfides from: {_fname_all}... ")
-        if not os.path.exists(_fname_all) or force is True:
-            _logger.info(f"Creating full loader: {_fname_all}... ")
+        loader = Bootstrap_PDB_SS(
+            loadpath=loadpath,
+            verbose=verbose,
+            subset=subset,
+            force=force,
+            cutoff=cutoff,
+            sg_cutoff=sg_cutoff,
+        )
+        loader.save(
+            savepath=loadpath,
+            subset=subset,
+            cutoff=cutoff,
+            sg_cutoff=sg_cutoff,
+        )
+        return loader
 
-            loader = Bootstrap_PDB_SS(
-                loadpath=loadpath,
-                verbose=verbose,
-                subset=False,
-                force=force,
-                cutoff=cutoff,
-                sg_cutoff=sg_cutoff,
-            )
-            loader.save(
-                savepath=loadpath,
-                subset=False,
-                cutoff=cutoff,
-                sg_cutoff=sg_cutoff,
-            )
-            if verbose:
-                print(f"-> load_PDB_SS(): Done Saving {_fname_all}... ")
-                _logger.info(f"Done saving disulfides to: {_fname_all}... ")
-            return loader
+    if verbose:
+        _logger.info("Reading disulfides from: %s...", _fpath)
 
-        if verbose:
-            print(f"-> load_PDB_SS(): Reading {_fname_all}... ")
-            _logger.info(f"Reading disulfides from: {_fname_all}... ")
-
-        with open(_fname_all, "rb") as f:
-            loader = pickle.load(f)
-
-        if verbose:
-            print(f"-> load_PDB_SS(): Done Reading {_fname_all}... ")
-            _logger.info(f"Done reading disulfides from: {_fname_all}... ")
+    with open(_fpath, "rb") as f:
+        loader = pickle.load(f)
+    if verbose:
+        _logger.info("Done reading disulfides from: %s...", _fpath)
 
     return loader
 
@@ -1010,8 +872,10 @@ def Bootstrap_PDB_SS(
 
     :param loadpath: Path from which to load the data, defaults to DATA_DIR
     :type loadpath: str
-    :param cutoff: Cutoff value for disulfide loading, defaults to 8.0
+    :param cutoff: Cutoff value for disulfide loading, defaults to -1.0 (no filtering)
     :type cutoff: float
+    :param sg_cutoff: Cutoff value for disulfide loading, defaults to -1.0 (no filtering)
+    :type sg_cutoff: float
     :param verbose: Flag to enable verbose logging, defaults to False
     :type verbose: bool
     :param subset: Flag to indicate whether to load a subset of the data, defaults to False
@@ -1025,16 +889,21 @@ def Bootstrap_PDB_SS(
     fname = SS_PICKLE_FILE
     url = SS_LIST_URL
 
-    _fname = os.path.join(loadpath, fname)
+    _fname = Path(loadpath) / fname
 
-    if not os.path.exists(_fname) or force is True:
+    if not _fname.exists() or force is True:
         if verbose:
             _logger.info("Downloading Disulfide Database from Drive...")
         gdown.download(url, str(_fname), quiet=False)
 
-    full_path = os.path.join(loadpath, _fname)
+    full_path = Path(loadpath) / _fname
     if verbose:
-        _logger.info("Building loader from: %s...", full_path)
+        _logger.info(
+            "Building loader from: %s with cutoffs %f, %f...",
+            full_path,
+            cutoff,
+            sg_cutoff,
+        )
 
     loader = DisulfideLoader(
         datadir=DATA_DIR,

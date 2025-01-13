@@ -5,6 +5,41 @@ Notable changes to the ``proteusPy`` project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.98.3] - 2024-1-12
+
+### Added
+
+- ``DisulfideExtractor_mp.py`` moved into the package as a callable module.
+
+  ``proteusPy.DisulfideExtractor`` from command line will launch the program
+
+- Incorporated consensus structures into the ``DisulfideClass_Constructor`` object. This presumes these have been generated. The consensus structures are created through the program ``DisulfideClass_Analysis.py``.
+
+### Changed
+
+- Corrected an error in ``DisulfideLoader`` that failed to initialize the torsion dataframe properly after filtering.
+- Change to setup.py - 2q7q_seqsim.csv was not being included
+
+### Fixed
+
+- Sg_distance was not being calculated with ``Disulfide.build_yourself()``
+- phi and psi were not correctly populating in the torsion dataframe.
+- There was a subtle error in the ``DisulfideLoader`` initialization that led to internal database inconsistencies after filtering. This has been corrected.
+
+## [v0.98.2] - 2024-12-30
+
+### Added
+
+- ``qt5viewer.py`` moved into the package as a callable module.
+
+``proteusPy.qt5viewer`` from command line will launch the program
+
+### Changed
+
+- logging cleanup in ``DisulfideLoader.py`` and ``DisulfideList.py``.
+- ongoing documentation tweaks, cleanup
+
+
 ## [v0.98.1] - 2024-12-30
 
 ### Added

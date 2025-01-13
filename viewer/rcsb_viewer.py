@@ -853,7 +853,7 @@ def save_as_file():
 set_window_title()
 set_widgets_from_state()
 
-render_win = pn.Column(menu, vtkpan, reloadable_app.servable())
+render_win = pn.Column(vtkpan, reloadable_app.servable())
 render_win.servable()
 
 # end of file

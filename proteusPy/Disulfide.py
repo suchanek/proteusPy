@@ -5,6 +5,7 @@ It represents the core of the current implementation of *proteusPy*.
 
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 Author: Eric G. Suchanek, PhD
+Last Modification: 2025-01-02 12:55:02
 """
 
 # pylint: disable=W1203 # use of print
@@ -1135,6 +1136,7 @@ class Disulfide:
         self._compute_rho()
         self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
         self.cb_distance = distance3d(self.cb_prox, self.cb_dist)
+        self.sg_distance = distance3d(self.sg_prox, self.sg_dist)
         self.torsion_array = np.array([chi1, chi2, chi3, chi4, chi5])
         self.missing_atoms = True
         self.modelled = True
@@ -2048,7 +2050,7 @@ class Disulfide:
                 pv.set_plot_theme("document")
 
         if verbose:
-            print(f"-> screenshot(): Rendering screenshot to file {fname}")
+            _logger.info("Rendering screenshot to file {fname}")
 
         if single:
             pl = pv.Plotter(window_size=WINSIZE)
@@ -2067,9 +2069,14 @@ class Disulfide:
             if shadows:
                 pl.enable_shadows()
 
-            pl.show(auto_close=False)
-            pl.screenshot(fname)
-            pl.clear()
+            pl.show(auto_close=False)  # allows for manipulation
+            # Take the screenshot after ensuring the plotter is still active
+            try:
+                pl.screenshot(fname)
+                if verbose:
+                    print(f" -> display_overlay(): Saved image to: {fname}")
+            except RuntimeError as e:
+                _logger.error(f"Error saving screenshot: {e}")
 
         else:
             pl = pv.Plotter(window_size=WINSIZE, shape=(2, 2))
@@ -2126,8 +2133,15 @@ class Disulfide:
             if shadows:
                 pl.enable_shadows()
 
-            pl.show(auto_close=False)
-            pl.screenshot(fname)
+            # Take the screenshot after ensuring the plotter is still active
+            pl.show(auto_close=False)  # allows for manipulation
+
+            try:
+                pl.screenshot(fname)
+                if verbose:
+                    _logger.info(f" -> display_overlay(): Saved image to: {fname}")
+            except RuntimeError as e:
+                _logger.error(f"Error saving screenshot: {e}")
 
         if verbose:
             print(f"Saved: {fname}")
@@ -2342,7 +2356,7 @@ class Disulfide:
 
         >>> tot = low_energy_neighbors.length
         >>> print(f'Neighbors: {tot}')
-        Neighbors: 9
+        Neighbors: 8
         >>> low_energy_neighbors.display_overlay(light="auto")
 
         """

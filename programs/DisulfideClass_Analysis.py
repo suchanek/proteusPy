@@ -1,5 +1,6 @@
 # pylint: disable=C0301
-# Last modification: 2024-12-28 19:36:28 -egs-
+# pylint: disable=C0103
+# Last modification: 2025-01-04 12:38:52 -egs-
 
 """
 Disulfide class consensus structure extraction using `proteusPy.Disulfide` package. Disulfide
@@ -84,8 +85,9 @@ global SAVE_DIR location. Binary analysis takes approximately 20 minutes with oc
 Update 8/28/2024 - multithreading is implemented and runs well up to around 10 threads on a 2023 M3 Max Macbook Pro.
 octant analysis takes around 22 minutes with 6 threads. Binary analysis takes around 25 minutes with 6 threads.
 
-Author: Eric G. Suchanek, PhD. Last Modified: 8/27/2024
+Author: Eric G. Suchanek, PhD. Last Modified: 2025-01-06 19:29:49
 """
+
 # plyint: disable=C0103
 
 import argparse
@@ -97,29 +99,20 @@ import time
 from datetime import timedelta
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from colorama import Fore, Style, init
 from tqdm import tqdm
 
-from proteusPy import (
-    Disulfide,
-    DisulfideList,
-    DisulfideLoader,
-    Load_PDB_SS,
-    configure_master_logger,
-    create_logger,
-    set_logger_level,
-    toggle_stream_handler,
-)
-from proteusPy.ProteusGlobals import SS_CONSENSUS_BIN_FILE, SS_CONSENSUS_OCT_FILE
+import proteusPy as pp
+from proteusPy import CA_CUTOFF, SG_CUTOFF, SS_CONSENSUS_BIN_FILE, SS_CONSENSUS_OCT_FILE
 
 HOME_DIR = Path.home()
 PDB = Path(os.getenv("PDB", HOME_DIR / "pdb"))
 
 DATA_DIR = PDB / "data"
 SAVE_DIR = HOME_DIR / "Documents" / "proteusPyDocs" / "classes"
+MODULE_DIR = HOME_DIR / "repos" / "proteusPy" / "proteusPy" / "data"
 REPO_DIR = HOME_DIR / "repos" / "proteusPy" / "data"
 
 OCTANT = SAVE_DIR / "octant"
@@ -141,10 +134,10 @@ PBAR_COLS = 78
 # Initialize colorama
 init(autoreset=True)
 
-_logger = create_logger("DisulfideClass_Analysis")
+_logger = pp.create_logger("__name__")
 
-configure_master_logger("DisulfidClass_Analysis.log")
-set_logger_level("DisulfideClass_Analysis", "INFO")
+pp.configure_master_logger("DisulfidClass_Analysis.log")
+pp.set_logger_level("DisulfideClass_Analysis", "INFO")
 
 
 def get_args():
@@ -236,12 +229,12 @@ def get_args():
 
 # task definition
 def task(
-    loader: DisulfideLoader,
+    loader: pp.DisulfideLoader,
     overall_pbar: tqdm,
     eight_or_bin: pd.DataFrame,
     start_idx: int,
     end_idx: int,
-    result_list: DisulfideList,
+    result_list: pp.DisulfideList,
     pbar: tqdm,
     total_ss: int,
     cutoff: float,
@@ -271,7 +264,6 @@ def task(
     """
 
     for idx in range(start_idx, end_idx):
-
         row = eight_or_bin.iloc[idx]
         cls = row["class_id"]
         ss_list = row["ss_id"]
@@ -306,15 +298,15 @@ def task(
 
             try:
                 class_disulfides_array[idx] = loader[ssid]
-            except Exception as e:
-                _logger.error(f"Error: %s", e)
+            except KeyError as e:
+                _logger.error("Error: %s", e)
 
             if (idx + 1) % update_freq == 0 or (idx + 1) == len(ss_list):
                 remaining = len(ss_list) - (idx + 1)
                 task_pbar.update(update_freq if remaining >= update_freq else remaining)
         task_pbar.close()
 
-        class_disulfides = DisulfideList(
+        class_disulfides = pp.DisulfideList(
             list(class_disulfides_array), cls, quiet=True, fast=True
         )
 
@@ -325,8 +317,8 @@ def task(
 
         avg_conformation = class_disulfides.average_conformation
 
-        ssname = f"{cls}_avg"
-        exemplar = Disulfide(ssname, torsions=avg_conformation)
+        ssname = f"{cls}"
+        exemplar = pp.Disulfide(ssname, torsions=avg_conformation)
         result_list.append(exemplar)
         overall_pbar.update(1)
 
@@ -335,48 +327,45 @@ def task(
 
 
 def analyze_classes_threaded(
-    loader: DisulfideLoader,
+    loader: pp.DisulfideLoader,
     do_graph=False,
     cutoff=0.0,
-    num_threads=6,
+    num_threads=8,
     verbose=False,
     do_octant=True,
     prefix="ss",
-) -> DisulfideList:
+) -> pp.DisulfideList:
     """
-    Analyze the six classes of disulfide bonds.
+    Analyze the classes of disulfide bonds.
 
     :param loader: The ``proteusPy.DisulfideLoader`` object.
     :param do_graph: Whether or not to display torsion statistics graphs. Default is True.
     :param cutoff: The cutoff percentage for each class. If the percentage of disulfides for a class is below
                    this value, the class will be skipped. Default is 0.1.
-    :param num_threads: Number of threads to use for processing. Default is 4.
+    :param num_threads: Number of threads to use for processing. Default is 8.
 
     :return: A list of disulfide bonds, where each disulfide bond represents the average conformation for a class.
     """
-    # global OCTANT, BINARY
 
     save_dir = None
 
     if do_octant:
-        # class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_OCT_FILE)
-        class_filename = DATA_DIR / SS_CONSENSUS_OCT_FILE
+        class_filename = Path(DATA_DIR) / SS_CONSENSUS_OCT_FILE
         save_dir = OCTANT
         eight_or_bin = loader.tclass.eightclass_df
         tot_classes = eight_or_bin.shape[0]
-        res_list = DisulfideList([], "SS_8class_Avg_SS")
+        res_list = pp.DisulfideList([], "SS_8class_Avg_SS")
         pix = octant_classes_vs_cutoff(loader, cutoff)
         if verbose:
             print(
                 f"--> analyze_eight_classes(): Expecting {pix} graphs for the octant classes."
             )
     else:
-        # class_filename = os.path.join(DATA_DIR, SS_CONSENSUS_BIN_FILE)
         class_filename = Path(DATA_DIR) / SS_CONSENSUS_BIN_FILE
         save_dir = BINARY
-        eight_or_bin = loader.tclass.classdf
+        eight_or_bin = loader.tclass.binaryclass_ktdf
         tot_classes = eight_or_bin.shape[0]
-        res_list = DisulfideList([], "SS_32class_Avg_SS")
+        res_list = pp.DisulfideList([], "SS_32class_Avg_SS")
         pix = 32
 
     total_ss = len(loader.SSList)
@@ -447,7 +436,7 @@ def analyze_classes_threaded(
 
 
 def analyze_classes(
-    loader: DisulfideLoader,
+    loader: pp.DisulfideLoader,
     binary: bool,
     octant: bool,
     threads: int = 4,
@@ -506,7 +495,7 @@ def analyze_classes(
     return
 
 
-def octant_classes_vs_cutoff(loader: DisulfideLoader, cutoff):
+def octant_classes_vs_cutoff(loader: pp.DisulfideLoader, cutoff):
     """
     Return number of members for the octant class for a given cutoff value.
 
@@ -526,7 +515,7 @@ def update_repository(source_dir, repo_dir, verbose=True, binary=False, octant=F
         dest = Path(repo_dir) / SS_CONSENSUS_BIN_FILE
 
         if verbose:
-            print(f"Copying {source} to {dest}")
+            print(f"Copying binary consensus classes from: {source} to {dest}")
 
         shutil.copy(source, dest)
 
@@ -535,11 +524,9 @@ def update_repository(source_dir, repo_dir, verbose=True, binary=False, octant=F
         dest = Path(repo_dir) / SS_CONSENSUS_OCT_FILE
 
         if verbose:
-            print(f"Copying consensus structures from {source} to {dest}")
+            print(f"Copying octant consensus structures from {source} to {dest}")
 
         shutil.copy(source, dest)
-
-    return
 
 
 def main():
@@ -585,21 +572,11 @@ def main():
         f"Loading PDB SS data...\n"
     )
 
-    PDB_SS = Load_PDB_SS(verbose=False, subset=False)
-    PDB_SS.describe()
-
-    analyze_classes(
-        PDB_SS,
-        binary,
-        octant,
-        threads=threads,
-        do_graph=do_graph,
-        cutoff=cutoff,
-    )
-
     if do_update:
         print("Updating repository with consensus classes.")
+
         update_repository(DATA_DIR, REPO_DIR, binary=binary, octant=octant)
+        update_repository(DATA_DIR, MODULE_DIR, binary=binary, octant=octant)
 
         if forge == "miniforge3":
             venv_dir = MINIFORGE_DIR / env / VENV_DIR
@@ -607,9 +584,25 @@ def main():
             venv_dir = MAMBAFORGE_DIR / env / VENV_DIR
 
         if verbose:
-            print(f"Copying SS files from: {DATA_DIR} to {venv_dir}")
+            print(f"Updating environment SS class files from: {DATA_DIR} to {venv_dir}")
 
         update_repository(DATA_DIR, venv_dir, binary=binary, octant=octant)
+        return
+
+    pdb_ss = pp.Load_PDB_SS(
+        verbose=True, subset=False, cutoff=CA_CUTOFF, sg_cutoff=SG_CUTOFF
+    )
+    # pdb_ss = pp.DisulfideLoader(verbose=True, subset=False, cutoff=, sg_cutoff=-1)
+    pdb_ss.describe()
+
+    analyze_classes(
+        pdb_ss,
+        binary,
+        octant,
+        threads=threads,
+        do_graph=do_graph,
+        cutoff=cutoff,
+    )
 
 
 if __name__ == "__main__":

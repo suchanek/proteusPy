@@ -18,7 +18,8 @@ proteusPy documentation, linked to from:
 http://suchanek.github.io/proteusPy/
 
 
-Eric G. Suchanek, PhD., suchanek@mac.com
+Author: Eric G. Suchanek, PhD., suchanek@mac.com
+Last Modification: 2025-01-04 14:51:52
 """
 
 # pylint: disable=E0011
@@ -28,7 +29,7 @@ import sys
 from pathlib import Path
 
 try:
-    from setuptools import Command, Extension, setup
+    from setuptools import Command, Extension, find_packages, setup
 except ImportError:
     sys.exit(
         "We need the Python library setuptools to be installed. "
@@ -74,13 +75,14 @@ setup(
     author="Eric G. Suchanek, PhD",
     author_email="suchanek@mac.com",
     license="BSD",
-    requires_python="3.12",
-    packages=["proteusPy"],
+    python_requires=">=3.12",  # corrected from 'requires_python'
+    packages=find_packages(),
     keywords="proteusPy suchanek disulfide",
     tests_require=["pytest"],
     test_suite="tests",
     setup_requires=["setuptools", "pytest-runner", "wheel"],
     install_requires=requirements,
+    include_package_data=True,
     extras_require={
         "dev": [
             "pytest",
@@ -109,19 +111,17 @@ setup(
             "wheel",
         ],
     },
-    source="https://github.com/suchanek/proteusPy/",
     project_urls={
         "Documentation": "https://suchanek.github.io/proteusPy/",
         "Source": "https://github.com/suchanek/proteusPy/",
         "Tracker": "https://github.com/suchanek/proteusPy/issues",
     },
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: BSD License",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
         "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Topic :: Scientific/Engineering",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
@@ -129,16 +129,16 @@ setup(
     ],
     package_data={
         "proteusPy": [
+            "README.md",
+            "CHANGELOG.md",
             "data/pdb5rsa.ent",
             "data/ss_completed.txt",
             "data/ss_query.json",
             "data/ss_ids.txt",
             "data/SS_consensus_class_oct.pkl",
-            "data/SS_consensus_class_sext.pkl",
             "data/SS_consensus_class_32.pkl",
             "data/2q7q_seqsim.csv",
-            "data/PDB_SS_class_definitions.csv",
-        ]
+        ],
     },
     exclude_package_data={
         "proteusPy": [
@@ -150,6 +150,7 @@ setup(
     entry_points={
         "console_scripts": [
             "proteusPy.qt5viewer = proteusPy.qt5viewer:main",
+            "proteusPy.DisulfideExtractor = proteusPy.DisulfideExtractor_mp:main",
         ]
     },
     zip_safe=False,
