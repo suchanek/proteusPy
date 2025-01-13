@@ -363,7 +363,7 @@ def analyze_classes_threaded(
     else:
         class_filename = Path(DATA_DIR) / SS_CONSENSUS_BIN_FILE
         save_dir = BINARY
-        eight_or_bin = loader.tclass.binaryclass_df
+        eight_or_bin = loader.tclass.binaryclass_ktdf
         tot_classes = eight_or_bin.shape[0]
         res_list = pp.DisulfideList([], "SS_32class_Avg_SS")
         pix = 32
