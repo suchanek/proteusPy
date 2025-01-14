@@ -125,7 +125,17 @@ class DisulfideLoader:
         try:
             # Check if the file exists before attempting to open it
             if not full_path.exists():
-                raise FileNotFoundError(f"File not found: {full_path}")
+                fname = SS_PICKLE_FILE
+                url = SS_LIST_URL
+
+                _fname = Path(DATA_DIR) / fname
+
+                if not _fname.exists():
+                    if verbose:
+                        _logger.info(
+                            "Master SS list unavailable. Downloading Disulfide Database from Drive..."
+                        )
+                    gdown.download(url, str(_fname), quiet=False)
 
             with open(full_path, "rb") as f:
                 sslist = pickle.load(f)
@@ -169,6 +179,7 @@ class DisulfideLoader:
 
             if self.verbose:
                 _logger.info("Loader initialization complete.")
+                self.describe()
 
         except FileNotFoundError as e:
             _logger.error("File not found: %s", full_path)
@@ -183,12 +194,12 @@ class DisulfideLoader:
         """
         Implements indexing and slicing to retrieve DisulfideList objects from the
         DisulfideLoader. Supports:
-        
+
         - Integer indexing to retrieve a single DisulfideList
         - Slicing to retrieve a subset as a DisulfideList
         - Lookup by PDB ID to retrieve all Disulfides for that structure
         - Lookup by full disulfide name
-        
+
         :param index: The index or key to retrieve the DisulfideList.
         :type index: int, slice, str
         :return: A DisulfideList object or a subset of it.
@@ -779,6 +790,29 @@ class DisulfideLoader:
 
         return pdbids, num_disulfides
 
+    def plot_distances(self, distance_type="ca", cutoff=-1, flip=False):
+        """
+        Plot the distances for the disulfides in the loader.
+
+        :param distance_type: The type of distance to plot ('ca' for Cα-Cα distance, 'sg' for Sγ-Sγ distance).
+        :type distance_type: str
+        :param cutoff: The cutoff value for the distance, defaults to -1 (no cutoff).
+        :type cutoff: float
+        :param flip: Whether to flip the plot. (<= or >), defaults to <
+        :type flip: bool
+        :return: None
+        :rtype: None
+        """
+        self.SSList.plot_distances(
+            distance_type=distance_type, cutoff=cutoff, flip=flip
+        )
+
+    def plot_deviation_histograms(self, verbose=True):
+        """
+        Plot histograms for Bondlength_Deviation, Angle_Deviation, and Ca_Distance.
+        """
+        self.SSList.plot_deviation_histograms(verbose=verbose)
+
 
 # class ends
 
@@ -850,6 +884,7 @@ def Load_PDB_SS(
         loader = pickle.load(f)
     if verbose:
         _logger.info("Done reading disulfides from: %s...", _fpath)
+        loader.describe()
 
     return loader
 
