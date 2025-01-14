@@ -17,8 +17,6 @@ __pdoc__ = {
 
 import logging
 
-DEFAULT_LOG_LEVEL = logging.WARNING
-
 # Set the default (global) logger level to CRITICAL
 logging.basicConfig(level=logging.CRITICAL)
 
@@ -78,6 +76,7 @@ from .DisulfideList import (
 )
 from .DisulfideLoader import Bootstrap_PDB_SS, DisulfideLoader, Load_PDB_SS
 from .logger_config import (
+    DEFAULT_LOG_LEVEL,
     configure_master_logger,
     create_logger,
     disable_stream_handlers_for_namespace,
@@ -170,7 +169,9 @@ from .vector3D import (
     rms_difference,
 )
 
+_logger.setLevel(logging.INFO)
 _logger.info("ProteusPy %s initialized ", __version__)
+
 _logger.setLevel(DEFAULT_LOG_LEVEL)
 
 # end of file

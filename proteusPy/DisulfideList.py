@@ -37,7 +37,9 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import plotly.express as px
 import plotly.graph_objects as go
+import plotly.io as pio
 import pyvista as pv
 from plotly.subplots import make_subplots
 
@@ -48,8 +50,9 @@ from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, PDB_DIR, WINSIZE
 from proteusPy.utility import get_jet_colormap, get_theme, grid_dimensions
 
-_logger = create_logger(__name__)
+# pio.renderers.default = "png"  # or 'svg'
 
+_logger = create_logger(__name__)
 
 # Set the figure sizes and axis limits.
 DPI = 220
@@ -57,7 +60,6 @@ WIDTH = 6.0
 HEIGHT = 6.0
 TORMIN = -179.9
 TORMAX = 180.0
-
 
 Torsion_DF_Cols = [
     "source",
@@ -1249,11 +1251,13 @@ class DisulfideList(UserList):
             raise TypeError("The value must be an instance of Disulfide.")
         return value
 
-    def create_deviation_dataframe(self):
+    def create_deviation_dataframe(self, verbose=False):
         """
         Create a DataFrame with columns PDB_ID, SS_Name, Angle_Deviation, Distance_Deviation,
         Ca Distance from a list of disulfides.
 
+        :param verbose: Whether to display a progress bar.
+        :type verbose: bool
         :return: DataFrame containing the disulfide information.
         :rtype: pd.DataFrame
         """
@@ -1268,35 +1272,141 @@ class DisulfideList(UserList):
             "Sg_Distance": [],
         }
 
-        # Collect data in batches
-        pdb_ids = []
-        resolutions = []
-        ss_names = []
-        angle_deviations = []
-        bondlength_deviations = []
-        ca_distances = []
-        sg_distances = []
+        if verbose:
+            pbar = tqdm(disulfide_list, desc="Processing...", leave=False)
+        else:
+            pbar = disulfide_list
 
-        for ss in tqdm(disulfide_list, desc="Processing..."):
-            pdb_ids.append(ss.pdb_id)
-            resolutions.append(ss.resolution)
-            ss_names.append(ss.name)
-            angle_deviations.append(ss.bond_angle_ideality)
-            bondlength_deviations.append(ss.bond_length_ideality)
-            ca_distances.append(ss.ca_distance)
-            sg_distances.append(ss.sg_distance)
-
-        # Extend the data dictionary in one go
-        data["PDB_ID"].extend(pdb_ids)
-        data["Resolution"].extend(resolutions)
-        data["SS_Name"].extend(ss_names)
-        data["Angle_Deviation"].extend(angle_deviations)
-        data["Bondlength_Deviation"].extend(bondlength_deviations)
-        data["Ca_Distance"].extend(ca_distances)
-        data["Sg_Distance"].extend(sg_distances)
+        for ss in pbar:
+            data["PDB_ID"].append(ss.pdb_id)
+            data["Resolution"].append(ss.resolution)
+            data["SS_Name"].append(ss.name)
+            data["Angle_Deviation"].append(ss.bond_angle_ideality)
+            data["Bondlength_Deviation"].append(ss.bond_length_ideality)
+            data["Ca_Distance"].append(ss.ca_distance)
+            data["Sg_Distance"].append(ss.sg_distance)
 
         df = pd.DataFrame(data)
         return df
+
+    def extract_distances(self, distance_type="sg", comparison="less", cutoff=4):
+        """
+        Extract and filter the distance values from the disulfide list based on the specified type and comparison.
+
+        :param disulfide_list: List of disulfide objects.
+        :param distance_type: Type of distance to extract ('sg' or 'ca').
+        :param comparison: Comparison operation ('less' or 'greater').
+        :param cutoff: Cutoff value for filtering distances.
+        :return: List of filtered distance values.
+        """
+        disulfide_list = self.data
+        distances = filtered_distances = []
+
+        match distance_type:
+            case "sg":
+                distances = [ds.sg_distance for ds in disulfide_list]
+            case "ca":
+                distances = [ds.ca_distance for ds in disulfide_list]
+            case _:
+                raise ValueError("Invalid distance_type. Must be 'sg' or 'ca'.")
+
+        if cutoff == -1.0:
+            return distances
+
+        match comparison:
+            case "less":
+                filtered_distances = [d for d in distances if d < cutoff]
+            case "greater":
+                filtered_distances = [d for d in distances if d >= cutoff]
+            case _:
+                raise ValueError("Invalid comparison. Must be 'less' or 'greater'.")
+
+        return filtered_distances
+
+    def plot_distances(self, distance_type="sg", cutoff=-1, flip=False):
+        """
+        Plot the distance values as a histogram using plotly express.
+
+        :param distances: List of distance values.
+        :param distance_type: Type of distance to plot ('sg' or 'ca').
+        :param cutoff: Cutoff value for the x-axis title.
+        :param flip: Whether to flip the comparison in the x-axis title.
+        """
+        distances = self.extract_distances(distance_type, "less", cutoff)
+
+        match distance_type:
+            case "sg":
+                column_name = "SG Distance"
+                title = "Sγ Distance Distribution"
+                if cutoff == -1.0:
+                    xtitle = "All Sγ-Sγ Distances"
+                else:
+                    xtitle = (
+                        f"Sγ Distance < {cutoff} Å"
+                        if not flip
+                        else f"Sγ-Sγ Distance >= {cutoff} Å"
+                    )
+            case "ca":
+                column_name = "Ca Distance"
+                title = "Cα Distance Distribution"
+                if cutoff == -1.0:
+                    xtitle = "All Cα-Cα Distances"
+                else:
+                    xtitle = (
+                        f"Cα Distance < {cutoff} Å"
+                        if not flip
+                        else f"Cα-Cα Distance >= {cutoff} Å"
+                    )
+            case _:
+                raise ValueError("Invalid distance_type. Must be 'sg' or 'ca'.")
+
+        # Convert to a Pandas DataFrame with the appropriate column name
+        df = pd.DataFrame(distances, columns=[column_name])
+
+        fig = px.histogram(
+            df,
+            x=column_name,  # Use the column name for the x-axis
+            nbins=100,
+            title=title,
+        )
+        fig.update_layout(
+            xaxis_title=xtitle,
+            yaxis_title="Frequency",
+            yaxis_type="log",
+            bargap=0.2,
+        )
+        fig.show()
+
+    def plot_deviation_histograms(self, verbose=False):
+        """
+        Plot histograms for Bondlength_Deviation, Angle_Deviation, and Ca_Distance.
+        """
+        df = self.create_deviation_dataframe(verbose=verbose)
+
+        fig = px.histogram(
+            df,
+            x="Bondlength_Deviation",
+            nbins=300,
+            title="Bond Length Deviation (Angstrom)",
+        )
+
+        fig.update_layout(
+            xaxis_title="Bond Length Deviation, (Angstrom)",
+            yaxis_title="Frequency",
+            yaxis_type="log",
+        )
+        fig.show()
+
+        fig2 = px.histogram(
+            df, x="Angle_Deviation", nbins=300, title="Bond Angle Deviation (degrees)"
+        )
+        fig2.update_layout(
+            xaxis_title="Bond Angle Deviation, (degrees)",
+            yaxis_title="Frequency",
+            yaxis_type="log",
+        )
+
+        fig2.show()
 
     # class ends
 

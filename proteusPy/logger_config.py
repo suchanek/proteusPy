@@ -10,6 +10,7 @@ Last updated 2024-11-19 -egs-
 
 import logging
 from pathlib import Path
+DEFAULT_LOG_LEVEL = logging.WARNING
 
 
 def set_logging_level_for_all_handlers(log_level: int):
