@@ -70,7 +70,6 @@ from .DisulfideExceptions import (
 )
 from .DisulfideList import (
     DisulfideList,
-    calculate_torsion_statistics,
     extract_disulfide,
     load_disulfides_from_id,
 )

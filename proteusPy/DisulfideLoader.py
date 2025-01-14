@@ -813,6 +813,37 @@ class DisulfideLoader:
         """
         self.SSList.plot_deviation_histograms(verbose=verbose)
 
+    def display_torsion_statistics(
+        self,
+        display=True,
+        save=False,
+        fname="ss_torsions.png",
+        stats=False,
+        light="Auto",
+    ):
+        """
+        Display torsion and distance statistics for all Disulfides in the loader.
+
+        :param display: Whether to display the plot in the notebook. Default is True.
+        :type display: bool
+        :param save: Whether to save the plot as an image file. Default is False.
+        :type save: bool
+        :param fname: The name of the image file to save. Default is 'ss_torsions.png'.
+        :type fname: str
+        :param stats: Whether to return the DataFrame representing the statistics for `self`. Default is False.
+        :type stats: bool
+        :param light: Whether to use the 'plotly_light' or 'plotly_dark' template. Default is True.
+        :type light: bool
+        :return: None
+        """
+        self.SSList.display_torsion_statistics(
+            display=display,
+            save=save,
+            fname=fname,
+            stats=stats,
+            light=light,
+        )
+
 
 # class ends
 
