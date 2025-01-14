@@ -1377,9 +1377,18 @@ class DisulfideList(UserList):
         )
         fig.show()
 
-    def plot_deviation_histograms(self, verbose=False):
+    def plot_deviation_histograms(self, verbose=False) -> pd.DataFrame:
         """
         Plot histograms for Bondlength_Deviation, Angle_Deviation, and Ca_Distance.
+
+        This function creates and displays histograms for the bond length deviation,
+        bond angle deviation, and Cα distance from the disulfide list. The histograms
+        are displayed on a logarithmic scale for the y-axis.
+
+        :param verbose: Whether to display a progress bar.
+        :type verbose: bool
+        :return: Dataframe containing the disulfide deviation information.
+        :rtype: pandas.DataFrame
         """
         df = self.create_deviation_dataframe(verbose=verbose)
 
@@ -1407,6 +1416,8 @@ class DisulfideList(UserList):
         )
 
         fig2.show()
+
+        return df
 
     # class ends
 
