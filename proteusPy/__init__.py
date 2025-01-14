@@ -68,11 +68,7 @@ from .DisulfideExceptions import (
     DisulfideIOException,
     DisulfideParseWarning,
 )
-from .DisulfideList import (
-    DisulfideList,
-    extract_disulfide,
-    load_disulfides_from_id,
-)
+from .DisulfideList import DisulfideList, extract_disulfide, load_disulfides_from_id
 from .DisulfideLoader import Bootstrap_PDB_SS, DisulfideLoader, Load_PDB_SS
 from .logger_config import (
     DEFAULT_LOG_LEVEL,
@@ -157,6 +153,7 @@ from .utility import (
     remove_duplicate_ss,
     retrieve_git_lfs_files,
     save_list_to_file,
+    set_plotly_theme,
     sort_by_column,
 )
 from .vector3D import (

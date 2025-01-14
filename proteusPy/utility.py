@@ -1158,6 +1158,37 @@ def load_list_from_file(filename):
     return loaded_list
 
 
+def set_plotly_theme(theme):
+    """
+    Set the Plotly theme based on the provided theme parameter.
+
+    This function sets the default Plotly template to either 'plotly_white' or 'plotly_dark'
+    based on the input theme. If 'auto' is selected, the theme is determined automatically
+    based on the current system or application theme.
+
+    :param theme: The theme to set for Plotly. Must be 'auto', 'light', or 'dark'.
+    :type theme: str
+    :raises ValueError: If an invalid theme is provided.
+    :return: None
+    :rtype: None
+    """
+    from plotly import io as pio
+
+    match theme:
+        case "auto":
+            _theme = get_theme()
+            if _theme == "light":
+                pio.templates.default = "plotly_white"
+            else:
+                pio.templates.default = "plotly_dark"
+        case "light":
+            pio.templates.default = "plotly_white"
+        case "dark":
+            pio.templates.default = "plotly_dark"
+        case _:
+            raise ValueError("Invalid theme. Must be 'auto', 'light', or 'dark'.")
+
+
 if __name__ == "__main__":
     import doctest
 

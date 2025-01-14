@@ -134,6 +134,9 @@
             <li>
                     <a class="function" href="#load_list_from_file">load_list_from_file</a>
             </li>
+            <li>
+                    <a class="function" href="#set_plotly_theme">set_plotly_theme</a>
+            </li>
     </ul>
 
 
@@ -1323,12 +1326,43 @@
 </span><span id="L-1158"><a href="#L-1158"><span class="linenos">1158</span></a>    <span class="k">return</span> <span class="n">loaded_list</span>
 </span><span id="L-1159"><a href="#L-1159"><span class="linenos">1159</span></a>
 </span><span id="L-1160"><a href="#L-1160"><span class="linenos">1160</span></a>
-</span><span id="L-1161"><a href="#L-1161"><span class="linenos">1161</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="L-1162"><a href="#L-1162"><span class="linenos">1162</span></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">doctest</span>
-</span><span id="L-1163"><a href="#L-1163"><span class="linenos">1163</span></a>
-</span><span id="L-1164"><a href="#L-1164"><span class="linenos">1164</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
-</span><span id="L-1165"><a href="#L-1165"><span class="linenos">1165</span></a>
-</span><span id="L-1166"><a href="#L-1166"><span class="linenos">1166</span></a><span class="c1"># end of file</span>
+</span><span id="L-1161"><a href="#L-1161"><span class="linenos">1161</span></a><span class="k">def</span><span class="w"> </span><span class="nf">set_plotly_theme</span><span class="p">(</span><span class="n">theme</span><span class="p">):</span>
+</span><span id="L-1162"><a href="#L-1162"><span class="linenos">1162</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1163"><a href="#L-1163"><span class="linenos">1163</span></a><span class="sd">    Set the Plotly theme based on the provided theme parameter.</span>
+</span><span id="L-1164"><a href="#L-1164"><span class="linenos">1164</span></a>
+</span><span id="L-1165"><a href="#L-1165"><span class="linenos">1165</span></a><span class="sd">    This function sets the default Plotly template to either &#39;plotly_white&#39; or &#39;plotly_dark&#39;</span>
+</span><span id="L-1166"><a href="#L-1166"><span class="linenos">1166</span></a><span class="sd">    based on the input theme. If &#39;auto&#39; is selected, the theme is determined automatically</span>
+</span><span id="L-1167"><a href="#L-1167"><span class="linenos">1167</span></a><span class="sd">    based on the current system or application theme.</span>
+</span><span id="L-1168"><a href="#L-1168"><span class="linenos">1168</span></a>
+</span><span id="L-1169"><a href="#L-1169"><span class="linenos">1169</span></a><span class="sd">    :param theme: The theme to set for Plotly. Must be &#39;auto&#39;, &#39;light&#39;, or &#39;dark&#39;.</span>
+</span><span id="L-1170"><a href="#L-1170"><span class="linenos">1170</span></a><span class="sd">    :type theme: str</span>
+</span><span id="L-1171"><a href="#L-1171"><span class="linenos">1171</span></a><span class="sd">    :raises ValueError: If an invalid theme is provided.</span>
+</span><span id="L-1172"><a href="#L-1172"><span class="linenos">1172</span></a><span class="sd">    :return: None</span>
+</span><span id="L-1173"><a href="#L-1173"><span class="linenos">1173</span></a><span class="sd">    :rtype: None</span>
+</span><span id="L-1174"><a href="#L-1174"><span class="linenos">1174</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-1175"><a href="#L-1175"><span class="linenos">1175</span></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">plotly</span><span class="w"> </span><span class="kn">import</span> <span class="n">io</span> <span class="k">as</span> <span class="n">pio</span>
+</span><span id="L-1176"><a href="#L-1176"><span class="linenos">1176</span></a>
+</span><span id="L-1177"><a href="#L-1177"><span class="linenos">1177</span></a>    <span class="k">match</span> <span class="n">theme</span><span class="p">:</span>
+</span><span id="L-1178"><a href="#L-1178"><span class="linenos">1178</span></a>        <span class="k">case</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+</span><span id="L-1179"><a href="#L-1179"><span class="linenos">1179</span></a>            <span class="n">_theme</span> <span class="o">=</span> <span class="n">get_theme</span><span class="p">()</span>
+</span><span id="L-1180"><a href="#L-1180"><span class="linenos">1180</span></a>            <span class="k">if</span> <span class="n">_theme</span> <span class="o">==</span> <span class="s2">&quot;light&quot;</span><span class="p">:</span>
+</span><span id="L-1181"><a href="#L-1181"><span class="linenos">1181</span></a>                <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
+</span><span id="L-1182"><a href="#L-1182"><span class="linenos">1182</span></a>            <span class="k">else</span><span class="p">:</span>
+</span><span id="L-1183"><a href="#L-1183"><span class="linenos">1183</span></a>                <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_dark&quot;</span>
+</span><span id="L-1184"><a href="#L-1184"><span class="linenos">1184</span></a>        <span class="k">case</span> <span class="s2">&quot;light&quot;</span><span class="p">:</span>
+</span><span id="L-1185"><a href="#L-1185"><span class="linenos">1185</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
+</span><span id="L-1186"><a href="#L-1186"><span class="linenos">1186</span></a>        <span class="k">case</span> <span class="s2">&quot;dark&quot;</span><span class="p">:</span>
+</span><span id="L-1187"><a href="#L-1187"><span class="linenos">1187</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_dark&quot;</span>
+</span><span id="L-1188"><a href="#L-1188"><span class="linenos">1188</span></a>        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+</span><span id="L-1189"><a href="#L-1189"><span class="linenos">1189</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid theme. Must be &#39;auto&#39;, &#39;light&#39;, or &#39;dark&#39;.&quot;</span><span class="p">)</span>
+</span><span id="L-1190"><a href="#L-1190"><span class="linenos">1190</span></a>
+</span><span id="L-1191"><a href="#L-1191"><span class="linenos">1191</span></a>
+</span><span id="L-1192"><a href="#L-1192"><span class="linenos">1192</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="L-1193"><a href="#L-1193"><span class="linenos">1193</span></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">doctest</span>
+</span><span id="L-1194"><a href="#L-1194"><span class="linenos">1194</span></a>
+</span><span id="L-1195"><a href="#L-1195"><span class="linenos">1195</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</span><span id="L-1196"><a href="#L-1196"><span class="linenos">1196</span></a>
+</span><span id="L-1197"><a href="#L-1197"><span class="linenos">1197</span></a><span class="c1"># end of file</span>
 </span></pre></div>
 
 
@@ -3208,6 +3242,76 @@ dominates the filter and will override the distance and angle cutoffs.</p>
 
 <blockquote>
   <p>The list that was loaded from the file.</p>
+</blockquote>
+</div>
+
+
+                </section>
+                <section id="set_plotly_theme">
+                            <input id="set_plotly_theme-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">set_plotly_theme</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">theme</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="set_plotly_theme-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#set_plotly_theme"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="set_plotly_theme-1162"><a href="#set_plotly_theme-1162"><span class="linenos">1162</span></a><span class="k">def</span><span class="w"> </span><span class="nf">set_plotly_theme</span><span class="p">(</span><span class="n">theme</span><span class="p">):</span>
+</span><span id="set_plotly_theme-1163"><a href="#set_plotly_theme-1163"><span class="linenos">1163</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="set_plotly_theme-1164"><a href="#set_plotly_theme-1164"><span class="linenos">1164</span></a><span class="sd">    Set the Plotly theme based on the provided theme parameter.</span>
+</span><span id="set_plotly_theme-1165"><a href="#set_plotly_theme-1165"><span class="linenos">1165</span></a>
+</span><span id="set_plotly_theme-1166"><a href="#set_plotly_theme-1166"><span class="linenos">1166</span></a><span class="sd">    This function sets the default Plotly template to either &#39;plotly_white&#39; or &#39;plotly_dark&#39;</span>
+</span><span id="set_plotly_theme-1167"><a href="#set_plotly_theme-1167"><span class="linenos">1167</span></a><span class="sd">    based on the input theme. If &#39;auto&#39; is selected, the theme is determined automatically</span>
+</span><span id="set_plotly_theme-1168"><a href="#set_plotly_theme-1168"><span class="linenos">1168</span></a><span class="sd">    based on the current system or application theme.</span>
+</span><span id="set_plotly_theme-1169"><a href="#set_plotly_theme-1169"><span class="linenos">1169</span></a>
+</span><span id="set_plotly_theme-1170"><a href="#set_plotly_theme-1170"><span class="linenos">1170</span></a><span class="sd">    :param theme: The theme to set for Plotly. Must be &#39;auto&#39;, &#39;light&#39;, or &#39;dark&#39;.</span>
+</span><span id="set_plotly_theme-1171"><a href="#set_plotly_theme-1171"><span class="linenos">1171</span></a><span class="sd">    :type theme: str</span>
+</span><span id="set_plotly_theme-1172"><a href="#set_plotly_theme-1172"><span class="linenos">1172</span></a><span class="sd">    :raises ValueError: If an invalid theme is provided.</span>
+</span><span id="set_plotly_theme-1173"><a href="#set_plotly_theme-1173"><span class="linenos">1173</span></a><span class="sd">    :return: None</span>
+</span><span id="set_plotly_theme-1174"><a href="#set_plotly_theme-1174"><span class="linenos">1174</span></a><span class="sd">    :rtype: None</span>
+</span><span id="set_plotly_theme-1175"><a href="#set_plotly_theme-1175"><span class="linenos">1175</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="set_plotly_theme-1176"><a href="#set_plotly_theme-1176"><span class="linenos">1176</span></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">plotly</span><span class="w"> </span><span class="kn">import</span> <span class="n">io</span> <span class="k">as</span> <span class="n">pio</span>
+</span><span id="set_plotly_theme-1177"><a href="#set_plotly_theme-1177"><span class="linenos">1177</span></a>
+</span><span id="set_plotly_theme-1178"><a href="#set_plotly_theme-1178"><span class="linenos">1178</span></a>    <span class="k">match</span> <span class="n">theme</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1179"><a href="#set_plotly_theme-1179"><span class="linenos">1179</span></a>        <span class="k">case</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1180"><a href="#set_plotly_theme-1180"><span class="linenos">1180</span></a>            <span class="n">_theme</span> <span class="o">=</span> <span class="n">get_theme</span><span class="p">()</span>
+</span><span id="set_plotly_theme-1181"><a href="#set_plotly_theme-1181"><span class="linenos">1181</span></a>            <span class="k">if</span> <span class="n">_theme</span> <span class="o">==</span> <span class="s2">&quot;light&quot;</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1182"><a href="#set_plotly_theme-1182"><span class="linenos">1182</span></a>                <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
+</span><span id="set_plotly_theme-1183"><a href="#set_plotly_theme-1183"><span class="linenos">1183</span></a>            <span class="k">else</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1184"><a href="#set_plotly_theme-1184"><span class="linenos">1184</span></a>                <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_dark&quot;</span>
+</span><span id="set_plotly_theme-1185"><a href="#set_plotly_theme-1185"><span class="linenos">1185</span></a>        <span class="k">case</span> <span class="s2">&quot;light&quot;</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1186"><a href="#set_plotly_theme-1186"><span class="linenos">1186</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
+</span><span id="set_plotly_theme-1187"><a href="#set_plotly_theme-1187"><span class="linenos">1187</span></a>        <span class="k">case</span> <span class="s2">&quot;dark&quot;</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1188"><a href="#set_plotly_theme-1188"><span class="linenos">1188</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_dark&quot;</span>
+</span><span id="set_plotly_theme-1189"><a href="#set_plotly_theme-1189"><span class="linenos">1189</span></a>        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1190"><a href="#set_plotly_theme-1190"><span class="linenos">1190</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid theme. Must be &#39;auto&#39;, &#39;light&#39;, or &#39;dark&#39;.&quot;</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Set the Plotly theme based on the provided theme parameter.</p>
+
+<p>This function sets the default Plotly template to either 'plotly_white' or 'plotly_dark'
+based on the input theme. If 'auto' is selected, the theme is determined automatically
+based on the current system or application theme.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>theme</strong>:  The theme to set for Plotly. Must be 'auto', 'light', or 'dark'.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>ValueError</strong>:  If an invalid theme is provided.</li>
+</ul>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <p>None</p>
 </blockquote>
 </div>
 

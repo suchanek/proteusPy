@@ -48,7 +48,12 @@ from proteusPy import Disulfide
 from proteusPy.atoms import BOND_RADIUS, FONTSIZE
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, PDB_DIR, WINSIZE
-from proteusPy.utility import get_jet_colormap, get_theme, grid_dimensions
+from proteusPy.utility import (
+    get_jet_colormap,
+    get_theme,
+    grid_dimensions,
+    set_plotly_theme,
+)
 
 # pio.renderers.default = "png"  # or 'svg'
 
@@ -1289,13 +1294,13 @@ class DisulfideList(UserList):
         df = pd.DataFrame(data)
         return df
 
-    def extract_distances(self, distance_type="sg", comparison="less", cutoff=4):
+    def extract_distances(self, distance_type="sg", flip=False, cutoff=-1):
         """
         Extract and filter the distance values from the disulfide list based on the specified type and comparison.
 
         :param disulfide_list: List of disulfide objects.
         :param distance_type: Type of distance to extract ('sg' or 'ca').
-        :param comparison: Comparison operation ('less' or 'greater').
+        :param flip: If true, return distances greater than the cutoff value.
         :param cutoff: Cutoff value for filtering distances.
         :return: List of filtered distance values.
         """
@@ -1313,17 +1318,14 @@ class DisulfideList(UserList):
         if cutoff == -1.0:
             return distances
 
-        match comparison:
-            case "less":
-                filtered_distances = [d for d in distances if d < cutoff]
-            case "greater":
-                filtered_distances = [d for d in distances if d >= cutoff]
-            case _:
-                raise ValueError("Invalid comparison. Must be 'less' or 'greater'.")
+        if flip:
+            filtered_distances = [d for d in distances if d > cutoff]
+        else:
+            filtered_distances = [d for d in distances if d <= cutoff]
 
         return filtered_distances
 
-    def plot_distances(self, distance_type="sg", cutoff=-1, flip=False):
+    def plot_distances(self, distance_type="sg", cutoff=-1, flip=False, theme="auto"):
         """
         Plot the distance values as a histogram using plotly express.
 
@@ -1332,7 +1334,11 @@ class DisulfideList(UserList):
         :param cutoff: Cutoff value for the x-axis title.
         :param flip: Whether to flip the comparison in the x-axis title.
         """
-        distances = self.extract_distances(distance_type, "less", cutoff)
+
+        set_plotly_theme(theme)
+        cmp_str = "less" if not flip else "greater"
+
+        distances = self.extract_distances(distance_type, cmp_str, cutoff)
 
         match distance_type:
             case "sg":
@@ -1377,12 +1383,12 @@ class DisulfideList(UserList):
         )
         fig.show()
 
-    def plot_deviation_histograms(self, verbose=False) -> pd.DataFrame:
+    def plot_deviation_histograms(self, verbose=False, theme="auto") -> pd.DataFrame:
         """
         Plot histograms for Bondlength_Deviation, Angle_Deviation, and Ca_Distance.
 
         This function creates and displays histograms for the bond length deviation,
-        bond angle deviation, and Cα distance from the disulfide list. The histograms
+        bond angle deviation from the disulfide list. The histograms
         are displayed on a logarithmic scale for the y-axis.
 
         :param verbose: Whether to display a progress bar.
@@ -1390,17 +1396,20 @@ class DisulfideList(UserList):
         :return: Dataframe containing the disulfide deviation information.
         :rtype: pandas.DataFrame
         """
+
+        set_plotly_theme(theme)
+
         df = self.create_deviation_dataframe(verbose=verbose)
 
         fig = px.histogram(
             df,
             x="Bondlength_Deviation",
             nbins=300,
-            title="Bond Length Deviation, (Å)",
+            title="Bond Length Deviation (Å)",
         )
 
         fig.update_layout(
-            xaxis_title="Bond Length Deviation, (Å)",
+            xaxis_title="Bond Length Deviation (Å)",
             yaxis_title="Frequency",
             yaxis_type="log",
         )
@@ -1410,7 +1419,7 @@ class DisulfideList(UserList):
             df, x="Angle_Deviation", nbins=300, title="Bond Angle Deviation, (°)"
         )
         fig2.update_layout(
-            xaxis_title="Bond Angle Deviation, (°)",
+            xaxis_title="Bond Angle Deviation (°)",
             yaxis_title="Frequency",
             yaxis_type="log",
         )
