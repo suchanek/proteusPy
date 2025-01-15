@@ -335,7 +335,7 @@ class DisulfideLoader:
 
         ss_ids = eightorbin[clsid]
 
-        tot_ss = len(eightorbin)
+        tot_ss = len(ss_ids)
         class_disulfides = DisulfideList([], clsid, quiet=True)
 
         if verbose:
@@ -790,7 +790,7 @@ class DisulfideLoader:
 
         return pdbids, num_disulfides
 
-    def plot_distances(self, distance_type="ca", cutoff=-1, flip=False):
+    def plot_distances(self, distance_type="ca", cutoff=-1, flip=False, theme="auto"):
         """
         Plot the distances for the disulfides in the loader.
 
@@ -800,26 +800,30 @@ class DisulfideLoader:
         :type cutoff: float
         :param flip: Whether to flip the plot. (<= or >), defaults to <
         :type flip: bool
+        :param theme: The theme to use for the plot ('auto', 'light', or 'dark'), defaults to 'auto'.
+        :type theme: str
         :return: None
         :rtype: None
         """
         self.SSList.plot_distances(
-            distance_type=distance_type, cutoff=cutoff, flip=flip
+            distance_type=distance_type,
+            cutoff=cutoff,
+            flip=flip,
+            theme=theme,
         )
 
-    def plot_deviation_histograms(self, verbose=True):
+    def plot_deviation_histograms(self, theme="auto", verbose=True):
         """
         Plot histograms for Bondlength_Deviation, Angle_Deviation, and Ca_Distance.
         """
-        self.SSList.plot_deviation_histograms(verbose=verbose)
+        self.SSList.plot_deviation_histograms(theme=theme, verbose=verbose)
 
     def display_torsion_statistics(
         self,
         display=True,
         save=False,
         fname="ss_torsions.png",
-        stats=False,
-        light="Auto",
+        theme="Auto",
     ):
         """
         Display torsion and distance statistics for all Disulfides in the loader.
@@ -830,18 +834,15 @@ class DisulfideLoader:
         :type save: bool
         :param fname: The name of the image file to save. Default is 'ss_torsions.png'.
         :type fname: str
-        :param stats: Whether to return the DataFrame representing the statistics for `self`. Default is False.
-        :type stats: bool
-        :param light: Whether to use the 'plotly_light' or 'plotly_dark' template. Default is True.
-        :type light: bool
+        :param theme: One of 'Auto', 'Light', or 'Dark'. Default is 'Auto'.
+        :type light: str
         :return: None
         """
         self.SSList.display_torsion_statistics(
             display=display,
             save=save,
             fname=fname,
-            stats=stats,
-            light=light,
+            theme=theme,
         )
 
 
