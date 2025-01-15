@@ -1347,7 +1347,7 @@ class DisulfideList(UserList):
                 column_name = "SG Distance"
                 title = "Sγ Distance Distribution"
                 if cutoff == -1.0:
-                    xtitle = "All Sγ-Sγ Distances"
+                    xtitle = "Sγ-Sγ Distances, (no cutoff)"
                 else:
                     xtitle = (
                         f"Sγ Distance < {cutoff} Å"
@@ -1358,7 +1358,7 @@ class DisulfideList(UserList):
                 column_name = "Ca Distance"
                 title = "Cα Distance Distribution"
                 if cutoff == -1.0:
-                    xtitle = "All Cα-Cα Distances"
+                    xtitle = "Cα-Cα Distances, (no cutoff)"
                 else:
                     xtitle = (
                         f"Cα Distance < {cutoff} Å"
