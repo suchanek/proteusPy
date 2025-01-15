@@ -189,7 +189,7 @@ class DisulfideLoader:
             _logger.error("An error occurred while loading the file: %s", full_path)
             raise e
 
-    # overload __getitem__ to handle slicing and indexing, and access by name
+    # overload __getitem__ to handle slicing and indexing, and access by name or classid
     def __getitem__(self, item):
         """
         Implements indexing and slicing to retrieve DisulfideList objects from the
@@ -199,6 +199,8 @@ class DisulfideLoader:
         - Slicing to retrieve a subset as a DisulfideList
         - Lookup by PDB ID to retrieve all Disulfides for that structure
         - Lookup by full disulfide name
+        - Lookup by classid in the format 11111b or 11111o. The last char is the class type.
+        - Lookup by classid in the format 11111. The base is 8 by default.
 
         :param index: The index or key to retrieve the DisulfideList.
         :type index: int, slice, str
@@ -209,6 +211,7 @@ class DisulfideLoader:
 
         res = DisulfideList([], "none")
         ind_list = []
+        ss = None
 
         if isinstance(item, slice):
             indices = range(*item.indices(len(self.SSList)))
@@ -226,7 +229,14 @@ class DisulfideLoader:
                     self.TotalDisulfides - 1,
                 )
             else:
-                return self.SSList[item]
+                ss = self.SSList[item]
+                return DisulfideList([ss], ss.name, ss.resolution)
+
+        # if the item is a string, it could be a PDB ID or a full disulfide name
+        # or a classid in the format 11111b or 11111o. the last char is the class type
+        if isinstance(item, str) and len(item) == 6 or len(item) == 5:  # classid
+            res = self.extract_class(item)
+            return res
 
         try:
             # PDB_SS['4yys'] return a list of SS
@@ -315,7 +325,7 @@ class DisulfideLoader:
             disulfide_dict[disulfide.pdb_id].append(index)
         return disulfide_dict
 
-    def extract_class(self, clsid, base=8, verbose=False) -> DisulfideList:
+    def extract_class(self, clsid: str, base=8, verbose=False) -> DisulfideList:
         """
         Return the list of disulfides corresponding to the input `clsid`.
 
@@ -325,18 +335,36 @@ class DisulfideLoader:
         """
 
         eightorbin = None
+        cls = clsid
 
-        if base == 8:
-            eightorbin = self.tclass.eightclass_dict
-        elif base == 2:
-            eightorbin = self.tclass.binaryclass_dict
-        else:
-            raise ValueError("Invalid base value.")
+        if isinstance(clsid, str):
+            if len(clsid) == 6:  # classid 11111b or 11111o
+                if clsid[-1] == "b":
+                    eightorbin = self.tclass.binaryclass_dict
+                elif clsid[-1] == "o":
+                    eightorbin = self.tclass.eightclass_dict
+                cls = clsid[:5]
 
-        ss_ids = eightorbin[clsid]
+            else:
+                if len(clsid) == 5:  # classid 11111
+                    if base == 8:
+                        eightorbin = self.tclass.eightclass_dict
+                    elif base == 2:
+                        eightorbin = self.tclass.binaryclass_dict
+                    else:
+                        _logger.error("Invalid base: %d", base)
+                        return DisulfideList([], clsid, quiet=True)
+                else:
+                    _logger.error("Invalid class ID: %s", clsid)
+                    return DisulfideList([], clsid, quiet=True)
+        try:
+            ss_ids = eightorbin[cls]
+        except KeyError:
+            _logger.error("Cannot find key %s in SSBond DB", clsid)
+            return DisulfideList([], cls, quiet=True)
 
         tot_ss = len(ss_ids)
-        class_disulfides = DisulfideList([], clsid, quiet=True)
+        class_disulfides = DisulfideList([], cls, quiet=True)
 
         if verbose:
             _pbar = tqdm(range(tot_ss), total=tot_ss, leave=True)
@@ -790,7 +818,9 @@ class DisulfideLoader:
 
         return pdbids, num_disulfides
 
-    def plot_distances(self, distance_type="ca", cutoff=-1, flip=False, theme="auto"):
+    def plot_distances(
+        self, distance_type="ca", cutoff=-1, flip=False, theme="auto", log=True
+    ):
         """
         Plot the distances for the disulfides in the loader.
 
@@ -802,6 +832,7 @@ class DisulfideLoader:
         :type flip: bool
         :param theme: The theme to use for the plot ('auto', 'light', or 'dark'), defaults to 'auto'.
         :type theme: str
+        :param log: Whether to use a log scale for the y-axis, defaults to True.
         :return: None
         :rtype: None
         """
@@ -810,6 +841,7 @@ class DisulfideLoader:
             cutoff=cutoff,
             flip=flip,
             theme=theme,
+            log=log,
         )
 
     def plot_deviation_histograms(self, theme="auto", verbose=True):
