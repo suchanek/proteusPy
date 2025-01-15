@@ -664,7 +664,7 @@ Last revision: 2025-01-15 00:09:24 -egs-</p>
 </span><span id="L-392"><a href="#L-392"><span class="linenos"> 392</span></a>
 </span><span id="L-393"><a href="#L-393"><span class="linenos"> 393</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build_distance_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 </span><span id="L-394"><a href="#L-394"><span class="linenos"> 394</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-395"><a href="#L-395"><span class="linenos"> 395</span></a><span class="sd">        Create a dataframe containing the input DisulfideList Cα-Cα distance, energy.</span>
+</span><span id="L-395"><a href="#L-395"><span class="linenos"> 395</span></a><span class="sd">        Create a dataframe containing the input DisulfideList Cα-Cα and Sg-Sg distances, energy.</span>
 </span><span id="L-396"><a href="#L-396"><span class="linenos"> 396</span></a><span class="sd">        This can take several minutes for the entire database.</span>
 </span><span id="L-397"><a href="#L-397"><span class="linenos"> 397</span></a>
 </span><span id="L-398"><a href="#L-398"><span class="linenos"> 398</span></a><span class="sd">        :return: DataFrame containing Ca distances</span>
@@ -710,7 +710,7 @@ Last revision: 2025-01-15 00:09:24 -egs-</p>
 </span><span id="L-438"><a href="#L-438"><span class="linenos"> 438</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build_torsion_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 </span><span id="L-439"><a href="#L-439"><span class="linenos"> 439</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-440"><a href="#L-440"><span class="linenos"> 440</span></a><span class="sd">        Create a dataframe containing the input DisulfideList torsional parameters,</span>
-</span><span id="L-441"><a href="#L-441"><span class="linenos"> 441</span></a><span class="sd">        Cα-Cα distance, energy, and phi-psi angles. This can take several minutes for the</span>
+</span><span id="L-441"><a href="#L-441"><span class="linenos"> 441</span></a><span class="sd">        Cα-Cα and Sg-Sg distances, energy, and phi-psi angles. This can take several minutes for the</span>
 </span><span id="L-442"><a href="#L-442"><span class="linenos"> 442</span></a><span class="sd">        entire database.</span>
 </span><span id="L-443"><a href="#L-443"><span class="linenos"> 443</span></a>
 </span><span id="L-444"><a href="#L-444"><span class="linenos"> 444</span></a><span class="sd">        :return: pd.DataFrame containing the torsions</span>
@@ -2456,7 +2456,7 @@ Last revision: 2025-01-15 00:09:24 -egs-</p>
 </span><span id="DisulfideList-393"><a href="#DisulfideList-393"><span class="linenos"> 393</span></a>
 </span><span id="DisulfideList-394"><a href="#DisulfideList-394"><span class="linenos"> 394</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build_distance_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 </span><span id="DisulfideList-395"><a href="#DisulfideList-395"><span class="linenos"> 395</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="DisulfideList-396"><a href="#DisulfideList-396"><span class="linenos"> 396</span></a><span class="sd">        Create a dataframe containing the input DisulfideList Cα-Cα distance, energy.</span>
+</span><span id="DisulfideList-396"><a href="#DisulfideList-396"><span class="linenos"> 396</span></a><span class="sd">        Create a dataframe containing the input DisulfideList Cα-Cα and Sg-Sg distances, energy.</span>
 </span><span id="DisulfideList-397"><a href="#DisulfideList-397"><span class="linenos"> 397</span></a><span class="sd">        This can take several minutes for the entire database.</span>
 </span><span id="DisulfideList-398"><a href="#DisulfideList-398"><span class="linenos"> 398</span></a>
 </span><span id="DisulfideList-399"><a href="#DisulfideList-399"><span class="linenos"> 399</span></a><span class="sd">        :return: DataFrame containing Ca distances</span>
@@ -2502,7 +2502,7 @@ Last revision: 2025-01-15 00:09:24 -egs-</p>
 </span><span id="DisulfideList-439"><a href="#DisulfideList-439"><span class="linenos"> 439</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build_torsion_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 </span><span id="DisulfideList-440"><a href="#DisulfideList-440"><span class="linenos"> 440</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideList-441"><a href="#DisulfideList-441"><span class="linenos"> 441</span></a><span class="sd">        Create a dataframe containing the input DisulfideList torsional parameters,</span>
-</span><span id="DisulfideList-442"><a href="#DisulfideList-442"><span class="linenos"> 442</span></a><span class="sd">        Cα-Cα distance, energy, and phi-psi angles. This can take several minutes for the</span>
+</span><span id="DisulfideList-442"><a href="#DisulfideList-442"><span class="linenos"> 442</span></a><span class="sd">        Cα-Cα and Sg-Sg distances, energy, and phi-psi angles. This can take several minutes for the</span>
 </span><span id="DisulfideList-443"><a href="#DisulfideList-443"><span class="linenos"> 443</span></a><span class="sd">        entire database.</span>
 </span><span id="DisulfideList-444"><a href="#DisulfideList-444"><span class="linenos"> 444</span></a>
 </span><span id="DisulfideList-445"><a href="#DisulfideList-445"><span class="linenos"> 445</span></a><span class="sd">        :return: pd.DataFrame containing the torsions</span>
@@ -4153,7 +4153,7 @@ DisulfideList</p>
     <a class="headerlink" href="#DisulfideList.build_distance_df"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.build_distance_df-394"><a href="#DisulfideList.build_distance_df-394"><span class="linenos">394</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build_distance_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 </span><span id="DisulfideList.build_distance_df-395"><a href="#DisulfideList.build_distance_df-395"><span class="linenos">395</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="DisulfideList.build_distance_df-396"><a href="#DisulfideList.build_distance_df-396"><span class="linenos">396</span></a><span class="sd">        Create a dataframe containing the input DisulfideList Cα-Cα distance, energy.</span>
+</span><span id="DisulfideList.build_distance_df-396"><a href="#DisulfideList.build_distance_df-396"><span class="linenos">396</span></a><span class="sd">        Create a dataframe containing the input DisulfideList Cα-Cα and Sg-Sg distances, energy.</span>
 </span><span id="DisulfideList.build_distance_df-397"><a href="#DisulfideList.build_distance_df-397"><span class="linenos">397</span></a><span class="sd">        This can take several minutes for the entire database.</span>
 </span><span id="DisulfideList.build_distance_df-398"><a href="#DisulfideList.build_distance_df-398"><span class="linenos">398</span></a>
 </span><span id="DisulfideList.build_distance_df-399"><a href="#DisulfideList.build_distance_df-399"><span class="linenos">399</span></a><span class="sd">        :return: DataFrame containing Ca distances</span>
@@ -4196,7 +4196,7 @@ DisulfideList</p>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Create a dataframe containing the input DisulfideList Cα-Cα distance, energy.
+            <div class="docstring"><p>Create a dataframe containing the input DisulfideList Cα-Cα and Sg-Sg distances, energy.
 This can take several minutes for the entire database.</p>
 
 <h6 id="returns">Returns</h6>
@@ -4222,7 +4222,7 @@ This can take several minutes for the entire database.</p>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideList.build_torsion_df-439"><a href="#DisulfideList.build_torsion_df-439"><span class="linenos">439</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build_torsion_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 </span><span id="DisulfideList.build_torsion_df-440"><a href="#DisulfideList.build_torsion_df-440"><span class="linenos">440</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="DisulfideList.build_torsion_df-441"><a href="#DisulfideList.build_torsion_df-441"><span class="linenos">441</span></a><span class="sd">        Create a dataframe containing the input DisulfideList torsional parameters,</span>
-</span><span id="DisulfideList.build_torsion_df-442"><a href="#DisulfideList.build_torsion_df-442"><span class="linenos">442</span></a><span class="sd">        Cα-Cα distance, energy, and phi-psi angles. This can take several minutes for the</span>
+</span><span id="DisulfideList.build_torsion_df-442"><a href="#DisulfideList.build_torsion_df-442"><span class="linenos">442</span></a><span class="sd">        Cα-Cα and Sg-Sg distances, energy, and phi-psi angles. This can take several minutes for the</span>
 </span><span id="DisulfideList.build_torsion_df-443"><a href="#DisulfideList.build_torsion_df-443"><span class="linenos">443</span></a><span class="sd">        entire database.</span>
 </span><span id="DisulfideList.build_torsion_df-444"><a href="#DisulfideList.build_torsion_df-444"><span class="linenos">444</span></a>
 </span><span id="DisulfideList.build_torsion_df-445"><a href="#DisulfideList.build_torsion_df-445"><span class="linenos">445</span></a><span class="sd">        :return: pd.DataFrame containing the torsions</span>
@@ -4279,7 +4279,7 @@ This can take several minutes for the entire database.</p>
 
 
             <div class="docstring"><p>Create a dataframe containing the input DisulfideList torsional parameters,
-Cα-Cα distance, energy, and phi-psi angles. This can take several minutes for the
+Cα-Cα and Sg-Sg distances, energy, and phi-psi angles. This can take several minutes for the
 entire database.</p>
 
 <h6 id="returns">Returns</h6>
