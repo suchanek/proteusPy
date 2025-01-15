@@ -632,6 +632,10 @@ class DisulfideList(UserList):
         :return: none
         """
 
+        if self.length == 0:
+            _logger.warning("Empty DisulfideList. Nothing to display.")
+            return
+
         set_plotly_theme(theme)
         title = f"{self.id}: {self.length} members"
 
@@ -1318,7 +1322,9 @@ class DisulfideList(UserList):
 
         return filtered_distances
 
-    def plot_distances(self, distance_type="sg", cutoff=-1, flip=False, theme="auto"):
+    def plot_distances(
+        self, distance_type="sg", cutoff=-1, flip=False, theme="auto", log=True
+    ):
         """
         Plot the distance values as a histogram using plotly express.
 
@@ -1326,12 +1332,15 @@ class DisulfideList(UserList):
         :param distance_type: Type of distance to plot ('sg' or 'ca').
         :param cutoff: Cutoff value for the x-axis title.
         :param flip: Whether to flip the comparison in the x-axis title.
+        :param theme: The plotly theme to use. Default is 'auto', which will use the current system theme.
+        :param log: Whether to use a logarithmic scale for the y-axis. Default is True.
         """
 
         set_plotly_theme(theme)
         cmp_str = "less" if not flip else "greater"
 
         distances = self.extract_distances(distance_type, cmp_str, cutoff)
+        yaxis_type = "log" if log else "linear"
 
         match distance_type:
             case "sg":
@@ -1372,12 +1381,12 @@ class DisulfideList(UserList):
             title={"text": "Distance Distribution", "x": 0.5, "xanchor": "center"},
             xaxis_title=xtitle,
             yaxis_title="Frequency",
-            yaxis_type="log",
+            yaxis_type=yaxis_type,
             bargap=0.2,
         )
         fig.show()
 
-    def plot_deviation_histograms(self, verbose=False, theme="auto") -> pd.DataFrame:
+    def plot_deviation_histograms(self, verbose=False, theme="auto", log=True) -> None:
         """
         Plot histograms for Bondlength_Deviation, Angle_Deviation, and Ca_Distance.
 
@@ -1388,11 +1397,14 @@ class DisulfideList(UserList):
         :param verbose: Whether to display a progress bar.
         :type verbose: bool
         :param theme: The plotly theme to use. Default is 'auto', which will use the current system theme.
-        :return: Dataframe containing the disulfide deviation information.
-        :rtype: pandas.DataFrame
+        :param log: Whether to use a logarithmic scale for the y-axis. Default is True.
         """
 
         set_plotly_theme(theme)
+        if log:
+            yaxis_type = "log"
+        else:
+            yaxis_type = "linear"
 
         df = self.create_deviation_dataframe(verbose=verbose)
 
@@ -1407,7 +1419,7 @@ class DisulfideList(UserList):
             title={"text": "Bond Length Deviation", "x": 0.5, "xanchor": "center"},
             xaxis_title="Bond Length Deviation (Å)",
             yaxis_title="Frequency",
-            yaxis_type="log",
+            yaxis_type=yaxis_type,
         )
         fig.show()
 
@@ -1418,12 +1430,12 @@ class DisulfideList(UserList):
             title={"text": "Bond Angle Deviation", "x": 0.5, "xanchor": "center"},
             xaxis_title="Bond Angle Deviation (°)",
             yaxis_title="Frequency",
-            yaxis_type="log",
+            yaxis_type=yaxis_type,
         )
 
         fig2.show()
 
-        return df
+        return
 
     def filter_deviation_df_by_cutoffs(
         self,
