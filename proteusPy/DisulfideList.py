@@ -392,7 +392,7 @@ class DisulfideList(UserList):
 
     def build_distance_df(self) -> pd.DataFrame:
         """
-        Create a dataframe containing the input DisulfideList Cα-Cα distance, energy.
+        Create a dataframe containing the input DisulfideList Cα-Cα and Sg-Sg distances, energy.
         This can take several minutes for the entire database.
 
         :return: DataFrame containing Ca distances
@@ -438,7 +438,7 @@ class DisulfideList(UserList):
     def build_torsion_df(self) -> pd.DataFrame:
         """
         Create a dataframe containing the input DisulfideList torsional parameters,
-        Cα-Cα distance, energy, and phi-psi angles. This can take several minutes for the
+        Cα-Cα and Sg-Sg distances, energy, and phi-psi angles. This can take several minutes for the
         entire database.
 
         :return: pd.DataFrame containing the torsions
