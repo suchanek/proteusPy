@@ -1072,63 +1072,6 @@ def calculate_percentile_cutoff(df, column, percentile=95):
     return cutoff
 
 
-def filter_by_cutoffs(
-    df, length_cutoff=1.0, angle_cutoff=1.0, ca_cutoff=8.0, minimum_distance=2.0
-):
-    """
-    Filter the DataFrame based on distance, angle, and Ca distance cutoffs. Ca cutoff
-    dominates the filter and will override the distance and angle cutoffs. Note: The
-    filter is applied if the Ca distance is less than or equal to 2.0 Angstroms, since
-    this is physically impossible.
-
-    :param df: DataFrame containing the deviations.
-    :type df: pd.DataFrame
-    :param length_cutoff: Cutoff value for Bond Length Deviation.
-    :type distance_cutoff: float
-    :param angle_cutoff: Cutoff value for angle deviation.
-    :type angle_cutoff: float
-    :param ca_cutoff: Cutoff value for Ca distance.
-    :type ca_cutoff: float
-    :return: Filtered DataFrame.
-    :rtype: pd.DataFrame
-    """
-    filtered_df = df[
-        (df["Bondlength_Deviation"] <= length_cutoff)
-        & (df["Angle_Deviation"] <= angle_cutoff)
-        & (df["Ca_Distance"] > minimum_distance)
-        & (df["Ca_Distance"] < ca_cutoff)
-    ]
-    return filtered_df
-
-
-def bad_filter_by_cutoffs(
-    df, distance_cutoff=1.0, angle_cutoff=1.0, ca_cutoff=8.0, minimum_distance=2.0
-):
-    """
-    Return the DataFrame objects that are GREATER than the cutoff based on distance,
-    angle, and Ca distance cutoffs. Used to get the bad structures. Ca cutoff
-    dominates the filter and will override the distance and angle cutoffs.
-
-    :param df: DataFrame containing the deviations.
-    :type df: pd.DataFrame
-    :param distance_cutoff: Cutoff value for Bond Length Deviation.
-    :type distance_cutoff: float
-    :param angle_cutoff: Cutoff value for angle deviation.
-    :type angle_cutoff: float
-    :param ca_cutoff: Cutoff value for Ca distance.
-    :type ca_cutoff: float
-    :return: Filtered DataFrame.
-    :rtype: pd.DataFrame
-    """
-    filtered_df = df[
-        (df["Bondlength_Deviation"] > distance_cutoff)
-        & (df["Angle_Deviation"] > angle_cutoff)
-        & (df["Ca_Distance"] > ca_cutoff)
-        & (df["Ca_Distance"] < minimum_distance)
-    ]
-    return filtered_df
-
-
 def save_list_to_file(input_list, filename):
     """
     Save the input list to a file using pickle.
@@ -1158,7 +1101,7 @@ def load_list_from_file(filename):
     return loaded_list
 
 
-def set_plotly_theme(theme):
+def set_plotly_theme(theme: str) -> None:
     """
     Set the Plotly theme based on the provided theme parameter.
 
@@ -1174,7 +1117,7 @@ def set_plotly_theme(theme):
     """
     from plotly import io as pio
 
-    match theme:
+    match theme.lower():
         case "auto":
             _theme = get_theme()
             if _theme == "light":
@@ -1186,7 +1129,9 @@ def set_plotly_theme(theme):
         case "dark":
             pio.templates.default = "plotly_dark"
         case _:
-            raise ValueError("Invalid theme. Must be 'auto', 'light', or 'dark'.")
+            _logger.error("Invalid theme. Must be 'auto', 'light', or 'dark'.")
+            pio.templates.default = "plotly_white"
+    return None
 
 
 if __name__ == "__main__":

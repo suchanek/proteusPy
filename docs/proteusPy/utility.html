@@ -123,12 +123,6 @@
                     <a class="function" href="#calculate_percentile_cutoff">calculate_percentile_cutoff</a>
             </li>
             <li>
-                    <a class="function" href="#filter_by_cutoffs">filter_by_cutoffs</a>
-            </li>
-            <li>
-                    <a class="function" href="#bad_filter_by_cutoffs">bad_filter_by_cutoffs</a>
-            </li>
-            <li>
                     <a class="function" href="#save_list_to_file">save_list_to_file</a>
             </li>
             <li>
@@ -1240,129 +1234,74 @@
 </span><span id="L-1072"><a href="#L-1072"><span class="linenos">1072</span></a>    <span class="k">return</span> <span class="n">cutoff</span>
 </span><span id="L-1073"><a href="#L-1073"><span class="linenos">1073</span></a>
 </span><span id="L-1074"><a href="#L-1074"><span class="linenos">1074</span></a>
-</span><span id="L-1075"><a href="#L-1075"><span class="linenos">1075</span></a><span class="k">def</span><span class="w"> </span><span class="nf">filter_by_cutoffs</span><span class="p">(</span>
-</span><span id="L-1076"><a href="#L-1076"><span class="linenos">1076</span></a>    <span class="n">df</span><span class="p">,</span> <span class="n">length_cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">angle_cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ca_cutoff</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span> <span class="n">minimum_distance</span><span class="o">=</span><span class="mf">2.0</span>
-</span><span id="L-1077"><a href="#L-1077"><span class="linenos">1077</span></a><span class="p">):</span>
-</span><span id="L-1078"><a href="#L-1078"><span class="linenos">1078</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-1079"><a href="#L-1079"><span class="linenos">1079</span></a><span class="sd">    Filter the DataFrame based on distance, angle, and Ca distance cutoffs. Ca cutoff</span>
-</span><span id="L-1080"><a href="#L-1080"><span class="linenos">1080</span></a><span class="sd">    dominates the filter and will override the distance and angle cutoffs. Note: The</span>
-</span><span id="L-1081"><a href="#L-1081"><span class="linenos">1081</span></a><span class="sd">    filter is applied if the Ca distance is less than or equal to 2.0 Angstroms, since</span>
-</span><span id="L-1082"><a href="#L-1082"><span class="linenos">1082</span></a><span class="sd">    this is physically impossible.</span>
-</span><span id="L-1083"><a href="#L-1083"><span class="linenos">1083</span></a>
-</span><span id="L-1084"><a href="#L-1084"><span class="linenos">1084</span></a><span class="sd">    :param df: DataFrame containing the deviations.</span>
-</span><span id="L-1085"><a href="#L-1085"><span class="linenos">1085</span></a><span class="sd">    :type df: pd.DataFrame</span>
-</span><span id="L-1086"><a href="#L-1086"><span class="linenos">1086</span></a><span class="sd">    :param length_cutoff: Cutoff value for Bond Length Deviation.</span>
-</span><span id="L-1087"><a href="#L-1087"><span class="linenos">1087</span></a><span class="sd">    :type distance_cutoff: float</span>
-</span><span id="L-1088"><a href="#L-1088"><span class="linenos">1088</span></a><span class="sd">    :param angle_cutoff: Cutoff value for angle deviation.</span>
-</span><span id="L-1089"><a href="#L-1089"><span class="linenos">1089</span></a><span class="sd">    :type angle_cutoff: float</span>
-</span><span id="L-1090"><a href="#L-1090"><span class="linenos">1090</span></a><span class="sd">    :param ca_cutoff: Cutoff value for Ca distance.</span>
-</span><span id="L-1091"><a href="#L-1091"><span class="linenos">1091</span></a><span class="sd">    :type ca_cutoff: float</span>
-</span><span id="L-1092"><a href="#L-1092"><span class="linenos">1092</span></a><span class="sd">    :return: Filtered DataFrame.</span>
-</span><span id="L-1093"><a href="#L-1093"><span class="linenos">1093</span></a><span class="sd">    :rtype: pd.DataFrame</span>
-</span><span id="L-1094"><a href="#L-1094"><span class="linenos">1094</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-1095"><a href="#L-1095"><span class="linenos">1095</span></a>    <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span>
-</span><span id="L-1096"><a href="#L-1096"><span class="linenos">1096</span></a>        <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Bondlength_Deviation&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">length_cutoff</span><span class="p">)</span>
-</span><span id="L-1097"><a href="#L-1097"><span class="linenos">1097</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Angle_Deviation&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">angle_cutoff</span><span class="p">)</span>
-</span><span id="L-1098"><a href="#L-1098"><span class="linenos">1098</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Ca_Distance&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">minimum_distance</span><span class="p">)</span>
-</span><span id="L-1099"><a href="#L-1099"><span class="linenos">1099</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Ca_Distance&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">ca_cutoff</span><span class="p">)</span>
-</span><span id="L-1100"><a href="#L-1100"><span class="linenos">1100</span></a>    <span class="p">]</span>
-</span><span id="L-1101"><a href="#L-1101"><span class="linenos">1101</span></a>    <span class="k">return</span> <span class="n">filtered_df</span>
+</span><span id="L-1075"><a href="#L-1075"><span class="linenos">1075</span></a><span class="k">def</span><span class="w"> </span><span class="nf">save_list_to_file</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+</span><span id="L-1076"><a href="#L-1076"><span class="linenos">1076</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1077"><a href="#L-1077"><span class="linenos">1077</span></a><span class="sd">    Save the input list to a file using pickle.</span>
+</span><span id="L-1078"><a href="#L-1078"><span class="linenos">1078</span></a>
+</span><span id="L-1079"><a href="#L-1079"><span class="linenos">1079</span></a><span class="sd">    :param input_list: List to be saved.</span>
+</span><span id="L-1080"><a href="#L-1080"><span class="linenos">1080</span></a><span class="sd">    :type input_list: list</span>
+</span><span id="L-1081"><a href="#L-1081"><span class="linenos">1081</span></a><span class="sd">    :param filename: Name of the file where the list will be saved.</span>
+</span><span id="L-1082"><a href="#L-1082"><span class="linenos">1082</span></a><span class="sd">    :type filename: str</span>
+</span><span id="L-1083"><a href="#L-1083"><span class="linenos">1083</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-1084"><a href="#L-1084"><span class="linenos">1084</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+</span><span id="L-1085"><a href="#L-1085"><span class="linenos">1085</span></a>        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+</span><span id="L-1086"><a href="#L-1086"><span class="linenos">1086</span></a>
+</span><span id="L-1087"><a href="#L-1087"><span class="linenos">1087</span></a>
+</span><span id="L-1088"><a href="#L-1088"><span class="linenos">1088</span></a><span class="k">def</span><span class="w"> </span><span class="nf">load_list_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+</span><span id="L-1089"><a href="#L-1089"><span class="linenos">1089</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1090"><a href="#L-1090"><span class="linenos">1090</span></a><span class="sd">    Load a list from a file using pickle.</span>
+</span><span id="L-1091"><a href="#L-1091"><span class="linenos">1091</span></a>
+</span><span id="L-1092"><a href="#L-1092"><span class="linenos">1092</span></a><span class="sd">    This function reads a list from a file that was previously saved using the pickle module.</span>
+</span><span id="L-1093"><a href="#L-1093"><span class="linenos">1093</span></a>
+</span><span id="L-1094"><a href="#L-1094"><span class="linenos">1094</span></a><span class="sd">    :param filename: Name of the file from which the list will be loaded.</span>
+</span><span id="L-1095"><a href="#L-1095"><span class="linenos">1095</span></a><span class="sd">    :type filename: str</span>
+</span><span id="L-1096"><a href="#L-1096"><span class="linenos">1096</span></a><span class="sd">    :return: The list that was loaded from the file.</span>
+</span><span id="L-1097"><a href="#L-1097"><span class="linenos">1097</span></a><span class="sd">    :rtype: list</span>
+</span><span id="L-1098"><a href="#L-1098"><span class="linenos">1098</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-1099"><a href="#L-1099"><span class="linenos">1099</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+</span><span id="L-1100"><a href="#L-1100"><span class="linenos">1100</span></a>        <span class="n">loaded_list</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+</span><span id="L-1101"><a href="#L-1101"><span class="linenos">1101</span></a>    <span class="k">return</span> <span class="n">loaded_list</span>
 </span><span id="L-1102"><a href="#L-1102"><span class="linenos">1102</span></a>
 </span><span id="L-1103"><a href="#L-1103"><span class="linenos">1103</span></a>
-</span><span id="L-1104"><a href="#L-1104"><span class="linenos">1104</span></a><span class="k">def</span><span class="w"> </span><span class="nf">bad_filter_by_cutoffs</span><span class="p">(</span>
-</span><span id="L-1105"><a href="#L-1105"><span class="linenos">1105</span></a>    <span class="n">df</span><span class="p">,</span> <span class="n">distance_cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">angle_cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ca_cutoff</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span> <span class="n">minimum_distance</span><span class="o">=</span><span class="mf">2.0</span>
-</span><span id="L-1106"><a href="#L-1106"><span class="linenos">1106</span></a><span class="p">):</span>
-</span><span id="L-1107"><a href="#L-1107"><span class="linenos">1107</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-1108"><a href="#L-1108"><span class="linenos">1108</span></a><span class="sd">    Return the DataFrame objects that are GREATER than the cutoff based on distance,</span>
-</span><span id="L-1109"><a href="#L-1109"><span class="linenos">1109</span></a><span class="sd">    angle, and Ca distance cutoffs. Used to get the bad structures. Ca cutoff</span>
-</span><span id="L-1110"><a href="#L-1110"><span class="linenos">1110</span></a><span class="sd">    dominates the filter and will override the distance and angle cutoffs.</span>
+</span><span id="L-1104"><a href="#L-1104"><span class="linenos">1104</span></a><span class="k">def</span><span class="w"> </span><span class="nf">set_plotly_theme</span><span class="p">(</span><span class="n">theme</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-1105"><a href="#L-1105"><span class="linenos">1105</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1106"><a href="#L-1106"><span class="linenos">1106</span></a><span class="sd">    Set the Plotly theme based on the provided theme parameter.</span>
+</span><span id="L-1107"><a href="#L-1107"><span class="linenos">1107</span></a>
+</span><span id="L-1108"><a href="#L-1108"><span class="linenos">1108</span></a><span class="sd">    This function sets the default Plotly template to either &#39;plotly_white&#39; or &#39;plotly_dark&#39;</span>
+</span><span id="L-1109"><a href="#L-1109"><span class="linenos">1109</span></a><span class="sd">    based on the input theme. If &#39;auto&#39; is selected, the theme is determined automatically</span>
+</span><span id="L-1110"><a href="#L-1110"><span class="linenos">1110</span></a><span class="sd">    based on the current system or application theme.</span>
 </span><span id="L-1111"><a href="#L-1111"><span class="linenos">1111</span></a>
-</span><span id="L-1112"><a href="#L-1112"><span class="linenos">1112</span></a><span class="sd">    :param df: DataFrame containing the deviations.</span>
-</span><span id="L-1113"><a href="#L-1113"><span class="linenos">1113</span></a><span class="sd">    :type df: pd.DataFrame</span>
-</span><span id="L-1114"><a href="#L-1114"><span class="linenos">1114</span></a><span class="sd">    :param distance_cutoff: Cutoff value for Bond Length Deviation.</span>
-</span><span id="L-1115"><a href="#L-1115"><span class="linenos">1115</span></a><span class="sd">    :type distance_cutoff: float</span>
-</span><span id="L-1116"><a href="#L-1116"><span class="linenos">1116</span></a><span class="sd">    :param angle_cutoff: Cutoff value for angle deviation.</span>
-</span><span id="L-1117"><a href="#L-1117"><span class="linenos">1117</span></a><span class="sd">    :type angle_cutoff: float</span>
-</span><span id="L-1118"><a href="#L-1118"><span class="linenos">1118</span></a><span class="sd">    :param ca_cutoff: Cutoff value for Ca distance.</span>
-</span><span id="L-1119"><a href="#L-1119"><span class="linenos">1119</span></a><span class="sd">    :type ca_cutoff: float</span>
-</span><span id="L-1120"><a href="#L-1120"><span class="linenos">1120</span></a><span class="sd">    :return: Filtered DataFrame.</span>
-</span><span id="L-1121"><a href="#L-1121"><span class="linenos">1121</span></a><span class="sd">    :rtype: pd.DataFrame</span>
-</span><span id="L-1122"><a href="#L-1122"><span class="linenos">1122</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-1123"><a href="#L-1123"><span class="linenos">1123</span></a>    <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span>
-</span><span id="L-1124"><a href="#L-1124"><span class="linenos">1124</span></a>        <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Bondlength_Deviation&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">distance_cutoff</span><span class="p">)</span>
-</span><span id="L-1125"><a href="#L-1125"><span class="linenos">1125</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Angle_Deviation&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">angle_cutoff</span><span class="p">)</span>
-</span><span id="L-1126"><a href="#L-1126"><span class="linenos">1126</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Ca_Distance&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">ca_cutoff</span><span class="p">)</span>
-</span><span id="L-1127"><a href="#L-1127"><span class="linenos">1127</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Ca_Distance&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">minimum_distance</span><span class="p">)</span>
-</span><span id="L-1128"><a href="#L-1128"><span class="linenos">1128</span></a>    <span class="p">]</span>
-</span><span id="L-1129"><a href="#L-1129"><span class="linenos">1129</span></a>    <span class="k">return</span> <span class="n">filtered_df</span>
-</span><span id="L-1130"><a href="#L-1130"><span class="linenos">1130</span></a>
-</span><span id="L-1131"><a href="#L-1131"><span class="linenos">1131</span></a>
-</span><span id="L-1132"><a href="#L-1132"><span class="linenos">1132</span></a><span class="k">def</span><span class="w"> </span><span class="nf">save_list_to_file</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
-</span><span id="L-1133"><a href="#L-1133"><span class="linenos">1133</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-1134"><a href="#L-1134"><span class="linenos">1134</span></a><span class="sd">    Save the input list to a file using pickle.</span>
+</span><span id="L-1112"><a href="#L-1112"><span class="linenos">1112</span></a><span class="sd">    :param theme: The theme to set for Plotly. Must be &#39;auto&#39;, &#39;light&#39;, or &#39;dark&#39;.</span>
+</span><span id="L-1113"><a href="#L-1113"><span class="linenos">1113</span></a><span class="sd">    :type theme: str</span>
+</span><span id="L-1114"><a href="#L-1114"><span class="linenos">1114</span></a><span class="sd">    :raises ValueError: If an invalid theme is provided.</span>
+</span><span id="L-1115"><a href="#L-1115"><span class="linenos">1115</span></a><span class="sd">    :return: None</span>
+</span><span id="L-1116"><a href="#L-1116"><span class="linenos">1116</span></a><span class="sd">    :rtype: None</span>
+</span><span id="L-1117"><a href="#L-1117"><span class="linenos">1117</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-1118"><a href="#L-1118"><span class="linenos">1118</span></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">plotly</span><span class="w"> </span><span class="kn">import</span> <span class="n">io</span> <span class="k">as</span> <span class="n">pio</span>
+</span><span id="L-1119"><a href="#L-1119"><span class="linenos">1119</span></a>
+</span><span id="L-1120"><a href="#L-1120"><span class="linenos">1120</span></a>    <span class="k">match</span> <span class="n">theme</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+</span><span id="L-1121"><a href="#L-1121"><span class="linenos">1121</span></a>        <span class="k">case</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+</span><span id="L-1122"><a href="#L-1122"><span class="linenos">1122</span></a>            <span class="n">_theme</span> <span class="o">=</span> <span class="n">get_theme</span><span class="p">()</span>
+</span><span id="L-1123"><a href="#L-1123"><span class="linenos">1123</span></a>            <span class="k">if</span> <span class="n">_theme</span> <span class="o">==</span> <span class="s2">&quot;light&quot;</span><span class="p">:</span>
+</span><span id="L-1124"><a href="#L-1124"><span class="linenos">1124</span></a>                <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
+</span><span id="L-1125"><a href="#L-1125"><span class="linenos">1125</span></a>            <span class="k">else</span><span class="p">:</span>
+</span><span id="L-1126"><a href="#L-1126"><span class="linenos">1126</span></a>                <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_dark&quot;</span>
+</span><span id="L-1127"><a href="#L-1127"><span class="linenos">1127</span></a>        <span class="k">case</span> <span class="s2">&quot;light&quot;</span><span class="p">:</span>
+</span><span id="L-1128"><a href="#L-1128"><span class="linenos">1128</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
+</span><span id="L-1129"><a href="#L-1129"><span class="linenos">1129</span></a>        <span class="k">case</span> <span class="s2">&quot;dark&quot;</span><span class="p">:</span>
+</span><span id="L-1130"><a href="#L-1130"><span class="linenos">1130</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_dark&quot;</span>
+</span><span id="L-1131"><a href="#L-1131"><span class="linenos">1131</span></a>        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+</span><span id="L-1132"><a href="#L-1132"><span class="linenos">1132</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid theme. Must be &#39;auto&#39;, &#39;light&#39;, or &#39;dark&#39;.&quot;</span><span class="p">)</span>
+</span><span id="L-1133"><a href="#L-1133"><span class="linenos">1133</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
+</span><span id="L-1134"><a href="#L-1134"><span class="linenos">1134</span></a>    <span class="k">return</span> <span class="kc">None</span>
 </span><span id="L-1135"><a href="#L-1135"><span class="linenos">1135</span></a>
-</span><span id="L-1136"><a href="#L-1136"><span class="linenos">1136</span></a><span class="sd">    :param input_list: List to be saved.</span>
-</span><span id="L-1137"><a href="#L-1137"><span class="linenos">1137</span></a><span class="sd">    :type input_list: list</span>
-</span><span id="L-1138"><a href="#L-1138"><span class="linenos">1138</span></a><span class="sd">    :param filename: Name of the file where the list will be saved.</span>
-</span><span id="L-1139"><a href="#L-1139"><span class="linenos">1139</span></a><span class="sd">    :type filename: str</span>
-</span><span id="L-1140"><a href="#L-1140"><span class="linenos">1140</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-1141"><a href="#L-1141"><span class="linenos">1141</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-</span><span id="L-1142"><a href="#L-1142"><span class="linenos">1142</span></a>        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
-</span><span id="L-1143"><a href="#L-1143"><span class="linenos">1143</span></a>
-</span><span id="L-1144"><a href="#L-1144"><span class="linenos">1144</span></a>
-</span><span id="L-1145"><a href="#L-1145"><span class="linenos">1145</span></a><span class="k">def</span><span class="w"> </span><span class="nf">load_list_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-</span><span id="L-1146"><a href="#L-1146"><span class="linenos">1146</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-1147"><a href="#L-1147"><span class="linenos">1147</span></a><span class="sd">    Load a list from a file using pickle.</span>
-</span><span id="L-1148"><a href="#L-1148"><span class="linenos">1148</span></a>
-</span><span id="L-1149"><a href="#L-1149"><span class="linenos">1149</span></a><span class="sd">    This function reads a list from a file that was previously saved using the pickle module.</span>
-</span><span id="L-1150"><a href="#L-1150"><span class="linenos">1150</span></a>
-</span><span id="L-1151"><a href="#L-1151"><span class="linenos">1151</span></a><span class="sd">    :param filename: Name of the file from which the list will be loaded.</span>
-</span><span id="L-1152"><a href="#L-1152"><span class="linenos">1152</span></a><span class="sd">    :type filename: str</span>
-</span><span id="L-1153"><a href="#L-1153"><span class="linenos">1153</span></a><span class="sd">    :return: The list that was loaded from the file.</span>
-</span><span id="L-1154"><a href="#L-1154"><span class="linenos">1154</span></a><span class="sd">    :rtype: list</span>
-</span><span id="L-1155"><a href="#L-1155"><span class="linenos">1155</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-1156"><a href="#L-1156"><span class="linenos">1156</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-</span><span id="L-1157"><a href="#L-1157"><span class="linenos">1157</span></a>        <span class="n">loaded_list</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-</span><span id="L-1158"><a href="#L-1158"><span class="linenos">1158</span></a>    <span class="k">return</span> <span class="n">loaded_list</span>
-</span><span id="L-1159"><a href="#L-1159"><span class="linenos">1159</span></a>
-</span><span id="L-1160"><a href="#L-1160"><span class="linenos">1160</span></a>
-</span><span id="L-1161"><a href="#L-1161"><span class="linenos">1161</span></a><span class="k">def</span><span class="w"> </span><span class="nf">set_plotly_theme</span><span class="p">(</span><span class="n">theme</span><span class="p">):</span>
-</span><span id="L-1162"><a href="#L-1162"><span class="linenos">1162</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-1163"><a href="#L-1163"><span class="linenos">1163</span></a><span class="sd">    Set the Plotly theme based on the provided theme parameter.</span>
-</span><span id="L-1164"><a href="#L-1164"><span class="linenos">1164</span></a>
-</span><span id="L-1165"><a href="#L-1165"><span class="linenos">1165</span></a><span class="sd">    This function sets the default Plotly template to either &#39;plotly_white&#39; or &#39;plotly_dark&#39;</span>
-</span><span id="L-1166"><a href="#L-1166"><span class="linenos">1166</span></a><span class="sd">    based on the input theme. If &#39;auto&#39; is selected, the theme is determined automatically</span>
-</span><span id="L-1167"><a href="#L-1167"><span class="linenos">1167</span></a><span class="sd">    based on the current system or application theme.</span>
-</span><span id="L-1168"><a href="#L-1168"><span class="linenos">1168</span></a>
-</span><span id="L-1169"><a href="#L-1169"><span class="linenos">1169</span></a><span class="sd">    :param theme: The theme to set for Plotly. Must be &#39;auto&#39;, &#39;light&#39;, or &#39;dark&#39;.</span>
-</span><span id="L-1170"><a href="#L-1170"><span class="linenos">1170</span></a><span class="sd">    :type theme: str</span>
-</span><span id="L-1171"><a href="#L-1171"><span class="linenos">1171</span></a><span class="sd">    :raises ValueError: If an invalid theme is provided.</span>
-</span><span id="L-1172"><a href="#L-1172"><span class="linenos">1172</span></a><span class="sd">    :return: None</span>
-</span><span id="L-1173"><a href="#L-1173"><span class="linenos">1173</span></a><span class="sd">    :rtype: None</span>
-</span><span id="L-1174"><a href="#L-1174"><span class="linenos">1174</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-1175"><a href="#L-1175"><span class="linenos">1175</span></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">plotly</span><span class="w"> </span><span class="kn">import</span> <span class="n">io</span> <span class="k">as</span> <span class="n">pio</span>
-</span><span id="L-1176"><a href="#L-1176"><span class="linenos">1176</span></a>
-</span><span id="L-1177"><a href="#L-1177"><span class="linenos">1177</span></a>    <span class="k">match</span> <span class="n">theme</span><span class="p">:</span>
-</span><span id="L-1178"><a href="#L-1178"><span class="linenos">1178</span></a>        <span class="k">case</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
-</span><span id="L-1179"><a href="#L-1179"><span class="linenos">1179</span></a>            <span class="n">_theme</span> <span class="o">=</span> <span class="n">get_theme</span><span class="p">()</span>
-</span><span id="L-1180"><a href="#L-1180"><span class="linenos">1180</span></a>            <span class="k">if</span> <span class="n">_theme</span> <span class="o">==</span> <span class="s2">&quot;light&quot;</span><span class="p">:</span>
-</span><span id="L-1181"><a href="#L-1181"><span class="linenos">1181</span></a>                <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
-</span><span id="L-1182"><a href="#L-1182"><span class="linenos">1182</span></a>            <span class="k">else</span><span class="p">:</span>
-</span><span id="L-1183"><a href="#L-1183"><span class="linenos">1183</span></a>                <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_dark&quot;</span>
-</span><span id="L-1184"><a href="#L-1184"><span class="linenos">1184</span></a>        <span class="k">case</span> <span class="s2">&quot;light&quot;</span><span class="p">:</span>
-</span><span id="L-1185"><a href="#L-1185"><span class="linenos">1185</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
-</span><span id="L-1186"><a href="#L-1186"><span class="linenos">1186</span></a>        <span class="k">case</span> <span class="s2">&quot;dark&quot;</span><span class="p">:</span>
-</span><span id="L-1187"><a href="#L-1187"><span class="linenos">1187</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_dark&quot;</span>
-</span><span id="L-1188"><a href="#L-1188"><span class="linenos">1188</span></a>        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
-</span><span id="L-1189"><a href="#L-1189"><span class="linenos">1189</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid theme. Must be &#39;auto&#39;, &#39;light&#39;, or &#39;dark&#39;.&quot;</span><span class="p">)</span>
-</span><span id="L-1190"><a href="#L-1190"><span class="linenos">1190</span></a>
-</span><span id="L-1191"><a href="#L-1191"><span class="linenos">1191</span></a>
-</span><span id="L-1192"><a href="#L-1192"><span class="linenos">1192</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="L-1193"><a href="#L-1193"><span class="linenos">1193</span></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">doctest</span>
-</span><span id="L-1194"><a href="#L-1194"><span class="linenos">1194</span></a>
-</span><span id="L-1195"><a href="#L-1195"><span class="linenos">1195</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
-</span><span id="L-1196"><a href="#L-1196"><span class="linenos">1196</span></a>
-</span><span id="L-1197"><a href="#L-1197"><span class="linenos">1197</span></a><span class="c1"># end of file</span>
+</span><span id="L-1136"><a href="#L-1136"><span class="linenos">1136</span></a>
+</span><span id="L-1137"><a href="#L-1137"><span class="linenos">1137</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="L-1138"><a href="#L-1138"><span class="linenos">1138</span></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">doctest</span>
+</span><span id="L-1139"><a href="#L-1139"><span class="linenos">1139</span></a>
+</span><span id="L-1140"><a href="#L-1140"><span class="linenos">1140</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</span><span id="L-1141"><a href="#L-1141"><span class="linenos">1141</span></a>
+</span><span id="L-1142"><a href="#L-1142"><span class="linenos">1142</span></a><span class="c1"># end of file</span>
 </span></pre></div>
 
 
@@ -3037,132 +2976,6 @@ than the cutoff value. If it's -1.0 then the function keeps all Disulfides.</p>
 
 
                 </section>
-                <section id="filter_by_cutoffs">
-                            <input id="filter_by_cutoffs-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">filter_by_cutoffs</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">df</span>,</span><span class="param">	<span class="n">length_cutoff</span><span class="o">=</span><span class="mf">1.0</span>,</span><span class="param">	<span class="n">angle_cutoff</span><span class="o">=</span><span class="mf">1.0</span>,</span><span class="param">	<span class="n">ca_cutoff</span><span class="o">=</span><span class="mf">8.0</span>,</span><span class="param">	<span class="n">minimum_distance</span><span class="o">=</span><span class="mf">2.0</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="filter_by_cutoffs-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#filter_by_cutoffs"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="filter_by_cutoffs-1076"><a href="#filter_by_cutoffs-1076"><span class="linenos">1076</span></a><span class="k">def</span><span class="w"> </span><span class="nf">filter_by_cutoffs</span><span class="p">(</span>
-</span><span id="filter_by_cutoffs-1077"><a href="#filter_by_cutoffs-1077"><span class="linenos">1077</span></a>    <span class="n">df</span><span class="p">,</span> <span class="n">length_cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">angle_cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ca_cutoff</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span> <span class="n">minimum_distance</span><span class="o">=</span><span class="mf">2.0</span>
-</span><span id="filter_by_cutoffs-1078"><a href="#filter_by_cutoffs-1078"><span class="linenos">1078</span></a><span class="p">):</span>
-</span><span id="filter_by_cutoffs-1079"><a href="#filter_by_cutoffs-1079"><span class="linenos">1079</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="filter_by_cutoffs-1080"><a href="#filter_by_cutoffs-1080"><span class="linenos">1080</span></a><span class="sd">    Filter the DataFrame based on distance, angle, and Ca distance cutoffs. Ca cutoff</span>
-</span><span id="filter_by_cutoffs-1081"><a href="#filter_by_cutoffs-1081"><span class="linenos">1081</span></a><span class="sd">    dominates the filter and will override the distance and angle cutoffs. Note: The</span>
-</span><span id="filter_by_cutoffs-1082"><a href="#filter_by_cutoffs-1082"><span class="linenos">1082</span></a><span class="sd">    filter is applied if the Ca distance is less than or equal to 2.0 Angstroms, since</span>
-</span><span id="filter_by_cutoffs-1083"><a href="#filter_by_cutoffs-1083"><span class="linenos">1083</span></a><span class="sd">    this is physically impossible.</span>
-</span><span id="filter_by_cutoffs-1084"><a href="#filter_by_cutoffs-1084"><span class="linenos">1084</span></a>
-</span><span id="filter_by_cutoffs-1085"><a href="#filter_by_cutoffs-1085"><span class="linenos">1085</span></a><span class="sd">    :param df: DataFrame containing the deviations.</span>
-</span><span id="filter_by_cutoffs-1086"><a href="#filter_by_cutoffs-1086"><span class="linenos">1086</span></a><span class="sd">    :type df: pd.DataFrame</span>
-</span><span id="filter_by_cutoffs-1087"><a href="#filter_by_cutoffs-1087"><span class="linenos">1087</span></a><span class="sd">    :param length_cutoff: Cutoff value for Bond Length Deviation.</span>
-</span><span id="filter_by_cutoffs-1088"><a href="#filter_by_cutoffs-1088"><span class="linenos">1088</span></a><span class="sd">    :type distance_cutoff: float</span>
-</span><span id="filter_by_cutoffs-1089"><a href="#filter_by_cutoffs-1089"><span class="linenos">1089</span></a><span class="sd">    :param angle_cutoff: Cutoff value for angle deviation.</span>
-</span><span id="filter_by_cutoffs-1090"><a href="#filter_by_cutoffs-1090"><span class="linenos">1090</span></a><span class="sd">    :type angle_cutoff: float</span>
-</span><span id="filter_by_cutoffs-1091"><a href="#filter_by_cutoffs-1091"><span class="linenos">1091</span></a><span class="sd">    :param ca_cutoff: Cutoff value for Ca distance.</span>
-</span><span id="filter_by_cutoffs-1092"><a href="#filter_by_cutoffs-1092"><span class="linenos">1092</span></a><span class="sd">    :type ca_cutoff: float</span>
-</span><span id="filter_by_cutoffs-1093"><a href="#filter_by_cutoffs-1093"><span class="linenos">1093</span></a><span class="sd">    :return: Filtered DataFrame.</span>
-</span><span id="filter_by_cutoffs-1094"><a href="#filter_by_cutoffs-1094"><span class="linenos">1094</span></a><span class="sd">    :rtype: pd.DataFrame</span>
-</span><span id="filter_by_cutoffs-1095"><a href="#filter_by_cutoffs-1095"><span class="linenos">1095</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="filter_by_cutoffs-1096"><a href="#filter_by_cutoffs-1096"><span class="linenos">1096</span></a>    <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span>
-</span><span id="filter_by_cutoffs-1097"><a href="#filter_by_cutoffs-1097"><span class="linenos">1097</span></a>        <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Bondlength_Deviation&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">length_cutoff</span><span class="p">)</span>
-</span><span id="filter_by_cutoffs-1098"><a href="#filter_by_cutoffs-1098"><span class="linenos">1098</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Angle_Deviation&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">angle_cutoff</span><span class="p">)</span>
-</span><span id="filter_by_cutoffs-1099"><a href="#filter_by_cutoffs-1099"><span class="linenos">1099</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Ca_Distance&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">minimum_distance</span><span class="p">)</span>
-</span><span id="filter_by_cutoffs-1100"><a href="#filter_by_cutoffs-1100"><span class="linenos">1100</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Ca_Distance&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">ca_cutoff</span><span class="p">)</span>
-</span><span id="filter_by_cutoffs-1101"><a href="#filter_by_cutoffs-1101"><span class="linenos">1101</span></a>    <span class="p">]</span>
-</span><span id="filter_by_cutoffs-1102"><a href="#filter_by_cutoffs-1102"><span class="linenos">1102</span></a>    <span class="k">return</span> <span class="n">filtered_df</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Filter the DataFrame based on distance, angle, and Ca distance cutoffs. Ca cutoff
-dominates the filter and will override the distance and angle cutoffs. Note: The
-filter is applied if the Ca distance is less than or equal to 2.0 Angstroms, since
-this is physically impossible.</p>
-
-<h6 id="parameters">Parameters</h6>
-
-<ul>
-<li><strong>df</strong>:  DataFrame containing the deviations.</li>
-<li><strong>length_cutoff</strong>:  Cutoff value for Bond Length Deviation.</li>
-<li><strong>angle_cutoff</strong>:  Cutoff value for angle deviation.</li>
-<li><strong>ca_cutoff</strong>:  Cutoff value for Ca distance.</li>
-</ul>
-
-<h6 id="returns">Returns</h6>
-
-<blockquote>
-  <p>Filtered DataFrame.</p>
-</blockquote>
-</div>
-
-
-                </section>
-                <section id="bad_filter_by_cutoffs">
-                            <input id="bad_filter_by_cutoffs-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">bad_filter_by_cutoffs</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">df</span>,</span><span class="param">	<span class="n">distance_cutoff</span><span class="o">=</span><span class="mf">1.0</span>,</span><span class="param">	<span class="n">angle_cutoff</span><span class="o">=</span><span class="mf">1.0</span>,</span><span class="param">	<span class="n">ca_cutoff</span><span class="o">=</span><span class="mf">8.0</span>,</span><span class="param">	<span class="n">minimum_distance</span><span class="o">=</span><span class="mf">2.0</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="bad_filter_by_cutoffs-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#bad_filter_by_cutoffs"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="bad_filter_by_cutoffs-1105"><a href="#bad_filter_by_cutoffs-1105"><span class="linenos">1105</span></a><span class="k">def</span><span class="w"> </span><span class="nf">bad_filter_by_cutoffs</span><span class="p">(</span>
-</span><span id="bad_filter_by_cutoffs-1106"><a href="#bad_filter_by_cutoffs-1106"><span class="linenos">1106</span></a>    <span class="n">df</span><span class="p">,</span> <span class="n">distance_cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">angle_cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ca_cutoff</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span> <span class="n">minimum_distance</span><span class="o">=</span><span class="mf">2.0</span>
-</span><span id="bad_filter_by_cutoffs-1107"><a href="#bad_filter_by_cutoffs-1107"><span class="linenos">1107</span></a><span class="p">):</span>
-</span><span id="bad_filter_by_cutoffs-1108"><a href="#bad_filter_by_cutoffs-1108"><span class="linenos">1108</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="bad_filter_by_cutoffs-1109"><a href="#bad_filter_by_cutoffs-1109"><span class="linenos">1109</span></a><span class="sd">    Return the DataFrame objects that are GREATER than the cutoff based on distance,</span>
-</span><span id="bad_filter_by_cutoffs-1110"><a href="#bad_filter_by_cutoffs-1110"><span class="linenos">1110</span></a><span class="sd">    angle, and Ca distance cutoffs. Used to get the bad structures. Ca cutoff</span>
-</span><span id="bad_filter_by_cutoffs-1111"><a href="#bad_filter_by_cutoffs-1111"><span class="linenos">1111</span></a><span class="sd">    dominates the filter and will override the distance and angle cutoffs.</span>
-</span><span id="bad_filter_by_cutoffs-1112"><a href="#bad_filter_by_cutoffs-1112"><span class="linenos">1112</span></a>
-</span><span id="bad_filter_by_cutoffs-1113"><a href="#bad_filter_by_cutoffs-1113"><span class="linenos">1113</span></a><span class="sd">    :param df: DataFrame containing the deviations.</span>
-</span><span id="bad_filter_by_cutoffs-1114"><a href="#bad_filter_by_cutoffs-1114"><span class="linenos">1114</span></a><span class="sd">    :type df: pd.DataFrame</span>
-</span><span id="bad_filter_by_cutoffs-1115"><a href="#bad_filter_by_cutoffs-1115"><span class="linenos">1115</span></a><span class="sd">    :param distance_cutoff: Cutoff value for Bond Length Deviation.</span>
-</span><span id="bad_filter_by_cutoffs-1116"><a href="#bad_filter_by_cutoffs-1116"><span class="linenos">1116</span></a><span class="sd">    :type distance_cutoff: float</span>
-</span><span id="bad_filter_by_cutoffs-1117"><a href="#bad_filter_by_cutoffs-1117"><span class="linenos">1117</span></a><span class="sd">    :param angle_cutoff: Cutoff value for angle deviation.</span>
-</span><span id="bad_filter_by_cutoffs-1118"><a href="#bad_filter_by_cutoffs-1118"><span class="linenos">1118</span></a><span class="sd">    :type angle_cutoff: float</span>
-</span><span id="bad_filter_by_cutoffs-1119"><a href="#bad_filter_by_cutoffs-1119"><span class="linenos">1119</span></a><span class="sd">    :param ca_cutoff: Cutoff value for Ca distance.</span>
-</span><span id="bad_filter_by_cutoffs-1120"><a href="#bad_filter_by_cutoffs-1120"><span class="linenos">1120</span></a><span class="sd">    :type ca_cutoff: float</span>
-</span><span id="bad_filter_by_cutoffs-1121"><a href="#bad_filter_by_cutoffs-1121"><span class="linenos">1121</span></a><span class="sd">    :return: Filtered DataFrame.</span>
-</span><span id="bad_filter_by_cutoffs-1122"><a href="#bad_filter_by_cutoffs-1122"><span class="linenos">1122</span></a><span class="sd">    :rtype: pd.DataFrame</span>
-</span><span id="bad_filter_by_cutoffs-1123"><a href="#bad_filter_by_cutoffs-1123"><span class="linenos">1123</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="bad_filter_by_cutoffs-1124"><a href="#bad_filter_by_cutoffs-1124"><span class="linenos">1124</span></a>    <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span>
-</span><span id="bad_filter_by_cutoffs-1125"><a href="#bad_filter_by_cutoffs-1125"><span class="linenos">1125</span></a>        <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Bondlength_Deviation&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">distance_cutoff</span><span class="p">)</span>
-</span><span id="bad_filter_by_cutoffs-1126"><a href="#bad_filter_by_cutoffs-1126"><span class="linenos">1126</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Angle_Deviation&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">angle_cutoff</span><span class="p">)</span>
-</span><span id="bad_filter_by_cutoffs-1127"><a href="#bad_filter_by_cutoffs-1127"><span class="linenos">1127</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Ca_Distance&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">ca_cutoff</span><span class="p">)</span>
-</span><span id="bad_filter_by_cutoffs-1128"><a href="#bad_filter_by_cutoffs-1128"><span class="linenos">1128</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Ca_Distance&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">minimum_distance</span><span class="p">)</span>
-</span><span id="bad_filter_by_cutoffs-1129"><a href="#bad_filter_by_cutoffs-1129"><span class="linenos">1129</span></a>    <span class="p">]</span>
-</span><span id="bad_filter_by_cutoffs-1130"><a href="#bad_filter_by_cutoffs-1130"><span class="linenos">1130</span></a>    <span class="k">return</span> <span class="n">filtered_df</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Return the DataFrame objects that are GREATER than the cutoff based on distance,
-angle, and Ca distance cutoffs. Used to get the bad structures. Ca cutoff
-dominates the filter and will override the distance and angle cutoffs.</p>
-
-<h6 id="parameters">Parameters</h6>
-
-<ul>
-<li><strong>df</strong>:  DataFrame containing the deviations.</li>
-<li><strong>distance_cutoff</strong>:  Cutoff value for Bond Length Deviation.</li>
-<li><strong>angle_cutoff</strong>:  Cutoff value for angle deviation.</li>
-<li><strong>ca_cutoff</strong>:  Cutoff value for Ca distance.</li>
-</ul>
-
-<h6 id="returns">Returns</h6>
-
-<blockquote>
-  <p>Filtered DataFrame.</p>
-</blockquote>
-</div>
-
-
-                </section>
                 <section id="save_list_to_file">
                             <input id="save_list_to_file-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
@@ -3174,17 +2987,17 @@ dominates the filter and will override the distance and angle cutoffs.</p>
 
     </div>
     <a class="headerlink" href="#save_list_to_file"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="save_list_to_file-1133"><a href="#save_list_to_file-1133"><span class="linenos">1133</span></a><span class="k">def</span><span class="w"> </span><span class="nf">save_list_to_file</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
-</span><span id="save_list_to_file-1134"><a href="#save_list_to_file-1134"><span class="linenos">1134</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="save_list_to_file-1135"><a href="#save_list_to_file-1135"><span class="linenos">1135</span></a><span class="sd">    Save the input list to a file using pickle.</span>
-</span><span id="save_list_to_file-1136"><a href="#save_list_to_file-1136"><span class="linenos">1136</span></a>
-</span><span id="save_list_to_file-1137"><a href="#save_list_to_file-1137"><span class="linenos">1137</span></a><span class="sd">    :param input_list: List to be saved.</span>
-</span><span id="save_list_to_file-1138"><a href="#save_list_to_file-1138"><span class="linenos">1138</span></a><span class="sd">    :type input_list: list</span>
-</span><span id="save_list_to_file-1139"><a href="#save_list_to_file-1139"><span class="linenos">1139</span></a><span class="sd">    :param filename: Name of the file where the list will be saved.</span>
-</span><span id="save_list_to_file-1140"><a href="#save_list_to_file-1140"><span class="linenos">1140</span></a><span class="sd">    :type filename: str</span>
-</span><span id="save_list_to_file-1141"><a href="#save_list_to_file-1141"><span class="linenos">1141</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="save_list_to_file-1142"><a href="#save_list_to_file-1142"><span class="linenos">1142</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-</span><span id="save_list_to_file-1143"><a href="#save_list_to_file-1143"><span class="linenos">1143</span></a>        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="save_list_to_file-1076"><a href="#save_list_to_file-1076"><span class="linenos">1076</span></a><span class="k">def</span><span class="w"> </span><span class="nf">save_list_to_file</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+</span><span id="save_list_to_file-1077"><a href="#save_list_to_file-1077"><span class="linenos">1077</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="save_list_to_file-1078"><a href="#save_list_to_file-1078"><span class="linenos">1078</span></a><span class="sd">    Save the input list to a file using pickle.</span>
+</span><span id="save_list_to_file-1079"><a href="#save_list_to_file-1079"><span class="linenos">1079</span></a>
+</span><span id="save_list_to_file-1080"><a href="#save_list_to_file-1080"><span class="linenos">1080</span></a><span class="sd">    :param input_list: List to be saved.</span>
+</span><span id="save_list_to_file-1081"><a href="#save_list_to_file-1081"><span class="linenos">1081</span></a><span class="sd">    :type input_list: list</span>
+</span><span id="save_list_to_file-1082"><a href="#save_list_to_file-1082"><span class="linenos">1082</span></a><span class="sd">    :param filename: Name of the file where the list will be saved.</span>
+</span><span id="save_list_to_file-1083"><a href="#save_list_to_file-1083"><span class="linenos">1083</span></a><span class="sd">    :type filename: str</span>
+</span><span id="save_list_to_file-1084"><a href="#save_list_to_file-1084"><span class="linenos">1084</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="save_list_to_file-1085"><a href="#save_list_to_file-1085"><span class="linenos">1085</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+</span><span id="save_list_to_file-1086"><a href="#save_list_to_file-1086"><span class="linenos">1086</span></a>        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -3211,20 +3024,20 @@ dominates the filter and will override the distance and angle cutoffs.</p>
 
     </div>
     <a class="headerlink" href="#load_list_from_file"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="load_list_from_file-1146"><a href="#load_list_from_file-1146"><span class="linenos">1146</span></a><span class="k">def</span><span class="w"> </span><span class="nf">load_list_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-</span><span id="load_list_from_file-1147"><a href="#load_list_from_file-1147"><span class="linenos">1147</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="load_list_from_file-1148"><a href="#load_list_from_file-1148"><span class="linenos">1148</span></a><span class="sd">    Load a list from a file using pickle.</span>
-</span><span id="load_list_from_file-1149"><a href="#load_list_from_file-1149"><span class="linenos">1149</span></a>
-</span><span id="load_list_from_file-1150"><a href="#load_list_from_file-1150"><span class="linenos">1150</span></a><span class="sd">    This function reads a list from a file that was previously saved using the pickle module.</span>
-</span><span id="load_list_from_file-1151"><a href="#load_list_from_file-1151"><span class="linenos">1151</span></a>
-</span><span id="load_list_from_file-1152"><a href="#load_list_from_file-1152"><span class="linenos">1152</span></a><span class="sd">    :param filename: Name of the file from which the list will be loaded.</span>
-</span><span id="load_list_from_file-1153"><a href="#load_list_from_file-1153"><span class="linenos">1153</span></a><span class="sd">    :type filename: str</span>
-</span><span id="load_list_from_file-1154"><a href="#load_list_from_file-1154"><span class="linenos">1154</span></a><span class="sd">    :return: The list that was loaded from the file.</span>
-</span><span id="load_list_from_file-1155"><a href="#load_list_from_file-1155"><span class="linenos">1155</span></a><span class="sd">    :rtype: list</span>
-</span><span id="load_list_from_file-1156"><a href="#load_list_from_file-1156"><span class="linenos">1156</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="load_list_from_file-1157"><a href="#load_list_from_file-1157"><span class="linenos">1157</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-</span><span id="load_list_from_file-1158"><a href="#load_list_from_file-1158"><span class="linenos">1158</span></a>        <span class="n">loaded_list</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-</span><span id="load_list_from_file-1159"><a href="#load_list_from_file-1159"><span class="linenos">1159</span></a>    <span class="k">return</span> <span class="n">loaded_list</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="load_list_from_file-1089"><a href="#load_list_from_file-1089"><span class="linenos">1089</span></a><span class="k">def</span><span class="w"> </span><span class="nf">load_list_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+</span><span id="load_list_from_file-1090"><a href="#load_list_from_file-1090"><span class="linenos">1090</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="load_list_from_file-1091"><a href="#load_list_from_file-1091"><span class="linenos">1091</span></a><span class="sd">    Load a list from a file using pickle.</span>
+</span><span id="load_list_from_file-1092"><a href="#load_list_from_file-1092"><span class="linenos">1092</span></a>
+</span><span id="load_list_from_file-1093"><a href="#load_list_from_file-1093"><span class="linenos">1093</span></a><span class="sd">    This function reads a list from a file that was previously saved using the pickle module.</span>
+</span><span id="load_list_from_file-1094"><a href="#load_list_from_file-1094"><span class="linenos">1094</span></a>
+</span><span id="load_list_from_file-1095"><a href="#load_list_from_file-1095"><span class="linenos">1095</span></a><span class="sd">    :param filename: Name of the file from which the list will be loaded.</span>
+</span><span id="load_list_from_file-1096"><a href="#load_list_from_file-1096"><span class="linenos">1096</span></a><span class="sd">    :type filename: str</span>
+</span><span id="load_list_from_file-1097"><a href="#load_list_from_file-1097"><span class="linenos">1097</span></a><span class="sd">    :return: The list that was loaded from the file.</span>
+</span><span id="load_list_from_file-1098"><a href="#load_list_from_file-1098"><span class="linenos">1098</span></a><span class="sd">    :rtype: list</span>
+</span><span id="load_list_from_file-1099"><a href="#load_list_from_file-1099"><span class="linenos">1099</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="load_list_from_file-1100"><a href="#load_list_from_file-1100"><span class="linenos">1100</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+</span><span id="load_list_from_file-1101"><a href="#load_list_from_file-1101"><span class="linenos">1101</span></a>        <span class="n">loaded_list</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+</span><span id="load_list_from_file-1102"><a href="#load_list_from_file-1102"><span class="linenos">1102</span></a>    <span class="k">return</span> <span class="n">loaded_list</span>
 </span></pre></div>
 
 
@@ -3252,41 +3065,43 @@ dominates the filter and will override the distance and angle cutoffs.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">set_plotly_theme</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">theme</span></span><span class="return-annotation">):</span></span>
+        <span class="name">set_plotly_theme</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">theme</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="set_plotly_theme-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#set_plotly_theme"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="set_plotly_theme-1162"><a href="#set_plotly_theme-1162"><span class="linenos">1162</span></a><span class="k">def</span><span class="w"> </span><span class="nf">set_plotly_theme</span><span class="p">(</span><span class="n">theme</span><span class="p">):</span>
-</span><span id="set_plotly_theme-1163"><a href="#set_plotly_theme-1163"><span class="linenos">1163</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="set_plotly_theme-1164"><a href="#set_plotly_theme-1164"><span class="linenos">1164</span></a><span class="sd">    Set the Plotly theme based on the provided theme parameter.</span>
-</span><span id="set_plotly_theme-1165"><a href="#set_plotly_theme-1165"><span class="linenos">1165</span></a>
-</span><span id="set_plotly_theme-1166"><a href="#set_plotly_theme-1166"><span class="linenos">1166</span></a><span class="sd">    This function sets the default Plotly template to either &#39;plotly_white&#39; or &#39;plotly_dark&#39;</span>
-</span><span id="set_plotly_theme-1167"><a href="#set_plotly_theme-1167"><span class="linenos">1167</span></a><span class="sd">    based on the input theme. If &#39;auto&#39; is selected, the theme is determined automatically</span>
-</span><span id="set_plotly_theme-1168"><a href="#set_plotly_theme-1168"><span class="linenos">1168</span></a><span class="sd">    based on the current system or application theme.</span>
-</span><span id="set_plotly_theme-1169"><a href="#set_plotly_theme-1169"><span class="linenos">1169</span></a>
-</span><span id="set_plotly_theme-1170"><a href="#set_plotly_theme-1170"><span class="linenos">1170</span></a><span class="sd">    :param theme: The theme to set for Plotly. Must be &#39;auto&#39;, &#39;light&#39;, or &#39;dark&#39;.</span>
-</span><span id="set_plotly_theme-1171"><a href="#set_plotly_theme-1171"><span class="linenos">1171</span></a><span class="sd">    :type theme: str</span>
-</span><span id="set_plotly_theme-1172"><a href="#set_plotly_theme-1172"><span class="linenos">1172</span></a><span class="sd">    :raises ValueError: If an invalid theme is provided.</span>
-</span><span id="set_plotly_theme-1173"><a href="#set_plotly_theme-1173"><span class="linenos">1173</span></a><span class="sd">    :return: None</span>
-</span><span id="set_plotly_theme-1174"><a href="#set_plotly_theme-1174"><span class="linenos">1174</span></a><span class="sd">    :rtype: None</span>
-</span><span id="set_plotly_theme-1175"><a href="#set_plotly_theme-1175"><span class="linenos">1175</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="set_plotly_theme-1176"><a href="#set_plotly_theme-1176"><span class="linenos">1176</span></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">plotly</span><span class="w"> </span><span class="kn">import</span> <span class="n">io</span> <span class="k">as</span> <span class="n">pio</span>
-</span><span id="set_plotly_theme-1177"><a href="#set_plotly_theme-1177"><span class="linenos">1177</span></a>
-</span><span id="set_plotly_theme-1178"><a href="#set_plotly_theme-1178"><span class="linenos">1178</span></a>    <span class="k">match</span> <span class="n">theme</span><span class="p">:</span>
-</span><span id="set_plotly_theme-1179"><a href="#set_plotly_theme-1179"><span class="linenos">1179</span></a>        <span class="k">case</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
-</span><span id="set_plotly_theme-1180"><a href="#set_plotly_theme-1180"><span class="linenos">1180</span></a>            <span class="n">_theme</span> <span class="o">=</span> <span class="n">get_theme</span><span class="p">()</span>
-</span><span id="set_plotly_theme-1181"><a href="#set_plotly_theme-1181"><span class="linenos">1181</span></a>            <span class="k">if</span> <span class="n">_theme</span> <span class="o">==</span> <span class="s2">&quot;light&quot;</span><span class="p">:</span>
-</span><span id="set_plotly_theme-1182"><a href="#set_plotly_theme-1182"><span class="linenos">1182</span></a>                <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
-</span><span id="set_plotly_theme-1183"><a href="#set_plotly_theme-1183"><span class="linenos">1183</span></a>            <span class="k">else</span><span class="p">:</span>
-</span><span id="set_plotly_theme-1184"><a href="#set_plotly_theme-1184"><span class="linenos">1184</span></a>                <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_dark&quot;</span>
-</span><span id="set_plotly_theme-1185"><a href="#set_plotly_theme-1185"><span class="linenos">1185</span></a>        <span class="k">case</span> <span class="s2">&quot;light&quot;</span><span class="p">:</span>
-</span><span id="set_plotly_theme-1186"><a href="#set_plotly_theme-1186"><span class="linenos">1186</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
-</span><span id="set_plotly_theme-1187"><a href="#set_plotly_theme-1187"><span class="linenos">1187</span></a>        <span class="k">case</span> <span class="s2">&quot;dark&quot;</span><span class="p">:</span>
-</span><span id="set_plotly_theme-1188"><a href="#set_plotly_theme-1188"><span class="linenos">1188</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_dark&quot;</span>
-</span><span id="set_plotly_theme-1189"><a href="#set_plotly_theme-1189"><span class="linenos">1189</span></a>        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
-</span><span id="set_plotly_theme-1190"><a href="#set_plotly_theme-1190"><span class="linenos">1190</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid theme. Must be &#39;auto&#39;, &#39;light&#39;, or &#39;dark&#39;.&quot;</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="set_plotly_theme-1105"><a href="#set_plotly_theme-1105"><span class="linenos">1105</span></a><span class="k">def</span><span class="w"> </span><span class="nf">set_plotly_theme</span><span class="p">(</span><span class="n">theme</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1106"><a href="#set_plotly_theme-1106"><span class="linenos">1106</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="set_plotly_theme-1107"><a href="#set_plotly_theme-1107"><span class="linenos">1107</span></a><span class="sd">    Set the Plotly theme based on the provided theme parameter.</span>
+</span><span id="set_plotly_theme-1108"><a href="#set_plotly_theme-1108"><span class="linenos">1108</span></a>
+</span><span id="set_plotly_theme-1109"><a href="#set_plotly_theme-1109"><span class="linenos">1109</span></a><span class="sd">    This function sets the default Plotly template to either &#39;plotly_white&#39; or &#39;plotly_dark&#39;</span>
+</span><span id="set_plotly_theme-1110"><a href="#set_plotly_theme-1110"><span class="linenos">1110</span></a><span class="sd">    based on the input theme. If &#39;auto&#39; is selected, the theme is determined automatically</span>
+</span><span id="set_plotly_theme-1111"><a href="#set_plotly_theme-1111"><span class="linenos">1111</span></a><span class="sd">    based on the current system or application theme.</span>
+</span><span id="set_plotly_theme-1112"><a href="#set_plotly_theme-1112"><span class="linenos">1112</span></a>
+</span><span id="set_plotly_theme-1113"><a href="#set_plotly_theme-1113"><span class="linenos">1113</span></a><span class="sd">    :param theme: The theme to set for Plotly. Must be &#39;auto&#39;, &#39;light&#39;, or &#39;dark&#39;.</span>
+</span><span id="set_plotly_theme-1114"><a href="#set_plotly_theme-1114"><span class="linenos">1114</span></a><span class="sd">    :type theme: str</span>
+</span><span id="set_plotly_theme-1115"><a href="#set_plotly_theme-1115"><span class="linenos">1115</span></a><span class="sd">    :raises ValueError: If an invalid theme is provided.</span>
+</span><span id="set_plotly_theme-1116"><a href="#set_plotly_theme-1116"><span class="linenos">1116</span></a><span class="sd">    :return: None</span>
+</span><span id="set_plotly_theme-1117"><a href="#set_plotly_theme-1117"><span class="linenos">1117</span></a><span class="sd">    :rtype: None</span>
+</span><span id="set_plotly_theme-1118"><a href="#set_plotly_theme-1118"><span class="linenos">1118</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="set_plotly_theme-1119"><a href="#set_plotly_theme-1119"><span class="linenos">1119</span></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">plotly</span><span class="w"> </span><span class="kn">import</span> <span class="n">io</span> <span class="k">as</span> <span class="n">pio</span>
+</span><span id="set_plotly_theme-1120"><a href="#set_plotly_theme-1120"><span class="linenos">1120</span></a>
+</span><span id="set_plotly_theme-1121"><a href="#set_plotly_theme-1121"><span class="linenos">1121</span></a>    <span class="k">match</span> <span class="n">theme</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+</span><span id="set_plotly_theme-1122"><a href="#set_plotly_theme-1122"><span class="linenos">1122</span></a>        <span class="k">case</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1123"><a href="#set_plotly_theme-1123"><span class="linenos">1123</span></a>            <span class="n">_theme</span> <span class="o">=</span> <span class="n">get_theme</span><span class="p">()</span>
+</span><span id="set_plotly_theme-1124"><a href="#set_plotly_theme-1124"><span class="linenos">1124</span></a>            <span class="k">if</span> <span class="n">_theme</span> <span class="o">==</span> <span class="s2">&quot;light&quot;</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1125"><a href="#set_plotly_theme-1125"><span class="linenos">1125</span></a>                <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
+</span><span id="set_plotly_theme-1126"><a href="#set_plotly_theme-1126"><span class="linenos">1126</span></a>            <span class="k">else</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1127"><a href="#set_plotly_theme-1127"><span class="linenos">1127</span></a>                <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_dark&quot;</span>
+</span><span id="set_plotly_theme-1128"><a href="#set_plotly_theme-1128"><span class="linenos">1128</span></a>        <span class="k">case</span> <span class="s2">&quot;light&quot;</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1129"><a href="#set_plotly_theme-1129"><span class="linenos">1129</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
+</span><span id="set_plotly_theme-1130"><a href="#set_plotly_theme-1130"><span class="linenos">1130</span></a>        <span class="k">case</span> <span class="s2">&quot;dark&quot;</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1131"><a href="#set_plotly_theme-1131"><span class="linenos">1131</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_dark&quot;</span>
+</span><span id="set_plotly_theme-1132"><a href="#set_plotly_theme-1132"><span class="linenos">1132</span></a>        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1133"><a href="#set_plotly_theme-1133"><span class="linenos">1133</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid theme. Must be &#39;auto&#39;, &#39;light&#39;, or &#39;dark&#39;.&quot;</span><span class="p">)</span>
+</span><span id="set_plotly_theme-1134"><a href="#set_plotly_theme-1134"><span class="linenos">1134</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
+</span><span id="set_plotly_theme-1135"><a href="#set_plotly_theme-1135"><span class="linenos">1135</span></a>    <span class="k">return</span> <span class="kc">None</span>
 </span></pre></div>
 
 
