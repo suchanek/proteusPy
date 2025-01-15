@@ -230,7 +230,8 @@ class DisulfideLoader:
                 )
             else:
                 ss = self.SSList[item]
-                return DisulfideList([ss], ss.name, ss.resolution)
+                return ss
+                # return DisulfideList([ss], ss.name, ss.resolution)
 
         # if the item is a string, it could be a PDB ID or a full disulfide name
         # or a classid in the format 11111b or 11111o. the last char is the class type

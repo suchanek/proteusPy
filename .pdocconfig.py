@@ -1,1 +1,1 @@
-pdoc_config = {"exclude": ["proteusPy/version.py"]}
+pdoc_config = {"exclude": ["proteusPy/_version.py"]}
