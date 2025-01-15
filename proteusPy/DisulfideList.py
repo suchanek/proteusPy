@@ -7,7 +7,7 @@ The module provides the implmentation and interface for the [DisulfideList](#Dis
 object, used extensively by Disulfide class.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-01-03 17:03:02 -egs-
+Last revision: 2025-01-15 00:09:24 -egs-
 """
 
 # pylint: disable=c0103
@@ -616,7 +616,7 @@ class DisulfideList(UserList):
         save=False,
         fname="ss_torsions.png",
         stats=False,
-        light="Auto",
+        theme="Auto",
     ):
         """
         Display torsion and distance statistics for a given Disulfide list.
@@ -629,10 +629,12 @@ class DisulfideList(UserList):
         :type fname: str
         :param stats: Whether to return the DataFrame representing the statistics for `self`. Default is False.
         :type stats: bool
-        :param light: Whether to use the 'plotly_light' or 'plotly_dark' template. Default is True.
-        :type light: bool
+        :param theme: The theme to use for the plot. Default is 'Auto'. Options are 'Auto', 'light', and 'dark'.
+        :type theme: str
         :return: None
         """
+
+        set_plotly_theme(theme)
         title = f"{self.id}: {self.length} members"
 
         df = self.torsion_df
@@ -650,7 +652,7 @@ class DisulfideList(UserList):
         fig = make_subplots(
             rows=2, cols=2, vertical_spacing=0.125, column_widths=[1, 1]
         )
-        fig.update_layout(template="plotly" if light else "plotly_dark")
+        # fig.update_layout(template="plotly" if light else "plotly_dark")
 
         fig.update_layout(
             title={
@@ -1393,6 +1395,7 @@ class DisulfideList(UserList):
 
         :param verbose: Whether to display a progress bar.
         :type verbose: bool
+        :param theme: The plotly theme to use. Default is 'auto', which will use the current system theme.
         :return: Dataframe containing the disulfide deviation information.
         :rtype: pandas.DataFrame
         """
@@ -1427,6 +1430,81 @@ class DisulfideList(UserList):
         fig2.show()
 
         return df
+
+    def filter_deviation_df_by_cutoffs(
+        self,
+        length_cutoff=10.0,
+        angle_cutoff=100.0,
+        ca_cutoff=1000.0,
+        sg_cutoff=10.0,
+        minimum_distance=0.0,
+    ) -> pd.DataFrame:
+        """
+        Filter the DataFrame based on bond length, angle, Ca and Sg distance cutoffs.
+
+        Note: The default values are set to high values to allow all structures to pass the filter.
+
+        :param df: DataFrame containing the deviations.
+        :type df: pd.DataFrame
+        :param length_cutoff: Cutoff value for Bond Length Deviation.
+        :type distance_cutoff: float
+        :param angle_cutoff: Cutoff value for angle deviation.
+        :type angle_cutoff: float
+        :param ca_cutoff: Cutoff value for Ca distance.
+        :type ca_cutoff: float
+        :param sg_cutoff: Cutoff value for Sg distance.
+        :type sg_cutoff: float
+        :return: Filtered DataFrame.
+        :rtype: pd.DataFrame
+        """
+        df = self.create_deviation_dataframe()
+
+        filtered_df = df[
+            (df["Bondlength_Deviation"] <= length_cutoff)
+            & (df["Angle_Deviation"] <= angle_cutoff)
+            & (df["Ca_Distance"] >= minimum_distance)
+            & (df["Ca_Distance"] <= ca_cutoff)
+            & (df["Sg_Distance"] >= minimum_distance)
+            & (df["Sg_Distance"] <= sg_cutoff)
+        ]
+        return filtered_df
+
+    def bad_filter_deviation_df_by_cutoffs(
+        self,
+        length_cutoff=0.0,
+        angle_cutoff=0.0,
+        ca_cutoff=0.0,
+        sg_cutoff=0.0,
+        minimum_distance=0.0,
+    ) -> pd.DataFrame:
+        """
+        Return the DataFrame objects that are GREATER than the cutoff based on distance,
+        angle, Ca and Sg distance cutoffs. Used to get the bad structures.
+
+        Note: The default values are set to low values to allow all structures to pass the filter.
+
+        :param df: DataFrame containing the deviations.
+        :type df: pd.DataFrame
+        :param length_cutoff: Cutoff value for Bond Length Deviation.
+        :type length_cutoff: float
+        :param angle_cutoff: Cutoff value for angle deviation.
+        :type angle_cutoff: float
+        :param ca_cutoff: Cutoff value for Ca distance.
+        :type ca_cutoff: float
+        :return: Filtered DataFrame.
+        :rtype: pd.DataFrame
+        """
+        df = self.create_deviation_dataframe()
+
+        filtered_df = df[
+            (df["Bondlength_Deviation"] > length_cutoff)
+            & (df["Angle_Deviation"] > angle_cutoff)
+            & (df["Ca_Distance"] > ca_cutoff)
+            & (df["Ca_Distance"] < minimum_distance)
+            & (df["Sg_Distance"] > sg_cutoff)
+            & (df["Sg_Distance"] < minimum_distance)
+        ]
+        return filtered_df
 
     def calculate_torsion_statistics(self) -> tuple:
         """
