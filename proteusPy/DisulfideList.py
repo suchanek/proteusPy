@@ -39,7 +39,6 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import plotly.io as pio
 import pyvista as pv
 from plotly.subplots import make_subplots
 
@@ -65,6 +64,8 @@ WIDTH = 6.0
 HEIGHT = 6.0
 TORMIN = -179.9
 TORMAX = 180.0
+
+NBINS = 380
 
 Torsion_DF_Cols = [
     "source",
@@ -615,8 +616,7 @@ class DisulfideList(UserList):
         display=True,
         save=False,
         fname="ss_torsions.png",
-        stats=False,
-        theme="Auto",
+        theme="auto",
     ):
         """
         Display torsion and distance statistics for a given Disulfide list.
@@ -627,19 +627,13 @@ class DisulfideList(UserList):
         :type save: bool
         :param fname: The name of the image file to save. Default is 'ss_torsions.png'.
         :type fname: str
-        :param stats: Whether to return the DataFrame representing the statistics for `self`. Default is False.
-        :type stats: bool
         :param theme: The theme to use for the plot. Default is 'Auto'. Options are 'Auto', 'light', and 'dark'.
         :type theme: str
-        :return: None
+        :return: none
         """
 
         set_plotly_theme(theme)
         title = f"{self.id}: {self.length} members"
-
-        df = self.torsion_df
-        df_subset = df.iloc[:, 4:]
-        df_stats = df_subset.describe()
 
         tor_vals, dist_vals = self.calculate_torsion_statistics()
 
@@ -652,7 +646,6 @@ class DisulfideList(UserList):
         fig = make_subplots(
             rows=2, cols=2, vertical_spacing=0.125, column_widths=[1, 1]
         )
-        # fig.update_layout(template="plotly" if light else "plotly_dark")
 
         fig.update_layout(
             title={
@@ -771,11 +764,9 @@ class DisulfideList(UserList):
 
         if display:
             fig.show()
+
         if save:
             fig.write_image(Path(fname))
-
-        if stats:
-            return df_stats
 
         return
 
@@ -897,7 +888,7 @@ class DisulfideList(UserList):
                 if verbose:
                     print(f" -> display_overlay(): Saved image to: {fname}")
             except RuntimeError as e:
-                _logger.error(f"Error saving screenshot: {e}")
+                _logger.error("Error saving screenshot: %s", e)
 
         elif movie:
             if verbose:
@@ -1070,7 +1061,7 @@ class DisulfideList(UserList):
         self.pdb_id = value
 
     def TorsionGraph(
-        self, display=True, save=False, fname="ss_torsions.png", light="Auto"
+        self, display=True, save=False, fname="ss_torsions.png", theme="Auto"
     ):
         """
         Generate and optionally display or save a torsion graph.
@@ -1084,14 +1075,14 @@ class DisulfideList(UserList):
         :type save: bool
         :param fname: The filename to save the torsion graph. Default is "ss_torsions.png".
         :type fname: str
-        :param light: If True, a light theme will be used for the graph. Default is True.
-        :type light: bool
+        :param theme: One of 'auto', 'light', or 'dark'. Default is 'auto'.
+        :type theme: str
 
         :return: None
         """
         # tor_stats, dist_stats = self.calculate_torsion_statistics()
         self.display_torsion_statistics(
-            display=display, save=save, fname=fname, light=light
+            display=display, save=save, fname=fname, theme=theme
         )
 
     def translate(self, translation_vector) -> None:
@@ -1374,10 +1365,11 @@ class DisulfideList(UserList):
         fig = px.histogram(
             df,
             x=column_name,  # Use the column name for the x-axis
-            nbins=100,
+            nbins=NBINS,
             title=title,
         )
         fig.update_layout(
+            title={"text": "Distance Distribution", "x": 0.5, "xanchor": "center"},
             xaxis_title=xtitle,
             yaxis_title="Frequency",
             yaxis_type="log",
@@ -1407,11 +1399,12 @@ class DisulfideList(UserList):
         fig = px.histogram(
             df,
             x="Bondlength_Deviation",
-            nbins=300,
+            nbins=NBINS,
             title="Bond Length Deviation (Å)",
         )
 
         fig.update_layout(
+            title={"text": "Bond Length Deviation", "x": 0.5, "xanchor": "center"},
             xaxis_title="Bond Length Deviation (Å)",
             yaxis_title="Frequency",
             yaxis_type="log",
@@ -1419,9 +1412,10 @@ class DisulfideList(UserList):
         fig.show()
 
         fig2 = px.histogram(
-            df, x="Angle_Deviation", nbins=300, title="Bond Angle Deviation, (°)"
+            df, x="Angle_Deviation", nbins=NBINS, title="Bond Angle Deviation, (°)"
         )
         fig2.update_layout(
+            title={"text": "Bond Angle Deviation", "x": 0.5, "xanchor": "center"},
             xaxis_title="Bond Angle Deviation (°)",
             yaxis_title="Frequency",
             yaxis_type="log",

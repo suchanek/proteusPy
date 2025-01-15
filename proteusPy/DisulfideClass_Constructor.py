@@ -293,7 +293,7 @@ class DisulfideClass_Constructor:
 
     def build_classes(self, loader) -> None:
         """
-        Build the internal structures needed for the binary and six-fold disulfide structural classes
+        Build the internal structures needed for the binary and octant disulfide structural classes
         based on dihedral angle rules.
 
         :param loader: The DisulfideLoader object containing the data.
@@ -380,7 +380,7 @@ class DisulfideClass_Constructor:
 
     def create_classes(self, df, base=8) -> pd.DataFrame:
         """
-        Create a new DataFrame from the input with a 6-class encoding for input 'chi' values.
+        Create a new DataFrame from the input with a 8-class encoding for input 'chi' values.
 
         The function takes a pandas DataFrame containing the following columns:
         'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'cb_distance',

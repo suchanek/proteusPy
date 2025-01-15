@@ -470,7 +470,7 @@ sixfold and eightfold classes based on the subdividing each dihedral angle chi1 
 </span><span id="L-293"><a href="#L-293"><span class="linenos">293</span></a>
 </span><span id="L-294"><a href="#L-294"><span class="linenos">294</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="L-295"><a href="#L-295"><span class="linenos">295</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-296"><a href="#L-296"><span class="linenos">296</span></a><span class="sd">        Build the internal structures needed for the binary and six-fold disulfide structural classes</span>
+</span><span id="L-296"><a href="#L-296"><span class="linenos">296</span></a><span class="sd">        Build the internal structures needed for the binary and octant disulfide structural classes</span>
 </span><span id="L-297"><a href="#L-297"><span class="linenos">297</span></a><span class="sd">        based on dihedral angle rules.</span>
 </span><span id="L-298"><a href="#L-298"><span class="linenos">298</span></a>
 </span><span id="L-299"><a href="#L-299"><span class="linenos">299</span></a><span class="sd">        :param loader: The DisulfideLoader object containing the data.</span>
@@ -557,7 +557,7 @@ sixfold and eightfold classes based on the subdividing each dihedral angle chi1 
 </span><span id="L-380"><a href="#L-380"><span class="linenos">380</span></a>
 </span><span id="L-381"><a href="#L-381"><span class="linenos">381</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 </span><span id="L-382"><a href="#L-382"><span class="linenos">382</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-383"><a href="#L-383"><span class="linenos">383</span></a><span class="sd">        Create a new DataFrame from the input with a 6-class encoding for input &#39;chi&#39; values.</span>
+</span><span id="L-383"><a href="#L-383"><span class="linenos">383</span></a><span class="sd">        Create a new DataFrame from the input with a 8-class encoding for input &#39;chi&#39; values.</span>
 </span><span id="L-384"><a href="#L-384"><span class="linenos">384</span></a>
 </span><span id="L-385"><a href="#L-385"><span class="linenos">385</span></a><span class="sd">        The function takes a pandas DataFrame containing the following columns:</span>
 </span><span id="L-386"><a href="#L-386"><span class="linenos">386</span></a><span class="sd">        &#39;ss_id&#39;, &#39;chi1&#39;, &#39;chi2&#39;, &#39;chi3&#39;, &#39;chi4&#39;, &#39;chi5&#39;, &#39;ca_distance&#39;, &#39;cb_distance&#39;,</span>
@@ -1123,7 +1123,7 @@ sixfold and eightfold classes based on the subdividing each dihedral angle chi1 
 </span><span id="DisulfideClass_Constructor-294"><a href="#DisulfideClass_Constructor-294"><span class="linenos">294</span></a>
 </span><span id="DisulfideClass_Constructor-295"><a href="#DisulfideClass_Constructor-295"><span class="linenos">295</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="DisulfideClass_Constructor-296"><a href="#DisulfideClass_Constructor-296"><span class="linenos">296</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="DisulfideClass_Constructor-297"><a href="#DisulfideClass_Constructor-297"><span class="linenos">297</span></a><span class="sd">        Build the internal structures needed for the binary and six-fold disulfide structural classes</span>
+</span><span id="DisulfideClass_Constructor-297"><a href="#DisulfideClass_Constructor-297"><span class="linenos">297</span></a><span class="sd">        Build the internal structures needed for the binary and octant disulfide structural classes</span>
 </span><span id="DisulfideClass_Constructor-298"><a href="#DisulfideClass_Constructor-298"><span class="linenos">298</span></a><span class="sd">        based on dihedral angle rules.</span>
 </span><span id="DisulfideClass_Constructor-299"><a href="#DisulfideClass_Constructor-299"><span class="linenos">299</span></a>
 </span><span id="DisulfideClass_Constructor-300"><a href="#DisulfideClass_Constructor-300"><span class="linenos">300</span></a><span class="sd">        :param loader: The DisulfideLoader object containing the data.</span>
@@ -1210,7 +1210,7 @@ sixfold and eightfold classes based on the subdividing each dihedral angle chi1 
 </span><span id="DisulfideClass_Constructor-381"><a href="#DisulfideClass_Constructor-381"><span class="linenos">381</span></a>
 </span><span id="DisulfideClass_Constructor-382"><a href="#DisulfideClass_Constructor-382"><span class="linenos">382</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 </span><span id="DisulfideClass_Constructor-383"><a href="#DisulfideClass_Constructor-383"><span class="linenos">383</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="DisulfideClass_Constructor-384"><a href="#DisulfideClass_Constructor-384"><span class="linenos">384</span></a><span class="sd">        Create a new DataFrame from the input with a 6-class encoding for input &#39;chi&#39; values.</span>
+</span><span id="DisulfideClass_Constructor-384"><a href="#DisulfideClass_Constructor-384"><span class="linenos">384</span></a><span class="sd">        Create a new DataFrame from the input with a 8-class encoding for input &#39;chi&#39; values.</span>
 </span><span id="DisulfideClass_Constructor-385"><a href="#DisulfideClass_Constructor-385"><span class="linenos">385</span></a>
 </span><span id="DisulfideClass_Constructor-386"><a href="#DisulfideClass_Constructor-386"><span class="linenos">386</span></a><span class="sd">        The function takes a pandas DataFrame containing the following columns:</span>
 </span><span id="DisulfideClass_Constructor-387"><a href="#DisulfideClass_Constructor-387"><span class="linenos">387</span></a><span class="sd">        &#39;ss_id&#39;, &#39;chi1&#39;, &#39;chi2&#39;, &#39;chi3&#39;, &#39;chi4&#39;, &#39;chi5&#39;, &#39;ca_distance&#39;, &#39;cb_distance&#39;,</span>
@@ -2240,7 +2240,7 @@ of an angle in the range of -180-180 degrees.</li>
     <a class="headerlink" href="#DisulfideClass_Constructor.build_classes"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideClass_Constructor.build_classes-295"><a href="#DisulfideClass_Constructor.build_classes-295"><span class="linenos">295</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="DisulfideClass_Constructor.build_classes-296"><a href="#DisulfideClass_Constructor.build_classes-296"><span class="linenos">296</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="DisulfideClass_Constructor.build_classes-297"><a href="#DisulfideClass_Constructor.build_classes-297"><span class="linenos">297</span></a><span class="sd">        Build the internal structures needed for the binary and six-fold disulfide structural classes</span>
+</span><span id="DisulfideClass_Constructor.build_classes-297"><a href="#DisulfideClass_Constructor.build_classes-297"><span class="linenos">297</span></a><span class="sd">        Build the internal structures needed for the binary and octant disulfide structural classes</span>
 </span><span id="DisulfideClass_Constructor.build_classes-298"><a href="#DisulfideClass_Constructor.build_classes-298"><span class="linenos">298</span></a><span class="sd">        based on dihedral angle rules.</span>
 </span><span id="DisulfideClass_Constructor.build_classes-299"><a href="#DisulfideClass_Constructor.build_classes-299"><span class="linenos">299</span></a>
 </span><span id="DisulfideClass_Constructor.build_classes-300"><a href="#DisulfideClass_Constructor.build_classes-300"><span class="linenos">300</span></a><span class="sd">        :param loader: The DisulfideLoader object containing the data.</span>
@@ -2298,7 +2298,7 @@ of an angle in the range of -180-180 degrees.</li>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Build the internal structures needed for the binary and six-fold disulfide structural classes
+            <div class="docstring"><p>Build the internal structures needed for the binary and octant disulfide structural classes
 based on dihedral angle rules.</p>
 
 <h6 id="parameters">Parameters</h6>
@@ -2391,7 +2391,7 @@ based on dihedral angle rules.</p>
     <a class="headerlink" href="#DisulfideClass_Constructor.create_classes"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DisulfideClass_Constructor.create_classes-382"><a href="#DisulfideClass_Constructor.create_classes-382"><span class="linenos">382</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 </span><span id="DisulfideClass_Constructor.create_classes-383"><a href="#DisulfideClass_Constructor.create_classes-383"><span class="linenos">383</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="DisulfideClass_Constructor.create_classes-384"><a href="#DisulfideClass_Constructor.create_classes-384"><span class="linenos">384</span></a><span class="sd">        Create a new DataFrame from the input with a 6-class encoding for input &#39;chi&#39; values.</span>
+</span><span id="DisulfideClass_Constructor.create_classes-384"><a href="#DisulfideClass_Constructor.create_classes-384"><span class="linenos">384</span></a><span class="sd">        Create a new DataFrame from the input with a 8-class encoding for input &#39;chi&#39; values.</span>
 </span><span id="DisulfideClass_Constructor.create_classes-385"><a href="#DisulfideClass_Constructor.create_classes-385"><span class="linenos">385</span></a>
 </span><span id="DisulfideClass_Constructor.create_classes-386"><a href="#DisulfideClass_Constructor.create_classes-386"><span class="linenos">386</span></a><span class="sd">        The function takes a pandas DataFrame containing the following columns:</span>
 </span><span id="DisulfideClass_Constructor.create_classes-387"><a href="#DisulfideClass_Constructor.create_classes-387"><span class="linenos">387</span></a><span class="sd">        &#39;ss_id&#39;, &#39;chi1&#39;, &#39;chi2&#39;, &#39;chi3&#39;, &#39;chi4&#39;, &#39;chi5&#39;, &#39;ca_distance&#39;, &#39;cb_distance&#39;,</span>
@@ -2431,7 +2431,7 @@ based on dihedral angle rules.</p>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Create a new DataFrame from the input with a 6-class encoding for input 'chi' values.</p>
+            <div class="docstring"><p>Create a new DataFrame from the input with a 8-class encoding for input 'chi' values.</p>
 
 <p>The function takes a pandas DataFrame containing the following columns:
 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'cb_distance',
