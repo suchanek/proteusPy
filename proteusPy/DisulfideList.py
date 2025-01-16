@@ -667,7 +667,7 @@ class DisulfideList(UserList):
             go.Bar(
                 x=["X1", "X2", "X3", "X4", "X5"],
                 y=tor_mean_vals[:5],
-                name="Torsion Angle,(°) ",
+                name="Torsion Angle (°) ",
                 error_y=dict(type="data", array=tor_std_vals, visible=True),
             ),
             row=1,
@@ -678,7 +678,7 @@ class DisulfideList(UserList):
             go.Bar(
                 x=["rho"],
                 y=[dist_mean_vals[4]],
-                name="ρ, (°)",
+                name="ρ (°)",
                 error_y=dict(type="data", array=[dist_std_vals[4]], visible=True),
             ),
             row=1,
@@ -744,7 +744,7 @@ class DisulfideList(UserList):
         # Add a scatter subplot for torsion length column
         fig.add_trace(
             go.Bar(
-                x=["Torsion Length, (Å)"],
+                x=["Torsion Length (Å)"],
                 y=[tor_mean_vals[5]],
                 name="Torsion Length, (Å)",
                 error_y=dict(
