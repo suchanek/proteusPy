@@ -9,13 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- ``DisulfideList.plot_distances()`` added
-- ``DisulfideList.plot_deviation_histograms()`` added
+- ``DisulfideList.plot_distances()``
+- ``DisulfideList.plot_deviation_histograms()``
+- Added the ability to access disulfide class strings directly through ``DisulfideLoader`` with indexing.
 
 ### Changed
 
 - ``Load_PDB_SS(verbose=True)`` now calls ``loader.describe()`` to print statistics for the database
 - Optimized ``DisulfideList.create_deviation_dataframe()``.
+- Moved various class plotting routines into ``DisulfideLoader`` class.
+- Cleaned up ``DisulfideClasses.py``
 
 
 ## [v0.98.3] - 2024-1-12
