@@ -714,7 +714,7 @@ class DisulfideList(UserList):
         # Update the layout of the subplot
         # fig.update_xaxes(title_text="Energy", row=1, col=2)
         fig.update_yaxes(
-            title_text="kcal/mol", range=[0, 20], row=1, col=2
+            title_text="kcal/mol", range=[0, 8], row=1, col=2
         )  # max possible DSE
 
         # Add another subplot for the mean values of ca_distance
@@ -738,7 +738,7 @@ class DisulfideList(UserList):
             col=1,
         )
         # Update the layout of the subplot
-        fig.update_yaxes(title_text="Distance (A)", range=[0, 10], row=2, col=1)  #
+        fig.update_yaxes(title_text="Distance (A)", range=[0, 8], row=2, col=1)  #
         fig.update_traces(width=0.25, row=2, col=1)
 
         # Add a scatter subplot for torsion length column
@@ -746,7 +746,7 @@ class DisulfideList(UserList):
             go.Bar(
                 x=["Torsion Length (Å)"],
                 y=[tor_mean_vals[5]],
-                name="Torsion Length, (Å)",
+                name="Torsion Length (Å)",
                 error_y=dict(
                     type="data", array=[tor_std_vals[5]], width=0.25, visible=True
                 ),
