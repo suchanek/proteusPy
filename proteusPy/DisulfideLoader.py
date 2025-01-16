@@ -236,7 +236,7 @@ class DisulfideLoader:
         # if the item is a string, it could be a PDB ID or a full disulfide name
         # or a classid in the format 11111b or 11111o. the last char is the class type
         if isinstance(item, str) and len(item) == 6 or len(item) == 5:  # classid
-            res = self.extract_class(item)
+            res = self.extract_class(item, verbose=self.verbose)
             return res
 
         try:
@@ -325,6 +325,15 @@ class DisulfideLoader:
                 disulfide_dict[disulfide.pdb_id] = []
             disulfide_dict[disulfide.pdb_id].append(index)
         return disulfide_dict
+
+    def print_classes(self, base=8):
+        """
+        Print the classes in the database.
+
+        :param base: The base class to use, 6 or 8.
+        :return: None
+        """
+        self.tclass.print_classes(base)
 
     def extract_class(self, clsid: str, base=8, verbose=False) -> DisulfideList:
         """

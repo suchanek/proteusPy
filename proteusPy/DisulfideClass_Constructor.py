@@ -602,6 +602,27 @@ class DisulfideClass_Constructor:
                     output_str += "0"
         return output_str
 
+    def print_classes(self, base=8):
+        """
+        Print the Disulfide structural classes.
+
+        :param self: The instance of the DisulfideClass_Constructor
+        :type self: DisulfideClass_Constructor
+        :return: None
+        :rtype: None
+        """
+
+        if base == 2:
+            cdict = self.binaryclass_dict
+
+        elif base == 8:
+            cdict = self.eightclass_dict
+        else:
+            raise ValueError("Invalid base. Must be 2, or 8.")
+
+        for key in cdict:
+            print(f"Class: |{key}|, {len(cdict[key])}")
+
     def plot_class_chart(self, classes: int) -> None:
         """
         Create a Matplotlib pie chart with `classes` segments of equal size.
