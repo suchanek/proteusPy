@@ -2,13 +2,13 @@
 DisulfideBond Class Analysis Dictionary creation
 Author: Eric G. Suchanek, PhD.
 License: BSD
-Last Modification: 2025-01-05 20:37:38 -egs-
+Last Modification: 2025-01-16 10:12:19 -egs-
 
 Disulfide Class creation and manipulation. Binary classes using the +/- formalism of Hogg et al. 
 (Biochem, 2006, 45, 7429-7433), are created for all 32 possible classes from the Disulfides 
 extracted. Classes are named per Hogg's convention. This approach is extended to create 
 sixfold and eightfold classes based on the subdividing each dihedral angle chi1 - chi5 into 
-6 and 8 equal segments, respectively.
+8 equal segments, effectively quantizing them.
 """
 
 # pylint: disable=C0301
@@ -23,6 +23,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from proteusPy import __version__
 from proteusPy.angle_annotation import AngleAnnotation
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.logger_config import create_logger
@@ -30,7 +31,6 @@ from proteusPy.ProteusGlobals import (
     CLASSOBJ_FNAME,
     DATA_DIR,
     DPI,
-    PBAR_COLS,
     SS_CLASS_DEFINITIONS,
     SS_CLASS_DICT_FILE,
     SS_CONSENSUS_BIN_FILE,
@@ -39,27 +39,6 @@ from proteusPy.ProteusGlobals import (
 
 _logger = create_logger(__name__)
 _logger.setLevel("INFO")
-
-merge_cols = [
-    "chi1_s",
-    "chi2_s",
-    "chi3_s",
-    "chi4_s",
-    "chi5_s",
-    "class_id",
-    "SS_Classname",
-    "FXN",
-    "count",
-    "incidence",
-    "percentage",
-    "ca_distance_mean",
-    "ca_distance_std",
-    "torsion_length_mean",
-    "torsion_length_std",
-    "energy_mean",
-    "energy_std",
-    "ss_id",
-]
 
 
 # class DisulfideClass_Constructor:
@@ -76,40 +55,40 @@ class DisulfideClass_Constructor:
     The ``class_id`` represents the sign of each dihedral angle $\chi_{1} - \chi_{1'}$
     where *0* represents *negative* dihedral angle and *2* a *positive* angle.
 
-    |   class_id | SS_Classname   | FXN        |   count |   incidence |
-    |-----------:|:---------------|:-----------|--------:|------------:|
-    |      00000 | -LHSpiral      | UNK        |   31513 |  0.261092   |
-    |      00002 | 00002          | UNK        |    5805 |  0.0480956  |
-    |      00020 | -LHHook        | UNK        |    3413 |  0.0282774  |
-    |      00022 | 00022          | UNK        |    1940 |  0.0160733  |
-    |      00200 | -RHStaple      | Allosteric |   12735 |  0.105512   |
-    |      00202 | 00202          | UNK        |     993 |  0.00822721 |
-    |      00220 | 00220          | UNK        |    5674 |  0.0470103  |
-    |      00222 | 00222          | UNK        |    5092 |  0.0421883  |
-    |      02000 | 02000          | UNK        |    4749 |  0.0393465  |
-    |      02002 | 02002          | UNK        |    3774 |  0.0312684  |
-    |      02020 | -LHStaple      | UNK        |    1494 |  0.0123781  |
-    |      02022 | 02022          | UNK        |     591 |  0.00489656 |
-    |      02200 | -RHHook        | UNK        |    5090 |  0.0421717  |
-    |      02202 | 02202          | UNK        |     533 |  0.00441602 |
-    |      02220 | -RHSpiral      | UNK        |    6751 |  0.0559335  |
-    |      02222 | 02222          | UNK        |    3474 |  0.0287828  |
-    |      20000 | ±LHSpiral      | UNK        |    3847 |  0.0318732  |
-    |      20002 | +LHSpiral      | UNK        |     875 |  0.00724956 |
-    |      20020 | ±LHHook        | UNK        |     803 |  0.00665302 |
-    |      20022 | +LHHook        | UNK        |     602 |  0.0049877  |
-    |      20200 | ±RHStaple      | UNK        |     419 |  0.0034715  |
-    |      20202 | +RHStaple      | UNK        |     293 |  0.00242757 |
-    |      20220 | ±RHHook        | Catalytic  |    1435 |  0.0118893  |
-    |      20222 | 20222          | UNK        |     488 |  0.00404318 |
-    |      22000 | -/+LHHook      | UNK        |    2455 |  0.0203402  |
-    |      22002 | 22002          | UNK        |    1027 |  0.00850891 |
-    |      22020 | ±LHStaple      | UNK        |    1046 |  0.00866633 |
-    |      22022 | +LHStaple      | UNK        |     300 |  0.00248556 |
-    |      22200 | -/+RHHook      | UNK        |    6684 |  0.0553783  |
-    |      22202 | +RHHook        | UNK        |     593 |  0.00491313 |
-    |      22220 | ±RHSpiral      | UNK        |    2544 |  0.0210776  |
-    |      22222 | +RHSpiral      | UNK        |    3665 |  0.0303653  |
+    |   class_id | SS_Classname   | FXN        |   count |   incidence |   percentage |
+    |-----------:|:---------------|:-----------|--------:|------------:|-------------:|
+    |          0 | -LHSpiral      | UNK        |   40943 |  0.23359    |    23.359    |
+    |          2 | 00002          | UNK        |    9391 |  0.0535781  |     5.35781  |
+    |         20 | -LHHook        | UNK        |    4844 |  0.0276363  |     2.76363  |
+    |         22 | 00022          | UNK        |    2426 |  0.0138409  |     1.38409  |
+    |        200 | -RHStaple      | Allosteric |   16146 |  0.092117   |     9.2117   |
+    |        202 | 00202          | UNK        |    1396 |  0.00796454 |     0.796454 |
+    |        220 | 00220          | UNK        |    7238 |  0.0412946  |     4.12946  |
+    |        222 | 00222          | UNK        |    6658 |  0.0379856  |     3.79856  |
+    |       2000 | 02000          | UNK        |    7104 |  0.0405301  |     4.05301  |
+    |       2002 | 02002          | UNK        |    8044 |  0.0458931  |     4.58931  |
+    |       2020 | -LHStaple      | UNK        |    3154 |  0.0179944  |     1.79944  |
+    |       2022 | 02022          | UNK        |    1146 |  0.00653822 |     0.653822 |
+    |       2200 | -RHHook        | UNK        |    7115 |  0.0405929  |     4.05929  |
+    |       2202 | 02202          | UNK        |    1021 |  0.00582507 |     0.582507 |
+    |       2220 | -RHSpiral      | UNK        |    8989 |  0.0512845  |     5.12845  |
+    |       2222 | 02222          | UNK        |    7641 |  0.0435939  |     4.35939  |
+    |      20000 | ±LHSpiral      | UNK        |    5007 |  0.0285662  |     2.85662  |
+    |      20002 | +LHSpiral      | UNK        |    1611 |  0.00919117 |     0.919117 |
+    |      20020 | ±LHHook        | UNK        |    1258 |  0.00717721 |     0.717721 |
+    |      20022 | +LHHook        | UNK        |     823 |  0.00469542 |     0.469542 |
+    |      20200 | ±RHStaple      | UNK        |     745 |  0.00425042 |     0.425042 |
+    |      20202 | +RHStaple      | UNK        |     538 |  0.00306943 |     0.306943 |
+    |      20220 | ±RHHook        | Catalytic  |    1907 |  0.0108799  |     1.08799  |
+    |      20222 | 20222          | UNK        |    1159 |  0.00661239 |     0.661239 |
+    |      22000 | -/+LHHook      | UNK        |    3652 |  0.0208356  |     2.08356  |
+    |      22002 | 22002          | UNK        |    2052 |  0.0117072  |     1.17072  |
+    |      22020 | ±LHStaple      | UNK        |    1791 |  0.0102181  |     1.02181  |
+    |      22022 | +LHStaple      | UNK        |     579 |  0.00330334 |     0.330334 |
+    |      22200 | -/+RHHook      | UNK        |    8169 |  0.0466062  |     4.66062  |
+    |      22202 | +RHHook        | UNK        |     895 |  0.0051062  |     0.51062  |
+    |      22220 | ±RHSpiral      | UNK        |    3581 |  0.0204305  |     2.04305  |
+    |      22222 | +RHSpiral      | UNK        |    8254 |  0.0470912  |     4.70912  |
     """
 
     def __init__(self, loader, verbose=True) -> None:
@@ -138,7 +117,7 @@ class DisulfideClass_Constructor:
     # overload __getitem__ to handle slicing and indexing, and access by name
     def __getitem__(self, item: str):
         """
-        Implements indexing and slicing to retrieve DisulfideList objects from the
+        Implements indexing and slicing to retrieve Disulfide class lists from the
         DisulfideLoader. Supports:
 
         - Return a DisulfideList given the input Class ID string. Works with Binary
@@ -151,16 +130,9 @@ class DisulfideClass_Constructor:
         if isinstance(item, int):
             raise ValueError("Integer indexing not supported. Use a string key.")
 
-        elif isinstance(item, str):
-            classdict = self.binaryclass_dict
-
-            try:
-                disulfides = classdict[item]
-                return disulfides
-            except KeyError:
-                _logger.error(
-                    "DisulfideLoader(): Cannot find key <%s> in SSBond DB", item
-                )
+        if isinstance(item, str):
+            disulfides = self.class_to_sslist(item)
+            return disulfides
 
     def load_class_dict(self, fname=Path(DATA_DIR) / SS_CLASS_DICT_FILE) -> dict:
         """Load the class dictionary from the specified file."""
@@ -176,6 +148,10 @@ class DisulfideClass_Constructor:
         else:
             fname = fpath / SS_CONSENSUS_BIN_FILE
 
+        if not fname.exists():
+            _logger.error("Cannot find file %s", fname)
+            raise FileNotFoundError(f"Cannot find file {fname}")
+
         with open(fname, "rb") as f:
             res = pickle.load(f)
         return res
@@ -186,48 +162,84 @@ class DisulfideClass_Constructor:
         result_df = pd.concat([class_df, ss_id_col], axis=1)
         return result_df
 
+    def class_to_sslist(self, clsid: str, base=8) -> np.ndarray:
+        """
+        Return the list of disulfides corresponding to the input `clsid`.
+
+        :param clsid: The class name to extract. Must be a string
+        in the format '11111' or '11111b' or '11111o'. The suffix 'b' or 'o' indicates
+        binary or octant classes, respectively.
+        :type clsid: str
+        :param base: The base class to use, 2 or 8. Default is 8.
+        :type base: int
+        :param verbose: If True, display progress bars, by default False.
+        :type verbose: bool
+        :return: The list of disulfide bonds from the class. NB: this is the list
+        of disulfide identifiers, not the Disulfide objects themselves.
+        :rtype: DisulfideList
+        :raises ValueError: If an invalid base value is provided.
+        :raises KeyError: If the clsid is not found in the dictionary.
+        """
+        cls = clsid[:5]
+
+        if not isinstance(clsid, str):
+            _logger.error("Invalid class ID: %s", clsid)
+            return np.array([])
+
+        match len(clsid):
+            case 6:
+                match clsid[-1]:
+                    case "b":
+                        eightorbin = self.binaryclass_dict
+                    case "o":
+                        eightorbin = self.eightclass_dict
+                    case _:
+                        _logger.error("Invalid class ID suffix: %s", clsid)
+                        return np.array([])
+
+            case 5:
+                match base:
+                    case 8:
+                        eightorbin = self.eightclass_dict
+                    case 2:
+                        eightorbin = self.binaryclass_dict
+                    case _:
+                        _logger.error("Invalid base: %d", base)
+                        return np.array([])
+            case _:
+                _logger.error("Invalid class ID length: %s", clsid)
+                return np.array([])
+
+        try:
+            ss_ids = eightorbin[cls]
+
+        except KeyError:
+            _logger.error("Cannot find key %s in SSBond DB", clsid)
+            return DisulfideList([], cls, quiet=True)
+
+        return ss_ids
+
     def list_classes(self, base=2):
         """
         List the Disulfide structural classes.
 
         :param self: The instance of the DisulfideClass_Constructor class.
         :type self: DisulfideClass_Constructor
-        :return: A list of disulfide structural classes.
-        :rtype: list
+        :param base: The base class to use, 2 or 8.
+        :type base: int
+        :return: None
+        :rtype: None
+        :raises ValueError: If an invalid base value is provided.
         """
-        if base == 2:
-            for k, v in enumerate(self.binaryclass_dict):
-                print(f"Class: |{k}|, |{v}|")
-
-        elif base == 8:
-            for k, v in enumerate(self.eightclass_dict):
-                print(f"Class: |{k}|, |{v}|")
-        else:
-            raise ValueError("Invalid base. Must be 2, 6, or 8.")
-
-    def from_class(self, loader, classid: str) -> DisulfideList:
-        """
-        Return a list of disulfides corresponding to the input BINARY class ID
-        string.
-
-        :param classid: Class ID, e.g. '00200'
-        :return: DisulfideList of class members
-        """
-
-        res = DisulfideList([], classid)
-
-        try:
-            sslist = self.binaryclass_dict[classid]
-            if self.verbose:
-                pbar = tqdm(sslist, ncols=PBAR_COLS)
-                for ssid in pbar:
-                    res.append(loader[ssid])
-                return res
-            else:
-                return DisulfideList([loader[ssid] for ssid in sslist], classid)
-        except KeyError:
-            _logger.error("No class: {classid}")
-        return
+        match base:
+            case 2:
+                for k, v in enumerate(self.binaryclass_dict):
+                    print(f"Class: |{k}|, |{v}|")
+            case 8:
+                for k, v in enumerate(self.eightclass_dict):
+                    print(f"Class: |{k}|, |{v}|")
+            case _:
+                raise ValueError("Invalid base. Must be 2 or 8.")
 
     def concat_dataframes(self, df1, df2):
         """
@@ -301,8 +313,6 @@ class DisulfideClass_Constructor:
         :return: None
         :rtype: None
         """
-
-        from proteusPy import __version__
 
         self.version = __version__
 
@@ -406,49 +416,12 @@ class DisulfideClass_Constructor:
         else:
             raise ValueError("Base must be either 6 or 8")
 
-        df["class_id"] = _df[["chi1_t", "chi2_t", "chi3_t", "chi4_t", "chi5_t"]].apply(
-            lambda x: "".join(x), axis=1
+        df["class_id"] = _df[["chi1_t", "chi2_t", "chi3_t", "chi4_t", "chi5_t"]].agg(
+            "".join, axis=1
         )
 
         grouped = df.groupby("class_id").agg({"ss_id": "unique"})
-        grouped["count"] = grouped["ss_id"].apply(lambda x: len(x))
-        grouped["incidence"] = grouped["count"] / len(df)
-        grouped["percentage"] = grouped["incidence"] * 100
-        grouped.reset_index(inplace=True)
-
-        return grouped
-
-    def create_eight_classes(self, df) -> pd.DataFrame:
-        """
-        Create a new DataFrame from the input with a 6-class encoding for input 'chi' values.
-
-        The function takes a pandas DataFrame containing the following columns:
-        'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'cb_distance',
-        'torsion_length', 'energy', and 'rho', and adds a class ID column based on the following rules:
-
-        1. A new column named `class_id` is added, which is the concatenation of the individual class IDs per Chi.
-        2. The DataFrame is grouped by the `class_id` column, and a new DataFrame is returned that shows the unique `ss_id` values for each group,
-        the count of unique `ss_id` values, the incidence of each group as a proportion of the total DataFrame, and the
-        percentage of incidence.
-
-        :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5',
-                'ca_distance', 'cb_distance', 'torsion_length', 'energy', and 'rho'
-        :return: The grouped DataFrame with the added class column.
-        """
-
-        _df = pd.DataFrame()
-        # create the chi_t columns for each chi column
-        for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
-            _df[col_name + "_t"] = df[col_name].apply(self.get_eighth_quadrant)
-
-        # create the class_id column
-        df["class_id"] = _df[["chi1_t", "chi2_t", "chi3_t", "chi4_t", "chi5_t"]].apply(
-            lambda x: "".join(x), axis=1
-        )
-
-        # group the DataFrame by class_id and return the grouped data
-        grouped = df.groupby("class_id").agg({"ss_id": "unique"})
-        grouped["count"] = grouped["ss_id"].apply(lambda x: len(x))
+        grouped["count"] = grouped["ss_id"].str.len()
         grouped["incidence"] = grouped["count"] / len(df)
         grouped["percentage"] = grouped["incidence"] * 100
         grouped.reset_index(inplace=True)
