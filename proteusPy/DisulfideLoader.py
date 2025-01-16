@@ -596,6 +596,7 @@ class DisulfideLoader:
         savedir=".",
         base=8,
         verbose=False,
+        log=True,
     ):
         """
         Plot a line graph of count vs class ID using Plotly for the given disulfide class. The
@@ -609,6 +610,7 @@ class DisulfideLoader:
         :param savedir: A string representing the directory to save the plot to. Default is '.'.
         :param base: An integer representing the base value for the enumeration. Default is 8.
         :param verbose: A boolean flag indicating whether to display verbose output. Default is False.
+        :param log: A boolean flag indicating whether to use a log scale for the y-axis. Default is False.
         :raises ValueError: If an invalid base value is provided, (2 or 8s).
         :return: None
         """
@@ -642,6 +644,8 @@ class DisulfideLoader:
             title_font=dict(size=20),
             xaxis_showgrid=False,
             yaxis_showgrid=False,
+            autosize=True,
+            yaxis_type="log" if log else "linear",
         )
         fig.update_layout(autosize=True)
 
@@ -653,15 +657,17 @@ class DisulfideLoader:
             fig.write_image(fname, "png")
         else:
             fig.show()
-        return fig
 
-    def plot_count_vs_classid(self, cls=None, theme="auto", base=8):
+        return
+
+    def plot_count_vs_classid(self, cls=None, theme="auto", base=8, log=True):
         """
         Plot a line graph of count vs class ID using Plotly.
 
         :param df: A pandas DataFrame containing the data to be plotted.
         :param title: A string representing the title of the plot (default is 'title').
         :param theme: A string representing the theme of the plot. Anything other than `light` is in `plotly_dark`.
+        :param log: A boolean flag indicating whether to use a log scale for the y-axis. Default is False.
         :return: None
         """
 
@@ -691,9 +697,11 @@ class DisulfideLoader:
             showlegend=True,
             title_x=0.5,
             autosize=True,
+            yaxis_type="log" if log else "linear",
         )
 
-        return fig
+        fig.show()
+        return
 
     def enumerate_class_fromlist(self, sslist, base=8):
         """
