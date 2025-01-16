@@ -262,7 +262,7 @@ class DisulfideClass_Constructor:
 
         return result
 
-    def binary_to_class(self, class_str: str, base: int) -> list:
+    def binary_to_class(self, class_str: str, base: int = 8) -> list:
         """
         Convert a binary input string to a list of possible class strings based on the specified base.
 
