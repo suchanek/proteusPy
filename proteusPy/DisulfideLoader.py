@@ -534,7 +534,7 @@ class DisulfideLoader:
         set_plotly_theme(theme)
 
         for c in _cutoff:
-            class_df = self.tclass.filter_class_by_percentage(base, c)
+            class_df = self.tclass.filter_class_by_percentage(c, base=base)
             tot = class_df["percentage"].sum()
             tot_list.append(tot)
             members_list.append(class_df.shape[0])
@@ -655,7 +655,7 @@ class DisulfideLoader:
             fig.show()
         return fig
 
-    def plot_count_vs_classid(self, cls=None, title="title", theme="auto", base=8):
+    def plot_count_vs_classid(self, cls=None, theme="auto", base=8):
         """
         Plot a line graph of count vs class ID using Plotly.
 
@@ -669,12 +669,13 @@ class DisulfideLoader:
 
         _title = None
 
-        if base == 8:
-            _title = f"Octant Class: {title}"
-        elif base == 2:
-            _title = f"Binary Class: {title}"
-        else:
-            raise ValueError("Invalid base. Must be 2 or 8")
+        match base:
+            case 8:
+                _title = "Octant Class Distribution"
+            case 2:
+                _title = "Binary Class Distribution"
+            case _:
+                raise ValueError("Invalid base. Must be 2 or 8")
 
         df = self.tclass.binaryclass_df if base == 2 else self.tclass.eightclass_df
 
