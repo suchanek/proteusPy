@@ -9,6 +9,7 @@ Last revision: 2025-01-07 22:04:58 -egs-
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
 
 # pylint: disable=C0301
+# pylint: disable=C0302
 # pylint: disable=W1203
 # pylint: disable=C0103
 # pylint: disable=W0612
@@ -235,6 +236,7 @@ class DisulfideLoader:
 
         # if the item is a string, it could be a PDB ID or a full disulfide name
         # or a classid in the format 11111b or 11111o. the last char is the class type
+
         if isinstance(item, str) and len(item) == 6 or len(item) == 5:  # classid
             res = self.extract_class(item, verbose=self.verbose)
             return res
@@ -335,7 +337,7 @@ class DisulfideLoader:
         """
         self.tclass.print_classes(base)
 
-    def extract_class(self, clsid: str, base=8, verbose=False) -> DisulfideList:
+    def extract_class(self, clsid: str, verbose=False) -> DisulfideList:
         """
         Return the list of disulfides corresponding to the input `clsid`.
 
@@ -344,31 +346,12 @@ class DisulfideLoader:
         :return: The list of disulfide bonds from the class.
         """
 
-        eightorbin = None
-        cls = clsid
+        ss_ids = None
+        cls = clsid[:5]
 
-        if isinstance(clsid, str):
-            if len(clsid) == 6:  # classid 11111b or 11111o
-                if clsid[-1] == "b":
-                    eightorbin = self.tclass.binaryclass_dict
-                elif clsid[-1] == "o":
-                    eightorbin = self.tclass.eightclass_dict
-                cls = clsid[:5]
-
-            else:
-                if len(clsid) == 5:  # classid 11111
-                    if base == 8:
-                        eightorbin = self.tclass.eightclass_dict
-                    elif base == 2:
-                        eightorbin = self.tclass.binaryclass_dict
-                    else:
-                        _logger.error("Invalid base: %d", base)
-                        return DisulfideList([], clsid, quiet=True)
-                else:
-                    _logger.error("Invalid class ID: %s", clsid)
-                    return DisulfideList([], clsid, quiet=True)
         try:
-            ss_ids = eightorbin[cls]
+            ss_ids = self.tclass[clsid]
+
         except KeyError:
             _logger.error("Cannot find key %s in SSBond DB", clsid)
             return DisulfideList([], cls, quiet=True)
