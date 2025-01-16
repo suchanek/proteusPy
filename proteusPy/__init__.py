@@ -49,14 +49,11 @@ from .Disulfide import (
 from .DisulfideClass_Constructor import DisulfideClass_Constructor
 from .DisulfideClasses import (
     angle_within_range,
-    create_classes,
     filter_by_percentage,
     get_angle_class,
     get_quadrant,
     get_section,
-    get_ss_id,
     is_between,
-    plot_class_chart,
     torsion_to_class_string,
     torsion_to_eightclass,
     torsion_to_sixclass,

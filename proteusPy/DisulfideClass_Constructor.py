@@ -57,22 +57,22 @@ class DisulfideClass_Constructor:
 
     |   class_id | SS_Classname   | FXN        |   count |   incidence |   percentage |
     |-----------:|:---------------|:-----------|--------:|------------:|-------------:|
-    |          0 | -LHSpiral      | UNK        |   40943 |  0.23359    |    23.359    |
-    |          2 | 00002          | UNK        |    9391 |  0.0535781  |     5.35781  |
-    |         20 | -LHHook        | UNK        |    4844 |  0.0276363  |     2.76363  |
-    |         22 | 00022          | UNK        |    2426 |  0.0138409  |     1.38409  |
-    |        200 | -RHStaple      | Allosteric |   16146 |  0.092117   |     9.2117   |
-    |        202 | 00202          | UNK        |    1396 |  0.00796454 |     0.796454 |
-    |        220 | 00220          | UNK        |    7238 |  0.0412946  |     4.12946  |
-    |        222 | 00222          | UNK        |    6658 |  0.0379856  |     3.79856  |
-    |       2000 | 02000          | UNK        |    7104 |  0.0405301  |     4.05301  |
-    |       2002 | 02002          | UNK        |    8044 |  0.0458931  |     4.58931  |
-    |       2020 | -LHStaple      | UNK        |    3154 |  0.0179944  |     1.79944  |
-    |       2022 | 02022          | UNK        |    1146 |  0.00653822 |     0.653822 |
-    |       2200 | -RHHook        | UNK        |    7115 |  0.0405929  |     4.05929  |
-    |       2202 | 02202          | UNK        |    1021 |  0.00582507 |     0.582507 |
-    |       2220 | -RHSpiral      | UNK        |    8989 |  0.0512845  |     5.12845  |
-    |       2222 | 02222          | UNK        |    7641 |  0.0435939  |     4.35939  |
+    |      00000 | -LHSpiral      | UNK        |   40943 |  0.23359    |    23.359    |
+    |      00002 | 00002          | UNK        |    9391 |  0.0535781  |     5.35781  |
+    |      00020 | -LHHook        | UNK        |    4844 |  0.0276363  |     2.76363  |
+    |      00022 | 00022          | UNK        |    2426 |  0.0138409  |     1.38409  |
+    |      00200 | -RHStaple      | Allosteric |   16146 |  0.092117   |     9.2117   |
+    |      00202 | 00202          | UNK        |    1396 |  0.00796454 |     0.796454 |
+    |      00220 | 00220          | UNK        |    7238 |  0.0412946  |     4.12946  |
+    |      00222 | 00222          | UNK        |    6658 |  0.0379856  |     3.79856  |
+    |      02000 | 02000          | UNK        |    7104 |  0.0405301  |     4.05301  |
+    |      02002 | 02002          | UNK        |    8044 |  0.0458931  |     4.58931  |
+    |      02020 | -LHStaple      | UNK        |    3154 |  0.0179944  |     1.79944  |
+    |      02022 | 02022          | UNK        |    1146 |  0.00653822 |     0.653822 |
+    |      02200 | -RHHook        | UNK        |    7115 |  0.0405929  |     4.05929  |
+    |      02202 | 02202          | UNK        |    1021 |  0.00582507 |     0.582507 |
+    |      02220 | -RHSpiral      | UNK        |    8989 |  0.0512845  |     5.12845  |
+    |      02222 | 02222          | UNK        |    7641 |  0.0435939  |     4.35939  |
     |      20000 | ±LHSpiral      | UNK        |    5007 |  0.0285662  |     2.85662  |
     |      20002 | +LHSpiral      | UNK        |    1611 |  0.00919117 |     0.919117 |
     |      20020 | ±LHHook        | UNK        |    1258 |  0.00717721 |     0.717721 |
@@ -165,6 +165,7 @@ class DisulfideClass_Constructor:
     def class_to_sslist(self, clsid: str, base=8) -> np.ndarray:
         """
         Return the list of disulfides corresponding to the input `clsid`.
+        This list is a list of disulfide identifiers, not the Disulfide objects themselves.
 
         :param clsid: The class name to extract. Must be a string
         in the format '11111' or '11111b' or '11111o'. The suffix 'b' or 'o' indicates
@@ -215,7 +216,7 @@ class DisulfideClass_Constructor:
 
         except KeyError:
             _logger.error("Cannot find key %s in SSBond DB", clsid)
-            return DisulfideList([], cls, quiet=True)
+            return np.array([])
 
         return ss_ids
 
@@ -264,40 +265,31 @@ class DisulfideClass_Constructor:
 
         return result
 
-    def binary_to_six_class(self, class_str):
+    def binary_to_class(self, class_str: str, base: int) -> list:
         """
-        Convert a binary input string to a list of possible six-class strings.
+        Convert a binary input string to a list of possible class strings based on the specified base.
 
         Returns a list of all possible combinations of ordinal sections of a unit circle
-        divided into 6 equal segments, originating at 0 degrees, rotating counterclockwise,
+        divided into the specified number of equal segments, originating at 0 degrees, rotating counterclockwise,
         based on the sign of each angle in the input string.
 
-        :param angle_str (str): A string of length 5, where each character represents the sign
+        :param class_str: A string of length 5, where each character represents the sign
         of an angle in the range of -180-180 degrees.
-
-        :return list: A list of strings of length 5, representing all possible six-class strings.
+        :type class_str: str
+        :param base: The base class to use, 6 or 8.
+        :type base: int
+        :return: A list of strings of length 5, representing all possible class strings.
+        :rtype: list
+        :raises ValueError: If an invalid base value is provided.
         """
+        match base:
+            case 6:
+                angle_maps = {"0": ["4", "5", "6"], "2": ["1", "2", "3"]}
+            case 8:
+                angle_maps = {"0": ["5", "6", "7", "8"], "2": ["1", "2", "3", "4"]}
+            case _:
+                raise ValueError("Invalid base value. Must be 6 or 8.")
 
-        angle_maps = {"0": ["4", "5", "6"], "2": ["1", "2", "3"]}
-        class_lists = [angle_maps[char] for char in class_str]
-        class_combinations = itertools.product(*class_lists)
-        class_strings = ["".join(combination) for combination in class_combinations]
-        return class_strings
-
-    def binary_to_eight_class(self, class_str):
-        """
-        Convert a binary input string to a list of possible eight-class strings.
-
-        Returns a list of all possible combinations of ordinal sections of a unit circle
-        divided into 6 equal segments, originating at 0 degrees, rotating counterclockwise,
-        based on the sign of each angle in the input string.
-
-        :param angle_str (str): A string of length 5, where each character represents the sign
-        of an angle in the range of -180-180 degrees.
-
-        :return list: A list of strings of length 5, representing all possible six-class strings.
-        """
-        angle_maps = {"0": ["5", "6", "7", "8"], "2": ["1", "2", "3", "4"]}
         class_lists = [angle_maps[char] for char in class_str]
         class_combinations = itertools.product(*class_lists)
         class_strings = ["".join(combination) for combination in class_combinations]
