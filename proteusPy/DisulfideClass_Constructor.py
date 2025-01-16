@@ -32,7 +32,6 @@ from proteusPy.ProteusGlobals import (
     DATA_DIR,
     DPI,
     SS_CLASS_DEFINITIONS,
-    SS_CLASS_DICT_FILE,
     SS_CONSENSUS_BIN_FILE,
     SS_CONSENSUS_OCT_FILE,
 )
@@ -41,7 +40,6 @@ _logger = create_logger(__name__)
 _logger.setLevel("INFO")
 
 
-# class DisulfideClass_Constructor:
 class DisulfideClass_Constructor:
     r"""
     This Class manages structural classes for the disulfide bonds contained
@@ -114,16 +112,18 @@ class DisulfideClass_Constructor:
 
         self.build_classes(loader)
 
-    # overload __getitem__ to handle slicing and indexing, and access by name
-    def __getitem__(self, item: str):
+    def __getitem__(self, item: str) -> np.ndarray:
         """
-        Implements indexing and slicing to retrieve Disulfide class lists from the
-        DisulfideLoader. Supports:
+        Implements indexing against a class ID string.
 
-        - Return a DisulfideList given the input Class ID string. Works with Binary
-        classes.
+        Return an array of disulfide IDs given the input Class ID string.
 
-        Raises DisulfideException on invalid indices or names.
+        :param item: The class ID string to index.
+        :type item: str
+        :return: An array of disulfide IDs corresponding to the class ID.
+        :rtype: np.ndarray
+        :raises ValueError: If an integer index is provided.
+        :raises DisulfideException: If the class ID is invalid.
         """
         disulfides = None
 
@@ -134,10 +134,7 @@ class DisulfideClass_Constructor:
             disulfides = self.class_to_sslist(item)
             return disulfides
 
-    def load_class_dict(self, fname=Path(DATA_DIR) / SS_CLASS_DICT_FILE) -> dict:
-        """Load the class dictionary from the specified file."""
-        with open(fname, "rb") as f:
-            self.binaryclass_dict = pickle.load(f)
+        return disulfides
 
     def load_consensus_file(self, fpath=Path(DATA_DIR), oct=True) -> DisulfideList:
         """Load the consensus file from the specified file."""
@@ -420,17 +417,19 @@ class DisulfideClass_Constructor:
 
         return grouped
 
-    def filter_class_by_percentage(self, base: int, cutoff: float) -> pd.DataFrame:
+    def filter_class_by_percentage(self, cutoff: float, base: int = 8) -> pd.DataFrame:
         """
         Filter the specified class definitions by percentage.
 
-        :param base: An integer specifying the class type to filter (6 or 8)
         :param cutoff: A numeric value specifying the minimum percentage required for a row to be included in the output
+        :param base: An optional integer specifying the class type to filter, defaults to 8
         :return: A new Pandas DataFrame containing only rows where the percentage is greater than or equal to the cutoff
         :rtype: pandas.DataFrame
         """
         if base == 8:
             df = self.eightclass_df
+        elif base == 2:
+            df = self.binaryclass_df
         else:
             raise ValueError("Invalid base. Must be 6 or 8.")
 
