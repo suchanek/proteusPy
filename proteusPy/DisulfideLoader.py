@@ -22,9 +22,9 @@ import time
 from pathlib import Path
 
 import gdown
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import plotly.graph_objects as go
 import plotly_express as px
 from pympler import asizeof
 
@@ -213,7 +213,6 @@ class DisulfideLoader:
 
         res = DisulfideList([], "none")
         ind_list = []
-        ss = None
 
         if isinstance(item, slice):
             indices = range(*item.indices(len(self.SSList)))
@@ -230,10 +229,10 @@ class DisulfideLoader:
                     item,
                     self.TotalDisulfides - 1,
                 )
-            else:
-                ss = self.SSList[item]
-                return ss
-                # return DisulfideList([ss], ss.name, ss.resolution)
+                return res
+
+            res = self.SSList[item]
+            return res
 
         # if the item is a string, it could be a PDB ID or a full disulfide name
         # or a classid in the format 11111b or 11111o. the last char is the class type
@@ -338,7 +337,7 @@ class DisulfideLoader:
         """
         self.tclass.print_classes(base)
 
-    def extract_class(self, clsid: str, verbose=False) -> DisulfideList:
+    def extract_class(self, clsid: str, verbose: bool = False) -> DisulfideList:
         """
         Return the list of disulfides corresponding to the input `clsid`.
 
@@ -347,7 +346,6 @@ class DisulfideLoader:
         :return: The list of disulfide bonds from the class.
         """
 
-        ss_ids = None
         cls = clsid[:5]
 
         try:
@@ -360,10 +358,9 @@ class DisulfideLoader:
         tot_ss = len(ss_ids)
         class_disulfides = DisulfideList([], cls, quiet=True)
 
-        if verbose:
-            _pbar = tqdm(range(tot_ss), total=tot_ss, leave=True)
-        else:
-            _pbar = range(tot_ss)
+        _pbar = (
+            tqdm(range(tot_ss), total=tot_ss, leave=True) if verbose else range(tot_ss)
+        )
 
         for idx in _pbar:
             ssid = ss_ids[idx]
@@ -516,7 +513,9 @@ class DisulfideLoader:
         """
         self._quiet = perm
 
-    def plot_classes_vs_cutoff(self, cutoff, steps, base=8, theme="auto") -> None:
+    def plot_classes_vs_cutoff(
+        self, cutoff: float, steps: int = 50, base=8, theme="auto", verbose=False
+    ) -> None:
         """
         Plot the total percentage and number of members for each octant class against the cutoff value.
 
@@ -526,10 +525,10 @@ class DisulfideLoader:
         :param theme: The theme to use for the plot ('auto', 'light', or 'dark'), defaults to 'auto'.
         :return: None
         """
-
         _cutoff = np.linspace(0, cutoff, steps)
         tot_list = []
         members_list = []
+        base_str = "Octant" if base == 8 else "Binary"
 
         set_plotly_theme(theme)
 
@@ -538,21 +537,63 @@ class DisulfideLoader:
             tot = class_df["percentage"].sum()
             tot_list.append(tot)
             members_list.append(class_df.shape[0])
-            print(
-                f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
+            if verbose:
+                print(
+                    f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
+                )
+
+        fig = go.Figure()
+
+        # Add total percentage trace
+        fig.add_trace(
+            go.Scatter(
+                x=_cutoff,
+                y=tot_list,
+                mode="lines+markers",
+                name="Total percentage",
+                yaxis="y1",
+                line=dict(color="blue"),
             )
+        )
 
-        _, ax1 = plt.subplots()
+        # Add number of members trace
+        fig.add_trace(
+            go.Scatter(
+                x=_cutoff,
+                y=members_list,
+                mode="lines+markers",
+                name="Number of members",
+                yaxis="y2",
+                line=dict(color="red"),
+            )
+        )
 
-        ax2 = ax1.twinx()
-        ax1.plot(_cutoff, tot_list, label="Total percentage", color="blue")
-        ax2.plot(_cutoff, members_list, label="Number of members", color="red")
+        # Update layout
+        fig.update_layout(
+            title={
+                "text": f"{base_str} Classes vs Cutoff, ({cutoff}%)",
+                "x": 0.5,
+                "yanchor": "top",
+                "xanchor": "center",
+            },
+            xaxis=dict(title="Cutoff"),
+            yaxis=dict(
+                title="Total percentage",
+                titlefont=dict(color="blue"),
+                tickfont=dict(color="blue"),
+            ),
+            yaxis2=dict(
+                title="Number of members",
+                titlefont=dict(color="red"),
+                tickfont=dict(color="red"),
+                overlaying="y",
+                side="right",
+                type="log",
+            ),
+            legend=dict(x=0.75, y=1.16),
+        )
 
-        ax1.set_xlabel("Cutoff")
-        ax1.set_ylabel("Total percentage", color="blue")
-        ax2.set_ylabel("Number of members", color="red")
-
-        plt.show()
+        fig.show()
 
     def plot_binary_to_eightclass_incidence(
         self,
@@ -776,14 +817,20 @@ class DisulfideLoader:
                 pdbids.append(pdbid)
                 num_disulfides.append(len(disulfides))
 
-        plt.figure(figsize=(12, 6))
-        plt.bar(pdbids, num_disulfides, color="skyblue")
-        plt.xlabel("PDB ID")
-        plt.ylabel("Number of Disulfides")
-        plt.title(f"Number of Disulfides vs PDB ID with cutoff: {cutoff}")
-        plt.xticks(rotation=90)
-        plt.tight_layout()
-        plt.show()
+        # Create a DataFrame
+        df = pd.DataFrame({"PDB ID": pdbids, "Number of Disulfides": num_disulfides})
+        fig = px.bar(
+            df,
+            x="PDB ID",
+            y="Number of Disulfides",
+            title=f"Disulfides vs PDB ID with cutoff: {cutoff}, {len(pdbids)} PDB IDs",
+        )
+        fig.update_layout(
+            xaxis_title="PDB ID",
+            yaxis_title="Number of Disulfides",
+            xaxis_tickangle=-90,
+        )
+        fig.show()
 
         return pdbids, num_disulfides
 

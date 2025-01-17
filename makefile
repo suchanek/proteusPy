@@ -10,7 +10,7 @@ DEVNAME = ppydev
 
 .PHONY: all vers newvers nuke pkg dev clean devclean install install_dev jup jup_dev format bld sdist docs upload tag push-tag commit tests docker docker_hub docker_github docker_all docker_run docker_purge
 
-all: clean sdist docs bld
+all: sdist docs bld docker_all
 
 vers:
 	@echo "Version = $(VERS)"
@@ -110,7 +110,7 @@ docker_hub: viewer/rcsb_viewer.py viewer/dockerfile
 		-f viewer/dockerfile \
 		-t docker.io/egsuchanek/rcsb_viewer:latest \
 		-t docker.io/egsuchanek/rcsb_viewer:$(VERS) \
-		--push --no-cache
+		--push
 
 docker_github: viewer/rcsb_viewer.py viewer/dockerfile
 	docker buildx use cloud-egsuchanek-rcsbviewer
@@ -123,9 +123,9 @@ docker_github: viewer/rcsb_viewer.py viewer/dockerfile
 docker_all: docker docker_hub docker_github
 
 docker_run:
-	docker run -d -p 5006:5006 --name rcsb_viewer --restart unless-stopped rcsb_viewer:latest
+	docker run -d -p 5006:5006 --name rcsb_viewer --restart unless-stopped egsuchanek/rcsb_viewer:latest
 
 docker_purge:
-	docker system prune -a -y
+	docker system prune -a
 
 # End of file
