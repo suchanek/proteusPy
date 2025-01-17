@@ -3,28 +3,46 @@ This file contains global declarations for the *proteusPy* package, a Python pac
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 8/3/24 -egs-
+Last revision: 2025-01-17 18:21:39 -egs-
 """
 
 # plyint: disable=C0103
 
 import importlib.resources as pkg_resources
+import logging
 import math
 import os
 from pathlib import Path
 
+from proteusPy.logger_config import create_logger
+
+# Create a logger for this program.
+_logger = create_logger(__name__)
+_logger.setLevel("WARNING")
+
 _this_dir = pkg_resources.files("proteusPy")
 
-HOME_DIR = os.path.expanduser("~")
-PDB_DIR = os.getenv("PDB")
+HOME_DIR = Path.home()
 
-if PDB_DIR is None:
-    print(f"The PDB environment variable is not set. Defaulting to {HOME_DIR}.")
+PDB_DIR = os.getenv("PDB")
+PDB_BASE = Path(PDB_DIR)
+
+GOOD_PDB_FILE = "good_pdb.pkl"
+
+MINIFORGE_DIR = HOME_DIR / Path("miniforge3/envs")
+MAMBAFORGE_DIR = HOME_DIR / Path("mambaforge/envs")
+
+VENV_DIR = Path("lib/python3.12/site-packages/proteusPy/data")
+
+if not PDB_BASE.is_dir():
+    print(f"Error: The directory {PDB_DIR} does not exist.")
     PDB_DIR = HOME_DIR
 
+DATA_DIR = Path(_this_dir) / "data"
+MODEL_DIR = PDB_BASE / "good"
 
-DATA_DIR = os.path.join(_this_dir, "data")
-MODEL_DIR = os.path.join(PDB_DIR, "good")
+# DATA_DIR = os.path.join(_this_dir, "data")
+# MODEL_DIR = os.path.join(PDB_DIR, "good")
 
 WINFRAME = 512  # single panel width
 WINSIZE = (1024, 1024)
@@ -35,7 +53,7 @@ _FLOAT_INIT = math.nan
 _INT_INIT = -1
 _ANG_INIT = -180.0
 
-PBAR_COLS = 80
+PBAR_COLS = 79
 # nominal macbook Pro screen resolution
 DPI = 220
 
@@ -54,7 +72,6 @@ SS_PROBLEM_SUBSET_ID_FILE = "PDB_subset_problems.csv"
 # contains the dihedral classes and their members
 SS_CLASS_DICT_FILE = "PDB_ss_classes_dict.pkl"
 SS_CONSENSUS_OCT_FILE = "SS_consensus_class_oct.pkl"
-SS_CONSENSUS_SEXT_FILE = "SS_consensus_class_sext.pkl"
 SS_CONSENSUS_BIN_FILE = "SS_consensus_class_32.pkl"
 
 LOADER_FNAME = "PDB_SS_ALL_LOADER.pkl"

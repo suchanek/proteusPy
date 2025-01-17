@@ -3,7 +3,7 @@ This module is part of the proteusPy package, a Python package for
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
-Last revision: 2025-01-07 22:04:58 -egs-
+Last revision: 2025-01-17 18:27:03 -egs-
 """
 
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
@@ -65,8 +65,11 @@ class DisulfideLoader:
     proteusPy.DisulfideList, a ```Pandas``` .csv file, and a ```dict``` of
     indices mapping the PDB IDs into their respective list of disulfides. The datastructures allow
     simple, direct and flexible access to the disulfide structures contained herein.
-    This makes it possible to access the disulfides by array index, PDB structure ID or disulfide
-    name.
+    This makes it possible to access the disulfides by array index, PDB structure ID, disulfide
+    name and class ID.
+
+    The class also provides methods for plotting distance and angle deviations
+    as well as torsion statistics for the disulfides in the database.
 
     The class can also render Disulfides overlaid on a common coordinate system to a pyVista
     window using the [display_overlay()](#DisulfideLoader.display_overlay) method. See below for examples.
@@ -75,10 +78,6 @@ class DisulfideLoader:
     The difference is that the latter function loads the compressed database from its single
     source. The `DisulfideLoader` class is used to build the Disulifde database with a
     specific cutoff, or for saving the database to a file.
-
-    *Developer's Notes:*
-    The .pkl files needed to instantiate this class and save it into its final .pkl file are
-    defined in the proteusPy.data class and should not be changed.
     """
 
     def __init__(
@@ -98,8 +97,9 @@ class DisulfideLoader:
         memory or time. The name for the subset file is hard-coded. One can pass a
         different data directory and file names for the pickle files. These different
         directories are normally established with the proteusPy.Extract_Disulfides
-        function.
-
+        program. The ``cutoff`` is the distance in Angstroms used to filter the disulfides
+        by Cα distance. The ``sg_cutoff`` is the distance in Angstroms used to filter the
+        disulfides by Sγ distance. The verbose flag controls the amount of output.
         """
 
         self.SSList = DisulfideList([], "ALL_PDB_SS")
@@ -142,10 +142,9 @@ class DisulfideLoader:
             with open(full_path, "rb") as f:
                 sslist = pickle.load(f)
                 old_length = len(sslist)
-
                 filt = DisulfideList(sslist.filter_by_distance(cutoff), "filtered")
-
                 new_length = len(filt)
+
                 if self.verbose:
                     _logger.info(
                         "Filtering with Cα cutoff %f: old: %d, new: %d",
@@ -241,8 +240,8 @@ class DisulfideLoader:
             res = self.extract_class(item, verbose=self.verbose)
             return res
 
+        # PDB_SS['4yys'] return a list of SS
         try:
-            # PDB_SS['4yys'] return a list of SS
             indices = self.SSDict[item]
             if indices:
                 res = DisulfideList([], item)
@@ -432,11 +431,11 @@ class DisulfideLoader:
         :return: None
 
         Example:
-        >>> from proteusPy import Disulfide, Load_PDB_SS, DisulfideList
+        >>> import proteusPy as pp
 
         Instantiate the Loader with the SS database subset.
 
-        >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
+        >>> PDB_SS = pp.Load_PDB_SS(verbose=False, subset=True)
 
         Display the Disulfides from the PDB ID ```4yys```, overlaid onto
         a common reference (the proximal disulfides).
@@ -469,8 +468,8 @@ class DisulfideLoader:
         :rtype: pd.DataFrame
 
         Example:
-        >>> from proteusPy import Load_PDB_SS
-        >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
+        >>> import proteusPy as pp
+        >>> PDB_SS = pp.Load_PDB_SS(verbose=False, subset=True)
         >>> Tor_DF = PDB_SS.getTorsions()
         """
         res_df = pd.DataFrame()

@@ -110,7 +110,7 @@ docker_hub: viewer/rcsb_viewer.py viewer/dockerfile
 		-f viewer/dockerfile \
 		-t docker.io/egsuchanek/rcsb_viewer:latest \
 		-t docker.io/egsuchanek/rcsb_viewer:$(VERS) \
-		--push
+		--push --no-cache
 
 docker_github: viewer/rcsb_viewer.py viewer/dockerfile
 	docker buildx use cloud-egsuchanek-rcsbviewer
