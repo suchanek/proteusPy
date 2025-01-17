@@ -60,6 +60,21 @@
                     <a class="variable" href="#PDB_DIR">PDB_DIR</a>
             </li>
             <li>
+                    <a class="variable" href="#PDB_BASE">PDB_BASE</a>
+            </li>
+            <li>
+                    <a class="variable" href="#GOOD_PDB_FILE">GOOD_PDB_FILE</a>
+            </li>
+            <li>
+                    <a class="variable" href="#MINIFORGE_DIR">MINIFORGE_DIR</a>
+            </li>
+            <li>
+                    <a class="variable" href="#MAMBAFORGE_DIR">MAMBAFORGE_DIR</a>
+            </li>
+            <li>
+                    <a class="variable" href="#VENV_DIR">VENV_DIR</a>
+            </li>
+            <li>
                     <a class="variable" href="#DATA_DIR">DATA_DIR</a>
             </li>
             <li>
@@ -103,9 +118,6 @@
             </li>
             <li>
                     <a class="variable" href="#SS_CONSENSUS_OCT_FILE">SS_CONSENSUS_OCT_FILE</a>
-            </li>
-            <li>
-                    <a class="variable" href="#SS_CONSENSUS_SEXT_FILE">SS_CONSENSUS_SEXT_FILE</a>
             </li>
             <li>
                     <a class="variable" href="#SS_CONSENSUS_BIN_FILE">SS_CONSENSUS_BIN_FILE</a>
@@ -169,7 +181,7 @@
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.</p>
 
 <p>Author: Eric G. Suchanek, PhD
-Last revision: 8/3/24 -egs-</p>
+Last revision: 2025-01-17 18:21:39 -egs-</p>
 </div>
 
                         <input id="mod-ProteusGlobals-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -181,122 +193,139 @@ Last revision: 8/3/24 -egs-</p>
 </span><span id="L-3"><a href="#L-3"><span class="linenos">  3</span></a><span class="sd">the analysis and modeling of protein structures, with an emphasis on disulfide bonds.</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos">  4</span></a>
 </span><span id="L-5"><a href="#L-5"><span class="linenos">  5</span></a><span class="sd">Author: Eric G. Suchanek, PhD</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="sd">Last revision: 8/3/24 -egs-</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos">  6</span></a><span class="sd">Last revision: 2025-01-17 18:21:39 -egs-</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos">  7</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos">  8</span></a>
 </span><span id="L-9"><a href="#L-9"><span class="linenos">  9</span></a><span class="c1"># plyint: disable=C0103</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos"> 10</span></a>
 </span><span id="L-11"><a href="#L-11"><span class="linenos"> 11</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">importlib.resources</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pkg_resources</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>
-</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="n">_this_dir</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="s2">&quot;proteusPy&quot;</span><span class="p">)</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>
-</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="n">HOME_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">)</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="n">PDB_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PDB&quot;</span><span class="p">)</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a>
-</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="k">if</span> <span class="n">PDB_DIR</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The PDB environment variable is not set. Defaulting to </span><span class="si">{</span><span class="n">HOME_DIR</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a>    <span class="n">PDB_DIR</span> <span class="o">=</span> <span class="n">HOME_DIR</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos"> 12</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos"> 13</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos"> 14</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a>
+</span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">proteusPy.logger_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_logger</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a>
+</span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="c1"># Create a logger for this program.</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="n">_logger</span> <span class="o">=</span> <span class="n">create_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="n">_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="s2">&quot;WARNING&quot;</span><span class="p">)</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos"> 22</span></a>
+</span><span id="L-23"><a href="#L-23"><span class="linenos"> 23</span></a><span class="n">_this_dir</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">files</span><span class="p">(</span><span class="s2">&quot;proteusPy&quot;</span><span class="p">)</span>
 </span><span id="L-24"><a href="#L-24"><span class="linenos"> 24</span></a>
-</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a>
-</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a><span class="n">DATA_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_this_dir</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="n">MODEL_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">PDB_DIR</span><span class="p">,</span> <span class="s2">&quot;good&quot;</span><span class="p">)</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a>
-</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a><span class="n">WINFRAME</span> <span class="o">=</span> <span class="mi">512</span>  <span class="c1"># single panel width</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="n">WINSIZE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a><span class="n">CAMERA_POS</span> <span class="o">=</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a>
-</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="c1"># global for initialization of dihedrals and energies</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="n">_FLOAT_INIT</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">nan</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="n">_INT_INIT</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="n">_ANG_INIT</span> <span class="o">=</span> <span class="o">-</span><span class="mf">180.0</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a>
-</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="n">PBAR_COLS</span> <span class="o">=</span> <span class="mi">80</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a><span class="c1"># nominal macbook Pro screen resolution</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a><span class="n">DPI</span> <span class="o">=</span> <span class="mi">220</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a>
-</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="c1"># global names for the disulfide .pkl files</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos"> 25</span></a><span class="n">HOME_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos"> 26</span></a>
+</span><span id="L-27"><a href="#L-27"><span class="linenos"> 27</span></a><span class="n">PDB_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;PDB&quot;</span><span class="p">)</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos"> 28</span></a><span class="n">PDB_BASE</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">PDB_DIR</span><span class="p">)</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos"> 29</span></a>
+</span><span id="L-30"><a href="#L-30"><span class="linenos"> 30</span></a><span class="n">GOOD_PDB_FILE</span> <span class="o">=</span> <span class="s2">&quot;good_pdb.pkl&quot;</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos"> 31</span></a>
+</span><span id="L-32"><a href="#L-32"><span class="linenos"> 32</span></a><span class="n">MINIFORGE_DIR</span> <span class="o">=</span> <span class="n">HOME_DIR</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;miniforge3/envs&quot;</span><span class="p">)</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="n">MAMBAFORGE_DIR</span> <span class="o">=</span> <span class="n">HOME_DIR</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;mambaforge/envs&quot;</span><span class="p">)</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a>
+</span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="n">VENV_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;lib/python3.12/site-packages/proteusPy/data&quot;</span><span class="p">)</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a>
+</span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="k">if</span> <span class="ow">not</span> <span class="n">PDB_BASE</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error: The directory </span><span class="si">{</span><span class="n">PDB_DIR</span><span class="si">}</span><span class="s2"> does not exist.&quot;</span><span class="p">)</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>    <span class="n">PDB_DIR</span> <span class="o">=</span> <span class="n">HOME_DIR</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos"> 40</span></a>
+</span><span id="L-41"><a href="#L-41"><span class="linenos"> 41</span></a><span class="n">DATA_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">_this_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos"> 42</span></a><span class="n">MODEL_DIR</span> <span class="o">=</span> <span class="n">PDB_BASE</span> <span class="o">/</span> <span class="s2">&quot;good&quot;</span>
 </span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a>
-</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="n">SS_PICKLE_FILE</span> <span class="o">=</span> <span class="s2">&quot;PDB_all_ss.pkl&quot;</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="n">SS_MASTER_PICKLE_FILE</span> <span class="o">=</span> <span class="s2">&quot;PDB_all_ss_master.pkl&quot;</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a><span class="c1"># DATA_DIR = os.path.join(_this_dir, &quot;data&quot;)</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="c1"># MODEL_DIR = os.path.join(PDB_DIR, &quot;good&quot;)</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a>
-</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="n">PROBLEM_ID_FILE</span> <span class="o">=</span> <span class="s2">&quot;PDB_all_SS_problems.csv&quot;</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="n">SS_ID_FILE</span> <span class="o">=</span> <span class="s2">&quot;ss_ids.txt&quot;</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>
-</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="n">SS_SUBSET_PICKLE_FILE</span> <span class="o">=</span> <span class="s2">&quot;PDB_subset_ss.pkl&quot;</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>
-</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a><span class="n">SS_PROBLEM_SUBSET_ID_FILE</span> <span class="o">=</span> <span class="s2">&quot;PDB_subset_problems.csv&quot;</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a>
-</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="c1"># contains the dihedral classes and their members</span>
-</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="n">SS_CLASS_DICT_FILE</span> <span class="o">=</span> <span class="s2">&quot;PDB_ss_classes_dict.pkl&quot;</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="n">SS_CONSENSUS_OCT_FILE</span> <span class="o">=</span> <span class="s2">&quot;SS_consensus_class_oct.pkl&quot;</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="n">SS_CONSENSUS_SEXT_FILE</span> <span class="o">=</span> <span class="s2">&quot;SS_consensus_class_sext.pkl&quot;</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="n">SS_CONSENSUS_BIN_FILE</span> <span class="o">=</span> <span class="s2">&quot;SS_consensus_class_32.pkl&quot;</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="n">WINFRAME</span> <span class="o">=</span> <span class="mi">512</span>  <span class="c1"># single panel width</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a><span class="n">WINSIZE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="n">CAMERA_POS</span> <span class="o">=</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a>
+</span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a><span class="c1"># global for initialization of dihedrals and energies</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos"> 52</span></a><span class="n">_FLOAT_INIT</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">nan</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="n">_INT_INIT</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="n">_ANG_INIT</span> <span class="o">=</span> <span class="o">-</span><span class="mf">180.0</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="n">PBAR_COLS</span> <span class="o">=</span> <span class="mi">79</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="c1"># nominal macbook Pro screen resolution</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="n">DPI</span> <span class="o">=</span> <span class="mi">220</span>
 </span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="n">LOADER_FNAME</span> <span class="o">=</span> <span class="s2">&quot;PDB_SS_ALL_LOADER.pkl&quot;</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="n">LOADER_SUBSET_FNAME</span> <span class="o">=</span> <span class="s2">&quot;PDB_SS_SUBSET_LOADER.pkl&quot;</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="n">LOADER_FNAME_URL</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/suchanek/proteusPy/master/proteusPy/data/PDB_SS_ALL_LOADER.pkl&quot;</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="n">LOADER_SUBSET_FNAME_URL</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/suchanek/proteusPy/blob/master/proteusPy/data/PDB_SS_SUBSET_LOADER.pkl&quot;</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="n">LOADER_ALL_MASTER_URL</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>    <span class="s2">&quot;https://drive.google.com/uc?id=1bpb9jkZO_XNNXiSlbsLQRHhl1MHJ1cJP&quot;</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="p">)</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a><span class="n">LOADER_SUBSET_MASTER_URL</span> <span class="o">=</span> <span class="p">(</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>    <span class="s2">&quot;https://drive.google.com/uc?id=1gCbELI9nBRknhLYOHWOZaUtI-L7tXVg9&quot;</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a><span class="p">)</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="n">LOADER_ALL_URL</span> <span class="o">=</span> <span class="s2">&quot;https://drive.google.com/uc?id=1igF-sppLPaNsBaUS7nkb13vtOGZZmsFp&quot;</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="n">LOADER_SUBSET_URL</span> <span class="o">=</span> <span class="s2">&quot;https://drive.google.com/uc?id=1puy9pxrClFks0KN9q5PPV_ONKvL-hg33&quot;</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="c1"># SS_LIST_URL = &quot;https://drive.google.com/uc?id=1H_Yn8DifsCCilifNicpkcjOQDAGbNGSU&quot;</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="c1"># SS_LIST_URL=&quot;https://drive.google.com/file/uc?id=1-B-uODacYHVEAYtWQhp-s2M4SEWGllM&quot;</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a><span class="n">SS_LIST_URL</span> <span class="o">=</span> <span class="s2">&quot;https://drive.google.com/uc?id=1-B-uODacYHVEAYtWQhp-s2M4SEWGllM-&quot;</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="n">SS_CLASS_DEFINITIONS</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="s2">Idx,chi1_s,chi2_s,chi3_s,chi4_s,chi5_s,class_id,SS_Classname,FXN</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="s2">0,-1,-1,-1,-1,-1,00000,-LHSpiral,UNK</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="s2">1,-1,-1,-1,-1,1,00002,00002,UNK</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="s2">2,-1,-1,-1,1,-1,00020,-LHHook,UNK</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="s2">3,-1,-1,-1,1,1,00022,00022,UNK</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="s2">4,-1,-1,1,-1,-1,00200,-RHStaple,Allosteric</span>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="s2">5,-1,-1,1,-1,1,00202,00202,UNK</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="s2">6,-1,-1,1,1,-1,00220,00220,UNK</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a><span class="s2">7,-1,-1,1,1,1,00222,00222,UNK</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="s2">8,-1,1,-1,-1,-1,02000,02000,UNK</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="s2">9,-1,1,-1,-1,1,02002,02002,UNK</span>
-</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="s2">10,-1,1,-1,1,-1,02020,-LHStaple,UNK</span>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="s2">11,-1,1,-1,1,1,02022,02022,UNK</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="s2">12,-1,1,1,-1,-1,02200,-RHHook,UNK</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="s2">13,-1,1,1,-1,1,02202,02202,UNK</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="s2">14,-1,1,1,1,-1,02220,-RHSpiral,UNK</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="s2">15,-1,1,1,1,1,02222,02222,UNK</span>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="s2">16,1,-1,-1,-1,-1,20000,±LHSpiral,UNK</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="s2">17,1,-1,-1,-1,1,20002,+LHSpiral,UNK</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="s2">18,1,-1,-1,1,-1,20020,±LHHook,UNK</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="s2">19,1,-1,-1,1,1,20022,+LHHook,UNK</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="s2">20,1,-1,1,-1,-1,20200,±RHStaple,UNK</span>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="s2">21,1,-1,1,-1,1,20202,+RHStaple,UNK</span>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="s2">22,1,-1,1,1,-1,20220,±RHHook,Catalytic</span>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="s2">23,1,-1,1,1,1,20222,20222,UNK</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="s2">24,1,1,-1,-1,-1,22000,-/+LHHook,UNK</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a><span class="s2">25,1,1,-1,-1,1,22002,22002,UNK</span>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="s2">26,1,1,-1,1,-1,22020,±LHStaple,UNK</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="s2">27,1,1,-1,1,1,22022,+LHStaple,UNK</span>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="s2">28,1,1,1,-1,-1,22200,-/+RHHook,UNK</span>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="s2">29,1,1,1,-1,1,22202,+RHHook,UNK</span>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a><span class="s2">30,1,1,1,1,-1,22220,±RHSpiral,UNK</span>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="s2">31,1,1,1,1,1,22222,+RHSpiral,UNK</span>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="s2">&quot;&quot;&quot;</span>
-</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="n">CLASSOBJ_FNAME</span> <span class="o">=</span> <span class="s2">&quot;PDB_CLASS_OBJ.pkl&quot;</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="c1"># Default cutoffs for the database from analysis. These are 95% confidence</span>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="c1"># intervals for Ca and Sg distances. The cutoffs are used to filter the database</span>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="c1"># for the most statistically reliable disulfide bonds.</span>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="n">CA_CUTOFF</span> <span class="o">=</span> <span class="mf">6.71</span>
-</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="n">SG_CUTOFF</span> <span class="o">=</span> <span class="mf">2.12</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="c1"># global names for the disulfide .pkl files</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="n">SS_PICKLE_FILE</span> <span class="o">=</span> <span class="s2">&quot;PDB_all_ss.pkl&quot;</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a><span class="n">SS_MASTER_PICKLE_FILE</span> <span class="o">=</span> <span class="s2">&quot;PDB_all_ss_master.pkl&quot;</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a><span class="n">PROBLEM_ID_FILE</span> <span class="o">=</span> <span class="s2">&quot;PDB_all_SS_problems.csv&quot;</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a><span class="n">SS_ID_FILE</span> <span class="o">=</span> <span class="s2">&quot;ss_ids.txt&quot;</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a><span class="n">SS_SUBSET_PICKLE_FILE</span> <span class="o">=</span> <span class="s2">&quot;PDB_subset_ss.pkl&quot;</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a><span class="n">SS_PROBLEM_SUBSET_ID_FILE</span> <span class="o">=</span> <span class="s2">&quot;PDB_subset_problems.csv&quot;</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a><span class="c1"># contains the dihedral classes and their members</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a><span class="n">SS_CLASS_DICT_FILE</span> <span class="o">=</span> <span class="s2">&quot;PDB_ss_classes_dict.pkl&quot;</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="n">SS_CONSENSUS_OCT_FILE</span> <span class="o">=</span> <span class="s2">&quot;SS_consensus_class_oct.pkl&quot;</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="n">SS_CONSENSUS_BIN_FILE</span> <span class="o">=</span> <span class="s2">&quot;SS_consensus_class_32.pkl&quot;</span>
+</span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="n">LOADER_FNAME</span> <span class="o">=</span> <span class="s2">&quot;PDB_SS_ALL_LOADER.pkl&quot;</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="n">LOADER_SUBSET_FNAME</span> <span class="o">=</span> <span class="s2">&quot;PDB_SS_SUBSET_LOADER.pkl&quot;</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="n">LOADER_FNAME_URL</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/suchanek/proteusPy/master/proteusPy/data/PDB_SS_ALL_LOADER.pkl&quot;</span>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="n">LOADER_SUBSET_FNAME_URL</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/suchanek/proteusPy/blob/master/proteusPy/data/PDB_SS_SUBSET_LOADER.pkl&quot;</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="n">LOADER_ALL_MASTER_URL</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>    <span class="s2">&quot;https://drive.google.com/uc?id=1bpb9jkZO_XNNXiSlbsLQRHhl1MHJ1cJP&quot;</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a><span class="p">)</span>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="n">LOADER_SUBSET_MASTER_URL</span> <span class="o">=</span> <span class="p">(</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>    <span class="s2">&quot;https://drive.google.com/uc?id=1gCbELI9nBRknhLYOHWOZaUtI-L7tXVg9&quot;</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="p">)</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="n">LOADER_ALL_URL</span> <span class="o">=</span> <span class="s2">&quot;https://drive.google.com/uc?id=1igF-sppLPaNsBaUS7nkb13vtOGZZmsFp&quot;</span>
+</span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a><span class="n">LOADER_SUBSET_URL</span> <span class="o">=</span> <span class="s2">&quot;https://drive.google.com/uc?id=1puy9pxrClFks0KN9q5PPV_ONKvL-hg33&quot;</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="c1"># SS_LIST_URL = &quot;https://drive.google.com/uc?id=1H_Yn8DifsCCilifNicpkcjOQDAGbNGSU&quot;</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="c1"># SS_LIST_URL=&quot;https://drive.google.com/file/uc?id=1-B-uODacYHVEAYtWQhp-s2M4SEWGllM&quot;</span>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="n">SS_LIST_URL</span> <span class="o">=</span> <span class="s2">&quot;https://drive.google.com/uc?id=1-B-uODacYHVEAYtWQhp-s2M4SEWGllM-&quot;</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="n">SS_CLASS_DEFINITIONS</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="s2">Idx,chi1_s,chi2_s,chi3_s,chi4_s,chi5_s,class_id,SS_Classname,FXN</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="s2">0,-1,-1,-1,-1,-1,00000,-LHSpiral,UNK</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="s2">1,-1,-1,-1,-1,1,00002,00002,UNK</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="s2">2,-1,-1,-1,1,-1,00020,-LHHook,UNK</span>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="s2">3,-1,-1,-1,1,1,00022,00022,UNK</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="s2">4,-1,-1,1,-1,-1,00200,-RHStaple,Allosteric</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="s2">5,-1,-1,1,-1,1,00202,00202,UNK</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="s2">6,-1,-1,1,1,-1,00220,00220,UNK</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a><span class="s2">7,-1,-1,1,1,1,00222,00222,UNK</span>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a><span class="s2">8,-1,1,-1,-1,-1,02000,02000,UNK</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a><span class="s2">9,-1,1,-1,-1,1,02002,02002,UNK</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a><span class="s2">10,-1,1,-1,1,-1,02020,-LHStaple,UNK</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a><span class="s2">11,-1,1,-1,1,1,02022,02022,UNK</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a><span class="s2">12,-1,1,1,-1,-1,02200,-RHHook,UNK</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a><span class="s2">13,-1,1,1,-1,1,02202,02202,UNK</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="s2">14,-1,1,1,1,-1,02220,-RHSpiral,UNK</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="s2">15,-1,1,1,1,1,02222,02222,UNK</span>
+</span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a><span class="s2">16,1,-1,-1,-1,-1,20000,±LHSpiral,UNK</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="s2">17,1,-1,-1,-1,1,20002,+LHSpiral,UNK</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="s2">18,1,-1,-1,1,-1,20020,±LHHook,UNK</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="s2">19,1,-1,-1,1,1,20022,+LHHook,UNK</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="s2">20,1,-1,1,-1,-1,20200,±RHStaple,UNK</span>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="s2">21,1,-1,1,-1,1,20202,+RHStaple,UNK</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="s2">22,1,-1,1,1,-1,20220,±RHHook,Catalytic</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="s2">23,1,-1,1,1,1,20222,20222,UNK</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="s2">24,1,1,-1,-1,-1,22000,-/+LHHook,UNK</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a><span class="s2">25,1,1,-1,-1,1,22002,22002,UNK</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="s2">26,1,1,-1,1,-1,22020,±LHStaple,UNK</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="s2">27,1,1,-1,1,1,22022,+LHStaple,UNK</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="s2">28,1,1,1,-1,-1,22200,-/+RHHook,UNK</span>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a><span class="s2">29,1,1,1,-1,1,22202,+RHHook,UNK</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a><span class="s2">30,1,1,1,1,-1,22220,±RHSpiral,UNK</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="s2">31,1,1,1,1,1,22222,+RHSpiral,UNK</span>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a><span class="s2">&quot;&quot;&quot;</span>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a><span class="n">CLASSOBJ_FNAME</span> <span class="o">=</span> <span class="s2">&quot;PDB_CLASS_OBJ.pkl&quot;</span>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a><span class="c1"># Default cutoffs for the database from analysis. These are 95% confidence</span>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a><span class="c1"># intervals for Ca and Sg distances. The cutoffs are used to filter the database</span>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a><span class="c1"># for the most statistically reliable disulfide bonds.</span>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a><span class="n">CA_CUTOFF</span> <span class="o">=</span> <span class="mf">6.71</span>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a><span class="n">SG_CUTOFF</span> <span class="o">=</span> <span class="mf">2.12</span>
 </span></pre></div>
 
 
@@ -304,7 +333,7 @@ Last revision: 8/3/24 -egs-</p>
                 <section id="HOME_DIR">
                     <div class="attr variable">
             <span class="name">HOME_DIR</span>        =
-<span class="default_value">$HOME</span>
+<span class="default_value">PosixPath(&#39;/Users/egs&#39;)</span>
 
         
     </div>
@@ -325,10 +354,70 @@ Last revision: 8/3/24 -egs-</p>
     
 
                 </section>
+                <section id="PDB_BASE">
+                    <div class="attr variable">
+            <span class="name">PDB_BASE</span>        =
+<span class="default_value">PosixPath(&#39;/Users/egs/PDB&#39;)</span>
+
+        
+    </div>
+    <a class="headerlink" href="#PDB_BASE"></a>
+    
+    
+
+                </section>
+                <section id="GOOD_PDB_FILE">
+                    <div class="attr variable">
+            <span class="name">GOOD_PDB_FILE</span>        =
+<span class="default_value">&#39;good_pdb.pkl&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#GOOD_PDB_FILE"></a>
+    
+    
+
+                </section>
+                <section id="MINIFORGE_DIR">
+                    <div class="attr variable">
+            <span class="name">MINIFORGE_DIR</span>        =
+<span class="default_value">PosixPath(&#39;/Users/egs/miniforge3/envs&#39;)</span>
+
+        
+    </div>
+    <a class="headerlink" href="#MINIFORGE_DIR"></a>
+    
+    
+
+                </section>
+                <section id="MAMBAFORGE_DIR">
+                    <div class="attr variable">
+            <span class="name">MAMBAFORGE_DIR</span>        =
+<span class="default_value">PosixPath(&#39;/Users/egs/mambaforge/envs&#39;)</span>
+
+        
+    </div>
+    <a class="headerlink" href="#MAMBAFORGE_DIR"></a>
+    
+    
+
+                </section>
+                <section id="VENV_DIR">
+                    <div class="attr variable">
+            <span class="name">VENV_DIR</span>        =
+<span class="default_value">PosixPath(&#39;lib/python3.12/site-packages/proteusPy/data&#39;)</span>
+
+        
+    </div>
+    <a class="headerlink" href="#VENV_DIR"></a>
+    
+    
+
+                </section>
                 <section id="DATA_DIR">
                     <div class="attr variable">
             <span class="name">DATA_DIR</span>        =
-<span class="default_value">&#39;/Users/egs/repos/proteusPy/proteusPy/data&#39;</span>
+<span class="default_value">PosixPath(&#39;/Users/egs/repos/proteusPy/proteusPy/data&#39;)</span>
 
         
     </div>
@@ -340,7 +429,7 @@ Last revision: 8/3/24 -egs-</p>
                 <section id="MODEL_DIR">
                     <div class="attr variable">
             <span class="name">MODEL_DIR</span>        =
-<span class="default_value">&#39;/Users/egs/PDB/good&#39;</span>
+<span class="default_value">PosixPath(&#39;/Users/egs/PDB/good&#39;)</span>
 
         
     </div>
@@ -388,7 +477,7 @@ Last revision: 8/3/24 -egs-</p>
                 <section id="PBAR_COLS">
                     <div class="attr variable">
             <span class="name">PBAR_COLS</span>        =
-<span class="default_value">80</span>
+<span class="default_value">79</span>
 
         
     </div>
@@ -501,18 +590,6 @@ Last revision: 8/3/24 -egs-</p>
         
     </div>
     <a class="headerlink" href="#SS_CONSENSUS_OCT_FILE"></a>
-    
-    
-
-                </section>
-                <section id="SS_CONSENSUS_SEXT_FILE">
-                    <div class="attr variable">
-            <span class="name">SS_CONSENSUS_SEXT_FILE</span>        =
-<span class="default_value">&#39;SS_consensus_class_sext.pkl&#39;</span>
-
-        
-    </div>
-    <a class="headerlink" href="#SS_CONSENSUS_SEXT_FILE"></a>
     
     
 
