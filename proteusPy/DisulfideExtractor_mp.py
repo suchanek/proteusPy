@@ -17,7 +17,7 @@ utilizes multiprocessing to speed up the extraction process.
 * Subset: Only extract and process the first 1000 Disulfides found in the PDB directory.
 
 Author: Eric G. Suchanek, PhD.
-Last revision: 2025-01-01 09:17:35 -egs-
+Last revision: 2025-01-17 13:16:20 -egs-
 """
 
 import argparse
@@ -127,7 +127,7 @@ num_ent_files = len(ent_files)
 pdb_id_list = [Path(f).stem[3:7] for f in ent_files]
 
 
-__version__ = "2.3.0"
+__version__ = "2.3.1"
 
 
 def parse_arguments():
@@ -137,7 +137,10 @@ def parse_arguments():
 
     parser = argparse.ArgumentParser(
         description=f"""\nproteusPy Disulfide Bond Extractor v{__version__}\n
-        This program extracts disulfide bonds from PDB files and builds a DisulfideLoader object.
+
+        This program extracts disulfide bonds from PDB files and builds the master disulfide list
+        and the DisulfideLoader object. The DisulfideLoader object is saved to the proteusPy module.
+
         The program expects the environment variable PDB to be set to the base location of the PDB files.
         The PDB files are expected to be in the PDB/good directory. Relevant output files, 
         (SS_*LOADER*.pkl) are stored in PDB/data."""
@@ -178,7 +181,7 @@ def parse_arguments():
         "-v",
         action="store_true",
         help="Enable verbose output",
-        default=True,
+        default=False,
     )
     parser.add_argument(
         "--cutoff",
@@ -387,7 +390,8 @@ def do_build(verbose, full, subset, cutoff, sg_cutoff):
         print("Error: No valid build option selected.")
         sys.exit(1)
 
-    PDB_SS.describe()
+    if not verbose:  # called automatically by the loader when verbose is True
+        PDB_SS.describe()
 
 
 def update_repo(datadir, destdir):
@@ -494,8 +498,6 @@ def main():
     # set_logging_level_for_all_handlers(logging.ERROR)
     # disable_stream_handlers_for_namespace("proteusPy")
 
-    _logger.info("Starting DisulfideExtractor at time %s", datetime.datetime.now())
-
     mess = (
         f"proteusPy DisulfideExtractor v{__version__}\n"
         f"PDB model directory:       {PDB_DIR}\n"
@@ -543,9 +545,9 @@ def main():
 
 
 if __name__ == "__main__":
+    print(f"Starting DisulfideExtraction at time: {datetime.datetime.now()}")
     main()
-
-    print(f"Finished DisulfideExtraction at time %s", datetime.datetime.now())
+    print(f"Finished DisulfideExtraction at time {datetime.datetime.now()}")
 
 
 # End of file
