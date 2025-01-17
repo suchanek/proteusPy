@@ -163,8 +163,8 @@ from .vector3D import (
     rms_difference,
 )
 
-_logger.setLevel(logging.INFO)
-_logger.info("ProteusPy %s initialized ", __version__)
+# _logger.setLevel(logging.INFO)
+# _logger.info("ProteusPy %s initialized ", __version__)
 
 _logger.setLevel(DEFAULT_LOG_LEVEL)
 
