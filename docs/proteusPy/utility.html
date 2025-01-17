@@ -123,16 +123,13 @@
                     <a class="function" href="#calculate_percentile_cutoff">calculate_percentile_cutoff</a>
             </li>
             <li>
-                    <a class="function" href="#filter_by_cutoffs">filter_by_cutoffs</a>
-            </li>
-            <li>
-                    <a class="function" href="#bad_filter_by_cutoffs">bad_filter_by_cutoffs</a>
-            </li>
-            <li>
                     <a class="function" href="#save_list_to_file">save_list_to_file</a>
             </li>
             <li>
                     <a class="function" href="#load_list_from_file">load_list_from_file</a>
+            </li>
+            <li>
+                    <a class="function" href="#set_plotly_theme">set_plotly_theme</a>
             </li>
     </ul>
 
@@ -1100,235 +1097,227 @@
 </span><span id="L-935"><a href="#L-935"><span class="linenos"> 935</span></a>    <span class="k">return</span>
 </span><span id="L-936"><a href="#L-936"><span class="linenos"> 936</span></a>
 </span><span id="L-937"><a href="#L-937"><span class="linenos"> 937</span></a>
-</span><span id="L-938"><a href="#L-938"><span class="linenos"> 938</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_theme</span><span class="p">():</span>
-</span><span id="L-939"><a href="#L-939"><span class="linenos"> 939</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-940"><a href="#L-940"><span class="linenos"> 940</span></a><span class="sd">    Determine the display theme for the current operating system.</span>
+</span><span id="L-938"><a href="#L-938"><span class="linenos"> 938</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
+</span><span id="L-939"><a href="#L-939"><span class="linenos"> 939</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+</span><span id="L-940"><a href="#L-940"><span class="linenos"> 940</span></a>
 </span><span id="L-941"><a href="#L-941"><span class="linenos"> 941</span></a>
-</span><span id="L-942"><a href="#L-942"><span class="linenos"> 942</span></a><span class="sd">    Returns:</span>
-</span><span id="L-943"><a href="#L-943"><span class="linenos"> 943</span></a><span class="sd">    :return str: &#39;light&#39; if the theme is light, &#39;dark&#39; if the theme is dark, and &#39;light&#39; otherwise</span>
-</span><span id="L-944"><a href="#L-944"><span class="linenos"> 944</span></a>
-</span><span id="L-945"><a href="#L-945"><span class="linenos"> 945</span></a><span class="sd">    Example:</span>
-</span><span id="L-946"><a href="#L-946"><span class="linenos"> 946</span></a><span class="sd">    &gt;&gt;&gt; get_theme()</span>
-</span><span id="L-947"><a href="#L-947"><span class="linenos"> 947</span></a><span class="sd">    &#39;dark&#39;</span>
-</span><span id="L-948"><a href="#L-948"><span class="linenos"> 948</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-949"><a href="#L-949"><span class="linenos"> 949</span></a>    <span class="n">system</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span>
-</span><span id="L-950"><a href="#L-950"><span class="linenos"> 950</span></a>
-</span><span id="L-951"><a href="#L-951"><span class="linenos"> 951</span></a>    <span class="k">if</span> <span class="n">system</span> <span class="o">==</span> <span class="s2">&quot;Darwin&quot;</span><span class="p">:</span>
-</span><span id="L-952"><a href="#L-952"><span class="linenos"> 952</span></a>        <span class="c1"># macOS</span>
-</span><span id="L-953"><a href="#L-953"><span class="linenos"> 953</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="L-954"><a href="#L-954"><span class="linenos"> 954</span></a>            <span class="c1"># AppleScript to get the appearance setting</span>
-</span><span id="L-955"><a href="#L-955"><span class="linenos"> 955</span></a>            <span class="n">script</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-</span><span id="L-956"><a href="#L-956"><span class="linenos"> 956</span></a><span class="s2">            tell application &quot;System Events&quot;</span>
-</span><span id="L-957"><a href="#L-957"><span class="linenos"> 957</span></a><span class="s2">                tell appearance preferences</span>
-</span><span id="L-958"><a href="#L-958"><span class="linenos"> 958</span></a><span class="s2">                    if (dark mode) then</span>
-</span><span id="L-959"><a href="#L-959"><span class="linenos"> 959</span></a><span class="s2">                        return &quot;dark&quot;</span>
-</span><span id="L-960"><a href="#L-960"><span class="linenos"> 960</span></a><span class="s2">                    else</span>
-</span><span id="L-961"><a href="#L-961"><span class="linenos"> 961</span></a><span class="s2">                        return &quot;light&quot;</span>
-</span><span id="L-962"><a href="#L-962"><span class="linenos"> 962</span></a><span class="s2">                    end if</span>
-</span><span id="L-963"><a href="#L-963"><span class="linenos"> 963</span></a><span class="s2">                end tell</span>
-</span><span id="L-964"><a href="#L-964"><span class="linenos"> 964</span></a><span class="s2">            end tell</span>
-</span><span id="L-965"><a href="#L-965"><span class="linenos"> 965</span></a><span class="s2">            &quot;&quot;&quot;</span>
-</span><span id="L-966"><a href="#L-966"><span class="linenos"> 966</span></a>            <span class="c1"># Run the AppleScript</span>
-</span><span id="L-967"><a href="#L-967"><span class="linenos"> 967</span></a>            <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-</span><span id="L-968"><a href="#L-968"><span class="linenos"> 968</span></a>                <span class="p">[</span><span class="s2">&quot;osascript&quot;</span><span class="p">,</span> <span class="s2">&quot;-e&quot;</span><span class="p">,</span> <span class="n">script</span><span class="p">],</span>
-</span><span id="L-969"><a href="#L-969"><span class="linenos"> 969</span></a>                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-</span><span id="L-970"><a href="#L-970"><span class="linenos"> 970</span></a>                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-</span><span id="L-971"><a href="#L-971"><span class="linenos"> 971</span></a>                <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="L-972"><a href="#L-972"><span class="linenos"> 972</span></a>                <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="L-973"><a href="#L-973"><span class="linenos"> 973</span></a>            <span class="p">)</span>
-</span><span id="L-974"><a href="#L-974"><span class="linenos"> 974</span></a>
-</span><span id="L-975"><a href="#L-975"><span class="linenos"> 975</span></a>            <span class="c1"># Check the output</span>
-</span><span id="L-976"><a href="#L-976"><span class="linenos"> 976</span></a>            <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="L-977"><a href="#L-977"><span class="linenos"> 977</span></a>                <span class="n">theme</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-</span><span id="L-978"><a href="#L-978"><span class="linenos"> 978</span></a>                <span class="k">if</span> <span class="n">theme</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;dark&quot;</span><span class="p">,</span> <span class="s2">&quot;light&quot;</span><span class="p">]:</span>
-</span><span id="L-979"><a href="#L-979"><span class="linenos"> 979</span></a>                    <span class="k">return</span> <span class="n">theme</span>
-</span><span id="L-980"><a href="#L-980"><span class="linenos"> 980</span></a>                <span class="k">return</span> <span class="kc">None</span>
-</span><span id="L-981"><a href="#L-981"><span class="linenos"> 981</span></a>            <span class="k">return</span> <span class="kc">None</span>
-</span><span id="L-982"><a href="#L-982"><span class="linenos"> 982</span></a>
-</span><span id="L-983"><a href="#L-983"><span class="linenos"> 983</span></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-</span><span id="L-984"><a href="#L-984"><span class="linenos"> 984</span></a>            <span class="c1"># In case of any exception, return None</span>
-</span><span id="L-985"><a href="#L-985"><span class="linenos"> 985</span></a>            <span class="k">return</span> <span class="kc">None</span>
+</span><span id="L-942"><a href="#L-942"><span class="linenos"> 942</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_theme</span><span class="p">():</span>
+</span><span id="L-943"><a href="#L-943"><span class="linenos"> 943</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-944"><a href="#L-944"><span class="linenos"> 944</span></a><span class="sd">    Determine the display theme for the current operating system.</span>
+</span><span id="L-945"><a href="#L-945"><span class="linenos"> 945</span></a>
+</span><span id="L-946"><a href="#L-946"><span class="linenos"> 946</span></a><span class="sd">    Returns:</span>
+</span><span id="L-947"><a href="#L-947"><span class="linenos"> 947</span></a><span class="sd">    :return str: &#39;light&#39; if the theme is light, &#39;dark&#39; if the theme is dark, and &#39;light&#39; otherwise</span>
+</span><span id="L-948"><a href="#L-948"><span class="linenos"> 948</span></a>
+</span><span id="L-949"><a href="#L-949"><span class="linenos"> 949</span></a><span class="sd">    Example:</span>
+</span><span id="L-950"><a href="#L-950"><span class="linenos"> 950</span></a><span class="sd">    &gt;&gt;&gt; get_theme()</span>
+</span><span id="L-951"><a href="#L-951"><span class="linenos"> 951</span></a><span class="sd">    &#39;dark&#39;</span>
+</span><span id="L-952"><a href="#L-952"><span class="linenos"> 952</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-953"><a href="#L-953"><span class="linenos"> 953</span></a>    <span class="n">system</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span>
+</span><span id="L-954"><a href="#L-954"><span class="linenos"> 954</span></a>    <span class="k">if</span> <span class="n">system</span> <span class="o">==</span> <span class="s2">&quot;Darwin&quot;</span><span class="p">:</span>
+</span><span id="L-955"><a href="#L-955"><span class="linenos"> 955</span></a>        <span class="c1"># macOS</span>
+</span><span id="L-956"><a href="#L-956"><span class="linenos"> 956</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="L-957"><a href="#L-957"><span class="linenos"> 957</span></a>            <span class="c1"># AppleScript to get the appearance setting</span>
+</span><span id="L-958"><a href="#L-958"><span class="linenos"> 958</span></a>            <span class="n">script</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+</span><span id="L-959"><a href="#L-959"><span class="linenos"> 959</span></a><span class="s2">            tell application &quot;System Events&quot;</span>
+</span><span id="L-960"><a href="#L-960"><span class="linenos"> 960</span></a><span class="s2">                tell appearance preferences</span>
+</span><span id="L-961"><a href="#L-961"><span class="linenos"> 961</span></a><span class="s2">                    if dark mode is true then</span>
+</span><span id="L-962"><a href="#L-962"><span class="linenos"> 962</span></a><span class="s2">                        return &quot;dark&quot;</span>
+</span><span id="L-963"><a href="#L-963"><span class="linenos"> 963</span></a><span class="s2">                    else</span>
+</span><span id="L-964"><a href="#L-964"><span class="linenos"> 964</span></a><span class="s2">                        return &quot;light&quot;</span>
+</span><span id="L-965"><a href="#L-965"><span class="linenos"> 965</span></a><span class="s2">                    end if</span>
+</span><span id="L-966"><a href="#L-966"><span class="linenos"> 966</span></a><span class="s2">                end tell</span>
+</span><span id="L-967"><a href="#L-967"><span class="linenos"> 967</span></a><span class="s2">            end tell</span>
+</span><span id="L-968"><a href="#L-968"><span class="linenos"> 968</span></a><span class="s2">            &quot;&quot;&quot;</span>
+</span><span id="L-969"><a href="#L-969"><span class="linenos"> 969</span></a>            <span class="c1"># Run the AppleScript</span>
+</span><span id="L-970"><a href="#L-970"><span class="linenos"> 970</span></a>            <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span id="L-971"><a href="#L-971"><span class="linenos"> 971</span></a>                <span class="p">[</span><span class="s2">&quot;osascript&quot;</span><span class="p">,</span> <span class="s2">&quot;-e&quot;</span><span class="p">,</span> <span class="n">script</span><span class="p">],</span>
+</span><span id="L-972"><a href="#L-972"><span class="linenos"> 972</span></a>                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+</span><span id="L-973"><a href="#L-973"><span class="linenos"> 973</span></a>                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+</span><span id="L-974"><a href="#L-974"><span class="linenos"> 974</span></a>                <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="L-975"><a href="#L-975"><span class="linenos"> 975</span></a>                <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="L-976"><a href="#L-976"><span class="linenos"> 976</span></a>            <span class="p">)</span>
+</span><span id="L-977"><a href="#L-977"><span class="linenos"> 977</span></a>            <span class="c1"># print(f&quot;AppleScript result: {result.stdout.strip()}&quot;)</span>
+</span><span id="L-978"><a href="#L-978"><span class="linenos"> 978</span></a>            <span class="c1"># print(f&quot;AppleScript stderr: {result.stderr.strip()}&quot;)</span>
+</span><span id="L-979"><a href="#L-979"><span class="linenos"> 979</span></a>            <span class="c1"># print(f&quot;AppleScript return code: {result.returncode}&quot;)</span>
+</span><span id="L-980"><a href="#L-980"><span class="linenos"> 980</span></a>            <span class="c1"># Check the output</span>
+</span><span id="L-981"><a href="#L-981"><span class="linenos"> 981</span></a>            <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="L-982"><a href="#L-982"><span class="linenos"> 982</span></a>                <span class="n">theme</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</span><span id="L-983"><a href="#L-983"><span class="linenos"> 983</span></a>                <span class="k">if</span> <span class="n">theme</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;dark&quot;</span><span class="p">,</span> <span class="s2">&quot;light&quot;</span><span class="p">]:</span>
+</span><span id="L-984"><a href="#L-984"><span class="linenos"> 984</span></a>                    <span class="k">return</span> <span class="n">theme</span>
+</span><span id="L-985"><a href="#L-985"><span class="linenos"> 985</span></a>            <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
 </span><span id="L-986"><a href="#L-986"><span class="linenos"> 986</span></a>
-</span><span id="L-987"><a href="#L-987"><span class="linenos"> 987</span></a>    <span class="k">elif</span> <span class="n">system</span> <span class="o">==</span> <span class="s2">&quot;Windows&quot;</span><span class="p">:</span>
-</span><span id="L-988"><a href="#L-988"><span class="linenos"> 988</span></a>        <span class="c1"># Windows</span>
-</span><span id="L-989"><a href="#L-989"><span class="linenos"> 989</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="L-990"><a href="#L-990"><span class="linenos"> 990</span></a>            <span class="kn">import</span><span class="w"> </span><span class="nn">winreg</span>
-</span><span id="L-991"><a href="#L-991"><span class="linenos"> 991</span></a>
-</span><span id="L-992"><a href="#L-992"><span class="linenos"> 992</span></a>            <span class="n">registry</span> <span class="o">=</span> <span class="n">winreg</span><span class="o">.</span><span class="n">ConnectRegistry</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">winreg</span><span class="o">.</span><span class="n">HKEY_CURRENT_USER</span><span class="p">)</span>
-</span><span id="L-993"><a href="#L-993"><span class="linenos"> 993</span></a>            <span class="n">key_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;Software\Microsoft\Windows\CurrentVersion\Themes\Personalize&quot;</span>
-</span><span id="L-994"><a href="#L-994"><span class="linenos"> 994</span></a>            <span class="n">key</span> <span class="o">=</span> <span class="n">winreg</span><span class="o">.</span><span class="n">OpenKey</span><span class="p">(</span><span class="n">registry</span><span class="p">,</span> <span class="n">key_path</span><span class="p">)</span>
-</span><span id="L-995"><a href="#L-995"><span class="linenos"> 995</span></a>            <span class="n">value</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">winreg</span><span class="o">.</span><span class="n">QueryValueEx</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;AppsUseLightTheme&quot;</span><span class="p">)</span>
-</span><span id="L-996"><a href="#L-996"><span class="linenos"> 996</span></a>            <span class="n">winreg</span><span class="o">.</span><span class="n">CloseKey</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span id="L-987"><a href="#L-987"><span class="linenos"> 987</span></a>        <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="L-988"><a href="#L-988"><span class="linenos"> 988</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CalledProcessError occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="L-989"><a href="#L-989"><span class="linenos"> 989</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;stderr: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">stderr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="L-990"><a href="#L-990"><span class="linenos"> 990</span></a>            <span class="c1"># In case of any exception, return &quot;light&quot;</span>
+</span><span id="L-991"><a href="#L-991"><span class="linenos"> 991</span></a>            <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
+</span><span id="L-992"><a href="#L-992"><span class="linenos"> 992</span></a>
+</span><span id="L-993"><a href="#L-993"><span class="linenos"> 993</span></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="L-994"><a href="#L-994"><span class="linenos"> 994</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exception occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="L-995"><a href="#L-995"><span class="linenos"> 995</span></a>            <span class="c1"># In case of any exception, return &quot;light&quot;</span>
+</span><span id="L-996"><a href="#L-996"><span class="linenos"> 996</span></a>            <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
 </span><span id="L-997"><a href="#L-997"><span class="linenos"> 997</span></a>
-</span><span id="L-998"><a href="#L-998"><span class="linenos"> 998</span></a>            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="L-999"><a href="#L-999"><span class="linenos"> 999</span></a>                <span class="k">return</span> <span class="s2">&quot;dark&quot;</span>
-</span><span id="L-1000"><a href="#L-1000"><span class="linenos">1000</span></a>            <span class="k">else</span><span class="p">:</span>
-</span><span id="L-1001"><a href="#L-1001"><span class="linenos">1001</span></a>                <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
+</span><span id="L-998"><a href="#L-998"><span class="linenos"> 998</span></a>    <span class="k">elif</span> <span class="n">system</span> <span class="o">==</span> <span class="s2">&quot;Windows&quot;</span><span class="p">:</span>
+</span><span id="L-999"><a href="#L-999"><span class="linenos"> 999</span></a>        <span class="c1"># Windows</span>
+</span><span id="L-1000"><a href="#L-1000"><span class="linenos">1000</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="L-1001"><a href="#L-1001"><span class="linenos">1001</span></a>            <span class="kn">import</span><span class="w"> </span><span class="nn">winreg</span>
 </span><span id="L-1002"><a href="#L-1002"><span class="linenos">1002</span></a>
-</span><span id="L-1003"><a href="#L-1003"><span class="linenos">1003</span></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-</span><span id="L-1004"><a href="#L-1004"><span class="linenos">1004</span></a>            <span class="c1"># In case of any exception, return None</span>
-</span><span id="L-1005"><a href="#L-1005"><span class="linenos">1005</span></a>            <span class="k">return</span> <span class="kc">None</span>
-</span><span id="L-1006"><a href="#L-1006"><span class="linenos">1006</span></a>
-</span><span id="L-1007"><a href="#L-1007"><span class="linenos">1007</span></a>    <span class="k">elif</span> <span class="n">system</span> <span class="o">==</span> <span class="s2">&quot;Linux&quot;</span><span class="p">:</span>
-</span><span id="L-1008"><a href="#L-1008"><span class="linenos">1008</span></a>        <span class="c1"># Linux</span>
-</span><span id="L-1009"><a href="#L-1009"><span class="linenos">1009</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="L-1010"><a href="#L-1010"><span class="linenos">1010</span></a>            <span class="c1"># Check for GTK theme setting</span>
-</span><span id="L-1011"><a href="#L-1011"><span class="linenos">1011</span></a>            <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-</span><span id="L-1012"><a href="#L-1012"><span class="linenos">1012</span></a>                <span class="p">[</span><span class="s2">&quot;gsettings&quot;</span><span class="p">,</span> <span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;org.gnome.desktop.interface&quot;</span><span class="p">,</span> <span class="s2">&quot;gtk-theme&quot;</span><span class="p">],</span>
-</span><span id="L-1013"><a href="#L-1013"><span class="linenos">1013</span></a>                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-</span><span id="L-1014"><a href="#L-1014"><span class="linenos">1014</span></a>                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-</span><span id="L-1015"><a href="#L-1015"><span class="linenos">1015</span></a>                <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="L-1016"><a href="#L-1016"><span class="linenos">1016</span></a>                <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="L-1017"><a href="#L-1017"><span class="linenos">1017</span></a>            <span class="p">)</span>
+</span><span id="L-1003"><a href="#L-1003"><span class="linenos">1003</span></a>            <span class="n">registry</span> <span class="o">=</span> <span class="n">winreg</span><span class="o">.</span><span class="n">ConnectRegistry</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">winreg</span><span class="o">.</span><span class="n">HKEY_CURRENT_USER</span><span class="p">)</span>
+</span><span id="L-1004"><a href="#L-1004"><span class="linenos">1004</span></a>            <span class="n">key_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;Software\Microsoft\Windows\CurrentVersion\Themes\Personalize&quot;</span>
+</span><span id="L-1005"><a href="#L-1005"><span class="linenos">1005</span></a>            <span class="n">key</span> <span class="o">=</span> <span class="n">winreg</span><span class="o">.</span><span class="n">OpenKey</span><span class="p">(</span><span class="n">registry</span><span class="p">,</span> <span class="n">key_path</span><span class="p">)</span>
+</span><span id="L-1006"><a href="#L-1006"><span class="linenos">1006</span></a>            <span class="n">value</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">winreg</span><span class="o">.</span><span class="n">QueryValueEx</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;AppsUseLightTheme&quot;</span><span class="p">)</span>
+</span><span id="L-1007"><a href="#L-1007"><span class="linenos">1007</span></a>            <span class="n">winreg</span><span class="o">.</span><span class="n">CloseKey</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span id="L-1008"><a href="#L-1008"><span class="linenos">1008</span></a>
+</span><span id="L-1009"><a href="#L-1009"><span class="linenos">1009</span></a>            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="L-1010"><a href="#L-1010"><span class="linenos">1010</span></a>                <span class="k">return</span> <span class="s2">&quot;dark&quot;</span>
+</span><span id="L-1011"><a href="#L-1011"><span class="linenos">1011</span></a>            <span class="k">else</span><span class="p">:</span>
+</span><span id="L-1012"><a href="#L-1012"><span class="linenos">1012</span></a>                <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
+</span><span id="L-1013"><a href="#L-1013"><span class="linenos">1013</span></a>
+</span><span id="L-1014"><a href="#L-1014"><span class="linenos">1014</span></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="L-1015"><a href="#L-1015"><span class="linenos">1015</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exception occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="L-1016"><a href="#L-1016"><span class="linenos">1016</span></a>            <span class="c1"># In case of any exception, return &quot;light&quot;</span>
+</span><span id="L-1017"><a href="#L-1017"><span class="linenos">1017</span></a>            <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
 </span><span id="L-1018"><a href="#L-1018"><span class="linenos">1018</span></a>
-</span><span id="L-1019"><a href="#L-1019"><span class="linenos">1019</span></a>            <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="L-1020"><a href="#L-1020"><span class="linenos">1020</span></a>                <span class="n">theme</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-</span><span id="L-1021"><a href="#L-1021"><span class="linenos">1021</span></a>                <span class="k">if</span> <span class="s2">&quot;dark&quot;</span> <span class="ow">in</span> <span class="n">theme</span><span class="p">:</span>
-</span><span id="L-1022"><a href="#L-1022"><span class="linenos">1022</span></a>                    <span class="k">return</span> <span class="s2">&quot;dark&quot;</span>
-</span><span id="L-1023"><a href="#L-1023"><span class="linenos">1023</span></a>                <span class="k">else</span><span class="p">:</span>
-</span><span id="L-1024"><a href="#L-1024"><span class="linenos">1024</span></a>                    <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
-</span><span id="L-1025"><a href="#L-1025"><span class="linenos">1025</span></a>            <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
-</span><span id="L-1026"><a href="#L-1026"><span class="linenos">1026</span></a>
-</span><span id="L-1027"><a href="#L-1027"><span class="linenos">1027</span></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-</span><span id="L-1028"><a href="#L-1028"><span class="linenos">1028</span></a>            <span class="c1"># In case of any exception, return None</span>
-</span><span id="L-1029"><a href="#L-1029"><span class="linenos">1029</span></a>            <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
+</span><span id="L-1019"><a href="#L-1019"><span class="linenos">1019</span></a>    <span class="k">elif</span> <span class="n">system</span> <span class="o">==</span> <span class="s2">&quot;Linux&quot;</span><span class="p">:</span>
+</span><span id="L-1020"><a href="#L-1020"><span class="linenos">1020</span></a>        <span class="c1"># Linux</span>
+</span><span id="L-1021"><a href="#L-1021"><span class="linenos">1021</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="L-1022"><a href="#L-1022"><span class="linenos">1022</span></a>            <span class="c1"># Check for GTK theme setting</span>
+</span><span id="L-1023"><a href="#L-1023"><span class="linenos">1023</span></a>            <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span id="L-1024"><a href="#L-1024"><span class="linenos">1024</span></a>                <span class="p">[</span><span class="s2">&quot;gsettings&quot;</span><span class="p">,</span> <span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;org.gnome.desktop.interface&quot;</span><span class="p">,</span> <span class="s2">&quot;gtk-theme&quot;</span><span class="p">],</span>
+</span><span id="L-1025"><a href="#L-1025"><span class="linenos">1025</span></a>                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+</span><span id="L-1026"><a href="#L-1026"><span class="linenos">1026</span></a>                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+</span><span id="L-1027"><a href="#L-1027"><span class="linenos">1027</span></a>                <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="L-1028"><a href="#L-1028"><span class="linenos">1028</span></a>                <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="L-1029"><a href="#L-1029"><span class="linenos">1029</span></a>            <span class="p">)</span>
 </span><span id="L-1030"><a href="#L-1030"><span class="linenos">1030</span></a>
-</span><span id="L-1031"><a href="#L-1031"><span class="linenos">1031</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-1032"><a href="#L-1032"><span class="linenos">1032</span></a>        <span class="c1"># Unsupported OS</span>
-</span><span id="L-1033"><a href="#L-1033"><span class="linenos">1033</span></a>        <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
-</span><span id="L-1034"><a href="#L-1034"><span class="linenos">1034</span></a>
-</span><span id="L-1035"><a href="#L-1035"><span class="linenos">1035</span></a>
-</span><span id="L-1036"><a href="#L-1036"><span class="linenos">1036</span></a><span class="c1"># functions to calculate statistics and filter disulfide lists via pandas</span>
-</span><span id="L-1037"><a href="#L-1037"><span class="linenos">1037</span></a>
+</span><span id="L-1031"><a href="#L-1031"><span class="linenos">1031</span></a>            <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="L-1032"><a href="#L-1032"><span class="linenos">1032</span></a>                <span class="n">theme</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</span><span id="L-1033"><a href="#L-1033"><span class="linenos">1033</span></a>                <span class="k">if</span> <span class="s2">&quot;dark&quot;</span> <span class="ow">in</span> <span class="n">theme</span><span class="p">:</span>
+</span><span id="L-1034"><a href="#L-1034"><span class="linenos">1034</span></a>                    <span class="k">return</span> <span class="s2">&quot;dark&quot;</span>
+</span><span id="L-1035"><a href="#L-1035"><span class="linenos">1035</span></a>                <span class="k">else</span><span class="p">:</span>
+</span><span id="L-1036"><a href="#L-1036"><span class="linenos">1036</span></a>                    <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
+</span><span id="L-1037"><a href="#L-1037"><span class="linenos">1037</span></a>            <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
 </span><span id="L-1038"><a href="#L-1038"><span class="linenos">1038</span></a>
-</span><span id="L-1039"><a href="#L-1039"><span class="linenos">1039</span></a><span class="k">def</span><span class="w"> </span><span class="nf">calculate_std_cutoff</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">num_std</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-</span><span id="L-1040"><a href="#L-1040"><span class="linenos">1040</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-1041"><a href="#L-1041"><span class="linenos">1041</span></a><span class="sd">    Calculate cutoff based on standard deviation.</span>
-</span><span id="L-1042"><a href="#L-1042"><span class="linenos">1042</span></a>
-</span><span id="L-1043"><a href="#L-1043"><span class="linenos">1043</span></a><span class="sd">    :param df: DataFrame containing the deviations.</span>
-</span><span id="L-1044"><a href="#L-1044"><span class="linenos">1044</span></a><span class="sd">    :type df: pd.DataFrame</span>
-</span><span id="L-1045"><a href="#L-1045"><span class="linenos">1045</span></a><span class="sd">    :param column: Column name for which to calculate the cutoff.</span>
-</span><span id="L-1046"><a href="#L-1046"><span class="linenos">1046</span></a><span class="sd">    :type column: str</span>
-</span><span id="L-1047"><a href="#L-1047"><span class="linenos">1047</span></a><span class="sd">    :param num_std: Number of standard deviations to use for the cutoff.</span>
-</span><span id="L-1048"><a href="#L-1048"><span class="linenos">1048</span></a><span class="sd">    :type num_std: int</span>
-</span><span id="L-1049"><a href="#L-1049"><span class="linenos">1049</span></a><span class="sd">    :return: Cutoff value.</span>
-</span><span id="L-1050"><a href="#L-1050"><span class="linenos">1050</span></a><span class="sd">    :rtype: float</span>
-</span><span id="L-1051"><a href="#L-1051"><span class="linenos">1051</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-1052"><a href="#L-1052"><span class="linenos">1052</span></a>    <span class="n">mean</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-</span><span id="L-1053"><a href="#L-1053"><span class="linenos">1053</span></a>    <span class="n">std</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
-</span><span id="L-1054"><a href="#L-1054"><span class="linenos">1054</span></a>    <span class="n">cutoff</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="n">num_std</span> <span class="o">*</span> <span class="n">std</span>
-</span><span id="L-1055"><a href="#L-1055"><span class="linenos">1055</span></a>    <span class="k">return</span> <span class="n">cutoff</span>
-</span><span id="L-1056"><a href="#L-1056"><span class="linenos">1056</span></a>
-</span><span id="L-1057"><a href="#L-1057"><span class="linenos">1057</span></a>
-</span><span id="L-1058"><a href="#L-1058"><span class="linenos">1058</span></a><span class="k">def</span><span class="w"> </span><span class="nf">calculate_percentile_cutoff</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">percentile</span><span class="o">=</span><span class="mi">95</span><span class="p">):</span>
-</span><span id="L-1059"><a href="#L-1059"><span class="linenos">1059</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-1060"><a href="#L-1060"><span class="linenos">1060</span></a><span class="sd">    Calculate cutoff based on percentile.</span>
-</span><span id="L-1061"><a href="#L-1061"><span class="linenos">1061</span></a>
-</span><span id="L-1062"><a href="#L-1062"><span class="linenos">1062</span></a><span class="sd">    :param df: DataFrame containing the deviations.</span>
-</span><span id="L-1063"><a href="#L-1063"><span class="linenos">1063</span></a><span class="sd">    :type df: pd.DataFrame</span>
-</span><span id="L-1064"><a href="#L-1064"><span class="linenos">1064</span></a><span class="sd">    :param column: Column name for which to calculate the cutoff.</span>
-</span><span id="L-1065"><a href="#L-1065"><span class="linenos">1065</span></a><span class="sd">    :type column: str</span>
-</span><span id="L-1066"><a href="#L-1066"><span class="linenos">1066</span></a><span class="sd">    :param percentile: Percentile to use for the cutoff.</span>
-</span><span id="L-1067"><a href="#L-1067"><span class="linenos">1067</span></a><span class="sd">    :type percentile: int</span>
-</span><span id="L-1068"><a href="#L-1068"><span class="linenos">1068</span></a><span class="sd">    :return: Cutoff value.</span>
-</span><span id="L-1069"><a href="#L-1069"><span class="linenos">1069</span></a><span class="sd">    :rtype: float</span>
-</span><span id="L-1070"><a href="#L-1070"><span class="linenos">1070</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-1071"><a href="#L-1071"><span class="linenos">1071</span></a>    <span class="n">cutoff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">percentile</span><span class="p">)</span>
-</span><span id="L-1072"><a href="#L-1072"><span class="linenos">1072</span></a>    <span class="k">return</span> <span class="n">cutoff</span>
-</span><span id="L-1073"><a href="#L-1073"><span class="linenos">1073</span></a>
+</span><span id="L-1039"><a href="#L-1039"><span class="linenos">1039</span></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="L-1040"><a href="#L-1040"><span class="linenos">1040</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exception occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="L-1041"><a href="#L-1041"><span class="linenos">1041</span></a>            <span class="c1"># In case of any exception, return &quot;light&quot;</span>
+</span><span id="L-1042"><a href="#L-1042"><span class="linenos">1042</span></a>            <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
+</span><span id="L-1043"><a href="#L-1043"><span class="linenos">1043</span></a>
+</span><span id="L-1044"><a href="#L-1044"><span class="linenos">1044</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-1045"><a href="#L-1045"><span class="linenos">1045</span></a>        <span class="c1"># Unsupported OS</span>
+</span><span id="L-1046"><a href="#L-1046"><span class="linenos">1046</span></a>        <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
+</span><span id="L-1047"><a href="#L-1047"><span class="linenos">1047</span></a>
+</span><span id="L-1048"><a href="#L-1048"><span class="linenos">1048</span></a>
+</span><span id="L-1049"><a href="#L-1049"><span class="linenos">1049</span></a><span class="c1"># functions to calculate statistics and filter disulfide lists via pandas</span>
+</span><span id="L-1050"><a href="#L-1050"><span class="linenos">1050</span></a>
+</span><span id="L-1051"><a href="#L-1051"><span class="linenos">1051</span></a>
+</span><span id="L-1052"><a href="#L-1052"><span class="linenos">1052</span></a><span class="k">def</span><span class="w"> </span><span class="nf">calculate_std_cutoff</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">num_std</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+</span><span id="L-1053"><a href="#L-1053"><span class="linenos">1053</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1054"><a href="#L-1054"><span class="linenos">1054</span></a><span class="sd">    Calculate cutoff based on standard deviation.</span>
+</span><span id="L-1055"><a href="#L-1055"><span class="linenos">1055</span></a>
+</span><span id="L-1056"><a href="#L-1056"><span class="linenos">1056</span></a><span class="sd">    :param df: DataFrame containing the deviations.</span>
+</span><span id="L-1057"><a href="#L-1057"><span class="linenos">1057</span></a><span class="sd">    :type df: pd.DataFrame</span>
+</span><span id="L-1058"><a href="#L-1058"><span class="linenos">1058</span></a><span class="sd">    :param column: Column name for which to calculate the cutoff.</span>
+</span><span id="L-1059"><a href="#L-1059"><span class="linenos">1059</span></a><span class="sd">    :type column: str</span>
+</span><span id="L-1060"><a href="#L-1060"><span class="linenos">1060</span></a><span class="sd">    :param num_std: Number of standard deviations to use for the cutoff.</span>
+</span><span id="L-1061"><a href="#L-1061"><span class="linenos">1061</span></a><span class="sd">    :type num_std: int</span>
+</span><span id="L-1062"><a href="#L-1062"><span class="linenos">1062</span></a><span class="sd">    :return: Cutoff value.</span>
+</span><span id="L-1063"><a href="#L-1063"><span class="linenos">1063</span></a><span class="sd">    :rtype: float</span>
+</span><span id="L-1064"><a href="#L-1064"><span class="linenos">1064</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-1065"><a href="#L-1065"><span class="linenos">1065</span></a>    <span class="n">mean</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</span><span id="L-1066"><a href="#L-1066"><span class="linenos">1066</span></a>    <span class="n">std</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+</span><span id="L-1067"><a href="#L-1067"><span class="linenos">1067</span></a>    <span class="n">cutoff</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="n">num_std</span> <span class="o">*</span> <span class="n">std</span>
+</span><span id="L-1068"><a href="#L-1068"><span class="linenos">1068</span></a>    <span class="k">return</span> <span class="n">cutoff</span>
+</span><span id="L-1069"><a href="#L-1069"><span class="linenos">1069</span></a>
+</span><span id="L-1070"><a href="#L-1070"><span class="linenos">1070</span></a>
+</span><span id="L-1071"><a href="#L-1071"><span class="linenos">1071</span></a><span class="k">def</span><span class="w"> </span><span class="nf">calculate_percentile_cutoff</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">percentile</span><span class="o">=</span><span class="mi">95</span><span class="p">):</span>
+</span><span id="L-1072"><a href="#L-1072"><span class="linenos">1072</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1073"><a href="#L-1073"><span class="linenos">1073</span></a><span class="sd">    Calculate cutoff based on percentile.</span>
 </span><span id="L-1074"><a href="#L-1074"><span class="linenos">1074</span></a>
-</span><span id="L-1075"><a href="#L-1075"><span class="linenos">1075</span></a><span class="k">def</span><span class="w"> </span><span class="nf">filter_by_cutoffs</span><span class="p">(</span>
-</span><span id="L-1076"><a href="#L-1076"><span class="linenos">1076</span></a>    <span class="n">df</span><span class="p">,</span> <span class="n">length_cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">angle_cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ca_cutoff</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span> <span class="n">minimum_distance</span><span class="o">=</span><span class="mf">2.0</span>
-</span><span id="L-1077"><a href="#L-1077"><span class="linenos">1077</span></a><span class="p">):</span>
-</span><span id="L-1078"><a href="#L-1078"><span class="linenos">1078</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-1079"><a href="#L-1079"><span class="linenos">1079</span></a><span class="sd">    Filter the DataFrame based on distance, angle, and Ca distance cutoffs. Ca cutoff</span>
-</span><span id="L-1080"><a href="#L-1080"><span class="linenos">1080</span></a><span class="sd">    dominates the filter and will override the distance and angle cutoffs. Note: The</span>
-</span><span id="L-1081"><a href="#L-1081"><span class="linenos">1081</span></a><span class="sd">    filter is applied if the Ca distance is less than or equal to 2.0 Angstroms, since</span>
-</span><span id="L-1082"><a href="#L-1082"><span class="linenos">1082</span></a><span class="sd">    this is physically impossible.</span>
-</span><span id="L-1083"><a href="#L-1083"><span class="linenos">1083</span></a>
-</span><span id="L-1084"><a href="#L-1084"><span class="linenos">1084</span></a><span class="sd">    :param df: DataFrame containing the deviations.</span>
-</span><span id="L-1085"><a href="#L-1085"><span class="linenos">1085</span></a><span class="sd">    :type df: pd.DataFrame</span>
-</span><span id="L-1086"><a href="#L-1086"><span class="linenos">1086</span></a><span class="sd">    :param length_cutoff: Cutoff value for Bond Length Deviation.</span>
-</span><span id="L-1087"><a href="#L-1087"><span class="linenos">1087</span></a><span class="sd">    :type distance_cutoff: float</span>
-</span><span id="L-1088"><a href="#L-1088"><span class="linenos">1088</span></a><span class="sd">    :param angle_cutoff: Cutoff value for angle deviation.</span>
-</span><span id="L-1089"><a href="#L-1089"><span class="linenos">1089</span></a><span class="sd">    :type angle_cutoff: float</span>
-</span><span id="L-1090"><a href="#L-1090"><span class="linenos">1090</span></a><span class="sd">    :param ca_cutoff: Cutoff value for Ca distance.</span>
-</span><span id="L-1091"><a href="#L-1091"><span class="linenos">1091</span></a><span class="sd">    :type ca_cutoff: float</span>
-</span><span id="L-1092"><a href="#L-1092"><span class="linenos">1092</span></a><span class="sd">    :return: Filtered DataFrame.</span>
-</span><span id="L-1093"><a href="#L-1093"><span class="linenos">1093</span></a><span class="sd">    :rtype: pd.DataFrame</span>
-</span><span id="L-1094"><a href="#L-1094"><span class="linenos">1094</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-1095"><a href="#L-1095"><span class="linenos">1095</span></a>    <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span>
-</span><span id="L-1096"><a href="#L-1096"><span class="linenos">1096</span></a>        <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Bondlength_Deviation&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">length_cutoff</span><span class="p">)</span>
-</span><span id="L-1097"><a href="#L-1097"><span class="linenos">1097</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Angle_Deviation&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">angle_cutoff</span><span class="p">)</span>
-</span><span id="L-1098"><a href="#L-1098"><span class="linenos">1098</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Ca_Distance&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">minimum_distance</span><span class="p">)</span>
-</span><span id="L-1099"><a href="#L-1099"><span class="linenos">1099</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Ca_Distance&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">ca_cutoff</span><span class="p">)</span>
-</span><span id="L-1100"><a href="#L-1100"><span class="linenos">1100</span></a>    <span class="p">]</span>
-</span><span id="L-1101"><a href="#L-1101"><span class="linenos">1101</span></a>    <span class="k">return</span> <span class="n">filtered_df</span>
-</span><span id="L-1102"><a href="#L-1102"><span class="linenos">1102</span></a>
-</span><span id="L-1103"><a href="#L-1103"><span class="linenos">1103</span></a>
-</span><span id="L-1104"><a href="#L-1104"><span class="linenos">1104</span></a><span class="k">def</span><span class="w"> </span><span class="nf">bad_filter_by_cutoffs</span><span class="p">(</span>
-</span><span id="L-1105"><a href="#L-1105"><span class="linenos">1105</span></a>    <span class="n">df</span><span class="p">,</span> <span class="n">distance_cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">angle_cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ca_cutoff</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span> <span class="n">minimum_distance</span><span class="o">=</span><span class="mf">2.0</span>
-</span><span id="L-1106"><a href="#L-1106"><span class="linenos">1106</span></a><span class="p">):</span>
-</span><span id="L-1107"><a href="#L-1107"><span class="linenos">1107</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-1108"><a href="#L-1108"><span class="linenos">1108</span></a><span class="sd">    Return the DataFrame objects that are GREATER than the cutoff based on distance,</span>
-</span><span id="L-1109"><a href="#L-1109"><span class="linenos">1109</span></a><span class="sd">    angle, and Ca distance cutoffs. Used to get the bad structures. Ca cutoff</span>
-</span><span id="L-1110"><a href="#L-1110"><span class="linenos">1110</span></a><span class="sd">    dominates the filter and will override the distance and angle cutoffs.</span>
-</span><span id="L-1111"><a href="#L-1111"><span class="linenos">1111</span></a>
-</span><span id="L-1112"><a href="#L-1112"><span class="linenos">1112</span></a><span class="sd">    :param df: DataFrame containing the deviations.</span>
-</span><span id="L-1113"><a href="#L-1113"><span class="linenos">1113</span></a><span class="sd">    :type df: pd.DataFrame</span>
-</span><span id="L-1114"><a href="#L-1114"><span class="linenos">1114</span></a><span class="sd">    :param distance_cutoff: Cutoff value for Bond Length Deviation.</span>
-</span><span id="L-1115"><a href="#L-1115"><span class="linenos">1115</span></a><span class="sd">    :type distance_cutoff: float</span>
-</span><span id="L-1116"><a href="#L-1116"><span class="linenos">1116</span></a><span class="sd">    :param angle_cutoff: Cutoff value for angle deviation.</span>
-</span><span id="L-1117"><a href="#L-1117"><span class="linenos">1117</span></a><span class="sd">    :type angle_cutoff: float</span>
-</span><span id="L-1118"><a href="#L-1118"><span class="linenos">1118</span></a><span class="sd">    :param ca_cutoff: Cutoff value for Ca distance.</span>
-</span><span id="L-1119"><a href="#L-1119"><span class="linenos">1119</span></a><span class="sd">    :type ca_cutoff: float</span>
-</span><span id="L-1120"><a href="#L-1120"><span class="linenos">1120</span></a><span class="sd">    :return: Filtered DataFrame.</span>
-</span><span id="L-1121"><a href="#L-1121"><span class="linenos">1121</span></a><span class="sd">    :rtype: pd.DataFrame</span>
-</span><span id="L-1122"><a href="#L-1122"><span class="linenos">1122</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-1123"><a href="#L-1123"><span class="linenos">1123</span></a>    <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span>
-</span><span id="L-1124"><a href="#L-1124"><span class="linenos">1124</span></a>        <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Bondlength_Deviation&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">distance_cutoff</span><span class="p">)</span>
-</span><span id="L-1125"><a href="#L-1125"><span class="linenos">1125</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Angle_Deviation&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">angle_cutoff</span><span class="p">)</span>
-</span><span id="L-1126"><a href="#L-1126"><span class="linenos">1126</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Ca_Distance&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">ca_cutoff</span><span class="p">)</span>
-</span><span id="L-1127"><a href="#L-1127"><span class="linenos">1127</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Ca_Distance&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">minimum_distance</span><span class="p">)</span>
-</span><span id="L-1128"><a href="#L-1128"><span class="linenos">1128</span></a>    <span class="p">]</span>
-</span><span id="L-1129"><a href="#L-1129"><span class="linenos">1129</span></a>    <span class="k">return</span> <span class="n">filtered_df</span>
-</span><span id="L-1130"><a href="#L-1130"><span class="linenos">1130</span></a>
-</span><span id="L-1131"><a href="#L-1131"><span class="linenos">1131</span></a>
-</span><span id="L-1132"><a href="#L-1132"><span class="linenos">1132</span></a><span class="k">def</span><span class="w"> </span><span class="nf">save_list_to_file</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
-</span><span id="L-1133"><a href="#L-1133"><span class="linenos">1133</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-1134"><a href="#L-1134"><span class="linenos">1134</span></a><span class="sd">    Save the input list to a file using pickle.</span>
-</span><span id="L-1135"><a href="#L-1135"><span class="linenos">1135</span></a>
-</span><span id="L-1136"><a href="#L-1136"><span class="linenos">1136</span></a><span class="sd">    :param input_list: List to be saved.</span>
-</span><span id="L-1137"><a href="#L-1137"><span class="linenos">1137</span></a><span class="sd">    :type input_list: list</span>
-</span><span id="L-1138"><a href="#L-1138"><span class="linenos">1138</span></a><span class="sd">    :param filename: Name of the file where the list will be saved.</span>
-</span><span id="L-1139"><a href="#L-1139"><span class="linenos">1139</span></a><span class="sd">    :type filename: str</span>
-</span><span id="L-1140"><a href="#L-1140"><span class="linenos">1140</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-1141"><a href="#L-1141"><span class="linenos">1141</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-</span><span id="L-1142"><a href="#L-1142"><span class="linenos">1142</span></a>        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
-</span><span id="L-1143"><a href="#L-1143"><span class="linenos">1143</span></a>
-</span><span id="L-1144"><a href="#L-1144"><span class="linenos">1144</span></a>
-</span><span id="L-1145"><a href="#L-1145"><span class="linenos">1145</span></a><span class="k">def</span><span class="w"> </span><span class="nf">load_list_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-</span><span id="L-1146"><a href="#L-1146"><span class="linenos">1146</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-1147"><a href="#L-1147"><span class="linenos">1147</span></a><span class="sd">    Load a list from a file using pickle.</span>
-</span><span id="L-1148"><a href="#L-1148"><span class="linenos">1148</span></a>
-</span><span id="L-1149"><a href="#L-1149"><span class="linenos">1149</span></a><span class="sd">    This function reads a list from a file that was previously saved using the pickle module.</span>
-</span><span id="L-1150"><a href="#L-1150"><span class="linenos">1150</span></a>
-</span><span id="L-1151"><a href="#L-1151"><span class="linenos">1151</span></a><span class="sd">    :param filename: Name of the file from which the list will be loaded.</span>
-</span><span id="L-1152"><a href="#L-1152"><span class="linenos">1152</span></a><span class="sd">    :type filename: str</span>
-</span><span id="L-1153"><a href="#L-1153"><span class="linenos">1153</span></a><span class="sd">    :return: The list that was loaded from the file.</span>
-</span><span id="L-1154"><a href="#L-1154"><span class="linenos">1154</span></a><span class="sd">    :rtype: list</span>
-</span><span id="L-1155"><a href="#L-1155"><span class="linenos">1155</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-1156"><a href="#L-1156"><span class="linenos">1156</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-</span><span id="L-1157"><a href="#L-1157"><span class="linenos">1157</span></a>        <span class="n">loaded_list</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-</span><span id="L-1158"><a href="#L-1158"><span class="linenos">1158</span></a>    <span class="k">return</span> <span class="n">loaded_list</span>
-</span><span id="L-1159"><a href="#L-1159"><span class="linenos">1159</span></a>
-</span><span id="L-1160"><a href="#L-1160"><span class="linenos">1160</span></a>
-</span><span id="L-1161"><a href="#L-1161"><span class="linenos">1161</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="L-1162"><a href="#L-1162"><span class="linenos">1162</span></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">doctest</span>
-</span><span id="L-1163"><a href="#L-1163"><span class="linenos">1163</span></a>
-</span><span id="L-1164"><a href="#L-1164"><span class="linenos">1164</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
-</span><span id="L-1165"><a href="#L-1165"><span class="linenos">1165</span></a>
-</span><span id="L-1166"><a href="#L-1166"><span class="linenos">1166</span></a><span class="c1"># end of file</span>
+</span><span id="L-1075"><a href="#L-1075"><span class="linenos">1075</span></a><span class="sd">    :param df: DataFrame containing the deviations.</span>
+</span><span id="L-1076"><a href="#L-1076"><span class="linenos">1076</span></a><span class="sd">    :type df: pd.DataFrame</span>
+</span><span id="L-1077"><a href="#L-1077"><span class="linenos">1077</span></a><span class="sd">    :param column: Column name for which to calculate the cutoff.</span>
+</span><span id="L-1078"><a href="#L-1078"><span class="linenos">1078</span></a><span class="sd">    :type column: str</span>
+</span><span id="L-1079"><a href="#L-1079"><span class="linenos">1079</span></a><span class="sd">    :param percentile: Percentile to use for the cutoff.</span>
+</span><span id="L-1080"><a href="#L-1080"><span class="linenos">1080</span></a><span class="sd">    :type percentile: int</span>
+</span><span id="L-1081"><a href="#L-1081"><span class="linenos">1081</span></a><span class="sd">    :return: Cutoff value.</span>
+</span><span id="L-1082"><a href="#L-1082"><span class="linenos">1082</span></a><span class="sd">    :rtype: float</span>
+</span><span id="L-1083"><a href="#L-1083"><span class="linenos">1083</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-1084"><a href="#L-1084"><span class="linenos">1084</span></a>    <span class="n">cutoff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">percentile</span><span class="p">)</span>
+</span><span id="L-1085"><a href="#L-1085"><span class="linenos">1085</span></a>    <span class="k">return</span> <span class="n">cutoff</span>
+</span><span id="L-1086"><a href="#L-1086"><span class="linenos">1086</span></a>
+</span><span id="L-1087"><a href="#L-1087"><span class="linenos">1087</span></a>
+</span><span id="L-1088"><a href="#L-1088"><span class="linenos">1088</span></a><span class="k">def</span><span class="w"> </span><span class="nf">save_list_to_file</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+</span><span id="L-1089"><a href="#L-1089"><span class="linenos">1089</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1090"><a href="#L-1090"><span class="linenos">1090</span></a><span class="sd">    Save the input list to a file using pickle.</span>
+</span><span id="L-1091"><a href="#L-1091"><span class="linenos">1091</span></a>
+</span><span id="L-1092"><a href="#L-1092"><span class="linenos">1092</span></a><span class="sd">    :param input_list: List to be saved.</span>
+</span><span id="L-1093"><a href="#L-1093"><span class="linenos">1093</span></a><span class="sd">    :type input_list: list</span>
+</span><span id="L-1094"><a href="#L-1094"><span class="linenos">1094</span></a><span class="sd">    :param filename: Name of the file where the list will be saved.</span>
+</span><span id="L-1095"><a href="#L-1095"><span class="linenos">1095</span></a><span class="sd">    :type filename: str</span>
+</span><span id="L-1096"><a href="#L-1096"><span class="linenos">1096</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-1097"><a href="#L-1097"><span class="linenos">1097</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+</span><span id="L-1098"><a href="#L-1098"><span class="linenos">1098</span></a>        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+</span><span id="L-1099"><a href="#L-1099"><span class="linenos">1099</span></a>
+</span><span id="L-1100"><a href="#L-1100"><span class="linenos">1100</span></a>
+</span><span id="L-1101"><a href="#L-1101"><span class="linenos">1101</span></a><span class="k">def</span><span class="w"> </span><span class="nf">load_list_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+</span><span id="L-1102"><a href="#L-1102"><span class="linenos">1102</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1103"><a href="#L-1103"><span class="linenos">1103</span></a><span class="sd">    Load a list from a file using pickle.</span>
+</span><span id="L-1104"><a href="#L-1104"><span class="linenos">1104</span></a>
+</span><span id="L-1105"><a href="#L-1105"><span class="linenos">1105</span></a><span class="sd">    This function reads a list from a file that was previously saved using the pickle module.</span>
+</span><span id="L-1106"><a href="#L-1106"><span class="linenos">1106</span></a>
+</span><span id="L-1107"><a href="#L-1107"><span class="linenos">1107</span></a><span class="sd">    :param filename: Name of the file from which the list will be loaded.</span>
+</span><span id="L-1108"><a href="#L-1108"><span class="linenos">1108</span></a><span class="sd">    :type filename: str</span>
+</span><span id="L-1109"><a href="#L-1109"><span class="linenos">1109</span></a><span class="sd">    :return: The list that was loaded from the file.</span>
+</span><span id="L-1110"><a href="#L-1110"><span class="linenos">1110</span></a><span class="sd">    :rtype: list</span>
+</span><span id="L-1111"><a href="#L-1111"><span class="linenos">1111</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-1112"><a href="#L-1112"><span class="linenos">1112</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+</span><span id="L-1113"><a href="#L-1113"><span class="linenos">1113</span></a>        <span class="n">loaded_list</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+</span><span id="L-1114"><a href="#L-1114"><span class="linenos">1114</span></a>    <span class="k">return</span> <span class="n">loaded_list</span>
+</span><span id="L-1115"><a href="#L-1115"><span class="linenos">1115</span></a>
+</span><span id="L-1116"><a href="#L-1116"><span class="linenos">1116</span></a>
+</span><span id="L-1117"><a href="#L-1117"><span class="linenos">1117</span></a><span class="k">def</span><span class="w"> </span><span class="nf">set_plotly_theme</span><span class="p">(</span><span class="n">theme</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-1118"><a href="#L-1118"><span class="linenos">1118</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1119"><a href="#L-1119"><span class="linenos">1119</span></a><span class="sd">    Set the Plotly theme based on the provided theme parameter.</span>
+</span><span id="L-1120"><a href="#L-1120"><span class="linenos">1120</span></a>
+</span><span id="L-1121"><a href="#L-1121"><span class="linenos">1121</span></a><span class="sd">    This function sets the default Plotly template to either &#39;plotly_white&#39; or &#39;plotly_dark&#39;</span>
+</span><span id="L-1122"><a href="#L-1122"><span class="linenos">1122</span></a><span class="sd">    based on the input theme. If &#39;auto&#39; is selected, the theme is determined automatically</span>
+</span><span id="L-1123"><a href="#L-1123"><span class="linenos">1123</span></a><span class="sd">    based on the current system or application theme.</span>
+</span><span id="L-1124"><a href="#L-1124"><span class="linenos">1124</span></a>
+</span><span id="L-1125"><a href="#L-1125"><span class="linenos">1125</span></a><span class="sd">    :param theme: The theme to set for Plotly. Must be &#39;auto&#39;, &#39;light&#39;, or &#39;dark&#39;.</span>
+</span><span id="L-1126"><a href="#L-1126"><span class="linenos">1126</span></a><span class="sd">    :type theme: str</span>
+</span><span id="L-1127"><a href="#L-1127"><span class="linenos">1127</span></a><span class="sd">    :raises ValueError: If an invalid theme is provided.</span>
+</span><span id="L-1128"><a href="#L-1128"><span class="linenos">1128</span></a><span class="sd">    :return: None</span>
+</span><span id="L-1129"><a href="#L-1129"><span class="linenos">1129</span></a><span class="sd">    :rtype: None</span>
+</span><span id="L-1130"><a href="#L-1130"><span class="linenos">1130</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-1131"><a href="#L-1131"><span class="linenos">1131</span></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">plotly</span><span class="w"> </span><span class="kn">import</span> <span class="n">io</span> <span class="k">as</span> <span class="n">pio</span>
+</span><span id="L-1132"><a href="#L-1132"><span class="linenos">1132</span></a>
+</span><span id="L-1133"><a href="#L-1133"><span class="linenos">1133</span></a>    <span class="k">match</span> <span class="n">theme</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+</span><span id="L-1134"><a href="#L-1134"><span class="linenos">1134</span></a>        <span class="k">case</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+</span><span id="L-1135"><a href="#L-1135"><span class="linenos">1135</span></a>            <span class="n">_theme</span> <span class="o">=</span> <span class="n">get_theme</span><span class="p">()</span>
+</span><span id="L-1136"><a href="#L-1136"><span class="linenos">1136</span></a>            <span class="k">if</span> <span class="n">_theme</span> <span class="o">==</span> <span class="s2">&quot;light&quot;</span><span class="p">:</span>
+</span><span id="L-1137"><a href="#L-1137"><span class="linenos">1137</span></a>                <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
+</span><span id="L-1138"><a href="#L-1138"><span class="linenos">1138</span></a>            <span class="k">else</span><span class="p">:</span>
+</span><span id="L-1139"><a href="#L-1139"><span class="linenos">1139</span></a>                <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_dark&quot;</span>
+</span><span id="L-1140"><a href="#L-1140"><span class="linenos">1140</span></a>        <span class="k">case</span> <span class="s2">&quot;light&quot;</span><span class="p">:</span>
+</span><span id="L-1141"><a href="#L-1141"><span class="linenos">1141</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
+</span><span id="L-1142"><a href="#L-1142"><span class="linenos">1142</span></a>        <span class="k">case</span> <span class="s2">&quot;dark&quot;</span><span class="p">:</span>
+</span><span id="L-1143"><a href="#L-1143"><span class="linenos">1143</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_dark&quot;</span>
+</span><span id="L-1144"><a href="#L-1144"><span class="linenos">1144</span></a>        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+</span><span id="L-1145"><a href="#L-1145"><span class="linenos">1145</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid theme. Must be &#39;auto&#39;, &#39;light&#39;, or &#39;dark&#39;.&quot;</span><span class="p">)</span>
+</span><span id="L-1146"><a href="#L-1146"><span class="linenos">1146</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
+</span><span id="L-1147"><a href="#L-1147"><span class="linenos">1147</span></a>
+</span><span id="L-1148"><a href="#L-1148"><span class="linenos">1148</span></a>    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plotly theme set to: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span><span class="p">)</span>
+</span><span id="L-1149"><a href="#L-1149"><span class="linenos">1149</span></a>
+</span><span id="L-1150"><a href="#L-1150"><span class="linenos">1150</span></a>    <span class="k">return</span> <span class="kc">None</span>
+</span><span id="L-1151"><a href="#L-1151"><span class="linenos">1151</span></a>
+</span><span id="L-1152"><a href="#L-1152"><span class="linenos">1152</span></a>
+</span><span id="L-1153"><a href="#L-1153"><span class="linenos">1153</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="L-1154"><a href="#L-1154"><span class="linenos">1154</span></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">doctest</span>
+</span><span id="L-1155"><a href="#L-1155"><span class="linenos">1155</span></a>
+</span><span id="L-1156"><a href="#L-1156"><span class="linenos">1156</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</span><span id="L-1157"><a href="#L-1157"><span class="linenos">1157</span></a>
+</span><span id="L-1158"><a href="#L-1158"><span class="linenos">1158</span></a><span class="c1"># end of file</span>
 </span></pre></div>
 
 
@@ -2785,102 +2774,111 @@ than the cutoff value. If it's -1.0 then the function keeps all Disulfides.</p>
 
     </div>
     <a class="headerlink" href="#get_theme"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="get_theme-939"><a href="#get_theme-939"><span class="linenos"> 939</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_theme</span><span class="p">():</span>
-</span><span id="get_theme-940"><a href="#get_theme-940"><span class="linenos"> 940</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="get_theme-941"><a href="#get_theme-941"><span class="linenos"> 941</span></a><span class="sd">    Determine the display theme for the current operating system.</span>
-</span><span id="get_theme-942"><a href="#get_theme-942"><span class="linenos"> 942</span></a>
-</span><span id="get_theme-943"><a href="#get_theme-943"><span class="linenos"> 943</span></a><span class="sd">    Returns:</span>
-</span><span id="get_theme-944"><a href="#get_theme-944"><span class="linenos"> 944</span></a><span class="sd">    :return str: &#39;light&#39; if the theme is light, &#39;dark&#39; if the theme is dark, and &#39;light&#39; otherwise</span>
-</span><span id="get_theme-945"><a href="#get_theme-945"><span class="linenos"> 945</span></a>
-</span><span id="get_theme-946"><a href="#get_theme-946"><span class="linenos"> 946</span></a><span class="sd">    Example:</span>
-</span><span id="get_theme-947"><a href="#get_theme-947"><span class="linenos"> 947</span></a><span class="sd">    &gt;&gt;&gt; get_theme()</span>
-</span><span id="get_theme-948"><a href="#get_theme-948"><span class="linenos"> 948</span></a><span class="sd">    &#39;dark&#39;</span>
-</span><span id="get_theme-949"><a href="#get_theme-949"><span class="linenos"> 949</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="get_theme-950"><a href="#get_theme-950"><span class="linenos"> 950</span></a>    <span class="n">system</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span>
-</span><span id="get_theme-951"><a href="#get_theme-951"><span class="linenos"> 951</span></a>
-</span><span id="get_theme-952"><a href="#get_theme-952"><span class="linenos"> 952</span></a>    <span class="k">if</span> <span class="n">system</span> <span class="o">==</span> <span class="s2">&quot;Darwin&quot;</span><span class="p">:</span>
-</span><span id="get_theme-953"><a href="#get_theme-953"><span class="linenos"> 953</span></a>        <span class="c1"># macOS</span>
-</span><span id="get_theme-954"><a href="#get_theme-954"><span class="linenos"> 954</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="get_theme-955"><a href="#get_theme-955"><span class="linenos"> 955</span></a>            <span class="c1"># AppleScript to get the appearance setting</span>
-</span><span id="get_theme-956"><a href="#get_theme-956"><span class="linenos"> 956</span></a>            <span class="n">script</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-</span><span id="get_theme-957"><a href="#get_theme-957"><span class="linenos"> 957</span></a><span class="s2">            tell application &quot;System Events&quot;</span>
-</span><span id="get_theme-958"><a href="#get_theme-958"><span class="linenos"> 958</span></a><span class="s2">                tell appearance preferences</span>
-</span><span id="get_theme-959"><a href="#get_theme-959"><span class="linenos"> 959</span></a><span class="s2">                    if (dark mode) then</span>
-</span><span id="get_theme-960"><a href="#get_theme-960"><span class="linenos"> 960</span></a><span class="s2">                        return &quot;dark&quot;</span>
-</span><span id="get_theme-961"><a href="#get_theme-961"><span class="linenos"> 961</span></a><span class="s2">                    else</span>
-</span><span id="get_theme-962"><a href="#get_theme-962"><span class="linenos"> 962</span></a><span class="s2">                        return &quot;light&quot;</span>
-</span><span id="get_theme-963"><a href="#get_theme-963"><span class="linenos"> 963</span></a><span class="s2">                    end if</span>
-</span><span id="get_theme-964"><a href="#get_theme-964"><span class="linenos"> 964</span></a><span class="s2">                end tell</span>
-</span><span id="get_theme-965"><a href="#get_theme-965"><span class="linenos"> 965</span></a><span class="s2">            end tell</span>
-</span><span id="get_theme-966"><a href="#get_theme-966"><span class="linenos"> 966</span></a><span class="s2">            &quot;&quot;&quot;</span>
-</span><span id="get_theme-967"><a href="#get_theme-967"><span class="linenos"> 967</span></a>            <span class="c1"># Run the AppleScript</span>
-</span><span id="get_theme-968"><a href="#get_theme-968"><span class="linenos"> 968</span></a>            <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-</span><span id="get_theme-969"><a href="#get_theme-969"><span class="linenos"> 969</span></a>                <span class="p">[</span><span class="s2">&quot;osascript&quot;</span><span class="p">,</span> <span class="s2">&quot;-e&quot;</span><span class="p">,</span> <span class="n">script</span><span class="p">],</span>
-</span><span id="get_theme-970"><a href="#get_theme-970"><span class="linenos"> 970</span></a>                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-</span><span id="get_theme-971"><a href="#get_theme-971"><span class="linenos"> 971</span></a>                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-</span><span id="get_theme-972"><a href="#get_theme-972"><span class="linenos"> 972</span></a>                <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="get_theme-973"><a href="#get_theme-973"><span class="linenos"> 973</span></a>                <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="get_theme-974"><a href="#get_theme-974"><span class="linenos"> 974</span></a>            <span class="p">)</span>
-</span><span id="get_theme-975"><a href="#get_theme-975"><span class="linenos"> 975</span></a>
-</span><span id="get_theme-976"><a href="#get_theme-976"><span class="linenos"> 976</span></a>            <span class="c1"># Check the output</span>
-</span><span id="get_theme-977"><a href="#get_theme-977"><span class="linenos"> 977</span></a>            <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="get_theme-978"><a href="#get_theme-978"><span class="linenos"> 978</span></a>                <span class="n">theme</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-</span><span id="get_theme-979"><a href="#get_theme-979"><span class="linenos"> 979</span></a>                <span class="k">if</span> <span class="n">theme</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;dark&quot;</span><span class="p">,</span> <span class="s2">&quot;light&quot;</span><span class="p">]:</span>
-</span><span id="get_theme-980"><a href="#get_theme-980"><span class="linenos"> 980</span></a>                    <span class="k">return</span> <span class="n">theme</span>
-</span><span id="get_theme-981"><a href="#get_theme-981"><span class="linenos"> 981</span></a>                <span class="k">return</span> <span class="kc">None</span>
-</span><span id="get_theme-982"><a href="#get_theme-982"><span class="linenos"> 982</span></a>            <span class="k">return</span> <span class="kc">None</span>
-</span><span id="get_theme-983"><a href="#get_theme-983"><span class="linenos"> 983</span></a>
-</span><span id="get_theme-984"><a href="#get_theme-984"><span class="linenos"> 984</span></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-</span><span id="get_theme-985"><a href="#get_theme-985"><span class="linenos"> 985</span></a>            <span class="c1"># In case of any exception, return None</span>
-</span><span id="get_theme-986"><a href="#get_theme-986"><span class="linenos"> 986</span></a>            <span class="k">return</span> <span class="kc">None</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="get_theme-943"><a href="#get_theme-943"><span class="linenos"> 943</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_theme</span><span class="p">():</span>
+</span><span id="get_theme-944"><a href="#get_theme-944"><span class="linenos"> 944</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="get_theme-945"><a href="#get_theme-945"><span class="linenos"> 945</span></a><span class="sd">    Determine the display theme for the current operating system.</span>
+</span><span id="get_theme-946"><a href="#get_theme-946"><span class="linenos"> 946</span></a>
+</span><span id="get_theme-947"><a href="#get_theme-947"><span class="linenos"> 947</span></a><span class="sd">    Returns:</span>
+</span><span id="get_theme-948"><a href="#get_theme-948"><span class="linenos"> 948</span></a><span class="sd">    :return str: &#39;light&#39; if the theme is light, &#39;dark&#39; if the theme is dark, and &#39;light&#39; otherwise</span>
+</span><span id="get_theme-949"><a href="#get_theme-949"><span class="linenos"> 949</span></a>
+</span><span id="get_theme-950"><a href="#get_theme-950"><span class="linenos"> 950</span></a><span class="sd">    Example:</span>
+</span><span id="get_theme-951"><a href="#get_theme-951"><span class="linenos"> 951</span></a><span class="sd">    &gt;&gt;&gt; get_theme()</span>
+</span><span id="get_theme-952"><a href="#get_theme-952"><span class="linenos"> 952</span></a><span class="sd">    &#39;dark&#39;</span>
+</span><span id="get_theme-953"><a href="#get_theme-953"><span class="linenos"> 953</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="get_theme-954"><a href="#get_theme-954"><span class="linenos"> 954</span></a>    <span class="n">system</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span>
+</span><span id="get_theme-955"><a href="#get_theme-955"><span class="linenos"> 955</span></a>    <span class="k">if</span> <span class="n">system</span> <span class="o">==</span> <span class="s2">&quot;Darwin&quot;</span><span class="p">:</span>
+</span><span id="get_theme-956"><a href="#get_theme-956"><span class="linenos"> 956</span></a>        <span class="c1"># macOS</span>
+</span><span id="get_theme-957"><a href="#get_theme-957"><span class="linenos"> 957</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="get_theme-958"><a href="#get_theme-958"><span class="linenos"> 958</span></a>            <span class="c1"># AppleScript to get the appearance setting</span>
+</span><span id="get_theme-959"><a href="#get_theme-959"><span class="linenos"> 959</span></a>            <span class="n">script</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+</span><span id="get_theme-960"><a href="#get_theme-960"><span class="linenos"> 960</span></a><span class="s2">            tell application &quot;System Events&quot;</span>
+</span><span id="get_theme-961"><a href="#get_theme-961"><span class="linenos"> 961</span></a><span class="s2">                tell appearance preferences</span>
+</span><span id="get_theme-962"><a href="#get_theme-962"><span class="linenos"> 962</span></a><span class="s2">                    if dark mode is true then</span>
+</span><span id="get_theme-963"><a href="#get_theme-963"><span class="linenos"> 963</span></a><span class="s2">                        return &quot;dark&quot;</span>
+</span><span id="get_theme-964"><a href="#get_theme-964"><span class="linenos"> 964</span></a><span class="s2">                    else</span>
+</span><span id="get_theme-965"><a href="#get_theme-965"><span class="linenos"> 965</span></a><span class="s2">                        return &quot;light&quot;</span>
+</span><span id="get_theme-966"><a href="#get_theme-966"><span class="linenos"> 966</span></a><span class="s2">                    end if</span>
+</span><span id="get_theme-967"><a href="#get_theme-967"><span class="linenos"> 967</span></a><span class="s2">                end tell</span>
+</span><span id="get_theme-968"><a href="#get_theme-968"><span class="linenos"> 968</span></a><span class="s2">            end tell</span>
+</span><span id="get_theme-969"><a href="#get_theme-969"><span class="linenos"> 969</span></a><span class="s2">            &quot;&quot;&quot;</span>
+</span><span id="get_theme-970"><a href="#get_theme-970"><span class="linenos"> 970</span></a>            <span class="c1"># Run the AppleScript</span>
+</span><span id="get_theme-971"><a href="#get_theme-971"><span class="linenos"> 971</span></a>            <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span id="get_theme-972"><a href="#get_theme-972"><span class="linenos"> 972</span></a>                <span class="p">[</span><span class="s2">&quot;osascript&quot;</span><span class="p">,</span> <span class="s2">&quot;-e&quot;</span><span class="p">,</span> <span class="n">script</span><span class="p">],</span>
+</span><span id="get_theme-973"><a href="#get_theme-973"><span class="linenos"> 973</span></a>                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+</span><span id="get_theme-974"><a href="#get_theme-974"><span class="linenos"> 974</span></a>                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+</span><span id="get_theme-975"><a href="#get_theme-975"><span class="linenos"> 975</span></a>                <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="get_theme-976"><a href="#get_theme-976"><span class="linenos"> 976</span></a>                <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="get_theme-977"><a href="#get_theme-977"><span class="linenos"> 977</span></a>            <span class="p">)</span>
+</span><span id="get_theme-978"><a href="#get_theme-978"><span class="linenos"> 978</span></a>            <span class="c1"># print(f&quot;AppleScript result: {result.stdout.strip()}&quot;)</span>
+</span><span id="get_theme-979"><a href="#get_theme-979"><span class="linenos"> 979</span></a>            <span class="c1"># print(f&quot;AppleScript stderr: {result.stderr.strip()}&quot;)</span>
+</span><span id="get_theme-980"><a href="#get_theme-980"><span class="linenos"> 980</span></a>            <span class="c1"># print(f&quot;AppleScript return code: {result.returncode}&quot;)</span>
+</span><span id="get_theme-981"><a href="#get_theme-981"><span class="linenos"> 981</span></a>            <span class="c1"># Check the output</span>
+</span><span id="get_theme-982"><a href="#get_theme-982"><span class="linenos"> 982</span></a>            <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="get_theme-983"><a href="#get_theme-983"><span class="linenos"> 983</span></a>                <span class="n">theme</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</span><span id="get_theme-984"><a href="#get_theme-984"><span class="linenos"> 984</span></a>                <span class="k">if</span> <span class="n">theme</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;dark&quot;</span><span class="p">,</span> <span class="s2">&quot;light&quot;</span><span class="p">]:</span>
+</span><span id="get_theme-985"><a href="#get_theme-985"><span class="linenos"> 985</span></a>                    <span class="k">return</span> <span class="n">theme</span>
+</span><span id="get_theme-986"><a href="#get_theme-986"><span class="linenos"> 986</span></a>            <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
 </span><span id="get_theme-987"><a href="#get_theme-987"><span class="linenos"> 987</span></a>
-</span><span id="get_theme-988"><a href="#get_theme-988"><span class="linenos"> 988</span></a>    <span class="k">elif</span> <span class="n">system</span> <span class="o">==</span> <span class="s2">&quot;Windows&quot;</span><span class="p">:</span>
-</span><span id="get_theme-989"><a href="#get_theme-989"><span class="linenos"> 989</span></a>        <span class="c1"># Windows</span>
-</span><span id="get_theme-990"><a href="#get_theme-990"><span class="linenos"> 990</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="get_theme-991"><a href="#get_theme-991"><span class="linenos"> 991</span></a>            <span class="kn">import</span><span class="w"> </span><span class="nn">winreg</span>
-</span><span id="get_theme-992"><a href="#get_theme-992"><span class="linenos"> 992</span></a>
-</span><span id="get_theme-993"><a href="#get_theme-993"><span class="linenos"> 993</span></a>            <span class="n">registry</span> <span class="o">=</span> <span class="n">winreg</span><span class="o">.</span><span class="n">ConnectRegistry</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">winreg</span><span class="o">.</span><span class="n">HKEY_CURRENT_USER</span><span class="p">)</span>
-</span><span id="get_theme-994"><a href="#get_theme-994"><span class="linenos"> 994</span></a>            <span class="n">key_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;Software\Microsoft\Windows\CurrentVersion\Themes\Personalize&quot;</span>
-</span><span id="get_theme-995"><a href="#get_theme-995"><span class="linenos"> 995</span></a>            <span class="n">key</span> <span class="o">=</span> <span class="n">winreg</span><span class="o">.</span><span class="n">OpenKey</span><span class="p">(</span><span class="n">registry</span><span class="p">,</span> <span class="n">key_path</span><span class="p">)</span>
-</span><span id="get_theme-996"><a href="#get_theme-996"><span class="linenos"> 996</span></a>            <span class="n">value</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">winreg</span><span class="o">.</span><span class="n">QueryValueEx</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;AppsUseLightTheme&quot;</span><span class="p">)</span>
-</span><span id="get_theme-997"><a href="#get_theme-997"><span class="linenos"> 997</span></a>            <span class="n">winreg</span><span class="o">.</span><span class="n">CloseKey</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span id="get_theme-988"><a href="#get_theme-988"><span class="linenos"> 988</span></a>        <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="get_theme-989"><a href="#get_theme-989"><span class="linenos"> 989</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CalledProcessError occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="get_theme-990"><a href="#get_theme-990"><span class="linenos"> 990</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;stderr: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">stderr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="get_theme-991"><a href="#get_theme-991"><span class="linenos"> 991</span></a>            <span class="c1"># In case of any exception, return &quot;light&quot;</span>
+</span><span id="get_theme-992"><a href="#get_theme-992"><span class="linenos"> 992</span></a>            <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
+</span><span id="get_theme-993"><a href="#get_theme-993"><span class="linenos"> 993</span></a>
+</span><span id="get_theme-994"><a href="#get_theme-994"><span class="linenos"> 994</span></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="get_theme-995"><a href="#get_theme-995"><span class="linenos"> 995</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exception occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="get_theme-996"><a href="#get_theme-996"><span class="linenos"> 996</span></a>            <span class="c1"># In case of any exception, return &quot;light&quot;</span>
+</span><span id="get_theme-997"><a href="#get_theme-997"><span class="linenos"> 997</span></a>            <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
 </span><span id="get_theme-998"><a href="#get_theme-998"><span class="linenos"> 998</span></a>
-</span><span id="get_theme-999"><a href="#get_theme-999"><span class="linenos"> 999</span></a>            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="get_theme-1000"><a href="#get_theme-1000"><span class="linenos">1000</span></a>                <span class="k">return</span> <span class="s2">&quot;dark&quot;</span>
-</span><span id="get_theme-1001"><a href="#get_theme-1001"><span class="linenos">1001</span></a>            <span class="k">else</span><span class="p">:</span>
-</span><span id="get_theme-1002"><a href="#get_theme-1002"><span class="linenos">1002</span></a>                <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
+</span><span id="get_theme-999"><a href="#get_theme-999"><span class="linenos"> 999</span></a>    <span class="k">elif</span> <span class="n">system</span> <span class="o">==</span> <span class="s2">&quot;Windows&quot;</span><span class="p">:</span>
+</span><span id="get_theme-1000"><a href="#get_theme-1000"><span class="linenos">1000</span></a>        <span class="c1"># Windows</span>
+</span><span id="get_theme-1001"><a href="#get_theme-1001"><span class="linenos">1001</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="get_theme-1002"><a href="#get_theme-1002"><span class="linenos">1002</span></a>            <span class="kn">import</span><span class="w"> </span><span class="nn">winreg</span>
 </span><span id="get_theme-1003"><a href="#get_theme-1003"><span class="linenos">1003</span></a>
-</span><span id="get_theme-1004"><a href="#get_theme-1004"><span class="linenos">1004</span></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-</span><span id="get_theme-1005"><a href="#get_theme-1005"><span class="linenos">1005</span></a>            <span class="c1"># In case of any exception, return None</span>
-</span><span id="get_theme-1006"><a href="#get_theme-1006"><span class="linenos">1006</span></a>            <span class="k">return</span> <span class="kc">None</span>
-</span><span id="get_theme-1007"><a href="#get_theme-1007"><span class="linenos">1007</span></a>
-</span><span id="get_theme-1008"><a href="#get_theme-1008"><span class="linenos">1008</span></a>    <span class="k">elif</span> <span class="n">system</span> <span class="o">==</span> <span class="s2">&quot;Linux&quot;</span><span class="p">:</span>
-</span><span id="get_theme-1009"><a href="#get_theme-1009"><span class="linenos">1009</span></a>        <span class="c1"># Linux</span>
-</span><span id="get_theme-1010"><a href="#get_theme-1010"><span class="linenos">1010</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="get_theme-1011"><a href="#get_theme-1011"><span class="linenos">1011</span></a>            <span class="c1"># Check for GTK theme setting</span>
-</span><span id="get_theme-1012"><a href="#get_theme-1012"><span class="linenos">1012</span></a>            <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-</span><span id="get_theme-1013"><a href="#get_theme-1013"><span class="linenos">1013</span></a>                <span class="p">[</span><span class="s2">&quot;gsettings&quot;</span><span class="p">,</span> <span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;org.gnome.desktop.interface&quot;</span><span class="p">,</span> <span class="s2">&quot;gtk-theme&quot;</span><span class="p">],</span>
-</span><span id="get_theme-1014"><a href="#get_theme-1014"><span class="linenos">1014</span></a>                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-</span><span id="get_theme-1015"><a href="#get_theme-1015"><span class="linenos">1015</span></a>                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-</span><span id="get_theme-1016"><a href="#get_theme-1016"><span class="linenos">1016</span></a>                <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="get_theme-1017"><a href="#get_theme-1017"><span class="linenos">1017</span></a>                <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="get_theme-1018"><a href="#get_theme-1018"><span class="linenos">1018</span></a>            <span class="p">)</span>
+</span><span id="get_theme-1004"><a href="#get_theme-1004"><span class="linenos">1004</span></a>            <span class="n">registry</span> <span class="o">=</span> <span class="n">winreg</span><span class="o">.</span><span class="n">ConnectRegistry</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">winreg</span><span class="o">.</span><span class="n">HKEY_CURRENT_USER</span><span class="p">)</span>
+</span><span id="get_theme-1005"><a href="#get_theme-1005"><span class="linenos">1005</span></a>            <span class="n">key_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;Software\Microsoft\Windows\CurrentVersion\Themes\Personalize&quot;</span>
+</span><span id="get_theme-1006"><a href="#get_theme-1006"><span class="linenos">1006</span></a>            <span class="n">key</span> <span class="o">=</span> <span class="n">winreg</span><span class="o">.</span><span class="n">OpenKey</span><span class="p">(</span><span class="n">registry</span><span class="p">,</span> <span class="n">key_path</span><span class="p">)</span>
+</span><span id="get_theme-1007"><a href="#get_theme-1007"><span class="linenos">1007</span></a>            <span class="n">value</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">winreg</span><span class="o">.</span><span class="n">QueryValueEx</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;AppsUseLightTheme&quot;</span><span class="p">)</span>
+</span><span id="get_theme-1008"><a href="#get_theme-1008"><span class="linenos">1008</span></a>            <span class="n">winreg</span><span class="o">.</span><span class="n">CloseKey</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span id="get_theme-1009"><a href="#get_theme-1009"><span class="linenos">1009</span></a>
+</span><span id="get_theme-1010"><a href="#get_theme-1010"><span class="linenos">1010</span></a>            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="get_theme-1011"><a href="#get_theme-1011"><span class="linenos">1011</span></a>                <span class="k">return</span> <span class="s2">&quot;dark&quot;</span>
+</span><span id="get_theme-1012"><a href="#get_theme-1012"><span class="linenos">1012</span></a>            <span class="k">else</span><span class="p">:</span>
+</span><span id="get_theme-1013"><a href="#get_theme-1013"><span class="linenos">1013</span></a>                <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
+</span><span id="get_theme-1014"><a href="#get_theme-1014"><span class="linenos">1014</span></a>
+</span><span id="get_theme-1015"><a href="#get_theme-1015"><span class="linenos">1015</span></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="get_theme-1016"><a href="#get_theme-1016"><span class="linenos">1016</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exception occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="get_theme-1017"><a href="#get_theme-1017"><span class="linenos">1017</span></a>            <span class="c1"># In case of any exception, return &quot;light&quot;</span>
+</span><span id="get_theme-1018"><a href="#get_theme-1018"><span class="linenos">1018</span></a>            <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
 </span><span id="get_theme-1019"><a href="#get_theme-1019"><span class="linenos">1019</span></a>
-</span><span id="get_theme-1020"><a href="#get_theme-1020"><span class="linenos">1020</span></a>            <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="get_theme-1021"><a href="#get_theme-1021"><span class="linenos">1021</span></a>                <span class="n">theme</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-</span><span id="get_theme-1022"><a href="#get_theme-1022"><span class="linenos">1022</span></a>                <span class="k">if</span> <span class="s2">&quot;dark&quot;</span> <span class="ow">in</span> <span class="n">theme</span><span class="p">:</span>
-</span><span id="get_theme-1023"><a href="#get_theme-1023"><span class="linenos">1023</span></a>                    <span class="k">return</span> <span class="s2">&quot;dark&quot;</span>
-</span><span id="get_theme-1024"><a href="#get_theme-1024"><span class="linenos">1024</span></a>                <span class="k">else</span><span class="p">:</span>
-</span><span id="get_theme-1025"><a href="#get_theme-1025"><span class="linenos">1025</span></a>                    <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
-</span><span id="get_theme-1026"><a href="#get_theme-1026"><span class="linenos">1026</span></a>            <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
-</span><span id="get_theme-1027"><a href="#get_theme-1027"><span class="linenos">1027</span></a>
-</span><span id="get_theme-1028"><a href="#get_theme-1028"><span class="linenos">1028</span></a>        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-</span><span id="get_theme-1029"><a href="#get_theme-1029"><span class="linenos">1029</span></a>            <span class="c1"># In case of any exception, return None</span>
-</span><span id="get_theme-1030"><a href="#get_theme-1030"><span class="linenos">1030</span></a>            <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
+</span><span id="get_theme-1020"><a href="#get_theme-1020"><span class="linenos">1020</span></a>    <span class="k">elif</span> <span class="n">system</span> <span class="o">==</span> <span class="s2">&quot;Linux&quot;</span><span class="p">:</span>
+</span><span id="get_theme-1021"><a href="#get_theme-1021"><span class="linenos">1021</span></a>        <span class="c1"># Linux</span>
+</span><span id="get_theme-1022"><a href="#get_theme-1022"><span class="linenos">1022</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="get_theme-1023"><a href="#get_theme-1023"><span class="linenos">1023</span></a>            <span class="c1"># Check for GTK theme setting</span>
+</span><span id="get_theme-1024"><a href="#get_theme-1024"><span class="linenos">1024</span></a>            <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+</span><span id="get_theme-1025"><a href="#get_theme-1025"><span class="linenos">1025</span></a>                <span class="p">[</span><span class="s2">&quot;gsettings&quot;</span><span class="p">,</span> <span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;org.gnome.desktop.interface&quot;</span><span class="p">,</span> <span class="s2">&quot;gtk-theme&quot;</span><span class="p">],</span>
+</span><span id="get_theme-1026"><a href="#get_theme-1026"><span class="linenos">1026</span></a>                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+</span><span id="get_theme-1027"><a href="#get_theme-1027"><span class="linenos">1027</span></a>                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+</span><span id="get_theme-1028"><a href="#get_theme-1028"><span class="linenos">1028</span></a>                <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="get_theme-1029"><a href="#get_theme-1029"><span class="linenos">1029</span></a>                <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="get_theme-1030"><a href="#get_theme-1030"><span class="linenos">1030</span></a>            <span class="p">)</span>
 </span><span id="get_theme-1031"><a href="#get_theme-1031"><span class="linenos">1031</span></a>
-</span><span id="get_theme-1032"><a href="#get_theme-1032"><span class="linenos">1032</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="get_theme-1033"><a href="#get_theme-1033"><span class="linenos">1033</span></a>        <span class="c1"># Unsupported OS</span>
-</span><span id="get_theme-1034"><a href="#get_theme-1034"><span class="linenos">1034</span></a>        <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
+</span><span id="get_theme-1032"><a href="#get_theme-1032"><span class="linenos">1032</span></a>            <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="get_theme-1033"><a href="#get_theme-1033"><span class="linenos">1033</span></a>                <span class="n">theme</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</span><span id="get_theme-1034"><a href="#get_theme-1034"><span class="linenos">1034</span></a>                <span class="k">if</span> <span class="s2">&quot;dark&quot;</span> <span class="ow">in</span> <span class="n">theme</span><span class="p">:</span>
+</span><span id="get_theme-1035"><a href="#get_theme-1035"><span class="linenos">1035</span></a>                    <span class="k">return</span> <span class="s2">&quot;dark&quot;</span>
+</span><span id="get_theme-1036"><a href="#get_theme-1036"><span class="linenos">1036</span></a>                <span class="k">else</span><span class="p">:</span>
+</span><span id="get_theme-1037"><a href="#get_theme-1037"><span class="linenos">1037</span></a>                    <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
+</span><span id="get_theme-1038"><a href="#get_theme-1038"><span class="linenos">1038</span></a>            <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
+</span><span id="get_theme-1039"><a href="#get_theme-1039"><span class="linenos">1039</span></a>
+</span><span id="get_theme-1040"><a href="#get_theme-1040"><span class="linenos">1040</span></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="get_theme-1041"><a href="#get_theme-1041"><span class="linenos">1041</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exception occurred: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="get_theme-1042"><a href="#get_theme-1042"><span class="linenos">1042</span></a>            <span class="c1"># In case of any exception, return &quot;light&quot;</span>
+</span><span id="get_theme-1043"><a href="#get_theme-1043"><span class="linenos">1043</span></a>            <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
+</span><span id="get_theme-1044"><a href="#get_theme-1044"><span class="linenos">1044</span></a>
+</span><span id="get_theme-1045"><a href="#get_theme-1045"><span class="linenos">1045</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="get_theme-1046"><a href="#get_theme-1046"><span class="linenos">1046</span></a>        <span class="c1"># Unsupported OS</span>
+</span><span id="get_theme-1047"><a href="#get_theme-1047"><span class="linenos">1047</span></a>        <span class="k">return</span> <span class="s2">&quot;light&quot;</span>
 </span></pre></div>
 
 
@@ -2916,23 +2914,23 @@ than the cutoff value. If it's -1.0 then the function keeps all Disulfides.</p>
 
     </div>
     <a class="headerlink" href="#calculate_std_cutoff"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="calculate_std_cutoff-1040"><a href="#calculate_std_cutoff-1040"><span class="linenos">1040</span></a><span class="k">def</span><span class="w"> </span><span class="nf">calculate_std_cutoff</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">num_std</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-</span><span id="calculate_std_cutoff-1041"><a href="#calculate_std_cutoff-1041"><span class="linenos">1041</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="calculate_std_cutoff-1042"><a href="#calculate_std_cutoff-1042"><span class="linenos">1042</span></a><span class="sd">    Calculate cutoff based on standard deviation.</span>
-</span><span id="calculate_std_cutoff-1043"><a href="#calculate_std_cutoff-1043"><span class="linenos">1043</span></a>
-</span><span id="calculate_std_cutoff-1044"><a href="#calculate_std_cutoff-1044"><span class="linenos">1044</span></a><span class="sd">    :param df: DataFrame containing the deviations.</span>
-</span><span id="calculate_std_cutoff-1045"><a href="#calculate_std_cutoff-1045"><span class="linenos">1045</span></a><span class="sd">    :type df: pd.DataFrame</span>
-</span><span id="calculate_std_cutoff-1046"><a href="#calculate_std_cutoff-1046"><span class="linenos">1046</span></a><span class="sd">    :param column: Column name for which to calculate the cutoff.</span>
-</span><span id="calculate_std_cutoff-1047"><a href="#calculate_std_cutoff-1047"><span class="linenos">1047</span></a><span class="sd">    :type column: str</span>
-</span><span id="calculate_std_cutoff-1048"><a href="#calculate_std_cutoff-1048"><span class="linenos">1048</span></a><span class="sd">    :param num_std: Number of standard deviations to use for the cutoff.</span>
-</span><span id="calculate_std_cutoff-1049"><a href="#calculate_std_cutoff-1049"><span class="linenos">1049</span></a><span class="sd">    :type num_std: int</span>
-</span><span id="calculate_std_cutoff-1050"><a href="#calculate_std_cutoff-1050"><span class="linenos">1050</span></a><span class="sd">    :return: Cutoff value.</span>
-</span><span id="calculate_std_cutoff-1051"><a href="#calculate_std_cutoff-1051"><span class="linenos">1051</span></a><span class="sd">    :rtype: float</span>
-</span><span id="calculate_std_cutoff-1052"><a href="#calculate_std_cutoff-1052"><span class="linenos">1052</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="calculate_std_cutoff-1053"><a href="#calculate_std_cutoff-1053"><span class="linenos">1053</span></a>    <span class="n">mean</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-</span><span id="calculate_std_cutoff-1054"><a href="#calculate_std_cutoff-1054"><span class="linenos">1054</span></a>    <span class="n">std</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
-</span><span id="calculate_std_cutoff-1055"><a href="#calculate_std_cutoff-1055"><span class="linenos">1055</span></a>    <span class="n">cutoff</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="n">num_std</span> <span class="o">*</span> <span class="n">std</span>
-</span><span id="calculate_std_cutoff-1056"><a href="#calculate_std_cutoff-1056"><span class="linenos">1056</span></a>    <span class="k">return</span> <span class="n">cutoff</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="calculate_std_cutoff-1053"><a href="#calculate_std_cutoff-1053"><span class="linenos">1053</span></a><span class="k">def</span><span class="w"> </span><span class="nf">calculate_std_cutoff</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">num_std</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+</span><span id="calculate_std_cutoff-1054"><a href="#calculate_std_cutoff-1054"><span class="linenos">1054</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="calculate_std_cutoff-1055"><a href="#calculate_std_cutoff-1055"><span class="linenos">1055</span></a><span class="sd">    Calculate cutoff based on standard deviation.</span>
+</span><span id="calculate_std_cutoff-1056"><a href="#calculate_std_cutoff-1056"><span class="linenos">1056</span></a>
+</span><span id="calculate_std_cutoff-1057"><a href="#calculate_std_cutoff-1057"><span class="linenos">1057</span></a><span class="sd">    :param df: DataFrame containing the deviations.</span>
+</span><span id="calculate_std_cutoff-1058"><a href="#calculate_std_cutoff-1058"><span class="linenos">1058</span></a><span class="sd">    :type df: pd.DataFrame</span>
+</span><span id="calculate_std_cutoff-1059"><a href="#calculate_std_cutoff-1059"><span class="linenos">1059</span></a><span class="sd">    :param column: Column name for which to calculate the cutoff.</span>
+</span><span id="calculate_std_cutoff-1060"><a href="#calculate_std_cutoff-1060"><span class="linenos">1060</span></a><span class="sd">    :type column: str</span>
+</span><span id="calculate_std_cutoff-1061"><a href="#calculate_std_cutoff-1061"><span class="linenos">1061</span></a><span class="sd">    :param num_std: Number of standard deviations to use for the cutoff.</span>
+</span><span id="calculate_std_cutoff-1062"><a href="#calculate_std_cutoff-1062"><span class="linenos">1062</span></a><span class="sd">    :type num_std: int</span>
+</span><span id="calculate_std_cutoff-1063"><a href="#calculate_std_cutoff-1063"><span class="linenos">1063</span></a><span class="sd">    :return: Cutoff value.</span>
+</span><span id="calculate_std_cutoff-1064"><a href="#calculate_std_cutoff-1064"><span class="linenos">1064</span></a><span class="sd">    :rtype: float</span>
+</span><span id="calculate_std_cutoff-1065"><a href="#calculate_std_cutoff-1065"><span class="linenos">1065</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="calculate_std_cutoff-1066"><a href="#calculate_std_cutoff-1066"><span class="linenos">1066</span></a>    <span class="n">mean</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</span><span id="calculate_std_cutoff-1067"><a href="#calculate_std_cutoff-1067"><span class="linenos">1067</span></a>    <span class="n">std</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+</span><span id="calculate_std_cutoff-1068"><a href="#calculate_std_cutoff-1068"><span class="linenos">1068</span></a>    <span class="n">cutoff</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="n">num_std</span> <span class="o">*</span> <span class="n">std</span>
+</span><span id="calculate_std_cutoff-1069"><a href="#calculate_std_cutoff-1069"><span class="linenos">1069</span></a>    <span class="k">return</span> <span class="n">cutoff</span>
 </span></pre></div>
 
 
@@ -2966,21 +2964,21 @@ than the cutoff value. If it's -1.0 then the function keeps all Disulfides.</p>
 
     </div>
     <a class="headerlink" href="#calculate_percentile_cutoff"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="calculate_percentile_cutoff-1059"><a href="#calculate_percentile_cutoff-1059"><span class="linenos">1059</span></a><span class="k">def</span><span class="w"> </span><span class="nf">calculate_percentile_cutoff</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">percentile</span><span class="o">=</span><span class="mi">95</span><span class="p">):</span>
-</span><span id="calculate_percentile_cutoff-1060"><a href="#calculate_percentile_cutoff-1060"><span class="linenos">1060</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="calculate_percentile_cutoff-1061"><a href="#calculate_percentile_cutoff-1061"><span class="linenos">1061</span></a><span class="sd">    Calculate cutoff based on percentile.</span>
-</span><span id="calculate_percentile_cutoff-1062"><a href="#calculate_percentile_cutoff-1062"><span class="linenos">1062</span></a>
-</span><span id="calculate_percentile_cutoff-1063"><a href="#calculate_percentile_cutoff-1063"><span class="linenos">1063</span></a><span class="sd">    :param df: DataFrame containing the deviations.</span>
-</span><span id="calculate_percentile_cutoff-1064"><a href="#calculate_percentile_cutoff-1064"><span class="linenos">1064</span></a><span class="sd">    :type df: pd.DataFrame</span>
-</span><span id="calculate_percentile_cutoff-1065"><a href="#calculate_percentile_cutoff-1065"><span class="linenos">1065</span></a><span class="sd">    :param column: Column name for which to calculate the cutoff.</span>
-</span><span id="calculate_percentile_cutoff-1066"><a href="#calculate_percentile_cutoff-1066"><span class="linenos">1066</span></a><span class="sd">    :type column: str</span>
-</span><span id="calculate_percentile_cutoff-1067"><a href="#calculate_percentile_cutoff-1067"><span class="linenos">1067</span></a><span class="sd">    :param percentile: Percentile to use for the cutoff.</span>
-</span><span id="calculate_percentile_cutoff-1068"><a href="#calculate_percentile_cutoff-1068"><span class="linenos">1068</span></a><span class="sd">    :type percentile: int</span>
-</span><span id="calculate_percentile_cutoff-1069"><a href="#calculate_percentile_cutoff-1069"><span class="linenos">1069</span></a><span class="sd">    :return: Cutoff value.</span>
-</span><span id="calculate_percentile_cutoff-1070"><a href="#calculate_percentile_cutoff-1070"><span class="linenos">1070</span></a><span class="sd">    :rtype: float</span>
-</span><span id="calculate_percentile_cutoff-1071"><a href="#calculate_percentile_cutoff-1071"><span class="linenos">1071</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="calculate_percentile_cutoff-1072"><a href="#calculate_percentile_cutoff-1072"><span class="linenos">1072</span></a>    <span class="n">cutoff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">percentile</span><span class="p">)</span>
-</span><span id="calculate_percentile_cutoff-1073"><a href="#calculate_percentile_cutoff-1073"><span class="linenos">1073</span></a>    <span class="k">return</span> <span class="n">cutoff</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="calculate_percentile_cutoff-1072"><a href="#calculate_percentile_cutoff-1072"><span class="linenos">1072</span></a><span class="k">def</span><span class="w"> </span><span class="nf">calculate_percentile_cutoff</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">percentile</span><span class="o">=</span><span class="mi">95</span><span class="p">):</span>
+</span><span id="calculate_percentile_cutoff-1073"><a href="#calculate_percentile_cutoff-1073"><span class="linenos">1073</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="calculate_percentile_cutoff-1074"><a href="#calculate_percentile_cutoff-1074"><span class="linenos">1074</span></a><span class="sd">    Calculate cutoff based on percentile.</span>
+</span><span id="calculate_percentile_cutoff-1075"><a href="#calculate_percentile_cutoff-1075"><span class="linenos">1075</span></a>
+</span><span id="calculate_percentile_cutoff-1076"><a href="#calculate_percentile_cutoff-1076"><span class="linenos">1076</span></a><span class="sd">    :param df: DataFrame containing the deviations.</span>
+</span><span id="calculate_percentile_cutoff-1077"><a href="#calculate_percentile_cutoff-1077"><span class="linenos">1077</span></a><span class="sd">    :type df: pd.DataFrame</span>
+</span><span id="calculate_percentile_cutoff-1078"><a href="#calculate_percentile_cutoff-1078"><span class="linenos">1078</span></a><span class="sd">    :param column: Column name for which to calculate the cutoff.</span>
+</span><span id="calculate_percentile_cutoff-1079"><a href="#calculate_percentile_cutoff-1079"><span class="linenos">1079</span></a><span class="sd">    :type column: str</span>
+</span><span id="calculate_percentile_cutoff-1080"><a href="#calculate_percentile_cutoff-1080"><span class="linenos">1080</span></a><span class="sd">    :param percentile: Percentile to use for the cutoff.</span>
+</span><span id="calculate_percentile_cutoff-1081"><a href="#calculate_percentile_cutoff-1081"><span class="linenos">1081</span></a><span class="sd">    :type percentile: int</span>
+</span><span id="calculate_percentile_cutoff-1082"><a href="#calculate_percentile_cutoff-1082"><span class="linenos">1082</span></a><span class="sd">    :return: Cutoff value.</span>
+</span><span id="calculate_percentile_cutoff-1083"><a href="#calculate_percentile_cutoff-1083"><span class="linenos">1083</span></a><span class="sd">    :rtype: float</span>
+</span><span id="calculate_percentile_cutoff-1084"><a href="#calculate_percentile_cutoff-1084"><span class="linenos">1084</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="calculate_percentile_cutoff-1085"><a href="#calculate_percentile_cutoff-1085"><span class="linenos">1085</span></a>    <span class="n">cutoff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">percentile</span><span class="p">)</span>
+</span><span id="calculate_percentile_cutoff-1086"><a href="#calculate_percentile_cutoff-1086"><span class="linenos">1086</span></a>    <span class="k">return</span> <span class="n">cutoff</span>
 </span></pre></div>
 
 
@@ -3003,132 +3001,6 @@ than the cutoff value. If it's -1.0 then the function keeps all Disulfides.</p>
 
 
                 </section>
-                <section id="filter_by_cutoffs">
-                            <input id="filter_by_cutoffs-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">filter_by_cutoffs</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">df</span>,</span><span class="param">	<span class="n">length_cutoff</span><span class="o">=</span><span class="mf">1.0</span>,</span><span class="param">	<span class="n">angle_cutoff</span><span class="o">=</span><span class="mf">1.0</span>,</span><span class="param">	<span class="n">ca_cutoff</span><span class="o">=</span><span class="mf">8.0</span>,</span><span class="param">	<span class="n">minimum_distance</span><span class="o">=</span><span class="mf">2.0</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="filter_by_cutoffs-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#filter_by_cutoffs"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="filter_by_cutoffs-1076"><a href="#filter_by_cutoffs-1076"><span class="linenos">1076</span></a><span class="k">def</span><span class="w"> </span><span class="nf">filter_by_cutoffs</span><span class="p">(</span>
-</span><span id="filter_by_cutoffs-1077"><a href="#filter_by_cutoffs-1077"><span class="linenos">1077</span></a>    <span class="n">df</span><span class="p">,</span> <span class="n">length_cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">angle_cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ca_cutoff</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span> <span class="n">minimum_distance</span><span class="o">=</span><span class="mf">2.0</span>
-</span><span id="filter_by_cutoffs-1078"><a href="#filter_by_cutoffs-1078"><span class="linenos">1078</span></a><span class="p">):</span>
-</span><span id="filter_by_cutoffs-1079"><a href="#filter_by_cutoffs-1079"><span class="linenos">1079</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="filter_by_cutoffs-1080"><a href="#filter_by_cutoffs-1080"><span class="linenos">1080</span></a><span class="sd">    Filter the DataFrame based on distance, angle, and Ca distance cutoffs. Ca cutoff</span>
-</span><span id="filter_by_cutoffs-1081"><a href="#filter_by_cutoffs-1081"><span class="linenos">1081</span></a><span class="sd">    dominates the filter and will override the distance and angle cutoffs. Note: The</span>
-</span><span id="filter_by_cutoffs-1082"><a href="#filter_by_cutoffs-1082"><span class="linenos">1082</span></a><span class="sd">    filter is applied if the Ca distance is less than or equal to 2.0 Angstroms, since</span>
-</span><span id="filter_by_cutoffs-1083"><a href="#filter_by_cutoffs-1083"><span class="linenos">1083</span></a><span class="sd">    this is physically impossible.</span>
-</span><span id="filter_by_cutoffs-1084"><a href="#filter_by_cutoffs-1084"><span class="linenos">1084</span></a>
-</span><span id="filter_by_cutoffs-1085"><a href="#filter_by_cutoffs-1085"><span class="linenos">1085</span></a><span class="sd">    :param df: DataFrame containing the deviations.</span>
-</span><span id="filter_by_cutoffs-1086"><a href="#filter_by_cutoffs-1086"><span class="linenos">1086</span></a><span class="sd">    :type df: pd.DataFrame</span>
-</span><span id="filter_by_cutoffs-1087"><a href="#filter_by_cutoffs-1087"><span class="linenos">1087</span></a><span class="sd">    :param length_cutoff: Cutoff value for Bond Length Deviation.</span>
-</span><span id="filter_by_cutoffs-1088"><a href="#filter_by_cutoffs-1088"><span class="linenos">1088</span></a><span class="sd">    :type distance_cutoff: float</span>
-</span><span id="filter_by_cutoffs-1089"><a href="#filter_by_cutoffs-1089"><span class="linenos">1089</span></a><span class="sd">    :param angle_cutoff: Cutoff value for angle deviation.</span>
-</span><span id="filter_by_cutoffs-1090"><a href="#filter_by_cutoffs-1090"><span class="linenos">1090</span></a><span class="sd">    :type angle_cutoff: float</span>
-</span><span id="filter_by_cutoffs-1091"><a href="#filter_by_cutoffs-1091"><span class="linenos">1091</span></a><span class="sd">    :param ca_cutoff: Cutoff value for Ca distance.</span>
-</span><span id="filter_by_cutoffs-1092"><a href="#filter_by_cutoffs-1092"><span class="linenos">1092</span></a><span class="sd">    :type ca_cutoff: float</span>
-</span><span id="filter_by_cutoffs-1093"><a href="#filter_by_cutoffs-1093"><span class="linenos">1093</span></a><span class="sd">    :return: Filtered DataFrame.</span>
-</span><span id="filter_by_cutoffs-1094"><a href="#filter_by_cutoffs-1094"><span class="linenos">1094</span></a><span class="sd">    :rtype: pd.DataFrame</span>
-</span><span id="filter_by_cutoffs-1095"><a href="#filter_by_cutoffs-1095"><span class="linenos">1095</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="filter_by_cutoffs-1096"><a href="#filter_by_cutoffs-1096"><span class="linenos">1096</span></a>    <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span>
-</span><span id="filter_by_cutoffs-1097"><a href="#filter_by_cutoffs-1097"><span class="linenos">1097</span></a>        <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Bondlength_Deviation&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">length_cutoff</span><span class="p">)</span>
-</span><span id="filter_by_cutoffs-1098"><a href="#filter_by_cutoffs-1098"><span class="linenos">1098</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Angle_Deviation&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">angle_cutoff</span><span class="p">)</span>
-</span><span id="filter_by_cutoffs-1099"><a href="#filter_by_cutoffs-1099"><span class="linenos">1099</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Ca_Distance&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">minimum_distance</span><span class="p">)</span>
-</span><span id="filter_by_cutoffs-1100"><a href="#filter_by_cutoffs-1100"><span class="linenos">1100</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Ca_Distance&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">ca_cutoff</span><span class="p">)</span>
-</span><span id="filter_by_cutoffs-1101"><a href="#filter_by_cutoffs-1101"><span class="linenos">1101</span></a>    <span class="p">]</span>
-</span><span id="filter_by_cutoffs-1102"><a href="#filter_by_cutoffs-1102"><span class="linenos">1102</span></a>    <span class="k">return</span> <span class="n">filtered_df</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Filter the DataFrame based on distance, angle, and Ca distance cutoffs. Ca cutoff
-dominates the filter and will override the distance and angle cutoffs. Note: The
-filter is applied if the Ca distance is less than or equal to 2.0 Angstroms, since
-this is physically impossible.</p>
-
-<h6 id="parameters">Parameters</h6>
-
-<ul>
-<li><strong>df</strong>:  DataFrame containing the deviations.</li>
-<li><strong>length_cutoff</strong>:  Cutoff value for Bond Length Deviation.</li>
-<li><strong>angle_cutoff</strong>:  Cutoff value for angle deviation.</li>
-<li><strong>ca_cutoff</strong>:  Cutoff value for Ca distance.</li>
-</ul>
-
-<h6 id="returns">Returns</h6>
-
-<blockquote>
-  <p>Filtered DataFrame.</p>
-</blockquote>
-</div>
-
-
-                </section>
-                <section id="bad_filter_by_cutoffs">
-                            <input id="bad_filter_by_cutoffs-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">bad_filter_by_cutoffs</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">df</span>,</span><span class="param">	<span class="n">distance_cutoff</span><span class="o">=</span><span class="mf">1.0</span>,</span><span class="param">	<span class="n">angle_cutoff</span><span class="o">=</span><span class="mf">1.0</span>,</span><span class="param">	<span class="n">ca_cutoff</span><span class="o">=</span><span class="mf">8.0</span>,</span><span class="param">	<span class="n">minimum_distance</span><span class="o">=</span><span class="mf">2.0</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="bad_filter_by_cutoffs-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#bad_filter_by_cutoffs"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="bad_filter_by_cutoffs-1105"><a href="#bad_filter_by_cutoffs-1105"><span class="linenos">1105</span></a><span class="k">def</span><span class="w"> </span><span class="nf">bad_filter_by_cutoffs</span><span class="p">(</span>
-</span><span id="bad_filter_by_cutoffs-1106"><a href="#bad_filter_by_cutoffs-1106"><span class="linenos">1106</span></a>    <span class="n">df</span><span class="p">,</span> <span class="n">distance_cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">angle_cutoff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ca_cutoff</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span> <span class="n">minimum_distance</span><span class="o">=</span><span class="mf">2.0</span>
-</span><span id="bad_filter_by_cutoffs-1107"><a href="#bad_filter_by_cutoffs-1107"><span class="linenos">1107</span></a><span class="p">):</span>
-</span><span id="bad_filter_by_cutoffs-1108"><a href="#bad_filter_by_cutoffs-1108"><span class="linenos">1108</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="bad_filter_by_cutoffs-1109"><a href="#bad_filter_by_cutoffs-1109"><span class="linenos">1109</span></a><span class="sd">    Return the DataFrame objects that are GREATER than the cutoff based on distance,</span>
-</span><span id="bad_filter_by_cutoffs-1110"><a href="#bad_filter_by_cutoffs-1110"><span class="linenos">1110</span></a><span class="sd">    angle, and Ca distance cutoffs. Used to get the bad structures. Ca cutoff</span>
-</span><span id="bad_filter_by_cutoffs-1111"><a href="#bad_filter_by_cutoffs-1111"><span class="linenos">1111</span></a><span class="sd">    dominates the filter and will override the distance and angle cutoffs.</span>
-</span><span id="bad_filter_by_cutoffs-1112"><a href="#bad_filter_by_cutoffs-1112"><span class="linenos">1112</span></a>
-</span><span id="bad_filter_by_cutoffs-1113"><a href="#bad_filter_by_cutoffs-1113"><span class="linenos">1113</span></a><span class="sd">    :param df: DataFrame containing the deviations.</span>
-</span><span id="bad_filter_by_cutoffs-1114"><a href="#bad_filter_by_cutoffs-1114"><span class="linenos">1114</span></a><span class="sd">    :type df: pd.DataFrame</span>
-</span><span id="bad_filter_by_cutoffs-1115"><a href="#bad_filter_by_cutoffs-1115"><span class="linenos">1115</span></a><span class="sd">    :param distance_cutoff: Cutoff value for Bond Length Deviation.</span>
-</span><span id="bad_filter_by_cutoffs-1116"><a href="#bad_filter_by_cutoffs-1116"><span class="linenos">1116</span></a><span class="sd">    :type distance_cutoff: float</span>
-</span><span id="bad_filter_by_cutoffs-1117"><a href="#bad_filter_by_cutoffs-1117"><span class="linenos">1117</span></a><span class="sd">    :param angle_cutoff: Cutoff value for angle deviation.</span>
-</span><span id="bad_filter_by_cutoffs-1118"><a href="#bad_filter_by_cutoffs-1118"><span class="linenos">1118</span></a><span class="sd">    :type angle_cutoff: float</span>
-</span><span id="bad_filter_by_cutoffs-1119"><a href="#bad_filter_by_cutoffs-1119"><span class="linenos">1119</span></a><span class="sd">    :param ca_cutoff: Cutoff value for Ca distance.</span>
-</span><span id="bad_filter_by_cutoffs-1120"><a href="#bad_filter_by_cutoffs-1120"><span class="linenos">1120</span></a><span class="sd">    :type ca_cutoff: float</span>
-</span><span id="bad_filter_by_cutoffs-1121"><a href="#bad_filter_by_cutoffs-1121"><span class="linenos">1121</span></a><span class="sd">    :return: Filtered DataFrame.</span>
-</span><span id="bad_filter_by_cutoffs-1122"><a href="#bad_filter_by_cutoffs-1122"><span class="linenos">1122</span></a><span class="sd">    :rtype: pd.DataFrame</span>
-</span><span id="bad_filter_by_cutoffs-1123"><a href="#bad_filter_by_cutoffs-1123"><span class="linenos">1123</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="bad_filter_by_cutoffs-1124"><a href="#bad_filter_by_cutoffs-1124"><span class="linenos">1124</span></a>    <span class="n">filtered_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span>
-</span><span id="bad_filter_by_cutoffs-1125"><a href="#bad_filter_by_cutoffs-1125"><span class="linenos">1125</span></a>        <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Bondlength_Deviation&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">distance_cutoff</span><span class="p">)</span>
-</span><span id="bad_filter_by_cutoffs-1126"><a href="#bad_filter_by_cutoffs-1126"><span class="linenos">1126</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Angle_Deviation&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">angle_cutoff</span><span class="p">)</span>
-</span><span id="bad_filter_by_cutoffs-1127"><a href="#bad_filter_by_cutoffs-1127"><span class="linenos">1127</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Ca_Distance&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">ca_cutoff</span><span class="p">)</span>
-</span><span id="bad_filter_by_cutoffs-1128"><a href="#bad_filter_by_cutoffs-1128"><span class="linenos">1128</span></a>        <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;Ca_Distance&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">minimum_distance</span><span class="p">)</span>
-</span><span id="bad_filter_by_cutoffs-1129"><a href="#bad_filter_by_cutoffs-1129"><span class="linenos">1129</span></a>    <span class="p">]</span>
-</span><span id="bad_filter_by_cutoffs-1130"><a href="#bad_filter_by_cutoffs-1130"><span class="linenos">1130</span></a>    <span class="k">return</span> <span class="n">filtered_df</span>
-</span></pre></div>
-
-
-            <div class="docstring"><p>Return the DataFrame objects that are GREATER than the cutoff based on distance,
-angle, and Ca distance cutoffs. Used to get the bad structures. Ca cutoff
-dominates the filter and will override the distance and angle cutoffs.</p>
-
-<h6 id="parameters">Parameters</h6>
-
-<ul>
-<li><strong>df</strong>:  DataFrame containing the deviations.</li>
-<li><strong>distance_cutoff</strong>:  Cutoff value for Bond Length Deviation.</li>
-<li><strong>angle_cutoff</strong>:  Cutoff value for angle deviation.</li>
-<li><strong>ca_cutoff</strong>:  Cutoff value for Ca distance.</li>
-</ul>
-
-<h6 id="returns">Returns</h6>
-
-<blockquote>
-  <p>Filtered DataFrame.</p>
-</blockquote>
-</div>
-
-
-                </section>
                 <section id="save_list_to_file">
                             <input id="save_list_to_file-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
@@ -3140,17 +3012,17 @@ dominates the filter and will override the distance and angle cutoffs.</p>
 
     </div>
     <a class="headerlink" href="#save_list_to_file"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="save_list_to_file-1133"><a href="#save_list_to_file-1133"><span class="linenos">1133</span></a><span class="k">def</span><span class="w"> </span><span class="nf">save_list_to_file</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
-</span><span id="save_list_to_file-1134"><a href="#save_list_to_file-1134"><span class="linenos">1134</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="save_list_to_file-1135"><a href="#save_list_to_file-1135"><span class="linenos">1135</span></a><span class="sd">    Save the input list to a file using pickle.</span>
-</span><span id="save_list_to_file-1136"><a href="#save_list_to_file-1136"><span class="linenos">1136</span></a>
-</span><span id="save_list_to_file-1137"><a href="#save_list_to_file-1137"><span class="linenos">1137</span></a><span class="sd">    :param input_list: List to be saved.</span>
-</span><span id="save_list_to_file-1138"><a href="#save_list_to_file-1138"><span class="linenos">1138</span></a><span class="sd">    :type input_list: list</span>
-</span><span id="save_list_to_file-1139"><a href="#save_list_to_file-1139"><span class="linenos">1139</span></a><span class="sd">    :param filename: Name of the file where the list will be saved.</span>
-</span><span id="save_list_to_file-1140"><a href="#save_list_to_file-1140"><span class="linenos">1140</span></a><span class="sd">    :type filename: str</span>
-</span><span id="save_list_to_file-1141"><a href="#save_list_to_file-1141"><span class="linenos">1141</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="save_list_to_file-1142"><a href="#save_list_to_file-1142"><span class="linenos">1142</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-</span><span id="save_list_to_file-1143"><a href="#save_list_to_file-1143"><span class="linenos">1143</span></a>        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="save_list_to_file-1089"><a href="#save_list_to_file-1089"><span class="linenos">1089</span></a><span class="k">def</span><span class="w"> </span><span class="nf">save_list_to_file</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+</span><span id="save_list_to_file-1090"><a href="#save_list_to_file-1090"><span class="linenos">1090</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="save_list_to_file-1091"><a href="#save_list_to_file-1091"><span class="linenos">1091</span></a><span class="sd">    Save the input list to a file using pickle.</span>
+</span><span id="save_list_to_file-1092"><a href="#save_list_to_file-1092"><span class="linenos">1092</span></a>
+</span><span id="save_list_to_file-1093"><a href="#save_list_to_file-1093"><span class="linenos">1093</span></a><span class="sd">    :param input_list: List to be saved.</span>
+</span><span id="save_list_to_file-1094"><a href="#save_list_to_file-1094"><span class="linenos">1094</span></a><span class="sd">    :type input_list: list</span>
+</span><span id="save_list_to_file-1095"><a href="#save_list_to_file-1095"><span class="linenos">1095</span></a><span class="sd">    :param filename: Name of the file where the list will be saved.</span>
+</span><span id="save_list_to_file-1096"><a href="#save_list_to_file-1096"><span class="linenos">1096</span></a><span class="sd">    :type filename: str</span>
+</span><span id="save_list_to_file-1097"><a href="#save_list_to_file-1097"><span class="linenos">1097</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="save_list_to_file-1098"><a href="#save_list_to_file-1098"><span class="linenos">1098</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+</span><span id="save_list_to_file-1099"><a href="#save_list_to_file-1099"><span class="linenos">1099</span></a>        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -3177,20 +3049,20 @@ dominates the filter and will override the distance and angle cutoffs.</p>
 
     </div>
     <a class="headerlink" href="#load_list_from_file"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="load_list_from_file-1146"><a href="#load_list_from_file-1146"><span class="linenos">1146</span></a><span class="k">def</span><span class="w"> </span><span class="nf">load_list_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-</span><span id="load_list_from_file-1147"><a href="#load_list_from_file-1147"><span class="linenos">1147</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="load_list_from_file-1148"><a href="#load_list_from_file-1148"><span class="linenos">1148</span></a><span class="sd">    Load a list from a file using pickle.</span>
-</span><span id="load_list_from_file-1149"><a href="#load_list_from_file-1149"><span class="linenos">1149</span></a>
-</span><span id="load_list_from_file-1150"><a href="#load_list_from_file-1150"><span class="linenos">1150</span></a><span class="sd">    This function reads a list from a file that was previously saved using the pickle module.</span>
-</span><span id="load_list_from_file-1151"><a href="#load_list_from_file-1151"><span class="linenos">1151</span></a>
-</span><span id="load_list_from_file-1152"><a href="#load_list_from_file-1152"><span class="linenos">1152</span></a><span class="sd">    :param filename: Name of the file from which the list will be loaded.</span>
-</span><span id="load_list_from_file-1153"><a href="#load_list_from_file-1153"><span class="linenos">1153</span></a><span class="sd">    :type filename: str</span>
-</span><span id="load_list_from_file-1154"><a href="#load_list_from_file-1154"><span class="linenos">1154</span></a><span class="sd">    :return: The list that was loaded from the file.</span>
-</span><span id="load_list_from_file-1155"><a href="#load_list_from_file-1155"><span class="linenos">1155</span></a><span class="sd">    :rtype: list</span>
-</span><span id="load_list_from_file-1156"><a href="#load_list_from_file-1156"><span class="linenos">1156</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="load_list_from_file-1157"><a href="#load_list_from_file-1157"><span class="linenos">1157</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-</span><span id="load_list_from_file-1158"><a href="#load_list_from_file-1158"><span class="linenos">1158</span></a>        <span class="n">loaded_list</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-</span><span id="load_list_from_file-1159"><a href="#load_list_from_file-1159"><span class="linenos">1159</span></a>    <span class="k">return</span> <span class="n">loaded_list</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="load_list_from_file-1102"><a href="#load_list_from_file-1102"><span class="linenos">1102</span></a><span class="k">def</span><span class="w"> </span><span class="nf">load_list_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+</span><span id="load_list_from_file-1103"><a href="#load_list_from_file-1103"><span class="linenos">1103</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="load_list_from_file-1104"><a href="#load_list_from_file-1104"><span class="linenos">1104</span></a><span class="sd">    Load a list from a file using pickle.</span>
+</span><span id="load_list_from_file-1105"><a href="#load_list_from_file-1105"><span class="linenos">1105</span></a>
+</span><span id="load_list_from_file-1106"><a href="#load_list_from_file-1106"><span class="linenos">1106</span></a><span class="sd">    This function reads a list from a file that was previously saved using the pickle module.</span>
+</span><span id="load_list_from_file-1107"><a href="#load_list_from_file-1107"><span class="linenos">1107</span></a>
+</span><span id="load_list_from_file-1108"><a href="#load_list_from_file-1108"><span class="linenos">1108</span></a><span class="sd">    :param filename: Name of the file from which the list will be loaded.</span>
+</span><span id="load_list_from_file-1109"><a href="#load_list_from_file-1109"><span class="linenos">1109</span></a><span class="sd">    :type filename: str</span>
+</span><span id="load_list_from_file-1110"><a href="#load_list_from_file-1110"><span class="linenos">1110</span></a><span class="sd">    :return: The list that was loaded from the file.</span>
+</span><span id="load_list_from_file-1111"><a href="#load_list_from_file-1111"><span class="linenos">1111</span></a><span class="sd">    :rtype: list</span>
+</span><span id="load_list_from_file-1112"><a href="#load_list_from_file-1112"><span class="linenos">1112</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="load_list_from_file-1113"><a href="#load_list_from_file-1113"><span class="linenos">1113</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+</span><span id="load_list_from_file-1114"><a href="#load_list_from_file-1114"><span class="linenos">1114</span></a>        <span class="n">loaded_list</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+</span><span id="load_list_from_file-1115"><a href="#load_list_from_file-1115"><span class="linenos">1115</span></a>    <span class="k">return</span> <span class="n">loaded_list</span>
 </span></pre></div>
 
 
@@ -3208,6 +3080,81 @@ dominates the filter and will override the distance and angle cutoffs.</p>
 
 <blockquote>
   <p>The list that was loaded from the file.</p>
+</blockquote>
+</div>
+
+
+                </section>
+                <section id="set_plotly_theme">
+                            <input id="set_plotly_theme-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">set_plotly_theme</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">theme</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+
+                <label class="view-source-button" for="set_plotly_theme-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#set_plotly_theme"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="set_plotly_theme-1118"><a href="#set_plotly_theme-1118"><span class="linenos">1118</span></a><span class="k">def</span><span class="w"> </span><span class="nf">set_plotly_theme</span><span class="p">(</span><span class="n">theme</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1119"><a href="#set_plotly_theme-1119"><span class="linenos">1119</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="set_plotly_theme-1120"><a href="#set_plotly_theme-1120"><span class="linenos">1120</span></a><span class="sd">    Set the Plotly theme based on the provided theme parameter.</span>
+</span><span id="set_plotly_theme-1121"><a href="#set_plotly_theme-1121"><span class="linenos">1121</span></a>
+</span><span id="set_plotly_theme-1122"><a href="#set_plotly_theme-1122"><span class="linenos">1122</span></a><span class="sd">    This function sets the default Plotly template to either &#39;plotly_white&#39; or &#39;plotly_dark&#39;</span>
+</span><span id="set_plotly_theme-1123"><a href="#set_plotly_theme-1123"><span class="linenos">1123</span></a><span class="sd">    based on the input theme. If &#39;auto&#39; is selected, the theme is determined automatically</span>
+</span><span id="set_plotly_theme-1124"><a href="#set_plotly_theme-1124"><span class="linenos">1124</span></a><span class="sd">    based on the current system or application theme.</span>
+</span><span id="set_plotly_theme-1125"><a href="#set_plotly_theme-1125"><span class="linenos">1125</span></a>
+</span><span id="set_plotly_theme-1126"><a href="#set_plotly_theme-1126"><span class="linenos">1126</span></a><span class="sd">    :param theme: The theme to set for Plotly. Must be &#39;auto&#39;, &#39;light&#39;, or &#39;dark&#39;.</span>
+</span><span id="set_plotly_theme-1127"><a href="#set_plotly_theme-1127"><span class="linenos">1127</span></a><span class="sd">    :type theme: str</span>
+</span><span id="set_plotly_theme-1128"><a href="#set_plotly_theme-1128"><span class="linenos">1128</span></a><span class="sd">    :raises ValueError: If an invalid theme is provided.</span>
+</span><span id="set_plotly_theme-1129"><a href="#set_plotly_theme-1129"><span class="linenos">1129</span></a><span class="sd">    :return: None</span>
+</span><span id="set_plotly_theme-1130"><a href="#set_plotly_theme-1130"><span class="linenos">1130</span></a><span class="sd">    :rtype: None</span>
+</span><span id="set_plotly_theme-1131"><a href="#set_plotly_theme-1131"><span class="linenos">1131</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="set_plotly_theme-1132"><a href="#set_plotly_theme-1132"><span class="linenos">1132</span></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">plotly</span><span class="w"> </span><span class="kn">import</span> <span class="n">io</span> <span class="k">as</span> <span class="n">pio</span>
+</span><span id="set_plotly_theme-1133"><a href="#set_plotly_theme-1133"><span class="linenos">1133</span></a>
+</span><span id="set_plotly_theme-1134"><a href="#set_plotly_theme-1134"><span class="linenos">1134</span></a>    <span class="k">match</span> <span class="n">theme</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+</span><span id="set_plotly_theme-1135"><a href="#set_plotly_theme-1135"><span class="linenos">1135</span></a>        <span class="k">case</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1136"><a href="#set_plotly_theme-1136"><span class="linenos">1136</span></a>            <span class="n">_theme</span> <span class="o">=</span> <span class="n">get_theme</span><span class="p">()</span>
+</span><span id="set_plotly_theme-1137"><a href="#set_plotly_theme-1137"><span class="linenos">1137</span></a>            <span class="k">if</span> <span class="n">_theme</span> <span class="o">==</span> <span class="s2">&quot;light&quot;</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1138"><a href="#set_plotly_theme-1138"><span class="linenos">1138</span></a>                <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
+</span><span id="set_plotly_theme-1139"><a href="#set_plotly_theme-1139"><span class="linenos">1139</span></a>            <span class="k">else</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1140"><a href="#set_plotly_theme-1140"><span class="linenos">1140</span></a>                <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_dark&quot;</span>
+</span><span id="set_plotly_theme-1141"><a href="#set_plotly_theme-1141"><span class="linenos">1141</span></a>        <span class="k">case</span> <span class="s2">&quot;light&quot;</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1142"><a href="#set_plotly_theme-1142"><span class="linenos">1142</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
+</span><span id="set_plotly_theme-1143"><a href="#set_plotly_theme-1143"><span class="linenos">1143</span></a>        <span class="k">case</span> <span class="s2">&quot;dark&quot;</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1144"><a href="#set_plotly_theme-1144"><span class="linenos">1144</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_dark&quot;</span>
+</span><span id="set_plotly_theme-1145"><a href="#set_plotly_theme-1145"><span class="linenos">1145</span></a>        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+</span><span id="set_plotly_theme-1146"><a href="#set_plotly_theme-1146"><span class="linenos">1146</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid theme. Must be &#39;auto&#39;, &#39;light&#39;, or &#39;dark&#39;.&quot;</span><span class="p">)</span>
+</span><span id="set_plotly_theme-1147"><a href="#set_plotly_theme-1147"><span class="linenos">1147</span></a>            <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;plotly_white&quot;</span>
+</span><span id="set_plotly_theme-1148"><a href="#set_plotly_theme-1148"><span class="linenos">1148</span></a>
+</span><span id="set_plotly_theme-1149"><a href="#set_plotly_theme-1149"><span class="linenos">1149</span></a>    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plotly theme set to: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">pio</span><span class="o">.</span><span class="n">templates</span><span class="o">.</span><span class="n">default</span><span class="p">)</span>
+</span><span id="set_plotly_theme-1150"><a href="#set_plotly_theme-1150"><span class="linenos">1150</span></a>
+</span><span id="set_plotly_theme-1151"><a href="#set_plotly_theme-1151"><span class="linenos">1151</span></a>    <span class="k">return</span> <span class="kc">None</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Set the Plotly theme based on the provided theme parameter.</p>
+
+<p>This function sets the default Plotly template to either 'plotly_white' or 'plotly_dark'
+based on the input theme. If 'auto' is selected, the theme is determined automatically
+based on the current system or application theme.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>theme</strong>:  The theme to set for Plotly. Must be 'auto', 'light', or 'dark'.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>ValueError</strong>:  If an invalid theme is provided.</li>
+</ul>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <p>None</p>
 </blockquote>
 </div>
 

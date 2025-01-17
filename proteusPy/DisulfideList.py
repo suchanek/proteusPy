@@ -7,7 +7,7 @@ The module provides the implmentation and interface for the [DisulfideList](#Dis
 object, used extensively by Disulfide class.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-01-03 17:03:02 -egs-
+Last revision: 2025-01-15 00:09:24 -egs-
 """
 
 # pylint: disable=c0103
@@ -37,6 +37,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import plotly.express as px
 import plotly.graph_objects as go
 import pyvista as pv
 from plotly.subplots import make_subplots
@@ -46,10 +47,16 @@ from proteusPy import Disulfide
 from proteusPy.atoms import BOND_RADIUS, FONTSIZE
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, PDB_DIR, WINSIZE
-from proteusPy.utility import get_jet_colormap, get_theme, grid_dimensions
+from proteusPy.utility import (
+    get_jet_colormap,
+    get_theme,
+    grid_dimensions,
+    set_plotly_theme,
+)
+
+# pio.renderers.default = "png"  # or 'svg'
 
 _logger = create_logger(__name__)
-
 
 # Set the figure sizes and axis limits.
 DPI = 220
@@ -58,6 +65,7 @@ HEIGHT = 6.0
 TORMIN = -179.9
 TORMAX = 180.0
 
+NBINS = 380
 
 Torsion_DF_Cols = [
     "source",
@@ -385,7 +393,7 @@ class DisulfideList(UserList):
 
     def build_distance_df(self) -> pd.DataFrame:
         """
-        Create a dataframe containing the input DisulfideList Cα-Cα distance, energy.
+        Create a dataframe containing the input DisulfideList Cα-Cα and Sg-Sg distances, energy.
         This can take several minutes for the entire database.
 
         :return: DataFrame containing Ca distances
@@ -431,7 +439,7 @@ class DisulfideList(UserList):
     def build_torsion_df(self) -> pd.DataFrame:
         """
         Create a dataframe containing the input DisulfideList torsional parameters,
-        Cα-Cα distance, energy, and phi-psi angles. This can take several minutes for the
+        Cα-Cα and Sg-Sg distances, energy, and phi-psi angles. This can take several minutes for the
         entire database.
 
         :return: pd.DataFrame containing the torsions
@@ -608,8 +616,7 @@ class DisulfideList(UserList):
         display=True,
         save=False,
         fname="ss_torsions.png",
-        stats=False,
-        light="Auto",
+        theme="auto",
     ):
         """
         Display torsion and distance statistics for a given Disulfide list.
@@ -620,19 +627,19 @@ class DisulfideList(UserList):
         :type save: bool
         :param fname: The name of the image file to save. Default is 'ss_torsions.png'.
         :type fname: str
-        :param stats: Whether to return the DataFrame representing the statistics for `self`. Default is False.
-        :type stats: bool
-        :param light: Whether to use the 'plotly_light' or 'plotly_dark' template. Default is True.
-        :type light: bool
-        :return: None
+        :param theme: The theme to use for the plot. Default is 'Auto'. Options are 'Auto', 'light', and 'dark'.
+        :type theme: str
+        :return: none
         """
+
+        if self.length == 0:
+            _logger.warning("Empty DisulfideList. Nothing to display.")
+            return
+
+        set_plotly_theme(theme)
         title = f"{self.id}: {self.length} members"
 
-        df = self.torsion_df
-        df_subset = df.iloc[:, 4:]
-        df_stats = df_subset.describe()
-
-        tor_vals, dist_vals = calculate_torsion_statistics(self)
+        tor_vals, dist_vals = self.calculate_torsion_statistics()
 
         tor_mean_vals = tor_vals.loc["mean"]
         tor_std_vals = tor_vals.loc["std"]
@@ -643,7 +650,6 @@ class DisulfideList(UserList):
         fig = make_subplots(
             rows=2, cols=2, vertical_spacing=0.125, column_widths=[1, 1]
         )
-        fig.update_layout(template="plotly" if light else "plotly_dark")
 
         fig.update_layout(
             title={
@@ -661,7 +667,7 @@ class DisulfideList(UserList):
             go.Bar(
                 x=["X1", "X2", "X3", "X4", "X5"],
                 y=tor_mean_vals[:5],
-                name="Torsion Angle,(°) ",
+                name="Torsion Angle (°) ",
                 error_y=dict(type="data", array=tor_std_vals, visible=True),
             ),
             row=1,
@@ -672,7 +678,7 @@ class DisulfideList(UserList):
             go.Bar(
                 x=["rho"],
                 y=[dist_mean_vals[4]],
-                name="ρ, (°)",
+                name="ρ (°)",
                 error_y=dict(type="data", array=[dist_std_vals[4]], visible=True),
             ),
             row=1,
@@ -708,13 +714,13 @@ class DisulfideList(UserList):
         # Update the layout of the subplot
         # fig.update_xaxes(title_text="Energy", row=1, col=2)
         fig.update_yaxes(
-            title_text="kcal/mol", range=[0, 20], row=1, col=2
+            title_text="kcal/mol", range=[0, 8], row=1, col=2
         )  # max possible DSE
 
         # Add another subplot for the mean values of ca_distance
         fig.add_trace(
             go.Bar(
-                x=["Cα Distance, (Å)", "Cβ Distance, (Å)", "Sγ Distance, (Å)"],
+                x=["Cα Distance (Å)", "Cβ Distance (Å)", "Sγ Distance (Å)"],
                 y=[dist_mean_vals[0], dist_mean_vals[1], dist_mean_vals[2]],
                 name="Distances (Å)",
                 error_y=dict(
@@ -732,15 +738,15 @@ class DisulfideList(UserList):
             col=1,
         )
         # Update the layout of the subplot
-        fig.update_yaxes(title_text="Distance (A)", range=[0, 10], row=2, col=1)  #
+        fig.update_yaxes(title_text="Distance (A)", range=[0, 8], row=2, col=1)  #
         fig.update_traces(width=0.25, row=2, col=1)
 
         # Add a scatter subplot for torsion length column
         fig.add_trace(
             go.Bar(
-                x=["Torsion Length, (Å)"],
+                x=["Torsion Length (Å)"],
                 y=[tor_mean_vals[5]],
-                name="Torsion Length, (Å)",
+                name="Torsion Length (Å)",
                 error_y=dict(
                     type="data", array=[tor_std_vals[5]], width=0.25, visible=True
                 ),
@@ -762,11 +768,9 @@ class DisulfideList(UserList):
 
         if display:
             fig.show()
+
         if save:
             fig.write_image(Path(fname))
-
-        if stats:
-            return df_stats
 
         return
 
@@ -888,7 +892,7 @@ class DisulfideList(UserList):
                 if verbose:
                     print(f" -> display_overlay(): Saved image to: {fname}")
             except RuntimeError as e:
-                _logger.error(f"Error saving screenshot: {e}")
+                _logger.error("Error saving screenshot: %s", e)
 
         elif movie:
             if verbose:
@@ -1061,7 +1065,7 @@ class DisulfideList(UserList):
         self.pdb_id = value
 
     def TorsionGraph(
-        self, display=True, save=False, fname="ss_torsions.png", light="Auto"
+        self, display=True, save=False, fname="ss_torsions.png", theme="Auto"
     ):
         """
         Generate and optionally display or save a torsion graph.
@@ -1075,14 +1079,14 @@ class DisulfideList(UserList):
         :type save: bool
         :param fname: The filename to save the torsion graph. Default is "ss_torsions.png".
         :type fname: str
-        :param light: If True, a light theme will be used for the graph. Default is True.
-        :type light: bool
+        :param theme: One of 'auto', 'light', or 'dark'. Default is 'auto'.
+        :type theme: str
 
         :return: None
         """
         # tor_stats, dist_stats = self.calculate_torsion_statistics()
         self.display_torsion_statistics(
-            display=display, save=save, fname=fname, light=light
+            display=display, save=save, fname=fname, theme=theme
         )
 
     def translate(self, translation_vector) -> None:
@@ -1249,11 +1253,13 @@ class DisulfideList(UserList):
             raise TypeError("The value must be an instance of Disulfide.")
         return value
 
-    def create_deviation_dataframe(self):
+    def create_deviation_dataframe(self, verbose=False):
         """
         Create a DataFrame with columns PDB_ID, SS_Name, Angle_Deviation, Distance_Deviation,
         Ca Distance from a list of disulfides.
 
+        :param verbose: Whether to display a progress bar.
+        :type verbose: bool
         :return: DataFrame containing the disulfide information.
         :rtype: pd.DataFrame
         """
@@ -1268,35 +1274,298 @@ class DisulfideList(UserList):
             "Sg_Distance": [],
         }
 
-        # Collect data in batches
-        pdb_ids = []
-        resolutions = []
-        ss_names = []
-        angle_deviations = []
-        bondlength_deviations = []
-        ca_distances = []
-        sg_distances = []
+        if verbose:
+            pbar = tqdm(disulfide_list, desc="Processing...", leave=False)
+        else:
+            pbar = disulfide_list
 
-        for ss in tqdm(disulfide_list, desc="Processing..."):
-            pdb_ids.append(ss.pdb_id)
-            resolutions.append(ss.resolution)
-            ss_names.append(ss.name)
-            angle_deviations.append(ss.bond_angle_ideality)
-            bondlength_deviations.append(ss.bond_length_ideality)
-            ca_distances.append(ss.ca_distance)
-            sg_distances.append(ss.sg_distance)
-
-        # Extend the data dictionary in one go
-        data["PDB_ID"].extend(pdb_ids)
-        data["Resolution"].extend(resolutions)
-        data["SS_Name"].extend(ss_names)
-        data["Angle_Deviation"].extend(angle_deviations)
-        data["Bondlength_Deviation"].extend(bondlength_deviations)
-        data["Ca_Distance"].extend(ca_distances)
-        data["Sg_Distance"].extend(sg_distances)
+        for ss in pbar:
+            data["PDB_ID"].append(ss.pdb_id)
+            data["Resolution"].append(ss.resolution)
+            data["SS_Name"].append(ss.name)
+            data["Angle_Deviation"].append(ss.bond_angle_ideality)
+            data["Bondlength_Deviation"].append(ss.bond_length_ideality)
+            data["Ca_Distance"].append(ss.ca_distance)
+            data["Sg_Distance"].append(ss.sg_distance)
 
         df = pd.DataFrame(data)
         return df
+
+    def extract_distances(self, distance_type="sg", flip=False, cutoff=-1):
+        """
+        Extract and filter the distance values from the disulfide list based on the specified type and comparison.
+
+        :param disulfide_list: List of disulfide objects.
+        :param distance_type: Type of distance to extract ('sg' or 'ca').
+        :param flip: If true, return distances greater than the cutoff value.
+        :param cutoff: Cutoff value for filtering distances.
+        :return: List of filtered distance values.
+        """
+        disulfide_list = self.data
+        distances = filtered_distances = []
+
+        match distance_type:
+            case "sg":
+                distances = [ds.sg_distance for ds in disulfide_list]
+            case "ca":
+                distances = [ds.ca_distance for ds in disulfide_list]
+            case _:
+                raise ValueError("Invalid distance_type. Must be 'sg' or 'ca'.")
+
+        if cutoff == -1.0:
+            return distances
+
+        if flip:
+            filtered_distances = [d for d in distances if d > cutoff]
+        else:
+            filtered_distances = [d for d in distances if d <= cutoff]
+
+        return filtered_distances
+
+    def plot_distances(
+        self, distance_type="sg", cutoff=-1, flip=False, theme="auto", log=True
+    ):
+        """
+        Plot the distance values as a histogram using plotly express.
+
+        :param distances: List of distance values.
+        :param distance_type: Type of distance to plot ('sg' or 'ca').
+        :param cutoff: Cutoff value for the x-axis title.
+        :param flip: Whether to flip the comparison in the x-axis title.
+        :param theme: The plotly theme to use. Default is 'auto', which will use the current system theme.
+        :param log: Whether to use a logarithmic scale for the y-axis. Default is True.
+        """
+
+        set_plotly_theme(theme)
+        cmp_str = "less" if not flip else "greater"
+
+        distances = self.extract_distances(distance_type, cmp_str, cutoff)
+        yaxis_type = "log" if log else "linear"
+
+        match distance_type:
+            case "sg":
+                column_name = "SG Distance"
+                title = "Sγ Distance Distribution"
+                if cutoff == -1.0:
+                    xtitle = "Sγ-Sγ Distances, (no cutoff)"
+                else:
+                    xtitle = (
+                        f"Sγ Distance < {cutoff} Å"
+                        if not flip
+                        else f"Sγ-Sγ Distance >= {cutoff} Å"
+                    )
+            case "ca":
+                column_name = "Ca Distance"
+                title = "Cα Distance Distribution"
+                if cutoff == -1.0:
+                    xtitle = "Cα-Cα Distances, (no cutoff)"
+                else:
+                    xtitle = (
+                        f"Cα Distance < {cutoff} Å"
+                        if not flip
+                        else f"Cα-Cα Distance >= {cutoff} Å"
+                    )
+            case _:
+                raise ValueError("Invalid distance_type. Must be 'sg' or 'ca'.")
+
+        # Convert to a Pandas DataFrame with the appropriate column name
+        df = pd.DataFrame(distances, columns=[column_name])
+
+        fig = px.histogram(
+            df,
+            x=column_name,  # Use the column name for the x-axis
+            nbins=NBINS,
+            title=title,
+        )
+        fig.update_layout(
+            title={"text": "Distance Distribution", "x": 0.5, "xanchor": "center"},
+            xaxis_title=xtitle,
+            yaxis_title="Frequency",
+            yaxis_type=yaxis_type,
+            bargap=0.2,
+        )
+        fig.show()
+
+    def plot_deviation_histograms(self, verbose=False, theme="auto", log=True) -> None:
+        """
+        Plot histograms for Bondlength_Deviation, Angle_Deviation, and Ca_Distance.
+
+        This function creates and displays histograms for the bond length deviation,
+        bond angle deviation from the disulfide list. The histograms
+        are displayed on a logarithmic scale for the y-axis.
+
+        :param verbose: Whether to display a progress bar.
+        :type verbose: bool
+        :param theme: The plotly theme to use. Default is 'auto', which will use the current system theme.
+        :param log: Whether to use a logarithmic scale for the y-axis. Default is True.
+        """
+
+        set_plotly_theme(theme)
+        if log:
+            yaxis_type = "log"
+        else:
+            yaxis_type = "linear"
+
+        df = self.create_deviation_dataframe(verbose=verbose)
+
+        fig = px.histogram(
+            df,
+            x="Bondlength_Deviation",
+            nbins=NBINS,
+            title="Bond Length Deviation (Å)",
+        )
+
+        fig.update_layout(
+            title={"text": "Bond Length Deviation", "x": 0.5, "xanchor": "center"},
+            xaxis_title="Bond Length Deviation (Å)",
+            yaxis_title="Frequency",
+            yaxis_type=yaxis_type,
+        )
+        fig.show()
+
+        fig2 = px.histogram(
+            df, x="Angle_Deviation", nbins=NBINS, title="Bond Angle Deviation, (°)"
+        )
+        fig2.update_layout(
+            title={"text": "Bond Angle Deviation", "x": 0.5, "xanchor": "center"},
+            xaxis_title="Bond Angle Deviation (°)",
+            yaxis_title="Frequency",
+            yaxis_type=yaxis_type,
+        )
+
+        fig2.show()
+
+        return
+
+    def filter_deviation_df_by_cutoffs(
+        self,
+        length_cutoff=10.0,
+        angle_cutoff=100.0,
+        ca_cutoff=1000.0,
+        sg_cutoff=10.0,
+        minimum_distance=0.0,
+    ) -> pd.DataFrame:
+        """
+        Filter the DataFrame based on bond length, angle, Ca and Sg distance cutoffs.
+
+        Note: The default values are set to high values to allow all structures to pass the filter.
+
+        :param df: DataFrame containing the deviations.
+        :type df: pd.DataFrame
+        :param length_cutoff: Cutoff value for Bond Length Deviation.
+        :type distance_cutoff: float
+        :param angle_cutoff: Cutoff value for angle deviation.
+        :type angle_cutoff: float
+        :param ca_cutoff: Cutoff value for Ca distance.
+        :type ca_cutoff: float
+        :param sg_cutoff: Cutoff value for Sg distance.
+        :type sg_cutoff: float
+        :return: Filtered DataFrame.
+        :rtype: pd.DataFrame
+        """
+        df = self.create_deviation_dataframe()
+
+        filtered_df = df[
+            (df["Bondlength_Deviation"] <= length_cutoff)
+            & (df["Angle_Deviation"] <= angle_cutoff)
+            & (df["Ca_Distance"] >= minimum_distance)
+            & (df["Ca_Distance"] <= ca_cutoff)
+            & (df["Sg_Distance"] >= minimum_distance)
+            & (df["Sg_Distance"] <= sg_cutoff)
+        ]
+        return filtered_df
+
+    def bad_filter_deviation_df_by_cutoffs(
+        self,
+        length_cutoff=0.0,
+        angle_cutoff=0.0,
+        ca_cutoff=0.0,
+        sg_cutoff=0.0,
+        minimum_distance=0.0,
+    ) -> pd.DataFrame:
+        """
+        Return the DataFrame objects that are GREATER than the cutoff based on distance,
+        angle, Ca and Sg distance cutoffs. Used to get the bad structures.
+
+        Note: The default values are set to low values to allow all structures to pass the filter.
+
+        :param df: DataFrame containing the deviations.
+        :type df: pd.DataFrame
+        :param length_cutoff: Cutoff value for Bond Length Deviation.
+        :type length_cutoff: float
+        :param angle_cutoff: Cutoff value for angle deviation.
+        :type angle_cutoff: float
+        :param ca_cutoff: Cutoff value for Ca distance.
+        :type ca_cutoff: float
+        :return: Filtered DataFrame.
+        :rtype: pd.DataFrame
+        """
+        df = self.create_deviation_dataframe()
+
+        filtered_df = df[
+            (df["Bondlength_Deviation"] > length_cutoff)
+            & (df["Angle_Deviation"] > angle_cutoff)
+            & (df["Ca_Distance"] > ca_cutoff)
+            & (df["Ca_Distance"] < minimum_distance)
+            & (df["Sg_Distance"] > sg_cutoff)
+            & (df["Sg_Distance"] < minimum_distance)
+        ]
+        return filtered_df
+
+    def calculate_torsion_statistics(self) -> tuple:
+        """
+        Calculate and return the torsion and distance statistics for the DisulfideList.
+
+        This method builds a DataFrame containing torsional parameters, Cα-Cα distance,
+        energy, and phi-psi angles for the DisulfideList. It then calculates the mean
+        and standard deviation for the torsional and distance parameters.
+
+        :return: A tuple containing two DataFrames:
+                - tor_stats: DataFrame with mean and standard deviation for torsional parameters.
+                - dist_stats: DataFrame with mean and standard deviation for distance parameters.
+        :rtype: tuple (pd.DataFrame, pd.DataFrame)
+        """
+
+        df = self.torsion_df
+
+        tor_cols = ["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]
+        dist_cols = ["ca_distance", "cb_distance", "sg_distance", "energy", "rho"]
+        tor_stats = {}
+        dist_stats = {}
+
+        def circular_mean(series):
+            """
+            Calculate the circular mean of a series of angles.
+
+            This function converts the input series of angles from degrees to radians,
+            computes the mean of the sine and cosine of these angles, and then converts
+            the result back to degrees.
+
+            :param series: A sequence of angles in degrees.
+            :type series: array-like
+            :return: The circular mean of the input angles in degrees.
+            :rtype: float
+            """
+            radians = np.deg2rad(series)
+            sin_mean = np.sin(radians).mean()
+            cos_mean = np.cos(radians).mean()
+            return np.rad2deg(np.arctan2(sin_mean, cos_mean))
+
+        for col in tor_cols[:5]:
+            tor_stats[col] = {"mean": circular_mean(df[col]), "std": df[col].std()}
+
+        tor_stats["torsion_length"] = {
+            "mean": df["torsion_length"].mean(),
+            "std": df["torsion_length"].std(),
+        }
+
+        for col in dist_cols:
+            dist_stats[col] = {"mean": df[col].mean(), "std": df[col].std()}
+
+        tor_stats = pd.DataFrame(tor_stats, columns=tor_cols)
+        dist_stats = pd.DataFrame(dist_stats, columns=dist_cols)
+
+        return tor_stats, dist_stats
 
     # class ends
 
@@ -1472,93 +1741,6 @@ def load_disulfides_from_id(
             )
 
     return copy.deepcopy(SSList)
-
-
-def Ocalculate_torsion_statistics(sslist: DisulfideList):
-    """
-    Calculate and return the torsion and distance statistics for the DisulfideList.
-
-    This method builds a DataFrame containing torsional parameters, Cα-Cα distance,
-    energy, and phi-psi angles for the DisulfideList. It then calculates the mean
-    and standard deviation for the torsional and distance parameters.
-
-    :return: A tuple containing two DataFrames:
-            - tor_stats: DataFrame with mean and standard deviation for torsional parameters.
-            - dist_stats: DataFrame with mean and standard deviation for distance parameters.
-    :rtype: tuple (pd.DataFrame, pd.DataFrame)
-    """
-    df = sslist.torsion_df
-
-    tor_cols = ["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]
-    dist_cols = ["ca_distance", "cb_distance", "sg_distance", "energy", "rho"]
-    tor_stats = {}
-    dist_stats = {}
-
-    for col in tor_cols:
-        tor_stats[col] = {"mean": (df[col]).mean(), "std": (df[col]).std()}
-
-    for col in dist_cols:
-        dist_stats[col] = {"mean": df[col].mean(), "std": df[col].std()}
-
-    tor_stats = pd.DataFrame(tor_stats, columns=tor_cols)
-    dist_stats = pd.DataFrame(dist_stats, columns=dist_cols)
-
-    return tor_stats, dist_stats
-
-
-def calculate_torsion_statistics(sslist):
-    """
-    Calculate and return the torsion and distance statistics for the DisulfideList.
-
-    This method builds a DataFrame containing torsional parameters, Cα-Cα distance,
-    energy, and phi-psi angles for the DisulfideList. It then calculates the mean
-    and standard deviation for the torsional and distance parameters.
-
-    :return: A tuple containing two DataFrames:
-            - tor_stats: DataFrame with mean and standard deviation for torsional parameters.
-            - dist_stats: DataFrame with mean and standard deviation for distance parameters.
-    :rtype: tuple (pd.DataFrame, pd.DataFrame)
-    """
-    df = sslist.torsion_df
-
-    tor_cols = ["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]
-    dist_cols = ["ca_distance", "cb_distance", "sg_distance", "energy", "rho"]
-    tor_stats = {}
-    dist_stats = {}
-
-    def circular_mean(series):
-        """
-        Calculate the circular mean of a series of angles.
-
-        This function converts the input series of angles from degrees to radians,
-        computes the mean of the sine and cosine of these angles, and then converts
-        the result back to degrees.
-
-        :param series: A sequence of angles in degrees.
-        :type series: array-like
-        :return: The circular mean of the input angles in degrees.
-        :rtype: float
-        """
-        radians = np.deg2rad(series)
-        sin_mean = np.sin(radians).mean()
-        cos_mean = np.cos(radians).mean()
-        return np.rad2deg(np.arctan2(sin_mean, cos_mean))
-
-    for col in tor_cols[:5]:
-        tor_stats[col] = {"mean": circular_mean(df[col]), "std": df[col].std()}
-
-    tor_stats["torsion_length"] = {
-        "mean": df["torsion_length"].mean(),
-        "std": df["torsion_length"].std(),
-    }
-
-    for col in dist_cols:
-        dist_stats[col] = {"mean": df[col].mean(), "std": df[col].std()}
-
-    tor_stats = pd.DataFrame(tor_stats, columns=tor_cols)
-    dist_stats = pd.DataFrame(dist_stats, columns=dist_cols)
-
-    return tor_stats, dist_stats
 
 
 def extract_disulfide(
