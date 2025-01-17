@@ -5,7 +5,7 @@
 VERS := $(shell python -c "exec(open('proteusPy/_version.py').read()); print(__version__)")
 RM := rm
 CONDA ?= conda
-MESS = "v0.98.31"
+MESS = "v0.98.4"
 DEVNAME = ppydev
 
 .PHONY: all vers newvers nuke pkg dev clean devclean install install_dev jup jup_dev format bld sdist docs upload tag push-tag commit tests docker docker_hub docker_github docker_all docker_run docker_purge
