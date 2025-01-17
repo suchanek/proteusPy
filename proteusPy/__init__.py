@@ -145,6 +145,7 @@ from .utility import (
     grid_dimensions,
     image_to_ascii_art,
     load_list_from_file,
+    plot_class_chart,
     print_memory_used,
     prune_extra_ss,
     remove_duplicate_ss,
