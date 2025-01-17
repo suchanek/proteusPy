@@ -935,6 +935,10 @@ def Extract_Disulfides_From_List(
     return
 
 
+import platform
+import subprocess
+
+
 def get_theme():
     """
     Determine the display theme for the current operating system.
@@ -947,7 +951,6 @@ def get_theme():
     'dark'
     """
     system = platform.system()
-
     if system == "Darwin":
         # macOS
         try:
@@ -955,7 +958,7 @@ def get_theme():
             script = """
             tell application "System Events"
                 tell appearance preferences
-                    if (dark mode) then
+                    if dark mode is true then
                         return "dark"
                     else
                         return "light"
@@ -971,18 +974,26 @@ def get_theme():
                 text=True,
                 check=True,
             )
-
+            # print(f"AppleScript result: {result.stdout.strip()}")
+            # print(f"AppleScript stderr: {result.stderr.strip()}")
+            # print(f"AppleScript return code: {result.returncode}")
             # Check the output
             if result.returncode == 0:
                 theme = result.stdout.strip().lower()
                 if theme in ["dark", "light"]:
                     return theme
-                return None
-            return None
+            return "light"
 
-        except Exception:
-            # In case of any exception, return None
-            return None
+        except subprocess.CalledProcessError as e:
+            _logger.error(f"CalledProcessError occurred: {e}")
+            _logger.error(f"stderr: {e.stderr}")
+            # In case of any exception, return "light"
+            return "light"
+
+        except Exception as e:
+            _logger.error(f"Exception occurred: {e}")
+            # In case of any exception, return "light"
+            return "light"
 
     elif system == "Windows":
         # Windows
@@ -1000,9 +1011,10 @@ def get_theme():
             else:
                 return "light"
 
-        except Exception:
-            # In case of any exception, return None
-            return None
+        except Exception as e:
+            print(f"Exception occurred: {e}")
+            # In case of any exception, return "light"
+            return "light"
 
     elif system == "Linux":
         # Linux
@@ -1024,8 +1036,9 @@ def get_theme():
                     return "light"
             return "light"
 
-        except Exception:
-            # In case of any exception, return None
+        except Exception as e:
+            print(f"Exception occurred: {e}")
+            # In case of any exception, return "light"
             return "light"
 
     else:
@@ -1131,6 +1144,9 @@ def set_plotly_theme(theme: str) -> None:
         case _:
             _logger.error("Invalid theme. Must be 'auto', 'light', or 'dark'.")
             pio.templates.default = "plotly_white"
+
+    _logger.info("Plotly theme set to: %s", pio.templates.default)
+
     return None
 
 

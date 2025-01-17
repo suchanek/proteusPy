@@ -198,14 +198,17 @@ proteusPy    </h1>
 
 <h1 id="testing">Testing</h1>
 
-<p><code>pytest</code> and docstring testing for the modules in place. To run them <code>cd</code> into the repository and run:</p>
+<p><code>pytest</code> and docstring testing for the modules are in place. To run them first install the package normally and then <code>cd</code> into the repository and run:</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="gp">$ </span>make<span class="w"> </span>tests
+<pre><span></span><code><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>proteusPy<span class="o">[</span>dev<span class="o">]</span>
+<span class="gp">$ </span>make<span class="w"> </span>tests
 </code></pre>
 </div>
 
-<p>The modules will run their docstring tests and disulfide visualization windows will open. Simply close them. If all goes normally there will be no errors. If you're not running the development version of proteusPy you may need to install <code>pytest</code>. Simply perform: <code>pip install pytest</code>. Docstring testing is sensitive to formatting; occasionally the <code>black</code> formatter changes the docstrings. As a result there may be some docstring tests that fail.</p>
+<p>The modules will run their docstring tests and disulfide visualization windows will open. Simply close them. If all goes normally there will be no errors. </p>
+
+<p>Docstring testing is sensitive to formatting; occasionally the <code>black</code> formatter changes the docstrings. As a result there may be some docstring tests that fail.</p>
 
 <h1 id="usage">Usage</h1>
 
@@ -221,10 +224,9 @@ proteusPy    </h1>
 <p>A simple example to display the lowest energy disulfide in the database is shown below:</p>
 
 <div class="pdoc-code codehilite">
-<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">proteusPy</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">proteusPy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Load_PDB_SS</span><span class="p">,</span> <span class="n">Disulfide</span>
+<pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">proteusPy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pp</span>
 
-<span class="n">PDB_SS</span> <span class="o">=</span> <span class="n">Load_PDB_SS</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">PDB_SS</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">Load_PDB_SS</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">best_ss</span> <span class="o">=</span> <span class="n">PDB_SS</span><span class="p">[</span><span class="s2">&quot;2q7q_75D_140D&quot;</span><span class="p">]</span>
 <span class="n">best_ss</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;sb&quot;</span><span class="p">,</span> <span class="n">light</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -242,9 +244,21 @@ proteusPy    </h1>
 
 <ul>
 <li><a href="https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py">DisulfideDownloader.py</a>: Downloads the raw RCSB structure files. The download consists of over 35,000 .ent files and took about twelve hours on a 200Mb internet connection. It is necessary to have these files locally to build the database. The download is about 35GB in size.</li>
-<li><a href="https://github.com/suchanek/proteusPy/blob/master/proteusPy/DisulfideExtractor_mp.py">DisulfideExtractor_mp.py</a>: Extracts the disulfides and creates the database loaders. This program is fully multi-processing, and one can specify the number of cores to use for the extract. The downloaded PDB files must be in $PDB/good. On my 14 core MacbookPro M3 Max the extraction of over 36,000 files and creation of the Disulfide loaders takes a bit over two minutes. This is in contrast to the initial single threaded version present in the initial release, which takes almost an hour to run!</li>
-<li><a href="https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideClass_Analysis.py">DisulfideClass_Analysis.py</a>: Extracts consensus structures for the binary, sextant and octant classes. Each consensus class is the average structure in torsional space for that class. The number of members of each class is determined by the <code>cutoff</code> chosen at the time of program run. These can be found in the <code>DATA_DIR</code> directory. This analysis is ongoing.</li>
-<li><a href="https://github.com/suchanek/proteusPy/blob/master/programs/qt5viewer.py">qt5viewer.py</a>: A simple PyQt5 viewer to examine disulfides in the database. This is under active development. Currently not working under Linux since I can't seem to get PyQt5 to build.</li>
+<li><p><a href="https://github.com/suchanek/proteusPy/blob/master/proteusPy/DisulfideExtractor_mp.py">DisulfideExtractor_mp.py</a>: Extracts the disulfides and creates the database loaders. This program is fully multi-processing, and one can specify the number of cores to use for the extract. The downloaded PDB files must be in $PDB/good. On my 14 core MacbookPro M3 Max the extraction of over 36,000 files and creation of the Disulfide loaders takes a bit over two minutes. This is in contrast to the initial single-threaded version present in the initial release, which takes almost an hour to run! This program is now a part of the module itself and may be invoked with:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="n">proteusPy</span><span class="o">.</span><span class="n">DisulfideExtractor</span> <span class="o">--</span><span class="n">help</span>
+</code></pre>
+</div></li>
+
+<li><p><a href="https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideClass_Analysis.py">DisulfideClass_Analysis.py</a>: Extracts consensus structures for the binary, sextant and octant classes. Each consensus class is the average structure in torsional space for that class. The number of members of each class is determined by the <code>cutoff</code> chosen at the time of program run. These can be found in the <code>DATA_DIR</code> directory. This analysis is ongoing.</p></li>
+<li><p><a href="https://github.com/suchanek/proteusPy/blob/master/programs/qt5viewer.py">qt5viewer.py</a>: A simple PyQt5 viewer to examine disulfides in the database. Currently not working under Linux since I can't seem to get PyQt5 to build.
+This program is now a part of the module itself and may be invoked with, (while within the environment):</p>
+
+<p><div class="pdoc-code codehilite">
+<pre><span></span><code><span class="go"> <a href="proteusPy/qt5viewer.html">proteusPy.qt5viewer</a></span>
+</code></pre>
+</div></p></li>
 </ul>
 
 <p>The first time one loads the database via <a href="https://suchanek.github.io/proteusPy/proteusPy/DisulfideLoader.html#Load_PDB_SS">Load_PDB_SS()</a> the system download full DisulfideList object. Once downloaded the <code>DisulfideLoader</code> is initialized, the binary, sextant and octant classdicts built, and the loaders saved.</p>
@@ -282,14 +296,14 @@ proteusPy    </h1>
 </code></pre>
 </div></p>
 
-<p>To run, just execute:</p>
+<p>It's also possible to simply pull the Docker image directly from DockerHub and run it via:</p>
 
 <p><div class="pdoc-code codehilite">
-<pre><span></span><code><span class="gp">  $ </span>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w">  </span>-p<span class="w"> </span><span class="m">5006</span>:5006<span class="w">  </span>--restart<span class="w"> </span>unless-stopped<span class="w"> </span>egsuchanek/rcsb_viewer:latest
+<pre><span></span><code><span class="gp">  $ </span>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w">  </span>-p<span class="w"> </span><span class="m">5006</span>:5006<span class="w">  </span>--n<span class="w"> </span>rcsb_viewer<span class="w"> </span>--restart<span class="w"> </span>unless-stopped<span class="w"> </span>egsuchanek/rcsb_viewer:latest
 </code></pre>
 </div></p>
 
-<p>4) <a href="https://github.com/suchanek/proteusPy/blob/master/proteusPy/qt5_viewer.py">qt5_viewer.py</a> - I have added a pyqt5-based viewer into proteusPy itself. This is similar to the <code>Panel</code> program but uses <code>pyqt5</code> for rendering. This works under Macos and Windows, but can't run under Linux due to the inability to install pyqt5. If you'd like to try it out under MacOS or Windows install proteusPy as above. After installation install the pyqt5 libraries with:</p>
+<p>1) <a href="https://github.com/suchanek/proteusPy/blob/master/proteusPy/qt5_viewer.py">qt5_viewer.py</a> - I have added a pyqt5-based viewer into proteusPy itself. This is similar to the <code>Panel</code> program but uses <code>pyqt5</code> for rendering. This works under Macos and Windows, but can't run under Linux due to the inability to install pyqt5. If you'd like to try it out under MacOS or Windows install proteusPy as above. After installation install the pyqt5 libraries with:</p>
 
 <div class="pdoc-code codehilite">
 <pre><span></span><code><span class="gp">  $ </span>pip<span class="w"> </span>install<span class="w"> </span>proteusPy<span class="o">[</span>pyqt5<span class="o">]</span>
