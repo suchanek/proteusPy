@@ -17,8 +17,6 @@ __pdoc__ = {
 
 import logging
 
-DEFAULT_LOG_LEVEL = logging.WARNING
-
 # Set the default (global) logger level to CRITICAL
 logging.basicConfig(level=logging.CRITICAL)
 
@@ -51,14 +49,11 @@ from .Disulfide import (
 from .DisulfideClass_Constructor import DisulfideClass_Constructor
 from .DisulfideClasses import (
     angle_within_range,
-    create_classes,
     filter_by_percentage,
     get_angle_class,
     get_quadrant,
     get_section,
-    get_ss_id,
     is_between,
-    plot_class_chart,
     torsion_to_class_string,
     torsion_to_eightclass,
     torsion_to_sixclass,
@@ -70,14 +65,10 @@ from .DisulfideExceptions import (
     DisulfideIOException,
     DisulfideParseWarning,
 )
-from .DisulfideList import (
-    DisulfideList,
-    calculate_torsion_statistics,
-    extract_disulfide,
-    load_disulfides_from_id,
-)
+from .DisulfideList import DisulfideList, extract_disulfide, load_disulfides_from_id
 from .DisulfideLoader import Bootstrap_PDB_SS, DisulfideLoader, Load_PDB_SS
 from .logger_config import (
+    DEFAULT_LOG_LEVEL,
     configure_master_logger,
     create_logger,
     disable_stream_handlers_for_namespace,
@@ -154,11 +145,13 @@ from .utility import (
     grid_dimensions,
     image_to_ascii_art,
     load_list_from_file,
+    plot_class_chart,
     print_memory_used,
     prune_extra_ss,
     remove_duplicate_ss,
     retrieve_git_lfs_files,
     save_list_to_file,
+    set_plotly_theme,
     sort_by_column,
 )
 from .vector3D import (
@@ -170,7 +163,9 @@ from .vector3D import (
     rms_difference,
 )
 
-_logger.info("ProteusPy %s initialized ", __version__)
+# _logger.setLevel(logging.INFO)
+# _logger.info("ProteusPy %s initialized ", __version__)
+
 _logger.setLevel(DEFAULT_LOG_LEVEL)
 
 # end of file

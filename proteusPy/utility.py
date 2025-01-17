@@ -37,9 +37,11 @@ import psutil
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from proteusPy import Disulfide, DisulfideList, __version__
+from proteusPy.angle_annotation import AngleAnnotation
 from proteusPy.DisulfideExceptions import DisulfideIOException
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
+    DPI,
     MODEL_DIR,
     PDB_DIR,
     PROBLEM_ID_FILE,
@@ -935,6 +937,10 @@ def Extract_Disulfides_From_List(
     return
 
 
+import platform
+import subprocess
+
+
 def get_theme():
     """
     Determine the display theme for the current operating system.
@@ -947,7 +953,6 @@ def get_theme():
     'dark'
     """
     system = platform.system()
-
     if system == "Darwin":
         # macOS
         try:
@@ -955,7 +960,7 @@ def get_theme():
             script = """
             tell application "System Events"
                 tell appearance preferences
-                    if (dark mode) then
+                    if dark mode is true then
                         return "dark"
                     else
                         return "light"
@@ -971,18 +976,26 @@ def get_theme():
                 text=True,
                 check=True,
             )
-
+            # print(f"AppleScript result: {result.stdout.strip()}")
+            # print(f"AppleScript stderr: {result.stderr.strip()}")
+            # print(f"AppleScript return code: {result.returncode}")
             # Check the output
             if result.returncode == 0:
                 theme = result.stdout.strip().lower()
                 if theme in ["dark", "light"]:
                     return theme
-                return None
-            return None
+            return "light"
 
-        except Exception:
-            # In case of any exception, return None
-            return None
+        except subprocess.CalledProcessError as e:
+            _logger.error(f"CalledProcessError occurred: {e}")
+            _logger.error(f"stderr: {e.stderr}")
+            # In case of any exception, return "light"
+            return "light"
+
+        except Exception as e:
+            _logger.error(f"Exception occurred: {e}")
+            # In case of any exception, return "light"
+            return "light"
 
     elif system == "Windows":
         # Windows
@@ -1000,9 +1013,10 @@ def get_theme():
             else:
                 return "light"
 
-        except Exception:
-            # In case of any exception, return None
-            return None
+        except Exception as e:
+            print(f"Exception occurred: {e}")
+            # In case of any exception, return "light"
+            return "light"
 
     elif system == "Linux":
         # Linux
@@ -1024,8 +1038,9 @@ def get_theme():
                     return "light"
             return "light"
 
-        except Exception:
-            # In case of any exception, return None
+        except Exception as e:
+            print(f"Exception occurred: {e}")
+            # In case of any exception, return "light"
             return "light"
 
     else:
@@ -1072,63 +1087,6 @@ def calculate_percentile_cutoff(df, column, percentile=95):
     return cutoff
 
 
-def filter_by_cutoffs(
-    df, length_cutoff=1.0, angle_cutoff=1.0, ca_cutoff=8.0, minimum_distance=2.0
-):
-    """
-    Filter the DataFrame based on distance, angle, and Ca distance cutoffs. Ca cutoff
-    dominates the filter and will override the distance and angle cutoffs. Note: The
-    filter is applied if the Ca distance is less than or equal to 2.0 Angstroms, since
-    this is physically impossible.
-
-    :param df: DataFrame containing the deviations.
-    :type df: pd.DataFrame
-    :param length_cutoff: Cutoff value for Bond Length Deviation.
-    :type distance_cutoff: float
-    :param angle_cutoff: Cutoff value for angle deviation.
-    :type angle_cutoff: float
-    :param ca_cutoff: Cutoff value for Ca distance.
-    :type ca_cutoff: float
-    :return: Filtered DataFrame.
-    :rtype: pd.DataFrame
-    """
-    filtered_df = df[
-        (df["Bondlength_Deviation"] <= length_cutoff)
-        & (df["Angle_Deviation"] <= angle_cutoff)
-        & (df["Ca_Distance"] > minimum_distance)
-        & (df["Ca_Distance"] < ca_cutoff)
-    ]
-    return filtered_df
-
-
-def bad_filter_by_cutoffs(
-    df, distance_cutoff=1.0, angle_cutoff=1.0, ca_cutoff=8.0, minimum_distance=2.0
-):
-    """
-    Return the DataFrame objects that are GREATER than the cutoff based on distance,
-    angle, and Ca distance cutoffs. Used to get the bad structures. Ca cutoff
-    dominates the filter and will override the distance and angle cutoffs.
-
-    :param df: DataFrame containing the deviations.
-    :type df: pd.DataFrame
-    :param distance_cutoff: Cutoff value for Bond Length Deviation.
-    :type distance_cutoff: float
-    :param angle_cutoff: Cutoff value for angle deviation.
-    :type angle_cutoff: float
-    :param ca_cutoff: Cutoff value for Ca distance.
-    :type ca_cutoff: float
-    :return: Filtered DataFrame.
-    :rtype: pd.DataFrame
-    """
-    filtered_df = df[
-        (df["Bondlength_Deviation"] > distance_cutoff)
-        & (df["Angle_Deviation"] > angle_cutoff)
-        & (df["Ca_Distance"] > ca_cutoff)
-        & (df["Ca_Distance"] < minimum_distance)
-    ]
-    return filtered_df
-
-
 def save_list_to_file(input_list, filename):
     """
     Save the input list to a file using pickle.
@@ -1156,6 +1114,127 @@ def load_list_from_file(filename):
     with open(filename, "rb") as file:
         loaded_list = pickle.load(file)
     return loaded_list
+
+
+def set_plotly_theme(theme: str) -> None:
+    """
+    Set the Plotly theme based on the provided theme parameter.
+
+    This function sets the default Plotly template to either 'plotly_white' or 'plotly_dark'
+    based on the input theme. If 'auto' is selected, the theme is determined automatically
+    based on the current system or application theme.
+
+    :param theme: The theme to set for Plotly. Must be 'auto', 'light', or 'dark'.
+    :type theme: str
+    :raises ValueError: If an invalid theme is provided.
+    :return: None
+    :rtype: None
+    """
+    from plotly import io as pio
+
+    match theme.lower():
+        case "auto":
+            _theme = get_theme()
+            if _theme == "light":
+                pio.templates.default = "plotly_white"
+            else:
+                pio.templates.default = "plotly_dark"
+        case "light":
+            pio.templates.default = "plotly_white"
+        case "dark":
+            pio.templates.default = "plotly_dark"
+        case _:
+            _logger.error("Invalid theme. Must be 'auto', 'light', or 'dark'.")
+            pio.templates.default = "plotly_white"
+
+    _logger.info("Plotly theme set to: %s", pio.templates.default)
+
+    return None
+
+
+def plot_class_chart(classes: int) -> None:
+    """
+    Create a Matplotlib pie chart with `classes` segments of equal size.
+
+    This function returns a figure representing the angular layout of
+    disulfide torsional classes for input `n` classes.
+
+    Parameters:
+        classes (int): The number of segments to create in the pie chart.
+
+    Returns:
+        None
+
+    Example:
+    >>> plot_class_chart(4)
+
+    This will create a pie chart with 4 equal segments.
+    """
+
+    matplotlib.use("TkAgg")  # or 'Qt5Agg', 'MacOSX', etc.
+
+    # Helper function to draw angle easily.
+    def plot_angle(ax, pos, angle, length=0.95, acol="C0", **kwargs):
+        vec2 = np.array([np.cos(np.deg2rad(angle)), np.sin(np.deg2rad(angle))])
+        xy = np.c_[[length, 0], [0, 0], vec2 * length].T + np.array(pos)
+        ax.plot(*xy.T, color=acol)
+        return AngleAnnotation(pos, xy[0], xy[2], ax=ax, **kwargs)
+
+    # fig = plt.figure(figsize=(WIDTH, HEIGHT), dpi=DPI)
+    fig, ax1 = plt.subplots(sharex=True)
+
+    # ax1, ax2 = fig.subplots(1, 2, sharey=True, sharex=True)
+
+    fig.suptitle("SS Torsion Classes")
+    fig.set_dpi(DPI)
+    fig.set_size_inches(6.2, 6)
+
+    fig.canvas.draw()  # Need to draw the figure to define renderer
+
+    # Showcase different text positions.
+    ax1.margins(y=0.4)
+    ax1.set_title("textposition")
+    _text = f"${360/classes}°$"
+    kw = dict(size=75, unit="points", text=_text)
+
+    plot_angle(ax1, (0, 0), 360 / classes, textposition="outside", **kw)
+
+    # Create a list of segment values
+    # !!!
+    values = [1 for _ in range(classes)]
+
+    # Create the pie chart
+    # fig, ax = plt.subplots()
+    wedges, _ = ax1.pie(
+        values,
+        startangle=0,
+        counterclock=False,
+        wedgeprops=dict(width=0.65),
+    )
+
+    # Set the chart title and size
+    ax1.set_title(f"{classes}-Class Angular Layout")
+
+    # Set the segment colors
+    color_palette = plt.cm.get_cmap("tab20", classes)
+    ax1.set_prop_cycle("color", [color_palette(i) for i in range(classes)])
+
+    # Create the legend
+    legend_labels = [f"Class {i+1}" for i in range(classes)]
+    legend = ax1.legend(
+        wedges,
+        legend_labels,
+        title="Classes",
+        loc="center left",
+        bbox_to_anchor=(1.1, 0.5),
+    )
+
+    # Set the legend fontsize
+    plt.setp(legend.get_title(), fontsize="large")
+    plt.setp(legend.get_texts(), fontsize="medium")
+
+    # Show the chart
+    fig.show()
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@ Last revision: 2025-01-07 22:04:58 -egs-
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
 
 # pylint: disable=C0301
+# pylint: disable=C0302
 # pylint: disable=W1203
 # pylint: disable=C0103
 # pylint: disable=W0612
@@ -21,9 +22,9 @@ import time
 from pathlib import Path
 
 import gdown
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import plotly.graph_objects as go
 import plotly_express as px
 from pympler import asizeof
 
@@ -42,6 +43,7 @@ from proteusPy.ProteusGlobals import (
     SS_LIST_URL,
     SS_PICKLE_FILE,
 )
+from proteusPy.utility import set_plotly_theme
 
 _logger = create_logger(__name__)
 
@@ -125,7 +127,17 @@ class DisulfideLoader:
         try:
             # Check if the file exists before attempting to open it
             if not full_path.exists():
-                raise FileNotFoundError(f"File not found: {full_path}")
+                fname = SS_PICKLE_FILE
+                url = SS_LIST_URL
+
+                _fname = Path(DATA_DIR) / fname
+
+                if not _fname.exists():
+                    if verbose:
+                        _logger.info(
+                            "Master SS list unavailable. Downloading Disulfide Database from Drive..."
+                        )
+                    gdown.download(url, str(_fname), quiet=False)
 
             with open(full_path, "rb") as f:
                 sslist = pickle.load(f)
@@ -169,6 +181,7 @@ class DisulfideLoader:
 
             if self.verbose:
                 _logger.info("Loader initialization complete.")
+                self.describe()
 
         except FileNotFoundError as e:
             _logger.error("File not found: %s", full_path)
@@ -178,17 +191,19 @@ class DisulfideLoader:
             _logger.error("An error occurred while loading the file: %s", full_path)
             raise e
 
-    # overload __getitem__ to handle slicing and indexing, and access by name
+    # overload __getitem__ to handle slicing and indexing, and access by name or classid
     def __getitem__(self, item):
         """
         Implements indexing and slicing to retrieve DisulfideList objects from the
         DisulfideLoader. Supports:
-        
+
         - Integer indexing to retrieve a single DisulfideList
         - Slicing to retrieve a subset as a DisulfideList
         - Lookup by PDB ID to retrieve all Disulfides for that structure
         - Lookup by full disulfide name
-        
+        - Lookup by classid in the format 11111b or 11111o. The last char is the class type.
+        - Lookup by classid in the format 11111. The base is 8 by default.
+
         :param index: The index or key to retrieve the DisulfideList.
         :type index: int, slice, str
         :return: A DisulfideList object or a subset of it.
@@ -214,8 +229,17 @@ class DisulfideLoader:
                     item,
                     self.TotalDisulfides - 1,
                 )
-            else:
-                return self.SSList[item]
+                return res
+
+            res = self.SSList[item]
+            return res
+
+        # if the item is a string, it could be a PDB ID or a full disulfide name
+        # or a classid in the format 11111b or 11111o. the last char is the class type
+
+        if isinstance(item, str) and len(item) == 6 or len(item) == 5:  # classid
+            res = self.extract_class(item, verbose=self.verbose)
+            return res
 
         try:
             # PDB_SS['4yys'] return a list of SS
@@ -304,7 +328,16 @@ class DisulfideLoader:
             disulfide_dict[disulfide.pdb_id].append(index)
         return disulfide_dict
 
-    def extract_class(self, clsid, base=8, verbose=False) -> DisulfideList:
+    def print_classes(self, base=8):
+        """
+        Print the classes in the database.
+
+        :param base: The base class to use, 6 or 8.
+        :return: None
+        """
+        self.tclass.print_classes(base)
+
+    def extract_class(self, clsid: str, verbose: bool = False) -> DisulfideList:
         """
         Return the list of disulfides corresponding to the input `clsid`.
 
@@ -313,24 +346,21 @@ class DisulfideLoader:
         :return: The list of disulfide bonds from the class.
         """
 
-        eightorbin = None
+        cls = clsid[:5]
 
-        if base == 8:
-            eightorbin = self.tclass.eightclass_dict
-        elif base == 2:
-            eightorbin = self.tclass.binaryclass_dict
-        else:
-            raise ValueError("Invalid base value.")
+        try:
+            ss_ids = self.tclass[clsid]
 
-        ss_ids = eightorbin[clsid]
+        except KeyError:
+            _logger.error("Cannot find key %s in SSBond DB", clsid)
+            return DisulfideList([], cls, quiet=True)
 
-        tot_ss = len(eightorbin)
-        class_disulfides = DisulfideList([], clsid, quiet=True)
+        tot_ss = len(ss_ids)
+        class_disulfides = DisulfideList([], cls, quiet=True)
 
-        if verbose:
-            _pbar = tqdm(range(tot_ss), total=tot_ss, leave=True)
-        else:
-            _pbar = range(tot_ss)
+        _pbar = (
+            tqdm(range(tot_ss), total=tot_ss, leave=True) if verbose else range(tot_ss)
+        )
 
         for idx in _pbar:
             ssid = ss_ids[idx]
@@ -483,40 +513,87 @@ class DisulfideLoader:
         """
         self._quiet = perm
 
-    def plot_classes_vs_cutoff(self, cutoff, steps, base=8) -> None:
+    def plot_classes_vs_cutoff(
+        self, cutoff: float, steps: int = 50, base=8, theme="auto", verbose=False
+    ) -> None:
         """
         Plot the total percentage and number of members for each octant class against the cutoff value.
 
         :param cutoff: Percent cutoff value for filtering the classes.
         :param steps: Number of steps to take in the cutoff.
         :param base: The base class to use, 6 or 8.
+        :param theme: The theme to use for the plot ('auto', 'light', or 'dark'), defaults to 'auto'.
         :return: None
         """
-
         _cutoff = np.linspace(0, cutoff, steps)
         tot_list = []
         members_list = []
+        base_str = "Octant" if base == 8 else "Binary"
+
+        set_plotly_theme(theme)
 
         for c in _cutoff:
-            class_df = self.tclass.filter_class_by_percentage(base, c)
+            class_df = self.tclass.filter_class_by_percentage(c, base=base)
             tot = class_df["percentage"].sum()
             tot_list.append(tot)
             members_list.append(class_df.shape[0])
-            print(
-                f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
+            if verbose:
+                print(
+                    f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
+                )
+
+        fig = go.Figure()
+
+        # Add total percentage trace
+        fig.add_trace(
+            go.Scatter(
+                x=_cutoff,
+                y=tot_list,
+                mode="lines+markers",
+                name="Total percentage",
+                yaxis="y1",
+                line=dict(color="blue"),
             )
+        )
 
-        _, ax1 = plt.subplots()
+        # Add number of members trace
+        fig.add_trace(
+            go.Scatter(
+                x=_cutoff,
+                y=members_list,
+                mode="lines+markers",
+                name="Number of members",
+                yaxis="y2",
+                line=dict(color="red"),
+            )
+        )
 
-        ax2 = ax1.twinx()
-        ax1.plot(_cutoff, tot_list, label="Total percentage", color="blue")
-        ax2.plot(_cutoff, members_list, label="Number of members", color="red")
+        # Update layout
+        fig.update_layout(
+            title={
+                "text": f"{base_str} Classes vs Cutoff, ({cutoff}%)",
+                "x": 0.5,
+                "yanchor": "top",
+                "xanchor": "center",
+            },
+            xaxis=dict(title="Cutoff"),
+            yaxis=dict(
+                title="Total percentage",
+                titlefont=dict(color="blue"),
+                tickfont=dict(color="blue"),
+            ),
+            yaxis2=dict(
+                title="Number of members",
+                titlefont=dict(color="red"),
+                tickfont=dict(color="red"),
+                overlaying="y",
+                side="right",
+                type="log",
+            ),
+            legend=dict(x=0.75, y=1.16),
+        )
 
-        ax1.set_xlabel("Cutoff")
-        ax1.set_ylabel("Total percentage", color="blue")
-        ax2.set_ylabel("Number of members", color="red")
-
-        plt.show()
+        fig.show()
 
     def plot_binary_to_eightclass_incidence(
         self,
@@ -526,7 +603,7 @@ class DisulfideLoader:
         verbose=False,
     ):
         """
-        Plot the incidence of all sextant Disulfide classes for a given binary class.
+        Plot the incidence of all octant Disulfide classes for a given binary class.
 
         :param loader: `proteusPy.DisulfideLoader` object
         """
@@ -536,7 +613,7 @@ class DisulfideLoader:
 
         clslist = self.tclass.binaryclass_df["class_id"]
         for cls in clslist:
-            eightcls = self.tclass.binary_to_eight_class(cls)
+            eightcls = self.tclass.binary_to_class(cls, 8)
             df = self.enumerate_class_fromlist(eightcls, base=8)
             self.plot_count_vs_class_df(
                 df,
@@ -550,17 +627,17 @@ class DisulfideLoader:
         if verbose:
             _logger.info("Graph generation complete.")
             _logger.setLevel("WARNING")
-        return
 
     def plot_count_vs_class_df(
         self,
         df,
         title="title",
-        theme="light",
+        theme="auto",
         save=False,
         savedir=".",
         base=8,
         verbose=False,
+        log=True,
     ):
         """
         Plot a line graph of count vs class ID using Plotly for the given disulfide class. The
@@ -574,9 +651,11 @@ class DisulfideLoader:
         :param savedir: A string representing the directory to save the plot to. Default is '.'.
         :param base: An integer representing the base value for the enumeration. Default is 8.
         :param verbose: A boolean flag indicating whether to display verbose output. Default is False.
+        :param log: A boolean flag indicating whether to use a log scale for the y-axis. Default is False.
         :raises ValueError: If an invalid base value is provided, (2 or 8s).
         :return: None
         """
+        set_plotly_theme(theme)
 
         _title = f"Binary Class: {title}"
         _labels = {}
@@ -600,17 +679,14 @@ class DisulfideLoader:
             labels=_labels,
         )
 
-        if theme == "light":
-            fig.update_layout(template="plotly_white")
-        else:
-            fig.update_layout(template="plotly_dark")
-
         fig.update_layout(
             showlegend=True,
             title_x=0.5,
             title_font=dict(size=20),
             xaxis_showgrid=False,
             yaxis_showgrid=False,
+            autosize=True,
+            yaxis_type="log" if log else "linear",
         )
         fig.update_layout(autosize=True)
 
@@ -622,26 +698,31 @@ class DisulfideLoader:
             fig.write_image(fname, "png")
         else:
             fig.show()
-        return fig
 
-    def plot_count_vs_classid(self, cls=None, title="title", theme="light", base=8):
+        return
+
+    def plot_count_vs_classid(self, cls=None, theme="auto", base=8, log=True):
         """
         Plot a line graph of count vs class ID using Plotly.
 
         :param df: A pandas DataFrame containing the data to be plotted.
         :param title: A string representing the title of the plot (default is 'title').
         :param theme: A string representing the theme of the plot. Anything other than `light` is in `plotly_dark`.
+        :param log: A boolean flag indicating whether to use a log scale for the y-axis. Default is False.
         :return: None
         """
 
+        set_plotly_theme(theme)
+
         _title = None
 
-        if base == 8:
-            _title = f"Octant Class: {title}"
-        elif base == 2:
-            _title = f"Binary Class: {title}"
-        else:
-            raise ValueError("Invalid base. Must be 2 or 8")
+        match base:
+            case 8:
+                _title = "Octant Class Distribution"
+            case 2:
+                _title = "Binary Class Distribution"
+            case _:
+                raise ValueError("Invalid base. Must be 2 or 8")
 
         df = self.tclass.binaryclass_df if base == 2 else self.tclass.eightclass_df
 
@@ -656,16 +737,12 @@ class DisulfideLoader:
             yaxis_title="Count",
             showlegend=True,
             title_x=0.5,
+            autosize=True,
+            yaxis_type="log" if log else "linear",
         )
-        fig.layout.autosize = True
 
-        if theme == "light":
-            fig.update_layout(template="plotly_white")
-        else:
-            fig.update_layout(template="plotly_dark")
-
-        fig.update_layout(autosize=True)
-        return fig
+        fig.show()
+        return
 
     def enumerate_class_fromlist(self, sslist, base=8):
         """
@@ -685,34 +762,6 @@ class DisulfideLoader:
                 if _y is not None:
                     # only append if we have both.
                     x.append(cls)
-                    y.append(len(_y))
-
-        sslist_df = pd.DataFrame(columns=["class_id", "count"])
-        sslist_df["class_id"] = x
-        sslist_df["count"] = y
-        return sslist_df
-
-    def enumerate_eightclass_fromlist(self, sslist) -> pd.DataFrame:
-        """
-        Enumerate the eight-class disulfide bonds from a list of class IDs and
-        returns a DataFrame with class IDs and their corresponding counts.
-
-        :param sslist: A list of eight-class disulfide bond class IDs.
-        :type sslist: list
-        :return: A DataFrame with columns "class_id" and "count" representing the
-        class IDs and their corresponding counts.
-        :rtype: pd.DataFrame
-        """
-        x = []
-        y = []
-
-        for eightcls in sslist:
-            if eightcls is not None:
-                _y = self.tclass.sslist_from_classid(eightcls, base=8)
-                # it's possible to have 0 SS in a class
-                if _y is not None:
-                    # only append if we have both.
-                    x.append(eightcls)
                     y.append(len(_y))
 
         sslist_df = pd.DataFrame(columns=["class_id", "count"])
@@ -768,16 +817,81 @@ class DisulfideLoader:
                 pdbids.append(pdbid)
                 num_disulfides.append(len(disulfides))
 
-        plt.figure(figsize=(12, 6))
-        plt.bar(pdbids, num_disulfides, color="skyblue")
-        plt.xlabel("PDB ID")
-        plt.ylabel("Number of Disulfides")
-        plt.title(f"Number of Disulfides vs PDB ID with cutoff: {cutoff}")
-        plt.xticks(rotation=90)
-        plt.tight_layout()
-        plt.show()
+        # Create a DataFrame
+        df = pd.DataFrame({"PDB ID": pdbids, "Number of Disulfides": num_disulfides})
+        fig = px.bar(
+            df,
+            x="PDB ID",
+            y="Number of Disulfides",
+            title=f"Disulfides vs PDB ID with cutoff: {cutoff}, {len(pdbids)} PDB IDs",
+        )
+        fig.update_layout(
+            xaxis_title="PDB ID",
+            yaxis_title="Number of Disulfides",
+            xaxis_tickangle=-90,
+        )
+        fig.show()
 
         return pdbids, num_disulfides
+
+    def plot_distances(
+        self, distance_type="ca", cutoff=-1, flip=False, theme="auto", log=True
+    ):
+        """
+        Plot the distances for the disulfides in the loader.
+
+        :param distance_type: The type of distance to plot ('ca' for Cα-Cα distance, 'sg' for Sγ-Sγ distance).
+        :type distance_type: str
+        :param cutoff: The cutoff value for the distance, defaults to -1 (no cutoff).
+        :type cutoff: float
+        :param flip: Whether to flip the plot. (<= or >), defaults to <
+        :type flip: bool
+        :param theme: The theme to use for the plot ('auto', 'light', or 'dark'), defaults to 'auto'.
+        :type theme: str
+        :param log: Whether to use a log scale for the y-axis, defaults to True.
+        :return: None
+        :rtype: None
+        """
+        self.SSList.plot_distances(
+            distance_type=distance_type,
+            cutoff=cutoff,
+            flip=flip,
+            theme=theme,
+            log=log,
+        )
+
+    def plot_deviation_histograms(self, theme="auto", verbose=True):
+        """
+        Plot histograms for Bondlength_Deviation, Angle_Deviation, and Ca_Distance.
+        """
+        self.SSList.plot_deviation_histograms(theme=theme, verbose=verbose)
+
+    def display_torsion_statistics(
+        self,
+        display=True,
+        save=False,
+        fname="ss_torsions.png",
+        theme="Auto",
+    ):
+        """
+        Display torsion and distance statistics for all Disulfides in the loader.
+
+        :param display: Whether to display the plot in the notebook. Default is True.
+        :type display: bool
+        :param save: Whether to save the plot as an image file. Default is False.
+        :type save: bool
+        :param fname: The name of the image file to save. Default is 'ss_torsions.png'.
+        :type fname: str
+        :param theme: One of 'Auto', 'Light', or 'Dark'. Default is 'Auto'.
+        :type light: str
+        :return: None
+        """
+        self.SSList.display_torsion_statistics(
+            display=display,
+            save=save,
+            fname=fname,
+            theme=theme,
+        )
 
 
 # class ends
@@ -850,6 +964,7 @@ def Load_PDB_SS(
         loader = pickle.load(f)
     if verbose:
         _logger.info("Done reading disulfides from: %s...", _fpath)
+        loader.describe()
 
     return loader
 
