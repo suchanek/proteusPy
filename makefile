@@ -66,15 +66,11 @@ jup_dev:
 format:
 	black proteusPy
 
-bld: docs sdist
-	@echo "Building $(VERS)..."
-	python setup.py bdist_wheel
-	pdoc -o docs --math --logo "./logo.png" ./proteusPy
-	@echo "Build complete."
+bld: sdist docs
 
 sdist: proteusPy/_version.py
-	@echo "Building source distribution..."
-	python setup.py sdist
+	@echo "Building source distribution and wheels..."
+	python -m build
 
 docs: $(wildcard proteusPy/**/*.py)
 	@echo "Generating documentation..."
