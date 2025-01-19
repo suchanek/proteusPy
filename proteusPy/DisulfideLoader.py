@@ -834,7 +834,7 @@ class DisulfideLoader:
         return pdbids, num_disulfides
 
     def plot_distances(
-        self, distance_type="ca", cutoff=-1, flip=False, theme="auto", log=True
+        self, distance_type="ca", cutoff=-1, comparison="less", theme="auto", log=True
     ):
         """
         Plot the distances for the disulfides in the loader.
@@ -843,8 +843,9 @@ class DisulfideLoader:
         :type distance_type: str
         :param cutoff: The cutoff value for the distance, defaults to -1 (no cutoff).
         :type cutoff: float
-        :param flip: Whether to flip the plot. (<= or >), defaults to <
-        :type flip: bool
+        :param comparison: if 'less' then plot distances less than the cutoff, if 'greater' then plot
+        distances greater than the cutoff.
+        :type flip: str
         :param theme: The theme to use for the plot ('auto', 'light', or 'dark'), defaults to 'auto'.
         :type theme: str
         :param log: Whether to use a log scale for the y-axis, defaults to True.
@@ -854,10 +855,23 @@ class DisulfideLoader:
         self.SSList.plot_distances(
             distance_type=distance_type,
             cutoff=cutoff,
-            flip=flip,
+            comparison=comparison,
             theme=theme,
             log=log,
         )
+
+    def plot_deviation_scatterplots(self, verbose=False, theme="auto"):
+        """
+        Plot scatter plots for Bondlength_Deviation, Angle_Deviation Ca_Distance
+        and SG_Distance.
+
+        :param verbose: Whether to display the plot in the notebook. Default is False.
+        :type verbose: bool
+        :param theme: One of 'Auto', 'Light', or 'Dark'. Default is 'Auto'.
+        :type light: str
+        :return: None
+        """
+        self.SSList.plot_deviation_scatterplots(verbose=verbose, theme=theme)
 
     def plot_deviation_histograms(self, theme="auto", verbose=True):
         """
