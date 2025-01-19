@@ -1291,13 +1291,13 @@ class DisulfideList(UserList):
         df = pd.DataFrame(data)
         return df
 
-    def extract_distances(self, distance_type="sg", flip=False, cutoff=-1):
+    def extract_distances(self, distance_type="sg", comparison="less", cutoff=-1):
         """
         Extract and filter the distance values from the disulfide list based on the specified type and comparison.
 
         :param disulfide_list: List of disulfide objects.
         :param distance_type: Type of distance to extract ('sg' or 'ca').
-        :param flip: If true, return distances greater than the cutoff value.
+        :param comparison: If 'less', return distances less than the cutoff value, otherwise return distances greater than or equal to the cutoff value.
         :param cutoff: Cutoff value for filtering distances.
         :return: List of filtered distance values.
         """
@@ -1315,7 +1315,7 @@ class DisulfideList(UserList):
         if cutoff == -1.0:
             return distances
 
-        if flip:
+        if comparison == "greater":
             filtered_distances = [d for d in distances if d > cutoff]
         else:
             filtered_distances = [d for d in distances if d <= cutoff]
@@ -1323,7 +1323,7 @@ class DisulfideList(UserList):
         return filtered_distances
 
     def plot_distances(
-        self, distance_type="sg", cutoff=-1, flip=False, theme="auto", log=True
+        self, distance_type="sg", cutoff=-1, comparison="less", theme="auto", log=True
     ):
         """
         Plot the distance values as a histogram using plotly express.
@@ -1337,10 +1337,10 @@ class DisulfideList(UserList):
         """
 
         set_plotly_theme(theme)
-        cmp_str = "less" if not flip else "greater"
 
-        distances = self.extract_distances(distance_type, cmp_str, cutoff)
+        distances = self.extract_distances(distance_type, comparison, cutoff)
         yaxis_type = "log" if log else "linear"
+        flip = False if comparison == "less" else True
 
         match distance_type:
             case "sg":
@@ -1384,6 +1384,38 @@ class DisulfideList(UserList):
             yaxis_type=yaxis_type,
             bargap=0.2,
         )
+        fig.show()
+
+    def plot_deviation_scatterplots(self, verbose=False, theme="auto"):
+        """
+        Plot scatter plots for Bondlength_Deviation, Angle_Deviation, Ca_Distance, and Sg_Distance
+        with the row index as the x-axis.
+
+        :param verbose: If True, display additional information during processing, defaults to False.
+        :type verbose: bool
+        :param theme: The theme to use for the plot ('auto', 'light', or 'dark'), defaults to 'auto'.
+        :type theme: str
+        """
+        set_plotly_theme(theme)
+
+        df = self.create_deviation_dataframe(verbose=verbose)
+
+        fig = px.scatter(
+            df, x=df.index, y="Bondlength_Deviation", title="Bondlength Deviation"
+        )
+        fig.update_layout(xaxis_title="Row Index", yaxis_title="Bondlength Deviation")
+        fig.show()
+
+        fig = px.scatter(df, x=df.index, y="Angle_Deviation", title="Angle Deviation")
+        fig.update_layout(xaxis_title="Row Index", yaxis_title="Angle Deviation")
+        fig.show()
+
+        fig = px.scatter(df, x=df.index, y="Ca_Distance", title="Cα Distance")
+        fig.update_layout(xaxis_title="Row Index", yaxis_title="Cα Distance")
+        fig.show()
+
+        fig = px.scatter(df, x=df.index, y="Sg_Distance", title="Sg Distance")
+        fig.update_layout(xaxis_title="Row Index", yaxis_title="Sg Distance")
         fig.show()
 
     def plot_deviation_histograms(self, verbose=False, theme="auto", log=True) -> None:
