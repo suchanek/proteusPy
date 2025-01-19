@@ -76,13 +76,14 @@ dev = [
     "build",
 ]
 bio = ["Biopython"]
+
 pyqt5 = [
     "pyqt5",
     "pyvistaqt",
 ]
+
 all = [
     "pytest",
-    "coverage",
     "twine",
     "pdoc",
     "Biopython",

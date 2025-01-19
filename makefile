@@ -40,11 +40,11 @@ clean devclean:
 
 install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install .
+	pip install . -q
 	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Installation finished!"
 
-install_dev: sdist
+install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	pip install .[all]
 	pip install pdoc twine black pytest build -q

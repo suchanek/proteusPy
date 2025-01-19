@@ -34,6 +34,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import psutil
+from matplotlib import font_manager
+from PIL import ImageFont
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from proteusPy import Disulfide, DisulfideList, __version__
@@ -1116,7 +1118,7 @@ def load_list_from_file(filename):
     return loaded_list
 
 
-def set_plotly_theme(theme: str) -> None:
+def set_plotly_theme(theme: str = "auto") -> None:
     """
     Set the Plotly theme based on the provided theme parameter.
 
@@ -1235,6 +1237,81 @@ def plot_class_chart(classes: int) -> None:
 
     # Show the chart
     fig.show()
+
+
+def find_arial_font():
+    """
+    Find the system font file arial.ttf for macOS, Windows, and Linux.
+
+    :return: The path to the arial.ttf font file if found, otherwise None.
+    """
+    font_paths = {
+        "Windows": [r"C:\Windows\Fonts\arial.ttf", r"C:\Windows\Fonts\Arial.ttf"],
+        "Darwin": [
+            "/Library/Fonts/Arial.ttf",
+            "/System/Library/Fonts/Arial.ttf",
+            "/System/Library/Fonts/Supplemental/Arial.ttf",
+        ],
+        "Linux": [
+            "/usr/share/fonts/truetype/msttcorefonts/arial.ttf",
+            "/usr/share/fonts/truetype/msttcore/arial.ttf",
+            "/usr/share/fonts/truetype/arial.ttf",
+            "/usr/share/fonts/Arial.ttf",
+        ],
+    }
+
+    system = platform.system()
+    if system in font_paths:
+        for path in font_paths[system]:
+            if os.path.exists(path):
+                return path
+
+    return None
+
+
+def calculate_fontsize(
+    title, window_width, font_path="arial.ttf", max_fontsize=20, min_fontsize=4
+):
+    """
+    Calculate the maximum font size for the title so that it fits within the window width in PyVista.
+
+    :param title: The title text.
+    :param window_width: The width of the window in pixels.
+    :param font_path: The path to the font file.
+    :param max_fontsize: The maximum font size.
+    :param min_fontsize: The minimum font size.
+    :return: The calculated font size.
+    """
+
+    if not title:
+        return min_fontsize  # Default to the smallest size if the title is empty
+
+    font_path = find_arial_font()
+
+    if not font_path:
+        _logger.warning("Arial font not found.")
+        return min_fontsize
+
+    def get_text_width(title, fontsize):
+        # Load the font with the given fontsize
+        font = ImageFont.truetype(font_path, fontsize)
+        # Calculate and return the text width using getbbox
+        sz = font.getbbox(title)
+        text_width = font.getbbox(title)[2]
+
+        _logger.error(f"Font size: {fontsize}, bbox: {sz}, text width: {text_width}")
+
+        return text_width
+
+    fontsize = max_fontsize
+    while fontsize > min_fontsize:
+        text_width = get_text_width(title, fontsize)
+        if text_width <= window_width:
+            break
+        fontsize -= 1
+
+    _logger.info(f"Calculated fontsize: {fontsize}")
+    return fontsize
 
 
 if __name__ == "__main__":
