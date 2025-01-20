@@ -44,12 +44,12 @@ from plotly.subplots import make_subplots
 
 import proteusPy
 from proteusPy import Disulfide
-from proteusPy.atoms import BOND_RADIUS, FONTSIZE
+from proteusPy.atoms import BOND_RADIUS
 from proteusPy.logger_config import create_logger
-from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, PDB_DIR, WINSIZE
+from proteusPy.ProteusGlobals import FONTSIZE, MODEL_DIR, PBAR_COLS, PDB_DIR, WINSIZE
 from proteusPy.utility import (
+    calculate_fontsize,
     get_jet_colormap,
-    get_theme,
     grid_dimensions,
     set_plotly_theme,
 )
@@ -230,7 +230,7 @@ class DisulfideList(UserList):
     # Rendering engine calculates and instantiates all bond
     # cylinders and atomic sphere meshes. Called by all high level routines
 
-    def _render(self, pl, style, res=100) -> pv.Plotter:
+    def _render(self, pl, style, res=100, fontsize=FONTSIZE) -> pv.Plotter:
         """
         Display a window showing the list of disulfides in the given style.
         :param style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd'
@@ -262,7 +262,7 @@ class DisulfideList(UserList):
             src = ss.pdb_id
             enrg = ss.energy
             title = f"{src} {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°"
-            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=fontsize)
             ss._render(
                 pl,
                 style=style,
@@ -562,7 +562,7 @@ class DisulfideList(UserList):
         print(f"Bond angle deviation: {avg_bondangle:.2f}°")
         print(f"Bond length deviation: {avg_bondlength:.2f} Å")
 
-    def display(self, style="sb", light="Auto", panelsize=512):
+    def display(self, style="sb", light="auto", panelsize=512):
         """
         Display the Disulfide list in the specific rendering style.
 
@@ -587,26 +587,15 @@ class DisulfideList(UserList):
         avg_dist = self.average_distance
         resolution = self.average_resolution
 
-        if light == "light":
-            pv.set_plot_theme("document")
-        elif light == "dark":
-            pv.set_plot_theme("dark")
-        else:
-            _theme = get_theme()
-            if _theme == "light":
-                pv.set_plot_theme("document")
-            elif _theme == "dark":
-                pv.set_plot_theme("dark")
-                _logger.info("Dark mode detected.")
-            else:
-                pv.set_plot_theme("document")
+        set_plotly_theme(light)
 
         title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
+        fontsize = calculate_fontsize(title, panelsize)
 
         pl = pv.Plotter(window_size=winsize, shape=(rows, cols))
-        pl = self._render(pl, style)
+        pl = self._render(pl, style, fontsize=fontsize)
         pl.enable_anti_aliasing("msaa")
-        pl.add_title(title=title, font_size=FONTSIZE)
+        pl.add_title(title=title, font_size=fontsize)
         pl.link_views()
         pl.reset_camera()
         pl.show()
@@ -795,7 +784,8 @@ class DisulfideList(UserList):
         movie=False,
         verbose=False,
         fname="ss_overlay.png",
-        light="Auto",
+        light="auto",
+        winsize=WINSIZE,
     ):
         """
         Display all disulfides in the list overlaid in stick mode against
@@ -828,28 +818,17 @@ class DisulfideList(UserList):
         if tot_ss > 90:
             res = 8
 
-        title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
+        title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), E: {avg_enrg:.2f} kcal/mol, Dist: {avg_dist:.2f} Å"
+        fontsize = calculate_fontsize(title, winsize[0])
 
-        if light == "light":
-            pv.set_plot_theme("document")
-        elif light == "dark":
-            pv.set_plot_theme("dark")
-        else:
-            _theme = get_theme()
-            if _theme == "light":
-                pv.set_plot_theme("document")
-            elif _theme == "dark":
-                pv.set_plot_theme("dark")
-                _logger.info("Dark mode detected.")
-            else:
-                pv.set_plot_theme("document")
+        set_plotly_theme(light)
 
         if movie:
-            pl = pv.Plotter(window_size=WINSIZE, off_screen=True)
+            pl = pv.Plotter(window_size=winsize, off_screen=True)
         else:
-            pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
+            pl = pv.Plotter(window_size=winsize, off_screen=False)
 
-        pl.add_title(title=title, font_size=FONTSIZE)
+        pl.add_title(title=title, font_size=fontsize)
         pl.enable_anti_aliasing("msaa")
         # pl.add_camera_orientation_widget()
         pl.add_axes()

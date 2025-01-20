@@ -9,7 +9,6 @@ Last revision: 2025-01-17 18:21:39 -egs-
 # plyint: disable=C0103
 
 import importlib.resources as pkg_resources
-import logging
 import math
 import os
 from pathlib import Path
@@ -136,3 +135,5 @@ CLASSOBJ_FNAME = "PDB_CLASS_OBJ.pkl"
 
 CA_CUTOFF = 6.71
 SG_CUTOFF = 2.12
+
+FONTSIZE = 12
