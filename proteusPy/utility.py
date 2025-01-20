@@ -8,6 +8,7 @@ Copyright (c)2024 Eric G. Suchanek, PhD, all rights reserved
 # Last modification 2025-01-04 12:40:28 -egs-
 
 # pylint: disable=c0103
+# pylint: disable=c0301
 # pylint: disable=c0302
 # pylint: disable=c0413
 # pylint: disable=c0412
@@ -34,6 +35,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import psutil
+from PIL import ImageFont
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from proteusPy import Disulfide, DisulfideList, __version__
@@ -42,6 +44,7 @@ from proteusPy.DisulfideExceptions import DisulfideIOException
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
     DPI,
+    FONTSIZE,
     MODEL_DIR,
     PDB_DIR,
     PROBLEM_ID_FILE,
@@ -1267,9 +1270,7 @@ def find_arial_font():
     return None
 
 
-def calculate_fontsize(
-    title, window_width, font_path="arial.ttf", max_fontsize=20, min_fontsize=4
-):
+def calculate_fontsize(title, window_width, max_fontsize=FONTSIZE, min_fontsize=2):
     """
     Calculate the maximum font size for the title so that it fits within the window width in PyVista.
 
@@ -1297,7 +1298,7 @@ def calculate_fontsize(
         sz = font.getbbox(title)
         text_width = font.getbbox(title)[2]
 
-        _logger.error(f"Font size: {fontsize}, bbox: {sz}, text width: {text_width}")
+        _logger.info(f"Font size: {fontsize}, bbox: {sz}, text width: {text_width}")
 
         return text_width
 
@@ -1309,7 +1310,7 @@ def calculate_fontsize(
         fontsize -= 1
 
     _logger.info(f"Calculated fontsize: {fontsize}")
-    return fontsize
+    return fontsize // 2
 
 
 if __name__ == "__main__":

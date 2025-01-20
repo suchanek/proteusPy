@@ -35,7 +35,6 @@ from proteusPy.atoms import (
     BOND_COLOR,
     BOND_RADIUS,
     BS_SCALE,
-    FONTSIZE,
     SPEC_POWER,
     SPECULARITY,
 )
@@ -46,14 +45,14 @@ from proteusPy.DisulfideExceptions import (
 )
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.logger_config import create_logger
-from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, WINSIZE
+from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, FONTSIZE, WINSIZE
 from proteusPy.Residue import build_residue
 from proteusPy.ssparser import (
     get_phipsi_atoms_coordinates,
     get_residue_atoms_coordinates,
 )
 from proteusPy.turtle3D import ORIENT_SIDECHAIN, Turtle3D
-from proteusPy.utility import get_theme
+from proteusPy.utility import calculate_fontsize, get_theme, set_plotly_theme
 from proteusPy.vector3D import (
     Vector3D,
     calc_dihedral,
@@ -1282,25 +1281,15 @@ class Disulfide:
 
         title = f"{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Cβ: {self.cb_distance:.2f} Å, Sg: {self.sg_distance:.2f} Å Tors: {self.torsion_length:.2f}°"
 
-        if light == "light":
-            pv.set_plot_theme("document")
-        elif light == "dark":
-            pv.set_plot_theme("dark")
-        else:
-            _theme = get_theme()
-            if _theme == "light":
-                pv.set_plot_theme("document")
-            elif _theme == "dark":
-                pv.set_plot_theme("dark")
-                _logger.info("Dark mode detected.")
-            else:
-                pv.set_plot_theme("document")
+        set_plotly_theme(light)
+        # fontsize = calculate_fontsize(title, winsize[0])
+        # this works generally well.
+        fontsize = 8
 
         if single:
             _pl = pv.Plotter(window_size=winsize)
-            _pl.add_title(title=title, font_size=FONTSIZE)
+            _pl.add_title(title=title, font_size=fontsize)
             _pl.enable_anti_aliasing("msaa")
-            # _pl.add_camera_orientation_widget()
 
             self._render(
                 _pl,
@@ -1318,7 +1307,7 @@ class Disulfide:
             pl = pv.Plotter(window_size=winsize, shape=(2, 2))
             pl.subplot(0, 0)
 
-            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=fontsize)
             pl.enable_anti_aliasing("msaa")
 
             # pl.add_camera_orientation_widget()
@@ -1333,7 +1322,7 @@ class Disulfide:
             )
 
             pl.subplot(0, 1)
-            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=fontsize)
 
             self._render(
                 pl,
@@ -1345,7 +1334,7 @@ class Disulfide:
             )
 
             pl.subplot(1, 0)
-            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=fontsize)
 
             self._render(
                 pl,
@@ -1357,7 +1346,7 @@ class Disulfide:
             )
 
             pl.subplot(1, 1)
-            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=fontsize)
 
             self._render(
                 pl,
