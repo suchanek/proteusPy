@@ -1469,27 +1469,29 @@
 </span><span id="L-1298"><a href="#L-1298"><span class="linenos">1298</span></a>        <span class="n">sz</span> <span class="o">=</span> <span class="n">font</span><span class="o">.</span><span class="n">getbbox</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
 </span><span id="L-1299"><a href="#L-1299"><span class="linenos">1299</span></a>        <span class="n">text_width</span> <span class="o">=</span> <span class="n">font</span><span class="o">.</span><span class="n">getbbox</span><span class="p">(</span><span class="n">title</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
 </span><span id="L-1300"><a href="#L-1300"><span class="linenos">1300</span></a>
-</span><span id="L-1301"><a href="#L-1301"><span class="linenos">1301</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Font size: </span><span class="si">{</span><span class="n">fontsize</span><span class="si">}</span><span class="s2">, bbox: </span><span class="si">{</span><span class="n">sz</span><span class="si">}</span><span class="s2">, text width: </span><span class="si">{</span><span class="n">text_width</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="L-1302"><a href="#L-1302"><span class="linenos">1302</span></a>
-</span><span id="L-1303"><a href="#L-1303"><span class="linenos">1303</span></a>        <span class="k">return</span> <span class="n">text_width</span>
+</span><span id="L-1301"><a href="#L-1301"><span class="linenos">1301</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+</span><span id="L-1302"><a href="#L-1302"><span class="linenos">1302</span></a>            <span class="s2">&quot;Font size: </span><span class="si">%d</span><span class="s2">, bbox: </span><span class="si">%s</span><span class="s2">, text width: </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="p">,</span> <span class="n">sz</span><span class="p">,</span> <span class="n">text_width</span>
+</span><span id="L-1303"><a href="#L-1303"><span class="linenos">1303</span></a>        <span class="p">)</span>
 </span><span id="L-1304"><a href="#L-1304"><span class="linenos">1304</span></a>
-</span><span id="L-1305"><a href="#L-1305"><span class="linenos">1305</span></a>    <span class="n">fontsize</span> <span class="o">=</span> <span class="n">max_fontsize</span>
-</span><span id="L-1306"><a href="#L-1306"><span class="linenos">1306</span></a>    <span class="k">while</span> <span class="n">fontsize</span> <span class="o">&gt;</span> <span class="n">min_fontsize</span><span class="p">:</span>
-</span><span id="L-1307"><a href="#L-1307"><span class="linenos">1307</span></a>        <span class="n">text_width</span> <span class="o">=</span> <span class="n">get_text_width</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="p">)</span>
-</span><span id="L-1308"><a href="#L-1308"><span class="linenos">1308</span></a>        <span class="k">if</span> <span class="n">text_width</span> <span class="o">&lt;=</span> <span class="n">window_width</span><span class="p">:</span>
-</span><span id="L-1309"><a href="#L-1309"><span class="linenos">1309</span></a>            <span class="k">break</span>
-</span><span id="L-1310"><a href="#L-1310"><span class="linenos">1310</span></a>        <span class="n">fontsize</span> <span class="o">-=</span> <span class="mi">1</span>
-</span><span id="L-1311"><a href="#L-1311"><span class="linenos">1311</span></a>
-</span><span id="L-1312"><a href="#L-1312"><span class="linenos">1312</span></a>    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Calculated fontsize: </span><span class="si">{</span><span class="n">fontsize</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="L-1313"><a href="#L-1313"><span class="linenos">1313</span></a>    <span class="k">return</span> <span class="n">fontsize</span> <span class="o">//</span> <span class="mi">2</span>
-</span><span id="L-1314"><a href="#L-1314"><span class="linenos">1314</span></a>
-</span><span id="L-1315"><a href="#L-1315"><span class="linenos">1315</span></a>
-</span><span id="L-1316"><a href="#L-1316"><span class="linenos">1316</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="L-1317"><a href="#L-1317"><span class="linenos">1317</span></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">doctest</span>
-</span><span id="L-1318"><a href="#L-1318"><span class="linenos">1318</span></a>
-</span><span id="L-1319"><a href="#L-1319"><span class="linenos">1319</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</span><span id="L-1305"><a href="#L-1305"><span class="linenos">1305</span></a>        <span class="k">return</span> <span class="n">text_width</span>
+</span><span id="L-1306"><a href="#L-1306"><span class="linenos">1306</span></a>
+</span><span id="L-1307"><a href="#L-1307"><span class="linenos">1307</span></a>    <span class="n">fontsize</span> <span class="o">=</span> <span class="n">max_fontsize</span>
+</span><span id="L-1308"><a href="#L-1308"><span class="linenos">1308</span></a>    <span class="k">while</span> <span class="n">fontsize</span> <span class="o">&gt;</span> <span class="n">min_fontsize</span><span class="p">:</span>
+</span><span id="L-1309"><a href="#L-1309"><span class="linenos">1309</span></a>        <span class="n">text_width</span> <span class="o">=</span> <span class="n">get_text_width</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="p">)</span>
+</span><span id="L-1310"><a href="#L-1310"><span class="linenos">1310</span></a>        <span class="k">if</span> <span class="n">text_width</span> <span class="o">&lt;=</span> <span class="n">window_width</span><span class="p">:</span>
+</span><span id="L-1311"><a href="#L-1311"><span class="linenos">1311</span></a>            <span class="k">break</span>
+</span><span id="L-1312"><a href="#L-1312"><span class="linenos">1312</span></a>        <span class="n">fontsize</span> <span class="o">-=</span> <span class="mi">1</span>
+</span><span id="L-1313"><a href="#L-1313"><span class="linenos">1313</span></a>
+</span><span id="L-1314"><a href="#L-1314"><span class="linenos">1314</span></a>    <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calculated fontsize: </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="p">)</span>
+</span><span id="L-1315"><a href="#L-1315"><span class="linenos">1315</span></a>    <span class="k">return</span> <span class="n">fontsize</span> <span class="o">//</span> <span class="mi">2</span>
+</span><span id="L-1316"><a href="#L-1316"><span class="linenos">1316</span></a>
+</span><span id="L-1317"><a href="#L-1317"><span class="linenos">1317</span></a>
+</span><span id="L-1318"><a href="#L-1318"><span class="linenos">1318</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="L-1319"><a href="#L-1319"><span class="linenos">1319</span></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">doctest</span>
 </span><span id="L-1320"><a href="#L-1320"><span class="linenos">1320</span></a>
-</span><span id="L-1321"><a href="#L-1321"><span class="linenos">1321</span></a><span class="c1"># end of file</span>
+</span><span id="L-1321"><a href="#L-1321"><span class="linenos">1321</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</span><span id="L-1322"><a href="#L-1322"><span class="linenos">1322</span></a>
+</span><span id="L-1323"><a href="#L-1323"><span class="linenos">1323</span></a><span class="c1"># end of file</span>
 </span></pre></div>
 
 
@@ -3544,19 +3546,21 @@ disulfide torsional classes for input <code>n</code> classes.</p>
 </span><span id="calculate_fontsize-1299"><a href="#calculate_fontsize-1299"><span class="linenos">1299</span></a>        <span class="n">sz</span> <span class="o">=</span> <span class="n">font</span><span class="o">.</span><span class="n">getbbox</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
 </span><span id="calculate_fontsize-1300"><a href="#calculate_fontsize-1300"><span class="linenos">1300</span></a>        <span class="n">text_width</span> <span class="o">=</span> <span class="n">font</span><span class="o">.</span><span class="n">getbbox</span><span class="p">(</span><span class="n">title</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span>
 </span><span id="calculate_fontsize-1301"><a href="#calculate_fontsize-1301"><span class="linenos">1301</span></a>
-</span><span id="calculate_fontsize-1302"><a href="#calculate_fontsize-1302"><span class="linenos">1302</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Font size: </span><span class="si">{</span><span class="n">fontsize</span><span class="si">}</span><span class="s2">, bbox: </span><span class="si">{</span><span class="n">sz</span><span class="si">}</span><span class="s2">, text width: </span><span class="si">{</span><span class="n">text_width</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="calculate_fontsize-1303"><a href="#calculate_fontsize-1303"><span class="linenos">1303</span></a>
-</span><span id="calculate_fontsize-1304"><a href="#calculate_fontsize-1304"><span class="linenos">1304</span></a>        <span class="k">return</span> <span class="n">text_width</span>
+</span><span id="calculate_fontsize-1302"><a href="#calculate_fontsize-1302"><span class="linenos">1302</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+</span><span id="calculate_fontsize-1303"><a href="#calculate_fontsize-1303"><span class="linenos">1303</span></a>            <span class="s2">&quot;Font size: </span><span class="si">%d</span><span class="s2">, bbox: </span><span class="si">%s</span><span class="s2">, text width: </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="p">,</span> <span class="n">sz</span><span class="p">,</span> <span class="n">text_width</span>
+</span><span id="calculate_fontsize-1304"><a href="#calculate_fontsize-1304"><span class="linenos">1304</span></a>        <span class="p">)</span>
 </span><span id="calculate_fontsize-1305"><a href="#calculate_fontsize-1305"><span class="linenos">1305</span></a>
-</span><span id="calculate_fontsize-1306"><a href="#calculate_fontsize-1306"><span class="linenos">1306</span></a>    <span class="n">fontsize</span> <span class="o">=</span> <span class="n">max_fontsize</span>
-</span><span id="calculate_fontsize-1307"><a href="#calculate_fontsize-1307"><span class="linenos">1307</span></a>    <span class="k">while</span> <span class="n">fontsize</span> <span class="o">&gt;</span> <span class="n">min_fontsize</span><span class="p">:</span>
-</span><span id="calculate_fontsize-1308"><a href="#calculate_fontsize-1308"><span class="linenos">1308</span></a>        <span class="n">text_width</span> <span class="o">=</span> <span class="n">get_text_width</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="p">)</span>
-</span><span id="calculate_fontsize-1309"><a href="#calculate_fontsize-1309"><span class="linenos">1309</span></a>        <span class="k">if</span> <span class="n">text_width</span> <span class="o">&lt;=</span> <span class="n">window_width</span><span class="p">:</span>
-</span><span id="calculate_fontsize-1310"><a href="#calculate_fontsize-1310"><span class="linenos">1310</span></a>            <span class="k">break</span>
-</span><span id="calculate_fontsize-1311"><a href="#calculate_fontsize-1311"><span class="linenos">1311</span></a>        <span class="n">fontsize</span> <span class="o">-=</span> <span class="mi">1</span>
-</span><span id="calculate_fontsize-1312"><a href="#calculate_fontsize-1312"><span class="linenos">1312</span></a>
-</span><span id="calculate_fontsize-1313"><a href="#calculate_fontsize-1313"><span class="linenos">1313</span></a>    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Calculated fontsize: </span><span class="si">{</span><span class="n">fontsize</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="calculate_fontsize-1314"><a href="#calculate_fontsize-1314"><span class="linenos">1314</span></a>    <span class="k">return</span> <span class="n">fontsize</span> <span class="o">//</span> <span class="mi">2</span>
+</span><span id="calculate_fontsize-1306"><a href="#calculate_fontsize-1306"><span class="linenos">1306</span></a>        <span class="k">return</span> <span class="n">text_width</span>
+</span><span id="calculate_fontsize-1307"><a href="#calculate_fontsize-1307"><span class="linenos">1307</span></a>
+</span><span id="calculate_fontsize-1308"><a href="#calculate_fontsize-1308"><span class="linenos">1308</span></a>    <span class="n">fontsize</span> <span class="o">=</span> <span class="n">max_fontsize</span>
+</span><span id="calculate_fontsize-1309"><a href="#calculate_fontsize-1309"><span class="linenos">1309</span></a>    <span class="k">while</span> <span class="n">fontsize</span> <span class="o">&gt;</span> <span class="n">min_fontsize</span><span class="p">:</span>
+</span><span id="calculate_fontsize-1310"><a href="#calculate_fontsize-1310"><span class="linenos">1310</span></a>        <span class="n">text_width</span> <span class="o">=</span> <span class="n">get_text_width</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="p">)</span>
+</span><span id="calculate_fontsize-1311"><a href="#calculate_fontsize-1311"><span class="linenos">1311</span></a>        <span class="k">if</span> <span class="n">text_width</span> <span class="o">&lt;=</span> <span class="n">window_width</span><span class="p">:</span>
+</span><span id="calculate_fontsize-1312"><a href="#calculate_fontsize-1312"><span class="linenos">1312</span></a>            <span class="k">break</span>
+</span><span id="calculate_fontsize-1313"><a href="#calculate_fontsize-1313"><span class="linenos">1313</span></a>        <span class="n">fontsize</span> <span class="o">-=</span> <span class="mi">1</span>
+</span><span id="calculate_fontsize-1314"><a href="#calculate_fontsize-1314"><span class="linenos">1314</span></a>
+</span><span id="calculate_fontsize-1315"><a href="#calculate_fontsize-1315"><span class="linenos">1315</span></a>    <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calculated fontsize: </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="p">)</span>
+</span><span id="calculate_fontsize-1316"><a href="#calculate_fontsize-1316"><span class="linenos">1316</span></a>    <span class="k">return</span> <span class="n">fontsize</span> <span class="o">//</span> <span class="mi">2</span>
 </span></pre></div>
 
 

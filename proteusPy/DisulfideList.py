@@ -230,7 +230,7 @@ class DisulfideList(UserList):
     # Rendering engine calculates and instantiates all bond
     # cylinders and atomic sphere meshes. Called by all high level routines
 
-    def _render(self, pl, style, res=100, fontsize=FONTSIZE) -> pv.Plotter:
+    def _render(self, pl, style, res=100, panelsize=WINSIZE) -> pv.Plotter:
         """
         Display a window showing the list of disulfides in the given style.
         :param style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd'
@@ -262,6 +262,7 @@ class DisulfideList(UserList):
             src = ss.pdb_id
             enrg = ss.energy
             title = f"{src} {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°"
+            fontsize = calculate_fontsize(title, panelsize)
             pl.add_title(title=title, font_size=fontsize)
             ss._render(
                 pl,
@@ -589,13 +590,15 @@ class DisulfideList(UserList):
 
         set_plotly_theme(light)
 
-        title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
-        fontsize = calculate_fontsize(title, panelsize)
+        # title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
 
         pl = pv.Plotter(window_size=winsize, shape=(rows, cols))
-        pl = self._render(pl, style, fontsize=fontsize)
+        pl = self._render(pl, style, panelsize=panelsize)
         pl.enable_anti_aliasing("msaa")
-        pl.add_title(title=title, font_size=fontsize)
+
+        # the subwindows already show a title
+        # pl.add_title(title=title, font_size=fontsize)
+
         pl.link_views()
         pl.reset_camera()
         pl.show()
