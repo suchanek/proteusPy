@@ -1298,7 +1298,9 @@ def calculate_fontsize(title, window_width, max_fontsize=FONTSIZE, min_fontsize=
         sz = font.getbbox(title)
         text_width = font.getbbox(title)[2]
 
-        _logger.info(f"Font size: {fontsize}, bbox: {sz}, text width: {text_width}")
+        _logger.debug(
+            "Font size: %d, bbox: %s, text width: %d", fontsize, sz, text_width
+        )
 
         return text_width
 
@@ -1309,7 +1311,7 @@ def calculate_fontsize(title, window_width, max_fontsize=FONTSIZE, min_fontsize=
             break
         fontsize -= 1
 
-    _logger.info(f"Calculated fontsize: {fontsize}")
+    _logger.debug("Calculated fontsize: %d", fontsize)
     return fontsize // 2
 
 
