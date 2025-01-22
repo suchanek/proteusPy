@@ -300,7 +300,7 @@ class DisulfideLoader:
                     res.append(self.SSList[ssid])
         return res
 
-    def _class_indices_from_tors_df(self, class_string, base=8) -> pd.Index:
+    def class_indices_from_tors_df(self, class_string, base=8) -> pd.Index:
         """
         Return the row indices of the torsion dataframe that match the class string.
 
@@ -922,7 +922,7 @@ class DisulfideLoader:
             case _:
                 raise ValueError(f"Base must be 2 or 8, not {base}")
 
-        indices = self._class_indices_from_tors_df(class_string, base=base)
+        indices = self.class_indices_from_tors_df(class_string, base=base)
 
         for i in indices:
             sslist.append(self[i])
