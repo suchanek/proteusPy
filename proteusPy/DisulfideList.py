@@ -46,7 +46,7 @@ import proteusPy
 from proteusPy import Disulfide
 from proteusPy.atoms import BOND_RADIUS
 from proteusPy.logger_config import create_logger
-from proteusPy.ProteusGlobals import FONTSIZE, MODEL_DIR, PBAR_COLS, PDB_DIR, WINSIZE
+from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, PDB_DIR, WINSIZE
 from proteusPy.utility import (
     calculate_fontsize,
     get_jet_colormap,
@@ -578,15 +578,10 @@ class DisulfideList(UserList):
         """
         # from proteusPy.utility import get_theme
 
-        pid = self.pdb_id
         ssbonds = self.data
         tot_ss = len(ssbonds)  # number off ssbonds
         rows, cols = grid_dimensions(tot_ss)
         winsize = (panelsize * cols, panelsize * rows)
-
-        avg_enrg = self.average_energy
-        avg_dist = self.average_distance
-        resolution = self.average_resolution
 
         set_plotly_theme(light)
 

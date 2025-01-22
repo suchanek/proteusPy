@@ -327,14 +327,14 @@ class DisulfideLoader:
             disulfide_dict[disulfide.pdb_id].append(index)
         return disulfide_dict
 
-    def print_classes(self, base=8):
+    def get_class_df(self, base=8) -> pd.DataFrame:
         """
-        Print the classes in the database.
+        Return the class incidence dataframe for the input base.
 
-        :param base: The base class to use, 6 or 8.
-        :return: None
+        :param base: The base class to use, 2 or 8.
+        :return: pd.DataFrame
         """
-        self.tclass.print_classes(base)
+        return self.tclass.get_class_df(base)
 
     def extract_class(self, clsid: str, verbose: bool = False) -> DisulfideList:
         """
@@ -896,7 +896,7 @@ class DisulfideLoader:
         :param fname: The name of the image file to save. Default is 'ss_torsions.png'.
         :type fname: str
         :param theme: One of 'Auto', 'Light', or 'Dark'. Default is 'Auto'.
-        :type light: str
+        :type theme: str
         :return: None
         """
         self.SSList.display_torsion_statistics(
