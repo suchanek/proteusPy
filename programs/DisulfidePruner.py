@@ -23,7 +23,7 @@ from pyvista import set_plot_theme
 from tqdm import tqdm
 
 from proteusPy import DisulfideList, Load_PDB_SS
-from proteusPy.Disulfide import Torsion_DF_Cols
+from proteusPy.proteusGlobals import Torsion_DF_Cols
 from proteusPy.utility import extract_firstchain_ss, prune_extra_ss
 
 # override the default location for the stored disulfides, which defaults to DATA_DIR

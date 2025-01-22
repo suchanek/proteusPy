@@ -38,6 +38,7 @@ from proteusPy.atoms import (
     SPEC_POWER,
     SPECULARITY,
 )
+from proteusPy.DisulfideClass_Constructor import DisulfideClass_Constructor
 from proteusPy.DisulfideExceptions import (
     DisulfideConstructionException,
     DisulfideConstructionWarning,
@@ -45,7 +46,7 @@ from proteusPy.DisulfideExceptions import (
 )
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.logger_config import create_logger
-from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, WINSIZE
+from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, WINSIZE, Torsion_DF_Cols
 from proteusPy.Residue import build_residue
 from proteusPy.ssparser import (
     get_phipsi_atoms_coordinates,
@@ -73,29 +74,6 @@ logging.basicConfig(
 
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
-
-# columns for the torsions file dataframe.
-Torsion_DF_Cols = [
-    "source",
-    "ss_id",
-    "proximal",
-    "distal",
-    "chi1",
-    "chi2",
-    "chi3",
-    "chi4",
-    "chi5",
-    "energy",
-    "ca_distance",
-    "cb_distance",
-    "sg_distance",
-    "phi_prox",
-    "psi_prox",
-    "phi_dist",
-    "psi_dist",
-    "torsion_length",
-    "rho",
-]
 
 ORIGIN = Vector3D(0.0, 0.0, 0.0)
 
@@ -765,6 +743,24 @@ class Disulfide:
         else:
             # exceptions are fatal - raise again with new message (including line nr)
             raise DisulfideConstructionException(message) from None
+
+    @property
+    def binary_class_string(self):
+        """
+        Return a binary string representation of the disulfide bond class.
+        """
+        return DisulfideClass_Constructor.class_string_from_dihedral(
+            self.chi1, self.chi2, self.chi3, self.chi4, self.chi5, base=2
+        )
+
+    @property
+    def octant_class_string(self):
+        """
+        Return the octant string representation of the disulfide bond class.
+        """
+        return DisulfideClass_Constructor.class_string_from_dihedral(
+            self.chi1, self.chi2, self.chi3, self.chi4, self.chi5, base=8
+        )
 
     @property
     def bond_angle_ideality(self):

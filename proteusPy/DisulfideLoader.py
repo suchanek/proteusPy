@@ -458,7 +458,7 @@ class DisulfideLoader:
 
     def getTorsions(self, pdbID=None) -> pd.DataFrame:
         """
-        Return the torsions, distances and energies defined by Disulfide.Torsion_DF_cols
+        Return the torsions, distances and energies defined by Torsion_DF_cols
 
         :param pdbID: pdbID, defaults to None, meaning return entire dataset.
         :type pdbID: str, optional used to extract for a specific PDB structure. If not specified
