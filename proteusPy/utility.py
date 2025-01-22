@@ -1150,7 +1150,7 @@ def set_plotly_theme(theme: str) -> None:
             _logger.error("Invalid theme. Must be 'auto', 'light', or 'dark'.")
             pio.templates.default = "plotly_white"
 
-    _logger.info("Plotly theme set to: %s", pio.templates.default)
+    _logger.debug("Plotly theme set to: %s", pio.templates.default)
 
     return None
 

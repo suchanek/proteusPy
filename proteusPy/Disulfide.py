@@ -45,14 +45,14 @@ from proteusPy.DisulfideExceptions import (
 )
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.logger_config import create_logger
-from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, FONTSIZE, WINSIZE
+from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, WINSIZE
 from proteusPy.Residue import build_residue
 from proteusPy.ssparser import (
     get_phipsi_atoms_coordinates,
     get_residue_atoms_coordinates,
 )
 from proteusPy.turtle3D import ORIENT_SIDECHAIN, Turtle3D
-from proteusPy.utility import calculate_fontsize, get_theme, set_plotly_theme
+from proteusPy.utility import get_theme, set_plotly_theme
 from proteusPy.vector3D import (
     Vector3D,
     calc_dihedral,
