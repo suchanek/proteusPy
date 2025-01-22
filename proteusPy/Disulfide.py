@@ -46,7 +46,7 @@ from proteusPy.DisulfideExceptions import (
 )
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.logger_config import create_logger
-from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, WINSIZE, Torsion_DF_Cols
+from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, WINSIZE
 from proteusPy.Residue import build_residue
 from proteusPy.ssparser import (
     get_phipsi_atoms_coordinates,
