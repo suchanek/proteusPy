@@ -137,3 +137,28 @@ CA_CUTOFF = 6.71
 SG_CUTOFF = 2.12
 
 FONTSIZE = 12
+
+# columns for the torsions file dataframe.
+Torsion_DF_Cols = [
+    "source",
+    "ss_id",
+    "proximal",
+    "distal",
+    "chi1",
+    "chi2",
+    "chi3",
+    "chi4",
+    "chi5",
+    "energy",
+    "ca_distance",
+    "cb_distance",
+    "sg_distance",
+    "phi_prox",
+    "psi_prox",
+    "phi_dist",
+    "psi_dist",
+    "torsion_length",
+    "rho",
+    "binary_class_string",
+    "octant_class_string",
+]

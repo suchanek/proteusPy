@@ -42,7 +42,7 @@ PDB_SS = DisulfideLoader(verbose=True, subset=True)
 
 
 # retrieve the torsions dataframe
-from proteusPy.Disulfide import Torsion_DF_Cols
+from proteusPy.proteusGlobals Torsion_DF_Cols
 
 _SSdf = PDB_SS.getTorsions()
 

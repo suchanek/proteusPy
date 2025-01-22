@@ -46,7 +46,13 @@ import proteusPy
 from proteusPy import Disulfide
 from proteusPy.atoms import BOND_RADIUS
 from proteusPy.logger_config import create_logger
-from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, PDB_DIR, WINSIZE
+from proteusPy.ProteusGlobals import (
+    MODEL_DIR,
+    PBAR_COLS,
+    PDB_DIR,
+    WINSIZE,
+    Torsion_DF_Cols,
+)
 from proteusPy.utility import (
     calculate_fontsize,
     get_jet_colormap,
@@ -67,27 +73,6 @@ TORMAX = 180.0
 
 NBINS = 380
 
-Torsion_DF_Cols = [
-    "source",
-    "ss_id",
-    "proximal",
-    "distal",
-    "chi1",
-    "chi2",
-    "chi3",
-    "chi4",
-    "chi5",
-    "energy",
-    "ca_distance",
-    "cb_distance",
-    "sg_distance",
-    "phi_prox",
-    "psi_prox",
-    "phi_dist",
-    "psi_dist",
-    "torsion_length",
-    "rho",
-]
 
 Distance_DF_Cols = [
     "source",
@@ -478,6 +463,8 @@ class DisulfideList(UserList):
                 "psi_dist": ss.psidist,
                 "torsion_length": ss.torsion_length,
                 "rho": ss.rho,
+                "binary_class_string": ss.binary_class_string,
+                "octant_class_string": ss.octant_class_string,
             }
             rows.append(new_row)
             i += 1
