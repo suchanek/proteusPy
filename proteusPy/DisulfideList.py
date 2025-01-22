@@ -420,8 +420,6 @@ class DisulfideList(UserList):
 
         return SS_df
 
-    # here we build a dataframe containing the torsional parameters
-
     def build_torsion_df(self) -> pd.DataFrame:
         """
         Create a dataframe containing the input DisulfideList torsional parameters,

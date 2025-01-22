@@ -300,6 +300,32 @@ class DisulfideLoader:
                     res.append(self.SSList[ssid])
         return res
 
+    def _class_indices_from_tors_df(self, class_string, base=8) -> pd.Index:
+        """
+        Return the row indices of the torsion dataframe that match the class string.
+
+        This method is used internally to find the indices of rows in the torsion dataframe
+        that match the specified class string based on the given base.
+
+        :param class_string: The class string to match in the torsion dataframe.
+        :type class_string: str
+        :param base: The base class to use for matching, either 2 or 8. Defaults to 8.
+        :type base: int
+        :return: The row indices of the torsion dataframe that match the class string.
+        :rtype: pd.Index
+        :raises ValueError: If the base is not 2 or 8.
+        """
+        tors_df = self.TorsionDF
+        match base:
+            case 8:
+                field = "octant_class_string"
+            case 2:
+                field = "binary_class_string"
+            case _:
+                raise ValueError(f"Base must be 2 or 8, not {base}")
+
+        return tors_df[tors_df[field] == class_string].index
+
     def copy(self):
         """
         Return a copy of self.
@@ -878,6 +904,30 @@ class DisulfideLoader:
         Plot histograms for Bondlength_Deviation, Angle_Deviation, and Ca_Distance.
         """
         self.SSList.plot_deviation_histograms(theme=theme, verbose=verbose)
+
+    def sslist_from_class(self, class_string, base=8) -> DisulfideList:
+        """
+        Return a DisulfideList containing Disulfides with the given class_string.
+
+        :param class_string: The class string to search for.
+        :param base: The base of the class string. Default is 8.
+        :return: DisulfideList containing Disulfides with the given class_string.
+        """
+        sslist = DisulfideList([], class_string)
+        match base:
+            case 8:
+                field = "octant_class_string"
+            case 2:
+                field = "binary_class_string"
+            case _:
+                raise ValueError(f"Base must be 2 or 8, not {base}")
+
+        indices = self._class_indices_from_tors_df(class_string, base=base)
+
+        for i in indices:
+            sslist.append(self[i])
+
+        return sslist
 
     def display_torsion_statistics(
         self,
