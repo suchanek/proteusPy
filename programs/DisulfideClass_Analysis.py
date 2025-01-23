@@ -1,6 +1,6 @@
 # pylint: disable=C0301
 # pylint: disable=C0103
-# Last modification: 2025-01-04 12:38:52 -egs-
+# Last modification: 2025-01-23 14:21:21 -egs-
 
 """
 Disulfide class consensus structure extraction using `proteusPy.Disulfide` package. Disulfide
@@ -99,7 +99,6 @@ import time
 from datetime import timedelta
 from pathlib import Path
 
-import pandas as pd
 from colorama import Fore, Style, init
 from tqdm import tqdm
 
@@ -230,7 +229,6 @@ def get_args():
 def task(
     loader: pp.DisulfideLoader,
     overall_pbar: tqdm,
-    eight_or_bin: pd.DataFrame,
     start_idx: int,
     end_idx: int,
     result_list: pp.DisulfideList,
@@ -274,7 +272,7 @@ def task(
 
         pbar.set_postfix({"CLS": cls})
 
-        class_disulfides = loader.sslist_from_class(cls, base=base)
+        class_disulfides = loader.sslist_from_class(cls, base=base, cutoff=cutoff)
 
         pbar.update(1)
 
@@ -282,7 +280,10 @@ def task(
 
         if do_graph:
             class_disulfides.display_torsion_statistics(
-                display=False, save=True, fname=fname, theme="light"
+                display=False,
+                save=True,
+                fname=fname,
+                theme="light",
             )
 
         avg_conformation = class_disulfides.average_conformation
@@ -302,7 +303,6 @@ def analyze_classes_threaded(
     do_graph=False,
     cutoff=0.0,
     num_threads=8,
-    verbose=False,
     do_octant=True,
     prefix="ss",
 ) -> pp.DisulfideList:
@@ -325,13 +325,14 @@ def analyze_classes_threaded(
         class_filename = Path(DATA_DIR) / SS_CONSENSUS_OCT_FILE
         save_dir = OCTANT
         eight_or_bin = loader.tclass.eightclass_df
-        res_list = pp.DisulfideList([], "SS_8class_Avg_SS")
+        res_list = pp.DisulfideList([], f"SS_32class_Avg_SS_{cutoff:.2f}")
         pix = octant_classes_vs_cutoff(loader, cutoff)
         base = 8
         classlist = tors_df["octant_class_string"].unique()
         total_classes = len(classlist)
 
-        print(f"Expecting {pix} graphs for the octant classes.")
+        if do_graph:
+            print(f"Expecting {pix} graphs for the octant classes.")
     else:
         class_filename = Path(DATA_DIR) / SS_CONSENSUS_BIN_FILE
         save_dir = BINARY
@@ -368,13 +369,13 @@ def analyze_classes_threaded(
             leave=False,
             ncols=PBAR_COLS + 10,
             bar_format="{l_bar}%s{bar}{r_bar}%s" % (Fore.BLUE, Style.RESET_ALL),
+            miniters=100,
         )
         thread = threading.Thread(
             target=task,
             args=(
                 loader,
                 overall_pbar,
-                eight_or_bin,
                 start_idx,
                 end_idx,
                 result_lists[i],
@@ -414,7 +415,6 @@ def analyze_classes(
     threads: int = 4,
     do_graph: bool = False,
     cutoff: float = 0.0,
-    verbose: bool = False,
 ):
     """
     Analyzes disulfide bond classes using the provided loader.
@@ -445,7 +445,6 @@ def analyze_classes(
             loader,
             do_graph=do_graph,
             cutoff=cutoff,
-            verbose=verbose,
             num_threads=threads,
             do_octant=True,
             prefix="ss_oct",
@@ -458,7 +457,6 @@ def analyze_classes(
             loader,
             do_graph=do_graph,
             cutoff=0.0,
-            verbose=verbose,
             num_threads=threads,
             do_octant=False,
             prefix="ss_bin",
