@@ -3,7 +3,7 @@ This module is part of the proteusPy package, a Python package for
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
-Last revision: 2025-01-07 22:04:58 -egs-
+Last revision: 2025-01-17 18:27:03 -egs-
 """
 
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
@@ -65,8 +65,11 @@ class DisulfideLoader:
     proteusPy.DisulfideList, a ```Pandas``` .csv file, and a ```dict``` of
     indices mapping the PDB IDs into their respective list of disulfides. The datastructures allow
     simple, direct and flexible access to the disulfide structures contained herein.
-    This makes it possible to access the disulfides by array index, PDB structure ID or disulfide
-    name.
+    This makes it possible to access the disulfides by array index, PDB structure ID, disulfide
+    name and class ID.
+
+    The class also provides methods for plotting distance and angle deviations
+    as well as torsion statistics for the disulfides in the database.
 
     The class can also render Disulfides overlaid on a common coordinate system to a pyVista
     window using the [display_overlay()](#DisulfideLoader.display_overlay) method. See below for examples.
@@ -75,10 +78,6 @@ class DisulfideLoader:
     The difference is that the latter function loads the compressed database from its single
     source. The `DisulfideLoader` class is used to build the Disulifde database with a
     specific cutoff, or for saving the database to a file.
-
-    *Developer's Notes:*
-    The .pkl files needed to instantiate this class and save it into its final .pkl file are
-    defined in the proteusPy.data class and should not be changed.
     """
 
     def __init__(
@@ -98,8 +97,9 @@ class DisulfideLoader:
         memory or time. The name for the subset file is hard-coded. One can pass a
         different data directory and file names for the pickle files. These different
         directories are normally established with the proteusPy.Extract_Disulfides
-        function.
-
+        program. The ``cutoff`` is the distance in Angstroms used to filter the disulfides
+        by Cα distance. The ``sg_cutoff`` is the distance in Angstroms used to filter the
+        disulfides by Sγ distance. The verbose flag controls the amount of output.
         """
 
         self.SSList = DisulfideList([], "ALL_PDB_SS")
@@ -142,10 +142,9 @@ class DisulfideLoader:
             with open(full_path, "rb") as f:
                 sslist = pickle.load(f)
                 old_length = len(sslist)
-
                 filt = DisulfideList(sslist.filter_by_distance(cutoff), "filtered")
-
                 new_length = len(filt)
+
                 if self.verbose:
                     _logger.info(
                         "Filtering with Cα cutoff %f: old: %d, new: %d",
@@ -241,8 +240,8 @@ class DisulfideLoader:
             res = self.extract_class(item, verbose=self.verbose)
             return res
 
+        # PDB_SS['4yys'] return a list of SS
         try:
-            # PDB_SS['4yys'] return a list of SS
             indices = self.SSDict[item]
             if indices:
                 res = DisulfideList([], item)
@@ -301,6 +300,32 @@ class DisulfideLoader:
                     res.append(self.SSList[ssid])
         return res
 
+    def class_indices_from_tors_df(self, class_string, base=8) -> pd.Index:
+        """
+        Return the row indices of the torsion dataframe that match the class string.
+
+        This method is used internally to find the indices of rows in the torsion dataframe
+        that match the specified class string based on the given base.
+
+        :param class_string: The class string to match in the torsion dataframe.
+        :type class_string: str
+        :param base: The base class to use for matching, either 2 or 8. Defaults to 8.
+        :type base: int
+        :return: The row indices of the torsion dataframe that match the class string.
+        :rtype: pd.Index
+        :raises ValueError: If the base is not 2 or 8.
+        """
+        tors_df = self.TorsionDF
+        match base:
+            case 8:
+                field = "octant_class_string"
+            case 2:
+                field = "binary_class_string"
+            case _:
+                raise ValueError(f"Base must be 2 or 8, not {base}")
+
+        return tors_df[tors_df[field] == class_string].index
+
     def copy(self):
         """
         Return a copy of self.
@@ -328,14 +353,14 @@ class DisulfideLoader:
             disulfide_dict[disulfide.pdb_id].append(index)
         return disulfide_dict
 
-    def print_classes(self, base=8):
+    def get_class_df(self, base=8) -> pd.DataFrame:
         """
-        Print the classes in the database.
+        Return the class incidence dataframe for the input base.
 
-        :param base: The base class to use, 6 or 8.
-        :return: None
+        :param base: The base class to use, 2 or 8.
+        :return: pd.DataFrame
         """
-        self.tclass.print_classes(base)
+        return self.tclass.get_class_df(base)
 
     def extract_class(self, clsid: str, verbose: bool = False) -> DisulfideList:
         """
@@ -432,11 +457,11 @@ class DisulfideLoader:
         :return: None
 
         Example:
-        >>> from proteusPy import Disulfide, Load_PDB_SS, DisulfideList
+        >>> import proteusPy as pp
 
         Instantiate the Loader with the SS database subset.
 
-        >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
+        >>> PDB_SS = pp.Load_PDB_SS(verbose=False, subset=True)
 
         Display the Disulfides from the PDB ID ```4yys```, overlaid onto
         a common reference (the proximal disulfides).
@@ -459,7 +484,7 @@ class DisulfideLoader:
 
     def getTorsions(self, pdbID=None) -> pd.DataFrame:
         """
-        Return the torsions, distances and energies defined by Disulfide.Torsion_DF_cols
+        Return the torsions, distances and energies defined by Torsion_DF_cols
 
         :param pdbID: pdbID, defaults to None, meaning return entire dataset.
         :type pdbID: str, optional used to extract for a specific PDB structure. If not specified
@@ -469,8 +494,8 @@ class DisulfideLoader:
         :rtype: pd.DataFrame
 
         Example:
-        >>> from proteusPy import Load_PDB_SS
-        >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
+        >>> import proteusPy as pp
+        >>> PDB_SS = pp.Load_PDB_SS(verbose=False, subset=True)
         >>> Tor_DF = PDB_SS.getTorsions()
         """
         res_df = pd.DataFrame()
@@ -835,7 +860,7 @@ class DisulfideLoader:
         return pdbids, num_disulfides
 
     def plot_distances(
-        self, distance_type="ca", cutoff=-1, flip=False, theme="auto", log=True
+        self, distance_type="ca", cutoff=-1, comparison="less", theme="auto", log=True
     ):
         """
         Plot the distances for the disulfides in the loader.
@@ -844,8 +869,9 @@ class DisulfideLoader:
         :type distance_type: str
         :param cutoff: The cutoff value for the distance, defaults to -1 (no cutoff).
         :type cutoff: float
-        :param flip: Whether to flip the plot. (<= or >), defaults to <
-        :type flip: bool
+        :param comparison: if 'less' then plot distances less than the cutoff, if 'greater' then plot
+        distances greater than the cutoff.
+        :type flip: str
         :param theme: The theme to use for the plot ('auto', 'light', or 'dark'), defaults to 'auto'.
         :type theme: str
         :param log: Whether to use a log scale for the y-axis, defaults to True.
@@ -855,16 +881,56 @@ class DisulfideLoader:
         self.SSList.plot_distances(
             distance_type=distance_type,
             cutoff=cutoff,
-            flip=flip,
+            comparison=comparison,
             theme=theme,
             log=log,
         )
+
+    def plot_deviation_scatterplots(self, verbose=False, theme="auto"):
+        """
+        Plot scatter plots for Bondlength_Deviation, Angle_Deviation Ca_Distance
+        and SG_Distance.
+
+        :param verbose: Whether to display the plot in the notebook. Default is False.
+        :type verbose: bool
+        :param theme: One of 'Auto', 'Light', or 'Dark'. Default is 'Auto'.
+        :type light: str
+        :return: None
+        """
+        self.SSList.plot_deviation_scatterplots(verbose=verbose, theme=theme)
 
     def plot_deviation_histograms(self, theme="auto", verbose=True):
         """
         Plot histograms for Bondlength_Deviation, Angle_Deviation, and Ca_Distance.
         """
         self.SSList.plot_deviation_histograms(theme=theme, verbose=verbose)
+
+    def sslist_from_class(self, class_string, base=8, cutoff=0.0) -> DisulfideList:
+        """
+        Return a DisulfideList containing Disulfides with the given class_string.
+
+        :param class_string: The class string to search for.
+        :param base: The base of the class string. Default is 8.
+        :param cutoff: The % cutoff value for the class. Default is 0.0.
+        :return: DisulfideList containing Disulfides with the given class_string.
+        """
+        sslist_name = f"{class_string}_{base}_{cutoff:.2f}"
+        sslist = DisulfideList([], sslist_name)
+
+        match base:
+            case 8:
+                field = "octant_class_string"
+            case 2:
+                field = "binary_class_string"
+            case _:
+                raise ValueError(f"Base must be 2 or 8, not {base}")
+
+        indices = self.class_indices_from_tors_df(class_string, base=base)
+
+        for i in indices:
+            sslist.append(self[i])
+
+        return sslist
 
     def display_torsion_statistics(
         self,
@@ -883,7 +949,7 @@ class DisulfideLoader:
         :param fname: The name of the image file to save. Default is 'ss_torsions.png'.
         :type fname: str
         :param theme: One of 'Auto', 'Light', or 'Dark'. Default is 'Auto'.
-        :type light: str
+        :type theme: str
         :return: None
         """
         self.SSList.display_torsion_statistics(

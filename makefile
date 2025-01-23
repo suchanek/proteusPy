@@ -5,7 +5,7 @@
 VERS := $(shell python -c "exec(open('proteusPy/_version.py').read()); print(__version__)")
 RM := rm
 CONDA ?= conda
-MESS = "v0.98.4"
+MESS = "v0.98.5.dev4"
 DEVNAME = ppydev
 
 .PHONY: all vers newvers nuke pkg dev clean devclean install install_dev jup jup_dev format bld sdist docs upload tag push-tag commit tests docker docker_hub docker_github docker_all docker_run docker_purge
@@ -66,15 +66,11 @@ jup_dev:
 format:
 	black proteusPy
 
-bld: docs sdist
-	@echo "Building $(VERS)..."
-	python setup.py bdist_wheel
-	pdoc -o docs --math --logo "./logo.png" ./proteusPy
-	@echo "Build complete."
+bld: sdist docs
 
 sdist: proteusPy/_version.py
-	@echo "Building source distribution..."
-	python setup.py sdist
+	@echo "Building source distribution and wheels..."
+	python -m build
 
 docs: $(wildcard proteusPy/**/*.py)
 	@echo "Generating documentation..."
@@ -110,7 +106,7 @@ docker_hub: viewer/rcsb_viewer.py viewer/dockerfile
 		-f viewer/dockerfile \
 		-t docker.io/egsuchanek/rcsb_viewer:latest \
 		-t docker.io/egsuchanek/rcsb_viewer:$(VERS) \
-		--push
+		--push --no-cache
 
 docker_github: viewer/rcsb_viewer.py viewer/dockerfile
 	docker buildx use cloud-egsuchanek-rcsbviewer
