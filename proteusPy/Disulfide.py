@@ -1069,7 +1069,7 @@ class Disulfide:
         >>> from proteusPy.Disulfide import Disulfide
         >>> modss = Disulfide('model')
         >>> modss.build_model(-60, -60, -90, -60, -60)
-        >>> modss.display(style='sb')
+        >>> modss.display(style='sb', light="auto")
         """
 
         self.dihedrals = [chi1, chi2, chi3, chi4, chi5]
@@ -1248,7 +1248,7 @@ class Disulfide:
         return energy
 
     def display(
-        self, single=True, style="sb", light="Auto", shadows=False, winsize=WINSIZE
+        self, single=True, style="sb", light="auto", shadows=False, winsize=WINSIZE
     ) -> None:
         """
         Display the Disulfide bond in the specific rendering style.
@@ -1269,7 +1269,7 @@ class Disulfide:
 
         >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
         >>> ss = PDB_SS[0]
-        >>> ss.display(style='cpk')
+        >>> ss.display(style='cpk', light="auto")
         >>> ss.screenshot(style='bs', fname='proteus_logo_sb.png')
         """
         src = self.pdb_id
@@ -1278,8 +1278,6 @@ class Disulfide:
         title = f"{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Cβ: {self.cb_distance:.2f} Å, Sg: {self.sg_distance:.2f} Å Tors: {self.torsion_length:.2f}°"
 
         set_plotly_theme(light)
-        # fontsize = calculate_fontsize(title, winsize[0])
-        # this works generally well.
         fontsize = 8
 
         if single:
@@ -1323,10 +1321,6 @@ class Disulfide:
             self._render(
                 pl,
                 style="bs",
-                bondcolor=BOND_COLOR,
-                bs_scale=BS_SCALE,
-                spec=SPECULARITY,
-                specpow=SPEC_POWER,
             )
 
             pl.subplot(1, 0)
@@ -1335,10 +1329,6 @@ class Disulfide:
             self._render(
                 pl,
                 style="sb",
-                bondcolor=BOND_COLOR,
-                bs_scale=BS_SCALE,
-                spec=SPECULARITY,
-                specpow=SPEC_POWER,
             )
 
             pl.subplot(1, 1)
@@ -1347,10 +1337,6 @@ class Disulfide:
             self._render(
                 pl,
                 style="pd",
-                bondcolor=BOND_COLOR,
-                bs_scale=BS_SCALE,
-                spec=SPECULARITY,
-                specpow=SPEC_POWER,
             )
 
             pl.link_views()
@@ -1660,10 +1646,6 @@ class Disulfide:
         pl = self._render(
             pl,
             style=style,
-            bondcolor=BOND_COLOR,
-            bs_scale=BS_SCALE,
-            spec=SPECULARITY,
-            specpow=SPEC_POWER,
         )
         pl.reset_camera()
         pl.orbit_on_path(path, write_frames=True)
@@ -1727,10 +1709,6 @@ class Disulfide:
             self._render(
                 pl,
                 style="cpk",
-                bondcolor=BOND_COLOR,
-                bs_scale=BS_SCALE,
-                spec=SPECULARITY,
-                specpow=SPEC_POWER,
             )
 
             pl.subplot(0, 1)
@@ -1738,10 +1716,6 @@ class Disulfide:
             self._render(
                 pl,
                 style="bs",
-                bondcolor=BOND_COLOR,
-                bs_scale=BS_SCALE,
-                spec=SPECULARITY,
-                specpow=SPEC_POWER,
             )
 
             pl.subplot(1, 0)
@@ -1749,20 +1723,12 @@ class Disulfide:
             self._render(
                 pl,
                 style="sb",
-                bondcolor=BOND_COLOR,
-                bs_scale=BS_SCALE,
-                spec=SPECULARITY,
-                specpow=SPEC_POWER,
             )
 
             pl.subplot(1, 1)
             self._render(
                 pl,
                 style="pd",
-                bondcolor=BOND_COLOR,
-                bs_scale=BS_SCALE,
-                spec=SPECULARITY,
-                specpow=SPEC_POWER,
             )
 
             pl.link_views()
@@ -2045,10 +2011,6 @@ class Disulfide:
             self._render(
                 pl,
                 style=style,
-                bondcolor=BOND_COLOR,
-                bs_scale=BS_SCALE,
-                spec=SPECULARITY,
-                specpow=SPEC_POWER,
             )
             pl.reset_camera()
             if shadows:
@@ -2074,10 +2036,6 @@ class Disulfide:
             self._render(
                 pl,
                 style="cpk",
-                bondcolor=BOND_COLOR,
-                bs_scale=BS_SCALE,
-                spec=SPECULARITY,
-                specpow=SPEC_POWER,
             )
 
             pl.subplot(0, 1)
@@ -2085,10 +2043,6 @@ class Disulfide:
             self._render(
                 pl,
                 style="pd",
-                bondcolor=BOND_COLOR,
-                bs_scale=BS_SCALE,
-                spec=SPECULARITY,
-                specpow=SPEC_POWER,
             )
 
             pl.subplot(1, 0)
@@ -2096,10 +2050,6 @@ class Disulfide:
             self._render(
                 pl,
                 style="bs",
-                bondcolor=BOND_COLOR,
-                bs_scale=BS_SCALE,
-                spec=SPECULARITY,
-                specpow=SPEC_POWER,
             )
 
             pl.subplot(1, 1)
@@ -2107,10 +2057,6 @@ class Disulfide:
             self._render(
                 pl,
                 style="sb",
-                bondcolor=BOND_COLOR,
-                bs_scale=BS_SCALE,
-                spec=SPECULARITY,
-                specpow=SPEC_POWER,
             )
 
             pl.link_views()
@@ -2167,10 +2113,6 @@ class Disulfide:
         self._plot(
             pl,
             style=style,
-            bondcolor=BOND_COLOR,
-            bs_scale=BS_SCALE,
-            spec=SPECULARITY,
-            specpow=SPEC_POWER,
         )
 
         self.save_meshes_as_stl(pl, fname)
