@@ -2,7 +2,7 @@
 DisulfideBond Class Analysis Dictionary creation
 Author: Eric G. Suchanek, PhD.
 License: BSD
-Last Modification: 2025-01-16 10:12:19 -egs-
+Last Modification: 2025-01-22 00:02:43 -egs-
 
 Disulfide Class creation and manipulation. Binary classes using the +/- formalism of Hogg et al. 
 (Biochem, 2006, 45, 7429-7433), are created for all 32 possible classes from the Disulfides 
@@ -26,7 +26,6 @@ from proteusPy import __version__
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
-    CLASSOBJ_FNAME,
     DATA_DIR,
     SS_CLASS_DEFINITIONS,
     SS_CONSENSUS_BIN_FILE,
@@ -395,10 +394,14 @@ class DisulfideClass_Constructor:
         _df = pd.DataFrame()
         if base == 6:
             for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
-                _df[col_name + "_t"] = df[col_name].apply(self.get_sixth_quadrant)
+                _df[col_name + "_t"] = df[col_name].apply(
+                    DisulfideClass_Constructor.get_sixth_quadrant
+                )
         elif base == 8:
             for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
-                _df[col_name + "_t"] = df[col_name].apply(self.get_eighth_quadrant)
+                _df[col_name + "_t"] = df[col_name].apply(
+                    DisulfideClass_Constructor.get_eighth_quadrant
+                )
         else:
             raise ValueError("Base must be either 6 or 8")
 
@@ -423,76 +426,173 @@ class DisulfideClass_Constructor:
         :return: A new Pandas DataFrame containing only rows where the percentage is greater than or equal to the cutoff
         :rtype: pandas.DataFrame
         """
-        if base == 8:
-            df = self.eightclass_df
-        elif base == 2:
-            df = self.binaryclass_df
-        else:
-            raise ValueError("Invalid base. Must be 6 or 8.")
+
+        match base:
+            case 8:
+                df = self.eightclass_df
+            case 2:
+                df = self.binaryclass_df
+            case _:
+                raise ValueError("Invalid base. Must be 6 or 8.")
 
         return df[df["percentage"] >= cutoff].copy()
 
-    def get_sixth_quadrant(self, angle_deg):
+    @staticmethod
+    def get_binary_quadrant(angle_deg):
         """
-        Return the sextant in which an angle in degrees lies if the area is described by dividing a unit circle into 6 equal segments.
+        Return the binary quadrant in which an angle in degrees lies if the area is described by dividing a unit circle into 2 equal segments.
 
-        :param angle_deg (float): The angle in degrees.
+        :param angle_deg (float or array-like): The angle in degrees.
 
         Returns:
-        :return int: The sextant (1-6) that the angle belongs to.
+        :return str or array-like: The binary quadrant (0 or 2) that the angle belongs to.
         """
-        # Normalize the angle to the range [0, 360)
-        angle_deg = angle_deg % 360
+        angle_deg = (
+            np.array(angle_deg) % 360
+        )  # Normalize the angle to the range [0, 360)
 
-        if angle_deg >= 0 and angle_deg < 60:
-            return str(6)
-        elif angle_deg >= 60 and angle_deg < 120:
-            return str(5)
-        elif angle_deg >= 120 and angle_deg < 180:
-            return str(4)
-        elif angle_deg >= 180 and angle_deg < 240:
-            return str(3)
-        elif angle_deg >= 240 and angle_deg < 300:
-            return str(2)
-        elif angle_deg >= 300 and angle_deg < 360:
-            return str(1)
-        else:
+        if np.isscalar(angle_deg):
+            if angle_deg >= 0 and angle_deg < 180:
+                return str(2)
+
+            if angle_deg >= 180 and angle_deg < 360:
+                return str(0)
+
             raise ValueError(
                 "Invalid angle value: angle must be in the range [-360, 360)."
             )
 
-    def get_eighth_quadrant(self, angle_deg):
-        """
-        Return the octant in which an angle in degrees lies if the area is described by dividing a unit circle into 8 equal segments.
+        quadrants = np.where((angle_deg >= 0) & (angle_deg < 180), "2", "0")
+        return "".join(quadrants)
 
-        :param angle_deg (float): The angle in degrees.
+    @staticmethod
+    def get_sixth_quadrant(angle_deg):
+        """
+        Return the sixth quadrant in which an angle in degrees lies if the area is described by dividing a unit circle into 6 equal segments.
+
+        :param angle_deg (float or array-like): The angle in degrees.
 
         Returns:
-        :return str: The octant (1-8) that the angle belongs to.
+        :return str or array-like: The sixth quadrant (1 to 6) that the angle belongs to.
         """
-        # Normalize the angle to the range [0, 360)
-        angle_deg = angle_deg % 360
+        angle_deg = (
+            np.array(angle_deg) % 360
+        )  # Normalize the angle to the range [0, 360)
 
-        if angle_deg >= 0 and angle_deg < 45:
-            return str(8)
-        elif angle_deg >= 45 and angle_deg < 90:
-            return str(7)
-        elif angle_deg >= 90 and angle_deg < 135:
-            return str(6)
-        elif angle_deg >= 135 and angle_deg < 180:
-            return str(5)
-        elif angle_deg >= 180 and angle_deg < 225:
-            return str(4)
-        elif angle_deg >= 225 and angle_deg < 270:
-            return str(3)
-        elif angle_deg >= 270 and angle_deg < 315:
-            return str(2)
-        elif angle_deg >= 315 and angle_deg < 360:
-            return str(1)
+        if np.isscalar(angle_deg):
+            if angle_deg >= 0 and angle_deg < 60:
+                return str(6)
+            elif angle_deg >= 60 and angle_deg < 120:
+                return str(5)
+            elif angle_deg >= 120 and angle_deg < 180:
+                return str(4)
+            elif angle_deg >= 180 and angle_deg < 240:
+                return str(3)
+            elif angle_deg >= 240 and angle_deg < 300:
+                return str(2)
+            elif angle_deg >= 300 and angle_deg < 360:
+                return str(1)
+            else:
+                raise ValueError(
+                    "Invalid angle value: angle must be in the range [-360, 360)."
+                )
         else:
-            raise ValueError(
-                "Invalid angle value: angle must be in the range [-360, 360)."
-            )
+            quadrants = np.empty(angle_deg.shape, dtype=str)
+            quadrants[(angle_deg >= 0) & (angle_deg < 60)] = "6"
+            quadrants[(angle_deg >= 60) & (angle_deg < 120)] = "5"
+            quadrants[(angle_deg >= 120) & (angle_deg < 180)] = "4"
+            quadrants[(angle_deg >= 180) & (angle_deg < 240)] = "3"
+            quadrants[(angle_deg >= 240) & (angle_deg < 300)] = "2"
+            quadrants[(angle_deg >= 300) & (angle_deg < 360)] = "1"
+            return "".join(quadrants)
+
+    @staticmethod
+    def get_eighth_quadrant(angle_deg):
+        """
+        Return the eighth quadrant in which an angle in degrees lies if the area is described by dividing a unit circle into 8 equal segments.
+
+        :param angle_deg (float or array-like): The angle in degrees.
+
+        Returns:
+        :return str or array-like: The eighth quadrant (1 to 8) that the angle belongs to.
+        """
+        angle_deg = (
+            np.array(angle_deg) % 360
+        )  # Normalize the angle to the range [0, 360)
+
+        if np.isscalar(angle_deg):
+            if angle_deg >= 0 and angle_deg < 45:
+                return str(8)
+            elif angle_deg >= 45 and angle_deg < 90:
+                return str(7)
+            elif angle_deg >= 90 and angle_deg < 135:
+                return str(6)
+            elif angle_deg >= 135 and angle_deg < 180:
+                return str(5)
+            elif angle_deg >= 180 and angle_deg < 225:
+                return str(4)
+            elif angle_deg >= 225 and angle_deg < 270:
+                return str(3)
+            elif angle_deg >= 270 and angle_deg < 315:
+                return str(2)
+            elif angle_deg >= 315 and angle_deg < 360:
+                return str(1)
+            else:
+                raise ValueError(
+                    "Invalid angle value: angle must be in the range [-360, 360)."
+                )
+        else:
+            quadrants = np.empty(angle_deg.shape, dtype=str)
+            quadrants[(angle_deg >= 0) & (angle_deg < 45)] = "8"
+            quadrants[(angle_deg >= 45) & (angle_deg < 90)] = "7"
+            quadrants[(angle_deg >= 90) & (angle_deg < 135)] = "6"
+            quadrants[(angle_deg >= 135) & (angle_deg < 180)] = "5"
+            quadrants[(angle_deg >= 180) & (angle_deg < 225)] = "4"
+            quadrants[(angle_deg >= 225) & (angle_deg < 270)] = "3"
+            quadrants[(angle_deg >= 270) & (angle_deg < 315)] = "2"
+            quadrants[(angle_deg >= 315) & (angle_deg < 360)] = "1"
+            return "".join(quadrants)
+
+    @staticmethod
+    def class_string_from_dihedral(*args, base=8) -> str:
+        """
+        Return the class string for a set of dihedral angles, given the base.
+
+        :param args: One or five dihedral angles.
+        :param base: The base class to use, 2, 6, or 8. Defaults to 8.
+        :return: The class string for the input dihedral angles.
+        :rtype: str
+        :raises ValueError: If the number of dihedral angles is not 1 or 5, or if the base is not 2, 6, or 8.
+        """
+        if len(args) not in [1, 5]:
+            raise ValueError("You must enter either 1 or 5 dihedral angles.")
+
+        if base not in [2, 6, 8]:
+            raise ValueError("Invalid base. Must be 2, 6, or 8.")
+
+        angles = np.array(args).flatten()
+
+        if len(angles) == 1:
+            match base:
+                case 2:
+                    return DisulfideClass_Constructor.get_binary_quadrant(angles[0])
+                case 6:
+                    return DisulfideClass_Constructor.get_sixth_quadrant(angles[0])
+                case 8:
+                    return DisulfideClass_Constructor.get_eighth_quadrant(angles[0])
+                case _:
+                    raise ValueError("Invalid base. Must be 2, 6, or 8.")
+
+        elif len(angles) == 5:
+            match base:
+                case 2:
+                    return DisulfideClass_Constructor.get_binary_quadrant(angles)
+                case 6:
+                    return DisulfideClass_Constructor.get_sixth_quadrant(angles)
+                case 8:
+                    return DisulfideClass_Constructor.get_eighth_quadrant(angles)
+                case _:
+                    raise ValueError("Invalid base. Must be 2, 6, or 8.")
 
     def sslist_from_classid(self, cls: str, base=8) -> pd.DataFrame:
         """
@@ -515,26 +615,6 @@ class DisulfideClass_Constructor:
             raise ValueError(f"Multiple rows found for class_id '{cls}'")
 
         return filtered_df.iloc[0]["ss_id"]
-
-    def save(self, savepath=DATA_DIR) -> None:
-        """
-        Save a copy of the fully instantiated class to the specified file.
-
-        :param savepath: Path to save the file, defaults to DATA_DIR
-        """
-        _fname = None
-        fname = CLASSOBJ_FNAME
-
-        _fname = f"{savepath}{fname}"
-
-        if self.verbose:
-            _logger.info("Writing %s", _fname)
-
-        with open(_fname, "wb+") as f:
-            pickle.dump(self, f)
-
-        if self.verbose:
-            _logger.info("Done.")
 
     def class_to_binary(self, cls_str, base=8):
         """
@@ -563,26 +643,27 @@ class DisulfideClass_Constructor:
                     output_str += "0"
         return output_str
 
-    def print_classes(self, base=8):
+    def get_class_df(self, base=8):
         """
-        Print the Disulfide structural classes.
+        Get the Disulfide structural classes DataFrame.
 
-        :param self: The instance of the DisulfideClass_Constructor
-        :type self: DisulfideClass_Constructor
-        :return: None
-        :rtype: None
+        :param base: The base class to use, either 2 or 8. Defaults to 8.
+        :type base: int
+        :return: A DataFrame containing the class_id, count, incidence, and percentage columns.
+        :rtype: pandas.DataFrame
+        :raises ValueError: If the base is not 2 or 8.
         """
+        columns = ["class_id", "count", "incidence", "percentage"]
+        match base:
+            case 2:
+                class_df = self.binaryclass_df
+            case 8:
+                class_df = self.eightclass_df
+            case _:
+                raise ValueError("Invalid base. Must be 2, or 8.")
 
-        if base == 2:
-            cdict = self.binaryclass_dict
-
-        elif base == 8:
-            cdict = self.eightclass_dict
-        else:
-            raise ValueError("Invalid base. Must be 2, or 8.")
-
-        for key in cdict:
-            print(f"Class: |{key}|, {len(cdict[key])}")
+        result_df = class_df[columns]
+        return result_df
 
 
 # class definition ends

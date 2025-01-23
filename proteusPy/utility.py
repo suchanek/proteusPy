@@ -8,6 +8,7 @@ Copyright (c)2024 Eric G. Suchanek, PhD, all rights reserved
 # Last modification 2025-01-04 12:40:28 -egs-
 
 # pylint: disable=c0103
+# pylint: disable=c0301
 # pylint: disable=c0302
 # pylint: disable=c0413
 # pylint: disable=c0412
@@ -34,6 +35,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import psutil
+from PIL import ImageFont
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from proteusPy import Disulfide, DisulfideList, __version__
@@ -42,6 +44,7 @@ from proteusPy.DisulfideExceptions import DisulfideIOException
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
     DPI,
+    FONTSIZE,
     MODEL_DIR,
     PDB_DIR,
     PROBLEM_ID_FILE,
@@ -1147,7 +1150,7 @@ def set_plotly_theme(theme: str) -> None:
             _logger.error("Invalid theme. Must be 'auto', 'light', or 'dark'.")
             pio.templates.default = "plotly_white"
 
-    _logger.info("Plotly theme set to: %s", pio.templates.default)
+    _logger.debug("Plotly theme set to: %s", pio.templates.default)
 
     return None
 
@@ -1235,6 +1238,81 @@ def plot_class_chart(classes: int) -> None:
 
     # Show the chart
     fig.show()
+
+
+def find_arial_font():
+    """
+    Find the system font file arial.ttf for macOS, Windows, and Linux.
+
+    :return: The path to the arial.ttf font file if found, otherwise None.
+    """
+    font_paths = {
+        "Windows": [r"C:\Windows\Fonts\arial.ttf", r"C:\Windows\Fonts\Arial.ttf"],
+        "Darwin": [
+            "/Library/Fonts/Arial.ttf",
+            "/System/Library/Fonts/Arial.ttf",
+            "/System/Library/Fonts/Supplemental/Arial.ttf",
+        ],
+        "Linux": [
+            "/usr/share/fonts/truetype/msttcorefonts/arial.ttf",
+            "/usr/share/fonts/truetype/msttcore/arial.ttf",
+            "/usr/share/fonts/truetype/arial.ttf",
+            "/usr/share/fonts/Arial.ttf",
+        ],
+    }
+
+    system = platform.system()
+    if system in font_paths:
+        for path in font_paths[system]:
+            if os.path.exists(path):
+                return path
+
+    return None
+
+
+def calculate_fontsize(title, window_width, max_fontsize=FONTSIZE, min_fontsize=2):
+    """
+    Calculate the maximum font size for the title so that it fits within the window width in PyVista.
+
+    :param title: The title text.
+    :param window_width: The width of the window in pixels.
+    :param font_path: The path to the font file.
+    :param max_fontsize: The maximum font size.
+    :param min_fontsize: The minimum font size.
+    :return: The calculated font size.
+    """
+
+    if not title:
+        return min_fontsize  # Default to the smallest size if the title is empty
+
+    font_path = find_arial_font()
+
+    if not font_path:
+        _logger.warning("Arial font not found.")
+        return min_fontsize
+
+    def get_text_width(title, fontsize):
+        # Load the font with the given fontsize
+        font = ImageFont.truetype(font_path, fontsize)
+        # Calculate and return the text width using getbbox
+        sz = font.getbbox(title)
+        text_width = font.getbbox(title)[2]
+
+        _logger.debug(
+            "Font size: %d, bbox: %s, text width: %d", fontsize, sz, text_width
+        )
+
+        return text_width
+
+    fontsize = max_fontsize
+    while fontsize > min_fontsize:
+        text_width = get_text_width(title, fontsize)
+        if text_width <= window_width:
+            break
+        fontsize -= 1
+
+    _logger.debug("Calculated fontsize: %d", fontsize)
+    return fontsize // 2
 
 
 if __name__ == "__main__":

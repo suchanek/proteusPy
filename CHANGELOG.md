@@ -5,6 +5,20 @@ Notable changes to the ``proteusPy`` project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.98.5] - 2024-1-30
+
+### Added
+
+- static method ``DisufideClass_Constructor.class_string_from_dihedral()`` - return the binary or octant class string for a single or array of dihedrals.
+- properties ``Disulfide.binary_class_string`` and ``Disulfide.octant_class_string``
+- ``DisulfideLoader.sslist_from_class()`` - now uses the index value for a specific disulfide that matches the classID from the TorsionDF dataframe. This allows for direct access to the DisulfideList containing the Disulfides via ``loader[index]``, which is significantly faster than looking up via ``loader[disulfide_name]``.
+
+### Changed
+
+- vectorized binary and octant class string construction
+- added binary and octant class strings to the master ``loader.TorsionDF`` DataFrame.
+
+
 ## [v0.98.4] - 2024-1-17
 
 ### Added

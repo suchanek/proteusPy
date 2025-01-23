@@ -36,7 +36,6 @@ from .atoms import (
     BOND_RADIUS,
     BS_SCALE,
     CAMERA_SCALE,
-    FONTSIZE,
     SPEC_POWER,
     SPECULARITY,
 )
@@ -85,6 +84,7 @@ from .ProteusGlobals import (
     _INT_INIT,
     CA_CUTOFF,
     CAMERA_POS,
+    FONTSIZE,
     LOADER_ALL_MASTER_URL,
     LOADER_FNAME,
     LOADER_FNAME_URL,
@@ -99,7 +99,6 @@ from .ProteusGlobals import (
     SS_CLASS_DICT_FILE,
     SS_CONSENSUS_BIN_FILE,
     SS_CONSENSUS_OCT_FILE,
-    SS_CONSENSUS_SEXT_FILE,
     SS_ID_FILE,
     SS_LIST_URL,
     SS_MASTER_PICKLE_FILE,

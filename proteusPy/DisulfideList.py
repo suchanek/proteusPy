@@ -44,12 +44,18 @@ from plotly.subplots import make_subplots
 
 import proteusPy
 from proteusPy import Disulfide
-from proteusPy.atoms import BOND_RADIUS, FONTSIZE
+from proteusPy.atoms import BOND_RADIUS
 from proteusPy.logger_config import create_logger
-from proteusPy.ProteusGlobals import MODEL_DIR, PBAR_COLS, PDB_DIR, WINSIZE
+from proteusPy.ProteusGlobals import (
+    MODEL_DIR,
+    PBAR_COLS,
+    PDB_DIR,
+    WINSIZE,
+    Torsion_DF_Cols,
+)
 from proteusPy.utility import (
+    calculate_fontsize,
     get_jet_colormap,
-    get_theme,
     grid_dimensions,
     set_plotly_theme,
 )
@@ -67,27 +73,6 @@ TORMAX = 180.0
 
 NBINS = 380
 
-Torsion_DF_Cols = [
-    "source",
-    "ss_id",
-    "proximal",
-    "distal",
-    "chi1",
-    "chi2",
-    "chi3",
-    "chi4",
-    "chi5",
-    "energy",
-    "ca_distance",
-    "cb_distance",
-    "sg_distance",
-    "phi_prox",
-    "psi_prox",
-    "phi_dist",
-    "psi_dist",
-    "torsion_length",
-    "rho",
-]
 
 Distance_DF_Cols = [
     "source",
@@ -230,7 +215,7 @@ class DisulfideList(UserList):
     # Rendering engine calculates and instantiates all bond
     # cylinders and atomic sphere meshes. Called by all high level routines
 
-    def _render(self, pl, style, res=100) -> pv.Plotter:
+    def _render(self, pl, style, res=100, panelsize=WINSIZE) -> pv.Plotter:
         """
         Display a window showing the list of disulfides in the given style.
         :param style: one of 'cpk', 'bs', 'sb', 'plain', 'cov', 'pd'
@@ -262,7 +247,8 @@ class DisulfideList(UserList):
             src = ss.pdb_id
             enrg = ss.energy
             title = f"{src} {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°"
-            pl.add_title(title=title, font_size=FONTSIZE)
+            fontsize = calculate_fontsize(title, panelsize)
+            pl.add_title(title=title, font_size=fontsize)
             ss._render(
                 pl,
                 style=style,
@@ -434,8 +420,6 @@ class DisulfideList(UserList):
 
         return SS_df
 
-    # here we build a dataframe containing the torsional parameters
-
     def build_torsion_df(self) -> pd.DataFrame:
         """
         Create a dataframe containing the input DisulfideList torsional parameters,
@@ -477,6 +461,8 @@ class DisulfideList(UserList):
                 "psi_dist": ss.psidist,
                 "torsion_length": ss.torsion_length,
                 "rho": ss.rho,
+                "binary_class_string": ss.binary_class_string,
+                "octant_class_string": ss.octant_class_string,
             }
             rows.append(new_row)
             i += 1
@@ -562,7 +548,7 @@ class DisulfideList(UserList):
         print(f"Bond angle deviation: {avg_bondangle:.2f}°")
         print(f"Bond length deviation: {avg_bondlength:.2f} Å")
 
-    def display(self, style="sb", light="Auto", panelsize=512):
+    def display(self, style="sb", light="auto", panelsize=512):
         """
         Display the Disulfide list in the specific rendering style.
 
@@ -577,36 +563,22 @@ class DisulfideList(UserList):
         """
         # from proteusPy.utility import get_theme
 
-        pid = self.pdb_id
         ssbonds = self.data
         tot_ss = len(ssbonds)  # number off ssbonds
         rows, cols = grid_dimensions(tot_ss)
         winsize = (panelsize * cols, panelsize * rows)
 
-        avg_enrg = self.average_energy
-        avg_dist = self.average_distance
-        resolution = self.average_resolution
+        set_plotly_theme(light)
 
-        if light == "light":
-            pv.set_plot_theme("document")
-        elif light == "dark":
-            pv.set_plot_theme("dark")
-        else:
-            _theme = get_theme()
-            if _theme == "light":
-                pv.set_plot_theme("document")
-            elif _theme == "dark":
-                pv.set_plot_theme("dark")
-                _logger.info("Dark mode detected.")
-            else:
-                pv.set_plot_theme("document")
-
-        title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
+        # title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
 
         pl = pv.Plotter(window_size=winsize, shape=(rows, cols))
-        pl = self._render(pl, style)
+        pl = self._render(pl, style, panelsize=panelsize)
         pl.enable_anti_aliasing("msaa")
-        pl.add_title(title=title, font_size=FONTSIZE)
+
+        # the subwindows already show a title
+        # pl.add_title(title=title, font_size=fontsize)
+
         pl.link_views()
         pl.reset_camera()
         pl.show()
@@ -795,7 +767,8 @@ class DisulfideList(UserList):
         movie=False,
         verbose=False,
         fname="ss_overlay.png",
-        light="Auto",
+        light="auto",
+        winsize=WINSIZE,
     ):
         """
         Display all disulfides in the list overlaid in stick mode against
@@ -828,28 +801,17 @@ class DisulfideList(UserList):
         if tot_ss > 90:
             res = 8
 
-        title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
+        title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), E: {avg_enrg:.2f} kcal/mol, Dist: {avg_dist:.2f} Å"
+        fontsize = calculate_fontsize(title, winsize[0])
 
-        if light == "light":
-            pv.set_plot_theme("document")
-        elif light == "dark":
-            pv.set_plot_theme("dark")
-        else:
-            _theme = get_theme()
-            if _theme == "light":
-                pv.set_plot_theme("document")
-            elif _theme == "dark":
-                pv.set_plot_theme("dark")
-                _logger.info("Dark mode detected.")
-            else:
-                pv.set_plot_theme("document")
+        set_plotly_theme(light)
 
         if movie:
-            pl = pv.Plotter(window_size=WINSIZE, off_screen=True)
+            pl = pv.Plotter(window_size=winsize, off_screen=True)
         else:
-            pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
+            pl = pv.Plotter(window_size=winsize, off_screen=False)
 
-        pl.add_title(title=title, font_size=FONTSIZE)
+        pl.add_title(title=title, font_size=fontsize)
         pl.enable_anti_aliasing("msaa")
         # pl.add_camera_orientation_widget()
         pl.add_axes()
@@ -1291,13 +1253,13 @@ class DisulfideList(UserList):
         df = pd.DataFrame(data)
         return df
 
-    def extract_distances(self, distance_type="sg", flip=False, cutoff=-1):
+    def extract_distances(self, distance_type="sg", comparison="less", cutoff=-1):
         """
         Extract and filter the distance values from the disulfide list based on the specified type and comparison.
 
         :param disulfide_list: List of disulfide objects.
         :param distance_type: Type of distance to extract ('sg' or 'ca').
-        :param flip: If true, return distances greater than the cutoff value.
+        :param comparison: If 'less', return distances less than the cutoff value, otherwise return distances greater than or equal to the cutoff value.
         :param cutoff: Cutoff value for filtering distances.
         :return: List of filtered distance values.
         """
@@ -1315,7 +1277,7 @@ class DisulfideList(UserList):
         if cutoff == -1.0:
             return distances
 
-        if flip:
+        if comparison == "greater":
             filtered_distances = [d for d in distances if d > cutoff]
         else:
             filtered_distances = [d for d in distances if d <= cutoff]
@@ -1323,7 +1285,7 @@ class DisulfideList(UserList):
         return filtered_distances
 
     def plot_distances(
-        self, distance_type="sg", cutoff=-1, flip=False, theme="auto", log=True
+        self, distance_type="sg", cutoff=-1, comparison="less", theme="auto", log=True
     ):
         """
         Plot the distance values as a histogram using plotly express.
@@ -1337,10 +1299,10 @@ class DisulfideList(UserList):
         """
 
         set_plotly_theme(theme)
-        cmp_str = "less" if not flip else "greater"
 
-        distances = self.extract_distances(distance_type, cmp_str, cutoff)
+        distances = self.extract_distances(distance_type, comparison, cutoff)
         yaxis_type = "log" if log else "linear"
+        flip = False if comparison == "less" else True
 
         match distance_type:
             case "sg":
@@ -1384,6 +1346,38 @@ class DisulfideList(UserList):
             yaxis_type=yaxis_type,
             bargap=0.2,
         )
+        fig.show()
+
+    def plot_deviation_scatterplots(self, verbose=False, theme="auto"):
+        """
+        Plot scatter plots for Bondlength_Deviation, Angle_Deviation, Ca_Distance, and Sg_Distance
+        with the row index as the x-axis.
+
+        :param verbose: If True, display additional information during processing, defaults to False.
+        :type verbose: bool
+        :param theme: The theme to use for the plot ('auto', 'light', or 'dark'), defaults to 'auto'.
+        :type theme: str
+        """
+        set_plotly_theme(theme)
+
+        df = self.create_deviation_dataframe(verbose=verbose)
+
+        fig = px.scatter(
+            df, x=df.index, y="Bondlength_Deviation", title="Bondlength Deviation"
+        )
+        fig.update_layout(xaxis_title="Row Index", yaxis_title="Bondlength Deviation")
+        fig.show()
+
+        fig = px.scatter(df, x=df.index, y="Angle_Deviation", title="Angle Deviation")
+        fig.update_layout(xaxis_title="Row Index", yaxis_title="Angle Deviation")
+        fig.show()
+
+        fig = px.scatter(df, x=df.index, y="Ca_Distance", title="Cα Distance")
+        fig.update_layout(xaxis_title="Row Index", yaxis_title="Cα Distance")
+        fig.show()
+
+        fig = px.scatter(df, x=df.index, y="Sg_Distance", title="Sg Distance")
+        fig.update_layout(xaxis_title="Row Index", yaxis_title="Sg Distance")
         fig.show()
 
     def plot_deviation_histograms(self, verbose=False, theme="auto", log=True) -> None:

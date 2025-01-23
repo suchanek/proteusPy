@@ -4,23 +4,21 @@
 # Cα Cβ Sγ
 
 import math
+import time
+
 import matplotlib
 import matplotlib.pyplot as plt
-
+import pandas as pd
 import plotly_express as px
-
-# import seaborn as sns
+import pyvista as pv
+from pyvista import set_plot_theme
 
 import proteusPy
 from proteusPy import *
 from proteusPy.Disulfide import *
-
 from proteusPy.ProteusGlobals import *
 
-import pandas as pd
-import pyvista as pv
-from pyvista import set_plot_theme
-import time
+# import seaborn as sns
 
 
 plt.style.use("dark_background")
@@ -66,7 +64,7 @@ GRIDSIZE = 20
 #
 #
 # retrieve the torsions dataframe
-from proteusPy.Disulfide import Torsion_DF_Cols
+from proteusPy.ProteusGlobals import Torsion_DF_Cols
 
 _SSdf = PDB_SS.getTorsions()
 # there are a few structures with bad SSBonds. Their
@@ -119,10 +117,11 @@ for k in range(n_clusters):
 
 # plt.show()
 
+import seaborn as sns
+
 # 2
 # takes over an hour for full dataset
 from sklearn.cluster import SpectralClustering
-import seaborn as sns
 
 _cols = ["chi3", "torsion_length", "energy"]
 # _cols = ['chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'torsion_length']
@@ -172,9 +171,7 @@ X["cluster"] = aff_model.fit_predict(X[["torsion_length"]])
 
 fig, ax = plt.subplots()
 ax.set(title="Affinity Propagation")
-sns.scatterplot(
-    x="torsion_length", y="energy", data=X, hue="cluster", ax=ax, size=2
-)
+sns.scatterplot(x="torsion_length", y="energy", data=X, hue="cluster", ax=ax, size=2)
 
 from sklearn.mixture import GaussianMixture
 
