@@ -58,6 +58,7 @@ from proteusPy.utility import (
     get_jet_colormap,
     grid_dimensions,
     set_plotly_theme,
+    set_pyvista_theme,
 )
 
 # pio.renderers.default = "png"  # or 'svg'
@@ -568,7 +569,7 @@ class DisulfideList(UserList):
         rows, cols = grid_dimensions(tot_ss)
         winsize = (panelsize * cols, panelsize * rows)
 
-        set_plotly_theme(light)
+        set_pyvista_theme(light)
 
         # title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), Avg E: {avg_enrg:.2f} kcal/mol, Avg Dist: {avg_dist:.2f} Å"
 
@@ -804,7 +805,7 @@ class DisulfideList(UserList):
         title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), E: {avg_enrg:.2f} kcal/mol, Dist: {avg_dist:.2f} Å"
         fontsize = calculate_fontsize(title, winsize[0])
 
-        set_plotly_theme(light)
+        set_pyvista_theme(light)
 
         if movie:
             pl = pv.Plotter(window_size=winsize, off_screen=True)

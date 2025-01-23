@@ -5,6 +5,17 @@ Notable changes to the ``proteusPy`` project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.98.6.dev0] - 2024-1-23 (beta)
+
+## Added
+
+- ``proteusPy.set_pyvista_theme`` - sets default theme to current system theme.
+- Initialized the themes in ``__init.py``
+
+## Fixed
+
+- Corrected auto-theming in Disulfide displays.
+- 
 ## [v0.98.5] - 2024-1-23
 
 ### Added

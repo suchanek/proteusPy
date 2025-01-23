@@ -151,6 +151,7 @@ from .utility import (
     retrieve_git_lfs_files,
     save_list_to_file,
     set_plotly_theme,
+    set_pyvista_theme,
     sort_by_column,
 )
 from .vector3D import (
@@ -165,5 +166,6 @@ from .vector3D import (
 _logger.setLevel(logging.INFO)
 _logger.info("ProteusPy %s initialized.", __version__)
 _logger.info("Plotly theme set to: %s", set_plotly_theme(theme="auto"))
+_logger.info("Pyvista theme set to: %s", set_pyvista_theme(theme="auto"))
 _logger.setLevel(DEFAULT_LOG_LEVEL)
 # end of file

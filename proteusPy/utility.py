@@ -2,7 +2,7 @@
 Utility functions for the proteusPy package \n
 Author: Eric G. Suchanek, PhD. \n
 License: BSD\n
-Copyright (c)2024 Eric G. Suchanek, PhD, all rights reserved
+Copyright (c)2025 Eric G. Suchanek, PhD, all rights reserved
 """
 
 # Last modification 2025-01-04 12:40:28 -egs-
@@ -35,13 +35,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import psutil
+import pyvista as pv
 from PIL import ImageFont
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from proteusPy import Disulfide, DisulfideList, __version__
 from proteusPy.angle_annotation import AngleAnnotation
 from proteusPy.DisulfideExceptions import DisulfideIOException
-from proteusPy.logger_config import create_logger, set_logger_level
+from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
     DPI,
     FONTSIZE,
@@ -940,10 +941,6 @@ def Extract_Disulfides_From_List(
     return
 
 
-import platform
-import subprocess
-
-
 def get_theme():
     """
     Determine the display theme for the current operating system.
@@ -990,13 +987,13 @@ def get_theme():
             return "light"
 
         except subprocess.CalledProcessError as e:
-            _logger.error(f"CalledProcessError occurred: {e}")
-            _logger.error(f"stderr: {e.stderr}")
+            _logger.error("CalledProcessError occurred: %s", e)
+            _logger.error("stderr: %s", e.stderr)
             # In case of any exception, return "light"
             return "light"
 
         except Exception as e:
-            _logger.error(f"Exception occurred: {e}")
+            _logger.error("Exception occurred: %s", e)
             # In case of any exception, return "light"
             return "light"
 
@@ -1119,6 +1116,34 @@ def load_list_from_file(filename):
     return loaded_list
 
 
+def set_pyvista_theme(theme: str) -> str:
+    """
+    Set the PyVista plotting theme based on the provided theme string.
+
+    Parameters:
+    theme (str): The desired theme for PyVista plotting. Accepts "light" or "dark".
+
+    Returns:
+    str: The theme that was set. If an invalid theme is provided, it returns the current theme.
+    """
+    if theme == "light":
+        pv.set_plot_theme("document")
+        return
+    elif theme == "dark":
+        pv.set_plot_theme("dark")
+        return
+    else:
+        _theme = get_theme()
+        if _theme == "light":
+            pv.set_plot_theme("document")
+        elif _theme == "dark":
+            pv.set_plot_theme("dark")
+            _logger.info("Dark mode detected.")
+        else:
+            pv.set_plot_theme("document")
+    return _theme
+
+
 def set_plotly_theme(theme: str, verbose=False) -> str:
     """
     Set the Plotly theme based on the provided theme parameter.
@@ -1149,7 +1174,7 @@ def set_plotly_theme(theme: str, verbose=False) -> str:
         case _:
             _logger.error("Invalid theme. Must be 'auto', 'light', or 'dark'.")
             pio.templates.default = "plotly_white"
-    
+
     if verbose:
         _logger.warning("Plotly theme set to: %s", pio.templates.default)
 

@@ -53,7 +53,7 @@ from proteusPy.ssparser import (
     get_residue_atoms_coordinates,
 )
 from proteusPy.turtle3D import ORIENT_SIDECHAIN, Turtle3D
-from proteusPy.utility import get_theme, set_plotly_theme
+from proteusPy.utility import get_theme, set_plotly_theme, set_pyvista_theme
 from proteusPy.vector3D import (
     Vector3D,
     calc_dihedral,
@@ -1277,7 +1277,7 @@ class Disulfide:
 
         title = f"{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Cβ: {self.cb_distance:.2f} Å, Sg: {self.sg_distance:.2f} Å Tors: {self.torsion_length:.2f}°"
 
-        set_plotly_theme(light)
+        set_pyvista_theme(light)
         fontsize = 8
 
         if single:
