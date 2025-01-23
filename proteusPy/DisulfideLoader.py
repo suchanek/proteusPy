@@ -905,15 +905,18 @@ class DisulfideLoader:
         """
         self.SSList.plot_deviation_histograms(theme=theme, verbose=verbose)
 
-    def sslist_from_class(self, class_string, base=8) -> DisulfideList:
+    def sslist_from_class(self, class_string, base=8, cutoff=0.0) -> DisulfideList:
         """
         Return a DisulfideList containing Disulfides with the given class_string.
 
         :param class_string: The class string to search for.
         :param base: The base of the class string. Default is 8.
+        :param cutoff: The % cutoff value for the class. Default is 0.0.
         :return: DisulfideList containing Disulfides with the given class_string.
         """
-        sslist = DisulfideList([], class_string)
+        sslist_name = f"{class_string}_{base}_{cutoff:.2f}"
+        sslist = DisulfideList([], sslist_name)
+
         match base:
             case 8:
                 field = "octant_class_string"
