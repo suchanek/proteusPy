@@ -235,13 +235,10 @@ def task(
     end_idx: int,
     result_list: pp.DisulfideList,
     pbar: tqdm,
-    total_ss: int,
     cutoff: float,
     do_graph: bool,
     save_dir: str,
     prefix: str,
-    position: int,
-    tasknum: int,
     base: int,
     classlist: list,
 ):
@@ -255,13 +252,10 @@ def task(
     :param end_idx: Ending index for processing.
     :param result_list: List to store the resulting disulfides.
     :param pbar: tqdm progress bar for overall progress.
-    :param total_ss: Total number of disulfides.
     :param cutoff: Cutoff percentage to filter classes.
     :param do_graph: Boolean flag to generate and save graphs.
     :param save_dir: Directory to save the output files.
     :param prefix: Prefix for the output file names.
-    :param position: Vertical position of the progress bar.
-    :param tasknum: Task number for identification.
     :param base: Base value for the class indices, 2 for binary and 8 for octant.
     :param classlist: List of class names.
     :return: None
@@ -269,21 +263,22 @@ def task(
 
     for idx in range(start_idx, end_idx):
         cls = classlist[idx]
-        tot = len(loader.class_indices_from_tors_df(cls, base))
+        tot_class_ss = len(loader.class_indices_from_tors_df(cls, base))
 
         # tot = loader.TotalDisulfides
-        if 100 * tot / loader.TotalDisulfides < cutoff:
+        if 100 * tot_class_ss / loader.TotalDisulfides < cutoff:
             pbar.set_postfix({"SKP": cls})
             pbar.update(1)
             overall_pbar.update(1)
             continue
 
+        pbar.set_postfix({"CLS": cls})
+
         class_disulfides = loader.sslist_from_class(cls, base=base)
 
-        pbar.set_postfix({"CLS": cls})
         pbar.update(1)
 
-        fname = Path(save_dir) / f"{prefix}_{cutoff}_{cls}_{tot}.png"
+        fname = Path(save_dir) / f"{prefix}_{cutoff}_{cls}_{tot_class_ss}.png"
 
         if do_graph:
             class_disulfides.display_torsion_statistics(
@@ -336,8 +331,7 @@ def analyze_classes_threaded(
         classlist = tors_df["octant_class_string"].unique()
         total_classes = len(classlist)
 
-        if verbose:
-            _logger.warning(f"Expecting {pix} graphs for the octant classes.")
+        print(f"Expecting {pix} graphs for the octant classes.")
     else:
         class_filename = Path(DATA_DIR) / SS_CONSENSUS_BIN_FILE
         save_dir = BINARY
@@ -359,7 +353,7 @@ def analyze_classes_threaded(
         desc=f"{Fore.GREEN}Overall Progress{Style.RESET_ALL}".ljust(20),
         position=0,
         leave=True,
-        ncols=PBAR_COLS,
+        ncols=PBAR_COLS + 10,
         bar_format="{l_bar}%s{bar}{r_bar}%s" % (Fore.GREEN, Style.RESET_ALL),
     )
 
@@ -372,7 +366,7 @@ def analyze_classes_threaded(
             desc=f"{Fore.BLUE}Thread {i+1:2}{Style.RESET_ALL}".ljust(10),
             position=pbar_index,
             leave=False,
-            ncols=PBAR_COLS,
+            ncols=PBAR_COLS + 10,
             bar_format="{l_bar}%s{bar}{r_bar}%s" % (Fore.BLUE, Style.RESET_ALL),
         )
         thread = threading.Thread(
@@ -385,13 +379,10 @@ def analyze_classes_threaded(
                 end_idx,
                 result_lists[i],
                 pbar,
-                total_classes,
                 cutoff,
                 do_graph,
                 save_dir,
                 prefix,
-                pbar_index,
-                i,
                 base,
                 classlist,
             ),
@@ -403,11 +394,11 @@ def analyze_classes_threaded(
     for thread in threads:
         thread.join()
 
+    overall_pbar.close()
+
     # Combine the results from all threads, yielding the final list of consensus structures.
     for result_list in result_lists:
         res_list.extend(result_list)
-
-    overall_pbar.close()
 
     print(f"Writing consensus structures to: {class_filename}")
     with open(class_filename, "wb+") as f:
