@@ -5,7 +5,7 @@ Notable changes to the ``proteusPy`` project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v0.98.5] - 2024-1-30
+## [v0.98.5] - 2024-1-23
 
 ### Added
 
@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - vectorized binary and octant class string construction
 - added binary and octant class strings to the master ``loader.TorsionDF`` DataFrame.
+- Rewrote ``programs/DisulfideClass_Extractor.py`` to use the index-based address scheme described above. This resulted in about a 20x speedup in the program!
 
 
 ## [v0.98.4] - 2024-1-17

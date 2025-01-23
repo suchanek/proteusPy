@@ -41,7 +41,7 @@ from tqdm.contrib.logging import logging_redirect_tqdm
 from proteusPy import Disulfide, DisulfideList, __version__
 from proteusPy.angle_annotation import AngleAnnotation
 from proteusPy.DisulfideExceptions import DisulfideIOException
-from proteusPy.logger_config import create_logger
+from proteusPy.logger_config import create_logger, set_logger_level
 from proteusPy.ProteusGlobals import (
     DPI,
     FONTSIZE,
@@ -1119,7 +1119,7 @@ def load_list_from_file(filename):
     return loaded_list
 
 
-def set_plotly_theme(theme: str) -> None:
+def set_plotly_theme(theme: str, verbose=False) -> str:
     """
     Set the Plotly theme based on the provided theme parameter.
 
@@ -1149,10 +1149,11 @@ def set_plotly_theme(theme: str) -> None:
         case _:
             _logger.error("Invalid theme. Must be 'auto', 'light', or 'dark'.")
             pio.templates.default = "plotly_white"
+    
+    if verbose:
+        _logger.warning("Plotly theme set to: %s", pio.templates.default)
 
-    _logger.debug("Plotly theme set to: %s", pio.templates.default)
-
-    return None
+    return pio.templates.default
 
 
 def plot_class_chart(classes: int) -> None:
