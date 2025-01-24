@@ -17,7 +17,7 @@ utilizes multiprocessing to speed up the extraction process.
 * Subset: Only extract and process the first 1000 Disulfides found in the PDB directory.
 
 Author: Eric G. Suchanek, PhD.
-Last revision: 2025-01-17 13:16:20 -egs-
+Last revision: 2025-01-24 10:05:47 -egs-
 """
 
 import argparse
@@ -47,8 +47,7 @@ from proteusPy import (
     create_logger,
     load_disulfides_from_id,
     remove_duplicate_ss,
-    set_logger_level,
-    toggle_stream_handler,
+    set_logger_level_for_module,
 )
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
@@ -58,40 +57,35 @@ from proteusPy.ProteusGlobals import (
     SS_SUBSET_PICKLE_FILE,
 )
 
-# Create a root logger. This will open ~/logs/DisulfideExtractor.log
-# and write all log messages to it. There are quite a few messages
-# generated while parsing. This provides a record of the process.
-
-configure_master_logger("DisulfideExtractor.log")
-set_logger_level("proteusPy.ssparser", "ERROR")
-set_logger_level("proteusPy.DisulfideList", "INFO")
-# set_logger_level("proteusPy.DisulfideLoader", "INFO")
-
-# Disable the stream handlers for the following namespaces.
-# This will suppress the output to the console.
-toggle_stream_handler("proteusPy.ssparser", False)
-toggle_stream_handler("proteusPy.DisulfideList", False)
-toggle_stream_handler("proteusPy.DisulfideClass_Constructor", False)
-
 # Create a logger for this program.
 _logger = create_logger("DisulfideExtractor")
 _logger.setLevel("INFO")
 
+# Configure the root logger. This will open ~/logs/DisulfideExtractor.log
+# and write all log messages to it. There are quite a few messages
+# generated while parsing. This provides a record of the process.
+
+configure_master_logger("DisulfideExtractor.log", enable_file_logging=True)
+
+set_logger_level_for_module("proteusPy", "ERROR")
+
+# Disable the stream handlers for the following namespaces.
+# This will suppress the output to the console.
+# toggle_stream_handler("proteusPy.ssparser", False)
+# toggle_stream_handler("proteusPy.DisulfideList", False)
+# toggle_stream_handler("proteusPy.DisulfideClass_Constructor", False)
+
+os.environ["NO_IMK_CLIENT"] = "1"
 
 PBAR_COLS = 79
 
 HOME_DIR = Path.home()
-
 PDB = os.getenv("PDB")
-PDB_BASE = Path(PDB)
 
-PDB_DIR = MODULE_DATA = REPO_DATA = DATA_DIR = ""
-GOOD_PDB_FILE = "good_pdb.pkl"
+if PDB is None:
+    print("Error: The environment variable PDB is not set. Setting to {HOME_DIR}")
+    PDB = HOME_DIR
 
-MINIFORGE_DIR = HOME_DIR / Path("miniforge3/envs")
-MAMBAFORGE_DIR = HOME_DIR / Path("mambaforge/envs")
-
-VENV_DIR = Path("lib/python3.12/site-packages/proteusPy/data")
 
 PDB_BASE = Path(PDB)
 
@@ -103,6 +97,15 @@ PDB_DIR = PDB_BASE / "good"
 if not PDB_DIR.is_dir():
     print(f"Error: The directory {PDB_DIR} does not exist.")
     sys.exit(1)
+
+MODULE_DATA = REPO_DATA = DATA_DIR = None
+
+GOOD_PDB_FILE = "good_pdb.pkl"
+
+MINIFORGE_DIR = HOME_DIR / Path("miniforge3/envs")
+MAMBAFORGE_DIR = HOME_DIR / Path("mambaforge/envs")
+
+VENV_DIR = Path("lib/python3.12/site-packages/proteusPy/data")
 
 MODULE_DATA = HOME_DIR / "repos" / "proteusPy" / "proteusPy" / "data"
 if not MODULE_DATA.is_dir():

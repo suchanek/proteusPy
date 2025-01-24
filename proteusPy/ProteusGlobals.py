@@ -24,7 +24,11 @@ _this_dir = pkg_resources.files("proteusPy")
 HOME_DIR = Path.home()
 
 PDB_DIR = os.getenv("PDB")
-PDB_BASE = Path(PDB_DIR)
+if PDB_DIR is None:
+    PDB_DIR = HOME_DIR
+
+PDB_BASE = Path(str(PDB_DIR))
+_logger.info("PDB_DIR: %s", PDB_DIR)
 
 GOOD_PDB_FILE = "good_pdb.pkl"
 

@@ -244,7 +244,7 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
         - list: A list of error messages encountered during processing.
     """
     if not os.path.exists(input_pdb_file):
-        _logger.error("Input PDB file {input_pdb_file} does not exist.")
+        _logger.error("Input PDB file %s does not exist.", input_pdb_file)
         return {}, 0, 0
 
     ssbonds = []
@@ -258,15 +258,14 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
     pdbid = extract_id_from_filename(input_pdb_file)
 
     # Read the PDB file and collect SSBOND, ATOM records, and RESOLUTION
-    with open(input_pdb_file, "r") as file:
+    with open(input_pdb_file, "r", encoding="utf-8") as file:
         lines = file.readlines()
 
     for line in lines:
         if line.startswith("SSBOND"):
             ssbonds.append(line)
             if dbg:
-                _logger.debug(str(f"Found SSBOND record for {pdbid}: {line.strip()}"))
-
+                _logger.debug("Found SSBOND record for %s: %s", pdbid, line.strip())
         elif line.startswith("ATOM") or line.startswith(
             "HETATM"
         ):  # Added HETATM to include non-standard residues like CSS
@@ -284,7 +283,12 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
             if dbg:
                 _logger.debug(
                     str(
-                        f"Found ATOM record for chain {chain_id}, residue {res_seq_num}, atom {atom_name}"
+                        _logger.debug(
+                            "Found ATOM record for chain %s, residue %s, atom %s",
+                            chain_id,
+                            res_seq_num,
+                            atom_name,
+                        )
                     )
                 )
         elif line.startswith("REMARK   2 RESOLUTION"):
@@ -294,32 +298,32 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                 resolution = float(resolution_str)
             except ValueError:
                 if verbose:
-                    _logger.error(
+                    _logger.warning(
                         str(
-                            f"Error parsing resolution value from line: {line.strip()}. Found: {resolution_str}"
+                            _logger.warning(
+                                "Error parsing resolution value from line: %s. Found: %s",
+                                line.strip(),
+                                resolution_str,
+                            )
                         )
                     )
             if dbg:
-                _logger.debug(str(f"Found RESOLUTION record: {resolution} Å"))
-
+                _logger.debug("Found RESOLUTION record: %s Å", resolution)
         elif line.startswith("HELIX"):
             helix_info = parse_helix_record(line)
             helices.append(helix_info)
             if verbose:
-                _logger.debug(str(f"Found HELIX record: {helix_info}"))
-
+                _logger.debug("Found HELIX record: %s", helix_info)
         elif line.startswith("SHEET"):
             sheet_info = parse_sheet_record(line)
             sheets.append(sheet_info)
             if verbose:
-                _logger.debug(str(f"Found SHEET record: {sheet_info}"))
-
+                _logger.debug("Found SHEET record: %s", sheet_info)
         elif line.startswith("TURN"):
             turn_info = parse_turn_record(line)
             turns.append(turn_info)
             if verbose:
-                _logger.debug(str(f"Found TURN record: {turn_info}"))
-
+                _logger.debug("Found TURN record: %s", turn_info)
     # Extract the ATOM records corresponding to SSBOND
     ssbond_atom_list = {
         "pdbid": pdbid,
@@ -352,9 +356,10 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                 )
                 if verbose:
                     _logger.warning(
-                        str(
-                            f"Atom record not found for chain {chain_id1}, residue {res_seq_num1}, atom {atom_name}"
-                        )
+                        "Atom record not found for chain %s, residue %s, atom %s",
+                        chain_id1,
+                        res_seq_num1,
+                        atom_name,
                     )
 
             if atom_record2:
@@ -367,9 +372,10 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                 )
                 if verbose:
                     _logger.warning(
-                        str(
-                            f"Atom record not found for chain {chain_id2}, residue {res_seq_num2}, atom {atom_name}"
-                        )
+                        "Atom record not found for chain %s, residue %s, atom %s",
+                        chain_id2,
+                        res_seq_num2,
+                        atom_name,
                     )
 
         # Collect phi/psi related atoms
@@ -379,8 +385,10 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                 try:
                     int(res_seq_num) + offset
                 except ValueError:
-                    _logger.error(
-                        "get_phiipsi_atoms: ValueError: {res_seq_num} + {offset}"
+                    _logger.warning(
+                        "get_phiipsi_atoms: ValueError: %s + %s",
+                        res_seq_num,
+                        offset,
                     )
                     continue
 
@@ -400,9 +408,10 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                         )
                         if verbose:
                             _logger.warning(
-                                str(
-                                    f"Atom record not found for chain {chain_id}, residue {str(int(res_seq_num) + offset)}, atom {atom_name}"
-                                )
+                                "Atom record not found for chain %s, residue %s, atom %s",
+                                chain_id,
+                                str(int(res_seq_num) + offset),
+                                atom_name,
                             )
             return phipsi_atoms
 
@@ -502,11 +511,11 @@ def extract_and_write_ssbonds_and_atoms(
     - verbose (bool): Flag to enable verbose logging.
     """
     if not os.path.exists(input_pdb_file):
-        _logger.error(str(f"Input PDB file {input_pdb_file} does not exist."))
+        _logger.error("Input PDB file %s does not exist.", input_pdb_file)
         return None
 
     if verbose:
-        _logger.info(str(f"Loading disulfides from {input_pdb_file}"))
+        _logger.info("Loading disulfides from %s", input_pdb_file)
 
     ssbond_atom_list, _, _ = extract_ssbonds_and_atoms(
         input_pdb_file, verbose=verbose, dbg=dbg
@@ -514,9 +523,8 @@ def extract_and_write_ssbonds_and_atoms(
 
     if verbose:
         _logger.info(
-            str(f"Writing disulfide bond and atom information to {output_pkl_file}")
+            "Writing disulfide bond and atom information to %s", output_pkl_file
         )
-
     with open(output_pkl_file, "wb") as f:
         pickle.dump(ssbond_atom_list, f)
 

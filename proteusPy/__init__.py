@@ -16,15 +16,25 @@ __pdoc__ = {
 }
 
 import logging
+import os
+
+from .logger_config import configure_master_logger
 
 # Set the default (global) logger level to CRITICAL
 logging.basicConfig(level=logging.CRITICAL)
 
+# Create a logger for the package itself. __name__ is the package name, proteusPy
+_logger = logging.getLogger(__name__)
+
+# Configure the master logger. This effectivley silences the Master logger
+configure_master_logger("proteusPy.log", enable_file_logging=False)
+
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
 
-# Create a logger for the package itself. __name__ is the package name, proteusPy
-_logger = logging.getLogger(__name__)
+
+# Set the environment variable to suppress the IMKClient message
+os.environ["NO_IMK_CLIENT"] = "1"
 
 from ._version import __version__
 from .angle_annotation import AngleAnnotation, plot_angle
@@ -68,7 +78,6 @@ from .DisulfideList import DisulfideList, extract_disulfide, load_disulfides_fro
 from .DisulfideLoader import Bootstrap_PDB_SS, DisulfideLoader, Load_PDB_SS
 from .logger_config import (
     DEFAULT_LOG_LEVEL,
-    configure_master_logger,
     create_logger,
     disable_stream_handlers_for_namespace,
     list_all_loggers,
@@ -163,7 +172,7 @@ from .vector3D import (
     rms_difference,
 )
 
-_logger.setLevel(logging.INFO)
+_logger.setLevel(DEFAULT_LOG_LEVEL)
 _logger.info("ProteusPy %s initialized.", __version__)
 _logger.info("Plotly theme set to: %s", set_plotly_theme(theme="auto"))
 _logger.info("Pyvista theme set to: %s", set_pyvista_theme(theme="auto"))

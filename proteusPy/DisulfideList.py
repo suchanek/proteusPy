@@ -1636,8 +1636,14 @@ def load_disulfides_from_id(
         _logger.setLevel(logging.ERROR)
 
     if verbose:
-        mess = f"{pdb_id} has {num_ssbonds} SSBonds, found: {errors} errors"
-        _logger.info(mess)
+        _logger.info(
+            "Initialized Disulfide: %s Prox: %s %s Dist: %s %s.",
+            pdb_id,
+            proximal,
+            chain1_id,
+            distal,
+            chain2_id,
+        )
 
     resolution = ssbond_atom_list["resolution"]
     for pair in ssbond_atom_list["pairs"]:
@@ -1649,35 +1655,45 @@ def load_disulfides_from_id(
         distal_secondary = pair["dist_secondary"]
 
         if dbg:
-            mess = f"Proximal: {proximal} {chain1_id} Distal: {distal} {chain2_id}"
-            _logger.debug(mess)
+            _logger.debug(
+                "Proximal: %s %s Distal: %s %s", proximal, chain1_id, distal, chain2_id
+            )
 
         proximal_int = int(proximal)
         distal_int = int(distal)
 
         if proximal == distal:
             if verbose:
-                mess = (
-                    f"SSBond record has (proximal == distal): "
-                    f"{pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
+                _logger.warning(
+                    "SSBond record has (proximal == distal): %s Prox: %s %s Dist: %s %s.",
+                    pdb_id,
+                    proximal,
+                    chain1_id,
+                    distal,
+                    chain2_id,
                 )
-                _logger.error(mess)
 
         if proximal == distal and chain1_id == chain2_id:
-            mess = (
-                f"SSBond record has self reference, skipping: "
-                f"{pdb_id} <{proximal} {chain1_id}> <{distal} {chain2_id}>"
+            _logger.warning(
+                "SSBond record has self reference, skipping: %s <%s %s> <%s %s>",
+                pdb_id,
+                proximal,
+                chain1_id,
+                distal,
+                chain2_id,
             )
-
-            _logger.error(mess)
             continue
 
         if verbose:
-            mess = (
-                f"SSBond: {i}: {pdb_id}: {proximal} {chain1_id} - {distal} {chain2_id}"
+            _logger.info(
+                "SSBond: %d: %s: %s %s - %s %s",
+                i,
+                pdb_id,
+                proximal,
+                chain1_id,
+                distal,
+                chain2_id,
             )
-            _logger.info(mess)
-
         new_ss = Initialize_Disulfide_From_Coords(
             ssbond_atom_list,
             pdb_id,
@@ -1696,11 +1712,23 @@ def load_disulfides_from_id(
         if new_ss is not None:
             SSList.append(new_ss)
             if verbose:
-                mess = f"Initialized Disulfide: {pdb_id} Prox: {proximal} {chain1_id} Dist: {distal} {chain2_id}."
-                _logger.info(mess)
+                _logger.info(
+                    "Initialized Disulfide: %s Prox: %s %s Dist: %s %s.",
+                    pdb_id,
+                    proximal,
+                    chain1_id,
+                    distal,
+                    chain2_id,
+                )
         else:
-            mess = f"Cannot initialize Disulfide: {pdb_id} <{proximal} {chain1_id}> <{distal} {chain2_id}>"
-            _logger.error(mess)
+            _logger.info(
+                "Cannot initialize Disulfide: %s Prox: %s %s Dist: %s %s.",
+                pdb_id,
+                proximal,
+                chain1_id,
+                distal,
+                chain2_id,
+            )
 
         i += 1
 
@@ -1714,7 +1742,7 @@ def load_disulfides_from_id(
         SSList = SSList.filter_by_distance(cutoff)
         delta = num_ssbonds - len(SSList)
         if delta:
-            _logger.error(
+            _logger.info(
                 "Filtered %d -> %d SSBonds by Ca distance, %s, delta is: %d",
                 num_ssbonds,
                 len(SSList),
@@ -1780,8 +1808,7 @@ def extract_disulfide(
     )
 
     if len(_sslist) == 0 or _sslist is None:
-        mess = f"Can't find SSBonds: {pdbid}"
-        _logger.error(mess)
+        _logger.error("Can't find SSBonds: %s" % pdbid)
         return DisulfideList([], pdbid)
 
     return _sslist

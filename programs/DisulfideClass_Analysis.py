@@ -85,12 +85,17 @@ global SAVE_DIR location. Binary analysis takes approximately 20 minutes with oc
 Update 8/28/2024 - multithreading is implemented and runs well up to around 10 threads on a 2023 M3 Max Macbook Pro.
 octant analysis takes around 22 minutes with 6 threads. Binary analysis takes around 25 minutes with 6 threads.
 
-Author: Eric G. Suchanek, PhD. Last Modified: 2025-01-06 19:29:49
+Update 1/24/2025 - rewrote to use index-based retrieval of classes from the torsion dataframe. This is much faster
+than the previous method of using the class string to retrieve the classes. T
+The analyses now take around 2 minutes to run!
+
+Author: Eric G. Suchanek, PhD. Last Modified: 2025-01-24 10:47:00
 """
 
 # plyint: disable=C0103
 
 import argparse
+import logging
 import os
 import pickle
 import shutil
@@ -129,13 +134,15 @@ VENV_DIR = Path("lib/python3.12/site-packages/proteusPy/data")
 
 PBAR_COLS = 78
 
+_logger = pp.create_logger("DisulfideClass_Analysis")
+
+pp.configure_master_logger(
+    "DisulfideClass_Analysis", enable_file_logging=True, log_level=logging.WARNING
+)
+_logger.setLevel(logging.INFO)
+
 # Initialize colorama
 init(autoreset=True)
-
-_logger = pp.create_logger("__name__")
-
-pp.configure_master_logger("DisulfidClass_Analysis.log")
-pp.set_logger_level("DisulfideClass_Analysis", "INFO")
 
 
 def get_args():

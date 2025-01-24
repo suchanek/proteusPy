@@ -5,17 +5,18 @@ convey logging information at a fine-grained level. The functions are completely
 independent of the application and can be used in any Python project.
 
 Author: Eric G. Suchanek, PhD
-Last updated 2024-11-19 -egs-
+Last updated 2025-01-24 10:53:01 -egs-
 """
 
 import logging
 from pathlib import Path
+
 DEFAULT_LOG_LEVEL = logging.WARNING
 
 
 def set_logging_level_for_all_handlers(log_level: int):
     """
-    Sets the logging level for all handlers of all loggers in the proteusPy package.
+    Set the logging level for all handlers of all loggers in the proteusPy package.
 
     :param log_level: The logging level to set.
     :type log_level: int
@@ -57,6 +58,7 @@ def configure_master_logger(
     log_file: str,
     file_path: str = "~/logs",
     log_level: int = logging.DEBUG,
+    enable_file_logging: bool = False,
 ):
     """
     Configures the root logger to write to a specified log file.
@@ -64,8 +66,8 @@ def configure_master_logger(
     Args:
         log_file (str): Name of the log file.
         file_path (str): Path to the directory where log files will be stored. Defaults to '~/logs'.
-        max_bytes (int): Maximum size of the log file before rotating.
-        backup_count (int): Number of backup files to keep.
+        log_level (int): Logging level. Defaults to logging.DEBUG.
+        enable_file_logging (bool): Whether to enable file logging. Defaults to True.
     """
     # Expand user path
     file_path = Path(file_path).expanduser()
@@ -78,23 +80,26 @@ def configure_master_logger(
 
     root_logger = logging.getLogger()
 
-    # Set the root logger level to DEBUG to capture all messages
+    # Set the root logger level to the specified log level
     root_logger.setLevel(log_level)
 
     # Remove all existing handlers
     for handler in root_logger.handlers[:]:
         root_logger.removeHandler(handler)
 
-    # Create a new FileHandler
-    handler = logging.FileHandler(full_log_file_path, mode="w")
+    if enable_file_logging:
+        # Create a new FileHandler
+        handler = logging.FileHandler(full_log_file_path, mode="w")
 
-    formatter = logging.Formatter(
-        "proteusPy: %(levelname)s %(asctime)s - %(name)s.%(funcName)s - %(message)s"
-    )
-    handler.setFormatter(formatter)
+        formatter = logging.Formatter(
+            "proteusPy: %(levelname)s %(asctime)s - %(name)s.%(funcName)s - %(message)s"
+        )
 
-    root_logger.addHandler(handler)
-    root_logger.disabled = False  # Enable the root logger
+        handler.setFormatter(formatter)
+        root_logger.addHandler(handler)
+
+    root_logger.disabled = True  # Enable the root logger
+
     for handler in root_logger.handlers:
         handler.setLevel(log_level)
 
@@ -113,6 +118,14 @@ def create_logger(
     :type log_level: int, optional
     :return: Configured logger instance.
     :rtype: logging.Logger
+
+    Example:
+        >>> logger = create_logger("my_logger", logging.DEBUG)
+        >>> logger.debug("This is a debug message")
+        >>> logger.info("This is an info message")
+        >>> logger.warning("This is a warning message")
+        >>> logger.error("This is an error message")
+        >>> logger.critical("This is a critical message")
     """
     logger = logging.getLogger(name)
     logger.setLevel(log_level)
@@ -158,8 +171,8 @@ def set_logger_level(name, level):
     if level not in level_dict:
         raise ValueError(
             (
-                f"--> set_logger_level(): Invalid logging level: {level}."
-                f"Must be one of ['WARNING', 'ERROR', 'INFO', 'DEBUG']"
+                f"set_logger_level(): Invalid logging level: {level}. "
+                "Must be one of ['WARNING', 'ERROR', 'INFO', 'DEBUG']"
             )
         )
 
@@ -243,7 +256,7 @@ def list_handlers(name):
     return handlers_info
 
 
-def set_logger_level_for_module(pkg_name, level=""):
+def set_logger_level_for_module(pkg_name="proteusPy", level="ERROR"):
     """
     Set the logging level for all loggers within a specified package.
 

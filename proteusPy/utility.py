@@ -31,6 +31,7 @@ import time
 from pathlib import Path
 
 import matplotlib
+import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -103,43 +104,16 @@ def get_jet_colormap(steps):
     :rtype: numpy.ndarray
 
     Example:
-        >>> get_viridis_colormap(5)
+        >>> get_jet_colormap(5)
         array([[ 68,   1,  84],
-               [ 72,  40, 120],
+               [ 58,  82, 139],
                [ 32, 144, 140],
-               [ 94, 201,  98],
-               [253, 231,  37]], dtype=uint8)
+               [ 94, 201,  97],
+               [253, 231,  36]], dtype=uint8)
     """
 
     norm = np.linspace(0.0, 1.0, steps)
     colormap = plt.get_cmap("viridis")
-    rgbcol = colormap(norm, bytes=True)[:, :3]
-
-    return rgbcol
-
-
-def Oget_jet_colormap(steps):
-    """
-    Return an array of uniformly spaced RGB values using the 'jet' colormap.
-
-    :param steps: The number of steps in the output array.
-
-    :return: An array of uniformly spaced RGB values using the 'jet' colormap. The shape
-    of the array is (steps, 3).
-    :rtype: numpy.ndarray
-
-    Example:
-        >>> get_jet_colormap(5)
-        array([[  0,   0, 127],
-               [  0, 128, 255],
-               [124, 255, 121],
-               [255, 148,   0],
-               [127,   0,   0]], dtype=uint8)
-    """
-
-    norm = np.linspace(0.0, 1.0, steps)
-    colormap = matplotlib.colormaps["jet"]
-    #    colormap = cm.get_cmap("jet", steps)
     rgbcol = colormap(norm, bytes=True)[:, :3]
 
     return rgbcol
@@ -768,8 +742,8 @@ def Extract_Disulfides_From_List(
     numb=-1,
     verbose=False,
     quiet=True,
-    pdbdir=PDB_DIR,
-    baddir=PDB_DIR + "/bad/",
+    pdbdir=str(PDB_DIR),
+    baddir=str(PDB_DIR) + "/bad/",
     datadir=MODEL_DIR,
     picklefile=SS_PICKLE_FILE,
     problemfile=PROBLEM_ID_FILE,
@@ -1116,7 +1090,7 @@ def load_list_from_file(filename):
     return loaded_list
 
 
-def set_pyvista_theme(theme: str) -> str:
+def set_pyvista_theme(theme: str, verbose: bool = False) -> str:
     """
     Set the PyVista plotting theme based on the provided theme string.
 
@@ -1128,19 +1102,20 @@ def set_pyvista_theme(theme: str) -> str:
     """
     if theme == "light":
         pv.set_plot_theme("document")
-        return
+        _theme = "light"
     elif theme == "dark":
         pv.set_plot_theme("dark")
-        return
+        _theme = "dark"
     else:
         _theme = get_theme()
         if _theme == "light":
             pv.set_plot_theme("document")
         elif _theme == "dark":
             pv.set_plot_theme("dark")
-            _logger.info("Dark mode detected.")
         else:
             pv.set_plot_theme("document")
+            _theme = "light"  # Default to light if theme detection fails
+
     return _theme
 
 
@@ -1176,7 +1151,7 @@ def set_plotly_theme(theme: str, verbose=False) -> str:
             pio.templates.default = "plotly_white"
 
     if verbose:
-        _logger.warning("Plotly theme set to: %s", pio.templates.default)
+        _logger.info("Plotly theme set to: %s", pio.templates.default)
 
     return pio.templates.default
 
@@ -1245,8 +1220,11 @@ def plot_class_chart(classes: int) -> None:
     ax1.set_title(f"{classes}-Class Angular Layout")
 
     # Set the segment colors
-    color_palette = plt.cm.get_cmap("tab20", classes)
-    ax1.set_prop_cycle("color", [color_palette(i) for i in range(classes)])
+    # color_palette = cm.get_cmap("tab20", classes)
+    color_palette = plt.cm.tab20
+    colors = color_palette(np.linspace(0, 1, classes))
+
+    ax1.set_prop_cycle("color", [colors[i] for i in range(classes)])
 
     # Create the legend
     legend_labels = [f"Class {i+1}" for i in range(classes)]
