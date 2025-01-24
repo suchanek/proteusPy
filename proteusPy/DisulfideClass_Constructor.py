@@ -15,6 +15,7 @@ sixfold and eightfold classes based on the subdividing each dihedral angle chi1 
 # pylint: disable=C0103
 
 import itertools
+import logging
 import pickle
 from io import StringIO
 from pathlib import Path
@@ -32,8 +33,7 @@ from proteusPy.ProteusGlobals import (
     SS_CONSENSUS_OCT_FILE,
 )
 
-_logger = create_logger(__name__)
-_logger.setLevel("INFO")
+_logger = create_logger(__name__, log_level=logging.ERROR)
 
 
 class DisulfideClass_Constructor:

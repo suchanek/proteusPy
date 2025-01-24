@@ -22,14 +22,14 @@ Dependencies:
 Usage:
 - Import the module and call the desired functions with appropriate arguments.
 """
-
+import logging
 import os
 import pickle
 
 from proteusPy.logger_config import create_logger
 from proteusPy.vector3D import Vector3D
 
-_logger = create_logger(__name__)
+_logger = create_logger(__name__, log_level=logging.ERROR)
 
 
 def extract_id_from_filename(filename: str) -> str:

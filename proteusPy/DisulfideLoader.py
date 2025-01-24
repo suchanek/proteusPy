@@ -17,6 +17,7 @@ Last revision: 2025-01-17 18:27:03 -egs-
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
 
 import copy
+import logging
 import pickle
 import time
 from pathlib import Path
@@ -45,7 +46,7 @@ from proteusPy.ProteusGlobals import (
 )
 from proteusPy.utility import set_plotly_theme
 
-_logger = create_logger(__name__)
+_logger = create_logger(__name__, log_level=logging.ERROR)
 
 try:
     # Check if running in Jupyter

@@ -11,15 +11,18 @@ Based on the C implementation originally authored by Eric G. Suchanek PhD, 1990.
 
 __pdoc__ = {"__all__": True}
 
+import logging
 import math
 
 import numpy
 
-numpy.set_printoptions(suppress=True)
+from proteusPy.logger_config import create_logger
 
 # from Bio.PDB.vectors import Vector, calc_angle, calc_dihedral
 from proteusPy.vector3D import Vector3D as Vector
-from proteusPy.vector3D import calc_angle, calc_dihedral
+
+_logger = create_logger(__name__, log_level=logging.ERROR)
+numpy.set_printoptions(suppress=True)
 
 _DOWN_ = -1
 _UP_ = 1

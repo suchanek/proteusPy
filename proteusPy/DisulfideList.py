@@ -63,7 +63,7 @@ from proteusPy.utility import (
 
 # pio.renderers.default = "png"  # or 'svg'
 
-_logger = create_logger(__name__)
+_logger = create_logger(__name__, logging.ERROR)
 
 # Set the figure sizes and axis limits.
 DPI = 220

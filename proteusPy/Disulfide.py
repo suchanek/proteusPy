@@ -20,6 +20,7 @@ Last Modification: 2025-01-02 12:55:02
 import copy
 import logging
 import math
+import os
 import warnings
 from math import cos
 
@@ -71,14 +72,14 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s",
 )
 
+os.environ["NO_IMK_CLIENT"] = "1"
 
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
 
 ORIGIN = Vector3D(0.0, 0.0, 0.0)
 
-_logger = create_logger(__name__)
-_logger.setLevel(logging.ERROR)
+_logger = create_logger(__name__, logging.ERROR)
 
 
 # class for the Disulfide bond

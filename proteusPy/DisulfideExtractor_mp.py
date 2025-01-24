@@ -130,7 +130,7 @@ num_ent_files = len(ent_files)
 pdb_id_list = [Path(f).stem[3:7] for f in ent_files]
 
 
-__version__ = "2.3.1"
+__version__ = "2.4.0"
 
 
 def parse_arguments():
