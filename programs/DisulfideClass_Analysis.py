@@ -134,12 +134,13 @@ VENV_DIR = Path("lib/python3.12/site-packages/proteusPy/data")
 
 PBAR_COLS = 78
 
-_logger = pp.create_logger("DisulfideClass_Analysis")
+_logger = pp.create_logger("DisulfideClass_Analysis", log_level=logging.INFO)
+
+# pp.set_logger_level("proteusPy.DisulfideLoader", "INFO")
 
 pp.configure_master_logger(
     "DisulfideClass_Analysis", enable_file_logging=True, log_level=logging.WARNING
 )
-_logger.setLevel(logging.INFO)
 
 # Initialize colorama
 init(autoreset=True)
@@ -376,7 +377,7 @@ def analyze_classes_threaded(
             leave=False,
             ncols=PBAR_COLS + 10,
             bar_format="{l_bar}%s{bar}{r_bar}%s" % (Fore.BLUE, Style.RESET_ALL),
-            miniters=100,
+            mininterval=1.0,
         )
         thread = threading.Thread(
             target=task,
@@ -403,6 +404,7 @@ def analyze_classes_threaded(
         thread.join()
 
     overall_pbar.close()
+    del overall_pbar
 
     # Combine the results from all threads, yielding the final list of consensus structures.
     for result_list in result_lists:
@@ -546,7 +548,6 @@ def main():
         f"PDB directory:         {PDB}\n"
         f"Forge:                 {forge}\n"
         f"Env:                   {env}\n"
-        f"Loading PDB SS data...\n"
     )
 
     if do_update:
@@ -566,10 +567,12 @@ def main():
         update_repository(DATA_DIR, venv_dir, binary=binary, octant=octant)
         return
 
-    pdb_ss = pp.Load_PDB_SS(
-        verbose=verbose, subset=False, cutoff=CA_CUTOFF, sg_cutoff=SG_CUTOFF
-    )
-    # pdb_ss = pp.DisulfideLoader(verbose=verbose, subset=False, cutoff=-1, sg_cutoff=-1)
+    # pdb_ss = pp.Load_PDB_SS(
+    #    verbose=verbose, subset=False, cutoff=CA_CUTOFF, sg_cutoff=SG_CUTOFF
+    # )
+
+    print("Building DisulfideLoader. Please be patient...")
+    pdb_ss = pp.DisulfideLoader(verbose=verbose, subset=False, cutoff=-1, sg_cutoff=-1)
 
     analyze_classes(
         pdb_ss,
