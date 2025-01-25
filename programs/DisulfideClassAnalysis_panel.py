@@ -14,6 +14,7 @@ from proteusPy import SS_CONSENSUS_BIN_FILE, SS_CONSENSUS_OCT_FILE
 
 # Initialize Panel extension
 pn.extension()
+pn.config.theme = "dark"
 
 # Define directories
 HOME_DIR = Path.home()
@@ -125,6 +126,7 @@ def task(
 ):
     global completed_tasks
     global lock
+    
     local_completed = 0
     last_update_time = time.time()  # Track last update
 
@@ -138,6 +140,7 @@ def task(
                 completed_tasks += 1
 
                 # Throttle UI updates to once every 200ms
+
                 if time.time() - last_update_time > 0.2:
                     update_progress(
                         overall_progress, overall_annotation, total, completed_tasks
@@ -149,6 +152,7 @@ def task(
                         local_completed,
                     )
                     last_update_time = time.time()
+
             continue
 
         # Process valid classes
@@ -169,7 +173,7 @@ def task(
             completed_tasks += 1
 
             # Throttle UI updates to once every 200ms
-            if time.time() - last_update_time > 0.2:
+            if time.time() - last_update_time > 0.3:
                 update_progress(
                     overall_progress, overall_annotation, total, completed_tasks
                 )
@@ -189,7 +193,8 @@ def task(
             end_idx - start_idx,
             local_completed,
         )
-    pn.io.push_notebook(dashboards)  # Force UI synchronization
+    pn.io.push_notebook(dashboards)  # Force the UI to refresh
+    print(f"Thread {thread_idx+1} completed.")
     return
 
 
@@ -253,6 +258,17 @@ def analyze_classes_threaded(loader, do_graph, cutoff, num_threads, do_octant, p
     for thread in threads:
         thread.join()
 
+    # Ensure overall progress matches total after all threads complete
+    assert (
+        completed_tasks == total_classes
+    ), f"Expected {total_classes}, but got {completed_tasks}"
+
+    with lock:
+        update_progress(
+            overall_progress, overall_annotation, total_classes, completed_tasks
+        )
+    pn.io.push_notebook(dashboards)  # Force UI synchronization
+
     res_list = pp.DisulfideList([], f"SS_32class_Avg_SS_{cutoff:.2f}")
     for result_list in result_lists:
         res_list.extend(result_list)
@@ -263,9 +279,6 @@ def analyze_classes_threaded(loader, do_graph, cutoff, num_threads, do_octant, p
     with open(class_filename, "wb+") as f:
         pickle.dump(res_list, f)
 
-    assert (
-        completed_tasks == total_classes
-    ), f"Expected {total_classes}, but got {completed_tasks}"
     return res_list
 
 
@@ -298,7 +311,7 @@ def main():
 
 
 if __name__ == "__main__":
-    # pn.state.add_periodic_callback(lambda: None, period=10)  # Keep the UI interactive
+    pn.state.add_periodic_callback(lambda: None, period=100)  # Keep the UI interactive
     server = pn.serve(
         dashboards, start=True, show=True, threaded=True, theme="dark-minimal"
     )
