@@ -126,7 +126,7 @@ def task(
 ):
     global completed_tasks
     global lock
-    
+
     local_completed = 0
     last_update_time = time.time()  # Track last update
 
@@ -134,7 +134,7 @@ def task(
         cls = classlist[idx]
         tot_class_ss = len(loader.class_indices_from_tors_df(cls, base))
 
-        if 100 * tot_class_ss / loader.TotalDisulfides < cutoff:
+        if tot_class_ss / loader.TotalDisulfides < cutoff:
             local_completed += 1
             with lock:
                 completed_tasks += 1

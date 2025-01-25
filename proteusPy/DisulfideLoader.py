@@ -917,6 +917,8 @@ class DisulfideLoader:
         """
         sslist_name = f"{class_string}_{base}_{cutoff:.2f}"
         sslist = DisulfideList([], sslist_name)
+        total_ss = self.TotalDisulfides
+        keep_length = cutoff * total_ss
 
         match base:
             case 8:
@@ -928,8 +930,11 @@ class DisulfideLoader:
 
         indices = self.class_indices_from_tors_df(class_string, base=base)
 
-        for i in indices:
-            sslist.append(self[i])
+        if len(indices) > keep_length:
+            for i in indices:
+                sslist.append(self.SSList[i])
+        else:
+            return None
 
         return sslist
 

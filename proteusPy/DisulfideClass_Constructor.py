@@ -433,7 +433,7 @@ class DisulfideClass_Constructor:
             case 2:
                 df = self.binaryclass_df
             case _:
-                raise ValueError("Invalid base. Must be 6 or 8.")
+                raise ValueError("Invalid base. Must be 2 or 8.")
 
         return df[df["percentage"] >= cutoff].copy()
 
