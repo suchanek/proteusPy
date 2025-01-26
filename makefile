@@ -5,7 +5,7 @@
 VERS := $(shell python -c "exec(open('proteusPy/_version.py').read()); print(__version__)")
 RM := rm
 CONDA ?= conda
-MESS = "v0.98.5"
+MESS = $(VERS)
 DEVNAME = ppydev
 
 .PHONY: all vers newvers nuke pkg dev clean devclean install install_dev jup jup_dev format bld sdist docs upload tag push-tag commit tests docker docker_hub docker_github docker_all docker_run docker_purge
@@ -19,6 +19,11 @@ newvers:
 	@echo "Current version number is: $(VERS)"	
 	@python -c "vers=input('Enter new version number: '); open('proteusPy/_version.py', 'w').write(f'__version__ = \"{vers}\"\\n')"
 	@echo "Version number updated."
+
+update_pyproject_version:
+	@echo "Updating version in pyproject.toml to $(VERS)"
+	@sed -i '' 's/version = ".*"/version = "$(VERS)"/' pyproject.toml
+	@echo "pyproject.toml version updated to $(VERS)"
 
 nuke: clean devclean
 	-@$(RM) dist/*
@@ -66,7 +71,7 @@ jup_dev:
 format:
 	black proteusPy
 
-bld: sdist docs
+bld: update_pyproject_version sdist docs 
 
 sdist: proteusPy/_version.py
 	@echo "Building source distribution and wheels..."
