@@ -124,3 +124,5 @@ proteusPy = [
 [project.scripts]
 "proteusPy.qt5viewer" = "proteusPy.qt5viewer:main"
 "proteusPy.DisulfideExtractor" = "proteusPy.DisulfideExtractor_mp:main"
+"proteusPy.bootstrapper" = "proteusPy.bootstrapper:main"
+

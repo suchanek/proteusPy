@@ -959,6 +959,17 @@ class DisulfideLoader:
             theme=theme,
         )
 
+    def classes_vs_cutoff(self, cutoff, base=8):
+        """
+        Return number of members for the octant class for a given cutoff value.
+
+        :param cutoff: Percent cutoff value for filtering the classes.
+        :return: None
+        """
+
+        class_df = self.tclass.filter_class_by_percentage(cutoff, base=base)
+        return class_df.shape[0]
+
 
 # class ends
 

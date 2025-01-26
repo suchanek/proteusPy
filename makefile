@@ -1,6 +1,6 @@
 # Makefile for proteusPy and associated programs
 # Author: Eric G. Suchanek, PhD
-# Last revision: 2024-12-17 19:05:22 -egs-
+# Last revision: 2025-01-26 17:06:12 -egs-
 
 VERS := $(shell python -c "exec(open('proteusPy/_version.py').read()); print(__version__)")
 RM := rm
@@ -10,7 +10,7 @@ DEVNAME = ppydev
 
 .PHONY: all vers newvers nuke pkg dev clean devclean install install_dev jup jup_dev format bld sdist docs upload tag push-tag commit tests docker docker_hub docker_github docker_all docker_run docker_purge
 
-all: sdist docs bld docker_all
+all: docs bld docker_all
 
 vers:
 	@echo "Version = $(VERS)"
@@ -20,7 +20,7 @@ newvers:
 	@python -c "vers=input('Enter new version number: '); open('proteusPy/_version.py', 'w').write(f'__version__ = \"{vers}\"\\n')"
 	@echo "Version number updated."
 
-update_pyproject_version:
+update_pyproject_version: proteusPy/_version.py
 	@echo "Updating version in pyproject.toml to $(VERS)"
 	@sed -i '' 's/version = ".*"/version = "$(VERS)"/' pyproject.toml
 	@echo "pyproject.toml version updated to $(VERS)"
@@ -71,17 +71,18 @@ jup_dev:
 format:
 	black proteusPy
 
-bld: update_pyproject_version sdist docs 
+bld: update_pyproject_version wheels
 
-sdist: proteusPy/_version.py
-	@echo "Building source distribution and wheels..."
+wheels: proteusPy/_version.py
+	@echo "Building wheels..."
+	-@$(RM) dist/*
 	python -m build
 
 docs: $(wildcard proteusPy/**/*.py)
 	@echo "Generating documentation..."
 	pdoc -o docs --math --logo "./logo.png" ./proteusPy
 
-upload: sdist
+upload: wheels
 	twine upload -r proteusPy dist/proteusPy-$(VERS)*
 
 tag:
