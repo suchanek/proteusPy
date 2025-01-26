@@ -109,7 +109,7 @@ HOME_DIR = Path.home()
 PDB = Path(os.getenv("PDB", HOME_DIR / "pdb"))
 
 DATA_DIR = PDB / "data"
-SAVE_DIR = HOME_DIR / "Documents" / "proteusPyDocs" / "classes"
+SAVE_DIR = HOME_DIR / "local" / "proteusPyDocs" / "classes"
 MODULE_DIR = HOME_DIR / "repos" / "proteusPy" / "proteusPy" / "data"
 REPO_DIR = HOME_DIR / "repos" / "proteusPy" / "data"
 
@@ -135,7 +135,7 @@ init(autoreset=True)
 _logger = pp.create_logger("__name__")
 
 pp.configure_master_logger("DisulfidClass_Analysis.log")
-pp.set_logger_level("DisulfideClass_Analysis", "INFO")
+pp.set_logger_level_for_module("proteusPy", "ERROR")
 
 
 def get_args():
@@ -272,11 +272,17 @@ def task(
 
         pbar.set_postfix({"CLS": cls})
 
-        class_disulfides = loader.sslist_from_class(cls, base=base, cutoff=cutoff)
+        class_disulfides = loader.sslist_from_class(cls, base=base, cutoff=0.0)
+        if len(class_disulfides) == 0 or class_disulfides is None:
+            _logger.warning("Class %s has no disulfides.", cls)
+            pbar.set_postfix({"ERR": cls})
+            pbar.update(1)
+            overall_pbar.update(1)
+            continue
 
         pbar.update(1)
 
-        fname = Path(save_dir) / f"{prefix}_{cutoff}_{cls}_{tot_class_ss}.png"
+        fname = Path(save_dir) / f"{tot_class_ss}_{cls}_{cutoff}.png"
 
         if do_graph:
             class_disulfides.display_torsion_statistics(
@@ -322,12 +328,12 @@ def analyze_classes_threaded(
     tors_df = loader.TorsionDF
 
     if do_octant:
+        base = 8
         class_filename = Path(DATA_DIR) / SS_CONSENSUS_OCT_FILE
         save_dir = OCTANT
         eight_or_bin = loader.tclass.eightclass_df
         res_list = pp.DisulfideList([], f"SS_32class_Avg_SS_{cutoff:.2f}")
-        pix = octant_classes_vs_cutoff(loader, cutoff)
-        base = 8
+        pix = loader.how_many_classes_vs_cutoff(cutoff, base=base)
         classlist = tors_df["octant_class_string"].unique()
         total_classes = len(classlist)
 

@@ -57,7 +57,7 @@ def main():
     PDB_SS.describe()
 
     # one disulfide from the database
-    ss = Disulfide()
+    ss = Disulfide("tst")
     ss = PDB_SS[0]
 
     # SS_DisplayTest(ss)
@@ -65,7 +65,6 @@ def main():
     # get all disulfides for one structure. Make a
     # DisulfideList object to hold it
 
-    ss4yss = DisulfideList([], "4yss")
     ss4yss = PDB_SS["4yys"]
 
     # SSlist_DisplayTest(ss4yss)

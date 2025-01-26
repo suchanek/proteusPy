@@ -141,11 +141,11 @@ class Disulfide:
 
     def __init__(
         self,
-        name: str = "SSBOND",
+        name: str,
         proximal: int = -1,
         distal: int = -1,
-        proximal_chain: str = "A",
-        distal_chain: str = "A",
+        proximal_chain: str = "X",
+        distal_chain: str = "X",
         pdb_id: str = "1egs",
         quiet: bool = True,
         torsions: list = None,
@@ -154,14 +154,14 @@ class Disulfide:
         Initialize the class to defined internal values. If torsions are provided, the
         Disulfide object is built using the torsions and initialized.
 
-        :param name: Disulfide name, by default "SSBOND"
+        :param name: Disulfide name, required
         :param proximal: Proximal residue number, by default -1
         :param distal: Distal residue number, by default -1
         :param proximal_chain: Chain identifier for the proximal residue, by default "A"
         :param distal_chain: Chain identifier for the distal residue, by default "A"
         :param pdb_id: PDB identifier, by default "1egs"
         :param quiet: If True, suppress output, by default True
-        :param torsions: List of torsion angles, by default None
+        :param torsions: List of 5 torsion angles, by default None
         """
         self.name = name
         self.proximal = proximal
@@ -1275,7 +1275,7 @@ class Disulfide:
         src = self.pdb_id
         enrg = self.energy
 
-        title = f"{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Cβ: {self.cb_distance:.2f} Å, Sg: {self.sg_distance:.2f} Å Tors: {self.torsion_length:.2f}°"
+        title = f"{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Ca: {self.ca_distance:.2f} Å Sg: {self.sg_distance:.2f} Å Tors: {self.torsion_length:.2f}°"
 
         set_plotly_theme(light)
         fontsize = 8

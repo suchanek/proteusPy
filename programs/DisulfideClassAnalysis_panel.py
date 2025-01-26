@@ -130,33 +130,35 @@ def task(
     local_completed = 0
     last_update_time = time.time()  # Track last update
 
+    total_ss = loader.TotalDisulfides
+
     for idx in range(start_idx, end_idx):
         cls = classlist[idx]
-        tot_class_ss = len(loader.class_indices_from_tors_df(cls, base))
+        class_disulfides = loader.sslist_from_class(cls, base=base, cutoff=0.0)
 
-        if tot_class_ss / loader.TotalDisulfides < cutoff:
+        tot_class_ss = len(class_disulfides)
+
+        if 100 * tot_class_ss / total_ss < cutoff:
+            completed_tasks += 1
             local_completed += 1
-            with lock:
-                completed_tasks += 1
-
-                # Throttle UI updates to once every 200ms
-
-                if time.time() - last_update_time > 0.2:
-                    update_progress(
-                        overall_progress, overall_annotation, total, completed_tasks
-                    )
-                    update_progress(
-                        thread_progress_bars[thread_idx],
-                        thread_annotations[thread_idx],
-                        end_idx - start_idx,
-                        local_completed,
-                    )
-                    last_update_time = time.time()
-
             continue
 
+        with lock:
+            # Throttle UI updates to once every 200ms
+            if local_completed % 100 == 0:
+                completed_tasks += 100
+                update_progress(
+                    overall_progress, overall_annotation, total, completed_tasks
+                )
+                update_progress(
+                    thread_progress_bars[thread_idx],
+                    thread_annotations[thread_idx],
+                    end_idx - start_idx,
+                    local_completed,
+                )
+                last_update_time = time.time()
+
         # Process valid classes
-        class_disulfides = loader.sslist_from_class(cls, base=base, cutoff=cutoff)
         if do_graph:
             fname = Path(save_dir) / f"{prefix}_{cutoff}_{cls}_{tot_class_ss}.png"
             class_disulfides.display_torsion_statistics(
@@ -170,20 +172,16 @@ def task(
 
         local_completed += 1
         with lock:
-            completed_tasks += 1
-
-            # Throttle UI updates to once every 200ms
-            if time.time() - last_update_time > 0.3:
-                update_progress(
-                    overall_progress, overall_annotation, total, completed_tasks
-                )
-                update_progress(
-                    thread_progress_bars[thread_idx],
-                    thread_annotations[thread_idx],
-                    end_idx - start_idx,
-                    local_completed,
-                )
-                last_update_time = time.time()
+            update_progress(
+                overall_progress, overall_annotation, total, completed_tasks
+            )
+            update_progress(
+                thread_progress_bars[thread_idx],
+                thread_annotations[thread_idx],
+                end_idx - start_idx,
+                local_completed,
+            )
+            last_update_time = time.time()
 
     # Final thread update
     with lock:
@@ -221,6 +219,30 @@ def analyze_classes_threaded(loader, do_graph, cutoff, num_threads, do_octant, p
     )
     total_classes = len(classlist)
 
+    if do_octant:
+        class_filename = Path(DATA_DIR) / SS_CONSENSUS_OCT_FILE
+        save_dir = OCTANT
+        eight_or_bin = loader.tclass.eightclass_df
+        res_list = pp.DisulfideList([], f"SS_32class_Avg_SS_{cutoff:.2f}")
+        pix = octant_classes_vs_cutoff(loader, cutoff)
+        base = 8
+        classlist = tors_df["octant_class_string"].unique()
+        total_classes = len(classlist)
+
+        if do_graph:
+            print(f"Expecting {pix} graphs for the octant classes.")
+    else:
+        class_filename = Path(DATA_DIR) / SS_CONSENSUS_BIN_FILE
+        save_dir = BINARY
+        eight_or_bin = loader.tclass.binaryclass_df
+        total_classes = eight_or_bin.shape[0]  # 32
+        res_list = pp.DisulfideList([], "SS_32class_Avg_SS")
+        pix = 32
+        base = 2
+        classlist = tors_df["binary_class_string"].unique()
+        total_classes = len(classlist)
+
+    ####
     completed_tasks = 0
     update_progress(
         overall_progress, overall_annotation, total_classes, completed_tasks
@@ -247,7 +269,7 @@ def analyze_classes_threaded(loader, do_graph, cutoff, num_threads, do_octant, p
                     do_graph,
                     save_dir,
                     prefix,
-                    8 if do_octant else 2,
+                    base,
                     classlist,
                 ),
             )
@@ -259,9 +281,11 @@ def analyze_classes_threaded(loader, do_graph, cutoff, num_threads, do_octant, p
         thread.join()
 
     # Ensure overall progress matches total after all threads complete
-    assert (
-        completed_tasks == total_classes
-    ), f"Expected {total_classes}, but got {completed_tasks}"
+
+    if completed_tasks != total_classes:
+        sys.exit(
+            f"Assertion failed: Expected {total_classes}, but got {completed_tasks}"
+        )
 
     with lock:
         update_progress(

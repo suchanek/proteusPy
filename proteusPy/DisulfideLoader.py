@@ -538,6 +538,18 @@ class DisulfideLoader:
         """
         self._quiet = perm
 
+    def how_many_classes_vs_cutoff(self, cutoff, base=8):
+        """
+        Return number of members for the class for a given cutoff value
+        and base.
+
+        :param cutoff: Percent cutoff value for filtering the classes.
+        :return: None
+        """
+
+        class_df = self.tclass.filter_class_by_percentage(cutoff, base)
+        return class_df.shape[0]
+
     def plot_classes_vs_cutoff(
         self, cutoff: float, steps: int = 50, base=8, theme="auto", verbose=False
     ) -> None:
@@ -916,6 +928,8 @@ class DisulfideLoader:
         """
         sslist_name = f"{class_string}_{base}_{cutoff:.2f}"
         sslist = DisulfideList([], sslist_name)
+        totalss = len(self.SSList)
+        tokeep = totalss * cutoff
 
         match base:
             case 8:
@@ -926,9 +940,9 @@ class DisulfideLoader:
                 raise ValueError(f"Base must be 2 or 8, not {base}")
 
         indices = self.class_indices_from_tors_df(class_string, base=base)
-
-        for i in indices:
-            sslist.append(self[i])
+        if len(indices) > tokeep:
+            for i in indices:
+                sslist.append(self[i])
 
         return sslist
 
