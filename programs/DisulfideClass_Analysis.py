@@ -559,10 +559,11 @@ def main():
         update_repository(DATA_DIR, venv_dir, binary=binary, octant=octant)
         return
 
-    pdb_ss = pp.Load_PDB_SS(
-        verbose=verbose, subset=False, cutoff=CA_CUTOFF, sg_cutoff=SG_CUTOFF
-    )
-    # pdb_ss = pp.DisulfideLoader(verbose=verbose, subset=False, cutoff=-1, sg_cutoff=-1)
+    #pdb_ss = pp.Load_PDB_SS(
+    #    verbose=verbose, subset=False, cutoff=CA_CUTOFF, sg_cutoff=SG_CUTOFF
+    #)
+    
+    pdb_ss = pp.DisulfideLoader(verbose=verbose, subset=False, cutoff=-1, sg_cutoff=-1)
 
     analyze_classes(
         pdb_ss,
