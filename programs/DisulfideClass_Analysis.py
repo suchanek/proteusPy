@@ -135,7 +135,7 @@ init(autoreset=True)
 _logger = pp.create_logger("__name__")
 
 pp.configure_master_logger("DisulfidClass_Analysis.log")
-pp.set_logger_level("DisulfideClass_Analysis", "INFO")
+pp.set_logger_level_for_module("proteusPy", "ERROR")
 
 
 def get_args():
@@ -324,10 +324,10 @@ def analyze_classes_threaded(
     if do_octant:
         class_filename = Path(DATA_DIR) / SS_CONSENSUS_OCT_FILE
         save_dir = OCTANT
+        base = 8
         eight_or_bin = loader.tclass.eightclass_df
         res_list = pp.DisulfideList([], f"SS_32class_Avg_SS_{cutoff:.2f}")
-        pix = octant_classes_vs_cutoff(loader, cutoff)
-        base = 8
+        pix = loader.classes_vs_cutoff(cutoff, base=base)
         classlist = tors_df["octant_class_string"].unique()
         total_classes = len(classlist)
 
@@ -465,18 +465,6 @@ def analyze_classes(
     return
 
 
-def octant_classes_vs_cutoff(loader: pp.DisulfideLoader, cutoff):
-    """
-    Return number of members for the octant class for a given cutoff value.
-
-    :param cutoff: Percent cutoff value for filtering the classes.
-    :return: None
-    """
-
-    class_df = loader.tclass.filter_class_by_percentage(cutoff, 8)
-    return class_df.shape[0]
-
-
 def update_repository(source_dir, repo_dir, verbose=True, binary=False, octant=False):
     """Copy the consensus classes to the repository."""
 
@@ -559,10 +547,10 @@ def main():
         update_repository(DATA_DIR, venv_dir, binary=binary, octant=octant)
         return
 
-    #pdb_ss = pp.Load_PDB_SS(
+    # pdb_ss = pp.Load_PDB_SS(
     #    verbose=verbose, subset=False, cutoff=CA_CUTOFF, sg_cutoff=SG_CUTOFF
-    #)
-    
+    # )
+
     pdb_ss = pp.DisulfideLoader(verbose=verbose, subset=False, cutoff=-1, sg_cutoff=-1)
 
     analyze_classes(
