@@ -35,7 +35,7 @@ pkg:
 
 dev:
 	@echo "Building development environment $(DEVNAME)..."
-	$(CONDA) create --name $(DEVNAME) -y python=3.12 numpy pandas
+	$(CONDA) create --name $(DEVNAME) -y python=3.12 build twine black pytest
 	@echo "Step 1 done. Activate the environment with 'conda activate $(DEVNAME)' and run 'make install_dev'"
 
 clean devclean:
@@ -45,14 +45,13 @@ clean devclean:
 
 install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install .
+	pip install . -q
 	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Installation finished!"
 
-install_dev: sdist
+install_dev: wheels
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install .[all]
-	pip install pdoc twine black pytest build -q
+	pip install .[all] -q
 	python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
 	@echo "Development environment installation finished!"
 

@@ -227,7 +227,7 @@ def prune_extra_ss(sslist):
     return copy.deepcopy(pruned_list), xchain
 
 
-def download_file(url, directory, verbose=False):
+def download_file(url: str, directory: str | Path, verbose: bool = False) -> None:
     """
     Download the given URL to the input directory
 
@@ -235,17 +235,32 @@ def download_file(url, directory, verbose=False):
     :param directory: Directory path for saving the file
     :param verbose: Verbosity, defaults to False
     """
-    file_name = url.split("/")[-1]
-    file_path = Path(directory) / file_name
+    if not url or not url.strip():
+        raise ValueError("URL cannot be empty")
 
-    if not os.path.exists(file_path):
+    directory = Path(directory)
+    if not directory.exists():
+        directory.mkdir(parents=True, exist_ok=True)
+    elif not os.access(directory, os.W_OK):
+        raise OSError(f"Directory not writable: {directory}")
+
+    file_name = url.split("/")[-1]
+    file_path = directory / file_name
+
+    if not file_path.exists():
         if verbose:
             _logger.info("Downloading %s...", file_name)
-        command = ["wget", "-P", directory, url]
-        subprocess.run(command, check=True)
-        print("Download complete.")
+        try:
+            command = ["wget", "-P", str(directory), url]
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
+            if verbose:
+                _logger.info("Download complete: %s", file_name)
+        except subprocess.CalledProcessError as e:
+            _logger.error("Download failed: %s\nError: %s", file_name, e.stderr)
+            raise
     else:
-        print(f"{file_name} already exists in {directory}.")
+        if verbose:
+            _logger.info("File already exists: %s", file_path)
 
 
 def get_memory_usage():
@@ -279,7 +294,7 @@ def print_memory_used():
     print(f"proteusPy {__version__}: Memory Used: {mem:.2f} GB")
 
 
-def image_to_ascii_art(fname, nwidth):
+def image_to_ascii_art(fname: str, nwidth: int) -> None:
     """
     Convert an image to ASCII art of given text width.
 
@@ -288,42 +303,45 @@ def image_to_ascii_art(fname, nwidth):
     :param fname: Input filename.
     :param nwidth: Output width in characters.
     """
-    from PIL import Image
-    from sklearn.preprocessing import minmax_scale  # type: ignore
+    try:
+        import numpy as np
+        from PIL import Image
+    except ImportError:
+        raise ImportError("This function requires PIL and numpy")
 
-    # Open the image file
-    image = Image.open(fname)
+    if nwidth < 1:
+        raise ValueError("Width must be at least 1 character")
 
-    # Resize the image to reduce the number of pixels
-    width, height = image.size
+    if not os.path.exists(fname):
+        raise FileNotFoundError(f"Image file not found: {fname}")
+
+    # ASCII character set from darkest to lightest
+    CHAR_SET = ["@", "#", "8", "&", "o", ":", "*", ".", " "]
+
+    # Open and resize image
+    img = Image.open(fname)
+    width, height = img.size
     aspect_ratio = height / width
-    new_width = nwidth
-    new_height = aspect_ratio * new_width * 0.55  # 0.55 is an adjustment factor
-    image = image.resize((new_width, int(new_height)))
+    new_height = int(
+        aspect_ratio * nwidth * 0.55
+    )  # 0.55 compensates for character aspect ratio
+    img = img.resize((nwidth, new_height))
+    img = img.convert("L")  # Convert to grayscale
 
-    # Convert the image to grayscale.
-    image = image.convert("L")
+    # Convert pixel values to ASCII characters using numpy for better performance
+    pixels = np.array(img.getdata())
+    # Normalize to [0, len(CHAR_SET)-1] range
+    pixel_indices = (
+        (pixels - pixels.min())
+        * (len(CHAR_SET) - 1)
+        / (pixels.max() - pixels.min() + 1e-8)
+    ).astype(int)
+    chars = [CHAR_SET[idx] for idx in pixel_indices]
 
-    # Define the ASCII character set to use (inverted colormap)
-    char_set = ["@", "#", "8", "&", "o", ":", "*", ".", " "]
-
-    # Normalize the pixel values in the image.
-    pixel_data = list(image.getdata())
-    pixel_data_norm = minmax_scale(
-        pixel_data, feature_range=(0, len(char_set) - 1), copy=True
-    )
-    pixel_data_norm = [int(x) for x in pixel_data_norm]
-
-    char_array = [char_set[pixel] for pixel in pixel_data_norm]
-    # Generate the ASCII art string
+    # Generate and print ASCII art
     ascii_art = "\n".join(
-        [
-            "".join([char_array[i + j] for j in range(new_width)])
-            for i in range(0, len(char_array), new_width)
-        ]
+        "".join(chars[i : i + nwidth]) for i in range(0, len(chars), nwidth)
     )
-
-    # Print the ASCII art string.
     print(ascii_art)
 
 
@@ -944,7 +962,7 @@ import platform
 import subprocess
 
 
-def get_theme():
+def get_theme() -> str:
     """
     Determine the display theme for the current operating system.
 
@@ -956,22 +974,20 @@ def get_theme():
     'dark'
     """
     system = platform.system()
-    if system == "Darwin":
-        # macOS
-        try:
-            # AppleScript to get the appearance setting
-            script = """
-            tell application "System Events"
-                tell appearance preferences
-                    if dark mode is true then
-                        return "dark"
-                    else
-                        return "light"
-                    end if
-                end tell
+
+    def _get_macos_theme() -> str:
+        script = """
+        tell application "System Events"
+            tell appearance preferences
+                if dark mode is true then
+                    return "dark"
+                else
+                    return "light"
+                end if
             end tell
-            """
-            # Run the AppleScript
+        end tell
+        """
+        try:
             result = subprocess.run(
                 ["osascript", "-e", script],
                 stdout=subprocess.PIPE,
@@ -979,52 +995,43 @@ def get_theme():
                 text=True,
                 check=True,
             )
-            # print(f"AppleScript result: {result.stdout.strip()}")
-            # print(f"AppleScript stderr: {result.stderr.strip()}")
-            # print(f"AppleScript return code: {result.returncode}")
-            # Check the output
             if result.returncode == 0:
                 theme = result.stdout.strip().lower()
                 if theme in ["dark", "light"]:
                     return theme
-            return "light"
-
         except subprocess.CalledProcessError as e:
-            _logger.error(f"CalledProcessError occurred: {e}")
-            _logger.error(f"stderr: {e.stderr}")
-            # In case of any exception, return "light"
-            return "light"
-
+            _logger.error("Failed to get macOS theme: %s", e.stderr)
         except Exception as e:
-            _logger.error(f"Exception occurred: {e}")
-            # In case of any exception, return "light"
-            return "light"
+            _logger.error("Error getting macOS theme: %s", e)
+        return "light"
 
-    elif system == "Windows":
-        # Windows
+    def _get_windows_theme() -> str:
         try:
-            import winreg
+            # Lazy import winreg only on Windows
+            from winreg import (
+                HKEY_CURRENT_USER,
+                CloseKey,
+                ConnectRegistry,
+                OpenKey,
+                QueryValueEx,
+            )
 
-            registry = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
+            registry = ConnectRegistry(None, HKEY_CURRENT_USER)
             key_path = r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
-            key = winreg.OpenKey(registry, key_path)
-            value, _ = winreg.QueryValueEx(key, "AppsUseLightTheme")
-            winreg.CloseKey(key)
-
-            if value == 0:
-                return "dark"
-            else:
-                return "light"
-
+            key = OpenKey(registry, key_path)
+            try:
+                value, _ = QueryValueEx(key, "AppsUseLightTheme")
+                return "dark" if value == 0 else "light"
+            finally:
+                CloseKey(key)
+        except ImportError:
+            _logger.warning("winreg module not available")
         except Exception as e:
-            print(f"Exception occurred: {e}")
-            # In case of any exception, return "light"
-            return "light"
+            _logger.error("Failed to get Windows theme: %s", e)
+        return "light"
 
-    elif system == "Linux":
-        # Linux
+    def _get_linux_theme() -> str:
         try:
-            # Check for GTK theme setting
             result = subprocess.run(
                 ["gsettings", "get", "org.gnome.desktop.interface", "gtk-theme"],
                 stdout=subprocess.PIPE,
@@ -1032,23 +1039,21 @@ def get_theme():
                 text=True,
                 check=True,
             )
-
-            if result.returncode == 0:
-                theme = result.stdout.strip().lower()
-                if "dark" in theme:
-                    return "dark"
-                else:
-                    return "light"
-            return "light"
-
+            if result.returncode == 0 and "dark" in result.stdout.strip().lower():
+                return "dark"
         except Exception as e:
-            print(f"Exception occurred: {e}")
-            # In case of any exception, return "light"
-            return "light"
-
-    else:
-        # Unsupported OS
+            _logger.error("Failed to get Linux theme: %s", e)
         return "light"
+
+    # Use a dictionary to map system to theme getter function
+    theme_getters = {
+        "Darwin": _get_macos_theme,
+        "Windows": _get_windows_theme,
+        "Linux": _get_linux_theme,
+    }
+
+    # Get theme using appropriate function or default to light
+    return theme_getters.get(system, lambda: "light")()
 
 
 # functions to calculate statistics and filter disulfide lists via pandas
@@ -1149,7 +1154,7 @@ def set_plotly_theme(theme: str, verbose=False) -> str:
         case _:
             _logger.error("Invalid theme. Must be 'auto', 'light', or 'dark'.")
             pio.templates.default = "plotly_white"
-    
+
     if verbose:
         _logger.warning("Plotly theme set to: %s", pio.templates.default)
 
