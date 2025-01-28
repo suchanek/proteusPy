@@ -19,7 +19,9 @@ Last revision: 2025-01-17 18:27:03 -egs-
 import copy
 import pickle
 import time
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Dict, List, Optional
 
 import gdown
 import numpy as np
@@ -58,6 +60,7 @@ except NameError:
     from tqdm import tqdm
 
 
+@dataclass
 class DisulfideLoader:
     """
     This class represents the disulfide database itself and is its primary means of accession.
@@ -78,48 +81,52 @@ class DisulfideLoader:
     The difference is that the latter function loads the compressed database from its single
     source. The `DisulfideLoader` class is used to build the Disulifde database with a
     specific cutoff, or for saving the database to a file.
+
+    :param verbose: Flag to control output verbosity
+    :type verbose: bool
+    :param datadir: Directory containing data files
+    :type datadir: str
+    :param picklefile: Name of the pickle file containing disulfide data
+    :type picklefile: str
+    :param quiet: Flag to suppress warnings
+    :type quiet: bool
+    :param subset: Flag to load only a subset of data
+    :type subset: bool
+    :param cutoff: Distance cutoff for filtering disulfides
+    :type cutoff: float
+    :param sg_cutoff: SG distance cutoff for filtering disulfides
+    :type sg_cutoff: float
     """
 
-    def __init__(
-        self,
-        verbose: bool = False,
-        datadir: str = DATA_DIR,  # the package installation data directory
-        picklefile: str = SS_PICKLE_FILE,  # PDB_all_ss.pkl by default
-        quiet: bool = True,
-        subset: bool = False,
-        cutoff: float = -1.0,
-        sg_cutoff: float = -1.0,
-    ) -> None:
-        """
-        Initializing the class initiates loading either the entire Disulfide dataset,
-        or the 'subset', which consists of the first 5000 disulfides. The subset
-        is useful for testing and debugging since it doesn't require nearly as much
-        memory or time. The name for the subset file is hard-coded. One can pass a
-        different data directory and file names for the pickle files. These different
-        directories are normally established with the proteusPy.Extract_Disulfides
-        program. The ``cutoff`` is the distance in Angstroms used to filter the disulfides
-        by Cα distance. The ``sg_cutoff`` is the distance in Angstroms used to filter the
-        disulfides by Sγ distance. The verbose flag controls the amount of output.
-        """
+    # Instance attributes
+    SSList: DisulfideList = field(
+        default_factory=lambda: DisulfideList([], "ALL_PDB_SS")
+    )
+    SSDict: Dict = field(default_factory=dict)
+    TorsionDF: pd.DataFrame = field(default_factory=pd.DataFrame)
+    TotalDisulfides: int = field(default=0)
+    IDList: List = field(default_factory=list)
+    _quiet: bool = field(default=True)
+    tclass: Optional[DisulfideClass_Constructor] = field(default=None)
+    cutoff: float = field(default=-1.0)
+    sg_cutoff: float = field(default=-1.0)
+    verbose: bool = field(default=False)
+    timestamp: float = field(default_factory=time.time)
+    version: str = field(default=__version__)
 
-        self.SSList = DisulfideList([], "ALL_PDB_SS")
-        self.SSDict = {}
-        self.TorsionDF = pd.DataFrame()
-        self.TotalDisulfides = 0
-        self.IDList = []
-        self._quiet = quiet
-        self.tclass = None  # disulfideClass_constructor to manage classes
-        self.cutoff = cutoff  # distance cutoff used to bulid the database
-        self.sg_cutoff = sg_cutoff  # distance cutoff used to bulid the database
-        self.verbose = verbose
-        self.timestamp = time.time()
-        self.version = __version__
+    # Initialization parameters
+    datadir: str = field(default=DATA_DIR)
+    picklefile: str = field(default=SS_PICKLE_FILE)
+    subset: bool = field(default=False)
 
-        _pickleFile = picklefile
+    def __post_init__(self) -> None:
+        """
+        Initialize the DisulfideLoader after dataclass initialization.
+        This method handles loading and processing of the disulfide data.
+        """
         old_length = new_length = 0
-
-        full_path = Path(datadir) / _pickleFile
-        if self.verbose and not self.quiet:
+        full_path = Path(self.datadir) / self.picklefile
+        if self.verbose and not self._quiet:
             _logger.info(
                 f"Reading disulfides from: {full_path}... ",
             )
@@ -133,7 +140,7 @@ class DisulfideLoader:
                 _fname = Path(DATA_DIR) / fname
 
                 if not _fname.exists():
-                    if verbose:
+                    if self.verbose:
                         _logger.info(
                             "Master SS list unavailable. Downloading Disulfide Database from Drive..."
                         )
@@ -142,34 +149,32 @@ class DisulfideLoader:
             with open(full_path, "rb") as f:
                 sslist = pickle.load(f)
                 old_length = len(sslist)
-                filt = DisulfideList(sslist.filter_by_distance(cutoff), "filtered")
+                filt = DisulfideList(sslist.filter_by_distance(self.cutoff), "filtered")
                 new_length = len(filt)
 
                 if self.verbose:
                     _logger.info(
-                        "Filtering with Cα cutoff %f: old: %d, new: %d",
-                        cutoff,
+                        "Filtering with Cα cutoff %.2f: old: %d, new: %d",
+                        self.cutoff,
                         old_length,
                         new_length,
                     )
 
                 old_length = new_length
-                filt = filt.filter_by_sg_distance(sg_cutoff)
+                filt = filt.filter_by_sg_distance(self.sg_cutoff)
                 new_length = len(filt)
 
                 if self.verbose:
                     _logger.info(
-                        "Filtering Sγ: cutoff %f: old: %d, new: %d",
-                        sg_cutoff,
+                        "Filtering Sγ: cutoff %.2f: old: %d, new: %d",
+                        self.sg_cutoff,
                         old_length,
                         new_length,
                     )
-                if subset:
+                if self.subset:
                     self.SSList = DisulfideList(filt[:5000], "SUBSET_PDB_SS")
                 else:
                     self.SSList = DisulfideList(filt, "ALL_PDB_SS")
-
-                self.TotalDisulfides = len(self.SSList)
 
                 self.SSDict = self.create_disulfide_dict()
                 self.IDList = list(self.SSDict.keys())
@@ -318,13 +323,13 @@ class DisulfideLoader:
         tors_df = self.TorsionDF
         match base:
             case 8:
-                field = "octant_class_string"
+                column = "octant_class_string"
             case 2:
-                field = "binary_class_string"
+                column = "binary_class_string"
             case _:
                 raise ValueError(f"Base must be 2 or 8, not {base}")
 
-        return tors_df[tors_df[field] == class_string].index
+        return tors_df[tors_df[column] == class_string].index
 
     def copy(self):
         """
@@ -916,14 +921,6 @@ class DisulfideLoader:
         """
         sslist_name = f"{class_string}_{base}_{cutoff:.2f}"
         sslist = DisulfideList([], sslist_name)
-
-        match base:
-            case 8:
-                field = "octant_class_string"
-            case 2:
-                field = "binary_class_string"
-            case _:
-                raise ValueError(f"Base must be 2 or 8, not {base}")
 
         indices = self.class_indices_from_tors_df(class_string, base=base)
 

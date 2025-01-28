@@ -21,7 +21,7 @@ def main():
     Main function to bootstrap proteusPy by building the DisulfideLoader.
 
     This function parses command-line arguments to set CA and SG cutoff values
-    and verbosity. It then initializes and saves the master and subset
+    and verbosity. It then initializes and saves the total and subset
     DisulfideLoader with the specified parameters.
 
     Command-line arguments:
@@ -32,13 +32,13 @@ def main():
     The function performs the following steps:
     1. Parses command-line arguments.
     2. Prints verbose output if enabled.
-    3. Initializes and saves the master DisulfideLoader.
+    3. Initializes and saves the total DisulfideLoader.
     4. Initializes and saves the subset DisulfideLoader.
     """
 
     helpstring = """Bootstrap proteusPy by building the DisulfideLoader.
     This program downloads and builds the proteusPy DisulfideLoader object with
-    specified Ca and Sg cutoffs. It then initializes and saves the master and subset
+    specified Ca and Sg cutoffs. It then initializes and saves the total and subset
     DisulfideLoader with the specified parameters. Use cutoff values of -1 to build the database without filtering.
     """
 
@@ -61,7 +61,7 @@ def main():
     print("CA cutoff: ", args.ca_cutoff)
     print("SG cutoff: ", args.sg_cutoff)
     print("Verbose: ", args.verbose)
-    print("Downloading master Disulfide list from Drive")
+    print("Downloading total Disulfide list from Drive")
 
     pdb_ss = Bootstrap_PDB_SS(
         cutoff=args.ca_cutoff,
@@ -72,7 +72,7 @@ def main():
     )
     pdb_ss.verbose = args.verbose
 
-    print("Saving master Loader")
+    print("Saving Complete Loader")
 
     pdb_ss.save(cutoff=args.ca_cutoff, sg_cutoff=args.sg_cutoff, subset=False)
 
@@ -90,7 +90,7 @@ def main():
 
     pdb_ss.save(cutoff=args.ca_cutoff, sg_cutoff=args.sg_cutoff, subset=True)
 
-    print("Master and Subset Loaders built and saved!")
+    print("Complete and Subset Loaders built and saved!")
     return
 
 
