@@ -444,7 +444,7 @@ class DisulfideLoader:
         print(f"Sγ distance cutoff:              {sg_cutoff:.2f} Å")
         if memusg:
             print(f"Total RAM Used:                     {ram:.2f} GB.")
-        print(f"      ============== proteusPy: {vers} ===================")
+        print(f"               ===== proteusPy: {vers} =====")
 
     def display_overlay(self, pdbid, verbose=False) -> None:
         """

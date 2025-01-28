@@ -1,15 +1,19 @@
-#
 # Bootstrap proteusPy by building the DisulfideLoader
+#
+# Author: Eric G. Suchanek, PhD
+# Last modification: 2025-01-26 17:35:43
 #
 
 import argparse
+import logging
 
 from proteusPy.DisulfideLoader import Bootstrap_PDB_SS
-from proteusPy.logger_config import set_logger_level_for_module
+from proteusPy.logger_config import configure_master_logger, set_logger_level_for_module
 from proteusPy.ProteusGlobals import CA_CUTOFF, SG_CUTOFF
 
-version = "0.1.0"
-set_logger_level_for_module("proteusPy", "WARNING")
+version = "1.0.0"
+set_logger_level_for_module("proteusPy", "INFO")
+configure_master_logger("bootstrap.log", log_level=logging.ERROR)
 
 
 def main():
@@ -32,7 +36,7 @@ def main():
     4. Initializes and saves the subset DisulfideLoader.
     """
 
-    helpstring = """ Bootstrap proteusPy by building the DisulfideLoader.
+    helpstring = """Bootstrap proteusPy by building the DisulfideLoader.
     This program downloads and builds the proteusPy DisulfideLoader object with
     specified Ca and Sg cutoffs. It then initializes and saves the master and subset
     DisulfideLoader with the specified parameters. Use cutoff values of -1 to build the database without filtering.
@@ -48,7 +52,7 @@ def main():
         "-s", "--sg_cutoff", type=float, default=SG_CUTOFF, help="SG cutoff value"
     )
     parser.add_argument(
-        "-v", "--verbose", action="store_false", help="Enable verbose output"
+        "-v", "--verbose", action="store_true", help="Enable verbose output"
     )
 
     args = parser.parse_args()
@@ -56,6 +60,7 @@ def main():
     print("proteusPy Bootstrapper v", version)
     print("CA cutoff: ", args.ca_cutoff)
     print("SG cutoff: ", args.sg_cutoff)
+    print("Verbose: ", args.verbose)
     print("Downloading master Disulfide list from Drive")
 
     pdb_ss = Bootstrap_PDB_SS(
@@ -67,13 +72,11 @@ def main():
     )
     pdb_ss.verbose = args.verbose
 
-    if args.verbose:
-        print("Saving master Loader")
+    print("Saving master Loader")
 
     pdb_ss.save(cutoff=args.ca_cutoff, sg_cutoff=args.sg_cutoff, subset=False)
 
-    if args.verbose:
-        print("Building Subset Loader")
+    print("Building Subset Loader")
 
     pdb_ss = Bootstrap_PDB_SS(
         verbose=args.verbose,
@@ -83,7 +86,12 @@ def main():
         force=False,
     )
     pdb_ss.verbose = args.verbose
+    print("Saving subset Loader")
+
     pdb_ss.save(cutoff=args.ca_cutoff, sg_cutoff=args.sg_cutoff, subset=True)
+
+    print("Master and Subset Loaders built and saved!")
+    return
 
 
 if __name__ == "__main__":
