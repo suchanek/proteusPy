@@ -20,6 +20,7 @@ import copy
 import pickle
 import time
 from dataclasses import dataclass, field
+from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -273,9 +274,11 @@ class DisulfideLoader:
         raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
 
     @property
+    @lru_cache(maxsize=1)
     def average_resolution(self) -> float:
         """
         Return the average structure resolution for the given list.
+        Result is cached since resolution values don't change after loading.
 
         :return: Average resolution (A)
         """
@@ -358,15 +361,18 @@ class DisulfideLoader:
             disulfide_dict[disulfide.pdb_id].append(index)
         return disulfide_dict
 
+    @lru_cache(maxsize=32)
     def get_class_df(self, base=8) -> pd.DataFrame:
         """
         Return the class incidence dataframe for the input base.
+        Result is cached since class distributions don't change after loading.
 
         :param base: The base class to use, 2 or 8.
         :return: pd.DataFrame
         """
         return self.tclass.get_class_df(base)
 
+    @lru_cache(maxsize=128)
     def extract_class(self, clsid: str, verbose: bool = False) -> DisulfideList:
         """
         Return the list of disulfides corresponding to the input `clsid`.
@@ -407,9 +413,11 @@ class DisulfideLoader:
         """
         return copy.deepcopy(self.SSList)
 
+    @lru_cache(maxsize=1024)
     def get_by_name(self, name) -> Disulfide:
         """
         Return the Disulfide with the given name from the list.
+        Result is cached since disulfide data doesn't change after loading.
         """
         for ss in self.SSList.data:
             if ss.name == name:
@@ -774,9 +782,11 @@ class DisulfideLoader:
         fig.show()
         return
 
+    @lru_cache(maxsize=64)
     def enumerate_class_fromlist(self, sslist, base=8):
         """
         Enumerate the classes from a list of class IDs and return a DataFrame with class IDs and their corresponding counts.
+        Results are cached for improved performance on repeated calls.
 
         :param sslist: A list of class IDs to enumerate.
         :param base: The base value for the enumeration, by default 8.
@@ -910,6 +920,7 @@ class DisulfideLoader:
         """
         self.SSList.plot_deviation_histograms(theme=theme, verbose=verbose)
 
+    @lru_cache(maxsize=64)
     def sslist_from_class(self, class_string, base=8, cutoff=0.0) -> DisulfideList:
         """
         Return a DisulfideList containing Disulfides with the given class_string.

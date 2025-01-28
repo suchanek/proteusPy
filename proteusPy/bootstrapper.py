@@ -70,7 +70,6 @@ def main():
         subset=False,
         force=True,
     )
-    pdb_ss.verbose = args.verbose
 
     print("Saving Complete Loader")
 
@@ -85,7 +84,7 @@ def main():
         subset=True,
         force=False,
     )
-    pdb_ss.verbose = args.verbose
+
     print("Saving subset Loader")
 
     pdb_ss.save(cutoff=args.ca_cutoff, sg_cutoff=args.sg_cutoff, subset=True)
