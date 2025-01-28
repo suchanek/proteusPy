@@ -35,13 +35,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import psutil
-from PIL import ImageFont
+from PIL import Image, ImageFont
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from proteusPy import Disulfide, DisulfideList, __version__
 from proteusPy.angle_annotation import AngleAnnotation
 from proteusPy.DisulfideExceptions import DisulfideIOException
-from proteusPy.logger_config import create_logger, set_logger_level
+from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
     DPI,
     FONTSIZE,
@@ -112,33 +112,6 @@ def get_jet_colormap(steps):
 
     norm = np.linspace(0.0, 1.0, steps)
     colormap = plt.get_cmap("viridis")
-    rgbcol = colormap(norm, bytes=True)[:, :3]
-
-    return rgbcol
-
-
-def Oget_jet_colormap(steps):
-    """
-    Return an array of uniformly spaced RGB values using the 'jet' colormap.
-
-    :param steps: The number of steps in the output array.
-
-    :return: An array of uniformly spaced RGB values using the 'jet' colormap. The shape
-    of the array is (steps, 3).
-    :rtype: numpy.ndarray
-
-    Example:
-        >>> get_jet_colormap(5)
-        array([[  0,   0, 127],
-               [  0, 128, 255],
-               [124, 255, 121],
-               [255, 148,   0],
-               [127,   0,   0]], dtype=uint8)
-    """
-
-    norm = np.linspace(0.0, 1.0, steps)
-    colormap = matplotlib.colormaps["jet"]
-    #    colormap = cm.get_cmap("jet", steps)
     rgbcol = colormap(norm, bytes=True)[:, :3]
 
     return rgbcol
@@ -254,7 +227,9 @@ def download_file(url: str, directory: str | Path, verbose: bool = False) -> Non
             command = ["wget", "-P", str(directory), url]
             result = subprocess.run(command, check=True, capture_output=True, text=True)
             if verbose:
-                _logger.info("Download complete: %s", file_name)
+                _logger.info(
+                    "Download complete with result %s for: %s", result, file_name
+                )
         except subprocess.CalledProcessError as e:
             _logger.error("Download failed: %s\nError: %s", file_name, e.stderr)
             raise
@@ -303,11 +278,6 @@ def image_to_ascii_art(fname: str, nwidth: int) -> None:
     :param fname: Input filename.
     :param nwidth: Output width in characters.
     """
-    try:
-        import numpy as np
-        from PIL import Image
-    except ImportError:
-        raise ImportError("This function requires PIL and numpy")
 
     if nwidth < 1:
         raise ValueError("Width must be at least 1 character")
@@ -956,10 +926,6 @@ def Extract_Disulfides_From_List(
     if quiet:
         _logger.setLevel(logging.WARNING)
     return
-
-
-import platform
-import subprocess
 
 
 def get_theme() -> str:
