@@ -274,7 +274,6 @@ class DisulfideLoader:
         raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
 
     @property
-    @lru_cache(maxsize=1)
     def average_resolution(self) -> float:
         """
         Return the average structure resolution for the given list.

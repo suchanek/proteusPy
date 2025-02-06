@@ -1382,7 +1382,7 @@ class Disulfide:
 
         # Get internal coordinates of both objects
         ic1 = self.internal_coords
-        ic2 = other._internal_coords()
+        ic2 = other.internal_coords
 
         # Compute the sum of squared differences between corresponding internal coordinates
         totsq = sum(math.dist(p1, p2) ** 2 for p1, p2 in zip(ic1, ic2))
@@ -1396,21 +1396,29 @@ class Disulfide:
     def Torsion_RMS(self, other) -> float:
         """
         Calculate the RMS distance between the dihedral angles of self and another Disulfide.
-        :param other: Comparison Disulfide
-        :return: RMS distance (deg).
-        """
 
+        :param other: Disulfide object to compare against.
+        :type other: Disulfide
+        :return: RMS distance in degrees.
+        :rtype: float
+        :raises ValueError: If the torsion arrays of self and other are not of equal length.
+        """
         # Get internal coordinates of both objects
         ic1 = self.torsion_array
         ic2 = other.torsion_array
 
-        # Compute the sum of squared differences between corresponding internal coordinates
-        totsq = sum((p1 - p2) ** 2 for p1, p2 in zip(ic1, ic2))
-        # Compute the mean of the squared distances
-        totsq /= len(ic1)
+        # Ensure both torsion arrays have the same length
+        if len(ic1) != len(ic2):
+            raise ValueError("Torsion arrays must be of the same length.")
 
-        # Take the square root of the mean to get the RMS distance
-        return math.sqrt(totsq)
+        # Compute the total squared difference between corresponding internal coordinates
+        total_squared_diff = sum(
+            (angle1 - angle2) ** 2 for angle1, angle2 in zip(ic1, ic2)
+        )
+        mean_squared_diff = total_squared_diff / len(ic1)
+
+        # Return the square root of the mean squared difference as the RMS distance
+        return math.sqrt(mean_squared_diff)
 
     def get_chains(self) -> tuple:
         """
