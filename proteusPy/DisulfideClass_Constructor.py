@@ -375,6 +375,46 @@ class DisulfideClass_Constructor:
 
     def create_classes(self, df, base=8) -> pd.DataFrame:
         """
+        Create a new DataFrame with 8-class encoding for input 'chi' values.
+
+        The function takes a pandas DataFrame containing the following columns:
+        'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'cb_distance',
+        'torsion_length', 'energy', and 'rho', and adds a class ID column based on the following rules:
+
+        1. A new column named `class_id` is added, which is the concatenation of the individual class IDs per Chi.
+        2. The DataFrame is grouped by the `class_id` column, and a new DataFrame is returned that shows the unique `ss_id` values for each group,
+        the count of unique `ss_id` values, the incidence of each group as a proportion of the total DataFrame, and
+        the percentage of incidence.
+
+        :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5',
+                'ca_distance', 'cb_distance', 'torsion_length', 'energy', and 'rho'
+        :return: The grouped DataFrame with the added class column.
+        """
+
+        if base not in [6, 8]:
+            raise ValueError("Base must be either 6 or 8")
+
+        # Apply get_segment function to each chi column based on the specified base
+        for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
+            df[col_name + "_t"] = df[col_name].apply(
+                lambda x: DisulfideClass_Constructor.get_segment(x, base=base)
+            )
+
+        # Concatenate the transformed chi columns to create class_id
+        df["class_id"] = df[["chi1_t", "chi2_t", "chi3_t", "chi4_t", "chi5_t"]].agg(
+            "".join, axis=1
+        )
+
+        # Group by class_id and aggregate required statistics
+        grouped = df.groupby("class_id").agg({"ss_id": "unique"})
+        grouped["count"] = grouped["ss_id"].str.len()
+        grouped["incidence"] = grouped["count"] / len(df)
+        grouped["percentage"] = grouped["incidence"] * 100
+
+        return grouped.reset_index()
+
+    def Ocreate_classes(self, df, base=8) -> pd.DataFrame:
+        """
         Create a new DataFrame from the input with a 8-class encoding for input 'chi' values.
 
         The function takes a pandas DataFrame containing the following columns:
@@ -468,90 +508,96 @@ class DisulfideClass_Constructor:
     @staticmethod
     def get_sixth_quadrant(angle_deg):
         """
-        Return the sixth quadrant in which an angle in degrees lies if the area is described by dividing a unit circle into 6 equal segments.
+        Return the eighth quadrant in which an angle in degrees lies by dividing a unit circle into 8 equal segments.
 
-        :param angle_deg (float or array-like): The angle in degrees.
-
-        Returns:
-        :return str or array-like: The sixth quadrant (1 to 6) that the angle belongs to.
+        :param angle_deg: float or array-like
+            The angle in degrees.
+        :return: str or numpy.ndarray of str
+            The eighth quadrant (1 to 8) that the angle belongs to. If the input is scalar, a string is returned.
+            For an array-like input, a numpy array of strings is returned.
         """
-        angle_deg = (
-            np.array(angle_deg) % 360
-        )  # Normalize the angle to the range [0, 360)
+        # Normalize the angle to the range [0, 360)
+        angle_deg = np.asarray(angle_deg) % 360
 
-        if np.isscalar(angle_deg):
-            if angle_deg >= 0 and angle_deg < 60:
-                return str(6)
-            elif angle_deg >= 60 and angle_deg < 120:
-                return str(5)
-            elif angle_deg >= 120 and angle_deg < 180:
-                return str(4)
-            elif angle_deg >= 180 and angle_deg < 240:
-                return str(3)
-            elif angle_deg >= 240 and angle_deg < 300:
-                return str(2)
-            elif angle_deg >= 300 and angle_deg < 360:
-                return str(1)
-            else:
-                raise ValueError(
-                    "Invalid angle value: angle must be in the range [-360, 360)."
-                )
+        # Calculate quadrant: each quadrant spans 60 degrees.
+        # The quadrant is computed as: quadrant = 6 - floor(angle_deg / 60)
+        quadrant = 6 - np.floor_divide(angle_deg, 60).astype(int)
+
+        # If the input was scalar (0-dim array), return a string.
+        if angle_deg.ndim == 0:
+            return str(quadrant.item())
         else:
-            quadrants = np.empty(angle_deg.shape, dtype=str)
-            quadrants[(angle_deg >= 0) & (angle_deg < 60)] = "6"
-            quadrants[(angle_deg >= 60) & (angle_deg < 120)] = "5"
-            quadrants[(angle_deg >= 120) & (angle_deg < 180)] = "4"
-            quadrants[(angle_deg >= 180) & (angle_deg < 240)] = "3"
-            quadrants[(angle_deg >= 240) & (angle_deg < 300)] = "2"
-            quadrants[(angle_deg >= 300) & (angle_deg < 360)] = "1"
-            return "".join(quadrants)
+            return quadrant.astype(str)
+
+    @staticmethod
+    def get_segment(angle_deg, base=8):
+        """
+        Return the segment corresponding to an angle in degrees when the circle is divided into
+        a specified number of equal segments. The segments are labeled in descending order, so that:
+
+            - For base=8, an angle in [0, 45) degrees returns "8",
+            an angle in [45, 90) returns "7", ...,
+            and an angle in [315, 360) returns "1".
+
+        Parameters
+        ----------
+        angle_deg : float or array-like
+            The angle in degrees.
+        base : int, optional
+            The number of segments (default is 8). For example, with base=8 each segment spans 45°,
+            with base=12 each spans 30°, etc.
+
+        Returns
+        -------
+        str or numpy.ndarray of str
+            The label corresponding to the segment in which the input angle lies. For scalar input,
+            a single string is returned; for array-like input, a NumPy array of strings is returned.
+
+        Examples
+        --------
+        >>> get_segment(45, base=8)
+        '7'
+        >>> get_segment(359, base=8)
+        '1'
+        """
+        # Normalize the angle to [0, 360)
+        angle_deg = np.asarray(angle_deg) % 360
+
+        # Each segment spans 360/base degrees.
+        segment_size = 360 / base
+
+        # Compute the segment number: subtract the segment index (via floor division) from base.
+        segment = base - np.floor_divide(angle_deg, segment_size).astype(int)
+
+        # Return as string(s)
+        if angle_deg.ndim == 0:
+            return str(segment.item())
+        else:
+            return segment.astype(str)
 
     @staticmethod
     def get_eighth_quadrant(angle_deg):
         """
-        Return the eighth quadrant in which an angle in degrees lies if the area is described by dividing a unit circle into 8 equal segments.
+        Return the eighth quadrant in which an angle in degrees lies by dividing a unit circle into 8 equal segments.
 
-        :param angle_deg (float or array-like): The angle in degrees.
-
-        Returns:
-        :return str or array-like: The eighth quadrant (1 to 8) that the angle belongs to.
+        :param angle_deg: float or array-like
+            The angle in degrees.
+        :return: str or numpy.ndarray of str
+            The eighth quadrant (1 to 8) that the angle belongs to. If the input is scalar, a string is returned.
+            For an array-like input, a numpy array of strings is returned.
         """
-        angle_deg = (
-            np.array(angle_deg) % 360
-        )  # Normalize the angle to the range [0, 360)
+        # Normalize the angle to the range [0, 360)
+        angle_deg = np.asarray(angle_deg) % 360
 
-        if np.isscalar(angle_deg):
-            if angle_deg >= 0 and angle_deg < 45:
-                return str(8)
-            elif angle_deg >= 45 and angle_deg < 90:
-                return str(7)
-            elif angle_deg >= 90 and angle_deg < 135:
-                return str(6)
-            elif angle_deg >= 135 and angle_deg < 180:
-                return str(5)
-            elif angle_deg >= 180 and angle_deg < 225:
-                return str(4)
-            elif angle_deg >= 225 and angle_deg < 270:
-                return str(3)
-            elif angle_deg >= 270 and angle_deg < 315:
-                return str(2)
-            elif angle_deg >= 315 and angle_deg < 360:
-                return str(1)
-            else:
-                raise ValueError(
-                    "Invalid angle value: angle must be in the range [-360, 360)."
-                )
+        # Calculate quadrant: each quadrant spans 45 degrees.
+        # The quadrant is computed as: quadrant = 8 - floor(angle_deg / 45)
+        quadrant = 8 - np.floor_divide(angle_deg, 45).astype(int)
+
+        # If the input was scalar (0-dim array), return a string.
+        if angle_deg.ndim == 0:
+            return str(quadrant.item())
         else:
-            quadrants = np.empty(angle_deg.shape, dtype=str)
-            quadrants[(angle_deg >= 0) & (angle_deg < 45)] = "8"
-            quadrants[(angle_deg >= 45) & (angle_deg < 90)] = "7"
-            quadrants[(angle_deg >= 90) & (angle_deg < 135)] = "6"
-            quadrants[(angle_deg >= 135) & (angle_deg < 180)] = "5"
-            quadrants[(angle_deg >= 180) & (angle_deg < 225)] = "4"
-            quadrants[(angle_deg >= 225) & (angle_deg < 270)] = "3"
-            quadrants[(angle_deg >= 270) & (angle_deg < 315)] = "2"
-            quadrants[(angle_deg >= 315) & (angle_deg < 360)] = "1"
-            return "".join(quadrants)
+            return quadrant.astype(str)
 
     @staticmethod
     def class_string_from_dihedral(*args, base=8) -> str:
