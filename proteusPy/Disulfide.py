@@ -11,6 +11,7 @@ Last Modification: 2025-01-02 12:55:02
 # pylint: disable=W1203 # use of print
 # pylint: disable=C0103 # invalid name
 # pylint: disable=C0301 # line too long
+# pylint: disable=C0302 # too many lines in module
 # pylint: disable=W0212 # access to protected member
 # pylint: disable=W0612 # unused variable
 # pylint: disable=W0613 # unused argument
@@ -1286,9 +1287,6 @@ class Disulfide:
             self._render(
                 _pl,
                 style=style,
-                bs_scale=BS_SCALE,
-                spec=SPECULARITY,
-                specpow=SPEC_POWER,
             )
             _pl.reset_camera()
             if shadows:
@@ -1296,7 +1294,7 @@ class Disulfide:
             _pl.show()
 
         else:
-            pl = pv.Plotter(window_size=winsize, shape=(2, 2), theme=light)
+            pl = pv.Plotter(window_size=winsize, shape=(2, 2))
             pl.subplot(0, 0)
 
             pl.add_title(title=title, font_size=fontsize)
@@ -1307,10 +1305,6 @@ class Disulfide:
             self._render(
                 pl,
                 style="cpk",
-                bondcolor=BOND_COLOR,
-                bs_scale=BS_SCALE,
-                spec=SPECULARITY,
-                specpow=SPEC_POWER,
             )
 
             pl.subplot(0, 1)
@@ -1994,27 +1988,13 @@ class Disulfide:
         title = f"{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Cβ: {self.cb_distance:.2f} Å, Sγ: {self.sg_distance:.2f} Å, Tors: {self.torsion_length:.2f}"
         set_pyvista_theme(light)
 
-        # if light == "Light":
-        #    pv.set_plot_theme("document")
-        # elif light == "Dark":
-        #    pv.set_plot_theme("dark")
-        # else:
-        #    _theme = get_theme()
-        #    if _theme == "light":
-        #        pv.set_plot_theme("document")
-        #    elif _theme == "dark":
-        #        pv.set_plot_theme("dark")
-        #    else:
-        #        pv.set_plot_theme("document")
-
         if verbose:
             _logger.info("Rendering screenshot to file {fname}")
 
         if single:
-            pl = pv.Plotter(window_size=WINSIZE)
+            pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
             # pl.add_title(title=title, font_size=FONTSIZE)
             pl.enable_anti_aliasing("msaa")
-            # pl.add_camera_orientation_widget()
             self._render(
                 pl,
                 style=style,
@@ -2027,13 +2007,11 @@ class Disulfide:
             # Take the screenshot after ensuring the plotter is still active
             try:
                 pl.screenshot(fname)
-                if verbose:
-                    print(f" -> display_overlay(): Saved image to: {fname}")
             except RuntimeError as e:
                 _logger.error(f"Error saving screenshot: {e}")
 
         else:
-            pl = pv.Plotter(window_size=WINSIZE, shape=(2, 2))
+            pl = pv.Plotter(window_size=WINSIZE, shape=(2, 2), off_screen=False)
             pl.subplot(0, 0)
 
             # pl.add_title(title=title, font_size=FONTSIZE)
@@ -2076,13 +2054,11 @@ class Disulfide:
 
             try:
                 pl.screenshot(fname)
-                if verbose:
-                    _logger.info(f" -> display_overlay(): Saved image to: {fname}")
             except RuntimeError as e:
                 _logger.error(f"Error saving screenshot: {e}")
 
         if verbose:
-            print(f"Saved: {fname}")
+            print(f"Screenshot saved as: {fname}")
 
     def save_meshes_as_stl(self, meshes, filename) -> None:
         """Save a list of meshes as a single STL file.

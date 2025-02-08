@@ -1,87 +1,98 @@
 """
-This module, ``Test_DisplaySS.py``, is part of the proteusPy package, a Python package for 
-the analysis and modeling of protein structures, with an emphasis on disulfide bonds. Note:
-depending on the speed of your hardware it can some time to load the full database and render
-the disulfides.
+Unit tests for the DisplaySS functionality in the proteusPy package.
 
-Author: Eric G. Suchanek, PhD
-Last revision: 10/9//2024
+This module contains unit tests for displaying and taking screenshots of disulfide bonds
+using the proteusPy package. The tests ensure that the display and screenshot functionalities
+work correctly for both single disulfide bonds and lists of disulfide bonds.
+Last revision: 2025-02-08 17:08:52 -egs-
 """
-
-# plyint: disable=C0116
-# plyint: disable=C0103
 
 import os
 import shutil
 import tempfile
+import unittest
 
-from proteusPy import get_theme, set_plotly_theme
-from proteusPy.Disulfide import Disulfide
-from proteusPy.DisulfideList import DisulfideList
+from proteusPy import set_pyvista_theme
 from proteusPy.DisulfideLoader import Load_PDB_SS
 
-TMP = tempfile.mkdtemp()
+# pylint: disable=W0718 # too general exception clause
+# pylint: disable=C0114 # missing-module-docstring
+# pylint: disable=C0103 # non-snake-case variable name
 
 
-def SS_DisplayTest(ss: Disulfide):
-    set_plotly_theme("auto", verbose=True)
-    ss.display(style="bs", single=True)
-    ss.display(style="cpk", single=True)
-    ss.display(style="sb", single=True)
-    ss.display(style="pd", single=False)
+class TestDisplaySS(unittest.TestCase):
+    """Unit tests for the DisplaySS functionality in the proteusPy package."""
 
-    filename = os.path.join(TMP, "cpk3.png")
-    ss.screenshot(style="cpk", single=True, fname=filename, verbose=True)
+    def setUp(self):
+        # Create a temporary directory for storing screenshots.
+        self.tmp_dir = tempfile.mkdtemp()
+        # Set the theme.
+        set_pyvista_theme("auto")
+        # Load the disulfide database (subset, for speed).
+        self.PDB = Load_PDB_SS(verbose=True, subset=True)
+        self.PDB.describe()
 
-    filename = os.path.join(TMP, "sb3.png")
-    ss.screenshot(style="sb", single=False, fname=filename, verbose=True)
-    return
+    def tearDown(self):
+        # Clean up the temporary directory.
+        shutil.rmtree(self.tmp_dir)
 
+    def test_single_disulfide_display(self):
+        """Test the display and screenshot functionality for a single disulfide."""
+        # Get the first disulfide from the database.
+        ss = self.PDB[0]
 
-def SSlist_DisplayTest(sslist):
-    sslist.display(style="cpk")
-    sslist.display(style="bs")
-    sslist.display(style="sb")
-    sslist.display(style="pd")
-    sslist.display(style="plain")
+        # Call display methods with various styles.
+        try:
+            ss.display(style="bs", single=True)
+            ss.display(style="cpk", single=True)
+            ss.display(style="sb", single=True)
+            ss.display(style="pd", single=False)
+        except Exception as e:
+            self.fail(f"Display method raised an exception: {e}")
 
+        # Test the screenshot functionality and verify the screenshot files exist.
+        cpk_filename = os.path.join(self.tmp_dir, "cpk3.png")
+        try:
+            ss.screenshot(style="cpk", single=True, fname=cpk_filename, verbose=True)
+        except Exception as e:
+            self.fail(f"Screenshot (cpk) method raised an exception: {e}")
+        self.assertTrue(
+            os.path.exists(cpk_filename), "CPK screenshot file does not exist."
+        )
 
-def main():
-    """
-    Program tests the proteusPy Disulfide rendering routines.
-    Usage: run the program and close each window after manipulating it. The program
-    will run through display styles and save a few files to /tmp. There should be no
-    errors upon execution.
-    """
-    set_plotly_theme("auto")
+        sb_filename = os.path.join(self.tmp_dir, "sb3.png")
+        try:
+            ss.screenshot(style="sb", single=False, fname=sb_filename, verbose=True)
+        except Exception as e:
+            self.fail(f"Screenshot (sb) method raised an exception: {e}")
+        self.assertTrue(
+            os.path.exists(sb_filename), "SB screenshot file does not exist."
+        )
 
-    PDB_SS = None
-    PDB_SS = Load_PDB_SS(verbose=True, subset=True)
-    PDB_SS.describe()
+    def test_disulfide_list_display(self):
+        """Test the display functionality for a list of disulfide bonds."""
+        # Retrieve a disulfide list for a given structure using its identifier.
+        try:
+            ss4yss = self.PDB["6dmb"]
+            ss4yss.display(style="cpk")
+            ss4yss.display(style="bs")
+            ss4yss.display(style="sb")
+            ss4yss.display(style="pd")
+            ss4yss.display(style="plain")
+        except Exception as e:
+            self.fail(f"DisulfideList display for '4yys' raised an exception: {e}")
 
-    # one disulfide from the database
-    ss = Disulfide()
-    ss = PDB_SS[0]
-
-    # SS_DisplayTest(ss)
-
-    # get all disulfides for one structure. Make a
-    # DisulfideList object to hold it
-
-    ss4yss = DisulfideList([], "4yss")
-    ss4yss = PDB_SS["4yys"]
-
-    # SSlist_DisplayTest(ss4yss)
-
-    # grab the last 12 disulfides
-    sslist = DisulfideList([], "last12")
-
-    sslist = PDB_SS[:12]
-    SSlist_DisplayTest(sslist)
-
-    print("--> Program complete!")
-    shutil.rmtree(TMP)
+        # Test with a subset (first 12 disulfides) of the database.
+        try:
+            sslist = self.PDB[:12]
+            sslist.display(style="cpk")
+            sslist.display(style="bs")
+            sslist.display(style="sb")
+            sslist.display(style="pd")
+            sslist.display(style="plain")
+        except Exception as e:
+            self.fail(f"DisulfideList display for subset raised an exception: {e}")
 
 
 if __name__ == "__main__":
-    main()
+    unittest.main()

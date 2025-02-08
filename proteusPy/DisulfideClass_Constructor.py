@@ -357,7 +357,7 @@ class DisulfideClass_Constructor:
         # Create new columns with the sign of each chi column
         chi_columns = ["chi1", "chi2", "chi3", "chi4", "chi5"]
         sign_columns = [col + "_s" for col in chi_columns]
-        df[sign_columns] = df[chi_columns].applymap(lambda x: 1 if x >= 0 else -1)
+        df[sign_columns] = df[chi_columns].map(lambda x: 1 if x >= 0 else -1)
 
         # Create a new column with the class ID for each row
         class_id_column = "class_id"

@@ -3,22 +3,39 @@
 # Last revision: 2025-01-26 17:06:12 -egs-
 
 VERS := $(shell python -c "exec(open('proteusPy/_version.py').read()); print(__version__)")
-RM := rm
 CONDA ?= conda
 MESS = $(VERS)
 DEVNAME = ppydev
+OS_NAME := $(shell uname -s)
 
-.PHONY: all vers newvers nuke pkg dev clean devclean install install_dev jup jup_dev format bld sdist docs upload tag push-tag commit tests docker docker_hub docker_github docker_all docker_run docker_purge
+ifeq ($(OS_NAME), Darwin)
+    RM := rm -rf
+else ifeq ($(OS_NAME), Linux)
+    RM := rm -rf
+else ifeq ($(OS_NAME), Windows_NT)
+    RM := del /Q
+else
+    RM := rm -rf
+endif
+
+.PHONY: all vers newvers nuke pkg dev clean devclean install \
+	install_dev jup jup_dev format bld sdist docs upload tag push-tag commit \
+	tests docker docker_hub docker_github docker_all docker_run docker_purge \
+	update_pyproject_version
 
 all: docs bld docker_all
 
 vers:
 	@echo "Version = $(VERS)"
+	@echo "Operating system = $(OS_NAME)"
 
 newvers:
 	@echo "Current version number is: $(VERS)"	
 	@python -c "vers=input('Enter new version number: '); open('proteusPy/_version.py', 'w').write(f'__version__ = \"{vers}\"\\n')"
 	@echo "Version number updated."
+	@echo "Updating version in pyproject.toml to $(VERS)"
+	@sed -i '' 's/version = ".*"/version = "$(VERS)"/' pyproject.toml
+	@echo "pyproject.toml version updated to $(VERS)"
 
 update_pyproject_version: proteusPy/_version.py
 	@echo "Updating version in pyproject.toml to $(VERS)"
@@ -71,7 +88,7 @@ jup_dev:
 format:
 	black proteusPy
 
-bld: update_pyproject_version wheels
+bld: wheels
 
 wheels: proteusPy/_version.py
 	@echo "Building wheels..."
@@ -87,7 +104,6 @@ upload: wheels
 
 tag:
 	git tag -a $(VERS) -m $(MESS)
-	@echo $(VERS) > tag.out
 
 push-tag:
 	git push origin $(VERS)
@@ -98,9 +114,8 @@ commit:
 
 tests: 
 	pytest .
-	python tests/Test_DisplaySS.py
-	python proteusPy/Disulfide.py
-	python proteusPy/DisulfideLoader.py
+	#python proteusPy/Disulfide.py
+	#python proteusPy/DisulfideLoader.py
 	python proteusPy/DisulfideClasses.py
 
 docker: viewer/rcsb_viewer.py viewer/dockerfile

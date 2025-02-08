@@ -13,17 +13,17 @@ Methods:
     test_name: Tests that the name attribute of the Disulfide instance is correctly set.
     test_extract: Tests that the name of the first disulfide in the loaded list matches 
     the expected value.
-    test_dihedrals: Placeholder for testing the dihedral angles of the first disulfide in the loaded list.
+    test_dihedrals: Placeholder for testing the dihedral angles of the first disulfide 
+    in the loaded list.
 """
 
-# plyint: disable=C0115
-# plyint: disable=C0116
-# plyint: disable=C0103
+# pylint: disable=C0115
+# pylint: disable=C0116
+# pylint: disable=C0103
 
-
-import tempfile
 import unittest
 
+from numpy.testing import assert_allclose
 from scipy.optimize import minimize
 
 from proteusPy import Disulfide, disulfide_energy_function, load_disulfides_from_id
@@ -31,6 +31,7 @@ from proteusPy.ProteusGlobals import DATA_DIR
 
 
 class TestDisulfide(unittest.TestCase):
+    """Contains unit tests for the Disulfide class."""
 
     def setUp(self):
 
@@ -58,7 +59,6 @@ class TestDisulfide(unittest.TestCase):
         self.assertEqual(result, expected_result)
 
     def test_dihedrals(self):
-        from numpy.testing import assert_allclose
 
         ss1 = self.sslist[0]
         result = ss1.dihedrals
@@ -98,11 +98,10 @@ class TestDisulfide(unittest.TestCase):
 
     def test_load(self):
 
-        with tempfile.TemporaryDirectory() as temp_dir:
-            entry = "5rsa"
+        entry = "5rsa"
 
-            sslist = load_disulfides_from_id(entry, pdb_dir=DATA_DIR)
-            self.assertTrue(len(sslist) > 0)
+        sslist = load_disulfides_from_id(entry, pdb_dir=DATA_DIR)
+        self.assertTrue(len(sslist) > 0)
 
     def test_compare(self):
 
