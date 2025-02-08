@@ -15,6 +15,7 @@ import os
 import shutil
 import tempfile
 
+from proteusPy import get_theme, set_plotly_theme
 from proteusPy.Disulfide import Disulfide
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.DisulfideLoader import Load_PDB_SS
@@ -23,6 +24,7 @@ TMP = tempfile.mkdtemp()
 
 
 def SS_DisplayTest(ss: Disulfide):
+    set_plotly_theme("auto", verbose=True)
     ss.display(style="bs", single=True)
     ss.display(style="cpk", single=True)
     ss.display(style="sb", single=True)
@@ -51,6 +53,7 @@ def main():
     will run through display styles and save a few files to /tmp. There should be no
     errors upon execution.
     """
+    set_plotly_theme("auto")
 
     PDB_SS = None
     PDB_SS = Load_PDB_SS(verbose=True, subset=True)

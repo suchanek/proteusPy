@@ -53,7 +53,7 @@ from proteusPy.ssparser import (
     get_residue_atoms_coordinates,
 )
 from proteusPy.turtle3D import ORIENT_SIDECHAIN, Turtle3D
-from proteusPy.utility import get_theme, set_plotly_theme
+from proteusPy.utility import set_pyvista_theme
 from proteusPy.vector3D import (
     Vector3D,
     calc_dihedral,
@@ -1066,8 +1066,8 @@ class Disulfide:
         :param chi5: Chi5 (degrees)
 
         Example:
-        >>> from proteusPy.Disulfide import Disulfide
-        >>> modss = Disulfide('model')
+        >>> import proteusPy as pp
+        >>> modss = pp.Disulfide('model')
         >>> modss.build_model(-60, -60, -90, -60, -60)
         >>> modss.display(style='sb', light="auto")
         """
@@ -1263,11 +1263,9 @@ class Disulfide:
         :param light: If True, light background, if False, dark
 
         Example:
-        >>> import proteusPy
-        >>> from proteusPy.Disulfide import Disulfide
-        >>> from proteusPy.DisulfideLoader import DisulfideLoader, Load_PDB_SS
+        >>> import proteusPy as pp
 
-        >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
+        >>> PDB_SS = pp.Load_PDB_SS(verbose=False, subset=True)
         >>> ss = PDB_SS[0]
         >>> ss.display(style='cpk', light="auto")
         >>> ss.screenshot(style='bs', fname='proteus_logo_sb.png')
@@ -1277,7 +1275,7 @@ class Disulfide:
 
         title = f"{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Cβ: {self.cb_distance:.2f} Å, Sg: {self.sg_distance:.2f} Å Tors: {self.torsion_length:.2f}°"
 
-        set_plotly_theme(light)
+        set_pyvista_theme(light)
         fontsize = 8
 
         if single:
@@ -1298,7 +1296,7 @@ class Disulfide:
             _pl.show()
 
         else:
-            pl = pv.Plotter(window_size=winsize, shape=(2, 2))
+            pl = pv.Plotter(window_size=winsize, shape=(2, 2), theme=light)
             pl.subplot(0, 0)
 
             pl.add_title(title=title, font_size=fontsize)
@@ -1644,7 +1642,7 @@ class Disulfide:
         if verbose:
             print(f"Rendering animation to {fname}...")
 
-        pl = pv.Plotter(window_size=WINSIZE, off_screen=True)
+        pl = pv.Plotter(window_size=WINSIZE, off_screen=True, theme="document")
         pl.open_movie(fname)
         path = pl.generate_orbital_path(n_points=steps)
 
@@ -1663,7 +1661,7 @@ class Disulfide:
             print(f"Saved mp4 animation to: {fname}")
 
     def plot(
-        self, pl, single=True, style="sb", light=True, shadows=False
+        self, pl, single=True, style="sb", light="True", shadows=False
     ) -> pv.Plotter:
         """
         Return the pyVista Plotter object for the Disulfide bond in the specific rendering style.
@@ -1994,19 +1992,20 @@ class Disulfide:
         enrg = self.energy
 
         title = f"{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Cβ: {self.cb_distance:.2f} Å, Sγ: {self.sg_distance:.2f} Å, Tors: {self.torsion_length:.2f}"
+        set_pyvista_theme(light)
 
-        if light == "Light":
-            pv.set_plot_theme("document")
-        elif light == "Dark":
-            pv.set_plot_theme("dark")
-        else:
-            _theme = get_theme()
-            if _theme == "light":
-                pv.set_plot_theme("document")
-            elif _theme == "dark":
-                pv.set_plot_theme("dark")
-            else:
-                pv.set_plot_theme("document")
+        # if light == "Light":
+        #    pv.set_plot_theme("document")
+        # elif light == "Dark":
+        #    pv.set_plot_theme("dark")
+        # else:
+        #    _theme = get_theme()
+        #    if _theme == "light":
+        #        pv.set_plot_theme("document")
+        #    elif _theme == "dark":
+        #        pv.set_plot_theme("dark")
+        #    else:
+        #        pv.set_plot_theme("document")
 
         if verbose:
             _logger.info("Rendering screenshot to file {fname}")
@@ -2272,10 +2271,10 @@ class Disulfide:
         the lowest and highest energies, and then find the nearest conformational neighbors.
         Finally, we display the neighbors overlaid against a common reference frame.
 
-        >>> from proteusPy import Load_PDB_SS, DisulfideList, Disulfide
-        >>> light = get_theme()
-        >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
-        >>> ss_list = DisulfideList([], 'tmp')
+        >>> import proteusPy as pp
+        >>> _theme = pp.set_pyvista_theme("auto")
+        >>> PDB_SS = pp.Load_PDB_SS(verbose=False, subset=True)
+        >>> ss_list = pp.DisulfideList([], 'tmp')
 
         We point to the complete list to search for lowest and highest energies.
         >>> sslist = PDB_SS.SSList
