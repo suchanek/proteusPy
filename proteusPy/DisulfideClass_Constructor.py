@@ -572,8 +572,8 @@ class DisulfideClass_Constructor:
         # Return as string(s)
         if angle_deg.ndim == 0:
             return str(segment.item())
-        else:
-            return segment.astype(str)
+
+        return segment.astype(str)
 
     @staticmethod
     def get_eighth_quadrant(angle_deg):
@@ -596,11 +596,35 @@ class DisulfideClass_Constructor:
         # If the input was scalar (0-dim array), return a string.
         if angle_deg.ndim == 0:
             return str(quadrant.item())
-        else:
-            return quadrant.astype(str)
+
+        return quadrant.astype(str)
 
     @staticmethod
     def class_string_from_dihedral(*args, base=8) -> str:
+        """
+        Return the class string for a set of dihedral angles, given the base.
+
+        :param args: One or five dihedral angles.
+        :param base: The base class to use, 2, 6, or 8. Defaults to 8.
+        :return: The class string for the input dihedral angles.
+        :rtype: str
+        :raises ValueError: If the number of dihedral angles is not 1 or 5, or if the base is not 2, 6, or 8.
+        """
+        if len(args) not in [1, 5]:
+            raise ValueError("You must enter either 1 or 5 dihedral angles.")
+
+        if base not in [2, 6, 8]:
+            raise ValueError("Invalid base. Must be 2, 6, or 8.")
+
+        angles = np.array(args).flatten()
+
+        if len(angles) == 1:
+            return DisulfideClass_Constructor.get_segment(angles[0], base=base)
+
+        return DisulfideClass_Constructor.get_segment(angles, base=base)
+
+    @staticmethod
+    def Oclass_string_from_dihedral(*args, base=8) -> str:
         """
         Return the class string for a set of dihedral angles, given the base.
 
