@@ -151,6 +151,7 @@ from .utility import (
     retrieve_git_lfs_files,
     save_list_to_file,
     set_plotly_theme,
+    set_pyvista_theme,
     sort_by_column,
 )
 from .vector3D import (

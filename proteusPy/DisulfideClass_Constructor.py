@@ -98,13 +98,13 @@ class DisulfideClass_Constructor:
             _logger.info(
                 "Loading binary consensus structure list from %s", SS_CONSENSUS_BIN_FILE
             )
-        self.consensus_binary_list = self.load_consensus_file(oct=False)
+        self.consensus_binary_list = self.load_consensus_file(octant=False)
 
         if self.verbose:
             _logger.info(
                 "Loading octant consensus structure list from %s", SS_CONSENSUS_OCT_FILE
             )
-        self.consensus_oct_list = self.load_consensus_file(oct=True)
+        self.consensus_oct_list = self.load_consensus_file(octant=True)
 
         self.build_classes(loader)
 
@@ -132,11 +132,11 @@ class DisulfideClass_Constructor:
 
         return disulfides
 
-    def load_consensus_file(self, fpath=Path(DATA_DIR), oct=True) -> DisulfideList:
+    def load_consensus_file(self, fpath=Path(DATA_DIR), octant=True) -> DisulfideList:
         """Load the consensus file from the specified file."""
 
         res = None
-        if oct:
+        if octant:
             fname = fpath / SS_CONSENSUS_OCT_FILE
         else:
             fname = fpath / SS_CONSENSUS_BIN_FILE
@@ -478,14 +478,14 @@ class DisulfideClass_Constructor:
         return df[df["percentage"] >= cutoff].copy()
 
     @staticmethod
-    def get_binary_quadrant(angle_deg):
+    def get_binary_quadrant(angle_deg) -> str:
         """
         Return the binary quadrant in which an angle in degrees lies if the area is described by dividing a unit circle into 2 equal segments.
 
         :param angle_deg (float or array-like): The angle in degrees.
 
         Returns:
-        :return str or array-like: The binary quadrant (0 or 2) that the angle belongs to.
+        :return str. The binary quadrant (0 or 2) that the angle belongs to.
         """
         angle_deg = (
             np.array(angle_deg) % 360
@@ -506,18 +506,16 @@ class DisulfideClass_Constructor:
         return "".join(quadrants)
 
     @staticmethod
-    def get_sixth_quadrant(angle_deg):
+    def get_sixth_quadrant(angle_deg) -> str:
         """
         Return the eighth quadrant in which an angle in degrees lies by dividing a unit circle into 8 equal segments.
 
         :param angle_deg: float or array-like
             The angle in degrees.
-        :return: str or numpy.ndarray of str
-            The eighth quadrant (1 to 8) that the angle belongs to. If the input is scalar, a string is returned.
-            For an array-like input, a numpy array of strings is returned.
+        :return: str
         """
         # Normalize the angle to the range [0, 360)
-        angle_deg = np.asarray(angle_deg) % 360
+        angle_deg = np.array(angle_deg) % 360
 
         # Calculate quadrant: each quadrant spans 60 degrees.
         # The quadrant is computed as: quadrant = 6 - floor(angle_deg / 60)
@@ -527,10 +525,33 @@ class DisulfideClass_Constructor:
         if angle_deg.ndim == 0:
             return str(quadrant.item())
         else:
-            return quadrant.astype(str)
+            return "".join(quadrant.astype(str))
 
     @staticmethod
-    def get_segment(angle_deg, base=8):
+    def get_eighth_quadrant(angle_deg) -> str:
+        """
+        Return the eighth quadrant in which an angle in degrees lies by dividing a unit circle into 8 equal segments.
+
+        :param angle_deg: float or array-like
+            The angle in degrees.
+        :return: str
+        """
+
+        # Normalize the angle to the range [0, 360)
+        angle_deg = np.asarray(angle_deg) % 360
+
+        # Calculate quadrant: each quadrant spans 45 degrees.
+        # The quadrant is computed as: quadrant = 8 - floor(angle_deg / 45)
+        quadrant = 8 - np.floor_divide(angle_deg, 45).astype(int)
+
+        # If the input was scalar (0-dim array), return a string.
+        if angle_deg.ndim == 0:
+            return str(quadrant.item())
+
+        return "".join(quadrant.astype(str))
+
+    @staticmethod
+    def get_segment(angle_deg, base=8) -> str:
         """
         Return the segment corresponding to an angle in degrees when the circle is divided into
         a specified number of equal segments. The segments are labeled in descending order, so that:
@@ -539,26 +560,15 @@ class DisulfideClass_Constructor:
             an angle in [45, 90) returns "7", ...,
             and an angle in [315, 360) returns "1".
 
-        Parameters
-        ----------
-        angle_deg : float or array-like
-            The angle in degrees.
-        base : int, optional
-            The number of segments (default is 8). For example, with base=8 each segment spans 45°,
-            with base=12 each spans 30°, etc.
-
-        Returns
-        -------
-        str or numpy.ndarray of str
-            The label corresponding to the segment in which the input angle lies. For scalar input,
-            a single string is returned; for array-like input, a NumPy array of strings is returned.
-
-        Examples
-        --------
-        >>> get_segment(45, base=8)
-        '7'
-        >>> get_segment(359, base=8)
-        '1'
+        :param angle_deg: The angle in degrees.
+        :type angle_deg: float or array-like
+        :param base: The number of segments (default is 8). For example, with base=8 each segment spans 45°,
+                        with base=12 each spans 30°, etc.
+        :type base: int, optional
+        :return: The label corresponding to the segment in which the input angle lies. For scalar input,
+                    a single string is returned; for array-like input, a NumPy array of strings is returned.
+        :rtype: str
+        :raises ValueError: If the angle is out of range.
         """
         # Normalize the angle to [0, 360)
         angle_deg = np.asarray(angle_deg) % 360
@@ -573,31 +583,7 @@ class DisulfideClass_Constructor:
         if angle_deg.ndim == 0:
             return str(segment.item())
 
-        return segment.astype(str)
-
-    @staticmethod
-    def get_eighth_quadrant(angle_deg):
-        """
-        Return the eighth quadrant in which an angle in degrees lies by dividing a unit circle into 8 equal segments.
-
-        :param angle_deg: float or array-like
-            The angle in degrees.
-        :return: str or numpy.ndarray of str
-            The eighth quadrant (1 to 8) that the angle belongs to. If the input is scalar, a string is returned.
-            For an array-like input, a numpy array of strings is returned.
-        """
-        # Normalize the angle to the range [0, 360)
-        angle_deg = np.asarray(angle_deg) % 360
-
-        # Calculate quadrant: each quadrant spans 45 degrees.
-        # The quadrant is computed as: quadrant = 8 - floor(angle_deg / 45)
-        quadrant = 8 - np.floor_divide(angle_deg, 45).astype(int)
-
-        # If the input was scalar (0-dim array), return a string.
-        if angle_deg.ndim == 0:
-            return str(quadrant.item())
-
-        return quadrant.astype(str)
+        return "".join(segment.astype(str))
 
     @staticmethod
     def class_string_from_dihedral(*args, base=8) -> str:
@@ -605,7 +591,9 @@ class DisulfideClass_Constructor:
         Return the class string for a set of dihedral angles, given the base.
 
         :param args: One or five dihedral angles.
+        :type args: float or array-like
         :param base: The base class to use, 2, 6, or 8. Defaults to 8.
+        :type base: int, optional
         :return: The class string for the input dihedral angles.
         :rtype: str
         :raises ValueError: If the number of dihedral angles is not 1 or 5, or if the base is not 2, 6, or 8.
@@ -618,10 +606,17 @@ class DisulfideClass_Constructor:
 
         angles = np.array(args).flatten()
 
-        if len(angles) == 1:
-            return DisulfideClass_Constructor.get_segment(angles[0], base=base)
-
-        return DisulfideClass_Constructor.get_segment(angles, base=base)
+        match len(angles):
+            case 1:
+                return DisulfideClass_Constructor.get_segment(angles[0], base=base)
+            case 5:
+                segments = [
+                    DisulfideClass_Constructor.get_segment(angle, base=base)
+                    for angle in angles
+                ]
+                return "".join(segments)
+            case _:
+                raise ValueError("Invalid number of angles. Must be 1 or 5.")
 
     @staticmethod
     def Oclass_string_from_dihedral(*args, base=8) -> str:

@@ -1100,9 +1100,11 @@ def set_plotly_theme(theme: str, verbose=False) -> str:
 
     :param theme: The theme to set for Plotly. Must be 'auto', 'light', or 'dark'.
     :type theme: str
+    :param verbose: If True, logs the selected theme. Defaults to False.
+    :type verbose: bool, optional
     :raises ValueError: If an invalid theme is provided.
-    :return: None
-    :rtype: None
+    :return: The current Plotly template.
+    :rtype: str
     """
     from plotly import io as pio
 
@@ -1118,13 +1120,50 @@ def set_plotly_theme(theme: str, verbose=False) -> str:
         case "dark":
             pio.templates.default = "plotly_dark"
         case _:
-            _logger.error("Invalid theme. Must be 'auto', 'light', or 'dark'.")
-            pio.templates.default = "plotly_white"
+            raise ValueError("Invalid theme. Must be 'auto', 'light', or 'dark'.")
 
     if verbose:
-        _logger.warning("Plotly theme set to: %s", pio.templates.default)
+        _logger.info("Plotly theme set to: %s", pio.templates.default)
 
     return pio.templates.default
+
+
+def set_pyvista_theme(theme: str, verbose=False) -> str:
+    """
+    Set the PyVista theme based on the provided theme parameter.
+
+    This function sets the default PyVista theme to either 'document' or 'dark'
+    based on the input theme. If 'auto' is selected, the theme is determined automatically
+    based on the current system or application theme.
+
+    :param theme: The theme to set for PyVista. Must be 'auto', 'light', or 'dark'.
+    :type theme: str
+    :param verbose: If True, logs the selected theme. Defaults to False.
+    :type verbose: bool, optional
+    :raises ValueError: If an invalid theme is provided.
+    :return: The current PyVista theme.
+    :rtype: str
+    """
+    import pyvista as pv
+
+    match theme.lower():
+        case "auto":
+            _theme = get_theme()
+            if _theme == "light":
+                pv.set_plot_theme("document")
+            else:
+                pv.set_plot_theme("dark")
+        case "light":
+            pv.set_plot_theme("document")
+        case "dark":
+            pv.set_plot_theme("dark")
+        case _:
+            raise ValueError("Invalid theme. Must be 'auto', 'light', or 'dark'.")
+
+    if verbose:
+        _logger.info("PyVista theme set to: %s", theme.lower())
+
+    return theme.lower()
 
 
 def plot_class_chart(classes: int) -> None:
