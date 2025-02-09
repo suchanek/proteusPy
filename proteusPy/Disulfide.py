@@ -1654,6 +1654,52 @@ class Disulfide:
         if verbose:
             print(f"Saved mp4 animation to: {fname}")
 
+    def spin(self, style="sb", verbose=False, steps=360, theme="auto") -> None:
+        """
+        Spin the object by rotating it one revolution about the Y axis in the given style.
+
+        :param style: Rendering style, defaults to 'sb', one of:
+            * 'sb' - split bonds
+            * 'bs' - ball and stick
+            * 'cpk' - CPK style
+            * 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
+            * 'plain' - boring single color
+
+        :param verbose: Verbosity, defaults to False
+        :param steps: Number of steps for one complete rotation, defaults to 360.
+        """
+
+        src = self.pdb_id
+        name = self.name
+        enrg = self.energy
+
+        title = f"{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Tors: {self.torsion_length:.2f}"
+        set_pyvista_theme(theme)
+
+        if verbose:
+            _logger.info("Spinning object: %d steps...", steps)
+
+        # Create a Plotter instance
+        pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
+
+        # Enable anti-aliasing for smoother rendering
+        pl.enable_anti_aliasing("msaa")
+
+        # Generate an orbital path for spinning
+        path = pl.generate_orbital_path(n_points=steps)
+
+        # Render the object in the specified style
+        pl = self._render(pl, style=style)
+
+        pl.reset_camera()
+        pl.show(auto_close=False)
+
+        # Orbit the camera along the generated path
+        pl.orbit_on_path(path, write_frames=False, step=1 / steps)
+
+        if verbose:
+            print("Spinning completed.")
+
     def plot(
         self, pl, single=True, style="sb", light="True", shadows=False
     ) -> pv.Plotter:
