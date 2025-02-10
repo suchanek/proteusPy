@@ -71,7 +71,7 @@ set_logger_level("proteusPy.DisulfideList", "INFO")
 # This will suppress the output to the console.
 toggle_stream_handler("proteusPy.ssparser", False)
 toggle_stream_handler("proteusPy.DisulfideList", False)
-toggle_stream_handler("proteusPy.DisulfideClass_Constructor", False)
+toggle_stream_handler("proteusPy.DisulfideClassManager", False)
 
 # Create a logger for this program.
 _logger = create_logger("DisulfideExtractor")

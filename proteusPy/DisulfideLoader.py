@@ -32,7 +32,7 @@ from pympler import asizeof
 
 from proteusPy import __version__
 from proteusPy.Disulfide import Disulfide
-from proteusPy.DisulfideClass_Constructor import DisulfideClass_Constructor
+from proteusPy.DisulfideClassManager import DisulfideClassManager
 from proteusPy.DisulfideExceptions import DisulfideParseWarning
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.logger_config import create_logger
@@ -45,7 +45,6 @@ from proteusPy.ProteusGlobals import (
     SS_LIST_URL,
     SS_PICKLE_FILE,
 )
-
 from proteusPy.utility import set_plotly_theme
 
 _logger = create_logger(__name__)
@@ -108,7 +107,7 @@ class DisulfideLoader:
     TotalDisulfides: int = field(default=0)
     IDList: List = field(default_factory=list)
     _quiet: bool = field(default=True)
-    tclass: Optional[DisulfideClass_Constructor] = field(default=None)
+    tclass: Optional[DisulfideClassManager] = field(default=None)
     cutoff: float = field(default=-1.0)
     sg_cutoff: float = field(default=-1.0)
     verbose: bool = field(default=False)
@@ -182,7 +181,7 @@ class DisulfideLoader:
 
                 self.TorsionDF = self.SSList.torsion_df
                 self.TotalDisulfides = len(self.SSList)
-                self.tclass = DisulfideClass_Constructor(self, self.verbose)
+                self.tclass = DisulfideClassManager(self, self.verbose)
 
             if self.verbose:
                 _logger.info("Loader initialization complete.")

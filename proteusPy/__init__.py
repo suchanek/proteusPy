@@ -4,6 +4,7 @@
 # Last updated: 2025-01-07 18:38:30 -egs-
 
 # pylint: disable=C0413
+# pylint: disable=C0103
 
 """
 proteusPy is a Python package specializing in the modeling and analysis 
@@ -57,7 +58,6 @@ from .Disulfide import (
     disulfide_energy_function,
     minimize_ss_energy,
 )
-from .DisulfideClass_Constructor import DisulfideClass_Constructor
 from .DisulfideClasses import (
     angle_within_range,
     filter_by_percentage,
@@ -69,6 +69,7 @@ from .DisulfideClasses import (
     torsion_to_eightclass,
     torsion_to_sixclass,
 )
+from .DisulfideClassManager import DisulfideClassManager
 from .DisulfideExceptions import (
     DisulfideConstructionException,
     DisulfideConstructionWarning,
