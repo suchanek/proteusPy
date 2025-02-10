@@ -7,7 +7,7 @@ Last Modification: 2025-01-22 00:02:43 -egs-
 Disulfide Class creation and manipulation. Binary classes using the +/- formalism of Hogg et al. 
 (Biochem, 2006, 45, 7429-7433), are created for all 32 possible classes from the Disulfides 
 extracted. Classes are named per Hogg's convention. This approach is extended to create 
-sixfold and eightfold classes based on the subdividing each dihedral angle chi1 - chi5 into 
+eightfold classes based on the subdividing each dihedral angle chi1 - chi5 into 
 8 equal segments, effectively quantizing them.
 """
 
@@ -280,8 +280,13 @@ class DisulfideClass_Constructor:
                 angle_maps = {"0": ["4", "5", "6"], "2": ["1", "2", "3"]}
             case 8:
                 angle_maps = {"0": ["5", "6", "7", "8"], "2": ["1", "2", "3", "4"]}
+            case 10:
+                angle_maps = {
+                    "0": ["6", "7", "8", "9", "A"],
+                    "2": ["1", "2", "3", "4", "5"],
+                }
             case _:
-                raise ValueError("Invalid base value. Must be 6 or 8.")
+                raise ValueError("Invalid base value. Must be 6, 8, or 10.")
 
         class_lists = [angle_maps[char] for char in class_str]
         class_combinations = itertools.product(*class_lists)
@@ -391,8 +396,8 @@ class DisulfideClass_Constructor:
         :return: The grouped DataFrame with the added class column.
         """
 
-        if base not in [6, 8]:
-            raise ValueError("Base must be either 6 or 8")
+        if base not in [2, 4, 6, 8, 10]:
+            raise ValueError("Base must be either 2, 4, 6, 8, or 10")
 
         # Apply get_segment function to each chi column based on the specified base
         for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
@@ -412,50 +417,6 @@ class DisulfideClass_Constructor:
         grouped["percentage"] = grouped["incidence"] * 100
 
         return grouped.reset_index()
-
-    def Ocreate_classes(self, df, base=8) -> pd.DataFrame:
-        """
-        Create a new DataFrame from the input with a 8-class encoding for input 'chi' values.
-
-        The function takes a pandas DataFrame containing the following columns:
-        'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'cb_distance',
-        'torsion_length', 'energy', and 'rho', and adds a class ID column based on the following rules:
-
-        1. A new column named `class_id` is added, which is the concatenation of the individual class IDs per Chi.
-        2. The DataFrame is grouped by the `class_id` column, and a new DataFrame is returned that shows the unique `ss_id` values for each group,
-        the count of unique `ss_id` values, the incidence of each group as a proportion of the total DataFrame, and the
-        percentage of incidence.
-
-        :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5',
-                'ca_distance', 'cb_distance', 'torsion_length', 'energy', and 'rho'
-        :return: The grouped DataFrame with the added class column.
-        """
-
-        _df = pd.DataFrame()
-        if base == 6:
-            for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
-                _df[col_name + "_t"] = df[col_name].apply(
-                    DisulfideClass_Constructor.get_sixth_quadrant
-                )
-        elif base == 8:
-            for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
-                _df[col_name + "_t"] = df[col_name].apply(
-                    DisulfideClass_Constructor.get_eighth_quadrant
-                )
-        else:
-            raise ValueError("Base must be either 6 or 8")
-
-        df["class_id"] = _df[["chi1_t", "chi2_t", "chi3_t", "chi4_t", "chi5_t"]].agg(
-            "".join, axis=1
-        )
-
-        grouped = df.groupby("class_id").agg({"ss_id": "unique"})
-        grouped["count"] = grouped["ss_id"].str.len()
-        grouped["incidence"] = grouped["count"] / len(df)
-        grouped["percentage"] = grouped["incidence"] * 100
-        grouped.reset_index(inplace=True)
-
-        return grouped
 
     def filter_class_by_percentage(self, cutoff: float, base: int = 8) -> pd.DataFrame:
         """
@@ -570,6 +531,14 @@ class DisulfideClass_Constructor:
         :rtype: str
         :raises ValueError: If the angle is out of range.
         """
+        char_map = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+        if base not in [2, 4, 6, 8, 10, 12, 14, 16]:
+            raise ValueError("Invalid base. Must be 2, 4, 6, 8, 10, 12, 14, or 16.")
+
+        if base == 2:
+            return DisulfideClass_Constructor.get_binary_quadrant(angle_deg)
+
         # Normalize the angle to [0, 360)
         angle_deg = np.asarray(angle_deg) % 360
 
@@ -581,9 +550,9 @@ class DisulfideClass_Constructor:
 
         # Return as string(s)
         if angle_deg.ndim == 0:
-            return str(segment.item())
+            return char_map[segment.item()]
 
-        return "".join(segment.astype(str))
+        return "".join(char_map[i] for i in segment)
 
     @staticmethod
     def class_string_from_dihedral(*args, base=8) -> str:
@@ -601,8 +570,8 @@ class DisulfideClass_Constructor:
         if len(args) not in [1, 5]:
             raise ValueError("You must enter either 1 or 5 dihedral angles.")
 
-        if base not in [2, 6, 8]:
-            raise ValueError("Invalid base. Must be 2, 6, or 8.")
+        if base > 16 or base < 2:
+            raise ValueError("Invalid base. Must be between 2 and 16.")
 
         angles = np.array(args).flatten()
 

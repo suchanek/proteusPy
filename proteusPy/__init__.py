@@ -6,7 +6,19 @@
 # pylint: disable=C0413
 
 """
-.. include:: ../README.md
+proteusPy is a Python package specializing in the modeling and analysis 
+of proteins of known structure with an emphasis on Disulfide bonds. This package 
+reprises my molecular modeling program [Proteus](https://doi.org/10.1021/bi00368a023), 
+a structure-based program developed as part of my graduate thesis.
+
+The package relies on the Turtle3D class to create and manipulate local coordinate systems. 
+It does this by implementing the functions Move, Roll, Yaw, Pitch and Turn for movement 
+in a three-dimensional space.
+
+This implementation focuses on the Disulfide class. This class implements methods to 
+analyze the protein structure stabilizing element known as a Disulfide Bond. Its
+underlying methods are used to perform a structural analysis of over 36,900 disulfide-bond 
+containing proteins in the RCSB protein data bank s(<https://www.rcsb.org>).
 """
 
 __pdoc__ = {
@@ -163,8 +175,21 @@ from .vector3D import (
     rms_difference,
 )
 
-_logger.setLevel(logging.INFO)
-_logger.info("ProteusPy %s initialized.", __version__)
-_logger.info("Plotly theme set to: %s", set_plotly_theme(theme="auto"))
-_logger.setLevel(DEFAULT_LOG_LEVEL)
+set_plotly_theme(theme="auto")
+set_pyvista_theme(theme="auto")
+
+
+def describe():
+    """
+    Describe the proteusPy package.
+    """
+    set_logger_level_for_module("proteusPy", logging.INFO)
+    _logger.info("ProteusPy %s initialized.", __version__)
+    _logger.info("Plotly theme set to: %s", set_plotly_theme(theme="auto"))
+    _logger.info("PyVista theme set to: %s", set_pyvista_theme(theme="auto"))
+    _logger.info("Logging level setting to default: %s", DEFAULT_LOG_LEVEL)
+    _logger.setLevel(DEFAULT_LOG_LEVEL)
+    return
+
+
 # end of file

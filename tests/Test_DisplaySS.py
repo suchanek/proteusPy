@@ -65,11 +65,11 @@ class TestDisplaySS(unittest.TestCase):
 
         try:
             ss.spin(style="sb")
-
             ss.display(style="bs", single=True)
             ss.display(style="cpk", single=True)
             ss.display(style="sb", single=True)
             ss.display(style="pd", single=False)
+            
         except Exception as e:
             self.fail(f"Display method raised an exception: {e}")
 

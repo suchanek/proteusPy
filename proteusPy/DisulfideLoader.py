@@ -20,7 +20,6 @@ import copy
 import pickle
 import time
 from dataclasses import dataclass, field
-from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -46,6 +45,7 @@ from proteusPy.ProteusGlobals import (
     SS_LIST_URL,
     SS_PICKLE_FILE,
 )
+
 from proteusPy.utility import set_plotly_theme
 
 _logger = create_logger(__name__)
@@ -732,6 +732,163 @@ class DisulfideLoader:
             fig.write_image(fname, "png")
         else:
             fig.show()
+
+        return
+
+    def plot_count_vs_class_df_sampled(
+        self,
+        df,
+        title="title",
+        theme="auto",
+        save=False,
+        savedir=".",
+        base=8,
+        verbose=False,
+        log=True,
+        sample_size=1000,
+    ):
+        """
+        Plot a line graph of count vs class ID using Plotly for the given disulfide class with sampling.
+
+        :param df: A pandas DataFrame containing the data to be plotted.
+        :param title: A string representing the title of the plot (default is 'title').
+        :param theme: A string representing the name of the theme to use. Can be either 'notebook'
+        or 'plotly_dark'. Default is 'plotly_dark'.
+        :param save: A boolean flag indicating whether to save the plot to a file. Default is False.
+        :param savedir: A string representing the directory to save the plot to. Default is '.'.
+        :param base: An integer representing the base value for the enumeration. Default is 8.
+        :param verbose: A boolean flag indicating whether to display verbose output. Default is False.
+        :param log: A boolean flag indicating whether to use a log scale for the y-axis. Default is False.
+        :param sample_size: Number of items to sample for plotting.
+        :raises ValueError: If an invalid base value is provided, (2 or 8s).
+        :return: None
+        """
+        set_plotly_theme(theme)
+
+        _title = f"Binary Class: {title}"
+        _labels = {}
+        _prefix = "None"
+        if base == 8:
+            _labels = {"class_id": "Octant Class ID", "count": "Count"}
+            _prefix = "Octant"
+
+        elif base == 2:
+            _labels = {"class_id": "Binary Class ID", "count": "Count"}
+            _prefix = "Binary"
+            df = self.tclass.binaryclass_df
+        else:
+            raise ValueError("Invalid base. Must be 2 or 8.")
+
+        df_sampled = df.sample(n=sample_size)
+
+        fig = px.line(
+            df_sampled,
+            x="class_id",
+            y="count",
+            title=f"{_title} (Sampled {sample_size} items)",
+            labels=_labels,
+        )
+
+        fig.update_layout(
+            showlegend=True,
+            title_x=0.5,
+            title_font=dict(size=20),
+            xaxis_showgrid=False,
+            yaxis_showgrid=False,
+            autosize=True,
+            yaxis_type="log" if log else "linear",
+        )
+        fig.update_layout(autosize=True)
+
+        if save:
+            fname = Path(savedir) / f"{title}_{_prefix}_sampled.png"
+
+            if verbose:
+                _logger.info("Saving %s plot to %s", title, fname)
+            fig.write_image(fname, "png")
+        else:
+            fig.show()
+
+        return
+
+    def plot_count_vs_class_df_paginated(
+        self,
+        df,
+        title="title",
+        theme="auto",
+        save=False,
+        savedir=".",
+        base=8,
+        verbose=False,
+        log=True,
+        page_size=200,
+    ):
+        """
+        Plot a line graph of count vs class ID using Plotly for the given disulfide class with pagination.
+
+        :param df: A pandas DataFrame containing the data to be plotted.
+        :param title: A string representing the title of the plot (default is 'title').
+        :param theme: A string representing the name of the theme to use. Can be either 'notebook'
+        or 'plotly_dark'. Default is 'plotly_dark'.
+        :param save: A boolean flag indicating whether to save the plot to a file. Default is False.
+        :param savedir: A string representing the directory to save the plot to. Default is '.'.
+        :param base: An integer representing the base value for the enumeration. Default is 8.
+        :param verbose: A boolean flag indicating whether to display verbose output. Default is False.
+        :param log: A boolean flag indicating whether to use a log scale for the y-axis. Default is False.
+        :param page_size: Number of items to plot per page.
+        :raises ValueError: If an invalid base value is provided, (2 or 8s).
+        :return: None
+        """
+        set_plotly_theme(theme)
+
+        _title = f"Binary Class: {title}"
+        _labels = {}
+        _prefix = "None"
+        if base == 8:
+            _labels = {"class_id": "Octant Class ID", "count": "Count"}
+            _prefix = "Octant"
+
+        elif base == 2:
+            _labels = {"class_id": "Binary Class ID", "count": "Count"}
+            _prefix = "Binary"
+            df = self.tclass.binaryclass_df
+        else:
+            raise ValueError("Invalid base. Must be 2 or 8.")
+
+        total_pages = (len(df) + page_size - 1) // page_size
+
+        for page in range(total_pages):
+            start = page * page_size
+            end = start + page_size
+            df_page = df.iloc[start:end]
+
+            fig = px.line(
+                df_page,
+                x="class_id",
+                y="count",
+                title=f"{_title} (Page {page + 1}/{total_pages})",
+                labels=_labels,
+            )
+
+            fig.update_layout(
+                showlegend=True,
+                title_x=0.5,
+                title_font=dict(size=20),
+                xaxis_showgrid=False,
+                yaxis_showgrid=False,
+                autosize=True,
+                yaxis_type="log" if log else "linear",
+            )
+            fig.update_layout(autosize=True)
+
+            if save:
+                fname = Path(savedir) / f"{title}_{_prefix}_page_{page + 1}.png"
+
+                if verbose:
+                    _logger.info("Saving %s plot to %s", title, fname)
+                fig.write_image(fname, "png")
+            else:
+                fig.show()
 
         return
 
