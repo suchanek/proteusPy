@@ -98,7 +98,7 @@ import proteusPy as pp
 PDB_SS = pp.Load_PDB_SS(verbose=True)
 
 best_ss = PDB_SS["2q7q_75D_140D"]
-best_ss.display(style="sb", light=True)
+best_ss.display(style="sb")
 ```
 
 The [notebooks](https://github.com/suchanek/proteusPy/blob/master/notebooks/) directory contains my Jupyter notebooks and is a good place to start:
