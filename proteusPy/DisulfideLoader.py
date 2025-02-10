@@ -1071,6 +1071,28 @@ class DisulfideLoader:
         """
         self.SSList.plot_deviation_histograms(theme=theme, verbose=verbose)
 
+    def plot_classes(
+        self, class_string, base=8, theme="auto", log=False, page_size=200
+    ):
+        """
+        Plot the distribution of classes for the given class string.
+
+        :param class_string: The class string to plot.
+        :type class_string: str
+        :param base: The base of the class string. Default is 8.
+        :type base: int
+        :param theme: The theme to use for the plot ('auto', 'light', or 'dark'), defaults to 'auto'.
+        :type theme: str
+        :return: None
+        """
+        classlist = self.tclass.binary_to_class(class_string, base)
+        df = self.enumerate_class_fromlist(classlist, base=base)
+        self.plot_count_vs_class_df_paginated(
+            df, title=class_string, theme=theme, base=base, log=log, page_size=page_size
+        )
+
+        return
+
     def sslist_from_class(self, class_string, base=8, cutoff=0.0) -> DisulfideList:
         """
         Return a DisulfideList containing Disulfides with the given class_string.

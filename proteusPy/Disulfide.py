@@ -47,7 +47,7 @@ from proteusPy.DisulfideExceptions import (
 )
 from proteusPy.DisulfideList import DisulfideList
 from proteusPy.logger_config import create_logger
-from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, WINSIZE
+from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, FONTSIZE, WINSIZE
 from proteusPy.Residue import build_residue
 from proteusPy.ssparser import (
     get_phipsi_atoms_coordinates,
@@ -1668,10 +1668,9 @@ class Disulfide:
         """
 
         src = self.pdb_id
-        name = self.name
         enrg = self.energy
 
-        title = f"{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Tors: {self.torsion_length:.2f}"
+        title = f"{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Tors: {self.torsion_length:.2f}"
 
         set_pyvista_theme(theme)
 
@@ -1715,9 +1714,9 @@ class Disulfide:
             * 'plain' - boring single color
         :param light: If True, light background, if False, dark
         """
-        # src = self.pdb_id
-        # enrg = self.energy
-        # title = f"{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Cβ: {self.cb_distance:.2f} Å Tors: {self.torsion_length:.2f}°"
+        src = self.pdb_id
+        enrg = self.energy
+        title = f"{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Cβ: {self.cb_distance:.2f} Å Tors: {self.torsion_length:.2f}°"
 
         if light:
             pv.set_plot_theme("document")
@@ -1728,7 +1727,7 @@ class Disulfide:
 
         if single:
             pl = pv.Plotter(window_size=WINSIZE)
-            # pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=FONTSIZE)
             pl.enable_anti_aliasing("msaa")
             # pl.add_camera_orientation_widget()
 
@@ -2027,10 +2026,9 @@ class Disulfide:
         :param shadows: Enable shadows, defaults to False
         """
 
-        # src = self.pdb_id
-        # name = self.name
-        # enrg = self.energy
-        # title = f"{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Cβ: {self.cb_distance:.2f} Å, Sγ: {self.sg_distance:.2f} Å, Tors: {self.torsion_length:.2f}"
+        src = self.pdb_id
+        enrg = self.energy
+        title = f"{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Cβ: {self.cb_distance:.2f} Å, Sγ: {self.sg_distance:.2f} Å, Tors: {self.torsion_length:.2f}"
 
         set_pyvista_theme(light)
 
@@ -2039,7 +2037,7 @@ class Disulfide:
 
         if single:
             pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
-            # pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=FONTSIZE)
             pl.enable_anti_aliasing("msaa")
             self._render(
                 pl,
@@ -2060,7 +2058,7 @@ class Disulfide:
             pl = pv.Plotter(window_size=WINSIZE, shape=(2, 2), off_screen=False)
             pl.subplot(0, 0)
 
-            # pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=FONTSIZE)
             pl.enable_anti_aliasing("msaa")
 
             # pl.add_camera_orientation_widget()
@@ -2070,21 +2068,21 @@ class Disulfide:
             )
 
             pl.subplot(0, 1)
-            # pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=FONTSIZE)
             self._render(
                 pl,
                 style="pd",
             )
 
             pl.subplot(1, 0)
-            # pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=FONTSIZE)
             self._render(
                 pl,
                 style="bs",
             )
 
             pl.subplot(1, 1)
-            # pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=FONTSIZE)
             self._render(
                 pl,
                 style="sb",
