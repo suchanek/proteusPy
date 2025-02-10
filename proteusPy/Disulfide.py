@@ -5,7 +5,7 @@ It represents the core of the current implementation of *proteusPy*.
 
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 Author: Eric G. Suchanek, PhD
-Last Modification: 2025-01-02 12:55:02
+Last Modification: 2025-02-09 23:32:12
 """
 
 # pylint: disable=W1203 # use of print
@@ -13,8 +13,8 @@ Last Modification: 2025-01-02 12:55:02
 # pylint: disable=C0301 # line too long
 # pylint: disable=C0302 # too many lines in module
 # pylint: disable=W0212 # access to protected member
-# pylint: disable=W0612 # unused variable
 # pylint: disable=W0613 # unused argument
+# pylint: disable=C2801 # no dunder method
 
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
 
@@ -39,7 +39,7 @@ from proteusPy.atoms import (
     SPEC_POWER,
     SPECULARITY,
 )
-from proteusPy.DisulfideClass_Constructor import DisulfideClass_Constructor
+from proteusPy.DisulfideClassManager import DisulfideClassManager
 from proteusPy.DisulfideExceptions import (
     DisulfideConstructionException,
     DisulfideConstructionWarning,
@@ -661,8 +661,6 @@ class Disulfide:
 
         _bradius = bond_radius
         coords = self.internal_coords
-        missing_atoms = self.missing_atoms
-        clen = coords.shape[0]
 
         model = self.modelled
         if model:
@@ -750,7 +748,7 @@ class Disulfide:
         """
         Return a binary string representation of the disulfide bond class.
         """
-        return DisulfideClass_Constructor.class_string_from_dihedral(
+        return DisulfideClassManager.class_string_from_dihedral(
             self.chi1, self.chi2, self.chi3, self.chi4, self.chi5, base=2
         )
 
@@ -759,7 +757,7 @@ class Disulfide:
         """
         Return the octant string representation of the disulfide bond class.
         """
-        return DisulfideClass_Constructor.class_string_from_dihedral(
+        return DisulfideClassManager.class_string_from_dihedral(
             self.chi1, self.chi2, self.chi3, self.chi4, self.chi5, base=8
         )
 
@@ -1627,11 +1625,11 @@ class Disulfide:
         :param verbose: Verbosity, defaults to False
         :param steps: Number of steps for one complete rotation, defaults to 360.
         """
-        src = self.pdb_id
-        name = self.name
-        enrg = self.energy
 
-        title = f"{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Tors: {self.torsion_length:.2f}"
+        # src = self.pdb_id
+        # name = self.name
+        # enrg = self.energy
+        # title = f"{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Tors: {self.torsion_length:.2f}"
 
         if verbose:
             print(f"Rendering animation to {fname}...")
@@ -1674,6 +1672,7 @@ class Disulfide:
         enrg = self.energy
 
         title = f"{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Tors: {self.torsion_length:.2f}"
+
         set_pyvista_theme(theme)
 
         if verbose:
@@ -1681,6 +1680,7 @@ class Disulfide:
 
         # Create a Plotter instance
         pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
+        pl.add_title(title=title, font_size=FONTSIZE)
 
         # Enable anti-aliasing for smoother rendering
         pl.enable_anti_aliasing("msaa")
@@ -1715,10 +1715,9 @@ class Disulfide:
             * 'plain' - boring single color
         :param light: If True, light background, if False, dark
         """
-        src = self.pdb_id
-        enrg = self.energy
-
-        title = f"{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Cβ: {self.cb_distance:.2f} Å Tors: {self.torsion_length:.2f}°"
+        # src = self.pdb_id
+        # enrg = self.energy
+        # title = f"{src}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol. Cα: {self.ca_distance:.2f} Å Cβ: {self.cb_distance:.2f} Å Tors: {self.torsion_length:.2f}°"
 
         if light:
             pv.set_plot_theme("document")
@@ -2027,11 +2026,12 @@ class Disulfide:
         :param verbose: Verbosit, defaults to False
         :param shadows: Enable shadows, defaults to False
         """
-        src = self.pdb_id
-        name = self.name
-        enrg = self.energy
 
-        title = f"{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Cβ: {self.cb_distance:.2f} Å, Sγ: {self.sg_distance:.2f} Å, Tors: {self.torsion_length:.2f}"
+        # src = self.pdb_id
+        # name = self.name
+        # enrg = self.energy
+        # title = f"{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Cβ: {self.cb_distance:.2f} Å, Sγ: {self.sg_distance:.2f} Å, Tors: {self.torsion_length:.2f}"
+
         set_pyvista_theme(light)
 
         if verbose:
