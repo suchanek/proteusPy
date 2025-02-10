@@ -524,18 +524,18 @@ class DisulfideClass_Constructor:
         :param angle_deg: The angle in degrees.
         :type angle_deg: float or array-like
         :param base: The number of segments (default is 8). For example, with base=8 each segment spans 45°,
-                        with base=12 each spans 30°, etc.
-        :type base: int, optional
+        with base=12 each spans 30°, etc.
+        :type base: int, optional, default=8, max=16, must be even.
         :return: The label corresponding to the segment in which the input angle lies. For scalar input,
                     a single string is returned; for array-like input, a NumPy array of strings is returned.
         :rtype: str
-        :raises ValueError: If the angle is out of range.
+        :raises ValueError: If the base is out of range.
         """
+        # Character map for the segment labels, technically up to base 36.
         char_map = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-        if base not in [2, 4, 6, 8, 10, 12, 14, 16]:
-            raise ValueError("Invalid base. Must be 2, 4, 6, 8, 10, 12, 14, or 16.")
-
+        if base > 16 or base < 2 and base % 2 != 0:
+            raise ValueError("Invalid base. Must be even and between 2 and 16.")
         if base == 2:
             return DisulfideClass_Constructor.get_binary_quadrant(angle_deg)
 
