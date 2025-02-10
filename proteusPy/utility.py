@@ -1146,24 +1146,27 @@ def set_pyvista_theme(theme: str, verbose=False) -> str:
     """
     import pyvista as pv
 
+    _theme = get_theme()
+
     match theme.lower():
         case "auto":
-            _theme = get_theme()
             if _theme == "light":
                 pv.set_plot_theme("document")
             else:
                 pv.set_plot_theme("dark")
+                _theme = "dark"
         case "light":
             pv.set_plot_theme("document")
         case "dark":
             pv.set_plot_theme("dark")
+            _theme = "dark"
         case _:
             raise ValueError("Invalid theme. Must be 'auto', 'light', or 'dark'.")
 
     if verbose:
-        _logger.info("PyVista theme set to: %s", theme.lower())
+        _logger.info("PyVista theme set to: %s", _theme.lower())
 
-    return theme.lower()
+    return _theme
 
 
 def plot_class_chart(classes: int) -> None:
