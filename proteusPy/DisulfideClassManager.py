@@ -592,47 +592,6 @@ class DisulfideClassManager:
             case _:
                 raise ValueError("Invalid number of angles. Must be 1 or 5.")
 
-    @staticmethod
-    def Oclass_string_from_dihedral(*args, base=8) -> str:
-        """
-        Return the class string for a set of dihedral angles, given the base.
-
-        :param args: One or five dihedral angles.
-        :param base: The base class to use, 2, 6, or 8. Defaults to 8.
-        :return: The class string for the input dihedral angles.
-        :rtype: str
-        :raises ValueError: If the number of dihedral angles is not 1 or 5, or if the base is not 2, 6, or 8.
-        """
-        if len(args) not in [1, 5]:
-            raise ValueError("You must enter either 1 or 5 dihedral angles.")
-
-        if base not in [2, 6, 8]:
-            raise ValueError("Invalid base. Must be 2, 6, or 8.")
-
-        angles = np.array(args).flatten()
-
-        if len(angles) == 1:
-            match base:
-                case 2:
-                    return DisulfideClassManager.get_binary_quadrant(angles[0])
-                case 6:
-                    return DisulfideClassManager.get_sixth_quadrant(angles[0])
-                case 8:
-                    return DisulfideClassManager.get_eighth_quadrant(angles[0])
-                case _:
-                    raise ValueError("Invalid base. Must be 2, 6, or 8.")
-
-        elif len(angles) == 5:
-            match base:
-                case 2:
-                    return DisulfideClassManager.get_binary_quadrant(angles)
-                case 6:
-                    return DisulfideClassManager.get_sixth_quadrant(angles)
-                case 8:
-                    return DisulfideClassManager.get_eighth_quadrant(angles)
-                case _:
-                    raise ValueError("Invalid base. Must be 2, 6, or 8.")
-
     def sslist_from_classid(self, cls: str, base=8) -> pd.DataFrame:
         """
         Return the 'ss_id' value in the given DataFrame that corresponds to the
@@ -663,23 +622,32 @@ class DisulfideClassManager:
 
         :param cls_str (str): A string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees.
         :param base (int): The base of the ordinal section (6 or 8).
+        :raises ValueError: If the base is not 6 or 8 or 10.
         :return str: A string of length 5, where each character is either '0' or '2', representing the sign of the corresponding input angle.
         """
-        if base not in [6, 8]:
-            raise ValueError("Base must be either 6 or 8")
+        if base not in [6, 8, 10]:
+            raise ValueError("Base must be either 6, 8, or 10")
 
         output_str = ""
         for char in cls_str:
-            if base == 6:
-                if char in ["1", "2", "3"]:
-                    output_str += "2"
-                elif char in ["4", "5", "6"]:
-                    output_str += "0"
-            elif base == 8:
-                if char in ["1", "2", "3", "4"]:
-                    output_str += "2"
-                elif char in ["5", "6", "7", "8"]:
-                    output_str += "0"
+            match base:
+                case 6:
+                    if char in ["1", "2", "3"]:
+                        output_str += "2"
+                    elif char in ["4", "5", "6"]:
+                        output_str += "0"
+                case 8:
+                    if char in ["1", "2", "3", "4"]:
+                        output_str += "2"
+                    elif char in ["5", "6", "7", "8"]:
+                        output_str += "0"
+                case 10:
+                    if char in ["1", "2", "3", "4", "5"]:
+                        output_str += "2"
+                    elif char in ["6", "7", "8", "9", "A"]:
+                        output_str += "0"
+                case _:
+                    raise ValueError("Invalid base. Must be either 6, 8, or 10")
         return output_str
 
     def get_class_df(self, base=8):
