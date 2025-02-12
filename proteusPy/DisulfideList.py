@@ -41,6 +41,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pyvista as pv
 from plotly.subplots import make_subplots
+from scipy import stats
 
 import proteusPy
 from proteusPy import Disulfide
@@ -1353,7 +1354,9 @@ class DisulfideList(UserList):
         )
         fig.show()
 
-    def plot_deviation_scatterplots(self, verbose=False, theme="auto"):
+    def plot_deviation_scatterplots(
+        self, verbose=False, theme="auto", df: pd.DataFrame = None
+    ) -> pd.DataFrame:
         """
         Plot scatter plots for Bondlength_Deviation, Angle_Deviation, Ca_Distance, and Sg_Distance
         with the row index as the x-axis.
@@ -1362,11 +1365,13 @@ class DisulfideList(UserList):
         :type verbose: bool
         :param theme: The theme to use for the plot ('auto', 'light', or 'dark'), defaults to 'auto'.
         :type theme: str
+        :return: DataFrame containing the deviation information.
         """
         set_plotly_theme(theme)
         dotsize = 2
 
-        df = self.create_deviation_dataframe(verbose=verbose)
+        if df is None:
+            df = self.create_deviation_dataframe(verbose=verbose)
 
         fig = px.scatter(
             df, x=df.index, y="Bondlength_Deviation", title="Bondlength Deviation"
@@ -1390,56 +1395,90 @@ class DisulfideList(UserList):
         fig.update_traces(marker=dict(size=dotsize))  # Adjust the size as needed
         fig.show()
 
-    def plot_deviation_histograms(self, verbose=False, theme="auto", log=True) -> None:
-        """
-        Plot histograms for Bondlength_Deviation, Angle_Deviation, and Ca_Distance.
+        return df
 
-        This function creates and displays histograms for the bond length deviation,
-        bond angle deviation from the disulfide list. The histograms
-        are displayed on a logarithmic scale for the y-axis.
+    def plot_deviation_histograms(
+        self, verbose=False, theme="auto", log=True, df: pd.DataFrame = None
+    ) -> pd.DataFrame:
+        """
+        Plot histograms for Bondlength_Deviation and Angle_Deviation with normal distribution overlay.
+
+        This function creates and displays histograms for the bond length deviation and
+        bond angle deviation from the disulfide list. The histograms are displayed on a
+        logarithmic scale for the y-axis by default. A normal distribution curve is
+        overlaid on each histogram for comparison.
 
         :param verbose: Whether to display a progress bar.
         :type verbose: bool
         :param theme: The plotly theme to use. Default is 'auto', which will use the current system theme.
         :param log: Whether to use a logarithmic scale for the y-axis. Default is True.
+        :return: DataFrame containing the deviation information.
+        :rtype: pd.DataFrame
         """
 
         set_plotly_theme(theme)
-        if log:
-            yaxis_type = "log"
-        else:
-            yaxis_type = "linear"
+        yaxis_type = "log" if log else "linear"
+        built = False
 
-        df = self.create_deviation_dataframe(verbose=verbose)
+        if df is None:
+            df = self.create_deviation_dataframe(verbose=verbose)
+            built = True
 
-        fig = px.histogram(
+        # Function to create histogram with normal distribution overlay
+        def create_histogram_with_normal(data, column_name, title, x_label):
+            fig = px.histogram(
+                data,
+                x=column_name,
+                nbins=NBINS,
+                title=title,
+            )
+
+            # Calculate normal distribution
+            mean = np.mean(data[column_name])
+            std = np.std(data[column_name])
+            x = np.linspace(data[column_name].min(), data[column_name].max(), 100)
+            y = stats.norm.pdf(x, mean, std)
+
+            # Scale the normal distribution to match histogram height
+            hist, _ = np.histogram(data[column_name], bins=NBINS)
+            scaling_factor = np.max(hist) / np.max(y)
+            y_scaled = y * scaling_factor
+
+            # Add normal distribution trace
+            fig.add_trace(
+                go.Scatter(x=x, y=y_scaled, mode="lines", name="Normal Distribution")
+            )
+
+            fig.update_layout(
+                title={"text": title, "x": 0.5, "xanchor": "center"},
+                xaxis_title=x_label,
+                yaxis_title="Frequency",
+                yaxis_type=yaxis_type,
+            )
+            # Set y-axis range to avoid very small values
+            if log:
+                fig.update_yaxes(range=[0, np.log10(np.max(hist))])
+            else:
+                fig.update_yaxes(range=[0, np.max(hist)])
+
+            return fig
+
+        # Create and show Bond Length Deviation histogram
+        fig_bond_length = create_histogram_with_normal(
             df,
-            x="Bondlength_Deviation",
-            nbins=NBINS,
-            title="Bond Length Deviation (Å)",
+            "Bondlength_Deviation",
+            "Bond Length Deviation",
+            "Bond Length Deviation (Å)",
         )
+        fig_bond_length.show()
 
-        fig.update_layout(
-            title={"text": "Bond Length Deviation", "x": 0.5, "xanchor": "center"},
-            xaxis_title="Bond Length Deviation (Å)",
-            yaxis_title="Frequency",
-            yaxis_type=yaxis_type,
+        # Create and show Bond Angle Deviation histogram
+        fig_bond_angle = create_histogram_with_normal(
+            df, "Angle_Deviation", "Bond Angle Deviation", "Bond Angle Deviation (°)"
         )
-        fig.show()
+        fig_bond_angle.show()
 
-        fig2 = px.histogram(
-            df, x="Angle_Deviation", nbins=NBINS, title="Bond Angle Deviation, (°)"
-        )
-        fig2.update_layout(
-            title={"text": "Bond Angle Deviation", "x": 0.5, "xanchor": "center"},
-            xaxis_title="Bond Angle Deviation (°)",
-            yaxis_title="Frequency",
-            yaxis_type=yaxis_type,
-        )
-
-        fig2.show()
-
-        return
+        return df
 
     def filter_deviation_df_by_cutoffs(
         self,
