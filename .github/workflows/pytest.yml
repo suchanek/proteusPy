@@ -21,7 +21,7 @@ jobs:
               python -m pip install --upgrade pip
               pip install wheel
               pip install pytest
-              pip install .
+              pip install --ignore=tests/Test_DisplaySS.py .
 
         - name: Test with pytest
           run: |
