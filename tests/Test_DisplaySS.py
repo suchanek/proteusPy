@@ -23,7 +23,7 @@ Usage:
     Run this module as a script to execute the unit tests.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-02-08 18:04:55 -egs-
+Last revision: 2025-02-11 20:41:46 -egs-
 """
 
 import os
@@ -31,8 +31,7 @@ import unittest
 from tempfile import TemporaryDirectory
 from unittest import main as run_tests
 
-from proteusPy import set_pyvista_theme
-from proteusPy.DisulfideLoader import Load_PDB_SS
+import proteusPy as pp
 
 # pylint: disable=W0718 # too general exception clause
 # pylint: disable=C0114 # missing-module-docstring
@@ -48,20 +47,50 @@ class TestDisplaySS(unittest.TestCase):
         self.temp_dir_obj = TemporaryDirectory(prefix="proteusPy_")
 
         # Set the theme.
-        set_pyvista_theme("auto")
+        pp.set_pyvista_theme("auto")
 
         # Load the disulfide database (subset, for speed).
-        self.PDB = Load_PDB_SS(verbose=True, subset=True)
+        self.PDB = pp.Load_PDB_SS(verbose=True, subset=True)
+        self.first_disulfide = self.PDB[0]
 
     def tearDown(self) -> None:
         """Clean up test fixtures after each test method."""
         # Remove the temporary directory via the TemporaryDirectory object's cleanup method.
         self.temp_dir_obj.cleanup()
 
+    def test_disulfide_list_display(self):
+        """Test the display functionality for a list of disulfide bonds."""
+        # Retrieve a disulfide list for a given structure using its identifier.
+
+        try:
+            ss6dmb = self.PDB["6dmb"]
+        except Exception as e:
+            self.fail(f"DisulfideList display for '6dmb' raised an exception: {e}")
+
+        ss6dmb.display(style="cpk")
+        ss6dmb.display(style="bs")
+        ss6dmb.display(style="sb")
+        ss6dmb.display(style="pd")
+        ss6dmb.display(style="plain")
+        ss6dmb.display_overlay()
+
+        # Test with a subset (first 32 disulfides) of the database.
+        try:
+            sslist = self.PDB[:16]
+        except Exception as e:
+            self.fail(f"DisulfideList display for subset raised an exception: {e}")
+
+        sslist.display(style="cpk")
+        sslist.display(style="bs")
+        sslist.display(style="sb")
+        sslist.display(style="pd")
+        sslist.display(style="plain")
+        sslist.display_overlay()
+
     def test_single_disulfide_display(self):
         """Test the display and screenshot functionality for a single disulfide."""
-        # Get the first disulfide from the database.
-        ss = self.PDB[0]
+        # Use the first disulfide from the database.
+        ss = self.first_disulfide
 
         try:
             ss.spin(style="sb")
@@ -69,7 +98,7 @@ class TestDisplaySS(unittest.TestCase):
             ss.display(style="cpk", single=True)
             ss.display(style="sb", single=True)
             ss.display(style="pd", single=False)
-            
+
         except Exception as e:
             self.fail(f"Display method raised an exception: {e}")
 
@@ -81,32 +110,6 @@ class TestDisplaySS(unittest.TestCase):
             )
         except Exception as e:
             self.fail(f"Screenshot (cpk) method raised an exception: {e}")
-
-    def test_disulfide_list_display(self):
-        """Test the display functionality for a list of disulfide bonds."""
-        # Retrieve a disulfide list for a given structure using its identifier.
-
-        try:
-            ss6dmb = self.PDB["6dmb"]
-            ss6dmb.display(style="cpk")
-            ss6dmb.display(style="bs")
-            ss6dmb.display(style="sb")
-            ss6dmb.display(style="pd")
-            ss6dmb.display(style="plain")
-            ss6dmb.display_overlay()
-        except Exception as e:
-            self.fail(f"DisulfideList display for '6dmb' raised an exception: {e}")
-
-        # Test with a subset (first 12 disulfides) of the database.
-        try:
-            sslist = self.PDB[:12]
-            sslist.display(style="cpk")
-            sslist.display(style="bs")
-            sslist.display(style="sb")
-            sslist.display(style="pd")
-            sslist.display(style="plain")
-        except Exception as e:
-            self.fail(f"DisulfideList display for subset raised an exception: {e}")
 
 
 if __name__ == "__main__":
