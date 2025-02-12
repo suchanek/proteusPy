@@ -1025,7 +1025,7 @@ class DisulfideLoader:
 
         return pdbids, num_disulfides
 
-    def plot_distances(
+    def Oplot_distances(
         self, distance_type="ca", cutoff=-1, comparison="less", theme="auto", log=True
     ):
         """
@@ -1044,7 +1044,10 @@ class DisulfideLoader:
         :return: None
         :rtype: None
         """
+        distances = self.SSList.data.copy()
+
         self.SSList.plot_distances(
+            distances,
             distance_type=distance_type,
             cutoff=cutoff,
             comparison=comparison,

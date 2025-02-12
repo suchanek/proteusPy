@@ -1284,8 +1284,14 @@ class DisulfideList(UserList):
 
         return filtered_distances
 
+    @staticmethod
     def plot_distances(
-        self, distance_type="sg", cutoff=-1, comparison="less", theme="auto", log=True
+        distances,
+        distance_type="sg",
+        cutoff=-1,
+        comparison="less",
+        theme="auto",
+        log=True,
     ):
         """
         Plot the distance values as a histogram using plotly express.
@@ -1300,7 +1306,6 @@ class DisulfideList(UserList):
 
         set_plotly_theme(theme)
 
-        distances = self.extract_distances(distance_type, comparison, cutoff)
         yaxis_type = "log" if log else "linear"
         flip = False if comparison == "less" else True
 
@@ -1359,6 +1364,7 @@ class DisulfideList(UserList):
         :type theme: str
         """
         set_plotly_theme(theme)
+        dotsize = 2
 
         df = self.create_deviation_dataframe(verbose=verbose)
 
@@ -1366,18 +1372,22 @@ class DisulfideList(UserList):
             df, x=df.index, y="Bondlength_Deviation", title="Bondlength Deviation"
         )
         fig.update_layout(xaxis_title="Row Index", yaxis_title="Bondlength Deviation")
+        fig.update_traces(marker=dict(size=dotsize))  # Adjust the size as needed
         fig.show()
 
         fig = px.scatter(df, x=df.index, y="Angle_Deviation", title="Angle Deviation")
         fig.update_layout(xaxis_title="Row Index", yaxis_title="Angle Deviation")
+        fig.update_traces(marker=dict(size=dotsize))  # Adjust the size as needed
         fig.show()
 
         fig = px.scatter(df, x=df.index, y="Ca_Distance", title="Cα Distance")
         fig.update_layout(xaxis_title="Row Index", yaxis_title="Cα Distance")
+        fig.update_traces(marker=dict(size=dotsize))  # Adjust the size as needed
         fig.show()
 
         fig = px.scatter(df, x=df.index, y="Sg_Distance", title="Sg Distance")
         fig.update_layout(xaxis_title="Row Index", yaxis_title="Sg Distance")
+        fig.update_traces(marker=dict(size=dotsize))  # Adjust the size as needed
         fig.show()
 
     def plot_deviation_histograms(self, verbose=False, theme="auto", log=True) -> None:
