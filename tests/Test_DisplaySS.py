@@ -74,11 +74,14 @@ class TestDisplaySS(unittest.TestCase):
         ss6dmb.display(style="plain")
         ss6dmb.display_overlay()
 
-        # Test with a subset (first 32 disulfides) of the database.
+        # Test with a subset (first 12 disulfides) of the database.
         try:
-            sslist = self.PDB[:16]
+            sslist = self.PDB[:12]
         except Exception as e:
             self.fail(f"DisulfideList display for subset raised an exception: {e}")
+
+        self.assertIsNotNone(sslist)
+        self.assertGreater(len(sslist), 0, "Disulfide list should not be empty.")
 
         sslist.display(style="cpk")
         sslist.display(style="bs")

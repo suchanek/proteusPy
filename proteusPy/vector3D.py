@@ -377,6 +377,10 @@ def calculate_bond_angle(atom1, atom2, atom3):
     magnitude1 = np.linalg.norm(vector1)
     magnitude2 = np.linalg.norm(vector2)
 
+    if magnitude1 == 0 or magnitude2 == 0:
+        _logger.warning("Cannot calculate angle with zero vector")
+        return 0.0
+
     # Calculate the cosine of the angle using the dot product formula
     cos_angle = dot_product / (magnitude1 * magnitude2)
 
