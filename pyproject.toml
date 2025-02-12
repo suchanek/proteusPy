@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "proteusPy"
-version = "0.99.1.dev1"  # Replace with your version variable
+version = "0.99.1.dev3"  # Replace with your version variable
 description = "proteusPy - Protein Structure Analysis and Modeling Tools"
 readme = "README.md"
 authors = [
