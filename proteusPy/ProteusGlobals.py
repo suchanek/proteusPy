@@ -137,8 +137,21 @@ CA_CUTOFF = 6.71
 SG_CUTOFF = 2.12
 
 FONTSIZE = 12
+NBINS = 380
 
-# columns for the torsions file dataframe.
+# Columns for the distance dataframe
+Distance_DF_Cols = [
+    "source",
+    "ss_id",
+    "proximal",
+    "distal",
+    "energy",
+    "ca_distance",
+    "cb_distance",
+    "sg_distance",
+]
+
+# Columns for the torsions file dataframe
 Torsion_DF_Cols = [
     "source",
     "ss_id",
