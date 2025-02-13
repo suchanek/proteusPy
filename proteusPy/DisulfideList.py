@@ -1354,24 +1354,21 @@ class DisulfideList(UserList):
         )
         fig.show()
 
-    def plot_deviation_scatterplots(
-        self, verbose=False, theme="auto", df: pd.DataFrame = None
-    ) -> pd.DataFrame:
+    @staticmethod
+    def plot_deviation_scatterplots(df: pd.DataFrame, theme="auto") -> go.Figure:
         """
         Plot scatter plots for Bondlength_Deviation, Angle_Deviation, Ca_Distance, and Sg_Distance
         with the row index as the x-axis.
 
-        :param verbose: If True, display additional information during processing, defaults to False.
-        :type verbose: bool
         :param theme: The theme to use for the plot ('auto', 'light', or 'dark'), defaults to 'auto'.
         :type theme: str
-        :return: DataFrame containing the deviation information.
+        :param df: DataFrame containing the deviation information, defaults to None.
+        :type df: pd.DataFrame
+        :return: Figure containing the scatter plots.
+        :rtype: go.Figure
         """
         set_plotly_theme(theme)
         dotsize = 2
-
-        if df is None:
-            df = self.create_deviation_dataframe(verbose=verbose)
 
         fig = px.scatter(
             df, x=df.index, y="Bondlength_Deviation", title="Bondlength Deviation"
@@ -1395,11 +1392,10 @@ class DisulfideList(UserList):
         fig.update_traces(marker=dict(size=dotsize))  # Adjust the size as needed
         fig.show()
 
-        return df
+        return fig
 
-    def plot_deviation_histograms(
-        self, verbose=False, theme="auto", log=True, df: pd.DataFrame = None
-    ) -> pd.DataFrame:
+    @staticmethod
+    def plot_deviation_histograms(df: pd.DataFrame, theme="auto", log=True) -> None:
         """
         Plot histograms for Bondlength_Deviation and Angle_Deviation with normal distribution overlay.
 
@@ -1408,21 +1404,14 @@ class DisulfideList(UserList):
         logarithmic scale for the y-axis by default. A normal distribution curve is
         overlaid on each histogram for comparison.
 
-        :param verbose: Whether to display a progress bar.
-        :type verbose: bool
         :param theme: The plotly theme to use. Default is 'auto', which will use the current system theme.
         :param log: Whether to use a logarithmic scale for the y-axis. Default is True.
-        :return: DataFrame containing the deviation information.
-        :rtype: pd.DataFrame
+        :return: Figure containing the deviation information.
+        :rtype: go.Figure
         """
 
         set_plotly_theme(theme)
         yaxis_type = "log" if log else "linear"
-        built = False
-
-        if df is None:
-            df = self.create_deviation_dataframe(verbose=verbose)
-            built = True
 
         # Function to create histogram with normal distribution overlay
         def create_histogram_with_normal(data, column_name, title, x_label):
@@ -1478,7 +1467,7 @@ class DisulfideList(UserList):
         )
         fig_bond_angle.show()
 
-        return df
+        return
 
     def filter_deviation_df_by_cutoffs(
         self,
