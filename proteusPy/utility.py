@@ -30,7 +30,6 @@ import subprocess
 import time
 from pathlib import Path
 
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -38,8 +37,7 @@ import psutil
 from PIL import Image, ImageFont
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from proteusPy import Disulfide, DisulfideList, __version__
-from proteusPy.angle_annotation import AngleAnnotation
+# from proteusPy.Disulfide import Disulfide, DisulfideList
 from proteusPy.DisulfideExceptions import DisulfideIOException
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
@@ -100,13 +98,6 @@ def get_jet_colormap(steps):
     of the array is (steps, 3).
     :rtype: numpy.ndarray
 
-    Example:
-        >>> get_viridis_colormap(5)
-        array([[ 68,   1,  84],
-               [ 72,  40, 120],
-               [ 32, 144, 140],
-               [ 94, 201,  98],
-               [253, 231,  37]], dtype=uint8)
     """
 
     norm = np.linspace(0.0, 1.0, steps)
@@ -525,7 +516,7 @@ def Download_Disulfides(
     return
 
 
-def remove_duplicate_ss(sslist: DisulfideList) -> list[Disulfide]:
+def remove_duplicate_ss(sslist: "DisulfideList") -> list:
     """Remove duplicate disulfides from the input list."""
     pruned = []
     for ss in sslist:
@@ -571,7 +562,7 @@ def Extract_Disulfides(
     :param dist_cutoff:    Ca distance cutoff to reject a Disulfide.
     :param prune:          Move bad files to bad directory, defaults to True
     """
-    from proteusPy.DisulfideList import load_disulfides_from_id
+    from proteusPy.DisulfideIO import load_disulfides_from_id
 
     def name_to_id(fname: str) -> str:
         """
@@ -783,7 +774,7 @@ def Extract_Disulfides_From_List(
     :param dist_cutoff:    Ca distance cutoff to reject a Disulfide.
     :param prune:          Move bad files to bad directory, defaults to True
     """
-    from proteusPy.DisulfideList import load_disulfides_from_id
+    from proteusPy.DisulfideIO import load_disulfides_from_id
 
     if quiet:
         _logger.setLevel(logging.ERROR)
@@ -933,10 +924,6 @@ def get_theme() -> str:
 
     Returns:
     :return str: 'light' if the theme is light, 'dark' if the theme is dark, and 'light' otherwise
-
-    Example:
-    >>> get_theme()
-    'dark'
     """
     system = platform.system()
 
@@ -1166,7 +1153,6 @@ def set_pyvista_theme(theme: str, verbose=False) -> str:
         _logger.info("PyVista theme set to: %s", _theme.lower())
 
     return _theme
-
 
 
 def find_arial_font():

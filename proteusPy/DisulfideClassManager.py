@@ -23,7 +23,8 @@ import numpy as np
 import pandas as pd
 
 from proteusPy import __version__
-from proteusPy.DisulfideList import DisulfideList
+
+# from proteusPy.Disulfide import DisulfideList
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
@@ -132,7 +133,7 @@ class DisulfideClassManager:
 
         return disulfides
 
-    def load_consensus_file(self, fpath=Path(DATA_DIR), octant=True) -> DisulfideList:
+    def load_consensus_file(self, fpath=Path(DATA_DIR), octant=True):
         """Load the consensus file from the specified file."""
 
         res = None

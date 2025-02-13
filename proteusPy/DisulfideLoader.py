@@ -31,10 +31,9 @@ import plotly_express as px
 from pympler import asizeof
 
 from proteusPy import __version__
-from proteusPy.Disulfide import Disulfide
+from proteusPy.Disulfide import Disulfide, DisulfideList
 from proteusPy.DisulfideClassManager import DisulfideClassManager
 from proteusPy.DisulfideExceptions import DisulfideParseWarning
-from proteusPy.DisulfideList import DisulfideList
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
     CA_CUTOFF,

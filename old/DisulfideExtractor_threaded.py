@@ -142,7 +142,7 @@ def Extract_Disulfides_From_List_threaded(
 
     import shutil
 
-    from proteusPy import DisulfideList, load_disulfides_from_id
+    from proteusPy load_disulfides_from_id
     from proteusPy.ProteusGlobals import Torsion_DF_Cols
 
     if quiet:

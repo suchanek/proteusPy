@@ -54,6 +54,7 @@ from .atoms import (
 )
 from .Disulfide import (
     Disulfide,
+    DisulfideList,
     Initialize_Disulfide_From_Coords,
     disulfide_energy_function,
     minimize_ss_energy,
@@ -72,8 +73,10 @@ from .DisulfideExceptions import (
     DisulfideIOException,
     DisulfideParseWarning,
 )
-from .DisulfideList import DisulfideList, extract_disulfide, load_disulfides_from_id
+from .DisulfideIO import extract_disulfide, load_disulfides_from_id
 from .DisulfideLoader import Bootstrap_PDB_SS, DisulfideLoader, Load_PDB_SS
+from .DisulfideStats import DisulfideStats
+from .DisulfideVisualization import DisulfideVisualization
 from .logger_config import (
     DEFAULT_LOG_LEVEL,
     configure_master_logger,
