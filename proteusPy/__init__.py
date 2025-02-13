@@ -61,13 +61,8 @@ from .Disulfide import (
 from .DisulfideClasses import (
     angle_within_range,
     filter_by_percentage,
-    get_angle_class,
     get_quadrant,
-    get_section,
     is_between,
-    torsion_to_class_string,
-    torsion_to_eightclass,
-    torsion_to_sixclass,
 )
 from .DisulfideClassManager import DisulfideClassManager
 from .DisulfideExceptions import (
@@ -91,7 +86,7 @@ from .logger_config import (
     set_logging_level_for_all_handlers,
     toggle_stream_handler,
 )
-from .Plotting import highlight_worst_structures
+from .Plotting import highlight_worst_structures, plot_class_chart
 from .ProteusGlobals import (
     _ANG_INIT,
     _FLOAT_INIT,
@@ -158,7 +153,6 @@ from .utility import (
     grid_dimensions,
     image_to_ascii_art,
     load_list_from_file,
-    plot_class_chart,
     print_memory_used,
     prune_extra_ss,
     remove_duplicate_ss,
