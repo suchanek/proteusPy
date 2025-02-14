@@ -64,13 +64,14 @@ from proteusPy.ProteusGlobals import (
 
 configure_master_logger("DisulfideExtractor.log")
 set_logger_level("proteusPy.ssparser", "ERROR")
-set_logger_level("proteusPy.DisulfideList", "INFO")
+set_logger_level("proteusPy.Disulfide", "INFO")
 # set_logger_level("proteusPy.DisulfideLoader", "INFO")
 
 # Disable the stream handlers for the following namespaces.
 # This will suppress the output to the console.
 toggle_stream_handler("proteusPy.ssparser", False)
-toggle_stream_handler("proteusPy.DisulfideList", False)
+toggle_stream_handler("proteusPy.Disulfide", False)
+toggle_stream_handler("proteusPy.DisulfideIO", False)
 toggle_stream_handler("proteusPy.DisulfideClassManager", False)
 
 # Create a logger for this program.

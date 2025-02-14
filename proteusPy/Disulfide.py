@@ -12,7 +12,6 @@ Last Modification: 2025-02-09 23:32:12
 # pylint: disable=C0103 # invalid name
 # pylint: disable=C0301 # line too long
 # pylint: disable=C0302 # too many lines in module
-# pylint: disable=C0405 # import outside toplevel
 # pylint: disable=W0212 # access to protected member
 # pylint: disable=W0613 # unused argument
 # pylint: disable=C2801 # no dunder method
@@ -484,6 +483,54 @@ class DisulfideList(UserList):
         ]
 
         return DisulfideList(reslist, f"filtered by Sγ distance < {distance:.2f}")
+
+    def plot_distances(
+        self, distance_type="ca", cutoff=-1, comparison="less", theme="auto", log=True
+    ):
+        """
+        Plot the distances for the disulfides in the loader.
+
+        :param distance_type: The type of distance to plot ('ca' for Cα-Cα distance, 'sg' for Sγ-Sγ distance)
+        :param cutoff: The cutoff value for the distance, defaults to -1 (no cutoff)
+        :param comparison: if 'less' then plot distances less than the cutoff, if 'greater' then plot distances greater than the cutoff
+        :param theme: The theme to use for the plot ('auto', 'light', or 'dark')
+        :param log: Whether to use a log scale for the y-axis
+        """
+        #from proteusPy.DisulfideVisualization import DisulfideVisualization
+
+        distances = self.data.copy()
+        DisulfideVisualization.plot_distances(
+            distances,
+            distance_type=distance_type,
+            cutoff=cutoff,
+            comparison=comparison,
+            theme=theme,
+            log=log,
+        )
+
+    def plot_deviation_scatterplots(self, verbose=False, theme="auto"):
+        """
+        Plot scatter plots for Bondlength_Deviation, Angle_Deviation Ca_Distance and SG_Distance.
+
+        :param verbose: Whether to display the plot in the notebook
+        :param theme: Theme to use for the plot ('auto', 'light', or 'dark')
+        """
+        #from proteusPy.DisulfideVisualization import DisulfideVisualization
+
+        df = self.torsion_df
+        DisulfideVisualization.plot_deviation_scatterplots(df, theme=theme)
+
+    def plot_deviation_histograms(self, theme="auto", verbose=True):
+        """
+        Plot histograms for Bondlength_Deviation, Angle_Deviation, and Ca_Distance.
+
+        :param theme: Theme to use for the plot ('auto', 'light', or 'dark')
+        :param verbose: Whether to display verbose output
+        """
+        #from proteusPy.DisulfideVisualization import DisulfideVisualization
+
+        df = self.torsion_df
+        DisulfideVisualization.plot_deviation_histograms(df, theme=theme, log=True)
 
 
 # class for the Disulfide bond

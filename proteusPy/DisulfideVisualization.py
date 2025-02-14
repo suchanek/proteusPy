@@ -7,7 +7,9 @@ Last revision: 2025-02-12
 
 # pylint: disable=C0301
 # pylint: disable=C0103
-# pylint: disable=W0202
+# pylint: disable=W0212
+
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -20,6 +22,7 @@ from tqdm import tqdm
 from tqdm.notebook import tqdm as tqdm_notebook
 
 from proteusPy.atoms import BOND_RADIUS
+from proteusPy.DisulfideClassManager import DisulfideClassManager
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import NBINS, PBAR_COLS, WINSIZE
 from proteusPy.utility import (
@@ -44,6 +47,466 @@ _logger = create_logger(__name__)
 class DisulfideVisualization:
     """Provides visualization methods for Disulfide bonds, including 3D rendering,
     statistical plots, and overlay displays."""
+
+    @staticmethod
+    def enumerate_class_fromlist(tclass: DisulfideClassManager, sslist, base=8):
+        """Enumerate the classes from a list of class IDs.
+
+        :param tclass: DisulfideClassManager instance
+        :param sslist: List of class IDs to enumerate
+        :param base: Base for class IDs (2 or 8)
+        :return: DataFrame with class IDs and counts
+        """
+        x = []
+        y = []
+
+        for cls in sslist:
+            if cls is not None:
+                _y = tclass.sslist_from_classid(cls, base=base)
+                # it's possible to have 0 SS in a class
+                if _y is not None:
+                    # only append if we have both.
+                    x.append(cls)
+                    y.append(len(_y))
+
+        sslist_df = pd.DataFrame(columns=["class_id", "count"])
+        sslist_df["class_id"] = x
+        sslist_df["count"] = y
+        return sslist_df
+
+    @staticmethod
+    def plot_classes_vs_cutoff(
+        tclass: DisulfideClassManager,
+        cutoff: float,
+        steps: int = 50,
+        base=8,
+        theme="auto",
+        verbose=False,
+    ) -> None:
+        """Plot the total percentage and number of members for each octant class against the cutoff value.
+
+        :param tclass: DisulfideClassManager instance
+        :param cutoff: Percent cutoff value for filtering the classes
+        :param steps: Number of steps to take in the cutoff
+        :param base: The base class to use, 6 or 8
+        :param theme: The theme to use for the plot ('auto', 'light', or 'dark')
+        :param verbose: Whether to display verbose output
+        :return: None
+        """
+        _cutoff = np.linspace(0, cutoff, steps)
+        tot_list = []
+        members_list = []
+        base_str = "Octant" if base == 8 else "Binary"
+
+        set_plotly_theme(theme)
+
+        for c in _cutoff:
+            class_df = tclass.filter_class_by_percentage(c, base=base)
+            tot = class_df["percentage"].sum()
+            tot_list.append(tot)
+            members_list.append(class_df.shape[0])
+            if verbose:
+                print(
+                    f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
+                )
+
+        fig = go.Figure()
+
+        # Add total percentage trace
+        fig.add_trace(
+            go.Scatter(
+                x=_cutoff,
+                y=tot_list,
+                mode="lines+markers",
+                name="Total percentage",
+                yaxis="y1",
+                line=dict(color="blue"),
+            )
+        )
+
+        # Add number of members trace
+        fig.add_trace(
+            go.Scatter(
+                x=_cutoff,
+                y=members_list,
+                mode="lines+markers",
+                name="Number of members",
+                yaxis="y2",
+                line=dict(color="red"),
+            )
+        )
+
+        # Update layout
+        fig.update_layout(
+            title={
+                "text": f"{base_str} Classes vs Cutoff, ({cutoff}%)",
+                "x": 0.5,
+                "yanchor": "top",
+                "xanchor": "center",
+            },
+            xaxis=dict(title="Cutoff"),
+            yaxis=dict(
+                title="Total percentage",
+                titlefont=dict(color="blue"),
+                tickfont=dict(color="blue"),
+            ),
+            yaxis2=dict(
+                title="Number of members",
+                titlefont=dict(color="red"),
+                tickfont=dict(color="red"),
+                overlaying="y",
+                side="right",
+                type="log",
+            ),
+            legend=dict(x=0.75, y=1.16),
+        )
+
+        fig.show()
+
+    @staticmethod
+    def plot_binary_to_eightclass_incidence(
+        tclass: DisulfideClassManager,
+        theme="light",
+        save=False,
+        savedir=".",
+        verbose=False,
+    ):
+        """Plot the incidence of all octant Disulfide classes for a given binary class.
+
+        :param tclass: DisulfideClassManager instance
+        :param theme: The theme to use for the plot
+        :param save: Whether to save the plots
+        :param savedir: Directory to save plots to
+        :param verbose: Whether to display verbose output
+        """
+        if verbose:
+            _logger.setLevel("INFO")
+
+        clslist = tclass.binaryclass_df["class_id"]
+        for cls in clslist:
+            eightcls = tclass.binary_to_class(cls, 8)
+            df = DisulfideVisualization.enumerate_class_fromlist(
+                tclass, eightcls, base=8
+            )
+            DisulfideVisualization.plot_count_vs_class_df(
+                df,
+                title=cls,
+                theme=theme,
+                save=save,
+                savedir=savedir,
+                base=8,
+                verbose=verbose,
+            )
+        if verbose:
+            _logger.info("Graph generation complete.")
+            _logger.setLevel("WARNING")
+
+    @staticmethod
+    def plot_count_vs_class_df(
+        df,
+        title="title",
+        theme="auto",
+        save=False,
+        savedir=".",
+        base=8,
+        verbose=False,
+        log=True,
+    ):
+        """Plot a line graph of count vs class ID using Plotly for the given disulfide class.
+
+        :param df: DataFrame containing class data
+        :param title: Title for the plot
+        :param theme: Theme to use for the plot
+        :param save: Whether to save the plot
+        :param savedir: Directory to save the plot to
+        :param base: Base for class IDs (2 or 8)
+        :param verbose: Whether to display verbose output
+        :param log: Whether to use log scale for y-axis
+        """
+        set_plotly_theme(theme)
+
+        _title = f"Binary Class: {title}"
+        _labels = {}
+        _prefix = "None"
+        if base == 8:
+            _labels = {"class_id": "Octant Class ID", "count": "Count"}
+            _prefix = "Octant"
+        elif base == 2:
+            _labels = {"class_id": "Binary Class ID", "count": "Count"}
+            _prefix = "Binary"
+        else:
+            raise ValueError("Invalid base. Must be 2 or 8.")
+
+        fig = px.line(
+            df,
+            x="class_id",
+            y="count",
+            title=f"{_title}",
+            labels=_labels,
+        )
+
+        fig.update_layout(
+            showlegend=True,
+            title_x=0.5,
+            title_font=dict(size=20),
+            xaxis_showgrid=False,
+            yaxis_showgrid=False,
+            autosize=True,
+            yaxis_type="log" if log else "linear",
+        )
+        fig.update_layout(autosize=True)
+
+        if save:
+            fname = Path(savedir) / f"{title}_{_prefix}.png"
+
+            if verbose:
+                _logger.info("Saving %s plot to %s", title, fname)
+            fig.write_image(fname, "png")
+        else:
+            fig.show()
+
+    @staticmethod
+    def plot_count_vs_class_df_sampled(
+        df,
+        title="title",
+        theme="auto",
+        save=False,
+        savedir=".",
+        base=8,
+        verbose=False,
+        log=True,
+        sample_size=1000,
+    ):
+        """Plot a line graph of count vs class ID using Plotly with sampling.
+
+        :param df: DataFrame containing class data
+        :param title: Title for the plot
+        :param theme: Theme to use for the plot
+        :param save: Whether to save the plot
+        :param savedir: Directory to save the plot to
+        :param base: Base for class IDs (2 or 8)
+        :param verbose: Whether to display verbose output
+        :param log: Whether to use log scale for y-axis
+        :param sample_size: Number of items to sample
+        """
+        set_plotly_theme(theme)
+
+        _title = f"Binary Class: {title}"
+        _labels = {}
+        _prefix = "None"
+        if base == 8:
+            _labels = {"class_id": "Octant Class ID", "count": "Count"}
+            _prefix = "Octant"
+        elif base == 2:
+            _labels = {"class_id": "Binary Class ID", "count": "Count"}
+            _prefix = "Binary"
+        else:
+            raise ValueError("Invalid base. Must be 2 or 8.")
+
+        df_sampled = df.sample(n=sample_size)
+
+        fig = px.line(
+            df_sampled,
+            x="class_id",
+            y="count",
+            title=f"{_title} (Sampled {sample_size} items)",
+            labels=_labels,
+        )
+
+        fig.update_layout(
+            showlegend=True,
+            title_x=0.5,
+            title_font=dict(size=20),
+            xaxis_showgrid=False,
+            yaxis_showgrid=False,
+            autosize=True,
+            yaxis_type="log" if log else "linear",
+        )
+        fig.update_layout(autosize=True)
+
+        if save:
+            fname = Path(savedir) / f"{title}_{_prefix}_sampled.png"
+
+            if verbose:
+                _logger.info("Saving %s plot to %s", title, fname)
+            fig.write_image(fname, "png")
+        else:
+            fig.show()
+
+    @staticmethod
+    def plot_count_vs_class_df_paginated(
+        df,
+        title="title",
+        theme="auto",
+        save=False,
+        savedir=".",
+        base=8,
+        verbose=False,
+        log=True,
+        page_size=200,
+    ):
+        """Plot a line graph of count vs class ID using Plotly with pagination.
+
+        :param df: DataFrame containing class data
+        :param title: Title for the plot
+        :param theme: Theme to use for the plot
+        :param save: Whether to save the plot
+        :param savedir: Directory to save the plot to
+        :param base: Base for class IDs (2 or 8)
+        :param verbose: Whether to display verbose output
+        :param log: Whether to use log scale for y-axis
+        :param page_size: Number of items per page
+        """
+        set_plotly_theme(theme)
+
+        _title = f"Binary Class: {title}"
+        _labels = {}
+        _prefix = "None"
+        if base == 8:
+            _labels = {"class_id": "Octant Class ID", "count": "Count"}
+            _prefix = "Octant"
+        elif base == 2:
+            _labels = {"class_id": "Binary Class ID", "count": "Count"}
+            _prefix = "Binary"
+        else:
+            raise ValueError("Invalid base. Must be 2 or 8.")
+
+        total_pages = (len(df) + page_size - 1) // page_size
+
+        for page in range(total_pages):
+            start = page * page_size
+            end = start + page_size
+            df_page = df.iloc[start:end]
+
+            fig = px.line(
+                df_page,
+                x="class_id",
+                y="count",
+                title=f"{_title} (Page {page + 1}/{total_pages})",
+                labels=_labels,
+            )
+
+            fig.update_layout(
+                showlegend=True,
+                title_x=0.5,
+                title_font=dict(size=20),
+                xaxis_showgrid=False,
+                yaxis_showgrid=False,
+                autosize=True,
+                yaxis_type="log" if log else "linear",
+            )
+            fig.update_layout(autosize=True)
+
+            if save:
+                fname = Path(savedir) / f"{title}_{_prefix}_page_{page + 1}.png"
+
+                if verbose:
+                    _logger.info("Saving %s plot to %s", title, fname)
+                fig.write_image(fname, "png")
+            else:
+                fig.show()
+
+    @staticmethod
+    def plot_count_vs_classid(
+        tclass: DisulfideClassManager, cls=None, theme="auto", base=8, log=True
+    ):
+        """Plot a line graph of count vs class ID using Plotly.
+
+        :param tclass: DisulfideClassManager instance
+        :param cls: Specific class to plot (optional)
+        :param theme: Theme to use for the plot
+        :param base: Base for class IDs (2 or 8)
+        :param log: Whether to use log scale for y-axis
+        """
+        set_plotly_theme(theme)
+
+        _title = None
+
+        match base:
+            case 8:
+                _title = "Octant Class Distribution"
+            case 2:
+                _title = "Binary Class Distribution"
+            case _:
+                raise ValueError("Invalid base. Must be 2 or 8")
+
+        df = tclass.binaryclass_df if base == 2 else tclass.eightclass_df
+
+        if cls is None:
+            fig = px.line(df, x="class_id", y="count", title=_title)
+        else:
+            subset = df[df["class_id"] == cls]
+            fig = px.line(subset, x="class_id", y="count", title=_title)
+
+        fig.update_layout(
+            xaxis_title="Class ID",
+            yaxis_title="Count",
+            showlegend=True,
+            title_x=0.5,
+            autosize=True,
+            yaxis_type="log" if log else "linear",
+        )
+
+        fig.show()
+
+    @staticmethod
+    def plot_disulfides_vs_pdbid(ssdict, cutoff=1):
+        """Plot the number of disulfides versus PDB ID.
+
+        :param ssdict: Dictionary mapping PDB IDs to disulfide indices
+        :param cutoff: Minimum number of disulfides required for inclusion
+        :return: Tuple of (pdb_ids, num_disulfides)
+        """
+        pdbids = []
+        num_disulfides = []
+
+        for pdbid, disulfides in ssdict.items():
+            if len(disulfides) > cutoff:
+                pdbids.append(pdbid)
+                num_disulfides.append(len(disulfides))
+
+        # Create a DataFrame
+        df = pd.DataFrame({"PDB ID": pdbids, "Number of Disulfides": num_disulfides})
+        fig = px.bar(
+            df,
+            x="PDB ID",
+            y="Number of Disulfides",
+            title=f"Disulfides vs PDB ID with cutoff: {cutoff}, {len(pdbids)} PDB IDs",
+        )
+        fig.update_layout(
+            xaxis_title="PDB ID",
+            yaxis_title="Number of Disulfides",
+            xaxis_tickangle=-90,
+        )
+        fig.show()
+
+        return pdbids, num_disulfides
+
+    @staticmethod
+    def plot_classes(
+        tclass: DisulfideClassManager,
+        class_string,
+        base=8,
+        theme="auto",
+        log=False,
+        page_size=200,
+    ):
+        """Plot the distribution of classes for the given class string.
+
+        :param tclass: DisulfideClassManager instance
+        :param class_string: The class string to plot
+        :param base: Base for class IDs (2 or 8)
+        :param theme: Theme to use for the plot
+        :param log: Whether to use log scale for y-axis
+        :param page_size: Number of items per page
+        """
+        classlist = tclass.binary_to_class(class_string, base)
+        df = DisulfideVisualization.enumerate_class_fromlist(
+            tclass, classlist, base=base
+        )
+        DisulfideVisualization.plot_count_vs_class_df_paginated(
+            df, title=class_string, theme=theme, base=base, log=log, page_size=page_size
+        )
 
     @staticmethod
     def display(sslist, style="sb", light="auto", panelsize=512):

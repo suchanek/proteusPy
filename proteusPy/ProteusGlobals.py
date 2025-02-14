@@ -37,12 +37,12 @@ if not PDB_BASE.is_dir():
     print(f"Error: The directory {PDB_DIR} does not exist.")
     PDB_DIR = HOME_DIR
 
-DATA_DIR = Path(_this_dir) / "data"
-MODEL_DIR = PDB_BASE / "good"
+# DATA_DIR = Path(_this_dir) / "data"
+# MODEL_DIR = PDB_BASE / "good"
 
-# DATA_DIR = os.path.join(_this_dir, "data")
-# MODEL_DIR = os.path.join(PDB_DIR, "good")
-
+DATA_DIR = os.path.join(_this_dir, "data")
+MODEL_DIR = os.path.join(PDB_DIR, "good")
+print(f"DATA_DIR: {DATA_DIR}")
 WINFRAME = 512  # single panel width
 WINSIZE = (1024, 1024)
 CAMERA_POS = ((0, 0, -10), (0, 0, 0), (0, 1, 0))

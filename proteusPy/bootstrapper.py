@@ -1,19 +1,20 @@
-# Bootstrap proteusPy by building the DisulfideLoader
-#
-# Author: Eric G. Suchanek, PhD
-# Last modification: 2025-01-26 17:35:43
-#
+"""
+Bootstrap proteusPy by building the DisulfideLoader
+
+Author: Eric G. Suchanek, PhD
+Last modification: 2025-02-13 19:19:27
+"""
 
 import argparse
 import logging
 
-from proteusPy.DisulfideLoader import Bootstrap_PDB_SS
-from proteusPy.logger_config import configure_master_logger, set_logger_level_for_module
-from proteusPy.ProteusGlobals import CA_CUTOFF, SG_CUTOFF
+import proteusPy as pp
+from proteusPy.ProteusGlobals import CA_CUTOFF, DATA_DIR, SG_CUTOFF
 
-version = "1.0.0"
-set_logger_level_for_module("proteusPy", "INFO")
-configure_master_logger("bootstrap.log", log_level=logging.ERROR)
+VERSION = "1.0.2"
+
+pp.set_logger_level_for_module("proteusPy", "INFO")
+pp.configure_master_logger("bootstrap.log", log_level=logging.ERROR)
 
 
 def main():
@@ -57,39 +58,47 @@ def main():
 
     args = parser.parse_args()
 
-    print("proteusPy Bootstrapper v", version)
+    print("proteusPy Bootstrapper v", VERSION)
     print("CA cutoff: ", args.ca_cutoff)
     print("SG cutoff: ", args.sg_cutoff)
     print("Verbose: ", args.verbose)
-    print("Downloading total Disulfide list from Drive")
+    print("Data Directory: ", DATA_DIR)
+    print("-> Downloading total Disulfide list from Google Drive")
 
-    pdb_ss = Bootstrap_PDB_SS(
+    pdb_ss = pp.Bootstrap_PDB_SS(
+        loadpath=DATA_DIR,
         cutoff=args.ca_cutoff,
         sg_cutoff=args.sg_cutoff,
         verbose=args.verbose,
         subset=False,
         force=True,
+        fake=False,
     )
 
-    print("Saving Complete Loader")
+    print("-> Saving Complete Loader")
+
+    if pdb_ss is None:
+        print("-> Failed to download/build DisulfideLoader!")
+        return
 
     pdb_ss.save(cutoff=args.ca_cutoff, sg_cutoff=args.sg_cutoff, subset=False)
 
-    print("Building Subset Loader")
+    print("-> Building Subset Loader")
 
-    pdb_ss = Bootstrap_PDB_SS(
+    pdb_ss = pp.Bootstrap_PDB_SS(
         verbose=args.verbose,
         cutoff=args.ca_cutoff,
         sg_cutoff=args.sg_cutoff,
         subset=True,
         force=False,
+        fake=False,
     )
 
-    print("Saving subset Loader")
+    print("-> Saving subset Loader")
 
     pdb_ss.save(cutoff=args.ca_cutoff, sg_cutoff=args.sg_cutoff, subset=True)
 
-    print("Complete and Subset Loaders built and saved!")
+    print("-> Complete and Subset Loaders built and saved!")
     return
 
 

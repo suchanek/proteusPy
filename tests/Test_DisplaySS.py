@@ -1,3 +1,5 @@
+# pylint: disable=C0103
+
 """
 Unit tests for the DisplaySS functionality in the proteusPy package.
 
@@ -17,7 +19,7 @@ Methods:
     test_single_disulfide_display(self): Tests the display and screenshot functionality for a 
         single disulfide bond.
     
-    test_disulfide_list_display(self): Tests the display functionality for a list of disulfide bonds.
+    test_disulfide_list_display(self): Test the display functionality for a list of disulfide bonds.
 
 Usage:
     Run this module as a script to execute the unit tests.
@@ -31,7 +33,9 @@ import unittest
 from tempfile import TemporaryDirectory
 from unittest import main as run_tests
 
-import proteusPy as pp
+#import proteusPy as pp
+from proteusPy import Load_PDB_SS, DisulfideLoader, set_pyvista_theme, __version__
+from proteusPy.ProteusGlobals import DATA_DIR
 
 # pylint: disable=W0718 # too general exception clause
 # pylint: disable=C0114 # missing-module-docstring
@@ -47,10 +51,13 @@ class TestDisplaySS(unittest.TestCase):
         self.temp_dir_obj = TemporaryDirectory(prefix="proteusPy_")
 
         # Set the theme.
-        pp.set_pyvista_theme("auto")
+        set_pyvista_theme("auto")
 
         # Load the disulfide database (subset, for speed).
-        self.PDB = pp.Load_PDB_SS(verbose=True, subset=True)
+        # self.PDB = pp.DisulfideLoader(verbose=True, subset=True)
+        print(f"DATA_DIR: {DATA_DIR}")
+        self.PDB = Load_PDB_SS(verbose=True, subset=True)
+
         self.first_disulfide = self.PDB[0]
 
     def tearDown(self) -> None:

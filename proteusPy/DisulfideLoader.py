@@ -24,9 +24,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import gdown
-import numpy as np
 import pandas as pd
-import plotly.graph_objects as go
 import plotly_express as px
 from pympler import asizeof
 
@@ -34,6 +32,7 @@ from proteusPy import __version__
 from proteusPy.Disulfide import Disulfide, DisulfideList
 from proteusPy.DisulfideClassManager import DisulfideClassManager
 from proteusPy.DisulfideExceptions import DisulfideParseWarning
+from proteusPy.DisulfideVisualization import DisulfideVisualization
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
     CA_CUTOFF,
@@ -44,7 +43,6 @@ from proteusPy.ProteusGlobals import (
     SS_LIST_URL,
     SS_PICKLE_FILE,
 )
-from proteusPy.utility import set_plotly_theme
 
 _logger = create_logger(__name__)
 
@@ -105,7 +103,7 @@ class DisulfideLoader:
     TorsionDF: pd.DataFrame = field(default_factory=pd.DataFrame)
     TotalDisulfides: int = field(default=0)
     IDList: List = field(default_factory=list)
-    _quiet: bool = field(default=True)
+    quiet: bool = field(default=False)
     tclass: Optional[DisulfideClassManager] = field(default=None)
     cutoff: float = field(default=-1.0)
     sg_cutoff: float = field(default=-1.0)
@@ -123,9 +121,15 @@ class DisulfideLoader:
         Initialize the DisulfideLoader after dataclass initialization.
         This method handles loading and processing of the disulfide data.
         """
+        sslist = DisulfideList([], "ALL_PDB_SS")
+        
         old_length = new_length = 0
         full_path = Path(self.datadir) / self.picklefile
-        if self.verbose and not self._quiet:
+        _logger.info(
+            f"Reading disulfides from: {self.datadir} {full_path}... ",
+        )
+
+        if self.verbose and not self.quiet:
             _logger.info(
                 f"Reading disulfides from: {full_path}... ",
             )
@@ -525,26 +529,6 @@ class DisulfideLoader:
         for k, v in enumerate(self.tclass.binaryclass_dict):
             print(f"Class: |{k}|, |{v}|")
 
-    @property
-    def quiet(self) -> bool:
-        """
-        The loader quiet state
-
-        :return: quiet parameter
-        :rtype: bool
-        """
-        return self._quiet
-
-    @quiet.setter
-    def quiet(self, perm: bool) -> None:
-        """
-        Sets the quiet attribute for the loader. This silences many of the BIO.PDB warnings.
-
-        :param perm: True or False
-        :type perm: bool
-        """
-        self._quiet = perm
-
     def plot_classes_vs_cutoff(
         self, cutoff: float, steps: int = 50, base=8, theme="auto", verbose=False
     ) -> None:
@@ -557,75 +541,11 @@ class DisulfideLoader:
         :param theme: The theme to use for the plot ('auto', 'light', or 'dark'), defaults to 'auto'.
         :return: None
         """
-        _cutoff = np.linspace(0, cutoff, steps)
-        tot_list = []
-        members_list = []
-        base_str = "Octant" if base == 8 else "Binary"
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
-        set_plotly_theme(theme)
-
-        for c in _cutoff:
-            class_df = self.tclass.filter_class_by_percentage(c, base=base)
-            tot = class_df["percentage"].sum()
-            tot_list.append(tot)
-            members_list.append(class_df.shape[0])
-            if verbose:
-                print(
-                    f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
-                )
-
-        fig = go.Figure()
-
-        # Add total percentage trace
-        fig.add_trace(
-            go.Scatter(
-                x=_cutoff,
-                y=tot_list,
-                mode="lines+markers",
-                name="Total percentage",
-                yaxis="y1",
-                line=dict(color="blue"),
-            )
+        DisulfideVisualization.plot_classes_vs_cutoff(
+            self.tclass, cutoff, steps, base, theme, verbose
         )
-
-        # Add number of members trace
-        fig.add_trace(
-            go.Scatter(
-                x=_cutoff,
-                y=members_list,
-                mode="lines+markers",
-                name="Number of members",
-                yaxis="y2",
-                line=dict(color="red"),
-            )
-        )
-
-        # Update layout
-        fig.update_layout(
-            title={
-                "text": f"{base_str} Classes vs Cutoff, ({cutoff}%)",
-                "x": 0.5,
-                "yanchor": "top",
-                "xanchor": "center",
-            },
-            xaxis=dict(title="Cutoff"),
-            yaxis=dict(
-                title="Total percentage",
-                titlefont=dict(color="blue"),
-                tickfont=dict(color="blue"),
-            ),
-            yaxis2=dict(
-                title="Number of members",
-                titlefont=dict(color="red"),
-                tickfont=dict(color="red"),
-                overlaying="y",
-                side="right",
-                type="log",
-            ),
-            legend=dict(x=0.75, y=1.16),
-        )
-
-        fig.show()
 
     def plot_binary_to_eightclass_incidence(
         self,
@@ -639,26 +559,11 @@ class DisulfideLoader:
 
         :param loader: `proteusPy.DisulfideLoader` object
         """
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
-        if verbose:
-            _logger.setLevel("INFO")
-
-        clslist = self.tclass.binaryclass_df["class_id"]
-        for cls in clslist:
-            eightcls = self.tclass.binary_to_class(cls, 8)
-            df = self.enumerate_class_fromlist(eightcls, base=8)
-            self.plot_count_vs_class_df(
-                df,
-                title=cls,
-                theme=theme,
-                save=save,
-                savedir=savedir,
-                base=8,
-                verbose=verbose,
-            )
-        if verbose:
-            _logger.info("Graph generation complete.")
-            _logger.setLevel("WARNING")
+        DisulfideVisualization.plot_binary_to_eightclass_incidence(
+            self.tclass, theme, save, savedir, verbose
+        )
 
     def plot_count_vs_class_df(
         self,
@@ -672,66 +577,22 @@ class DisulfideLoader:
         log=True,
     ):
         """
-        Plot a line graph of count vs class ID using Plotly for the given disulfide class. The
-        base selects the class type to plot: 2, 6, or 8, for binary, sextant, or octant classes.
+        Plot a line graph of count vs class ID using Plotly for the given disulfide class.
 
         :param df: A pandas DataFrame containing the data to be plotted.
         :param title: A string representing the title of the plot (default is 'title').
-        :param theme: A string representing the name of the theme to use. Can be either 'notebook'
-        or 'plotly_dark'. Default is 'plotly_dark'.
-        :param save: A boolean flag indicating whether to save the plot to a file. Default is False.
-        :param savedir: A string representing the directory to save the plot to. Default is '.'.
-        :param base: An integer representing the base value for the enumeration. Default is 8.
-        :param verbose: A boolean flag indicating whether to display verbose output. Default is False.
-        :param log: A boolean flag indicating whether to use a log scale for the y-axis. Default is False.
-        :raises ValueError: If an invalid base value is provided, (2 or 8s).
-        :return: None
+        :param theme: Theme to use for the plot
+        :param save: Whether to save the plot
+        :param savedir: Directory to save the plot to
+        :param base: Base for class IDs (2 or 8)
+        :param verbose: Whether to display verbose output
+        :param log: Whether to use log scale for y-axis
         """
-        set_plotly_theme(theme)
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
-        _title = f"Binary Class: {title}"
-        _labels = {}
-        _prefix = "None"
-        if base == 8:
-            _labels = {"class_id": "Octant Class ID", "count": "Count"}
-            _prefix = "Octant"
-
-        elif base == 2:
-            _labels = {"class_id": "Binary Class ID", "count": "Count"}
-            _prefix = "Binary"
-            df = self.tclass.binaryclass_df
-        else:
-            raise ValueError("Invalid base. Must be 2 or 8.")
-
-        fig = px.line(
-            df,
-            x="class_id",
-            y="count",
-            title=f"{_title}",
-            labels=_labels,
+        DisulfideVisualization.plot_count_vs_class_df(
+            df, title, theme, save, savedir, base, verbose, log
         )
-
-        fig.update_layout(
-            showlegend=True,
-            title_x=0.5,
-            title_font=dict(size=20),
-            xaxis_showgrid=False,
-            yaxis_showgrid=False,
-            autosize=True,
-            yaxis_type="log" if log else "linear",
-        )
-        fig.update_layout(autosize=True)
-
-        if save:
-            fname = Path(savedir) / f"{title}_{_prefix}.png"
-
-            if verbose:
-                _logger.info("Saving %s plot to %s", title, fname)
-            fig.write_image(fname, "png")
-        else:
-            fig.show()
-
-        return
 
     def plot_count_vs_class_df_sampled(
         self,
@@ -746,68 +607,23 @@ class DisulfideLoader:
         sample_size=1000,
     ):
         """
-        Plot a line graph of count vs class ID using Plotly for the given disulfide class with sampling.
+        Plot a line graph of count vs class ID using Plotly with sampling.
 
-        :param df: A pandas DataFrame containing the data to be plotted.
-        :param title: A string representing the title of the plot (default is 'title').
-        :param theme: A string representing the name of the theme to use. Can be either 'notebook'
-        or 'plotly_dark'. Default is 'plotly_dark'.
-        :param save: A boolean flag indicating whether to save the plot to a file. Default is False.
-        :param savedir: A string representing the directory to save the plot to. Default is '.'.
-        :param base: An integer representing the base value for the enumeration. Default is 8.
-        :param verbose: A boolean flag indicating whether to display verbose output. Default is False.
-        :param log: A boolean flag indicating whether to use a log scale for the y-axis. Default is False.
-        :param sample_size: Number of items to sample for plotting.
-        :raises ValueError: If an invalid base value is provided, (2 or 8s).
-        :return: None
+        :param df: DataFrame containing class data
+        :param title: Title for the plot
+        :param theme: Theme to use for the plot
+        :param save: Whether to save the plot
+        :param savedir: Directory to save the plot to
+        :param base: Base for class IDs (2 or 8)
+        :param verbose: Whether to display verbose output
+        :param log: Whether to use log scale for y-axis
+        :param sample_size: Number of items to sample
         """
-        set_plotly_theme(theme)
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
-        _title = f"Binary Class: {title}"
-        _labels = {}
-        _prefix = "None"
-        if base == 8:
-            _labels = {"class_id": "Octant Class ID", "count": "Count"}
-            _prefix = "Octant"
-
-        elif base == 2:
-            _labels = {"class_id": "Binary Class ID", "count": "Count"}
-            _prefix = "Binary"
-            df = self.tclass.binaryclass_df
-        else:
-            raise ValueError("Invalid base. Must be 2 or 8.")
-
-        df_sampled = df.sample(n=sample_size)
-
-        fig = px.line(
-            df_sampled,
-            x="class_id",
-            y="count",
-            title=f"{_title} (Sampled {sample_size} items)",
-            labels=_labels,
+        DisulfideVisualization.plot_count_vs_class_df_sampled(
+            df, title, theme, save, savedir, base, verbose, log, sample_size
         )
-
-        fig.update_layout(
-            showlegend=True,
-            title_x=0.5,
-            title_font=dict(size=20),
-            xaxis_showgrid=False,
-            yaxis_showgrid=False,
-            autosize=True,
-            yaxis_type="log" if log else "linear",
-        )
-        fig.update_layout(autosize=True)
-
-        if save:
-            fname = Path(savedir) / f"{title}_{_prefix}_sampled.png"
-
-            if verbose:
-                _logger.info("Saving %s plot to %s", title, fname)
-            fig.write_image(fname, "png")
-        else:
-            fig.show()
-
-        return
 
     def plot_count_vs_class_df_paginated(
         self,
@@ -822,116 +638,36 @@ class DisulfideLoader:
         page_size=200,
     ):
         """
-        Plot a line graph of count vs class ID using Plotly for the given disulfide class with pagination.
+        Plot a line graph of count vs class ID using Plotly with pagination.
 
-        :param df: A pandas DataFrame containing the data to be plotted.
-        :param title: A string representing the title of the plot (default is 'title').
-        :param theme: A string representing the name of the theme to use. Can be either 'notebook'
-        or 'plotly_dark'. Default is 'plotly_dark'.
-        :param save: A boolean flag indicating whether to save the plot to a file. Default is False.
-        :param savedir: A string representing the directory to save the plot to. Default is '.'.
-        :param base: An integer representing the base value for the enumeration. Default is 8.
-        :param verbose: A boolean flag indicating whether to display verbose output. Default is False.
-        :param log: A boolean flag indicating whether to use a log scale for the y-axis. Default is False.
-        :param page_size: Number of items to plot per page.
-        :raises ValueError: If an invalid base value is provided, (2 or 8s).
-        :return: None
+        :param df: DataFrame containing class data
+        :param title: Title for the plot
+        :param theme: Theme to use for the plot
+        :param save: Whether to save the plot
+        :param savedir: Directory to save the plot to
+        :param base: Base for class IDs (2 or 8)
+        :param verbose: Whether to display verbose output
+        :param log: Whether to use log scale for y-axis
+        :param page_size: Number of items per page
         """
-        set_plotly_theme(theme)
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
-        _title = f"Binary Class: {title}"
-        _labels = {}
-        _prefix = "None"
-        if base == 8:
-            _labels = {"class_id": "Octant Class ID", "count": "Count"}
-            _prefix = "Octant"
-
-        elif base == 2:
-            _labels = {"class_id": "Binary Class ID", "count": "Count"}
-            _prefix = "Binary"
-            df = self.tclass.binaryclass_df
-        else:
-            raise ValueError("Invalid base. Must be 2 or 8.")
-
-        total_pages = (len(df) + page_size - 1) // page_size
-
-        for page in range(total_pages):
-            start = page * page_size
-            end = start + page_size
-            df_page = df.iloc[start:end]
-
-            fig = px.line(
-                df_page,
-                x="class_id",
-                y="count",
-                title=f"{_title} (Page {page + 1}/{total_pages})",
-                labels=_labels,
-            )
-
-            fig.update_layout(
-                showlegend=True,
-                title_x=0.5,
-                title_font=dict(size=20),
-                xaxis_showgrid=False,
-                yaxis_showgrid=False,
-                autosize=True,
-                yaxis_type="log" if log else "linear",
-            )
-            fig.update_layout(autosize=True)
-
-            if save:
-                fname = Path(savedir) / f"{title}_{_prefix}_page_{page + 1}.png"
-
-                if verbose:
-                    _logger.info("Saving %s plot to %s", title, fname)
-                fig.write_image(fname, "png")
-            else:
-                fig.show()
-
-        return
+        DisulfideVisualization.plot_count_vs_class_df_paginated(
+            df, title, theme, save, savedir, base, verbose, log, page_size
+        )
 
     def plot_count_vs_classid(self, cls=None, theme="auto", base=8, log=True):
         """
         Plot a line graph of count vs class ID using Plotly.
 
-        :param df: A pandas DataFrame containing the data to be plotted.
-        :param title: A string representing the title of the plot (default is 'title').
-        :param theme: A string representing the theme of the plot. Anything other than `light` is in `plotly_dark`.
-        :param log: A boolean flag indicating whether to use a log scale for the y-axis. Default is False.
-        :return: None
+        :param cls: Specific class to plot (optional)
+        :param theme: Theme to use for the plot
+        :param base: Base for class IDs (2 or 8)
+        :param log: Whether to use log scale for y-axis
         """
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
-        set_plotly_theme(theme)
-
-        _title = None
-
-        match base:
-            case 8:
-                _title = "Octant Class Distribution"
-            case 2:
-                _title = "Binary Class Distribution"
-            case _:
-                raise ValueError("Invalid base. Must be 2 or 8")
-
-        df = self.tclass.binaryclass_df if base == 2 else self.tclass.eightclass_df
-
-        if cls is None:
-            fig = px.line(df, x="class_id", y="count", title=_title)
-        else:
-            subset = df[df["class_id"] == cls]
-            fig = px.line(subset, x="class_id", y="count", title=_title)
-
-        fig.update_layout(
-            xaxis_title="Class ID",
-            yaxis_title="Count",
-            showlegend=True,
-            title_x=0.5,
-            autosize=True,
-            yaxis_type="log" if log else "linear",
-        )
-
-        fig.show()
-        return
+        DisulfideVisualization.plot_count_vs_classid(self.tclass, cls, theme, base, log)
 
     def enumerate_class_fromlist(self, sslist, base=8):
         """
@@ -959,7 +695,13 @@ class DisulfideLoader:
         sslist_df["count"] = y
         return sslist_df
 
-    def save(self, savepath=DATA_DIR, subset=False, cutoff=-1.0, sg_cutoff=-1.0):
+    def save(
+        self,
+        savepath=DATA_DIR,
+        subset=False,
+        cutoff=-1.0,
+        sg_cutoff=-1.0,
+    ):
         """
         Save a copy of the fully instantiated Loader to the specified file.
 
@@ -1024,28 +766,22 @@ class DisulfideLoader:
 
         return pdbids, num_disulfides
 
-    def Oplot_distances(
+    def plot_distances(
         self, distance_type="ca", cutoff=-1, comparison="less", theme="auto", log=True
     ):
         """
         Plot the distances for the disulfides in the loader.
 
-        :param distance_type: The type of distance to plot ('ca' for Cα-Cα distance, 'sg' for Sγ-Sγ distance).
-        :type distance_type: str
-        :param cutoff: The cutoff value for the distance, defaults to -1 (no cutoff).
-        :type cutoff: float
-        :param comparison: if 'less' then plot distances less than the cutoff, if 'greater' then plot
-        distances greater than the cutoff.
-        :type flip: str
-        :param theme: The theme to use for the plot ('auto', 'light', or 'dark'), defaults to 'auto'.
-        :type theme: str
-        :param log: Whether to use a log scale for the y-axis, defaults to True.
-        :return: None
-        :rtype: None
+        :param distance_type: The type of distance to plot ('ca' for Cα-Cα distance, 'sg' for Sγ-Sγ distance)
+        :param cutoff: The cutoff value for the distance, defaults to -1 (no cutoff)
+        :param comparison: if 'less' then plot distances less than the cutoff, if 'greater' then plot distances greater than the cutoff
+        :param theme: The theme to use for the plot ('auto', 'light', or 'dark')
+        :param log: Whether to use a log scale for the y-axis
         """
-        distances = self.SSList.data.copy()
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
-        self.SSList.plot_distances(
+        distances = self.SSList.data.copy()
+        DisulfideVisualization.plot_distances(
             distances,
             distance_type=distance_type,
             cutoff=cutoff,
@@ -1056,22 +792,27 @@ class DisulfideLoader:
 
     def plot_deviation_scatterplots(self, verbose=False, theme="auto"):
         """
-        Plot scatter plots for Bondlength_Deviation, Angle_Deviation Ca_Distance
-        and SG_Distance.
+        Plot scatter plots for Bondlength_Deviation, Angle_Deviation Ca_Distance and SG_Distance.
 
-        :param verbose: Whether to display the plot in the notebook. Default is False.
-        :type verbose: bool
-        :param theme: One of 'Auto', 'Light', or 'Dark'. Default is 'Auto'.
-        :type light: str
-        :return: None
+        :param verbose: Whether to display the plot in the notebook
+        :param theme: Theme to use for the plot ('auto', 'light', or 'dark')
         """
-        self.SSList.plot_deviation_scatterplots(verbose=verbose, theme=theme)
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
+
+        df = self.SSList.torsion_df
+        DisulfideVisualization.plot_deviation_scatterplots(df, theme=theme)
 
     def plot_deviation_histograms(self, theme="auto", verbose=True):
         """
         Plot histograms for Bondlength_Deviation, Angle_Deviation, and Ca_Distance.
+
+        :param theme: Theme to use for the plot ('auto', 'light', or 'dark')
+        :param verbose: Whether to display verbose output
         """
-        self.SSList.plot_deviation_histograms(theme=theme, verbose=verbose)
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
+
+        df = self.SSList.torsion_df
+        DisulfideVisualization.plot_deviation_histograms(df, theme=theme, log=True)
 
     def plot_classes(
         self, class_string, base=8, theme="auto", log=False, page_size=200
@@ -1119,22 +860,20 @@ class DisulfideLoader:
         display=True,
         save=False,
         fname="ss_torsions.png",
-        theme="Auto",
+        theme="auto",
     ):
         """
         Display torsion and distance statistics for all Disulfides in the loader.
 
-        :param display: Whether to display the plot in the notebook. Default is True.
-        :type display: bool
-        :param save: Whether to save the plot as an image file. Default is False.
-        :type save: bool
-        :param fname: The name of the image file to save. Default is 'ss_torsions.png'.
-        :type fname: str
-        :param theme: One of 'Auto', 'Light', or 'Dark'. Default is 'Auto'.
-        :type theme: str
-        :return: None
+        :param display: Whether to display the plot in the notebook
+        :param save: Whether to save the plot as an image file
+        :param fname: The name of the image file to save
+        :param theme: Theme to use for the plot ('auto', 'light', or 'dark')
         """
-        self.SSList.display_torsion_statistics(
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
+
+        DisulfideVisualization.display_torsion_statistics(
+            self.SSList,
             display=display,
             save=save,
             fname=fname,
@@ -1232,9 +971,10 @@ def Bootstrap_PDB_SS(
     loadpath=DATA_DIR,
     cutoff=-1.0,
     sg_cutoff=-1.0,
-    verbose=False,
+    verbose=True,
     subset=False,
     force=False,
+    fake=False,
 ):
     """
     Download and instantiate the disulfide databases from Google Drive.
@@ -1263,14 +1003,19 @@ def Bootstrap_PDB_SS(
     fname = SS_PICKLE_FILE
     url = SS_LIST_URL
 
-    _fname = Path(loadpath) / fname
+    # _fname = Path(loadpath) / fname
+    full_path = Path(loadpath) / fname
 
-    if not _fname.exists() or force is True:
+    if not full_path.exists() or force is True:
         if verbose:
-            _logger.info("Downloading Disulfide Database from Drive...")
-        gdown.download(url, str(_fname), quiet=False)
+            _logger.warning("Can't find %s. Downloading from Drive...", full_path)
 
-    full_path = Path(loadpath) / _fname
+        if not fake:
+            gdown.download(url, str(full_path), quiet=False)
+        else:
+            if verbose:
+                _logger.warning("Fake download: %s", full_path)
+                return None
     if verbose:
         _logger.info(
             "Building loader from: %s with cutoffs %f, %f...",
