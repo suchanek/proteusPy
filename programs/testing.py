@@ -14,7 +14,7 @@ from proteusPy.utility import distance3d, distance_squared
 
 
 class TestDisulfide(TestCase):
-    from proteusPy.Disulfide import Disulfide
+    from proteusPy.DisulfideBase import Disulfide
 
     def test_init(self):
         ss = Disulfide()
@@ -63,7 +63,7 @@ class TestDisulfide(TestCase):
 
 
 class TestDisulfideList(TestCase):
-    from proteusPy.Disulfide import DisulfideList
+    from proteusPy.DisulfideBase import DisulfideList
 
     def test_init(self):
         PDB_SS = Load_PDB_SS(verbose=True, subset=True)

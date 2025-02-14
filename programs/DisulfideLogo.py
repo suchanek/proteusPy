@@ -7,7 +7,7 @@ import pandas as pd
 import pyvista as pv
 from pyvista import set_plot_theme
 
-from proteusPy.Disulfide import Disulfide, DisulfideList
+from proteusPy.DisulfideBase import Disulfide, DisulfideList
 from proteusPy.DisulfideLoader import Load_PDB_SS
 
 

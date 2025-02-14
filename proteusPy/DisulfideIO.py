@@ -6,13 +6,15 @@ Author: Eric G. Suchanek, PhD
 Last revision: 2025-02-12
 """
 
+# pylint: disable=C0103 # snake case
+# pylint: disable=C0301 # line too long
+# pylint: disable=C0302 # too many lines in module
+
 import copy
 import logging
 import os
-from pathlib import Path
 
-from proteusPy import Disulfide
-from proteusPy.Disulfide import DisulfideList, Initialize_Disulfide_From_Coords
+from proteusPy.DisulfideBase import DisulfideList, Initialize_Disulfide_From_Coords
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import MODEL_DIR, PDB_DIR
 from proteusPy.ssparser import extract_ssbonds_and_atoms
@@ -149,7 +151,7 @@ def load_disulfides_from_id(
     num_ssbonds = len(SSList)
 
     if cutoff > 0:
-        SSList = SSList.filter_by_distance(cutoff)
+        SSList = SSList.filter_by_ca_distance(cutoff)
         delta = num_ssbonds - len(SSList)
         if delta:
             _logger.error(

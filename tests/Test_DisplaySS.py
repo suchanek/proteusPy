@@ -33,8 +33,8 @@ import unittest
 from tempfile import TemporaryDirectory
 from unittest import main as run_tests
 
-#import proteusPy as pp
-from proteusPy import Load_PDB_SS, DisulfideLoader, set_pyvista_theme, __version__
+# import proteusPy as pp
+from proteusPy import Load_PDB_SS, __version__, set_pyvista_theme
 from proteusPy.ProteusGlobals import DATA_DIR
 
 # pylint: disable=W0718 # too general exception clause
