@@ -230,7 +230,7 @@ class DisulfideLoader:
             name = f"pdb_slice[{ind_list[0]}:{ind_list[-1]+1}]"
             resolution = self.SSList[0].resolution
             sublist = [self.SSList[i] for i in indices]
-            return DisulfideList(sublist, name, resolution)
+            return DisulfideList(sublist, name, resolution, quiet=True)
 
         if isinstance(item, int):
             if item < 0 or item >= self.TotalDisulfides:
