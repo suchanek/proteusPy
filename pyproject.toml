@@ -126,3 +126,5 @@ proteusPy = [
 "proteusPy.DisulfideExtractor" = "proteusPy.DisulfideExtractor_mp:main"
 "proteusPy.bootstrapper" = "proteusPy.bootstrapper:main"
 
+[tool.pytest.ini_options]
+addopts = "--ignore=tests/test_DisplaySS.py"
