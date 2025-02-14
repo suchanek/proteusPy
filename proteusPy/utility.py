@@ -37,7 +37,7 @@ import psutil
 from PIL import Image, ImageFont
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-# from proteusPy.Disulfide import Disulfide, DisulfideList
+# from proteusPy.DisulfideBase import Disulfide, DisulfideList
 from proteusPy.DisulfideExceptions import DisulfideIOException
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (

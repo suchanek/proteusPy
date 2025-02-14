@@ -15,7 +15,7 @@ from pyvista import set_plot_theme
 
 import proteusPy
 from proteusPy import *
-from proteusPy.Disulfide import *
+from proteusPy.DisulfideBase import *
 from proteusPy.ProteusGlobals import *
 
 # import seaborn as sns

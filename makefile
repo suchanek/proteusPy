@@ -114,8 +114,7 @@ commit:
 
 tests: 
 	pytest .
-	#python proteusPy/Disulfide.py
-	#python proteusPy/DisulfideLoader.py
+	python tests/test_DisplaySS.py
 	python proteusPy/DisulfideClasses.py
 
 docker: viewer/rcsb_viewer.py viewer/dockerfile

@@ -29,7 +29,7 @@ import plotly_express as px
 from pympler import asizeof
 
 from proteusPy import __version__
-from proteusPy.Disulfide import Disulfide, DisulfideList
+from proteusPy.DisulfideBase import Disulfide, DisulfideList
 from proteusPy.DisulfideClassManager import DisulfideClassManager
 from proteusPy.DisulfideExceptions import DisulfideParseWarning
 from proteusPy.DisulfideVisualization import DisulfideVisualization
@@ -122,7 +122,7 @@ class DisulfideLoader:
         This method handles loading and processing of the disulfide data.
         """
         sslist = DisulfideList([], "ALL_PDB_SS")
-        
+
         old_length = new_length = 0
         full_path = Path(self.datadir) / self.picklefile
         _logger.info(
@@ -152,7 +152,10 @@ class DisulfideLoader:
             with open(full_path, "rb") as f:
                 sslist = pickle.load(f)
                 old_length = len(sslist)
-                filt = DisulfideList(sslist.filter_by_distance(self.cutoff), "filtered")
+                filt = DisulfideList(
+                    sslist.filter_by_ca_distance(self.cutoff), "filtered"
+                )
+
                 new_length = len(filt)
 
                 if self.verbose:
@@ -780,7 +783,9 @@ class DisulfideLoader:
         """
         # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
-        distances = self.SSList.data.copy()
+        sslist = self.SSList
+        distances = sslist.extract_distances(distance_type, comparison, cutoff)
+
         DisulfideVisualization.plot_distances(
             distances,
             distance_type=distance_type,

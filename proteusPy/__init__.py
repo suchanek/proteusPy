@@ -52,7 +52,7 @@ from .atoms import (
     SPEC_POWER,
     SPECULARITY,
 )
-from .Disulfide import (
+from .DisulfideBase import (
     Disulfide,
     DisulfideList,
     Initialize_Disulfide_From_Coords,

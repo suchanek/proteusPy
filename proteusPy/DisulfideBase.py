@@ -5,7 +5,7 @@ It represents the core of the current implementation of *proteusPy*.
 
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 Author: Eric G. Suchanek, PhD
-Last Modification: 2025-02-09 23:32:12
+Last Modification: 2025-02-14 08:51:33
 """
 
 # pylint: disable=W1203 # use of print
@@ -438,7 +438,7 @@ class DisulfideList(UserList):
         """Return the torsions as an array"""
         return np.array([ss.torsion_array for ss in self.data])
 
-    def filter_by_distance(self, distance: float = -1.0, minimum: float = 2.0):
+    def filter_by_ca_distance(self, distance: float = -1.0, minimum: float = 2.0):
         """Return a DisulfideList filtered by to between the maxium Ca distance and
         the minimum, which defaults to 2.0A.
 
@@ -496,9 +496,9 @@ class DisulfideList(UserList):
         :param theme: The theme to use for the plot ('auto', 'light', or 'dark')
         :param log: Whether to use a log scale for the y-axis
         """
-        #from proteusPy.DisulfideVisualization import DisulfideVisualization
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
-        distances = self.data.copy()
+        distances = self.extract_distances(distance_type, comparison, cutoff)
         DisulfideVisualization.plot_distances(
             distances,
             distance_type=distance_type,
@@ -515,9 +515,9 @@ class DisulfideList(UserList):
         :param verbose: Whether to display the plot in the notebook
         :param theme: Theme to use for the plot ('auto', 'light', or 'dark')
         """
-        #from proteusPy.DisulfideVisualization import DisulfideVisualization
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
-        df = self.torsion_df
+        dev_df = self.create_deviation_dataframe(verbose)
         DisulfideVisualization.plot_deviation_scatterplots(df, theme=theme)
 
     def plot_deviation_histograms(self, theme="auto", verbose=True):
@@ -527,10 +527,9 @@ class DisulfideList(UserList):
         :param theme: Theme to use for the plot ('auto', 'light', or 'dark')
         :param verbose: Whether to display verbose output
         """
-        #from proteusPy.DisulfideVisualization import DisulfideVisualization
-
-        df = self.torsion_df
-        DisulfideVisualization.plot_deviation_histograms(df, theme=theme, log=True)
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
+        dev_df = self.create_deviation_dataframe(verbose)
+        DisulfideVisualization.plot_deviation_histograms(dev_df, theme=theme, log=True)
 
 
 # class for the Disulfide bond

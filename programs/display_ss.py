@@ -9,6 +9,8 @@ Author: Eric G. Suchanek, PhD
 Last revision: 2025-02-13
 """
 
+# pylint: disable=W1203
+
 import os
 from tempfile import TemporaryDirectory
 

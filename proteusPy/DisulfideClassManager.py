@@ -24,7 +24,7 @@ import pandas as pd
 
 from proteusPy import __version__
 
-# from proteusPy.Disulfide import DisulfideList
+# from proteusPy.DisulfideBase import DisulfideList
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
     DATA_DIR,
