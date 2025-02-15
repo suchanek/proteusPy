@@ -291,6 +291,17 @@ class DisulfideLoader:
 
         return sum(valid_resolutions) / len(valid_resolutions)
 
+    @staticmethod
+    def binary_to_class(binary_class: str, base=8) -> str:
+        """
+        Convert a binary class string to an octant class string.
+
+        :param binary_class: The binary class string to convert.
+        :param base: The base class to use, 2 or 8.
+        :return: The octant class string.
+        """
+        return DisulfideClassManager.binary_to_class(binary_class, base)
+
     def build_ss_from_idlist(self, idlist) -> DisulfideList:
         """
         Return a DisulfideList of Disulfides for a given list of PDBIDs
@@ -563,7 +574,7 @@ class DisulfideLoader:
 
     def plot_count_vs_class_df(
         self,
-        clslist,
+        class_string,
         title="title",
         theme="auto",
         save=False,
@@ -576,7 +587,7 @@ class DisulfideLoader:
         Plot a line graph of count vs class ID using Plotly for the given disulfide class. The
         base selects the class type to plot: 2, 6, or 8, for binary, sextant, or octant classes.
 
-        :param df: A pandas DataFrame containing the data to be plotted.
+        :param class_string: The binary class string to be plotted.
         :param title: A string representing the title of the plot (default is 'title').
         :param theme: Theme to use for the plot
         :param save: Whether to save the plot
@@ -586,15 +597,15 @@ class DisulfideLoader:
         :param log: Whether to use log scale for y-axis
         """
         # from proteusPy.DisulfideVisualization import DisulfideVisualization
-
-        df = self.enumerate_class_fromlist(clslist, base=base)
+        class_list = self.tclass.binary_to_class(class_string, base)
+        df = self.enumerate_class_fromlist(class_list, base=base)
         DisulfideVisualization.plot_count_vs_class_df(
             df, title, theme, save, savedir, base, verbose, log
         )
 
     def plot_count_vs_class_df_sampled(
         self,
-        clslist,
+        class_string,
         title="title",
         theme="auto",
         save=False,
@@ -618,15 +629,16 @@ class DisulfideLoader:
         :param sample_size: Number of items to sample
         """
         # from proteusPy.DisulfideVisualization import DisulfideVisualization
+        class_list = self.tclass.binary_to_class(class_string, base)
+        df = self.enumerate_class_fromlist(class_list, base=base)
 
-        df = self.enumerate_class_fromlist(clslist, base=base)
         DisulfideVisualization.plot_count_vs_class_df_sampled(
             df, title, theme, save, savedir, base, verbose, log, sample_size
         )
 
     def plot_count_vs_class_df_paginated(
         self,
-        clslist,
+        class_string,
         title="title",
         theme="auto",
         save=False,
@@ -649,7 +661,9 @@ class DisulfideLoader:
         :param log: Whether to use log scale for y-axis
         :param page_size: Number of items per page
         """
-        df = self.enumerate_class_fromlist(clslist, base=base)
+        class_list = self.tclass.binary_to_class(class_string, base)
+        df = self.enumerate_class_fromlist(class_list, base=base)
+
         DisulfideVisualization.plot_count_vs_class_df_paginated(
             df, title, theme, save, savedir, base, verbose, log, page_size
         )
