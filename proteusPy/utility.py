@@ -254,6 +254,8 @@ def print_memory_used():
     """
     Print memory used by the proteusPy process (GB).
     """
+    from proteusPy import __version__
+
     mem = get_memory_usage() / (1024**3)  # to GB
 
     print(f"proteusPy {__version__}: Memory Used: {mem:.2f} GB")
