@@ -518,7 +518,7 @@ class DisulfideList(UserList):
         # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
         dev_df = self.create_deviation_dataframe(verbose)
-        DisulfideVisualization.plot_deviation_scatterplots(df, theme=theme)
+        DisulfideVisualization.plot_deviation_scatterplots(dev_df, theme=theme)
 
     def plot_deviation_histograms(self, theme="auto", verbose=True):
         """

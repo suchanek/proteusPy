@@ -359,7 +359,7 @@ def do_build(verbose, full, subset, cutoff, sg_cutoff):
     if full:
         if verbose:
             print(
-                f"Building the compressed loader for the full dataset with cutoffs: Cα: {cutoff}Å, Sγ: {sg_cutoff}Å"
+                f"Building the loader for the full dataset with cutoffs: Cα: {cutoff}Å, Sγ: {sg_cutoff}Å"
             )
         PDB_SS = DisulfideLoader(
             datadir=DATA_DIR,
@@ -375,7 +375,7 @@ def do_build(verbose, full, subset, cutoff, sg_cutoff):
     elif subset:
         if verbose:
             print(
-                f"Building the packed loader for the Disulfide subset with cutoffs: {cutoff}, {sg_cutoff}..."
+                f"Building the loader for the Disulfide subset with cutoffs: {cutoff}, {sg_cutoff}..."
             )
         PDB_SS = DisulfideLoader(
             datadir=DATA_DIR,
