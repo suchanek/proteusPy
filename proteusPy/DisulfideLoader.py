@@ -3,7 +3,7 @@ This module is part of the proteusPy package, a Python package for
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
-Last revision: 2025-01-17 18:27:03 -egs-
+Last revision: 2025-02-15 16:40:01 -egs-
 """
 
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
@@ -24,9 +24,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import gdown
-import numpy as np
 import pandas as pd
-import plotly.graph_objects as go
 import plotly_express as px
 from pympler import asizeof
 
@@ -34,6 +32,7 @@ from proteusPy import __version__
 from proteusPy.DisulfideBase import Disulfide, DisulfideList
 from proteusPy.DisulfideClassManager import DisulfideClassManager
 from proteusPy.DisulfideExceptions import DisulfideParseWarning
+from proteusPy.DisulfideVisualization import DisulfideVisualization
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
     CA_CUTOFF,
@@ -44,7 +43,6 @@ from proteusPy.ProteusGlobals import (
     SS_LIST_URL,
     SS_PICKLE_FILE,
 )
-from proteusPy.utility import set_plotly_theme
 
 _logger = create_logger(__name__)
 
@@ -541,7 +539,7 @@ class DisulfideLoader:
         """
         # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
-        pp.DisulfideVisualization.plot_classes_vs_cutoff(
+        DisulfideVisualization.plot_classes_vs_cutoff(
             self.tclass, cutoff, steps, base, theme, verbose
         )
 
@@ -559,13 +557,13 @@ class DisulfideLoader:
         """
         # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
-        pp.DisulfideVisualization.plot_binary_to_eightclass_incidence(
+        DisulfideVisualization.plot_binary_to_eightclass_incidence(
             self.tclass, theme, save, savedir, verbose
         )
 
     def plot_count_vs_class_df(
         self,
-        df,
+        clslist,
         title="title",
         theme="auto",
         save=False,
@@ -589,13 +587,14 @@ class DisulfideLoader:
         """
         # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
+        df = self.enumerate_class_fromlist(clslist, base=base)
         DisulfideVisualization.plot_count_vs_class_df(
             df, title, theme, save, savedir, base, verbose, log
         )
 
     def plot_count_vs_class_df_sampled(
         self,
-        df,
+        clslist,
         title="title",
         theme="auto",
         save=False,
@@ -620,13 +619,14 @@ class DisulfideLoader:
         """
         # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
-        pp.DisulfideVisualization.plot_count_vs_class_df_sampled(
+        df = self.enumerate_class_fromlist(clslist, base=base)
+        DisulfideVisualization.plot_count_vs_class_df_sampled(
             df, title, theme, save, savedir, base, verbose, log, sample_size
         )
 
     def plot_count_vs_class_df_paginated(
         self,
-        df,
+        clslist,
         title="title",
         theme="auto",
         save=False,
@@ -649,9 +649,8 @@ class DisulfideLoader:
         :param log: Whether to use log scale for y-axis
         :param page_size: Number of items per page
         """
-        # from proteusPy.DisulfideVisualization import DisulfideVisualization
-
-        pp.DisulfideVisualization.plot_count_vs_class_df_paginated(
+        df = self.enumerate_class_fromlist(clslist, base=base)
+        DisulfideVisualization.plot_count_vs_class_df_paginated(
             df, title, theme, save, savedir, base, verbose, log, page_size
         )
 
@@ -773,8 +772,8 @@ class DisulfideLoader:
         """
         # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
-        sslist = self.SSList
-        distances = sslist.extract_distances(distance_type, comparison, cutoff)
+        # sslist = self.SSList
+        # distances = sslist.extract_distances(distance_type, comparison, cutoff)
 
         self.SSList.plot_distances(
             distance_type=distance_type,
@@ -819,7 +818,7 @@ class DisulfideLoader:
         """
         classlist = self.tclass.binary_to_class(class_string, base)
         df = self.enumerate_class_fromlist(classlist, base=base)
-        self.plot_count_vs_class_df_paginated(
+        pp.DisulfideVisualization.plot_count_vs_class_df_paginated(
             df, title=class_string, theme=theme, base=base, log=log, page_size=page_size
         )
 
