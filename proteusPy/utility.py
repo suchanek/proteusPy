@@ -37,7 +37,7 @@ import psutil
 from PIL import Image, ImageFont
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-# from proteusPy.DisulfideBase import Disulfide, DisulfideList
+# from proteusPy.DisulfideBase import DisulfideList
 from proteusPy.DisulfideExceptions import DisulfideIOException
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
@@ -518,7 +518,7 @@ def Download_Disulfides(
     return
 
 
-def remove_duplicate_ss(sslist: "DisulfideList") -> list:
+def remove_duplicate_ss(sslist) -> list:
     """Remove duplicate disulfides from the input list."""
     pruned = []
     for ss in sslist:
