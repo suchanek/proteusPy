@@ -9,6 +9,7 @@ Last revision: 2025-02-12
 # pylint: disable=C0103
 # pylint: disable=W0212
 
+import math
 from pathlib import Path
 
 import numpy as np
@@ -21,10 +22,19 @@ from scipy import stats
 from tqdm import tqdm
 from tqdm.notebook import tqdm as tqdm_notebook
 
-from proteusPy.atoms import BOND_RADIUS
+from proteusPy.atoms import (
+    ATOM_COLORS,
+    ATOM_RADII_COVALENT,
+    ATOM_RADII_CPK,
+    BOND_COLOR,
+    BOND_RADIUS,
+    BS_SCALE,
+    SPEC_POWER,
+    SPECULARITY,
+)
 from proteusPy.DisulfideClassManager import DisulfideClassManager
 from proteusPy.logger_config import create_logger
-from proteusPy.ProteusGlobals import NBINS, PBAR_COLS, WINSIZE
+from proteusPy.ProteusGlobals import FONTSIZE, NBINS, PBAR_COLS, WINSIZE
 from proteusPy.utility import (
     calculate_fontsize,
     get_jet_colormap,
@@ -509,7 +519,7 @@ class DisulfideVisualization:
         )
 
     @staticmethod
-    def display(sslist, style="sb", light="auto", panelsize=512):
+    def display_sslist(sslist, style="sb", light="auto", panelsize=512):
         """Display the Disulfide list in the specific rendering style.
 
         :param sslist: List of Disulfide objects
@@ -530,7 +540,9 @@ class DisulfideVisualization:
         set_pyvista_theme(light)
 
         pl = pv.Plotter(window_size=winsize, shape=(rows, cols))
-        pl = DisulfideVisualization._render(pl, sslist, style, panelsize=panelsize)
+        pl = DisulfideVisualization._render_sslist(
+            pl, sslist, style, panelsize=panelsize
+        )
         pl.enable_anti_aliasing("msaa")
 
         pl.link_views()
@@ -558,7 +570,7 @@ class DisulfideVisualization:
         :param light: Background color
         :param winsize: Window size tuple (width, height)
         """
-        pid = sslist.id
+        pid = sslist.pdb_id
         ssbonds = sslist
         tot_ss = len(ssbonds)
         avg_enrg = sslist.average_energy
@@ -601,7 +613,8 @@ class DisulfideVisualization:
 
         for i, ss in zip(pbar, ssbonds):
             color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
-            ss._render(
+            DisulfideVisualization._render_ss(
+                ss,
                 pl,
                 style="plain",
                 bondcolor=color,
@@ -937,7 +950,7 @@ class DisulfideVisualization:
         fig_bond_angle.show()
 
     @staticmethod
-    def _render(pl, sslist, style, res=100, panelsize=WINSIZE):
+    def _render_sslist(pl, sslist, style, res=100, panelsize=WINSIZE):
         """Internal rendering engine that calculates and instantiates all bond
         cylinders and atomic sphere meshes.
 
@@ -971,10 +984,629 @@ class DisulfideVisualization:
             title = f"{src} {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°"
             fontsize = calculate_fontsize(title, panelsize)
             pl.add_title(title=title, font_size=fontsize)
-            ss._render(
+            DisulfideVisualization._render_ss(
+                ss,
                 pl,
                 style=style,
                 res=res,
             )
 
         return pl
+
+    @staticmethod
+    def _render_ss(
+        ss,
+        pvplot: pv.Plotter,
+        style="bs",
+        plain=False,
+        bondcolor=BOND_COLOR,
+        bs_scale=BS_SCALE,
+        spec=SPECULARITY,
+        specpow=SPEC_POWER,
+        translate=True,
+        bond_radius=BOND_RADIUS,
+        res=100,
+    ):
+        """
+        Update the passed pyVista plotter() object with the mesh data for the
+        input Disulfide Bond. Used internally.
+
+        :param pvplot: pyvista.Plotter object
+        :type pvplot: pv.Plotter
+
+        :param style: Rendering style, by default 'bs'. One of 'bs', 'st', 'cpk'. Render as \
+            CPK, ball-and-stick or stick. Bonds are colored by atom color, unless \
+            'plain' is specified.
+        :type style: str, optional
+
+        :param plain: Used internally, by default False
+        :type plain: bool, optional
+
+        :param bondcolor: pyVista color name, optional bond color for simple bonds, by default BOND_COLOR
+        :type bondcolor: str, optional
+
+        :param bs_scale: Scale factor (0-1) to reduce the atom sizes for ball and stick, by default BS_SCALE
+        :type bs_scale: float, optional
+
+        :param spec: Specularity (0-1), where 1 is totally smooth and 0 is rough, by default SPECULARITY
+        :type spec: float, optional
+
+        :param specpow: Exponent used for specularity calculations, by default SPEC_POWER
+        :type specpow: int, optional
+
+        :param translate: Flag used internally to indicate if we should translate \
+            the disulfide to its geometric center of mass, by default True.
+        :type translate: bool, optional
+
+        :returns: Updated pv.Plotter object with atoms and bonds.
+        :rtype: pv.Plotter
+        """
+
+        def add_atoms(pvp, coords, atoms, radii, colors, spec, specpow):
+            for i, atom in enumerate(atoms):
+                rad = radii[atom]
+                if style == "bs" and i > 11:
+                    rad *= 0.75
+                pvp.add_mesh(
+                    pv.Sphere(center=coords[i], radius=rad),
+                    color=colors[atom],
+                    smooth_shading=True,
+                    specular=spec,
+                    specular_power=specpow,
+                )
+
+        def draw_bonds(
+            ss,
+            pvp,
+            coords,
+            bond_radius=BOND_RADIUS,
+            style="sb",
+            bcolor=BOND_COLOR,
+            all_atoms=True,
+            res=100,
+        ):
+            """
+            Generate the appropriate pyVista cylinder objects to represent
+            a particular disulfide bond. This utilizes a connection table
+            for the starting and ending atoms and a color table for the
+            bond colors. Used internally.
+
+            :param pvp: input plotter object to be updated
+            :param bradius: bond radius
+            :param style: bond style. One of sb, plain, pd
+            :param bcolor: pyvista color
+            :param missing: True if atoms are missing, False othersie
+            :param all_atoms: True if rendering O, False if only backbone rendered
+
+            :return pvp: Updated Plotter object.
+
+            """
+            _bond_conn = np.array(
+                [
+                    [0, 1],  # n-ca
+                    [1, 2],  # ca-c
+                    [2, 3],  # c-o
+                    [1, 4],  # ca-cb
+                    [4, 5],  # cb-sg
+                    [6, 7],  # n-ca
+                    [7, 8],  # ca-c
+                    [8, 9],  # c-o
+                    [7, 10],  # ca-cb
+                    [10, 11],  # cb-sg
+                    [5, 11],  # sg -sg
+                    [12, 0],  # cprev_prox-n
+                    [2, 13],  # c-nnext_prox
+                    [14, 6],  # cprev_dist-n_dist
+                    [8, 15],  # c-nnext_dist
+                ]
+            )
+
+            # modeled disulfides only have backbone atoms since
+            # phi and psi are undefined, which makes the carbonyl
+            # oxygen (O) undefined as well. Their previous and next N
+            # are also undefined.
+
+            missing = ss.missing_atoms
+            bradius = bond_radius
+
+            _bond_conn_backbone = np.array(
+                [
+                    [0, 1],  # n-ca
+                    [1, 2],  # ca-c
+                    [1, 4],  # ca-cb
+                    [4, 5],  # cb-sg
+                    [6, 7],  # n-ca
+                    [7, 8],  # ca-c
+                    [7, 10],  # ca-cb
+                    [10, 11],  # cb-sg
+                    [5, 11],  # sg -sg
+                ]
+            )
+
+            # colors for the bonds. Index into ATOM_COLORS array
+            _bond_split_colors = np.array(
+                [
+                    ("N", "C"),
+                    ("C", "C"),
+                    ("C", "O"),
+                    ("C", "C"),
+                    ("C", "SG"),
+                    ("N", "C"),
+                    ("C", "C"),
+                    ("C", "O"),
+                    ("C", "C"),
+                    ("C", "SG"),
+                    ("SG", "SG"),
+                    # prev and next C-N bonds - color by atom Z
+                    ("C", "N"),
+                    ("C", "N"),
+                    ("C", "N"),
+                    ("C", "N"),
+                ]
+            )
+
+            _bond_split_colors_backbone = np.array(
+                [
+                    ("N", "C"),
+                    ("C", "C"),
+                    ("C", "C"),
+                    ("C", "SG"),
+                    ("N", "C"),
+                    ("C", "C"),
+                    ("C", "C"),
+                    ("C", "SG"),
+                    ("SG", "SG"),
+                ]
+            )
+            # work through connectivity and colors
+            orig_col = dest_col = bcolor
+
+            if all_atoms:
+                bond_conn = _bond_conn
+                bond_split_colors = _bond_split_colors
+            else:
+                bond_conn = _bond_conn_backbone
+                bond_split_colors = _bond_split_colors_backbone
+
+            for i, bond in enumerate(bond_conn):
+                if all_atoms:
+                    if i > 10 and missing:  # skip missing atoms
+                        continue
+
+                orig, dest = bond
+                col = bond_split_colors[i]
+
+                # get the coords
+                prox_pos = coords[orig]
+                distal_pos = coords[dest]
+
+                # compute a direction vector
+                direction = distal_pos - prox_pos
+
+                # compute vector length. divide by 2 since split bond
+                height = math.dist(prox_pos, distal_pos) / 2.0
+
+                # the cylinder origins are actually in the
+                # middle so we translate
+
+                origin = prox_pos + 0.5 * direction  # for a single plain bond
+                origin1 = prox_pos + 0.25 * direction
+                origin2 = prox_pos + 0.75 * direction
+
+                if style == "plain":
+                    orig_col = dest_col = bcolor
+
+                # proximal-distal red/green coloring
+                elif style == "pd":
+                    if i <= 4 or i == 11 or i == 12:
+                        orig_col = dest_col = "red"
+                    else:
+                        orig_col = dest_col = "green"
+                    if i == 10:
+                        orig_col = dest_col = "yellow"
+                else:
+                    orig_col = ATOM_COLORS[col[0]]
+                    dest_col = ATOM_COLORS[col[1]]
+
+                if i >= 11:  # prev and next residue atoms for phi/psi calcs
+                    bradius = bradius * 0.5  # make smaller to distinguish
+
+                cap1 = pv.Sphere(center=prox_pos, radius=bradius)
+                cap2 = pv.Sphere(center=distal_pos, radius=bradius)
+
+                if style == "plain":
+                    cyl = pv.Cylinder(
+                        origin, direction, radius=bradius, height=height * 2.0
+                    )
+                    pvp.add_mesh(cyl, color=orig_col)
+                else:
+                    cyl1 = pv.Cylinder(
+                        origin1,
+                        direction,
+                        radius=bradius,
+                        height=height,
+                        capping=False,
+                        resolution=res,
+                    )
+                    cyl2 = pv.Cylinder(
+                        origin2,
+                        direction,
+                        radius=bradius,
+                        height=height,
+                        capping=False,
+                        resolution=res,
+                    )
+                    pvp.add_mesh(cyl1, color=orig_col)
+                    pvp.add_mesh(cyl2, color=dest_col)
+
+                pvp.add_mesh(cap1, color=orig_col)
+                pvp.add_mesh(cap2, color=dest_col)
+
+            return pvp  # end draw_bonds
+
+        model = ss.modelled
+        coords = ss.internal_coords
+        if translate:
+            coords -= ss.cofmass
+
+        atoms = (
+            "N",
+            "C",
+            "C",
+            "O",
+            "C",
+            "SG",
+            "N",
+            "C",
+            "C",
+            "O",
+            "C",
+            "SG",
+            "C",
+            "N",
+            "C",
+            "N",
+        )
+        pvp = pvplot
+        all_atoms = not model
+
+        if style == "cpk":
+            add_atoms(pvp, coords, atoms, ATOM_RADII_CPK, ATOM_COLORS, spec, specpow)
+        elif style == "cov":
+            add_atoms(
+                pvp, coords, atoms, ATOM_RADII_COVALENT, ATOM_COLORS, spec, specpow
+            )
+        elif style == "bs":
+            add_atoms(
+                pvp,
+                coords,
+                atoms,
+                {atom: ATOM_RADII_CPK[atom] * bs_scale for atom in atoms},
+                ATOM_COLORS,
+                spec,
+                specpow,
+            )
+            pvp = draw_bonds(
+                ss,
+                pvp,
+                coords,
+                style="bs",
+                all_atoms=all_atoms,
+                bond_radius=bond_radius,
+            )
+        elif style in ["sb", "pd", "plain"]:
+            pvp = draw_bonds(
+                ss,
+                pvp,
+                coords,
+                style=style,
+                all_atoms=all_atoms,
+                bond_radius=bond_radius,
+                bcolor=bondcolor if style == "plain" else None,
+            )
+
+        return pvp
+
+    @staticmethod
+    def display_ss(
+        ss, single=True, style="sb", light="auto", shadows=False, winsize=WINSIZE
+    ) -> None:
+        """
+        Display the Disulfide bond in the specific rendering style.
+        :param ss: Disulfide object
+        :param single: Display the bond in a single panel in the specific style.
+        :param style:  Rendering style: One of:
+            * 'sb' - split bonds
+            * 'bs' - ball and stick
+            * 'cpk' - CPK style
+            * 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
+            * 'plain' - boring single color
+        :param light: If True, light background, if False, dark
+
+        Example:
+        >>> import proteusPy as pp
+
+        >>> PDB_SS = pp.Load_PDB_SS(verbose=False, subset=True)
+        >>> ss = PDB_SS[0]
+        >>> ss.display(style='cpk', light="auto")
+        >>> ss.screenshot(style='bs', fname='proteus_logo_sb.png')
+        """
+
+        src = ss.pdb_id
+        enrg = ss.energy
+
+        title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Cα: {ss.ca_distance:.2f} Å Cβ: {ss.cb_distance:.2f} Å, Sg: {ss.sg_distance:.2f} Å Tors: {ss.torsion_length:.2f}°"
+
+        set_pyvista_theme(light)
+        fontsize = 8
+
+        if single:
+            _pl = pv.Plotter(window_size=winsize)
+            _pl.add_title(title=title, font_size=fontsize)
+            _pl.enable_anti_aliasing("msaa")
+
+            DisulfideVisualization._render_ss(
+                ss,
+                _pl,
+                style=style,
+            )
+            _pl.reset_camera()
+            if shadows:
+                _pl.enable_shadows()
+            _pl.show()
+
+        else:
+            pl = pv.Plotter(window_size=winsize, shape=(2, 2))
+            pl.subplot(0, 0)
+
+            pl.add_title(title=title, font_size=fontsize)
+            pl.enable_anti_aliasing("msaa")
+
+            # pl.add_camera_orientation_widget()
+
+            DisulfideVisualization._render_ss(
+                ss,
+                pl,
+                style="cpk",
+            )
+
+            pl.subplot(0, 1)
+            pl.add_title(title=title, font_size=fontsize)
+
+            DisulfideVisualization._render_ss(
+                ss,
+                pl,
+                style="bs",
+            )
+
+            pl.subplot(1, 0)
+            pl.add_title(title=title, font_size=fontsize)
+
+            DisulfideVisualization._render_ss(
+                ss,
+                pl,
+                style="sb",
+            )
+
+            pl.subplot(1, 1)
+            pl.add_title(title=title, font_size=fontsize)
+
+            DisulfideVisualization._render_ss(
+                ss,
+                pl,
+                style="pd",
+            )
+
+            pl.link_views()
+            pl.reset_camera()
+            if shadows:
+                pl.enable_shadows()
+            pl.show()
+        return
+
+    @staticmethod
+    def make_movie(
+        ss, style="sb", fname="ssbond.mp4", verbose=False, steps=360
+    ) -> None:
+        """
+        Create an animation for ```self``` rotating one revolution about the Y axis,
+        in the given ```style```, saving to ```filename```.
+
+        :param style: Rendering style, defaults to 'sb', one of:
+        * 'sb' - split bonds
+        * 'bs' - ball and stick
+        * 'cpk' - CPK style
+        * 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
+        * 'plain' - boring single color
+
+        :param fname: Output filename, defaults to ```ssbond.mp4```
+        :param verbose: Verbosity, defaults to False
+        :param steps: Number of steps for one complete rotation, defaults to 360.
+        """
+
+        # src = self.pdb_id
+        # name = self.name
+        # enrg = self.energy
+        # title = f"{src} {name}: {self.proximal}{self.proximal_chain}-{self.distal}{self.distal_chain}: {enrg:.2f} kcal/mol, Cα: {self.ca_distance:.2f} Å, Tors: {self.torsion_length:.2f}"
+
+        if verbose:
+            print(f"Rendering animation to {fname}...")
+
+        pl = pv.Plotter(window_size=WINSIZE, off_screen=True, theme="document")
+        pl.open_movie(fname)
+        path = pl.generate_orbital_path(n_points=steps)
+
+        #
+        # pl.add_title(title=title, font_size=FONTSIZE)
+        pl.enable_anti_aliasing("msaa")
+        pl = DisulfideVisualization._render_ss(
+            ss,
+            pl,
+            style=style,
+        )
+        pl.reset_camera()
+        pl.orbit_on_path(path, write_frames=True)
+        pl.close()
+
+        if verbose:
+            print(f"Saved mp4 animation to: {fname}")
+
+    @staticmethod
+    def spin(ss, style="sb", verbose=False, steps=360, theme="auto") -> None:
+        """
+        Spin the object by rotating it one revolution about the Y axis in the given style.
+
+        :param style: Rendering style, defaults to 'sb', one of:
+            * 'sb' - split bonds
+            * 'bs' - ball and stick
+            * 'cpk' - CPK style
+            * 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
+            * 'plain' - boring single color
+
+        :param verbose: Verbosity, defaults to False
+        :param steps: Number of steps for one complete rotation, defaults to 360.
+        """
+
+        src = ss.pdb_id
+        enrg = ss.energy
+
+        title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}"
+
+        set_pyvista_theme(theme)
+
+        if verbose:
+            _logger.info("Spinning object: %d steps...", steps)
+
+        # Create a Plotter instance
+        pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
+        pl.add_title(title=title, font_size=FONTSIZE)
+
+        # Enable anti-aliasing for smoother rendering
+        pl.enable_anti_aliasing("msaa")
+
+        # Generate an orbital path for spinning
+        path = pl.generate_orbital_path(n_points=steps)
+
+        # Render the object in the specified style
+        pl = DisulfideVisualization._render_ss(ss, pl, style=style)
+
+        pl.reset_camera()
+        pl.show(auto_close=False)
+
+        # Orbit the camera along the generated path
+        pl.orbit_on_path(path, write_frames=False, step=1 / steps)
+
+        if verbose:
+            print("Spinning completed.")
+
+    @staticmethod
+    def screenshot(
+        ss,
+        single=True,
+        style="sb",
+        fname="ssbond.png",
+        verbose=False,
+        shadows=False,
+        light="Auto",
+    ) -> None:
+        """
+        Create and save a screenshot of the Disulfide in the given style
+        and filename
+
+        :param single: Display a single vs panel view, defaults to True
+        :param style: Rendering style, one of:
+        * 'sb' - split bonds
+        * 'bs' - ball and stick
+        * 'cpk' - CPK style
+        * 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
+        * 'plain' - boring single color,
+        :param fname: output filename,, defaults to 'ssbond.png'
+        :param verbose: Verbosit, defaults to False
+        :param shadows: Enable shadows, defaults to False
+        """
+
+        src = ss.pdb_id
+        enrg = ss.energy
+        title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol, Cα: {ss.ca_distance:.2f} Å, Cβ: {ss.cb_distance:.2f} Å, Sγ: {ss.sg_distance:.2f} Å, Tors: {ss.torsion_length:.2f}"
+
+        set_pyvista_theme(light)
+
+        if verbose:
+            _logger.info("Rendering screenshot to file {fname}")
+
+        if single:
+            pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
+            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.enable_anti_aliasing("msaa")
+            DisulfideVisualization._render_ss(
+                ss,
+                pl,
+                style=style,
+            )
+            pl.reset_camera()
+            if shadows:
+                pl.enable_shadows()
+
+            pl.show(auto_close=False)  # allows for manipulation
+            # Take the screenshot after ensuring the plotter is still active
+            try:
+                pl.screenshot(fname)
+            except RuntimeError as e:
+                _logger.error("Error saving screenshot: %s", e)
+
+        else:
+            pl = pv.Plotter(window_size=WINSIZE, shape=(2, 2), off_screen=False)
+            pl.subplot(0, 0)
+
+            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.enable_anti_aliasing("msaa")
+
+            # pl.add_camera_orientation_widget()
+            DisulfideVisualization._render_ss(
+                ss,
+                pl,
+                style="cpk",
+            )
+
+            pl.subplot(0, 1)
+            pl.add_title(title=title, font_size=FONTSIZE)
+            DisulfideVisualization._render_ss(
+                ss,
+                pl,
+                style="pd",
+            )
+
+            pl.subplot(1, 0)
+            pl.add_title(title=title, font_size=FONTSIZE)
+            DisulfideVisualization._render_ss(
+                ss,
+                pl,
+                style="bs",
+            )
+
+            pl.subplot(1, 1)
+            pl.add_title(title=title, font_size=FONTSIZE)
+            DisulfideVisualization._render_ss(
+                ss,
+                pl,
+                style="sb",
+            )
+
+            pl.link_views()
+            pl.reset_camera()
+            if shadows:
+                pl.enable_shadows()
+
+            # Take the screenshot after ensuring the plotter is still active
+            pl.show(auto_close=False)  # allows for manipulation
+
+            try:
+                pl.screenshot(fname)
+            except RuntimeError as e:
+                _logger.error("Error saving screenshot: %s", e)
+
+        if verbose:
+            print(f"Screenshot saved as: {fname}")
+
+
+# EOF

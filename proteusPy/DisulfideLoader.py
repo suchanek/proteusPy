@@ -820,7 +820,7 @@ class DisulfideLoader:
         self, class_string, base=8, theme="auto", log=False, page_size=200
     ):
         """
-        Plot the distribution of classes for the given class string.
+        Plot the distribution of disulfides for the given class string.
 
         :param class_string: The class string to plot.
         :type class_string: str
@@ -832,7 +832,7 @@ class DisulfideLoader:
         """
         classlist = self.tclass.binary_to_class(class_string, base)
         df = self.enumerate_class_fromlist(classlist, base=base)
-        pp.DisulfideVisualization.plot_count_vs_class_df_paginated(
+        DisulfideVisualization.plot_count_vs_class_df_paginated(
             df, title=class_string, theme=theme, base=base, log=log, page_size=page_size
         )
 
