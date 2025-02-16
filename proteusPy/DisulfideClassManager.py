@@ -22,7 +22,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from proteusPy import __version__
 
 # from proteusPy.DisulfideBase import DisulfideList
 from proteusPy.logger_config import create_logger
@@ -304,6 +303,8 @@ class DisulfideClassManager:
         :return: None
         :rtype: None
         """
+        
+        from proteusPy import __version__
 
         self.version = __version__
 
