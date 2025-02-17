@@ -383,7 +383,16 @@ class DisulfideList(UserList):
 
     # Delegate to DisulfideVisualization
     def display(self, style="sb", light="auto", panelsize=512):
-        """Display the Disulfide list in the specific rendering style"""
+        """Display the Disulfide list in the specific rendering style.
+
+        :param style: Rendering style: One of:
+            * 'sb' - split bonds
+            * 'bs' - ball and stick
+            * 'cpk' - CPK style
+            * 'pd' - Proximal/Distal style - Red=proximal, Green=Distal
+            * 'plain' - boring single color
+        :param light: If True, light background, if False, dark
+        :param panelsize: Size of each panel in pixels"""
         DisulfideVisualization.display_sslist(self, style, light, panelsize)
 
     def display_overlay(
@@ -395,7 +404,16 @@ class DisulfideList(UserList):
         light="auto",
         winsize=(1024, 1024),
     ):
-        """Display all disulfides overlaid in stick mode"""
+        """Display all disulfides in the list overlaid in stick mode against
+        a common coordinate frame.
+
+        :param screenshot: Save a screenshot
+        :param movie: Save a movie
+        :param verbose: Verbosity
+        :param fname: Filename to save for the movie or screenshot
+        :param light: Background color
+        :param winsize: Window size tuple (width, height)
+        """
         DisulfideVisualization.display_overlay(
             self, screenshot, movie, verbose, fname, light, winsize
         )
@@ -407,7 +425,13 @@ class DisulfideList(UserList):
         fname="ss_torsions.png",
         theme="auto",
     ):
-        """Display torsion and distance statistics"""
+        """Display torsion and distance statistics for a given Disulfide list.
+
+        :param display: Whether to display the plot in the notebook
+        :param save: Whether to save the plot as an image file
+        :param fname: The name of the image file to save
+        :param theme: The theme to use for the plot
+        """
         DisulfideVisualization.display_torsion_statistics(
             self, display, save, fname, theme
         )
@@ -474,17 +498,60 @@ class DisulfideList(UserList):
 
         return DisulfideList(reslist, f"filtered by Sγ distance < {distance:.2f}")
 
+    def filter_by_distance(self, distance_type: str = "ca", distance: float = -1.0, minimum: float = 2.0):
+        """
+        Return a DisulfideList filtered by the specified distance type (Ca or Sg) between the maximum distance and
+        the minimum, which defaults to 2.0A for Ca and 1.0A for Sg.
+    
+        :param distance_type: Type of distance to filter by ('ca' or 'sg').
+        :param distance: Distance in Å.
+        :param minimum: Minimum distance in Å.
+        :return: DisulfideList containing disulfides with the given distance.
+        """
+        reslist = []
+        sslist = self.data
+    
+        # Set default minimum distance based on distance_type
+        if distance_type == "ca":
+            default_minimum = 2.0
+        elif distance_type == "sg":
+            default_minimum = 1.0
+        else:
+            raise ValueError("Invalid distance_type. Must be 'ca' or 'sg'.")
+    
+        # Use the provided minimum distance or the default
+        minimum = minimum if minimum != -1.0 else default_minimum
+    
+        # If distance is -1.0, return the entire list
+        if distance == -1.0:
+            return sslist.copy()
+    
+        # Filter based on the specified distance type
+        if distance_type == "ca":
+            reslist = [
+                ss
+                for ss in sslist
+                if ss.ca_distance < distance and ss.ca_distance > minimum
+            ]
+        elif distance_type == "sg":
+            reslist = [
+                ss
+                for ss in sslist
+                if ss.sg_distance < distance and ss.sg_distance > minimum
+            ]
+    
+        return DisulfideList(reslist, f"filtered by {distance_type} distance < {distance:.2f}")
+    
     def plot_distances(
         self, distance_type="ca", cutoff=-1, comparison="less", theme="auto", log=True
     ):
-        """
-        Plot the distances for the disulfides in the loader.
+        """Plot the distance values as a histogram.
 
-        :param distance_type: The type of distance to plot ('ca' for Cα-Cα distance, 'sg' for Sγ-Sγ distance)
-        :param cutoff: The cutoff value for the distance, defaults to -1 (no cutoff)
-        :param comparison: if 'less' then plot distances less than the cutoff, if 'greater' then plot distances greater than the cutoff
-        :param theme: The theme to use for the plot ('auto', 'light', or 'dark')
-        :param log: Whether to use a log scale for the y-axis
+        :param distance_type: Type of distance to plot ('sg' or 'ca')
+        :param cutoff: Cutoff value for the x-axis title
+        :param comparison: If 'less', show distances less than cutoff
+        :param theme: The plotly theme to use
+        :param log: Whether to use a logarithmic scale for the y-axis
         """
         # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
