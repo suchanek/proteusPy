@@ -146,7 +146,9 @@ class DisulfideLoader:
             with open(full_path, "rb") as f:
                 sslist = pickle.load(f)
                 old_length = len(sslist)
-                filt = sslist.filter_by_ca_distance(self.cutoff)
+                filt = sslist.filter_by_distance(
+                    distance=self.cutoff, distance_type="ca"
+                )
                 filt = DisulfideList(filt, "filtered by Ca")
 
                 new_length = len(filt)
@@ -160,7 +162,9 @@ class DisulfideLoader:
                     )
 
                 old_length = new_length
-                filt = filt.filter_by_sg_distance(self.sg_cutoff)
+                filt = sslist.filter_by_distance(
+                    distance=self.sg_cutoff, distance_type="sg"
+                )
                 new_length = len(filt)
 
                 if self.verbose:
@@ -561,12 +565,14 @@ class DisulfideLoader:
         savedir=".",
         verbose=False,
     ):
-        """
-        Plot the incidence of all octant Disulfide classes for a given binary class.
+        """Plot the incidence of all octant Disulfide classes for a given binary class.
 
-        :param loader: `proteusPy.DisulfideLoader` object
+        :param tclass: DisulfideClassManager instance
+        :param theme: The theme to use for the plot
+        :param save: Whether to save the plots
+        :param savedir: Directory to save plots to
+        :param verbose: Whether to display verbose output
         """
-        # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
         DisulfideVisualization.plot_binary_to_eightclass_incidence(
             self.tclass, theme, save, savedir, verbose

@@ -30,7 +30,6 @@ class DisulfideStats:
         """
         rows = []
         total_length = len(sslist)
-        update_interval = max(1, total_length // 20)  # 5% of the list length
 
         if quiet:
             pbar = sslist
@@ -63,7 +62,6 @@ class DisulfideStats:
         """
         rows = []
         total_length = len(sslist)
-        update_interval = max(1, total_length // 20)
 
         if quiet:
             pbar = sslist

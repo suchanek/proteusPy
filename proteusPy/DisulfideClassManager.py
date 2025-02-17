@@ -22,7 +22,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-
 # from proteusPy.DisulfideBase import DisulfideList
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
@@ -303,7 +302,7 @@ class DisulfideClassManager:
         :return: None
         :rtype: None
         """
-        
+
         from proteusPy import __version__
 
         self.version = __version__
@@ -523,7 +522,7 @@ class DisulfideClassManager:
             an angle in [45, 90) returns "7", ...,
             and an angle in [315, 360) returns "1".
 
-        :param angle_deg: The angle in degrees.
+        :param angle_deg: The angle in degrees. Single or array-like with length 5.
         :type angle_deg: float or array-like
         :param base: The number of segments (default is 8). For example, with base=8 each segment spans 45°,
         with base=12 each spans 30°, etc.
