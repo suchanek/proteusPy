@@ -2,23 +2,27 @@
 This module provides statistical analysis functionality for disulfide bonds in the proteusPy package.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-02-12
+Last revision: 2025-02-17 00:53:26
 """
+
+import logging
+import math
 
 import numpy as np
 import pandas as pd
-from scipy import stats
 from tqdm import tqdm
 
 from proteusPy.logger_config import create_logger
-from proteusPy.ProteusGlobals import PBAR_COLS, Torsion_DF_Cols, Distance_DF_Cols
+from proteusPy.ProteusGlobals import PBAR_COLS, Distance_DF_Cols, Torsion_DF_Cols
+from proteusPy.vector3D import calculate_bond_angle, rms_difference
 
 _logger = create_logger(__name__)
+
 
 class DisulfideStats:
     """Provides statistical analysis methods for Disulfide bonds, including torsion statistics,
     distance calculations, and data frame generation."""
-    
+
     @staticmethod
     def build_distance_df(sslist, quiet=True) -> pd.DataFrame:
         """Create a dataframe containing the input DisulfideList Cα-Cα and Sg-Sg distances, energy.
@@ -29,7 +33,6 @@ class DisulfideStats:
         :return: DataFrame containing Ca distances
         """
         rows = []
-        total_length = len(sslist)
 
         if quiet:
             pbar = sslist
@@ -61,7 +64,6 @@ class DisulfideStats:
         :return: DataFrame containing the torsions
         """
         rows = []
-        total_length = len(sslist)
 
         if quiet:
             pbar = sslist
@@ -199,3 +201,185 @@ class DisulfideStats:
             filtered_distances = [d for d in distances if d <= cutoff]
 
         return filtered_distances
+
+    @staticmethod
+    def bond_angle_ideality(ss, verbose=False):
+        """
+        Calculate all bond angles for a disulfide bond and compare them to idealized angles.
+
+        :param np.ndarray atom_coordinates: Array containing coordinates of atoms in the order:
+            N1, CA1, C1, O1, CB1, SG1, N2, CA2, C2, O2, CB2, SG2
+        :return: RMS difference between calculated bond angles and idealized bond angles.
+        :rtype: float
+        """
+
+        atom_coordinates = ss.coords_array
+        verbose = not ss.quiet
+        if verbose:
+            _logger.setLevel(logging.INFO)
+
+        idealized_angles = {
+            ("N1", "CA1", "C1"): 111.0,
+            ("N1", "CA1", "CB1"): 108.5,
+            ("CA1", "CB1", "SG1"): 112.8,
+            ("CB1", "SG1", "SG2"): 103.8,  # This angle is for the disulfide bond itself
+            ("SG1", "SG2", "CB2"): 103.8,  # This angle is for the disulfide bond itself
+            ("SG2", "CB2", "CA2"): 112.8,
+            ("CB2", "CA2", "N2"): 108.5,
+            ("N2", "CA2", "C2"): 111.0,
+        }
+
+        # List of triplets for which we need to calculate bond angles
+        # I am omitting the proximal and distal backbone angle N, Ca, C
+        # to focus on the disulfide bond angles themselves.
+        angle_triplets = [
+            ("N1", "CA1", "C1"),
+            ("N1", "CA1", "CB1"),
+            ("CA1", "CB1", "SG1"),
+            ("CB1", "SG1", "SG2"),
+            ("SG1", "SG2", "CB2"),
+            ("SG2", "CB2", "CA2"),
+            ("CB2", "CA2", "N2"),
+            ("N2", "CA2", "C2"),
+        ]
+
+        atom_indices = {
+            "N1": 0,
+            "CA1": 1,
+            "C1": 2,
+            "CB1": 4,
+            "SG1": 5,
+            "SG2": 11,
+            "CB2": 10,
+            "CA2": 7,
+            "N2": 6,
+            "C2": 8,
+        }
+
+        calculated_angles = []
+        for triplet in angle_triplets:
+            a = atom_coordinates[atom_indices[triplet[0]]]
+            b = atom_coordinates[atom_indices[triplet[1]]]
+            c = atom_coordinates[atom_indices[triplet[2]]]
+            ideal = idealized_angles[triplet]
+            try:
+                angle = calculate_bond_angle(a, b, c)
+            except ValueError as e:
+                print(f"Error calculating angle for atoms {triplet}: {e}")
+                return None
+            calculated_angles.append(angle)
+            if verbose:
+                _logger.info(
+                    "Calculated angle for atoms %s: %.2f, Ideal angle: %.2f",
+                    triplet,
+                    angle,
+                    ideal,
+                )
+
+        # Convert idealized angles to a list
+        idealized_angles_list = [
+            idealized_angles[triplet] for triplet in angle_triplets
+        ]
+
+        # Calculate RMS difference
+        rms_diff = rms_difference(
+            np.array(calculated_angles), np.array(idealized_angles_list)
+        )
+
+        if verbose:
+            _logger.info("RMS bond angle deviation: %.2f", rms_diff)
+
+        return rms_diff
+
+    @staticmethod
+    def bond_length_ideality(ss, verbose=False):
+        """
+        Calculate bond lengths for a disulfide bond and compare them to idealized lengths.
+
+        :param np.ndarray atom_coordinates: Array containing coordinates of atoms in the order:
+            N1, CA1, C1, O1, CB1, SG1, N2, CA2, C2, O2, CB2, SG2
+        :return: RMS difference between calculated bond lengths and idealized bond lengths.
+        :rtype: float
+        """
+
+        atom_coordinates = ss.coords_array
+        verbose = not ss.quiet
+        if verbose:
+            _logger.setLevel(logging.INFO)
+
+        idealized_bonds = {
+            ("N1", "CA1"): 1.46,
+            ("CA1", "C1"): 1.52,
+            ("CA1", "CB1"): 1.52,
+            ("CB1", "SG1"): 1.86,
+            ("SG1", "SG2"): 2.044,  # This angle is for the disulfide bond itself
+            ("SG2", "CB2"): 1.86,
+            ("CB2", "CA2"): 1.52,
+            ("CA2", "C2"): 1.52,
+            ("N2", "CA2"): 1.46,
+        }
+
+        # List of triplets for which we need to calculate bond angles
+        # I am omitting the proximal and distal backbone angle N, Ca, C
+        # to focus on the disulfide bond angles themselves.
+        distance_pairs = [
+            ("N1", "CA1"),
+            ("CA1", "C1"),
+            ("CA1", "CB1"),
+            ("CB1", "SG1"),
+            ("SG1", "SG2"),  # This angle is for the disulfide bond itself
+            ("SG2", "CB2"),
+            ("CB2", "CA2"),
+            ("CA2", "C2"),
+            ("N2", "CA2"),
+        ]
+
+        atom_indices = {
+            "N1": 0,
+            "CA1": 1,
+            "C1": 2,
+            "CB1": 4,
+            "SG1": 5,
+            "SG2": 11,
+            "CB2": 10,
+            "CA2": 7,
+            "N2": 6,
+            "C2": 8,
+        }
+
+        calculated_distances = []
+        for pair in distance_pairs:
+            a = atom_coordinates[atom_indices[pair[0]]]
+            b = atom_coordinates[atom_indices[pair[1]]]
+            ideal = idealized_bonds[pair]
+            try:
+                distance = math.dist(a, b)
+            except ValueError as e:
+                _logger.error("Error calculating bond length for atoms %s: %s", pair, e)
+                return None
+            calculated_distances.append(distance)
+            if verbose:
+                _logger.info(
+                    "Calculated distance for atoms %s: %.2fA, Ideal distance: %.2fA",
+                    pair,
+                    distance,
+                    ideal,
+                )
+
+        # Convert idealized distances to a list
+        idealized_distance_list = [idealized_bonds[pair] for pair in distance_pairs]
+
+        # Calculate RMS difference
+        rms_diff = rms_difference(
+            np.array(calculated_distances), np.array(idealized_distance_list)
+        )
+
+        if verbose:
+            _logger.info(
+                "RMS distance deviation from ideality for SS atoms: %.2f", rms_diff
+            )
+
+            # Reset logger level
+            _logger.setLevel(logging.WARNING)
+
+        return rms_diff

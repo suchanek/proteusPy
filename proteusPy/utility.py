@@ -142,6 +142,7 @@ def extract_firstchain_ss(sslist, verbose=False):
     :param sslist: Starting SS list
     :return: (Pruned SS list, xchain)
     """
+    from proteusPy.DisulfideBase import DisulfideList
 
     chain = ""
     chainlist = []
@@ -180,6 +181,8 @@ def prune_extra_ss(sslist):
 
     :param ssdict: input dictionary with disulfides
     """
+    from proteusPy.DisulfideBase import DisulfideList
+
     xchain = 0
 
     # print(f'Processing: {ss} with: {sslist}')
@@ -564,6 +567,7 @@ def Extract_Disulfides(
     :param dist_cutoff:    Ca distance cutoff to reject a Disulfide.
     :param prune:          Move bad files to bad directory, defaults to True
     """
+    from proteusPy.DisulfideBase import DisulfideList
     from proteusPy.DisulfideIO import load_disulfides_from_id
 
     def name_to_id(fname: str) -> str:
@@ -776,6 +780,7 @@ def Extract_Disulfides_From_List(
     :param dist_cutoff:    Ca distance cutoff to reject a Disulfide.
     :param prune:          Move bad files to bad directory, defaults to True
     """
+    from proteusPy.DisulfideBase import DisulfideList
     from proteusPy.DisulfideIO import load_disulfides_from_id
 
     if quiet:

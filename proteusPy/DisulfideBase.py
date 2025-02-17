@@ -51,7 +51,6 @@ from proteusPy.utility import set_pyvista_theme
 from proteusPy.vector3D import (
     Vector3D,
     calc_dihedral,
-    calculate_bond_angle,
     distance3d,
     rms_difference,
 )
@@ -498,11 +497,13 @@ class DisulfideList(UserList):
 
         return DisulfideList(reslist, f"filtered by Sγ distance < {distance:.2f}")
 
-    def filter_by_distance(self, distance_type: str = "ca", distance: float = -1.0, minimum: float = 2.0):
+    def filter_by_distance(
+        self, distance_type: str = "ca", distance: float = -1.0, minimum: float = 2.0
+    ):
         """
         Return a DisulfideList filtered by the specified distance type (Ca or Sg) between the maximum distance and
         the minimum, which defaults to 2.0A for Ca and 1.0A for Sg.
-    
+
         :param distance_type: Type of distance to filter by ('ca' or 'sg').
         :param distance: Distance in Å.
         :param minimum: Minimum distance in Å.
@@ -510,7 +511,7 @@ class DisulfideList(UserList):
         """
         reslist = []
         sslist = self.data
-    
+
         # Set default minimum distance based on distance_type
         if distance_type == "ca":
             default_minimum = 2.0
@@ -518,14 +519,14 @@ class DisulfideList(UserList):
             default_minimum = 1.0
         else:
             raise ValueError("Invalid distance_type. Must be 'ca' or 'sg'.")
-    
+
         # Use the provided minimum distance or the default
         minimum = minimum if minimum != -1.0 else default_minimum
-    
+
         # If distance is -1.0, return the entire list
         if distance == -1.0:
             return sslist.copy()
-    
+
         # Filter based on the specified distance type
         if distance_type == "ca":
             reslist = [
@@ -539,9 +540,11 @@ class DisulfideList(UserList):
                 for ss in sslist
                 if ss.sg_distance < distance and ss.sg_distance > minimum
             ]
-    
-        return DisulfideList(reslist, f"filtered by {distance_type} distance < {distance:.2f}")
-    
+
+        return DisulfideList(
+            reslist, f"filtered by {distance_type} distance < {distance:.2f}"
+        )
+
     def plot_distances(
         self, distance_type="ca", cutoff=-1, comparison="less", theme="auto", log=True
     ):
@@ -815,12 +818,7 @@ class Disulfide:
 
         if self.quiet:
             # just print a warning - some residues/atoms may be missing
-            warnings.warn(
-                f"DisulfideConstructionException: {message}\n",
-                "Exception ignored.\n",
-                "Some atoms may be missing in the data structure.",
-                DisulfideConstructionWarning,
-            )
+            _logger.warning(f"DisulfideConstructionException: {message}\n")
         else:
             # exceptions are fatal - raise again with new message (including line nr)
             raise DisulfideConstructionException(message) from None
@@ -853,81 +851,7 @@ class Disulfide:
         :return: RMS difference between calculated bond angles and idealized bond angles.
         :rtype: float
         """
-
-        atom_coordinates = self.coords_array
-        verbose = not self.quiet
-        if verbose:
-            _logger.setLevel(logging.INFO)
-
-        idealized_angles = {
-            ("N1", "CA1", "C1"): 111.0,
-            ("N1", "CA1", "CB1"): 108.5,
-            ("CA1", "CB1", "SG1"): 112.8,
-            ("CB1", "SG1", "SG2"): 103.8,  # This angle is for the disulfide bond itself
-            ("SG1", "SG2", "CB2"): 103.8,  # This angle is for the disulfide bond itself
-            ("SG2", "CB2", "CA2"): 112.8,
-            ("CB2", "CA2", "N2"): 108.5,
-            ("N2", "CA2", "C2"): 111.0,
-        }
-
-        # List of triplets for which we need to calculate bond angles
-        # I am omitting the proximal and distal backbone angle N, Ca, C
-        # to focus on the disulfide bond angles themselves.
-        angle_triplets = [
-            ("N1", "CA1", "C1"),
-            ("N1", "CA1", "CB1"),
-            ("CA1", "CB1", "SG1"),
-            ("CB1", "SG1", "SG2"),
-            ("SG1", "SG2", "CB2"),
-            ("SG2", "CB2", "CA2"),
-            ("CB2", "CA2", "N2"),
-            ("N2", "CA2", "C2"),
-        ]
-
-        atom_indices = {
-            "N1": 0,
-            "CA1": 1,
-            "C1": 2,
-            "CB1": 4,
-            "SG1": 5,
-            "SG2": 11,
-            "CB2": 10,
-            "CA2": 7,
-            "N2": 6,
-            "C2": 8,
-        }
-
-        calculated_angles = []
-        for triplet in angle_triplets:
-            a = atom_coordinates[atom_indices[triplet[0]]]
-            b = atom_coordinates[atom_indices[triplet[1]]]
-            c = atom_coordinates[atom_indices[triplet[2]]]
-            ideal = idealized_angles[triplet]
-            try:
-                angle = calculate_bond_angle(a, b, c)
-            except ValueError as e:
-                print(f"Error calculating angle for atoms {triplet}: {e}")
-                return None
-            calculated_angles.append(angle)
-            if verbose:
-                _logger.info(
-                    f"Calculated angle for atoms {triplet}: {angle:.2f}, Ideal angle: {ideal:.2f}"
-                )
-
-        # Convert idealized angles to a list
-        idealized_angles_list = [
-            idealized_angles[triplet] for triplet in angle_triplets
-        ]
-
-        # Calculate RMS difference
-        rms_diff = rms_difference(
-            np.array(calculated_angles), np.array(idealized_angles_list)
-        )
-
-        if verbose:
-            _logger.info(f"RMS bond angle deviation:, {rms_diff:.2f}")
-
-        return rms_diff
+        return DisulfideStats.bond_angle_ideality(self)
 
     @property
     def bond_length_ideality(self):
@@ -939,85 +863,7 @@ class Disulfide:
         :return: RMS difference between calculated bond lengths and idealized bond lengths.
         :rtype: float
         """
-
-        atom_coordinates = self.coords_array
-        verbose = not self.quiet
-        if verbose:
-            _logger.setLevel(logging.INFO)
-
-        idealized_bonds = {
-            ("N1", "CA1"): 1.46,
-            ("CA1", "C1"): 1.52,
-            ("CA1", "CB1"): 1.52,
-            ("CB1", "SG1"): 1.86,
-            ("SG1", "SG2"): 2.044,  # This angle is for the disulfide bond itself
-            ("SG2", "CB2"): 1.86,
-            ("CB2", "CA2"): 1.52,
-            ("CA2", "C2"): 1.52,
-            ("N2", "CA2"): 1.46,
-        }
-
-        # List of triplets for which we need to calculate bond angles
-        # I am omitting the proximal and distal backbone angle N, Ca, C
-        # to focus on the disulfide bond angles themselves.
-        distance_pairs = [
-            ("N1", "CA1"),
-            ("CA1", "C1"),
-            ("CA1", "CB1"),
-            ("CB1", "SG1"),
-            ("SG1", "SG2"),  # This angle is for the disulfide bond itself
-            ("SG2", "CB2"),
-            ("CB2", "CA2"),
-            ("CA2", "C2"),
-            ("N2", "CA2"),
-        ]
-
-        atom_indices = {
-            "N1": 0,
-            "CA1": 1,
-            "C1": 2,
-            "CB1": 4,
-            "SG1": 5,
-            "SG2": 11,
-            "CB2": 10,
-            "CA2": 7,
-            "N2": 6,
-            "C2": 8,
-        }
-
-        calculated_distances = []
-        for pair in distance_pairs:
-            a = atom_coordinates[atom_indices[pair[0]]]
-            b = atom_coordinates[atom_indices[pair[1]]]
-            ideal = idealized_bonds[pair]
-            try:
-                distance = math.dist(a, b)
-            except ValueError as e:
-                _logger.error(f"Error calculating bond length for atoms {pair}: {e}")
-                return None
-            calculated_distances.append(distance)
-            if verbose:
-                _logger.info(
-                    f"Calculated distance for atoms {pair}: {distance:.2f}A, Ideal distance: {ideal:.2f}A"
-                )
-
-        # Convert idealized distances to a list
-        idealized_distance_list = [idealized_bonds[pair] for pair in distance_pairs]
-
-        # Calculate RMS difference
-        rms_diff = rms_difference(
-            np.array(calculated_distances), np.array(idealized_distance_list)
-        )
-
-        if verbose:
-            _logger.info(
-                f"RMS distance deviation from ideality for SS atoms: {rms_diff:.2f}"
-            )
-
-            # Reset logger level
-            _logger.setLevel(logging.WARNING)
-
-        return rms_diff
+        return DisulfideStats.bond_length_ideality(self)
 
     @property
     def internal_coords_array(self):
