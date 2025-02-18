@@ -151,8 +151,6 @@ from .utility import (
     Download_Disulfides,
     Extract_Disulfides,
     Extract_Disulfides_From_List,
-    calculate_percentile_cutoff,
-    calculate_std_cutoff,
     display_ss_pymol,
     distance_squared,
     extract_firstchain_ss,

@@ -961,8 +961,8 @@ class DisulfideVisualization:
         :param panelsize: Size of each panel
         :return: Updated plotter object
         """
-        ssList = sslist
-        tot_ss = len(ssList)
+        _ssList = sslist
+        tot_ss = len(_ssList)
         rows, cols = grid_dimensions(tot_ss)
 
         if tot_ss > 30:
@@ -978,7 +978,7 @@ class DisulfideVisualization:
             c = idx % cols
             pl.subplot(r, c)
 
-            ss = ssList[idx]
+            ss = _ssList[idx]
             src = ss.pdb_id
             enrg = ss.energy
             title = f"{src} {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°"

@@ -32,6 +32,7 @@ from proteusPy import __version__
 from proteusPy.DisulfideBase import Disulfide, DisulfideList
 from proteusPy.DisulfideClassManager import DisulfideClassManager
 from proteusPy.DisulfideExceptions import DisulfideParseWarning
+from proteusPy.DisulfideStats import DisulfideStats
 from proteusPy.DisulfideVisualization import DisulfideVisualization
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
@@ -46,6 +47,7 @@ from proteusPy.ProteusGlobals import (
 
 _logger = create_logger(__name__)
 
+
 try:
     # Check if running in Jupyter
     shell = get_ipython().__class__.__name__  # type: ignore
@@ -55,6 +57,9 @@ try:
         from tqdm import tqdm
 except NameError:
     from tqdm import tqdm
+
+
+# Note: The calculate_std_cutoff and calculate_percentile_cutoff functions have been moved to DisulfideStats class
 
 
 @dataclass
@@ -108,6 +113,7 @@ class DisulfideLoader:
     cutoff: float = field(default=-1.0)
     sg_cutoff: float = field(default=-1.0)
     verbose: bool = field(default=False)
+    percentile: float = field(default=-1.0)
     timestamp: float = field(default_factory=time.time)
     version: str = field(default=__version__)
 
@@ -115,14 +121,21 @@ class DisulfideLoader:
     datadir: str = field(default=DATA_DIR)
     picklefile: str = field(default=SS_PICKLE_FILE)
     subset: bool = field(default=False)
+    cutoff: float = field(default=-1.0)
+    sg_cutoff: float = field(default=-1.0)
+    verbose: bool = field(default=False)
+    percentile: float = field(default=-1.0)
 
     def __post_init__(self) -> None:
         """
         Initialize the DisulfideLoader after dataclass initialization.
         This method handles loading and processing of the disulfide data.
         """
+
+        cutoffs = {}
         old_length = new_length = 0
         full_path = Path(self.datadir) / self.picklefile
+
         if self.verbose and not self.quiet:
             _logger.info(
                 f"Reading disulfides from: {full_path}... ",
@@ -145,6 +158,25 @@ class DisulfideLoader:
 
             with open(full_path, "rb") as f:
                 sslist = pickle.load(f)
+
+                if self.percentile > 0.0:
+                    if self.percentile > 100.0:
+                        raise ValueError("Percentile must be between 0 and 100.")
+
+                    cutoffs = DisulfideStats.calculate_cutoff_from_percentile(
+                        sslist, percentile=self.percentile, verbose=self.verbose
+                    )
+
+                    ca_cutoff = cutoffs["ca_cutoff_percentile"]
+                    sg_cutoff = cutoffs["sg_cutoff_percentile"]
+                    self.cutoff = ca_cutoff
+                    self.sg_cutoff = sg_cutoff
+
+                    if self.verbose:
+                        _logger.info(
+                            f"Using percentile cutoffs: {ca_cutoff:.2f}, {sg_cutoff:.2f}"
+                        )
+
                 old_length = len(sslist)
                 filt = sslist.filter_by_distance(
                     distance=self.cutoff, distance_type="ca"
@@ -162,7 +194,7 @@ class DisulfideLoader:
                     )
 
                 old_length = new_length
-                filt = sslist.filter_by_distance(
+                filt = filt.filter_by_distance(
                     distance=self.sg_cutoff, distance_type="sg"
                 )
                 new_length = len(filt)
@@ -713,7 +745,14 @@ class DisulfideLoader:
         sslist_df["count"] = y
         return sslist_df
 
-    def save(self, savepath=DATA_DIR, subset=False, cutoff=-1.0, sg_cutoff=-1.0):
+    def save(
+        self,
+        savepath=DATA_DIR,
+        subset=False,
+        cutoff=-1.0,
+        sg_cutoff=-1.0,
+        verbose=False,
+    ):
         """
         Save a copy of the fully instantiated Loader to the specified file.
 
@@ -735,13 +774,14 @@ class DisulfideLoader:
             fname = LOADER_FNAME
 
         _fname = Path(savepath) / fname
-        if self.verbose:
-            _logger.info("Writing %s...", _fname)
+
+        if verbose:
+            _logger.info("Writing Disulfide Loader to: %s...", _fname)
 
         with open(str(_fname), "wb+") as f:
             pickle.dump(self, f)
 
-        if self.verbose:
+        if verbose:
             _logger.info("Done saving loader.")
 
     def plot_disulfides_vs_pdbid(self, cutoff=1):
@@ -912,31 +952,41 @@ def Load_PDB_SS(
     cutoff=CA_CUTOFF,
     sg_cutoff=SG_CUTOFF,
     force=False,
+    percentile=-1.0,
 ) -> DisulfideLoader:
     """
-    Load the fully instantiated Disulfide database from the specified file. Use the
-    defaults unless you are building the database by hand. *This is the function
-    used to load the built database.*
+    Load the fully instantiated Disulfide database from the specified file. This function
+    will load the pre-built database if available, or bootstrap a new loader by downloading
+    the data from Google Drive if needed. Use the provided parameters to control the loading
+    behavior, filtering cutoffs, and verbosity.
 
-    :param loadpath: Path from which to load, defaults to DATA_DIR
+    :param loadpath: Path from which to load the database; defaults to DATA_DIR.
     :type loadpath: str
-    :param verbose: Verbosity, defaults to False
+    :param verbose: If True, enables verbose logging; defaults to False.
     :type verbose: bool
-    :param subset: If True, load the subset DB, otherwise load the full database
+    :param subset: If True, loads the subset database; otherwise loads the full database.
     :type subset: bool
-    :return: The loaded Disulfide database
-    :rtype: DisulfideList
+    :param cutoff: Cα distance cutoff used to filter disulfides; defaults to CA_CUTOFF.
+    :type cutoff: float
+    :param sg_cutoff: Sγ distance cutoff used to filter disulfides; defaults to SG_CUTOFF.
+    :type sg_cutoff: float
+    :param force: If True, forces re-loading from Google Drive even if the file exists; defaults to False.
+    :type force: bool
+    :param percentile: Percentile (0-100) to compute cutoffs dynamically; if set to -1.0, the percentile method is not used.
+    :type percentile: float
+    :return: An instance of DisulfideLoader containing the loaded disulfide database.
+    :rtype: DisulfideLoader
 
     Example:
-    >>> from proteusPy import Load_PDB_SS, create_logger
-    >>> import logging
-    >>> _logger = create_logger("testing")
-    >>> _logger.setLevel(logging.WARNING)
-    >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
-    >>> PDB_SS[0]
-    <Disulfide 6dmb_203A_226A, Source: 6dmb, Resolution: 3.0 Å>
-
+        >>> from proteusPy import Load_PDB_SS, create_logger
+        >>> import logging
+        >>> _logger = create_logger("testing")
+        >>> _logger.setLevel(logging.WARNING)
+        >>> loader = Load_PDB_SS(verbose=False, subset=True)
+        >>> print(loader[0])
+        <Disulfide 6dmb_203A_226A, Source: 6dmb, Resolution: 3.0 Å>
     """
+
     # normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy
     # distribution. In that case we need to download the files for all disulfides and the subset
     # from my Google Drive. This is a one-time operation.

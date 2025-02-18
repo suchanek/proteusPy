@@ -12,11 +12,15 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from proteusPy.logger_config import create_logger
+from proteusPy.logger_config import create_logger, set_logger_level
 from proteusPy.ProteusGlobals import PBAR_COLS, Distance_DF_Cols, Torsion_DF_Cols
 from proteusPy.vector3D import calculate_bond_angle, rms_difference
 
+# toggle_stream_handler("proteusPy.Vector3D", False)
+
 _logger = create_logger(__name__)
+# set_logger_level("proteusPy.DisulfideStats", "ERROR")
+set_logger_level("proteusPy.vector3D", "ERROR")
 
 
 class DisulfideStats:
@@ -383,3 +387,127 @@ class DisulfideStats:
             _logger.setLevel(logging.WARNING)
 
         return rms_diff
+
+    # functions to calculate statistics and filter disulfide lists via pandas
+    @staticmethod
+    def calculate_std_cutoff(df, column, num_std=2):
+        """
+        Calculate cutoff based on standard deviation.
+
+        :param df: DataFrame containing the deviations.
+        :type df: pd.DataFrame
+        :param column: Column name for which to calculate the cutoff.
+        :type column: str
+        :param num_std: Number of standard deviations to use for the cutoff.
+        :type num_std: int
+        :return: Cutoff value.
+        :rtype: float
+        """
+        mean = df[column].mean()
+        std = df[column].std()
+        cutoff = mean + num_std * std
+        return cutoff
+
+    @staticmethod
+    def calculate_percentile_cutoff(df, column, percentile=95):
+        """
+        Calculate cutoff based on percentile.
+
+        :param df: DataFrame containing the deviations.
+        :type df: pd.DataFrame
+        :param column: Column name for which to calculate the cutoff.
+        :type column: str
+        :param percentile: Percentile to use for the cutoff.
+        :type percentile: int
+        :return: Cutoff value.
+        :rtype: float
+        """
+        cutoff = np.percentile(df[column].dropna(), percentile)
+        return cutoff
+
+    @staticmethod
+    def calculate_cutoff_from_percentile(
+        sslist, percentile: float, verbose: bool = False
+    ) -> dict:
+        """
+        Calculate the cutoff values for the standard deviation and percentile methods.
+
+        :return: Dictionary containing the cutoff values for the standard deviation and percentile methods.
+        :rtype: dict
+        """
+        from scipy.stats import norm
+
+        # Set some parameters for the standard deviation and percentile methods
+        std = 3.0
+        dev_df = sslist.create_deviation_dataframe(verbose)
+
+        # Calculate cutoffs using DisulfideStats methods
+        distance_cutoff_std = DisulfideStats.calculate_std_cutoff(
+            dev_df, "Bondlength_Deviation", num_std=std
+        )
+        angle_cutoff_std = DisulfideStats.calculate_std_cutoff(
+            dev_df, "Angle_Deviation", num_std=std
+        )
+        ca_cutoff_std = DisulfideStats.calculate_std_cutoff(
+            dev_df, "Ca_Distance", num_std=std
+        )
+        sg_cutoff_std = DisulfideStats.calculate_std_cutoff(
+            dev_df, "Sg_Distance", num_std=std
+        )
+
+        # Percentile Method
+        distance_cutoff_percentile = DisulfideStats.calculate_percentile_cutoff(
+            dev_df, "Bondlength_Deviation", percentile=percentile
+        )
+        angle_cutoff_percentile = DisulfideStats.calculate_percentile_cutoff(
+            dev_df, "Angle_Deviation", percentile=percentile
+        )
+        ca_cutoff_percentile = DisulfideStats.calculate_percentile_cutoff(
+            dev_df, "Ca_Distance", percentile=percentile
+        )
+        sg_cutoff_percentile = DisulfideStats.calculate_percentile_cutoff(
+            dev_df, "Sg_Distance", percentile=percentile
+        )
+
+        if verbose:
+            print(
+                f"Bond Length Deviation Cutoff ({std:.2f} Std Dev): {distance_cutoff_std:.2f}"
+            )
+            print(f"Angle Deviation Cutoff ({std:.2f} Std Dev): {angle_cutoff_std:.2f}")
+            print(f"Ca Distance Cutoff ({std:.2f} Std Dev): {ca_cutoff_std:.2f}")
+            print(f"Sg Distance Cutoff ({std:.2f} Std Dev): {sg_cutoff_std:.2f}")
+
+            print(
+                f"\nBond Length Deviation Cutoff ({percentile:.2f}th Percentile): {distance_cutoff_percentile:.2f}"
+            )
+            print(
+                f"Angle Deviation Cutoff ({percentile:.2f}th Percentile): {angle_cutoff_percentile:.2f}"
+            )
+            print(
+                f"Ca Distance Cutoff ({percentile:.2f}th Percentile): {ca_cutoff_percentile:.2f}"
+            )
+            print(
+                f"Sg Distance Cutoff ({percentile:.2f}th Percentile): {sg_cutoff_percentile:.2f}"
+            )
+
+        # Calculate the Z-score for the percentile
+        z_score = norm.ppf(percentile / 100.0)
+
+        if verbose:
+            print(
+                f"The Z-score for the {percentile}th percentile is approximately {z_score:.3f}"
+            )
+
+        return {
+            "distance_cutoff_std": distance_cutoff_std,
+            "angle_cutoff_std": angle_cutoff_std,
+            "ca_cutoff_std": ca_cutoff_std,
+            "sg_cutoff_std": sg_cutoff_std,
+            "distance_cutoff_percentile": distance_cutoff_percentile,
+            "angle_cutoff_percentile": angle_cutoff_percentile,
+            "ca_cutoff_percentile": ca_cutoff_percentile,
+            "sg_cutoff_percentile": sg_cutoff_percentile,
+        }
+
+
+# EOF
