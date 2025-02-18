@@ -1015,45 +1015,6 @@ def get_theme() -> str:
     return theme_getters.get(system, lambda: "light")()
 
 
-# functions to calculate statistics and filter disulfide lists via pandas
-
-
-def calculate_std_cutoff(df, column, num_std=2):
-    """
-    Calculate cutoff based on standard deviation.
-
-    :param df: DataFrame containing the deviations.
-    :type df: pd.DataFrame
-    :param column: Column name for which to calculate the cutoff.
-    :type column: str
-    :param num_std: Number of standard deviations to use for the cutoff.
-    :type num_std: int
-    :return: Cutoff value.
-    :rtype: float
-    """
-    mean = df[column].mean()
-    std = df[column].std()
-    cutoff = mean + num_std * std
-    return cutoff
-
-
-def calculate_percentile_cutoff(df, column, percentile=95):
-    """
-    Calculate cutoff based on percentile.
-
-    :param df: DataFrame containing the deviations.
-    :type df: pd.DataFrame
-    :param column: Column name for which to calculate the cutoff.
-    :type column: str
-    :param percentile: Percentile to use for the cutoff.
-    :type percentile: int
-    :return: Cutoff value.
-    :rtype: float
-    """
-    cutoff = np.percentile(df[column].dropna(), percentile)
-    return cutoff
-
-
 def save_list_to_file(input_list, filename):
     """
     Save the input list to a file using pickle.
