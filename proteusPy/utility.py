@@ -147,7 +147,7 @@ def extract_firstchain_ss(sslist, verbose=False):
     chain = ""
     chainlist = []
     pc = dc = ""
-    res = DisulfideList([], sslist.id)
+    res = DisulfideList([], sslist.pdb_id)
     xchain = 0
 
     # build list of chains

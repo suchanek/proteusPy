@@ -48,12 +48,7 @@ from proteusPy.ssparser import (
 )
 from proteusPy.turtle3D import ORIENT_SIDECHAIN, Turtle3D
 from proteusPy.utility import set_pyvista_theme
-from proteusPy.vector3D import (
-    Vector3D,
-    calc_dihedral,
-    distance3d,
-    rms_difference,
-)
+from proteusPy.vector3D import Vector3D, calc_dihedral, distance3d
 
 np.set_printoptions(suppress=True)
 
@@ -132,11 +127,11 @@ class DisulfideList(UserList):
         self.data[index] = self.validate_ss(item)
 
     def append(self, item):
-        """Append the list with item"""
+        """Append the list with a Disulfide"""
         self.data.append(self.validate_ss(item))
 
     def extend(self, other):
-        """Extend the Disulfide list with other"""
+        """Extend the Disulfide list with another Disulfide"""
         if isinstance(other, type(self)):
             self.data.extend(other)
         else:
@@ -150,16 +145,6 @@ class DisulfideList(UserList):
     def length(self):
         """Return the length of the list"""
         return len(self.data)
-
-    @property
-    def id(self):
-        """PDB ID of the list"""
-        return self.pdb_id
-
-    @id.setter
-    def id(self, value):
-        """Set the DisulfideList ID"""
-        self.pdb_id = value
 
     @property
     def resolution(self) -> float:
