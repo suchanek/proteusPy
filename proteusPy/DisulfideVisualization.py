@@ -669,7 +669,7 @@ class DisulfideVisualization:
             return
 
         set_plotly_theme(theme)
-        title = f"{sslist.id}: {len(sslist)} members"
+        title = f"{sslist.pdb_id}: {len(sslist)} members"
 
         tor_vals, dist_vals = sslist.calculate_torsion_statistics()
 

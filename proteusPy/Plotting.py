@@ -4,9 +4,14 @@ Various utility functions for disulfide bond analysis.
 
 import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
+
+from proteusPy.angle_annotation import AngleAnnotation
+
+DPI = 300
 
 # uncomment the following line to set the default renderer to 'png'
 # pio.renderers.default = "png"  # or 'svg'
@@ -69,7 +74,7 @@ def highlight_worst_structures(df, top_n=10, sample_percent=10):
         hovertemplate="<b>PDB ID: %{customdata[0]}</b><br>Bondlength Deviation: %{customdata[1]:.2f}<br>Angle Deviation: %{customdata[2]:.2f}<extra></extra>",
         name="Worst Structures",
     )
-    for i, row in worst_structures.iterrows():
+    for _, row in worst_structures.iterrows():
         fig.add_annotation(
             x=row["Bondlength_Deviation"],
             y=row["Angle_Deviation"],
