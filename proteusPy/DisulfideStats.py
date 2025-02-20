@@ -2,7 +2,7 @@
 This module provides statistical analysis functionality for disulfide bonds in the proteusPy package.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-02-17 00:53:26
+Last revision: 2025-02-19 23:17:44
 """
 
 import logging
@@ -19,7 +19,6 @@ from proteusPy.vector3D import calculate_bond_angle, rms_difference
 # toggle_stream_handler("proteusPy.Vector3D", False)
 
 _logger = create_logger(__name__)
-# set_logger_level("proteusPy.DisulfideStats", "ERROR")
 set_logger_level("proteusPy.vector3D", "ERROR")
 
 

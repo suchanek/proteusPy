@@ -5,11 +5,12 @@ convey logging information at a fine-grained level. The functions are completely
 independent of the application and can be used in any Python project.
 
 Author: Eric G. Suchanek, PhD
-Last updated 2024-11-19 -egs-
+Last updated 2025-02-19 23:43:45 -egs-
 """
 
 import logging
 from pathlib import Path
+
 DEFAULT_LOG_LEVEL = logging.WARNING
 
 
@@ -45,10 +46,21 @@ def disable_stream_handlers_for_namespace(namespace: str):
     :param namespace: The namespace whose stream handlers should be disabled.
     :type namespace: str
     """
+    # First check the specific logger for the namespace
+    logger = logging.getLogger(namespace)
+    for handler in logger.handlers[
+        :
+    ]:  # Create a copy of the list to safely modify during iteration
+        if isinstance(handler, logging.StreamHandler):
+            logger.removeHandler(handler)
+
+    # Then check all loggers in the manager's dictionary that start with the namespace
     for logger_name in logging.Logger.manager.loggerDict:
         if logger_name.startswith(namespace):
             _logger = logging.getLogger(logger_name)
-            for handler in _logger.handlers:
+            for handler in _logger.handlers[
+                :
+            ]:  # Create a copy of the list to safely modify during iteration
                 if isinstance(handler, logging.StreamHandler):
                     _logger.removeHandler(handler)
 
@@ -56,16 +68,22 @@ def disable_stream_handlers_for_namespace(namespace: str):
 def configure_master_logger(
     log_file: str,
     file_path: str = "~/logs",
-    log_level: int = logging.DEBUG,
-):
+    log_level: int = logging.ERROR,
+    disabled: bool = False,
+) -> logging.Logger:
     """
     Configures the root logger to write to a specified log file.
 
-    Args:
-        log_file (str): Name of the log file.
-        file_path (str): Path to the directory where log files will be stored. Defaults to '~/logs'.
-        max_bytes (int): Maximum size of the log file before rotating.
-        backup_count (int): Number of backup files to keep.
+    :param log_file: Name of the log file.
+    :type log_file: str
+    :param file_path: Path to the directory where log files will be stored. Defaults to '~/logs'.
+    :type file_path: str
+    :param log_level: The logging level to set. Defaults to logging.ERROR.
+    :type log_level: int
+    :param disabled: If True, the logger will be disabled. Defaults to False.
+    :type disabled: bool
+    :return: The configured root logger.
+    :rtype: logging.Logger
     """
     # Expand user path
     file_path = Path(file_path).expanduser()
@@ -94,9 +112,15 @@ def configure_master_logger(
     handler.setFormatter(formatter)
 
     root_logger.addHandler(handler)
-    root_logger.disabled = False  # Enable the root logger
     for handler in root_logger.handlers:
         handler.setLevel(log_level)
+
+    if disabled:
+        root_logger.disabled = True
+    else:
+        root_logger.disabled = False  # Enable the root logger
+
+    return root_logger
 
 
 def create_logger(

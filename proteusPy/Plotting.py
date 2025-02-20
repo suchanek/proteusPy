@@ -1,5 +1,19 @@
 """
-Various utility functions for disulfide bond analysis.
+This module provides various utility functions for disulfide bond analysis, 
+including functions for highlighting worst-case structures based on distance 
+and angle deviations, as well as generating pie charts to visualize disulfide 
+torsional classes.
+
+Functions:
+- highlight_worst_structures: Highlights the worst structures for distance and angle deviations and annotates their names.
+- plot_class_chart: Creates a Matplotlib pie chart with segments of equal size to represent disulfide torsional classes.
+
+Dependencies:
+- matplotlib
+- numpy
+- pandas
+
+Last Revision: 2025-02-19 23:16:31 -egs-
 """
 
 import matplotlib
@@ -7,7 +21,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plotly.express as px
-import plotly.io as pio
 
 from proteusPy.angle_annotation import AngleAnnotation
 
@@ -112,9 +125,11 @@ def plot_class_chart(classes: int) -> None:
         None
 
     Example:
-    >>> plot_class_chart(4)
+    >>> from proteusPy.Plotting import plot_class_chart
+    >>> plot_class_chart(8)
 
-    This will create a pie chart with 4 equal segments.
+    This will create a pie chart with 8 equal segments, and represents
+    the layout of the disulfide octant class definition.
     """
 
     matplotlib.use("TkAgg")  # or 'Qt5Agg', 'MacOSX', etc.
@@ -181,3 +196,11 @@ def plot_class_chart(classes: int) -> None:
 
     # Show the chart
     fig.show()
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
+
+# End of file

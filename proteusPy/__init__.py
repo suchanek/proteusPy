@@ -63,7 +63,6 @@ from .atoms import (
 from .DisulfideBase import (
     Disulfide,
     DisulfideList,
-    Initialize_Disulfide_From_Coords,
     disulfide_energy_function,
     minimize_ss_energy,
 )
@@ -81,7 +80,11 @@ from .DisulfideExceptions import (
     DisulfideIOException,
     DisulfideParseWarning,
 )
-from .DisulfideIO import extract_disulfide, load_disulfides_from_id
+from .DisulfideIO import (
+    Initialize_Disulfide_From_Coords,
+    extract_disulfide,
+    load_disulfides_from_id,
+)
 from .DisulfideLoader import Bootstrap_PDB_SS, DisulfideLoader, Load_PDB_SS
 from .DisulfideStats import DisulfideStats
 from .DisulfideVisualization import DisulfideVisualization
