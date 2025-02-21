@@ -13,6 +13,7 @@ Last Modification: 2025-02-14 08:51:33
 # pylint: disable=C0301 # line too long
 # pylint: disable=C0302 # too many lines in module
 # pylint: disable=W0212 # access to protected member
+# pylint: disable=W0237 # renaming index
 # pylint: disable=W0613 # unused argument
 # pylint: disable=C2801 # no dunder method
 

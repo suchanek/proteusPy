@@ -1,3 +1,7 @@
+"""Module for testing DisulfideList class."""
+
+# pylint: disable=C0103
+
 import numpy as np
 import pytest
 
