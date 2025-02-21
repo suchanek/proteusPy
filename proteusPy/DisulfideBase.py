@@ -1,9 +1,13 @@
 """
-This module, *Disulfide*, is part of the proteusPy package, a Python package for 
-the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
-It represents the core of the current implementation of *proteusPy*.
+This module, *DisulfideBase*, is part of the proteusPy package, a Python package for 
+the analysis and modeling of protein structures with an emphasis on disulfide bonds.
+It represents the core of the current implementation of *proteusPy* and includes the
+``Disulfide`` and ``DisulfideList`` classes, which provide a Python object and methods representing
+a physical disulfide bond either extracted from the RCSB protein databank or built using the
+``proteusPy.Turtle3D`` class.
 
-This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
+This work is based on the original C/C++ implementation by Eric G. Suchanek.
+
 Author: Eric G. Suchanek, PhD
 Last Modification: 2025-02-21 16:33:47
 """
@@ -28,7 +32,6 @@ from itertools import combinations
 from math import cos
 
 import numpy as np
-import pyvista as pv
 from scipy.optimize import minimize
 
 from proteusPy.DisulfideClassManager import DisulfideClassManager
@@ -261,9 +264,14 @@ class DisulfideList(UserList):
 
     @property
     def average_conformation(self):
-        """Average conformation [x1, x2, x3, x4, x5]"""
+        """Average conformation [x1, x2, x3, x4, x5] handling circular angles properly"""
         sslist = self.data
-        return np.mean([ss.torsion_array for ss in sslist], axis=0)
+        torsions = np.array([ss.torsion_array for ss in sslist])
+        # Calculate circular mean for each torsion angle separately
+        avg_torsions = np.array(
+            [DisulfideStats.circular_mean(torsions[:, i]) for i in range(5)]
+        )
+        return avg_torsions
 
     @property
     def average_torsion_distance(self):
@@ -1840,18 +1848,6 @@ class Disulfide:
         DisulfideVisualization.screenshot(
             self, single, style, fname, verbose, shadows, light
         )
-
-    def save_meshes_as_stl(self, meshes, filename) -> None:
-        """Save a list of meshes as a single STL file.
-
-        Args:
-            meshes (list): List of pyvista mesh objects to save.
-            filename (str): Path to save the STL file to.
-        """
-        merged_mesh = pv.UnstructuredGrid()
-        for mesh in meshes:
-            merged_mesh += mesh
-        merged_mesh.save(filename)
 
     def set_positions(
         self,

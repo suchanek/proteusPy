@@ -83,13 +83,7 @@ def test_average_conformation(pdb_5rsa):
     :type pdb_5rsa: DisulfideList
     """
     assert pdb_5rsa.average_conformation == pytest.approx(
-        [
-            -61.87699859,
-            -66.80281181,
-            -34.91612161,
-            -38.36943922,
-            -63.74957406,
-        ],
+        [-61.87715271, -66.73547088, -87.55935525, -72.51359397, -63.74599715],
         rel=1e-5,
     )
 
