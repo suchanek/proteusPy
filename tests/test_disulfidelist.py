@@ -488,8 +488,6 @@ def test_same_chains(pdb_5rsa):
     same_chain_ss = Disulfide("test")
     same_chain_ss.proximal_chain = first_ss.proximal_chain
     same_chain_ss.distal_chain = first_ss.proximal_chain
-    # Create list and test
-    test_list = DisulfideList([same_chain_ss], "test")
     assert same_chain_ss.same_chains()
 
 
