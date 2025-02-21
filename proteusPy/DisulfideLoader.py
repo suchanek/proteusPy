@@ -952,7 +952,6 @@ def Load_PDB_SS(
     cutoff=CA_CUTOFF,
     sg_cutoff=SG_CUTOFF,
     force=False,
-    percentile=-1.0,
 ) -> DisulfideLoader:
     """
     Load the fully instantiated Disulfide database from the specified file. This function

@@ -1187,162 +1187,161 @@ This work is based on the original C/C++ implementation by Eric G. Suchanek. </p
 </span><span id="L-952"><a href="#L-952"><span class="linenos"> 952</span></a>    <span class="n">cutoff</span><span class="o">=</span><span class="n">CA_CUTOFF</span><span class="p">,</span>
 </span><span id="L-953"><a href="#L-953"><span class="linenos"> 953</span></a>    <span class="n">sg_cutoff</span><span class="o">=</span><span class="n">SG_CUTOFF</span><span class="p">,</span>
 </span><span id="L-954"><a href="#L-954"><span class="linenos"> 954</span></a>    <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-</span><span id="L-955"><a href="#L-955"><span class="linenos"> 955</span></a>    <span class="n">percentile</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span>
-</span><span id="L-956"><a href="#L-956"><span class="linenos"> 956</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DisulfideLoader</span><span class="p">:</span>
-</span><span id="L-957"><a href="#L-957"><span class="linenos"> 957</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-958"><a href="#L-958"><span class="linenos"> 958</span></a><span class="sd">    Load the fully instantiated Disulfide database from the specified file. This function</span>
-</span><span id="L-959"><a href="#L-959"><span class="linenos"> 959</span></a><span class="sd">    will load the pre-built database if available, or bootstrap a new loader by downloading</span>
-</span><span id="L-960"><a href="#L-960"><span class="linenos"> 960</span></a><span class="sd">    the data from Google Drive if needed. Use the provided parameters to control the loading</span>
-</span><span id="L-961"><a href="#L-961"><span class="linenos"> 961</span></a><span class="sd">    behavior, filtering cutoffs, and verbosity.</span>
-</span><span id="L-962"><a href="#L-962"><span class="linenos"> 962</span></a>
-</span><span id="L-963"><a href="#L-963"><span class="linenos"> 963</span></a><span class="sd">    :param loadpath: Path from which to load the database; defaults to DATA_DIR.</span>
-</span><span id="L-964"><a href="#L-964"><span class="linenos"> 964</span></a><span class="sd">    :type loadpath: str</span>
-</span><span id="L-965"><a href="#L-965"><span class="linenos"> 965</span></a><span class="sd">    :param verbose: If True, enables verbose logging; defaults to False.</span>
-</span><span id="L-966"><a href="#L-966"><span class="linenos"> 966</span></a><span class="sd">    :type verbose: bool</span>
-</span><span id="L-967"><a href="#L-967"><span class="linenos"> 967</span></a><span class="sd">    :param subset: If True, loads the subset database; otherwise loads the full database.</span>
-</span><span id="L-968"><a href="#L-968"><span class="linenos"> 968</span></a><span class="sd">    :type subset: bool</span>
-</span><span id="L-969"><a href="#L-969"><span class="linenos"> 969</span></a><span class="sd">    :param cutoff: Cα distance cutoff used to filter disulfides; defaults to CA_CUTOFF.</span>
-</span><span id="L-970"><a href="#L-970"><span class="linenos"> 970</span></a><span class="sd">    :type cutoff: float</span>
-</span><span id="L-971"><a href="#L-971"><span class="linenos"> 971</span></a><span class="sd">    :param sg_cutoff: Sγ distance cutoff used to filter disulfides; defaults to SG_CUTOFF.</span>
-</span><span id="L-972"><a href="#L-972"><span class="linenos"> 972</span></a><span class="sd">    :type sg_cutoff: float</span>
-</span><span id="L-973"><a href="#L-973"><span class="linenos"> 973</span></a><span class="sd">    :param force: If True, forces re-loading from Google Drive even if the file exists; defaults to False.</span>
-</span><span id="L-974"><a href="#L-974"><span class="linenos"> 974</span></a><span class="sd">    :type force: bool</span>
-</span><span id="L-975"><a href="#L-975"><span class="linenos"> 975</span></a><span class="sd">    :param percentile: Percentile (0-100) to compute cutoffs dynamically; if set to -1.0, the percentile method is not used.</span>
-</span><span id="L-976"><a href="#L-976"><span class="linenos"> 976</span></a><span class="sd">    :type percentile: float</span>
-</span><span id="L-977"><a href="#L-977"><span class="linenos"> 977</span></a><span class="sd">    :return: An instance of DisulfideLoader containing the loaded disulfide database.</span>
-</span><span id="L-978"><a href="#L-978"><span class="linenos"> 978</span></a><span class="sd">    :rtype: DisulfideLoader</span>
-</span><span id="L-979"><a href="#L-979"><span class="linenos"> 979</span></a>
-</span><span id="L-980"><a href="#L-980"><span class="linenos"> 980</span></a><span class="sd">    Example:</span>
-</span><span id="L-981"><a href="#L-981"><span class="linenos"> 981</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy import Load_PDB_SS, create_logger</span>
-</span><span id="L-982"><a href="#L-982"><span class="linenos"> 982</span></a><span class="sd">        &gt;&gt;&gt; import logging</span>
-</span><span id="L-983"><a href="#L-983"><span class="linenos"> 983</span></a><span class="sd">        &gt;&gt;&gt; _logger = create_logger(&quot;testing&quot;)</span>
-</span><span id="L-984"><a href="#L-984"><span class="linenos"> 984</span></a><span class="sd">        &gt;&gt;&gt; _logger.setLevel(logging.WARNING)</span>
-</span><span id="L-985"><a href="#L-985"><span class="linenos"> 985</span></a><span class="sd">        &gt;&gt;&gt; loader = Load_PDB_SS(verbose=False, subset=True)</span>
-</span><span id="L-986"><a href="#L-986"><span class="linenos"> 986</span></a><span class="sd">        &gt;&gt;&gt; print(loader[0])</span>
-</span><span id="L-987"><a href="#L-987"><span class="linenos"> 987</span></a><span class="sd">        &lt;Disulfide 6dmb_203A_226A, Source: 6dmb, Resolution: 3.0 Å&gt;</span>
-</span><span id="L-988"><a href="#L-988"><span class="linenos"> 988</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-989"><a href="#L-989"><span class="linenos"> 989</span></a>
-</span><span id="L-990"><a href="#L-990"><span class="linenos"> 990</span></a>    <span class="c1"># normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy</span>
-</span><span id="L-991"><a href="#L-991"><span class="linenos"> 991</span></a>    <span class="c1"># distribution. In that case we need to download the files for all disulfides and the subset</span>
-</span><span id="L-992"><a href="#L-992"><span class="linenos"> 992</span></a>    <span class="c1"># from my Google Drive. This is a one-time operation.</span>
-</span><span id="L-993"><a href="#L-993"><span class="linenos"> 993</span></a>
-</span><span id="L-994"><a href="#L-994"><span class="linenos"> 994</span></a>    <span class="n">_fname_sub</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">loadpath</span><span class="p">)</span> <span class="o">/</span> <span class="n">LOADER_SUBSET_FNAME</span>
-</span><span id="L-995"><a href="#L-995"><span class="linenos"> 995</span></a>    <span class="n">_fname_all</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">loadpath</span><span class="p">)</span> <span class="o">/</span> <span class="n">LOADER_FNAME</span>
-</span><span id="L-996"><a href="#L-996"><span class="linenos"> 996</span></a>    <span class="n">_fpath</span> <span class="o">=</span> <span class="n">_fname_sub</span> <span class="k">if</span> <span class="n">subset</span> <span class="k">else</span> <span class="n">_fname_all</span>
-</span><span id="L-997"><a href="#L-997"><span class="linenos"> 997</span></a>
-</span><span id="L-998"><a href="#L-998"><span class="linenos"> 998</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">_fpath</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="n">force</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-</span><span id="L-999"><a href="#L-999"><span class="linenos"> 999</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-1000"><a href="#L-1000"><span class="linenos">1000</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Bootstrapping new loader: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">_fpath</span><span class="p">)</span><span class="si">}</span><span class="s2">... &quot;</span><span class="p">)</span>
-</span><span id="L-1001"><a href="#L-1001"><span class="linenos">1001</span></a>
-</span><span id="L-1002"><a href="#L-1002"><span class="linenos">1002</span></a>        <span class="n">loader</span> <span class="o">=</span> <span class="n">Bootstrap_PDB_SS</span><span class="p">(</span>
-</span><span id="L-1003"><a href="#L-1003"><span class="linenos">1003</span></a>            <span class="n">loadpath</span><span class="o">=</span><span class="n">loadpath</span><span class="p">,</span>
-</span><span id="L-1004"><a href="#L-1004"><span class="linenos">1004</span></a>            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-</span><span id="L-1005"><a href="#L-1005"><span class="linenos">1005</span></a>            <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">,</span>
-</span><span id="L-1006"><a href="#L-1006"><span class="linenos">1006</span></a>            <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
-</span><span id="L-1007"><a href="#L-1007"><span class="linenos">1007</span></a>            <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
-</span><span id="L-1008"><a href="#L-1008"><span class="linenos">1008</span></a>            <span class="n">sg_cutoff</span><span class="o">=</span><span class="n">sg_cutoff</span><span class="p">,</span>
-</span><span id="L-1009"><a href="#L-1009"><span class="linenos">1009</span></a>        <span class="p">)</span>
-</span><span id="L-1010"><a href="#L-1010"><span class="linenos">1010</span></a>        <span class="n">loader</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
-</span><span id="L-1011"><a href="#L-1011"><span class="linenos">1011</span></a>            <span class="n">savepath</span><span class="o">=</span><span class="n">loadpath</span><span class="p">,</span>
-</span><span id="L-1012"><a href="#L-1012"><span class="linenos">1012</span></a>            <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">,</span>
-</span><span id="L-1013"><a href="#L-1013"><span class="linenos">1013</span></a>            <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
-</span><span id="L-1014"><a href="#L-1014"><span class="linenos">1014</span></a>            <span class="n">sg_cutoff</span><span class="o">=</span><span class="n">sg_cutoff</span><span class="p">,</span>
-</span><span id="L-1015"><a href="#L-1015"><span class="linenos">1015</span></a>        <span class="p">)</span>
-</span><span id="L-1016"><a href="#L-1016"><span class="linenos">1016</span></a>        <span class="k">return</span> <span class="n">loader</span>
-</span><span id="L-1017"><a href="#L-1017"><span class="linenos">1017</span></a>
-</span><span id="L-1018"><a href="#L-1018"><span class="linenos">1018</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-1019"><a href="#L-1019"><span class="linenos">1019</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reading disulfides from: </span><span class="si">%s</span><span class="s2">...&quot;</span><span class="p">,</span> <span class="n">_fpath</span><span class="p">)</span>
-</span><span id="L-1020"><a href="#L-1020"><span class="linenos">1020</span></a>
-</span><span id="L-1021"><a href="#L-1021"><span class="linenos">1021</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_fpath</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="L-1022"><a href="#L-1022"><span class="linenos">1022</span></a>        <span class="n">loader</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-</span><span id="L-1023"><a href="#L-1023"><span class="linenos">1023</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-1024"><a href="#L-1024"><span class="linenos">1024</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Done reading disulfides from: </span><span class="si">%s</span><span class="s2">...&quot;</span><span class="p">,</span> <span class="n">_fpath</span><span class="p">)</span>
-</span><span id="L-1025"><a href="#L-1025"><span class="linenos">1025</span></a>        <span class="n">loader</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
-</span><span id="L-1026"><a href="#L-1026"><span class="linenos">1026</span></a>
-</span><span id="L-1027"><a href="#L-1027"><span class="linenos">1027</span></a>    <span class="k">return</span> <span class="n">loader</span>
+</span><span id="L-955"><a href="#L-955"><span class="linenos"> 955</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DisulfideLoader</span><span class="p">:</span>
+</span><span id="L-956"><a href="#L-956"><span class="linenos"> 956</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-957"><a href="#L-957"><span class="linenos"> 957</span></a><span class="sd">    Load the fully instantiated Disulfide database from the specified file. This function</span>
+</span><span id="L-958"><a href="#L-958"><span class="linenos"> 958</span></a><span class="sd">    will load the pre-built database if available, or bootstrap a new loader by downloading</span>
+</span><span id="L-959"><a href="#L-959"><span class="linenos"> 959</span></a><span class="sd">    the data from Google Drive if needed. Use the provided parameters to control the loading</span>
+</span><span id="L-960"><a href="#L-960"><span class="linenos"> 960</span></a><span class="sd">    behavior, filtering cutoffs, and verbosity.</span>
+</span><span id="L-961"><a href="#L-961"><span class="linenos"> 961</span></a>
+</span><span id="L-962"><a href="#L-962"><span class="linenos"> 962</span></a><span class="sd">    :param loadpath: Path from which to load the database; defaults to DATA_DIR.</span>
+</span><span id="L-963"><a href="#L-963"><span class="linenos"> 963</span></a><span class="sd">    :type loadpath: str</span>
+</span><span id="L-964"><a href="#L-964"><span class="linenos"> 964</span></a><span class="sd">    :param verbose: If True, enables verbose logging; defaults to False.</span>
+</span><span id="L-965"><a href="#L-965"><span class="linenos"> 965</span></a><span class="sd">    :type verbose: bool</span>
+</span><span id="L-966"><a href="#L-966"><span class="linenos"> 966</span></a><span class="sd">    :param subset: If True, loads the subset database; otherwise loads the full database.</span>
+</span><span id="L-967"><a href="#L-967"><span class="linenos"> 967</span></a><span class="sd">    :type subset: bool</span>
+</span><span id="L-968"><a href="#L-968"><span class="linenos"> 968</span></a><span class="sd">    :param cutoff: Cα distance cutoff used to filter disulfides; defaults to CA_CUTOFF.</span>
+</span><span id="L-969"><a href="#L-969"><span class="linenos"> 969</span></a><span class="sd">    :type cutoff: float</span>
+</span><span id="L-970"><a href="#L-970"><span class="linenos"> 970</span></a><span class="sd">    :param sg_cutoff: Sγ distance cutoff used to filter disulfides; defaults to SG_CUTOFF.</span>
+</span><span id="L-971"><a href="#L-971"><span class="linenos"> 971</span></a><span class="sd">    :type sg_cutoff: float</span>
+</span><span id="L-972"><a href="#L-972"><span class="linenos"> 972</span></a><span class="sd">    :param force: If True, forces re-loading from Google Drive even if the file exists; defaults to False.</span>
+</span><span id="L-973"><a href="#L-973"><span class="linenos"> 973</span></a><span class="sd">    :type force: bool</span>
+</span><span id="L-974"><a href="#L-974"><span class="linenos"> 974</span></a><span class="sd">    :param percentile: Percentile (0-100) to compute cutoffs dynamically; if set to -1.0, the percentile method is not used.</span>
+</span><span id="L-975"><a href="#L-975"><span class="linenos"> 975</span></a><span class="sd">    :type percentile: float</span>
+</span><span id="L-976"><a href="#L-976"><span class="linenos"> 976</span></a><span class="sd">    :return: An instance of DisulfideLoader containing the loaded disulfide database.</span>
+</span><span id="L-977"><a href="#L-977"><span class="linenos"> 977</span></a><span class="sd">    :rtype: DisulfideLoader</span>
+</span><span id="L-978"><a href="#L-978"><span class="linenos"> 978</span></a>
+</span><span id="L-979"><a href="#L-979"><span class="linenos"> 979</span></a><span class="sd">    Example:</span>
+</span><span id="L-980"><a href="#L-980"><span class="linenos"> 980</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy import Load_PDB_SS, create_logger</span>
+</span><span id="L-981"><a href="#L-981"><span class="linenos"> 981</span></a><span class="sd">        &gt;&gt;&gt; import logging</span>
+</span><span id="L-982"><a href="#L-982"><span class="linenos"> 982</span></a><span class="sd">        &gt;&gt;&gt; _logger = create_logger(&quot;testing&quot;)</span>
+</span><span id="L-983"><a href="#L-983"><span class="linenos"> 983</span></a><span class="sd">        &gt;&gt;&gt; _logger.setLevel(logging.WARNING)</span>
+</span><span id="L-984"><a href="#L-984"><span class="linenos"> 984</span></a><span class="sd">        &gt;&gt;&gt; loader = Load_PDB_SS(verbose=False, subset=True)</span>
+</span><span id="L-985"><a href="#L-985"><span class="linenos"> 985</span></a><span class="sd">        &gt;&gt;&gt; print(loader[0])</span>
+</span><span id="L-986"><a href="#L-986"><span class="linenos"> 986</span></a><span class="sd">        &lt;Disulfide 6dmb_203A_226A, Source: 6dmb, Resolution: 3.0 Å&gt;</span>
+</span><span id="L-987"><a href="#L-987"><span class="linenos"> 987</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-988"><a href="#L-988"><span class="linenos"> 988</span></a>
+</span><span id="L-989"><a href="#L-989"><span class="linenos"> 989</span></a>    <span class="c1"># normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy</span>
+</span><span id="L-990"><a href="#L-990"><span class="linenos"> 990</span></a>    <span class="c1"># distribution. In that case we need to download the files for all disulfides and the subset</span>
+</span><span id="L-991"><a href="#L-991"><span class="linenos"> 991</span></a>    <span class="c1"># from my Google Drive. This is a one-time operation.</span>
+</span><span id="L-992"><a href="#L-992"><span class="linenos"> 992</span></a>
+</span><span id="L-993"><a href="#L-993"><span class="linenos"> 993</span></a>    <span class="n">_fname_sub</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">loadpath</span><span class="p">)</span> <span class="o">/</span> <span class="n">LOADER_SUBSET_FNAME</span>
+</span><span id="L-994"><a href="#L-994"><span class="linenos"> 994</span></a>    <span class="n">_fname_all</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">loadpath</span><span class="p">)</span> <span class="o">/</span> <span class="n">LOADER_FNAME</span>
+</span><span id="L-995"><a href="#L-995"><span class="linenos"> 995</span></a>    <span class="n">_fpath</span> <span class="o">=</span> <span class="n">_fname_sub</span> <span class="k">if</span> <span class="n">subset</span> <span class="k">else</span> <span class="n">_fname_all</span>
+</span><span id="L-996"><a href="#L-996"><span class="linenos"> 996</span></a>
+</span><span id="L-997"><a href="#L-997"><span class="linenos"> 997</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">_fpath</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="n">force</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+</span><span id="L-998"><a href="#L-998"><span class="linenos"> 998</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="L-999"><a href="#L-999"><span class="linenos"> 999</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Bootstrapping new loader: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">_fpath</span><span class="p">)</span><span class="si">}</span><span class="s2">... &quot;</span><span class="p">)</span>
+</span><span id="L-1000"><a href="#L-1000"><span class="linenos">1000</span></a>
+</span><span id="L-1001"><a href="#L-1001"><span class="linenos">1001</span></a>        <span class="n">loader</span> <span class="o">=</span> <span class="n">Bootstrap_PDB_SS</span><span class="p">(</span>
+</span><span id="L-1002"><a href="#L-1002"><span class="linenos">1002</span></a>            <span class="n">loadpath</span><span class="o">=</span><span class="n">loadpath</span><span class="p">,</span>
+</span><span id="L-1003"><a href="#L-1003"><span class="linenos">1003</span></a>            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+</span><span id="L-1004"><a href="#L-1004"><span class="linenos">1004</span></a>            <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">,</span>
+</span><span id="L-1005"><a href="#L-1005"><span class="linenos">1005</span></a>            <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
+</span><span id="L-1006"><a href="#L-1006"><span class="linenos">1006</span></a>            <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+</span><span id="L-1007"><a href="#L-1007"><span class="linenos">1007</span></a>            <span class="n">sg_cutoff</span><span class="o">=</span><span class="n">sg_cutoff</span><span class="p">,</span>
+</span><span id="L-1008"><a href="#L-1008"><span class="linenos">1008</span></a>        <span class="p">)</span>
+</span><span id="L-1009"><a href="#L-1009"><span class="linenos">1009</span></a>        <span class="n">loader</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+</span><span id="L-1010"><a href="#L-1010"><span class="linenos">1010</span></a>            <span class="n">savepath</span><span class="o">=</span><span class="n">loadpath</span><span class="p">,</span>
+</span><span id="L-1011"><a href="#L-1011"><span class="linenos">1011</span></a>            <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">,</span>
+</span><span id="L-1012"><a href="#L-1012"><span class="linenos">1012</span></a>            <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+</span><span id="L-1013"><a href="#L-1013"><span class="linenos">1013</span></a>            <span class="n">sg_cutoff</span><span class="o">=</span><span class="n">sg_cutoff</span><span class="p">,</span>
+</span><span id="L-1014"><a href="#L-1014"><span class="linenos">1014</span></a>        <span class="p">)</span>
+</span><span id="L-1015"><a href="#L-1015"><span class="linenos">1015</span></a>        <span class="k">return</span> <span class="n">loader</span>
+</span><span id="L-1016"><a href="#L-1016"><span class="linenos">1016</span></a>
+</span><span id="L-1017"><a href="#L-1017"><span class="linenos">1017</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="L-1018"><a href="#L-1018"><span class="linenos">1018</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reading disulfides from: </span><span class="si">%s</span><span class="s2">...&quot;</span><span class="p">,</span> <span class="n">_fpath</span><span class="p">)</span>
+</span><span id="L-1019"><a href="#L-1019"><span class="linenos">1019</span></a>
+</span><span id="L-1020"><a href="#L-1020"><span class="linenos">1020</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_fpath</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="L-1021"><a href="#L-1021"><span class="linenos">1021</span></a>        <span class="n">loader</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span><span id="L-1022"><a href="#L-1022"><span class="linenos">1022</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="L-1023"><a href="#L-1023"><span class="linenos">1023</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Done reading disulfides from: </span><span class="si">%s</span><span class="s2">...&quot;</span><span class="p">,</span> <span class="n">_fpath</span><span class="p">)</span>
+</span><span id="L-1024"><a href="#L-1024"><span class="linenos">1024</span></a>        <span class="n">loader</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</span><span id="L-1025"><a href="#L-1025"><span class="linenos">1025</span></a>
+</span><span id="L-1026"><a href="#L-1026"><span class="linenos">1026</span></a>    <span class="k">return</span> <span class="n">loader</span>
+</span><span id="L-1027"><a href="#L-1027"><span class="linenos">1027</span></a>
 </span><span id="L-1028"><a href="#L-1028"><span class="linenos">1028</span></a>
-</span><span id="L-1029"><a href="#L-1029"><span class="linenos">1029</span></a>
-</span><span id="L-1030"><a href="#L-1030"><span class="linenos">1030</span></a><span class="k">def</span><span class="w"> </span><span class="nf">Bootstrap_PDB_SS</span><span class="p">(</span>
-</span><span id="L-1031"><a href="#L-1031"><span class="linenos">1031</span></a>    <span class="n">loadpath</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span>
-</span><span id="L-1032"><a href="#L-1032"><span class="linenos">1032</span></a>    <span class="n">cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span>
-</span><span id="L-1033"><a href="#L-1033"><span class="linenos">1033</span></a>    <span class="n">sg_cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span>
-</span><span id="L-1034"><a href="#L-1034"><span class="linenos">1034</span></a>    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="L-1035"><a href="#L-1035"><span class="linenos">1035</span></a>    <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-</span><span id="L-1036"><a href="#L-1036"><span class="linenos">1036</span></a>    <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-</span><span id="L-1037"><a href="#L-1037"><span class="linenos">1037</span></a>    <span class="n">fake</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-</span><span id="L-1038"><a href="#L-1038"><span class="linenos">1038</span></a><span class="p">):</span>
-</span><span id="L-1039"><a href="#L-1039"><span class="linenos">1039</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-1040"><a href="#L-1040"><span class="linenos">1040</span></a><span class="sd">    Download and instantiate the disulfide databases from Google Drive.</span>
-</span><span id="L-1041"><a href="#L-1041"><span class="linenos">1041</span></a>
-</span><span id="L-1042"><a href="#L-1042"><span class="linenos">1042</span></a><span class="sd">    This function downloads the disulfide master SS list from Google Drive if it doesn&#39;t</span>
-</span><span id="L-1043"><a href="#L-1043"><span class="linenos">1043</span></a><span class="sd">    already exist in the specified load path or if the force flag is set to True.</span>
-</span><span id="L-1044"><a href="#L-1044"><span class="linenos">1044</span></a><span class="sd">    It then loads the disulfide data from the downloaded file and initializes a</span>
-</span><span id="L-1045"><a href="#L-1045"><span class="linenos">1045</span></a><span class="sd">    DisulfideLoader instance.</span>
-</span><span id="L-1046"><a href="#L-1046"><span class="linenos">1046</span></a>
-</span><span id="L-1047"><a href="#L-1047"><span class="linenos">1047</span></a><span class="sd">    :param loadpath: Path from which to load the data, defaults to DATA_DIR</span>
-</span><span id="L-1048"><a href="#L-1048"><span class="linenos">1048</span></a><span class="sd">    :type loadpath: str</span>
-</span><span id="L-1049"><a href="#L-1049"><span class="linenos">1049</span></a><span class="sd">    :param cutoff: Cutoff value for disulfide loading, defaults to -1.0 (no filtering)</span>
-</span><span id="L-1050"><a href="#L-1050"><span class="linenos">1050</span></a><span class="sd">    :type cutoff: float</span>
-</span><span id="L-1051"><a href="#L-1051"><span class="linenos">1051</span></a><span class="sd">    :param sg_cutoff: Cutoff value for disulfide loading, defaults to -1.0 (no filtering)</span>
-</span><span id="L-1052"><a href="#L-1052"><span class="linenos">1052</span></a><span class="sd">    :type sg_cutoff: float</span>
-</span><span id="L-1053"><a href="#L-1053"><span class="linenos">1053</span></a><span class="sd">    :param verbose: Flag to enable verbose logging, defaults to False</span>
-</span><span id="L-1054"><a href="#L-1054"><span class="linenos">1054</span></a><span class="sd">    :type verbose: bool</span>
-</span><span id="L-1055"><a href="#L-1055"><span class="linenos">1055</span></a><span class="sd">    :param subset: Flag to indicate whether to load a subset of the data, defaults to False</span>
-</span><span id="L-1056"><a href="#L-1056"><span class="linenos">1056</span></a><span class="sd">    :type subset: bool</span>
-</span><span id="L-1057"><a href="#L-1057"><span class="linenos">1057</span></a><span class="sd">    :param force: Flag to force download even if the file exists, defaults to False</span>
-</span><span id="L-1058"><a href="#L-1058"><span class="linenos">1058</span></a><span class="sd">    :type force: bool</span>
-</span><span id="L-1059"><a href="#L-1059"><span class="linenos">1059</span></a><span class="sd">    :return: An instance of DisulfideLoader initialized with the loaded data</span>
-</span><span id="L-1060"><a href="#L-1060"><span class="linenos">1060</span></a><span class="sd">    :rtype: DisulfideLoader</span>
-</span><span id="L-1061"><a href="#L-1061"><span class="linenos">1061</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-1062"><a href="#L-1062"><span class="linenos">1062</span></a>
-</span><span id="L-1063"><a href="#L-1063"><span class="linenos">1063</span></a>    <span class="n">fname</span> <span class="o">=</span> <span class="n">SS_PICKLE_FILE</span>
-</span><span id="L-1064"><a href="#L-1064"><span class="linenos">1064</span></a>    <span class="n">url</span> <span class="o">=</span> <span class="n">SS_LIST_URL</span>
-</span><span id="L-1065"><a href="#L-1065"><span class="linenos">1065</span></a>
-</span><span id="L-1066"><a href="#L-1066"><span class="linenos">1066</span></a>    <span class="c1"># _fname = Path(loadpath) / fname</span>
-</span><span id="L-1067"><a href="#L-1067"><span class="linenos">1067</span></a>    <span class="n">full_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">loadpath</span><span class="p">)</span> <span class="o">/</span> <span class="n">fname</span>
-</span><span id="L-1068"><a href="#L-1068"><span class="linenos">1068</span></a>
-</span><span id="L-1069"><a href="#L-1069"><span class="linenos">1069</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">full_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="n">force</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-</span><span id="L-1070"><a href="#L-1070"><span class="linenos">1070</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-1071"><a href="#L-1071"><span class="linenos">1071</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Can&#39;t find </span><span class="si">%s</span><span class="s2">. Downloading from Drive...&quot;</span><span class="p">,</span> <span class="n">full_path</span><span class="p">)</span>
-</span><span id="L-1072"><a href="#L-1072"><span class="linenos">1072</span></a>
-</span><span id="L-1073"><a href="#L-1073"><span class="linenos">1073</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">fake</span><span class="p">:</span>
-</span><span id="L-1074"><a href="#L-1074"><span class="linenos">1074</span></a>            <span class="n">gdown</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">full_path</span><span class="p">),</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</span><span id="L-1075"><a href="#L-1075"><span class="linenos">1075</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="L-1076"><a href="#L-1076"><span class="linenos">1076</span></a>            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-1077"><a href="#L-1077"><span class="linenos">1077</span></a>                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Fake download: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">full_path</span><span class="p">)</span>
-</span><span id="L-1078"><a href="#L-1078"><span class="linenos">1078</span></a>                <span class="k">return</span> <span class="kc">None</span>
-</span><span id="L-1079"><a href="#L-1079"><span class="linenos">1079</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-1080"><a href="#L-1080"><span class="linenos">1080</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-</span><span id="L-1081"><a href="#L-1081"><span class="linenos">1081</span></a>            <span class="s2">&quot;Building loader from: </span><span class="si">%s</span><span class="s2"> with cutoffs </span><span class="si">%f</span><span class="s2">, </span><span class="si">%f</span><span class="s2">...&quot;</span><span class="p">,</span>
-</span><span id="L-1082"><a href="#L-1082"><span class="linenos">1082</span></a>            <span class="n">full_path</span><span class="p">,</span>
-</span><span id="L-1083"><a href="#L-1083"><span class="linenos">1083</span></a>            <span class="n">cutoff</span><span class="p">,</span>
-</span><span id="L-1084"><a href="#L-1084"><span class="linenos">1084</span></a>            <span class="n">sg_cutoff</span><span class="p">,</span>
-</span><span id="L-1085"><a href="#L-1085"><span class="linenos">1085</span></a>        <span class="p">)</span>
-</span><span id="L-1086"><a href="#L-1086"><span class="linenos">1086</span></a>
-</span><span id="L-1087"><a href="#L-1087"><span class="linenos">1087</span></a>    <span class="n">loader</span> <span class="o">=</span> <span class="n">DisulfideLoader</span><span class="p">(</span>
-</span><span id="L-1088"><a href="#L-1088"><span class="linenos">1088</span></a>        <span class="n">datadir</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span>
-</span><span id="L-1089"><a href="#L-1089"><span class="linenos">1089</span></a>        <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">,</span>
-</span><span id="L-1090"><a href="#L-1090"><span class="linenos">1090</span></a>        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-</span><span id="L-1091"><a href="#L-1091"><span class="linenos">1091</span></a>        <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
-</span><span id="L-1092"><a href="#L-1092"><span class="linenos">1092</span></a>        <span class="n">sg_cutoff</span><span class="o">=</span><span class="n">sg_cutoff</span><span class="p">,</span>
-</span><span id="L-1093"><a href="#L-1093"><span class="linenos">1093</span></a>    <span class="p">)</span>
-</span><span id="L-1094"><a href="#L-1094"><span class="linenos">1094</span></a>
-</span><span id="L-1095"><a href="#L-1095"><span class="linenos">1095</span></a>    <span class="k">if</span> <span class="n">loader</span><span class="o">.</span><span class="n">TotalDisulfides</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="L-1096"><a href="#L-1096"><span class="linenos">1096</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No disulfides loaded!&quot;</span><span class="p">)</span>
-</span><span id="L-1097"><a href="#L-1097"><span class="linenos">1097</span></a>        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="L-1098"><a href="#L-1098"><span class="linenos">1098</span></a>
-</span><span id="L-1099"><a href="#L-1099"><span class="linenos">1099</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-1100"><a href="#L-1100"><span class="linenos">1100</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Done building loader.&quot;</span><span class="p">)</span>
-</span><span id="L-1101"><a href="#L-1101"><span class="linenos">1101</span></a>
-</span><span id="L-1102"><a href="#L-1102"><span class="linenos">1102</span></a>    <span class="k">return</span> <span class="n">loader</span>
+</span><span id="L-1029"><a href="#L-1029"><span class="linenos">1029</span></a><span class="k">def</span><span class="w"> </span><span class="nf">Bootstrap_PDB_SS</span><span class="p">(</span>
+</span><span id="L-1030"><a href="#L-1030"><span class="linenos">1030</span></a>    <span class="n">loadpath</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span>
+</span><span id="L-1031"><a href="#L-1031"><span class="linenos">1031</span></a>    <span class="n">cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span>
+</span><span id="L-1032"><a href="#L-1032"><span class="linenos">1032</span></a>    <span class="n">sg_cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span>
+</span><span id="L-1033"><a href="#L-1033"><span class="linenos">1033</span></a>    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="L-1034"><a href="#L-1034"><span class="linenos">1034</span></a>    <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="L-1035"><a href="#L-1035"><span class="linenos">1035</span></a>    <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="L-1036"><a href="#L-1036"><span class="linenos">1036</span></a>    <span class="n">fake</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="L-1037"><a href="#L-1037"><span class="linenos">1037</span></a><span class="p">):</span>
+</span><span id="L-1038"><a href="#L-1038"><span class="linenos">1038</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-1039"><a href="#L-1039"><span class="linenos">1039</span></a><span class="sd">    Download and instantiate the disulfide databases from Google Drive.</span>
+</span><span id="L-1040"><a href="#L-1040"><span class="linenos">1040</span></a>
+</span><span id="L-1041"><a href="#L-1041"><span class="linenos">1041</span></a><span class="sd">    This function downloads the disulfide master SS list from Google Drive if it doesn&#39;t</span>
+</span><span id="L-1042"><a href="#L-1042"><span class="linenos">1042</span></a><span class="sd">    already exist in the specified load path or if the force flag is set to True.</span>
+</span><span id="L-1043"><a href="#L-1043"><span class="linenos">1043</span></a><span class="sd">    It then loads the disulfide data from the downloaded file and initializes a</span>
+</span><span id="L-1044"><a href="#L-1044"><span class="linenos">1044</span></a><span class="sd">    DisulfideLoader instance.</span>
+</span><span id="L-1045"><a href="#L-1045"><span class="linenos">1045</span></a>
+</span><span id="L-1046"><a href="#L-1046"><span class="linenos">1046</span></a><span class="sd">    :param loadpath: Path from which to load the data, defaults to DATA_DIR</span>
+</span><span id="L-1047"><a href="#L-1047"><span class="linenos">1047</span></a><span class="sd">    :type loadpath: str</span>
+</span><span id="L-1048"><a href="#L-1048"><span class="linenos">1048</span></a><span class="sd">    :param cutoff: Cutoff value for disulfide loading, defaults to -1.0 (no filtering)</span>
+</span><span id="L-1049"><a href="#L-1049"><span class="linenos">1049</span></a><span class="sd">    :type cutoff: float</span>
+</span><span id="L-1050"><a href="#L-1050"><span class="linenos">1050</span></a><span class="sd">    :param sg_cutoff: Cutoff value for disulfide loading, defaults to -1.0 (no filtering)</span>
+</span><span id="L-1051"><a href="#L-1051"><span class="linenos">1051</span></a><span class="sd">    :type sg_cutoff: float</span>
+</span><span id="L-1052"><a href="#L-1052"><span class="linenos">1052</span></a><span class="sd">    :param verbose: Flag to enable verbose logging, defaults to False</span>
+</span><span id="L-1053"><a href="#L-1053"><span class="linenos">1053</span></a><span class="sd">    :type verbose: bool</span>
+</span><span id="L-1054"><a href="#L-1054"><span class="linenos">1054</span></a><span class="sd">    :param subset: Flag to indicate whether to load a subset of the data, defaults to False</span>
+</span><span id="L-1055"><a href="#L-1055"><span class="linenos">1055</span></a><span class="sd">    :type subset: bool</span>
+</span><span id="L-1056"><a href="#L-1056"><span class="linenos">1056</span></a><span class="sd">    :param force: Flag to force download even if the file exists, defaults to False</span>
+</span><span id="L-1057"><a href="#L-1057"><span class="linenos">1057</span></a><span class="sd">    :type force: bool</span>
+</span><span id="L-1058"><a href="#L-1058"><span class="linenos">1058</span></a><span class="sd">    :return: An instance of DisulfideLoader initialized with the loaded data</span>
+</span><span id="L-1059"><a href="#L-1059"><span class="linenos">1059</span></a><span class="sd">    :rtype: DisulfideLoader</span>
+</span><span id="L-1060"><a href="#L-1060"><span class="linenos">1060</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-1061"><a href="#L-1061"><span class="linenos">1061</span></a>
+</span><span id="L-1062"><a href="#L-1062"><span class="linenos">1062</span></a>    <span class="n">fname</span> <span class="o">=</span> <span class="n">SS_PICKLE_FILE</span>
+</span><span id="L-1063"><a href="#L-1063"><span class="linenos">1063</span></a>    <span class="n">url</span> <span class="o">=</span> <span class="n">SS_LIST_URL</span>
+</span><span id="L-1064"><a href="#L-1064"><span class="linenos">1064</span></a>
+</span><span id="L-1065"><a href="#L-1065"><span class="linenos">1065</span></a>    <span class="c1"># _fname = Path(loadpath) / fname</span>
+</span><span id="L-1066"><a href="#L-1066"><span class="linenos">1066</span></a>    <span class="n">full_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">loadpath</span><span class="p">)</span> <span class="o">/</span> <span class="n">fname</span>
+</span><span id="L-1067"><a href="#L-1067"><span class="linenos">1067</span></a>
+</span><span id="L-1068"><a href="#L-1068"><span class="linenos">1068</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">full_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="n">force</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+</span><span id="L-1069"><a href="#L-1069"><span class="linenos">1069</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="L-1070"><a href="#L-1070"><span class="linenos">1070</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Can&#39;t find </span><span class="si">%s</span><span class="s2">. Downloading from Drive...&quot;</span><span class="p">,</span> <span class="n">full_path</span><span class="p">)</span>
+</span><span id="L-1071"><a href="#L-1071"><span class="linenos">1071</span></a>
+</span><span id="L-1072"><a href="#L-1072"><span class="linenos">1072</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">fake</span><span class="p">:</span>
+</span><span id="L-1073"><a href="#L-1073"><span class="linenos">1073</span></a>            <span class="n">gdown</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">full_path</span><span class="p">),</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><span id="L-1074"><a href="#L-1074"><span class="linenos">1074</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="L-1075"><a href="#L-1075"><span class="linenos">1075</span></a>            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="L-1076"><a href="#L-1076"><span class="linenos">1076</span></a>                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Fake download: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">full_path</span><span class="p">)</span>
+</span><span id="L-1077"><a href="#L-1077"><span class="linenos">1077</span></a>                <span class="k">return</span> <span class="kc">None</span>
+</span><span id="L-1078"><a href="#L-1078"><span class="linenos">1078</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="L-1079"><a href="#L-1079"><span class="linenos">1079</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+</span><span id="L-1080"><a href="#L-1080"><span class="linenos">1080</span></a>            <span class="s2">&quot;Building loader from: </span><span class="si">%s</span><span class="s2"> with cutoffs </span><span class="si">%f</span><span class="s2">, </span><span class="si">%f</span><span class="s2">...&quot;</span><span class="p">,</span>
+</span><span id="L-1081"><a href="#L-1081"><span class="linenos">1081</span></a>            <span class="n">full_path</span><span class="p">,</span>
+</span><span id="L-1082"><a href="#L-1082"><span class="linenos">1082</span></a>            <span class="n">cutoff</span><span class="p">,</span>
+</span><span id="L-1083"><a href="#L-1083"><span class="linenos">1083</span></a>            <span class="n">sg_cutoff</span><span class="p">,</span>
+</span><span id="L-1084"><a href="#L-1084"><span class="linenos">1084</span></a>        <span class="p">)</span>
+</span><span id="L-1085"><a href="#L-1085"><span class="linenos">1085</span></a>
+</span><span id="L-1086"><a href="#L-1086"><span class="linenos">1086</span></a>    <span class="n">loader</span> <span class="o">=</span> <span class="n">DisulfideLoader</span><span class="p">(</span>
+</span><span id="L-1087"><a href="#L-1087"><span class="linenos">1087</span></a>        <span class="n">datadir</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span>
+</span><span id="L-1088"><a href="#L-1088"><span class="linenos">1088</span></a>        <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">,</span>
+</span><span id="L-1089"><a href="#L-1089"><span class="linenos">1089</span></a>        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+</span><span id="L-1090"><a href="#L-1090"><span class="linenos">1090</span></a>        <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+</span><span id="L-1091"><a href="#L-1091"><span class="linenos">1091</span></a>        <span class="n">sg_cutoff</span><span class="o">=</span><span class="n">sg_cutoff</span><span class="p">,</span>
+</span><span id="L-1092"><a href="#L-1092"><span class="linenos">1092</span></a>    <span class="p">)</span>
+</span><span id="L-1093"><a href="#L-1093"><span class="linenos">1093</span></a>
+</span><span id="L-1094"><a href="#L-1094"><span class="linenos">1094</span></a>    <span class="k">if</span> <span class="n">loader</span><span class="o">.</span><span class="n">TotalDisulfides</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="L-1095"><a href="#L-1095"><span class="linenos">1095</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No disulfides loaded!&quot;</span><span class="p">)</span>
+</span><span id="L-1096"><a href="#L-1096"><span class="linenos">1096</span></a>        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="L-1097"><a href="#L-1097"><span class="linenos">1097</span></a>
+</span><span id="L-1098"><a href="#L-1098"><span class="linenos">1098</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="L-1099"><a href="#L-1099"><span class="linenos">1099</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Done building loader.&quot;</span><span class="p">)</span>
+</span><span id="L-1100"><a href="#L-1100"><span class="linenos">1100</span></a>
+</span><span id="L-1101"><a href="#L-1101"><span class="linenos">1101</span></a>    <span class="k">return</span> <span class="n">loader</span>
+</span><span id="L-1102"><a href="#L-1102"><span class="linenos">1102</span></a>
 </span><span id="L-1103"><a href="#L-1103"><span class="linenos">1103</span></a>
-</span><span id="L-1104"><a href="#L-1104"><span class="linenos">1104</span></a>
-</span><span id="L-1105"><a href="#L-1105"><span class="linenos">1105</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-</span><span id="L-1106"><a href="#L-1106"><span class="linenos">1106</span></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">doctest</span>
-</span><span id="L-1107"><a href="#L-1107"><span class="linenos">1107</span></a>
-</span><span id="L-1108"><a href="#L-1108"><span class="linenos">1108</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
-</span><span id="L-1109"><a href="#L-1109"><span class="linenos">1109</span></a>
-</span><span id="L-1110"><a href="#L-1110"><span class="linenos">1110</span></a><span class="c1"># End of file</span>
+</span><span id="L-1104"><a href="#L-1104"><span class="linenos">1104</span></a><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+</span><span id="L-1105"><a href="#L-1105"><span class="linenos">1105</span></a>    <span class="kn">import</span><span class="w"> </span><span class="nn">doctest</span>
+</span><span id="L-1106"><a href="#L-1106"><span class="linenos">1106</span></a>
+</span><span id="L-1107"><a href="#L-1107"><span class="linenos">1107</span></a>    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+</span><span id="L-1108"><a href="#L-1108"><span class="linenos">1108</span></a>
+</span><span id="L-1109"><a href="#L-1109"><span class="linenos">1109</span></a><span class="c1"># End of file</span>
 </span></pre></div>
 
 
@@ -4036,7 +4035,7 @@ and SG_Distance.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">Load_PDB_SS</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">loadpath</span><span class="o">=</span><span class="s1">&#39;/Users/egs/repos/proteusPy/proteusPy/data&#39;</span>,</span><span class="param">	<span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>,</span><span class="param">	<span class="n">subset</span><span class="o">=</span><span class="kc">False</span>,</span><span class="param">	<span class="n">cutoff</span><span class="o">=</span><span class="mf">6.71</span>,</span><span class="param">	<span class="n">sg_cutoff</span><span class="o">=</span><span class="mf">2.12</span>,</span><span class="param">	<span class="n">force</span><span class="o">=</span><span class="kc">False</span>,</span><span class="param">	<span class="n">percentile</span><span class="o">=-</span><span class="mf">1.0</span></span><span class="return-annotation">) -> <span class="n"><a href="#DisulfideLoader">DisulfideLoader</a></span>:</span></span>
+        <span class="name">Load_PDB_SS</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">loadpath</span><span class="o">=</span><span class="s1">&#39;/Users/egs/repos/proteusPy/proteusPy/data&#39;</span>,</span><span class="param">	<span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>,</span><span class="param">	<span class="n">subset</span><span class="o">=</span><span class="kc">False</span>,</span><span class="param">	<span class="n">cutoff</span><span class="o">=</span><span class="mf">6.71</span>,</span><span class="param">	<span class="n">sg_cutoff</span><span class="o">=</span><span class="mf">2.12</span>,</span><span class="param">	<span class="n">force</span><span class="o">=</span><span class="kc">False</span></span><span class="return-annotation">) -> <span class="n"><a href="#DisulfideLoader">DisulfideLoader</a></span>:</span></span>
 
                 <label class="view-source-button" for="Load_PDB_SS-view-source"><span>View Source</span></label>
 
@@ -4049,79 +4048,78 @@ and SG_Distance.</p>
 </span><span id="Load_PDB_SS-953"><a href="#Load_PDB_SS-953"><span class="linenos"> 953</span></a>    <span class="n">cutoff</span><span class="o">=</span><span class="n">CA_CUTOFF</span><span class="p">,</span>
 </span><span id="Load_PDB_SS-954"><a href="#Load_PDB_SS-954"><span class="linenos"> 954</span></a>    <span class="n">sg_cutoff</span><span class="o">=</span><span class="n">SG_CUTOFF</span><span class="p">,</span>
 </span><span id="Load_PDB_SS-955"><a href="#Load_PDB_SS-955"><span class="linenos"> 955</span></a>    <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-</span><span id="Load_PDB_SS-956"><a href="#Load_PDB_SS-956"><span class="linenos"> 956</span></a>    <span class="n">percentile</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span>
-</span><span id="Load_PDB_SS-957"><a href="#Load_PDB_SS-957"><span class="linenos"> 957</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DisulfideLoader</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-958"><a href="#Load_PDB_SS-958"><span class="linenos"> 958</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Load_PDB_SS-959"><a href="#Load_PDB_SS-959"><span class="linenos"> 959</span></a><span class="sd">    Load the fully instantiated Disulfide database from the specified file. This function</span>
-</span><span id="Load_PDB_SS-960"><a href="#Load_PDB_SS-960"><span class="linenos"> 960</span></a><span class="sd">    will load the pre-built database if available, or bootstrap a new loader by downloading</span>
-</span><span id="Load_PDB_SS-961"><a href="#Load_PDB_SS-961"><span class="linenos"> 961</span></a><span class="sd">    the data from Google Drive if needed. Use the provided parameters to control the loading</span>
-</span><span id="Load_PDB_SS-962"><a href="#Load_PDB_SS-962"><span class="linenos"> 962</span></a><span class="sd">    behavior, filtering cutoffs, and verbosity.</span>
-</span><span id="Load_PDB_SS-963"><a href="#Load_PDB_SS-963"><span class="linenos"> 963</span></a>
-</span><span id="Load_PDB_SS-964"><a href="#Load_PDB_SS-964"><span class="linenos"> 964</span></a><span class="sd">    :param loadpath: Path from which to load the database; defaults to DATA_DIR.</span>
-</span><span id="Load_PDB_SS-965"><a href="#Load_PDB_SS-965"><span class="linenos"> 965</span></a><span class="sd">    :type loadpath: str</span>
-</span><span id="Load_PDB_SS-966"><a href="#Load_PDB_SS-966"><span class="linenos"> 966</span></a><span class="sd">    :param verbose: If True, enables verbose logging; defaults to False.</span>
-</span><span id="Load_PDB_SS-967"><a href="#Load_PDB_SS-967"><span class="linenos"> 967</span></a><span class="sd">    :type verbose: bool</span>
-</span><span id="Load_PDB_SS-968"><a href="#Load_PDB_SS-968"><span class="linenos"> 968</span></a><span class="sd">    :param subset: If True, loads the subset database; otherwise loads the full database.</span>
-</span><span id="Load_PDB_SS-969"><a href="#Load_PDB_SS-969"><span class="linenos"> 969</span></a><span class="sd">    :type subset: bool</span>
-</span><span id="Load_PDB_SS-970"><a href="#Load_PDB_SS-970"><span class="linenos"> 970</span></a><span class="sd">    :param cutoff: Cα distance cutoff used to filter disulfides; defaults to CA_CUTOFF.</span>
-</span><span id="Load_PDB_SS-971"><a href="#Load_PDB_SS-971"><span class="linenos"> 971</span></a><span class="sd">    :type cutoff: float</span>
-</span><span id="Load_PDB_SS-972"><a href="#Load_PDB_SS-972"><span class="linenos"> 972</span></a><span class="sd">    :param sg_cutoff: Sγ distance cutoff used to filter disulfides; defaults to SG_CUTOFF.</span>
-</span><span id="Load_PDB_SS-973"><a href="#Load_PDB_SS-973"><span class="linenos"> 973</span></a><span class="sd">    :type sg_cutoff: float</span>
-</span><span id="Load_PDB_SS-974"><a href="#Load_PDB_SS-974"><span class="linenos"> 974</span></a><span class="sd">    :param force: If True, forces re-loading from Google Drive even if the file exists; defaults to False.</span>
-</span><span id="Load_PDB_SS-975"><a href="#Load_PDB_SS-975"><span class="linenos"> 975</span></a><span class="sd">    :type force: bool</span>
-</span><span id="Load_PDB_SS-976"><a href="#Load_PDB_SS-976"><span class="linenos"> 976</span></a><span class="sd">    :param percentile: Percentile (0-100) to compute cutoffs dynamically; if set to -1.0, the percentile method is not used.</span>
-</span><span id="Load_PDB_SS-977"><a href="#Load_PDB_SS-977"><span class="linenos"> 977</span></a><span class="sd">    :type percentile: float</span>
-</span><span id="Load_PDB_SS-978"><a href="#Load_PDB_SS-978"><span class="linenos"> 978</span></a><span class="sd">    :return: An instance of DisulfideLoader containing the loaded disulfide database.</span>
-</span><span id="Load_PDB_SS-979"><a href="#Load_PDB_SS-979"><span class="linenos"> 979</span></a><span class="sd">    :rtype: DisulfideLoader</span>
-</span><span id="Load_PDB_SS-980"><a href="#Load_PDB_SS-980"><span class="linenos"> 980</span></a>
-</span><span id="Load_PDB_SS-981"><a href="#Load_PDB_SS-981"><span class="linenos"> 981</span></a><span class="sd">    Example:</span>
-</span><span id="Load_PDB_SS-982"><a href="#Load_PDB_SS-982"><span class="linenos"> 982</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy import Load_PDB_SS, create_logger</span>
-</span><span id="Load_PDB_SS-983"><a href="#Load_PDB_SS-983"><span class="linenos"> 983</span></a><span class="sd">        &gt;&gt;&gt; import logging</span>
-</span><span id="Load_PDB_SS-984"><a href="#Load_PDB_SS-984"><span class="linenos"> 984</span></a><span class="sd">        &gt;&gt;&gt; _logger = create_logger(&quot;testing&quot;)</span>
-</span><span id="Load_PDB_SS-985"><a href="#Load_PDB_SS-985"><span class="linenos"> 985</span></a><span class="sd">        &gt;&gt;&gt; _logger.setLevel(logging.WARNING)</span>
-</span><span id="Load_PDB_SS-986"><a href="#Load_PDB_SS-986"><span class="linenos"> 986</span></a><span class="sd">        &gt;&gt;&gt; loader = Load_PDB_SS(verbose=False, subset=True)</span>
-</span><span id="Load_PDB_SS-987"><a href="#Load_PDB_SS-987"><span class="linenos"> 987</span></a><span class="sd">        &gt;&gt;&gt; print(loader[0])</span>
-</span><span id="Load_PDB_SS-988"><a href="#Load_PDB_SS-988"><span class="linenos"> 988</span></a><span class="sd">        &lt;Disulfide 6dmb_203A_226A, Source: 6dmb, Resolution: 3.0 Å&gt;</span>
-</span><span id="Load_PDB_SS-989"><a href="#Load_PDB_SS-989"><span class="linenos"> 989</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="Load_PDB_SS-990"><a href="#Load_PDB_SS-990"><span class="linenos"> 990</span></a>
-</span><span id="Load_PDB_SS-991"><a href="#Load_PDB_SS-991"><span class="linenos"> 991</span></a>    <span class="c1"># normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy</span>
-</span><span id="Load_PDB_SS-992"><a href="#Load_PDB_SS-992"><span class="linenos"> 992</span></a>    <span class="c1"># distribution. In that case we need to download the files for all disulfides and the subset</span>
-</span><span id="Load_PDB_SS-993"><a href="#Load_PDB_SS-993"><span class="linenos"> 993</span></a>    <span class="c1"># from my Google Drive. This is a one-time operation.</span>
-</span><span id="Load_PDB_SS-994"><a href="#Load_PDB_SS-994"><span class="linenos"> 994</span></a>
-</span><span id="Load_PDB_SS-995"><a href="#Load_PDB_SS-995"><span class="linenos"> 995</span></a>    <span class="n">_fname_sub</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">loadpath</span><span class="p">)</span> <span class="o">/</span> <span class="n">LOADER_SUBSET_FNAME</span>
-</span><span id="Load_PDB_SS-996"><a href="#Load_PDB_SS-996"><span class="linenos"> 996</span></a>    <span class="n">_fname_all</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">loadpath</span><span class="p">)</span> <span class="o">/</span> <span class="n">LOADER_FNAME</span>
-</span><span id="Load_PDB_SS-997"><a href="#Load_PDB_SS-997"><span class="linenos"> 997</span></a>    <span class="n">_fpath</span> <span class="o">=</span> <span class="n">_fname_sub</span> <span class="k">if</span> <span class="n">subset</span> <span class="k">else</span> <span class="n">_fname_all</span>
-</span><span id="Load_PDB_SS-998"><a href="#Load_PDB_SS-998"><span class="linenos"> 998</span></a>
-</span><span id="Load_PDB_SS-999"><a href="#Load_PDB_SS-999"><span class="linenos"> 999</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">_fpath</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="n">force</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-1000"><a href="#Load_PDB_SS-1000"><span class="linenos">1000</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-1001"><a href="#Load_PDB_SS-1001"><span class="linenos">1001</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Bootstrapping new loader: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">_fpath</span><span class="p">)</span><span class="si">}</span><span class="s2">... &quot;</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-1002"><a href="#Load_PDB_SS-1002"><span class="linenos">1002</span></a>
-</span><span id="Load_PDB_SS-1003"><a href="#Load_PDB_SS-1003"><span class="linenos">1003</span></a>        <span class="n">loader</span> <span class="o">=</span> <span class="n">Bootstrap_PDB_SS</span><span class="p">(</span>
-</span><span id="Load_PDB_SS-1004"><a href="#Load_PDB_SS-1004"><span class="linenos">1004</span></a>            <span class="n">loadpath</span><span class="o">=</span><span class="n">loadpath</span><span class="p">,</span>
-</span><span id="Load_PDB_SS-1005"><a href="#Load_PDB_SS-1005"><span class="linenos">1005</span></a>            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-</span><span id="Load_PDB_SS-1006"><a href="#Load_PDB_SS-1006"><span class="linenos">1006</span></a>            <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">,</span>
-</span><span id="Load_PDB_SS-1007"><a href="#Load_PDB_SS-1007"><span class="linenos">1007</span></a>            <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
-</span><span id="Load_PDB_SS-1008"><a href="#Load_PDB_SS-1008"><span class="linenos">1008</span></a>            <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
-</span><span id="Load_PDB_SS-1009"><a href="#Load_PDB_SS-1009"><span class="linenos">1009</span></a>            <span class="n">sg_cutoff</span><span class="o">=</span><span class="n">sg_cutoff</span><span class="p">,</span>
-</span><span id="Load_PDB_SS-1010"><a href="#Load_PDB_SS-1010"><span class="linenos">1010</span></a>        <span class="p">)</span>
-</span><span id="Load_PDB_SS-1011"><a href="#Load_PDB_SS-1011"><span class="linenos">1011</span></a>        <span class="n">loader</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
-</span><span id="Load_PDB_SS-1012"><a href="#Load_PDB_SS-1012"><span class="linenos">1012</span></a>            <span class="n">savepath</span><span class="o">=</span><span class="n">loadpath</span><span class="p">,</span>
-</span><span id="Load_PDB_SS-1013"><a href="#Load_PDB_SS-1013"><span class="linenos">1013</span></a>            <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">,</span>
-</span><span id="Load_PDB_SS-1014"><a href="#Load_PDB_SS-1014"><span class="linenos">1014</span></a>            <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
-</span><span id="Load_PDB_SS-1015"><a href="#Load_PDB_SS-1015"><span class="linenos">1015</span></a>            <span class="n">sg_cutoff</span><span class="o">=</span><span class="n">sg_cutoff</span><span class="p">,</span>
-</span><span id="Load_PDB_SS-1016"><a href="#Load_PDB_SS-1016"><span class="linenos">1016</span></a>        <span class="p">)</span>
-</span><span id="Load_PDB_SS-1017"><a href="#Load_PDB_SS-1017"><span class="linenos">1017</span></a>        <span class="k">return</span> <span class="n">loader</span>
-</span><span id="Load_PDB_SS-1018"><a href="#Load_PDB_SS-1018"><span class="linenos">1018</span></a>
-</span><span id="Load_PDB_SS-1019"><a href="#Load_PDB_SS-1019"><span class="linenos">1019</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-1020"><a href="#Load_PDB_SS-1020"><span class="linenos">1020</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reading disulfides from: </span><span class="si">%s</span><span class="s2">...&quot;</span><span class="p">,</span> <span class="n">_fpath</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-1021"><a href="#Load_PDB_SS-1021"><span class="linenos">1021</span></a>
-</span><span id="Load_PDB_SS-1022"><a href="#Load_PDB_SS-1022"><span class="linenos">1022</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_fpath</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-1023"><a href="#Load_PDB_SS-1023"><span class="linenos">1023</span></a>        <span class="n">loader</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-1024"><a href="#Load_PDB_SS-1024"><span class="linenos">1024</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Load_PDB_SS-1025"><a href="#Load_PDB_SS-1025"><span class="linenos">1025</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Done reading disulfides from: </span><span class="si">%s</span><span class="s2">...&quot;</span><span class="p">,</span> <span class="n">_fpath</span><span class="p">)</span>
-</span><span id="Load_PDB_SS-1026"><a href="#Load_PDB_SS-1026"><span class="linenos">1026</span></a>        <span class="n">loader</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
-</span><span id="Load_PDB_SS-1027"><a href="#Load_PDB_SS-1027"><span class="linenos">1027</span></a>
-</span><span id="Load_PDB_SS-1028"><a href="#Load_PDB_SS-1028"><span class="linenos">1028</span></a>    <span class="k">return</span> <span class="n">loader</span>
+</span><span id="Load_PDB_SS-956"><a href="#Load_PDB_SS-956"><span class="linenos"> 956</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DisulfideLoader</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-957"><a href="#Load_PDB_SS-957"><span class="linenos"> 957</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Load_PDB_SS-958"><a href="#Load_PDB_SS-958"><span class="linenos"> 958</span></a><span class="sd">    Load the fully instantiated Disulfide database from the specified file. This function</span>
+</span><span id="Load_PDB_SS-959"><a href="#Load_PDB_SS-959"><span class="linenos"> 959</span></a><span class="sd">    will load the pre-built database if available, or bootstrap a new loader by downloading</span>
+</span><span id="Load_PDB_SS-960"><a href="#Load_PDB_SS-960"><span class="linenos"> 960</span></a><span class="sd">    the data from Google Drive if needed. Use the provided parameters to control the loading</span>
+</span><span id="Load_PDB_SS-961"><a href="#Load_PDB_SS-961"><span class="linenos"> 961</span></a><span class="sd">    behavior, filtering cutoffs, and verbosity.</span>
+</span><span id="Load_PDB_SS-962"><a href="#Load_PDB_SS-962"><span class="linenos"> 962</span></a>
+</span><span id="Load_PDB_SS-963"><a href="#Load_PDB_SS-963"><span class="linenos"> 963</span></a><span class="sd">    :param loadpath: Path from which to load the database; defaults to DATA_DIR.</span>
+</span><span id="Load_PDB_SS-964"><a href="#Load_PDB_SS-964"><span class="linenos"> 964</span></a><span class="sd">    :type loadpath: str</span>
+</span><span id="Load_PDB_SS-965"><a href="#Load_PDB_SS-965"><span class="linenos"> 965</span></a><span class="sd">    :param verbose: If True, enables verbose logging; defaults to False.</span>
+</span><span id="Load_PDB_SS-966"><a href="#Load_PDB_SS-966"><span class="linenos"> 966</span></a><span class="sd">    :type verbose: bool</span>
+</span><span id="Load_PDB_SS-967"><a href="#Load_PDB_SS-967"><span class="linenos"> 967</span></a><span class="sd">    :param subset: If True, loads the subset database; otherwise loads the full database.</span>
+</span><span id="Load_PDB_SS-968"><a href="#Load_PDB_SS-968"><span class="linenos"> 968</span></a><span class="sd">    :type subset: bool</span>
+</span><span id="Load_PDB_SS-969"><a href="#Load_PDB_SS-969"><span class="linenos"> 969</span></a><span class="sd">    :param cutoff: Cα distance cutoff used to filter disulfides; defaults to CA_CUTOFF.</span>
+</span><span id="Load_PDB_SS-970"><a href="#Load_PDB_SS-970"><span class="linenos"> 970</span></a><span class="sd">    :type cutoff: float</span>
+</span><span id="Load_PDB_SS-971"><a href="#Load_PDB_SS-971"><span class="linenos"> 971</span></a><span class="sd">    :param sg_cutoff: Sγ distance cutoff used to filter disulfides; defaults to SG_CUTOFF.</span>
+</span><span id="Load_PDB_SS-972"><a href="#Load_PDB_SS-972"><span class="linenos"> 972</span></a><span class="sd">    :type sg_cutoff: float</span>
+</span><span id="Load_PDB_SS-973"><a href="#Load_PDB_SS-973"><span class="linenos"> 973</span></a><span class="sd">    :param force: If True, forces re-loading from Google Drive even if the file exists; defaults to False.</span>
+</span><span id="Load_PDB_SS-974"><a href="#Load_PDB_SS-974"><span class="linenos"> 974</span></a><span class="sd">    :type force: bool</span>
+</span><span id="Load_PDB_SS-975"><a href="#Load_PDB_SS-975"><span class="linenos"> 975</span></a><span class="sd">    :param percentile: Percentile (0-100) to compute cutoffs dynamically; if set to -1.0, the percentile method is not used.</span>
+</span><span id="Load_PDB_SS-976"><a href="#Load_PDB_SS-976"><span class="linenos"> 976</span></a><span class="sd">    :type percentile: float</span>
+</span><span id="Load_PDB_SS-977"><a href="#Load_PDB_SS-977"><span class="linenos"> 977</span></a><span class="sd">    :return: An instance of DisulfideLoader containing the loaded disulfide database.</span>
+</span><span id="Load_PDB_SS-978"><a href="#Load_PDB_SS-978"><span class="linenos"> 978</span></a><span class="sd">    :rtype: DisulfideLoader</span>
+</span><span id="Load_PDB_SS-979"><a href="#Load_PDB_SS-979"><span class="linenos"> 979</span></a>
+</span><span id="Load_PDB_SS-980"><a href="#Load_PDB_SS-980"><span class="linenos"> 980</span></a><span class="sd">    Example:</span>
+</span><span id="Load_PDB_SS-981"><a href="#Load_PDB_SS-981"><span class="linenos"> 981</span></a><span class="sd">        &gt;&gt;&gt; from proteusPy import Load_PDB_SS, create_logger</span>
+</span><span id="Load_PDB_SS-982"><a href="#Load_PDB_SS-982"><span class="linenos"> 982</span></a><span class="sd">        &gt;&gt;&gt; import logging</span>
+</span><span id="Load_PDB_SS-983"><a href="#Load_PDB_SS-983"><span class="linenos"> 983</span></a><span class="sd">        &gt;&gt;&gt; _logger = create_logger(&quot;testing&quot;)</span>
+</span><span id="Load_PDB_SS-984"><a href="#Load_PDB_SS-984"><span class="linenos"> 984</span></a><span class="sd">        &gt;&gt;&gt; _logger.setLevel(logging.WARNING)</span>
+</span><span id="Load_PDB_SS-985"><a href="#Load_PDB_SS-985"><span class="linenos"> 985</span></a><span class="sd">        &gt;&gt;&gt; loader = Load_PDB_SS(verbose=False, subset=True)</span>
+</span><span id="Load_PDB_SS-986"><a href="#Load_PDB_SS-986"><span class="linenos"> 986</span></a><span class="sd">        &gt;&gt;&gt; print(loader[0])</span>
+</span><span id="Load_PDB_SS-987"><a href="#Load_PDB_SS-987"><span class="linenos"> 987</span></a><span class="sd">        &lt;Disulfide 6dmb_203A_226A, Source: 6dmb, Resolution: 3.0 Å&gt;</span>
+</span><span id="Load_PDB_SS-988"><a href="#Load_PDB_SS-988"><span class="linenos"> 988</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="Load_PDB_SS-989"><a href="#Load_PDB_SS-989"><span class="linenos"> 989</span></a>
+</span><span id="Load_PDB_SS-990"><a href="#Load_PDB_SS-990"><span class="linenos"> 990</span></a>    <span class="c1"># normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy</span>
+</span><span id="Load_PDB_SS-991"><a href="#Load_PDB_SS-991"><span class="linenos"> 991</span></a>    <span class="c1"># distribution. In that case we need to download the files for all disulfides and the subset</span>
+</span><span id="Load_PDB_SS-992"><a href="#Load_PDB_SS-992"><span class="linenos"> 992</span></a>    <span class="c1"># from my Google Drive. This is a one-time operation.</span>
+</span><span id="Load_PDB_SS-993"><a href="#Load_PDB_SS-993"><span class="linenos"> 993</span></a>
+</span><span id="Load_PDB_SS-994"><a href="#Load_PDB_SS-994"><span class="linenos"> 994</span></a>    <span class="n">_fname_sub</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">loadpath</span><span class="p">)</span> <span class="o">/</span> <span class="n">LOADER_SUBSET_FNAME</span>
+</span><span id="Load_PDB_SS-995"><a href="#Load_PDB_SS-995"><span class="linenos"> 995</span></a>    <span class="n">_fname_all</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">loadpath</span><span class="p">)</span> <span class="o">/</span> <span class="n">LOADER_FNAME</span>
+</span><span id="Load_PDB_SS-996"><a href="#Load_PDB_SS-996"><span class="linenos"> 996</span></a>    <span class="n">_fpath</span> <span class="o">=</span> <span class="n">_fname_sub</span> <span class="k">if</span> <span class="n">subset</span> <span class="k">else</span> <span class="n">_fname_all</span>
+</span><span id="Load_PDB_SS-997"><a href="#Load_PDB_SS-997"><span class="linenos"> 997</span></a>
+</span><span id="Load_PDB_SS-998"><a href="#Load_PDB_SS-998"><span class="linenos"> 998</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">_fpath</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="n">force</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-999"><a href="#Load_PDB_SS-999"><span class="linenos"> 999</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-1000"><a href="#Load_PDB_SS-1000"><span class="linenos">1000</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Bootstrapping new loader: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">_fpath</span><span class="p">)</span><span class="si">}</span><span class="s2">... &quot;</span><span class="p">)</span>
+</span><span id="Load_PDB_SS-1001"><a href="#Load_PDB_SS-1001"><span class="linenos">1001</span></a>
+</span><span id="Load_PDB_SS-1002"><a href="#Load_PDB_SS-1002"><span class="linenos">1002</span></a>        <span class="n">loader</span> <span class="o">=</span> <span class="n">Bootstrap_PDB_SS</span><span class="p">(</span>
+</span><span id="Load_PDB_SS-1003"><a href="#Load_PDB_SS-1003"><span class="linenos">1003</span></a>            <span class="n">loadpath</span><span class="o">=</span><span class="n">loadpath</span><span class="p">,</span>
+</span><span id="Load_PDB_SS-1004"><a href="#Load_PDB_SS-1004"><span class="linenos">1004</span></a>            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+</span><span id="Load_PDB_SS-1005"><a href="#Load_PDB_SS-1005"><span class="linenos">1005</span></a>            <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">,</span>
+</span><span id="Load_PDB_SS-1006"><a href="#Load_PDB_SS-1006"><span class="linenos">1006</span></a>            <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span>
+</span><span id="Load_PDB_SS-1007"><a href="#Load_PDB_SS-1007"><span class="linenos">1007</span></a>            <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+</span><span id="Load_PDB_SS-1008"><a href="#Load_PDB_SS-1008"><span class="linenos">1008</span></a>            <span class="n">sg_cutoff</span><span class="o">=</span><span class="n">sg_cutoff</span><span class="p">,</span>
+</span><span id="Load_PDB_SS-1009"><a href="#Load_PDB_SS-1009"><span class="linenos">1009</span></a>        <span class="p">)</span>
+</span><span id="Load_PDB_SS-1010"><a href="#Load_PDB_SS-1010"><span class="linenos">1010</span></a>        <span class="n">loader</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+</span><span id="Load_PDB_SS-1011"><a href="#Load_PDB_SS-1011"><span class="linenos">1011</span></a>            <span class="n">savepath</span><span class="o">=</span><span class="n">loadpath</span><span class="p">,</span>
+</span><span id="Load_PDB_SS-1012"><a href="#Load_PDB_SS-1012"><span class="linenos">1012</span></a>            <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">,</span>
+</span><span id="Load_PDB_SS-1013"><a href="#Load_PDB_SS-1013"><span class="linenos">1013</span></a>            <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+</span><span id="Load_PDB_SS-1014"><a href="#Load_PDB_SS-1014"><span class="linenos">1014</span></a>            <span class="n">sg_cutoff</span><span class="o">=</span><span class="n">sg_cutoff</span><span class="p">,</span>
+</span><span id="Load_PDB_SS-1015"><a href="#Load_PDB_SS-1015"><span class="linenos">1015</span></a>        <span class="p">)</span>
+</span><span id="Load_PDB_SS-1016"><a href="#Load_PDB_SS-1016"><span class="linenos">1016</span></a>        <span class="k">return</span> <span class="n">loader</span>
+</span><span id="Load_PDB_SS-1017"><a href="#Load_PDB_SS-1017"><span class="linenos">1017</span></a>
+</span><span id="Load_PDB_SS-1018"><a href="#Load_PDB_SS-1018"><span class="linenos">1018</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-1019"><a href="#Load_PDB_SS-1019"><span class="linenos">1019</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reading disulfides from: </span><span class="si">%s</span><span class="s2">...&quot;</span><span class="p">,</span> <span class="n">_fpath</span><span class="p">)</span>
+</span><span id="Load_PDB_SS-1020"><a href="#Load_PDB_SS-1020"><span class="linenos">1020</span></a>
+</span><span id="Load_PDB_SS-1021"><a href="#Load_PDB_SS-1021"><span class="linenos">1021</span></a>    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_fpath</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-1022"><a href="#Load_PDB_SS-1022"><span class="linenos">1022</span></a>        <span class="n">loader</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span><span id="Load_PDB_SS-1023"><a href="#Load_PDB_SS-1023"><span class="linenos">1023</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="Load_PDB_SS-1024"><a href="#Load_PDB_SS-1024"><span class="linenos">1024</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Done reading disulfides from: </span><span class="si">%s</span><span class="s2">...&quot;</span><span class="p">,</span> <span class="n">_fpath</span><span class="p">)</span>
+</span><span id="Load_PDB_SS-1025"><a href="#Load_PDB_SS-1025"><span class="linenos">1025</span></a>        <span class="n">loader</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</span><span id="Load_PDB_SS-1026"><a href="#Load_PDB_SS-1026"><span class="linenos">1026</span></a>
+</span><span id="Load_PDB_SS-1027"><a href="#Load_PDB_SS-1027"><span class="linenos">1027</span></a>    <span class="k">return</span> <span class="n">loader</span>
 </span></pre></div>
 
 
@@ -4178,79 +4176,79 @@ behavior, filtering cutoffs, and verbosity.</p>
 
     </div>
     <a class="headerlink" href="#Bootstrap_PDB_SS"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Bootstrap_PDB_SS-1031"><a href="#Bootstrap_PDB_SS-1031"><span class="linenos">1031</span></a><span class="k">def</span><span class="w"> </span><span class="nf">Bootstrap_PDB_SS</span><span class="p">(</span>
-</span><span id="Bootstrap_PDB_SS-1032"><a href="#Bootstrap_PDB_SS-1032"><span class="linenos">1032</span></a>    <span class="n">loadpath</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span>
-</span><span id="Bootstrap_PDB_SS-1033"><a href="#Bootstrap_PDB_SS-1033"><span class="linenos">1033</span></a>    <span class="n">cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span>
-</span><span id="Bootstrap_PDB_SS-1034"><a href="#Bootstrap_PDB_SS-1034"><span class="linenos">1034</span></a>    <span class="n">sg_cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span>
-</span><span id="Bootstrap_PDB_SS-1035"><a href="#Bootstrap_PDB_SS-1035"><span class="linenos">1035</span></a>    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-</span><span id="Bootstrap_PDB_SS-1036"><a href="#Bootstrap_PDB_SS-1036"><span class="linenos">1036</span></a>    <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-</span><span id="Bootstrap_PDB_SS-1037"><a href="#Bootstrap_PDB_SS-1037"><span class="linenos">1037</span></a>    <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-</span><span id="Bootstrap_PDB_SS-1038"><a href="#Bootstrap_PDB_SS-1038"><span class="linenos">1038</span></a>    <span class="n">fake</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-</span><span id="Bootstrap_PDB_SS-1039"><a href="#Bootstrap_PDB_SS-1039"><span class="linenos">1039</span></a><span class="p">):</span>
-</span><span id="Bootstrap_PDB_SS-1040"><a href="#Bootstrap_PDB_SS-1040"><span class="linenos">1040</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Bootstrap_PDB_SS-1041"><a href="#Bootstrap_PDB_SS-1041"><span class="linenos">1041</span></a><span class="sd">    Download and instantiate the disulfide databases from Google Drive.</span>
-</span><span id="Bootstrap_PDB_SS-1042"><a href="#Bootstrap_PDB_SS-1042"><span class="linenos">1042</span></a>
-</span><span id="Bootstrap_PDB_SS-1043"><a href="#Bootstrap_PDB_SS-1043"><span class="linenos">1043</span></a><span class="sd">    This function downloads the disulfide master SS list from Google Drive if it doesn&#39;t</span>
-</span><span id="Bootstrap_PDB_SS-1044"><a href="#Bootstrap_PDB_SS-1044"><span class="linenos">1044</span></a><span class="sd">    already exist in the specified load path or if the force flag is set to True.</span>
-</span><span id="Bootstrap_PDB_SS-1045"><a href="#Bootstrap_PDB_SS-1045"><span class="linenos">1045</span></a><span class="sd">    It then loads the disulfide data from the downloaded file and initializes a</span>
-</span><span id="Bootstrap_PDB_SS-1046"><a href="#Bootstrap_PDB_SS-1046"><span class="linenos">1046</span></a><span class="sd">    DisulfideLoader instance.</span>
-</span><span id="Bootstrap_PDB_SS-1047"><a href="#Bootstrap_PDB_SS-1047"><span class="linenos">1047</span></a>
-</span><span id="Bootstrap_PDB_SS-1048"><a href="#Bootstrap_PDB_SS-1048"><span class="linenos">1048</span></a><span class="sd">    :param loadpath: Path from which to load the data, defaults to DATA_DIR</span>
-</span><span id="Bootstrap_PDB_SS-1049"><a href="#Bootstrap_PDB_SS-1049"><span class="linenos">1049</span></a><span class="sd">    :type loadpath: str</span>
-</span><span id="Bootstrap_PDB_SS-1050"><a href="#Bootstrap_PDB_SS-1050"><span class="linenos">1050</span></a><span class="sd">    :param cutoff: Cutoff value for disulfide loading, defaults to -1.0 (no filtering)</span>
-</span><span id="Bootstrap_PDB_SS-1051"><a href="#Bootstrap_PDB_SS-1051"><span class="linenos">1051</span></a><span class="sd">    :type cutoff: float</span>
-</span><span id="Bootstrap_PDB_SS-1052"><a href="#Bootstrap_PDB_SS-1052"><span class="linenos">1052</span></a><span class="sd">    :param sg_cutoff: Cutoff value for disulfide loading, defaults to -1.0 (no filtering)</span>
-</span><span id="Bootstrap_PDB_SS-1053"><a href="#Bootstrap_PDB_SS-1053"><span class="linenos">1053</span></a><span class="sd">    :type sg_cutoff: float</span>
-</span><span id="Bootstrap_PDB_SS-1054"><a href="#Bootstrap_PDB_SS-1054"><span class="linenos">1054</span></a><span class="sd">    :param verbose: Flag to enable verbose logging, defaults to False</span>
-</span><span id="Bootstrap_PDB_SS-1055"><a href="#Bootstrap_PDB_SS-1055"><span class="linenos">1055</span></a><span class="sd">    :type verbose: bool</span>
-</span><span id="Bootstrap_PDB_SS-1056"><a href="#Bootstrap_PDB_SS-1056"><span class="linenos">1056</span></a><span class="sd">    :param subset: Flag to indicate whether to load a subset of the data, defaults to False</span>
-</span><span id="Bootstrap_PDB_SS-1057"><a href="#Bootstrap_PDB_SS-1057"><span class="linenos">1057</span></a><span class="sd">    :type subset: bool</span>
-</span><span id="Bootstrap_PDB_SS-1058"><a href="#Bootstrap_PDB_SS-1058"><span class="linenos">1058</span></a><span class="sd">    :param force: Flag to force download even if the file exists, defaults to False</span>
-</span><span id="Bootstrap_PDB_SS-1059"><a href="#Bootstrap_PDB_SS-1059"><span class="linenos">1059</span></a><span class="sd">    :type force: bool</span>
-</span><span id="Bootstrap_PDB_SS-1060"><a href="#Bootstrap_PDB_SS-1060"><span class="linenos">1060</span></a><span class="sd">    :return: An instance of DisulfideLoader initialized with the loaded data</span>
-</span><span id="Bootstrap_PDB_SS-1061"><a href="#Bootstrap_PDB_SS-1061"><span class="linenos">1061</span></a><span class="sd">    :rtype: DisulfideLoader</span>
-</span><span id="Bootstrap_PDB_SS-1062"><a href="#Bootstrap_PDB_SS-1062"><span class="linenos">1062</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="Bootstrap_PDB_SS-1063"><a href="#Bootstrap_PDB_SS-1063"><span class="linenos">1063</span></a>
-</span><span id="Bootstrap_PDB_SS-1064"><a href="#Bootstrap_PDB_SS-1064"><span class="linenos">1064</span></a>    <span class="n">fname</span> <span class="o">=</span> <span class="n">SS_PICKLE_FILE</span>
-</span><span id="Bootstrap_PDB_SS-1065"><a href="#Bootstrap_PDB_SS-1065"><span class="linenos">1065</span></a>    <span class="n">url</span> <span class="o">=</span> <span class="n">SS_LIST_URL</span>
-</span><span id="Bootstrap_PDB_SS-1066"><a href="#Bootstrap_PDB_SS-1066"><span class="linenos">1066</span></a>
-</span><span id="Bootstrap_PDB_SS-1067"><a href="#Bootstrap_PDB_SS-1067"><span class="linenos">1067</span></a>    <span class="c1"># _fname = Path(loadpath) / fname</span>
-</span><span id="Bootstrap_PDB_SS-1068"><a href="#Bootstrap_PDB_SS-1068"><span class="linenos">1068</span></a>    <span class="n">full_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">loadpath</span><span class="p">)</span> <span class="o">/</span> <span class="n">fname</span>
-</span><span id="Bootstrap_PDB_SS-1069"><a href="#Bootstrap_PDB_SS-1069"><span class="linenos">1069</span></a>
-</span><span id="Bootstrap_PDB_SS-1070"><a href="#Bootstrap_PDB_SS-1070"><span class="linenos">1070</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">full_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="n">force</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-</span><span id="Bootstrap_PDB_SS-1071"><a href="#Bootstrap_PDB_SS-1071"><span class="linenos">1071</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Bootstrap_PDB_SS-1072"><a href="#Bootstrap_PDB_SS-1072"><span class="linenos">1072</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Can&#39;t find </span><span class="si">%s</span><span class="s2">. Downloading from Drive...&quot;</span><span class="p">,</span> <span class="n">full_path</span><span class="p">)</span>
-</span><span id="Bootstrap_PDB_SS-1073"><a href="#Bootstrap_PDB_SS-1073"><span class="linenos">1073</span></a>
-</span><span id="Bootstrap_PDB_SS-1074"><a href="#Bootstrap_PDB_SS-1074"><span class="linenos">1074</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">fake</span><span class="p">:</span>
-</span><span id="Bootstrap_PDB_SS-1075"><a href="#Bootstrap_PDB_SS-1075"><span class="linenos">1075</span></a>            <span class="n">gdown</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">full_path</span><span class="p">),</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</span><span id="Bootstrap_PDB_SS-1076"><a href="#Bootstrap_PDB_SS-1076"><span class="linenos">1076</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="Bootstrap_PDB_SS-1077"><a href="#Bootstrap_PDB_SS-1077"><span class="linenos">1077</span></a>            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Bootstrap_PDB_SS-1078"><a href="#Bootstrap_PDB_SS-1078"><span class="linenos">1078</span></a>                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Fake download: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">full_path</span><span class="p">)</span>
-</span><span id="Bootstrap_PDB_SS-1079"><a href="#Bootstrap_PDB_SS-1079"><span class="linenos">1079</span></a>                <span class="k">return</span> <span class="kc">None</span>
-</span><span id="Bootstrap_PDB_SS-1080"><a href="#Bootstrap_PDB_SS-1080"><span class="linenos">1080</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Bootstrap_PDB_SS-1081"><a href="#Bootstrap_PDB_SS-1081"><span class="linenos">1081</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-</span><span id="Bootstrap_PDB_SS-1082"><a href="#Bootstrap_PDB_SS-1082"><span class="linenos">1082</span></a>            <span class="s2">&quot;Building loader from: </span><span class="si">%s</span><span class="s2"> with cutoffs </span><span class="si">%f</span><span class="s2">, </span><span class="si">%f</span><span class="s2">...&quot;</span><span class="p">,</span>
-</span><span id="Bootstrap_PDB_SS-1083"><a href="#Bootstrap_PDB_SS-1083"><span class="linenos">1083</span></a>            <span class="n">full_path</span><span class="p">,</span>
-</span><span id="Bootstrap_PDB_SS-1084"><a href="#Bootstrap_PDB_SS-1084"><span class="linenos">1084</span></a>            <span class="n">cutoff</span><span class="p">,</span>
-</span><span id="Bootstrap_PDB_SS-1085"><a href="#Bootstrap_PDB_SS-1085"><span class="linenos">1085</span></a>            <span class="n">sg_cutoff</span><span class="p">,</span>
-</span><span id="Bootstrap_PDB_SS-1086"><a href="#Bootstrap_PDB_SS-1086"><span class="linenos">1086</span></a>        <span class="p">)</span>
-</span><span id="Bootstrap_PDB_SS-1087"><a href="#Bootstrap_PDB_SS-1087"><span class="linenos">1087</span></a>
-</span><span id="Bootstrap_PDB_SS-1088"><a href="#Bootstrap_PDB_SS-1088"><span class="linenos">1088</span></a>    <span class="n">loader</span> <span class="o">=</span> <span class="n">DisulfideLoader</span><span class="p">(</span>
-</span><span id="Bootstrap_PDB_SS-1089"><a href="#Bootstrap_PDB_SS-1089"><span class="linenos">1089</span></a>        <span class="n">datadir</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span>
-</span><span id="Bootstrap_PDB_SS-1090"><a href="#Bootstrap_PDB_SS-1090"><span class="linenos">1090</span></a>        <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">,</span>
-</span><span id="Bootstrap_PDB_SS-1091"><a href="#Bootstrap_PDB_SS-1091"><span class="linenos">1091</span></a>        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-</span><span id="Bootstrap_PDB_SS-1092"><a href="#Bootstrap_PDB_SS-1092"><span class="linenos">1092</span></a>        <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
-</span><span id="Bootstrap_PDB_SS-1093"><a href="#Bootstrap_PDB_SS-1093"><span class="linenos">1093</span></a>        <span class="n">sg_cutoff</span><span class="o">=</span><span class="n">sg_cutoff</span><span class="p">,</span>
-</span><span id="Bootstrap_PDB_SS-1094"><a href="#Bootstrap_PDB_SS-1094"><span class="linenos">1094</span></a>    <span class="p">)</span>
-</span><span id="Bootstrap_PDB_SS-1095"><a href="#Bootstrap_PDB_SS-1095"><span class="linenos">1095</span></a>
-</span><span id="Bootstrap_PDB_SS-1096"><a href="#Bootstrap_PDB_SS-1096"><span class="linenos">1096</span></a>    <span class="k">if</span> <span class="n">loader</span><span class="o">.</span><span class="n">TotalDisulfides</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span id="Bootstrap_PDB_SS-1097"><a href="#Bootstrap_PDB_SS-1097"><span class="linenos">1097</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No disulfides loaded!&quot;</span><span class="p">)</span>
-</span><span id="Bootstrap_PDB_SS-1098"><a href="#Bootstrap_PDB_SS-1098"><span class="linenos">1098</span></a>        <span class="k">return</span> <span class="kc">None</span>
-</span><span id="Bootstrap_PDB_SS-1099"><a href="#Bootstrap_PDB_SS-1099"><span class="linenos">1099</span></a>
-</span><span id="Bootstrap_PDB_SS-1100"><a href="#Bootstrap_PDB_SS-1100"><span class="linenos">1100</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-</span><span id="Bootstrap_PDB_SS-1101"><a href="#Bootstrap_PDB_SS-1101"><span class="linenos">1101</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Done building loader.&quot;</span><span class="p">)</span>
-</span><span id="Bootstrap_PDB_SS-1102"><a href="#Bootstrap_PDB_SS-1102"><span class="linenos">1102</span></a>
-</span><span id="Bootstrap_PDB_SS-1103"><a href="#Bootstrap_PDB_SS-1103"><span class="linenos">1103</span></a>    <span class="k">return</span> <span class="n">loader</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Bootstrap_PDB_SS-1030"><a href="#Bootstrap_PDB_SS-1030"><span class="linenos">1030</span></a><span class="k">def</span><span class="w"> </span><span class="nf">Bootstrap_PDB_SS</span><span class="p">(</span>
+</span><span id="Bootstrap_PDB_SS-1031"><a href="#Bootstrap_PDB_SS-1031"><span class="linenos">1031</span></a>    <span class="n">loadpath</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span>
+</span><span id="Bootstrap_PDB_SS-1032"><a href="#Bootstrap_PDB_SS-1032"><span class="linenos">1032</span></a>    <span class="n">cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span>
+</span><span id="Bootstrap_PDB_SS-1033"><a href="#Bootstrap_PDB_SS-1033"><span class="linenos">1033</span></a>    <span class="n">sg_cutoff</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span>
+</span><span id="Bootstrap_PDB_SS-1034"><a href="#Bootstrap_PDB_SS-1034"><span class="linenos">1034</span></a>    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+</span><span id="Bootstrap_PDB_SS-1035"><a href="#Bootstrap_PDB_SS-1035"><span class="linenos">1035</span></a>    <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="Bootstrap_PDB_SS-1036"><a href="#Bootstrap_PDB_SS-1036"><span class="linenos">1036</span></a>    <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="Bootstrap_PDB_SS-1037"><a href="#Bootstrap_PDB_SS-1037"><span class="linenos">1037</span></a>    <span class="n">fake</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="Bootstrap_PDB_SS-1038"><a href="#Bootstrap_PDB_SS-1038"><span class="linenos">1038</span></a><span class="p">):</span>
+</span><span id="Bootstrap_PDB_SS-1039"><a href="#Bootstrap_PDB_SS-1039"><span class="linenos">1039</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Bootstrap_PDB_SS-1040"><a href="#Bootstrap_PDB_SS-1040"><span class="linenos">1040</span></a><span class="sd">    Download and instantiate the disulfide databases from Google Drive.</span>
+</span><span id="Bootstrap_PDB_SS-1041"><a href="#Bootstrap_PDB_SS-1041"><span class="linenos">1041</span></a>
+</span><span id="Bootstrap_PDB_SS-1042"><a href="#Bootstrap_PDB_SS-1042"><span class="linenos">1042</span></a><span class="sd">    This function downloads the disulfide master SS list from Google Drive if it doesn&#39;t</span>
+</span><span id="Bootstrap_PDB_SS-1043"><a href="#Bootstrap_PDB_SS-1043"><span class="linenos">1043</span></a><span class="sd">    already exist in the specified load path or if the force flag is set to True.</span>
+</span><span id="Bootstrap_PDB_SS-1044"><a href="#Bootstrap_PDB_SS-1044"><span class="linenos">1044</span></a><span class="sd">    It then loads the disulfide data from the downloaded file and initializes a</span>
+</span><span id="Bootstrap_PDB_SS-1045"><a href="#Bootstrap_PDB_SS-1045"><span class="linenos">1045</span></a><span class="sd">    DisulfideLoader instance.</span>
+</span><span id="Bootstrap_PDB_SS-1046"><a href="#Bootstrap_PDB_SS-1046"><span class="linenos">1046</span></a>
+</span><span id="Bootstrap_PDB_SS-1047"><a href="#Bootstrap_PDB_SS-1047"><span class="linenos">1047</span></a><span class="sd">    :param loadpath: Path from which to load the data, defaults to DATA_DIR</span>
+</span><span id="Bootstrap_PDB_SS-1048"><a href="#Bootstrap_PDB_SS-1048"><span class="linenos">1048</span></a><span class="sd">    :type loadpath: str</span>
+</span><span id="Bootstrap_PDB_SS-1049"><a href="#Bootstrap_PDB_SS-1049"><span class="linenos">1049</span></a><span class="sd">    :param cutoff: Cutoff value for disulfide loading, defaults to -1.0 (no filtering)</span>
+</span><span id="Bootstrap_PDB_SS-1050"><a href="#Bootstrap_PDB_SS-1050"><span class="linenos">1050</span></a><span class="sd">    :type cutoff: float</span>
+</span><span id="Bootstrap_PDB_SS-1051"><a href="#Bootstrap_PDB_SS-1051"><span class="linenos">1051</span></a><span class="sd">    :param sg_cutoff: Cutoff value for disulfide loading, defaults to -1.0 (no filtering)</span>
+</span><span id="Bootstrap_PDB_SS-1052"><a href="#Bootstrap_PDB_SS-1052"><span class="linenos">1052</span></a><span class="sd">    :type sg_cutoff: float</span>
+</span><span id="Bootstrap_PDB_SS-1053"><a href="#Bootstrap_PDB_SS-1053"><span class="linenos">1053</span></a><span class="sd">    :param verbose: Flag to enable verbose logging, defaults to False</span>
+</span><span id="Bootstrap_PDB_SS-1054"><a href="#Bootstrap_PDB_SS-1054"><span class="linenos">1054</span></a><span class="sd">    :type verbose: bool</span>
+</span><span id="Bootstrap_PDB_SS-1055"><a href="#Bootstrap_PDB_SS-1055"><span class="linenos">1055</span></a><span class="sd">    :param subset: Flag to indicate whether to load a subset of the data, defaults to False</span>
+</span><span id="Bootstrap_PDB_SS-1056"><a href="#Bootstrap_PDB_SS-1056"><span class="linenos">1056</span></a><span class="sd">    :type subset: bool</span>
+</span><span id="Bootstrap_PDB_SS-1057"><a href="#Bootstrap_PDB_SS-1057"><span class="linenos">1057</span></a><span class="sd">    :param force: Flag to force download even if the file exists, defaults to False</span>
+</span><span id="Bootstrap_PDB_SS-1058"><a href="#Bootstrap_PDB_SS-1058"><span class="linenos">1058</span></a><span class="sd">    :type force: bool</span>
+</span><span id="Bootstrap_PDB_SS-1059"><a href="#Bootstrap_PDB_SS-1059"><span class="linenos">1059</span></a><span class="sd">    :return: An instance of DisulfideLoader initialized with the loaded data</span>
+</span><span id="Bootstrap_PDB_SS-1060"><a href="#Bootstrap_PDB_SS-1060"><span class="linenos">1060</span></a><span class="sd">    :rtype: DisulfideLoader</span>
+</span><span id="Bootstrap_PDB_SS-1061"><a href="#Bootstrap_PDB_SS-1061"><span class="linenos">1061</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="Bootstrap_PDB_SS-1062"><a href="#Bootstrap_PDB_SS-1062"><span class="linenos">1062</span></a>
+</span><span id="Bootstrap_PDB_SS-1063"><a href="#Bootstrap_PDB_SS-1063"><span class="linenos">1063</span></a>    <span class="n">fname</span> <span class="o">=</span> <span class="n">SS_PICKLE_FILE</span>
+</span><span id="Bootstrap_PDB_SS-1064"><a href="#Bootstrap_PDB_SS-1064"><span class="linenos">1064</span></a>    <span class="n">url</span> <span class="o">=</span> <span class="n">SS_LIST_URL</span>
+</span><span id="Bootstrap_PDB_SS-1065"><a href="#Bootstrap_PDB_SS-1065"><span class="linenos">1065</span></a>
+</span><span id="Bootstrap_PDB_SS-1066"><a href="#Bootstrap_PDB_SS-1066"><span class="linenos">1066</span></a>    <span class="c1"># _fname = Path(loadpath) / fname</span>
+</span><span id="Bootstrap_PDB_SS-1067"><a href="#Bootstrap_PDB_SS-1067"><span class="linenos">1067</span></a>    <span class="n">full_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">loadpath</span><span class="p">)</span> <span class="o">/</span> <span class="n">fname</span>
+</span><span id="Bootstrap_PDB_SS-1068"><a href="#Bootstrap_PDB_SS-1068"><span class="linenos">1068</span></a>
+</span><span id="Bootstrap_PDB_SS-1069"><a href="#Bootstrap_PDB_SS-1069"><span class="linenos">1069</span></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">full_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">or</span> <span class="n">force</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+</span><span id="Bootstrap_PDB_SS-1070"><a href="#Bootstrap_PDB_SS-1070"><span class="linenos">1070</span></a>        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="Bootstrap_PDB_SS-1071"><a href="#Bootstrap_PDB_SS-1071"><span class="linenos">1071</span></a>            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Can&#39;t find </span><span class="si">%s</span><span class="s2">. Downloading from Drive...&quot;</span><span class="p">,</span> <span class="n">full_path</span><span class="p">)</span>
+</span><span id="Bootstrap_PDB_SS-1072"><a href="#Bootstrap_PDB_SS-1072"><span class="linenos">1072</span></a>
+</span><span id="Bootstrap_PDB_SS-1073"><a href="#Bootstrap_PDB_SS-1073"><span class="linenos">1073</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">fake</span><span class="p">:</span>
+</span><span id="Bootstrap_PDB_SS-1074"><a href="#Bootstrap_PDB_SS-1074"><span class="linenos">1074</span></a>            <span class="n">gdown</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">full_path</span><span class="p">),</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><span id="Bootstrap_PDB_SS-1075"><a href="#Bootstrap_PDB_SS-1075"><span class="linenos">1075</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="Bootstrap_PDB_SS-1076"><a href="#Bootstrap_PDB_SS-1076"><span class="linenos">1076</span></a>            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="Bootstrap_PDB_SS-1077"><a href="#Bootstrap_PDB_SS-1077"><span class="linenos">1077</span></a>                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Fake download: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">full_path</span><span class="p">)</span>
+</span><span id="Bootstrap_PDB_SS-1078"><a href="#Bootstrap_PDB_SS-1078"><span class="linenos">1078</span></a>                <span class="k">return</span> <span class="kc">None</span>
+</span><span id="Bootstrap_PDB_SS-1079"><a href="#Bootstrap_PDB_SS-1079"><span class="linenos">1079</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="Bootstrap_PDB_SS-1080"><a href="#Bootstrap_PDB_SS-1080"><span class="linenos">1080</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+</span><span id="Bootstrap_PDB_SS-1081"><a href="#Bootstrap_PDB_SS-1081"><span class="linenos">1081</span></a>            <span class="s2">&quot;Building loader from: </span><span class="si">%s</span><span class="s2"> with cutoffs </span><span class="si">%f</span><span class="s2">, </span><span class="si">%f</span><span class="s2">...&quot;</span><span class="p">,</span>
+</span><span id="Bootstrap_PDB_SS-1082"><a href="#Bootstrap_PDB_SS-1082"><span class="linenos">1082</span></a>            <span class="n">full_path</span><span class="p">,</span>
+</span><span id="Bootstrap_PDB_SS-1083"><a href="#Bootstrap_PDB_SS-1083"><span class="linenos">1083</span></a>            <span class="n">cutoff</span><span class="p">,</span>
+</span><span id="Bootstrap_PDB_SS-1084"><a href="#Bootstrap_PDB_SS-1084"><span class="linenos">1084</span></a>            <span class="n">sg_cutoff</span><span class="p">,</span>
+</span><span id="Bootstrap_PDB_SS-1085"><a href="#Bootstrap_PDB_SS-1085"><span class="linenos">1085</span></a>        <span class="p">)</span>
+</span><span id="Bootstrap_PDB_SS-1086"><a href="#Bootstrap_PDB_SS-1086"><span class="linenos">1086</span></a>
+</span><span id="Bootstrap_PDB_SS-1087"><a href="#Bootstrap_PDB_SS-1087"><span class="linenos">1087</span></a>    <span class="n">loader</span> <span class="o">=</span> <span class="n">DisulfideLoader</span><span class="p">(</span>
+</span><span id="Bootstrap_PDB_SS-1088"><a href="#Bootstrap_PDB_SS-1088"><span class="linenos">1088</span></a>        <span class="n">datadir</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span>
+</span><span id="Bootstrap_PDB_SS-1089"><a href="#Bootstrap_PDB_SS-1089"><span class="linenos">1089</span></a>        <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">,</span>
+</span><span id="Bootstrap_PDB_SS-1090"><a href="#Bootstrap_PDB_SS-1090"><span class="linenos">1090</span></a>        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+</span><span id="Bootstrap_PDB_SS-1091"><a href="#Bootstrap_PDB_SS-1091"><span class="linenos">1091</span></a>        <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span><span class="p">,</span>
+</span><span id="Bootstrap_PDB_SS-1092"><a href="#Bootstrap_PDB_SS-1092"><span class="linenos">1092</span></a>        <span class="n">sg_cutoff</span><span class="o">=</span><span class="n">sg_cutoff</span><span class="p">,</span>
+</span><span id="Bootstrap_PDB_SS-1093"><a href="#Bootstrap_PDB_SS-1093"><span class="linenos">1093</span></a>    <span class="p">)</span>
+</span><span id="Bootstrap_PDB_SS-1094"><a href="#Bootstrap_PDB_SS-1094"><span class="linenos">1094</span></a>
+</span><span id="Bootstrap_PDB_SS-1095"><a href="#Bootstrap_PDB_SS-1095"><span class="linenos">1095</span></a>    <span class="k">if</span> <span class="n">loader</span><span class="o">.</span><span class="n">TotalDisulfides</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="Bootstrap_PDB_SS-1096"><a href="#Bootstrap_PDB_SS-1096"><span class="linenos">1096</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No disulfides loaded!&quot;</span><span class="p">)</span>
+</span><span id="Bootstrap_PDB_SS-1097"><a href="#Bootstrap_PDB_SS-1097"><span class="linenos">1097</span></a>        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="Bootstrap_PDB_SS-1098"><a href="#Bootstrap_PDB_SS-1098"><span class="linenos">1098</span></a>
+</span><span id="Bootstrap_PDB_SS-1099"><a href="#Bootstrap_PDB_SS-1099"><span class="linenos">1099</span></a>    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+</span><span id="Bootstrap_PDB_SS-1100"><a href="#Bootstrap_PDB_SS-1100"><span class="linenos">1100</span></a>        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Done building loader.&quot;</span><span class="p">)</span>
+</span><span id="Bootstrap_PDB_SS-1101"><a href="#Bootstrap_PDB_SS-1101"><span class="linenos">1101</span></a>
+</span><span id="Bootstrap_PDB_SS-1102"><a href="#Bootstrap_PDB_SS-1102"><span class="linenos">1102</span></a>    <span class="k">return</span> <span class="n">loader</span>
 </span></pre></div>
 
 

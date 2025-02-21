@@ -5,6 +5,22 @@ Notable changes to the ``proteusPy`` project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.99.3.pre] - 2024-2-21 unreleased
+
+### Added
+
+- Stronger type checking in general
+- Additional error checking for slicing lists
+- Several new Unittests
+
+
+### Changed
+
+- Refactored both ``Disufulfide`` and ``DisulfideList`` and moved plotting and statistics into new modules.
+- Created ``DisulfideVisualization`` and ``DisulfideStats`` classes for them.
+- Simplification and unification of accessing Disulfides via class strings
+- Generalized Disulfide class creation, can create up to 26-fold classes now.
+
 ## [v0.99.1.dev0] - 2024-2-07 unreleased
 
 ### Added

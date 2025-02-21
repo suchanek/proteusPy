@@ -1,5 +1,6 @@
 """
-This module provides statistical analysis functionality for disulfide bonds in the proteusPy package.
+This module provides statistical analysis functionality for disulfide bonds 
+in the proteusPy package.
 
 Author: Eric G. Suchanek, PhD
 Last revision: 2025-02-19 23:17:44
@@ -137,6 +138,14 @@ class DisulfideStats:
         return pd.DataFrame(data)
 
     @staticmethod
+    def circular_mean(series):
+        """Calculate the circular mean of a series of angles."""
+        radians = np.deg2rad(series)
+        sin_mean = np.sin(radians).mean()
+        cos_mean = np.cos(radians).mean()
+        return np.rad2deg(np.arctan2(sin_mean, cos_mean))
+
+    @staticmethod
     def calculate_torsion_statistics(sslist) -> tuple:
         """Calculate and return the torsion and distance statistics for the DisulfideList.
 
@@ -152,7 +161,7 @@ class DisulfideStats:
         tor_stats = {}
         dist_stats = {}
 
-        def circular_mean(series):
+        def _circular_mean(series):
             """Calculate the circular mean of a series of angles."""
             radians = np.deg2rad(series)
             sin_mean = np.sin(radians).mean()
@@ -160,7 +169,7 @@ class DisulfideStats:
             return np.rad2deg(np.arctan2(sin_mean, cos_mean))
 
         for col in tor_cols[:5]:
-            tor_stats[col] = {"mean": circular_mean(df[col]), "std": df[col].std()}
+            tor_stats[col] = {"mean": _circular_mean(df[col]), "std": df[col].std()}
 
         tor_stats["torsion_length"] = {
             "mean": df["torsion_length"].mean(),
