@@ -70,7 +70,7 @@ def configure_master_logger(
     file_path: str = "~/logs",
     log_level: int = logging.ERROR,
     disabled: bool = False,
-) -> logging.Logger:
+) -> None:
     """
     Configures the root logger to write to a specified log file.
 
@@ -82,8 +82,6 @@ def configure_master_logger(
     :type log_level: int
     :param disabled: If True, the logger will be disabled. Defaults to False.
     :type disabled: bool
-    :return: The configured root logger.
-    :rtype: logging.Logger
     """
     # Expand user path
     file_path = Path(file_path).expanduser()
@@ -120,7 +118,7 @@ def configure_master_logger(
     else:
         root_logger.disabled = False  # Enable the root logger
 
-    return root_logger
+    return
 
 
 def create_logger(
@@ -238,7 +236,9 @@ def list_all_loggers():
     """
     logger_dict = logging.Logger.manager.loggerDict
     loggers = [
-        name for name in logger_dict if isinstance(logger_dict[name], logging.Logger)
+        name
+        for name, logger in logger_dict.items()
+        if isinstance(logger, logging.Logger)
     ]
     return loggers
 

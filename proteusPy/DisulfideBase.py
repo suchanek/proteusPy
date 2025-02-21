@@ -22,7 +22,6 @@ Last Modification: 2025-02-14 08:51:33
 import copy
 import logging
 import math
-import warnings
 from collections import UserList
 from itertools import combinations
 from math import cos
@@ -42,7 +41,6 @@ from proteusPy.DisulfideVisualization import DisulfideVisualization
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, WINSIZE
 from proteusPy.Residue import build_residue
-
 from proteusPy.turtle3D import ORIENT_SIDECHAIN, Turtle3D
 from proteusPy.utility import set_pyvista_theme
 from proteusPy.vector3D import Vector3D, calc_dihedral, distance3d
@@ -106,18 +104,48 @@ class DisulfideList(UserList):
 
         :param item: Index or slice
         :return: Sublist
+        :rtype: DisulfideList
+        :raises IndexError: Invalid index or slice range outside list bounds
+        :raises ValueError: Invalid slice step (zero) or invalid slice range
         """
         if isinstance(item, slice):
-            indices = range(*item.indices(len(self.data)))
-            ind_list = list(indices)
-            first_ind = ind_list[0]
-            last_ind = ind_list[-1]
-            name = (
-                self.data[first_ind].pdb_id
-                + f"_slice[{first_ind}:{last_ind+1}]_{self.data[last_ind].pdb_id}"
-            )
+            # Get list length
+            list_len = len(self.data)
+
+            # Validate step first since it's the only parameter that should raise an error
+            if item.step == 0:
+                raise ValueError("Slice step cannot be zero")
+
+            # Get normalized indices using Python's built-in slice.indices()
+            # This handles negative indices and out-of-bounds values by clamping them
+            start, stop, step = item.indices(list_len)
+
+            if start < 0 or step < 0:
+                _logger.error("Negative indices or steps are not supported")
+                return DisulfideList([], "invalid_start_or_step")
+
+            if stop > list_len:
+                _logger.error("Slice range exceeds list bounds")
+                stop = max(list_len, stop)
+                return DisulfideList([], "invalid_slice")
+
+            # Create range of indices
+            indices = range(start, stop, step)
+
+            # Create the sublist
             sublist = [self.data[i] for i in indices]
+
+            # Return empty list for empty slice
+            if not sublist:
+                return DisulfideList([], "empty_slice")
+
+            # Create name with slice info
+            name = (
+                sublist[0].pdb_id
+                + f"_slice[{indices[0]}:{indices[-1]+1}]_{sublist[-1].pdb_id}"
+            )
             return DisulfideList(sublist, name)
+
         return UserList.__getitem__(self, item)
 
     def __setitem__(self, index, item):
@@ -137,6 +165,41 @@ class DisulfideList(UserList):
     def insert(self, index, item):
         """Insert a Disulfide into the list at the specified index"""
         self.data.insert(index, self.validate_ss(item))
+
+    def describe(self):
+        """
+        Prints out relevant attributes of the given disulfideList.
+
+        :param disulfideList: A list of disulfide objects.
+        :param list_name: The name of the list.
+        """
+        name = self.pdb_id
+        avg_distance = self.average_ca_distance
+        avg_energy = self.average_energy
+        avg_resolution = self.average_resolution
+        list_length = len(self.data)
+
+        if list_length == 0:
+            avg_bondangle = 0
+            avg_bondlength = 0
+        else:
+            total_bondangle = 0
+            total_bondlength = 0
+
+            for ss in self.data:
+                total_bondangle += ss.bond_angle_ideality
+                total_bondlength += ss.bond_length_ideality
+
+            avg_bondangle = total_bondangle / list_length
+            avg_bondlength = total_bondlength / list_length
+
+        print(f"DisulfideList: {name}")
+        print(f"Length: {list_length}")
+        print(f"Average energy: {avg_energy:.2f} kcal/mol")
+        print(f"Average CA distance: {avg_distance:.2f} Å")
+        print(f"Average Resolution: {avg_resolution:.2f} Å")
+        print(f"Bond angle deviation: {avg_bondangle:.2f}°")
+        print(f"Bond length deviation: {avg_bondlength:.2f} Å")
 
     @property
     def length(self):
@@ -292,8 +355,36 @@ class DisulfideList(UserList):
         return reslist
 
     def nearest_neighbors(self, cutoff: float, *args):
-        """Return all Disulfides within the given angle cutoff"""
+        """
+        Find and return neighboring Disulfide objects based on torsion angle similarity.
+
+        This method uses the provided torsion angles to create a model Disulfide object and then
+        returns all Disulfide objects in the current list (self) whose torsion angle Euclidean
+        distance from the model is less than or equal to the specified cutoff value. The torsion
+        angles can be provided either as a single list (or numpy array) of 5 angles or as 5 individual
+        float arguments.
+
+        :param cutoff: The maximum allowable Euclidean distance (in degrees) between the torsion angles
+                    of the model and another Disulfide for them to be considered neighbors.
+        :type cutoff: float
+        :param args: Either a single iterable (list or numpy.ndarray) containing 5 torsion angles or 5
+                    individual torsion angle float values.
+        :type args: list or numpy.ndarray or 5 individual float values
+        :return: A DisulfideList containing all Disulfide objects whose torsion distance from the model
+                is within the specified cutoff.
+        :rtype: DisulfideList
+        :raises ValueError: If the number of provided angles is not exactly 5.
+
+        Example:
+            >>> import proteusPy as pp
+            >>> pdb_list = pp.Load_PDB_SS(verbose=False, subset=True).SSList
+            >>> # Using 5 individual angles:
+            >>> neighbors = pdb_list.nearest_neighbors(8, -60, -60, -90, -60, -60)
+        """
+
         if len(args) == 1 and isinstance(args[0], list) and len(args[0]) == 5:
+            chi1, chi2, chi3, chi4, chi5 = args[0]
+        elif len(args) == 1 and isinstance(args[0], np.ndarray) and len(args[0]) == 5:
             chi1, chi2, chi3, chi4, chi5 = args[0]
         elif len(args) == 5:
             chi1, chi2, chi3, chi4, chi5 = args
@@ -302,21 +393,30 @@ class DisulfideList(UserList):
                 "You must provide either 5 individual angles or a list of 5 angles."
             )
 
-        sslist = self.data
-
         modelss = Disulfide("model", torsions=[chi1, chi2, chi3, chi4, chi5])
-        res = modelss.torsion_neighbors(sslist, cutoff)
+        res = modelss.torsion_neighbors(self, cutoff)
         resname = f"Neighbors within {cutoff:.2f}° of [{', '.join(f'{angle:.2f}' for angle in modelss.dihedrals)}]"
         res.pdb_id = resname
         return res
 
-    def nearest_neighbors_ss(self, ss, cutoff: float):
+    def nearest_neighbors_ss(self, ss: "Disulfide", cutoff: float):
         """Return Disulfides within the torsional cutoff of the input Disulfide"""
-        sslist = self.data
-        res = ss.torsion_neighbors(sslist, cutoff)
+        res = ss.torsion_neighbors(self, cutoff)
         resname = f"{ss.name} neighbors within {cutoff}°"
         res.pdb_id = resname
         return res
+
+    def getlist(self):
+        """Return a copy of the list"""
+        return self.copy()
+
+    def build_ss_from_idlist(self, id_list):
+        """Build a DisulfideList from a list of PDB IDs"""
+        result = []
+        for ss in self.data:
+            if ss.pdb_id in id_list:
+                result.append(ss.copy())
+        return DisulfideList(result, f"Built from {','.join(id_list)}")
 
     def pprint(self):
         """Pretty print self"""
@@ -1265,7 +1365,7 @@ class Disulfide:
         """
         prox = self.proximal_chain
         dist = self.distal_chain
-        return tuple(prox, dist)
+        return prox, dist
 
     def get_full_id(self) -> tuple:
         """
@@ -1914,7 +2014,7 @@ class Disulfide:
 
         >>> tot = low_energy_neighbors.length
         >>> print(f'Neighbors: {tot}')
-        Neighbors: 8
+        Neighbors: 9
         >>> low_energy_neighbors.display_overlay(light="auto")
 
         """
