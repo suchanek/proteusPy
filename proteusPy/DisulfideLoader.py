@@ -59,9 +59,6 @@ except NameError:
     from tqdm import tqdm
 
 
-# Note: The calculate_std_cutoff and calculate_percentile_cutoff functions have been moved to DisulfideStats class
-
-
 @dataclass
 class DisulfideLoader:
     """
@@ -181,13 +178,16 @@ class DisulfideLoader:
                 filt = sslist.filter_by_distance(
                     distance=self.cutoff, distance_type="ca"
                 )
-                filt = DisulfideList(filt, "filtered by Ca")
+                filt = DisulfideList(
+                    filt,
+                    f"filtered by Ca cutoff:{self.cutoff:.2f}, Sg cutoff: {self.sg_cutoff:.2f}",
+                )
 
                 new_length = len(filt)
 
                 if self.verbose:
                     _logger.info(
-                        "Filtering with Cα cutoff %.2f: old: %d, new: %d",
+                        "Filtered with Cα cutoff %.2f: old: %d, new: %d",
                         self.cutoff,
                         old_length,
                         new_length,
@@ -201,7 +201,7 @@ class DisulfideLoader:
 
                 if self.verbose:
                     _logger.info(
-                        "Filtering Sγ: cutoff %.2f: old: %d, new: %d",
+                        "Filtered with Sγ: cutoff %.2f: old: %d, new: %d",
                         self.sg_cutoff,
                         old_length,
                         new_length,
