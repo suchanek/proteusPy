@@ -5,7 +5,7 @@ It represents the core of the current implementation of *proteusPy*.
 
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 Author: Eric G. Suchanek, PhD
-Last Modification: 2025-02-14 08:51:33
+Last Modification: 2025-02-21 16:33:47
 """
 
 # pylint: disable=W1203 # use of print
