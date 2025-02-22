@@ -25,8 +25,22 @@ _this_dir = pkg_resources.files("proteusPy")
 
 HOME_DIR = Path.home()
 
-PDB_DIR = os.getenv("PDB")
+# Get the PDB directory from environment variable
+PDB_DIR = os.environ.get("PDB")
+if not PDB_DIR:
+    _logger.error(
+        "Environment variable 'PDB' is not set. Defaulting to HOME_DIR: %s",
+        str(HOME_DIR),
+    )
+    PDB_DIR = str(HOME_DIR)
+
 PDB_BASE = Path(PDB_DIR)
+if not (PDB_BASE.exists() and PDB_BASE.is_dir()):
+    _logger.error(
+        "Invalid PDB directory '%s'. Defaulting to HOME_DIR: %s", PDB_DIR, str(HOME_DIR)
+    )
+    PDB_DIR = str(HOME_DIR)
+    PDB_BASE = HOME_DIR
 
 GOOD_PDB_FILE = "good_pdb.pkl"
 
@@ -35,13 +49,6 @@ MAMBAFORGE_DIR = HOME_DIR / Path("mambaforge/envs")
 
 VENV_DIR = Path("lib/python3.12/site-packages/proteusPy/data")
 VENV_DEV_DIR = Path("lib/python3.12/site-packages/ppydev/data")
-
-if not PDB_BASE.is_dir():
-    print(f"Error: The directory {PDB_DIR} does not exist.")
-    PDB_DIR = HOME_DIR
-
-# DATA_DIR = Path(_this_dir) / "data"
-# MODEL_DIR = PDB_BASE / "good"
 
 DATA_DIR = os.path.join(_this_dir, "data")
 MODEL_DIR = os.path.join(PDB_DIR, "good")
