@@ -15,10 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Refactored both ``Disufulfide`` and ``DisulfideList`` and moved plotting and statistics into new modules.
-- Created ``DisulfideVisualization`` and ``DisulfideStats`` classes for them.
+- Refactored both ``Disufulfide`` and ``DisulfideList`` and moved plotting and statistics into new classes ``DisulfideVisualization`` and ``DisulfideStats``.
 - Simplification and unification of accessing Disulfides via class strings
 - Generalized Disulfide class creation, can create up to 26-fold classes now.
+
+### Fixed
+
+- DisulfideList.AverageConformation now uses a circular mean function to correctly handle the nature of -180 - 180 degree dihedral angle averaging.
 
 ## [v0.99.1.dev0] - 2024-2-07 unreleased
 

@@ -47,10 +47,10 @@ def main():
         description=helpstring,
     )
     parser.add_argument(
-        "-c", "--ca_cutoff", type=float, default=CA_CUTOFF, help="CA cutoff value"
+        "-c", "--ca_cutoff", type=float, default=-1.0, help="CA cutoff value"
     )
     parser.add_argument(
-        "-s", "--sg_cutoff", type=float, default=SG_CUTOFF, help="SG cutoff value"
+        "-s", "--sg_cutoff", type=float, default=-1.0, help="SG cutoff value"
     )
     parser.add_argument(
         "-v", "--verbose", action="store_true", help="Enable verbose output"
