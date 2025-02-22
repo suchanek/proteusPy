@@ -1,6 +1,6 @@
 # pylint: disable=C0301
 # pylint: disable=C0103
-# Last modification: 2025-01-23 14:21:21 -egs-
+# Last modification: 2025-02-21 19:03:29 14:21:21 -egs-
 
 """
 Disulfide class consensus structure extraction using `proteusPy.Disulfide` package. Disulfide
@@ -137,8 +137,16 @@ from pathlib import Path
 from colorama import Fore, Style, init
 from tqdm import tqdm
 
-import proteusPy as pp
-from proteusPy import CA_CUTOFF, SG_CUTOFF, SS_CONSENSUS_BIN_FILE, SS_CONSENSUS_OCT_FILE
+from proteusPy import (
+    SS_CONSENSUS_BIN_FILE,
+    SS_CONSENSUS_OCT_FILE,
+    Disulfide,
+    DisulfideList,
+    DisulfideLoader,
+    configure_master_logger,
+    create_logger,
+    set_logger_level_for_module,
+)
 
 HOME_DIR = Path.home()
 PDB = Path(os.getenv("PDB", HOME_DIR / "pdb"))
@@ -167,10 +175,10 @@ PBAR_COLS = 78
 # Initialize colorama
 init(autoreset=True)
 
-_logger = pp.create_logger("__name__")
+_logger = create_logger("__name__")
 
-pp.configure_master_logger("DisulfidClass_Analysis.log")
-pp.set_logger_level_for_module("proteusPy", "ERROR")
+configure_master_logger("DisulfidClass_Analysis.log")
+set_logger_level_for_module("proteusPy", "ERROR")
 
 
 def get_args():
@@ -262,11 +270,11 @@ def get_args():
 
 # task definition
 def task(
-    loader: pp.DisulfideLoader,
+    loader: DisulfideLoader,
     overall_pbar: tqdm,
     start_idx: int,
     end_idx: int,
-    result_list: pp.DisulfideList,
+    result_list: DisulfideList,
     pbar: tqdm,
     cutoff: float,
     do_graph: bool,
@@ -324,7 +332,7 @@ def task(
         avg_conformation = class_disulfides.average_conformation
 
         ssname = f"{cls}"
-        exemplar = pp.Disulfide(ssname, torsions=avg_conformation)
+        exemplar = Disulfide(ssname, torsions=avg_conformation)
         result_list.append(exemplar)
 
         overall_pbar.update(1)
@@ -334,13 +342,13 @@ def task(
 
 
 def analyze_classes_threaded(
-    loader: pp.DisulfideLoader,
+    loader: DisulfideLoader,
     do_graph=False,
     cutoff=0.0,
     num_threads=8,
     do_octant=True,
     prefix="ss",
-) -> pp.DisulfideList:
+) -> DisulfideList:
     """
     Analyze the classes of disulfide bonds.
 
@@ -361,7 +369,7 @@ def analyze_classes_threaded(
         save_dir = OCTANT
         base = 8
         eight_or_bin = loader.tclass.eightclass_df
-        res_list = pp.DisulfideList([], f"SS_32class_Avg_SS_{cutoff:.2f}")
+        res_list = DisulfideList([], f"SS_32class_Avg_SS_{cutoff:.2f}")
         pix = loader.classes_vs_cutoff(cutoff, base=base)
         classlist = tors_df["octant_class_string"].unique()
         total_classes = len(classlist)
@@ -373,7 +381,7 @@ def analyze_classes_threaded(
         save_dir = BINARY
         eight_or_bin = loader.tclass.binaryclass_df
         total_classes = eight_or_bin.shape[0]  # 32
-        res_list = pp.DisulfideList([], "SS_32class_Avg_SS")
+        res_list = DisulfideList([], "SS_32class_Avg_SS")
         pix = 32
         base = 2
         classlist = tors_df["binary_class_string"].unique()
@@ -444,7 +452,7 @@ def analyze_classes_threaded(
 
 
 def analyze_classes(
-    loader: pp.DisulfideLoader,
+    loader: DisulfideLoader,
     binary: bool,
     octant: bool,
     threads: int = 4,
@@ -582,11 +590,7 @@ def main():
         update_repository(DATA_DIR, venv_dir, binary=binary, octant=octant)
         return
 
-    # pdb_ss = pp.Load_PDB_SS(
-    #    verbose=verbose, subset=False, cutoff=CA_CUTOFF, sg_cutoff=SG_CUTOFF
-    # )
-
-    pdb_ss = pp.DisulfideLoader(verbose=verbose, subset=False, cutoff=-1, sg_cutoff=-1)
+    pdb_ss = DisulfideLoader(verbose=verbose, subset=False, cutoff=-1, sg_cutoff=-1)
 
     analyze_classes(
         pdb_ss,
