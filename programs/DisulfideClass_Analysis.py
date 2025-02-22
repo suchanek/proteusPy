@@ -1,79 +1,12 @@
 # pylint: disable=C0301
 # pylint: disable=C0103
-# Last modification: 2025-02-21 19:03:29 14:21:21 -egs-
+# Last modification: 2025-02-22 15:44:59 -egs-
 
 """
-Disulfide class consensus structure extraction using `proteusPy.Disulfide` package. Disulfide
-binary families are defined using the +/- formalism of Schmidt et al. (Biochem, 2006, 45, 
-7429-7433), across all 32 possible classes ($$2^5$$). Classes are named per the paper's convention.
-
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| IDX|   chi1_s |   chi2_s |   chi3_s |   chi4_s |   chi5_s |   class_id | SS_Classname   | FXN        |
-+====+==========+==========+==========+==========+==========+============+================+============+
-|  0 |       -1 |       -1 |       -1 |       -1 |       -1 |      00000 | -LHSpiral      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  1 |       -1 |       -1 |       -1 |       -1 |        1 |      00002 | 00002          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  2 |       -1 |       -1 |       -1 |        1 |       -1 |      00020 | -LHHook        | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  3 |       -1 |       -1 |       -1 |        1 |        1 |      00022 | 00022          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  4 |       -1 |       -1 |        1 |       -1 |       -1 |      00200 | -RHStaple      | Allosteric |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  5 |       -1 |       -1 |        1 |       -1 |        1 |      00202 | 00202          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  6 |       -1 |       -1 |        1 |        1 |       -1 |      00220 | 00220          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  7 |       -1 |       -1 |        1 |        1 |        1 |      00222 | 00222          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  8 |       -1 |        1 |       -1 |       -1 |       -1 |      02000 | 02000          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-|  9 |       -1 |        1 |       -1 |       -1 |        1 |      02002 | 02002          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 10 |       -1 |        1 |       -1 |        1 |       -1 |      02020 | -LHStaple      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 11 |       -1 |        1 |       -1 |        1 |        1 |      02022 | 02022          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 12 |       -1 |        1 |        1 |       -1 |       -1 |      02200 | -RHHook        | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 13 |       -1 |        1 |        1 |       -1 |        1 |      02202 | 02202          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 14 |       -1 |        1 |        1 |        1 |       -1 |      02220 | -RHSpiral      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 15 |       -1 |        1 |        1 |        1 |        1 |      02222 | 02222          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 16 |        1 |       -1 |       -1 |       -1 |       -1 |      20000 | ±LHSpiral      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 17 |        1 |       -1 |       -1 |       -1 |        1 |      20002 | +LHSpiral      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 18 |        1 |       -1 |       -1 |        1 |       -1 |      20020 | ±LHHook        | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 19 |        1 |       -1 |       -1 |        1 |        1 |      20022 | +LHHook        | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 20 |        1 |       -1 |        1 |       -1 |       -1 |      20200 | ±RHStaple      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 21 |        1 |       -1 |        1 |       -1 |        1 |      20202 | +RHStaple      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 22 |        1 |       -1 |        1 |        1 |       -1 |      20220 | ±RHHook        | Catalytic  |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 23 |        1 |       -1 |        1 |        1 |        1 |      20222 | 20222          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 24 |        1 |        1 |       -1 |       -1 |       -1 |      22000 | -/+LHHook      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 25 |        1 |        1 |       -1 |       -1 |        1 |      22002 | 22002          | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 26 |        1 |        1 |       -1 |        1 |       -1 |      22020 | +/-LHStaple    | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 27 |        1 |        1 |       -1 |        1 |        1 |      22022 | +LHStaple      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 28 |        1 |        1 |        1 |       -1 |       -1 |      22200 | -/+RHHook      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 29 |        1 |        1 |        1 |       -1 |        1 |      22202 | +RHHook        | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 30 |        1 |        1 |        1 |        1 |       -1 |      22220 | ±RHSpiral      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
-| 31 |        1 |        1 |        1 |        1 |        1 |      22222 | +RHSpiral      | UNK        |
-+----+----------+----------+----------+----------+----------+------------+----------------+------------+
+Disulfide class consensus structure extraction using `proteusPy.Disulfide` package.
+Disulfide binary families are defined using the +/- formalism of Schmidt et al.
+(Biochem, 2006, 45, 7429-7433), across all 32 possible classes ($$2^5$$). Classes
+are named per the paper's convention.
 
 |   class_id | SS_Classname   | FXN        |   count |   incidence |   percentage |
 |-----------:|:---------------|:-----------|--------:|------------:|-------------:|
@@ -110,20 +43,29 @@ binary families are defined using the +/- formalism of Schmidt et al. (Biochem, 
 |      22220 | ±RHSpiral      | UNK        |    3581 |  0.0204305  |     2.04305  |
 |      22222 | +RHSpiral      | UNK        |    8254 |  0.0470912  |     4.70912  |
 
-The octant class approach is unique to ``proteusPy``, wherein the dihedral circle for the dihedral angles X1-X5 
-is divided into 8 sections, and a dihedral angle five-dimensional string, (class id) defined by characterizing each dihedral 
-angle into one of these sections. This yields $8^{5}$ or 32,768 possible classes. This program analyzes the RCSB database 
-and creates graphs illustrating the membership across the binary and octant classes. The graphs are stored in the 
-global SAVE_DIR location. Binary analysis takes approximately 20 minutes with octant analysis taking about
-75 minutes on a 2023 M3 Max Macbook Pro. (single-threaded).
+The octant class approach is unique to ``proteusPy``, wherein the dihedral circle
+for the dihedral angles X1-X5 is divided into 8 sections and then represented as
+a string of length 5, (class id) defined by characterizing each dihedral angle 
+into one of these sections. This yields $8^{5}$ or 32,768 possible classes. This 
+program analyzes the RCSB database and creates graphs illustrating the membership
+across the binary and octant classes. The graphs are stored in the global SAVE_DIR
+location. 
 
-Update 8/28/2024 - multithreading is implemented and runs well up to around 10 threads on a 2023 M3 Max Macbook Pro.
-octant analysis takes around 22 minutes with 6 threads. Binary analysis takes around 25 minutes with 6 threads.
+Initial release: 1/12/2024
+Binary analysis takes approximately 20 minutes with octant analysis taking
+about 75 minutes on a 2023 M3 Max Macbook Pro. (single-threaded).
+
+Update 8/28/2024 - multithreading is implemented and runs well up to around 10 
+threads on a 2023 M3 Max Macbook Pro. Octant analysis takes around 22 minutes with
+6 threads. Binary analysis takes around 25 minutes with 6 threads.
+
+Update 2/22/25 - after re-writing the DisulfideLoader class to use an index-based 
+approach to class selection, the octant and binary class analysis runs in about 2 
+minutes with 14 threads!
+
 
 Author: Eric G. Suchanek, PhD. Last Modified: 2025-01-06 19:29:49
 """
-
-# plyint: disable=C0103
 
 import argparse
 import os
@@ -133,6 +75,7 @@ import threading
 import time
 from datetime import timedelta
 from pathlib import Path
+from typing import List
 
 from colorama import Fore, Style, init
 from tqdm import tqdm
@@ -148,40 +91,35 @@ from proteusPy import (
     set_logger_level_for_module,
 )
 
-HOME_DIR = Path.home()
-PDB = Path(os.getenv("PDB", HOME_DIR / "pdb"))
+# Constants
+HOME_DIR: Path = Path.home()
+PDB: Path = Path(os.getenv("PDB", HOME_DIR / "pdb"))
+DATA_DIR: Path = PDB / "data"
+SAVE_DIR: Path = HOME_DIR / "Documents" / "proteusPyDocs" / "classes"
+MODULE_DIR: Path = HOME_DIR / "repos" / "proteusPy" / "proteusPy" / "data"
+REPO_DIR: Path = HOME_DIR / "repos" / "proteusPy" / "data"
+OCTANT: Path = SAVE_DIR / "octant"
+SEXTANT: Path = SAVE_DIR / "sextant"
+BINARY: Path = SAVE_DIR / "binary"
+MINIFORGE_DIR: Path = HOME_DIR / Path("miniforge3/envs")
+MAMBAFORGE_DIR: Path = HOME_DIR / Path("mambaforge/envs")
+VENV_DIR: Path = Path("lib/python3.12/site-packages/proteusPy/data")
+PBAR_COLS: int = 78
 
-DATA_DIR = PDB / "data"
-SAVE_DIR = HOME_DIR / "Documents" / "proteusPyDocs" / "classes"
-MODULE_DIR = HOME_DIR / "repos" / "proteusPy" / "proteusPy" / "data"
-REPO_DIR = HOME_DIR / "repos" / "proteusPy" / "data"
-
-OCTANT = SAVE_DIR / "octant"
+# Directory Setup
 OCTANT.mkdir(parents=True, exist_ok=True)
-
-SEXTANT = SAVE_DIR / "sextant"
 SEXTANT.mkdir(parents=True, exist_ok=True)
-
-BINARY = SAVE_DIR / "binary"
 BINARY.mkdir(parents=True, exist_ok=True)
-
-MINIFORGE_DIR = HOME_DIR / Path("miniforge3/envs")
-MAMBAFORGE_DIR = HOME_DIR / Path("mambaforge/envs")
-
-VENV_DIR = Path("lib/python3.12/site-packages/proteusPy/data")
-
-PBAR_COLS = 78
 
 # Initialize colorama
 init(autoreset=True)
 
 _logger = create_logger("__name__")
-
 configure_master_logger("DisulfidClass_Analysis.log")
 set_logger_level_for_module("proteusPy", "ERROR")
 
 
-def get_args():
+def get_args() -> argparse.Namespace:
     """
     Parses and returns command-line arguments for the DisulfideClass_Analysis script.
 
@@ -196,7 +134,8 @@ def get_args():
     - `-v`, `--verbose`: Enable verbose output (default: False).
     - `-u`, `--update`: Update repository with the consensus classes (default: True).
 
-    Returns:
+    :return: An object containing the parsed command-line arguments.
+    :rtype:
         argparse.Namespace: An object containing the parsed command-line arguments.
     """
     parser = argparse.ArgumentParser()
@@ -263,12 +202,9 @@ def get_args():
         action=argparse.BooleanOptionalAction,
         default=False,
     )
-
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
-# task definition
 def task(
     loader: DisulfideLoader,
     overall_pbar: tqdm,
@@ -281,86 +217,96 @@ def task(
     save_dir: str,
     prefix: str,
     base: int,
-    classlist: list,
-):
+    classlist: List[str],
+) -> None:
     """
-    Processes a range of lines in the disulfide class dict for the binary or octant
-    disulfide classes and updates the progress bar.
+    Processes a range of lines in the disulfide class dict for the binary or octant disulfide classes.
 
-    :param loader: DisulfideLoader instance to load disulfides.
-    :param eight_or_bin: DataFrame containing class and disulfide IDs.
-    :param start_idx: Starting index for processing.
-    :param end_idx: Ending index for processing.
-    :param result_list: List to store the resulting disulfides.
-    :param pbar: tqdm progress bar for overall progress.
-    :param cutoff: Cutoff percentage to filter classes.
-    :param do_graph: Boolean flag to generate and save graphs.
-    :param save_dir: Directory to save the output files.
-    :param prefix: Prefix for the output file names.
-    :param base: Base value for the class indices, 2 for binary and 8 for octant.
-    :param classlist: List of class names.
-    :return: None
+    :param loader: DisulfideLoader instance to load disulfides
+    :type loader: DisulfideLoader
+    :param overall_pbar: Progress bar for overall progress
+    :type overall_pbar: tqdm
+    :param start_idx: Starting index for processing
+    :type start_idx: int
+    :param end_idx: Ending index for processing
+    :type end_idx: int
+    :param result_list: List to store the resulting disulfides
+    :type result_list: DisulfideList
+    :param pbar: Progress bar for thread-specific progress
+    :type pbar: tqdm
+    :param cutoff: Cutoff percentage to filter classes (0.04 is good)
+    :type cutoff: float
+    :param do_graph: Boolean flag to generate and save graphs
+    :type do_graph: bool
+    :param save_dir: Directory to save the output files
+    :type save_dir: str
+    :param prefix: Prefix for the output file names
+    :type prefix: str
+    :param base: Base value for the class type, 2 for binary and 8 for octant
+    :type base: int
+    :param classlist: List of class names
+    :type classlist: List[str]
     """
+    try:
+        for idx in range(start_idx, end_idx):
+            cls = classlist[idx]
+            tot_class_ss = len(loader.class_indices_from_tors_df(cls, base))
 
-    for idx in range(start_idx, end_idx):
-        cls = classlist[idx]
-        tot_class_ss = len(loader.class_indices_from_tors_df(cls, base))
+            if 100 * tot_class_ss / loader.TotalDisulfides < cutoff:
+                pbar.set_postfix({"SKP": cls})
+                pbar.update(1)
+                overall_pbar.update(1)
+                continue
 
-        # tot = loader.TotalDisulfides
-        if 100 * tot_class_ss / loader.TotalDisulfides < cutoff:
-            pbar.set_postfix({"SKP": cls})
+            pbar.set_postfix({"CLS": cls})
+            class_disulfides = loader.sslist_from_class(cls, base=base, cutoff=cutoff)
             pbar.update(1)
+
+            fname = Path(save_dir) / f"{prefix}_{cutoff}_{cls}_{tot_class_ss}.png"
+
+            if do_graph:
+                class_disulfides.display_torsion_statistics(
+                    display=False,
+                    save=True,
+                    fname=fname,
+                    theme="light",
+                )
+
+            avg_conformation = class_disulfides.average_conformation
+            ssname = f"{cls}"
+            exemplar = Disulfide(ssname, torsions=avg_conformation)
+            result_list.append(exemplar)
             overall_pbar.update(1)
-            continue
-
-        pbar.set_postfix({"CLS": cls})
-
-        class_disulfides = loader.sslist_from_class(cls, base=base, cutoff=cutoff)
-
-        pbar.update(1)
-
-        fname = Path(save_dir) / f"{prefix}_{cutoff}_{cls}_{tot_class_ss}.png"
-
-        if do_graph:
-            class_disulfides.display_torsion_statistics(
-                display=False,
-                save=True,
-                fname=fname,
-                theme="light",
-            )
-
-        avg_conformation = class_disulfides.average_conformation
-
-        ssname = f"{cls}"
-        exemplar = Disulfide(ssname, torsions=avg_conformation)
-        result_list.append(exemplar)
-
-        overall_pbar.update(1)
-
-    pbar.close()
-    return
+    finally:
+        pbar.close()
 
 
 def analyze_classes_threaded(
     loader: DisulfideLoader,
-    do_graph=False,
-    cutoff=0.0,
-    num_threads=8,
-    do_octant=True,
-    prefix="ss",
+    do_graph: bool = False,
+    cutoff: float = 0.0,
+    num_threads: int = 8,
+    do_octant: bool = True,
+    prefix: str = "ss",
 ) -> DisulfideList:
     """
-    Analyze the classes of disulfide bonds.
+    Analyze the classes of disulfide bonds using multithreading.
 
-    :param loader: The ``proteusPy.DisulfideLoader`` object.
-    :param do_graph: Whether or not to display torsion statistics graphs. Default is True.
-    :param cutoff: The cutoff percentage for each class. If the percentage of disulfides for a class is below
-                   this value, the class will be skipped. Default is 0.1.
-    :param num_threads: Number of threads to use for processing. Default is 8.
-
-    :return: A list of disulfide bonds, where each disulfide bond represents the average conformation for a class.
+    :param loader: The DisulfideLoader object
+    :type loader: DisulfideLoader
+    :param do_graph: Whether to display torsion statistics graphs
+    :type do_graph: bool
+    :param cutoff: The cutoff percentage for each class
+    :type cutoff: float
+    :param num_threads: Number of threads to use for processing
+    :type num_threads: int
+    :param do_octant: Whether to analyze octant classes (True) or binary (False)
+    :type do_octant: bool
+    :param prefix: Prefix for output filenames
+    :type prefix: str
+    :return: List of disulfide bonds representing average conformations
+    :rtype: DisulfideList
     """
-
     save_dir = None
     tors_df = loader.TorsionDF
 
@@ -389,9 +335,8 @@ def analyze_classes_threaded(
 
     threads = []
     chunk_size = total_classes // num_threads
-    result_lists = [[] for _ in range(num_threads)]
+    result_lists = [DisulfideList([]) for _ in range(num_threads)]
 
-    # Create the overall progress bar
     overall_pbar = tqdm(
         total=total_classes,
         desc=f"{Fore.GREEN}Overall Progress{Style.RESET_ALL}".ljust(20),
@@ -404,7 +349,7 @@ def analyze_classes_threaded(
     for i in range(num_threads):
         start_idx = i * chunk_size
         end_idx = (i + 1) * chunk_size if i != num_threads - 1 else total_classes
-        pbar_index = i + 1  # so the task pbar is displayed in the correct position
+        pbar_index = i + 1
         pbar = tqdm(
             total=end_idx - start_idx,
             desc=f"{Fore.BLUE}Thread {i+1:2}{Style.RESET_ALL}".ljust(10),
@@ -434,19 +379,21 @@ def analyze_classes_threaded(
         threads.append(thread)
         thread.start()
 
-    # Wait for all threads to finish
     for thread in threads:
         thread.join()
 
     overall_pbar.close()
 
-    # Combine the results from all threads, yielding the final list of consensus structures.
     for result_list in result_lists:
         res_list.extend(result_list)
 
-    print(f"Writing consensus structures to: {class_filename}")
-    with open(class_filename, "wb+") as f:
-        pickle.dump(res_list, f)
+    try:
+        print(f"Writing consensus structures to: {class_filename}")
+        with open(class_filename, "wb+") as f:
+            pickle.dump(res_list, f)
+    except IOError as e:
+        _logger.error("Failed to write consensus file: %s", e)
+        raise
 
     return res_list
 
@@ -458,30 +405,23 @@ def analyze_classes(
     threads: int = 4,
     do_graph: bool = False,
     cutoff: float = 0.0,
-):
+) -> None:
     """
     Analyzes disulfide bond classes using the provided loader.
 
-    This function can analyze binary classes, octant classes, or both, depending on the parameters.
-    It uses threading to parallelize the analysis and can optionally generate graphs.
-
-    :param loader: The DisulfideLoader instance used to load and process disulfide bonds.
+    :param loader: The DisulfideLoader instance used to load and process disulfide bonds
     :type loader: DisulfideLoader
-    :param binary: If True, analyzes binary classes.
+    :param binary: If True, analyzes binary classes
     :type binary: bool
-    :param octant: If True, analyzes octant classes.
+    :param octant: If True, analyzes octant classes
     :type octant: bool
-    :param threads: The number of threads to use for analysis. Default is 4.
+    :param threads: The number of threads to use for analysis
     :type threads: int
-    :param do_graph: If True, generates graphs for the analysis. Default is False.
+    :param do_graph: If True, generates graphs for the analysis
     :type do_graph: bool
-    :param cutoff: The cutoff value for filtering disulfides. Default is 0.0.
+    :param cutoff: The cutoff value for filtering disulfides
     :type cutoff: float
-    :param verbose: If True, enables verbose output. Default is False.
-    :type verbose: bool
-    :return: None
     """
-
     if octant:
         print("Analyzing octant classes.")
         analyze_classes_threaded(
@@ -495,7 +435,6 @@ def analyze_classes(
 
     if binary:
         print("Analyzing binary classes.")
-
         analyze_classes_threaded(
             loader,
             do_graph=do_graph,
@@ -505,55 +444,68 @@ def analyze_classes(
             prefix="ss_bin",
         )
 
-    return
 
+def update_repository(
+    source_dir: str,
+    repo_dir: str,
+    verbose: bool = True,
+    binary: bool = False,
+    octant: bool = False,
+) -> None:
+    """
+    Copy the consensus class structures to the repository.
 
-def update_repository(source_dir, repo_dir, verbose=True, binary=False, octant=False):
-    """Copy the consensus classes to the repository."""
-
+    :param source_dir: Source directory containing consensus files
+    :type source_dir: str
+    :param repo_dir: Destination repository directory
+    :type repo_dir: str
+    :param verbose: If True, print copy operations
+    :type verbose: bool
+    :param binary: If True, update binary consensus classes
+    :type binary: bool
+    :param octant: If True, update octant consensus classes
+    :type octant: bool
+    """
     if binary:
         source = Path(source_dir) / SS_CONSENSUS_BIN_FILE
         dest = Path(repo_dir) / SS_CONSENSUS_BIN_FILE
-
         if verbose:
             print(f"Copying binary consensus classes from: {source} to {dest}")
-
-        shutil.copy(source, dest)
+        try:
+            shutil.copy(source, dest)
+        except IOError as e:
+            _logger.error("Failed to copy binary consensus: %s", e)
 
     if octant:
         source = Path(source_dir) / SS_CONSENSUS_OCT_FILE
         dest = Path(repo_dir) / SS_CONSENSUS_OCT_FILE
-
         if verbose:
             print(f"Copying octant consensus structures from {source} to {dest}")
+        try:
+            shutil.copy(source, dest)
+        except IOError as e:
+            _logger.error("Failed to copy octant consensus: %s", e)
 
-        shutil.copy(source, dest)
 
-
-def main():
+def main() -> None:
     """
     Main function to execute the disulfide class consensus class extraction.
-
-    This function parses command-line arguments and performs the analysis of disulfide bond classes.
-    It can analyze binary classes, octant classes, or both, depending on the arguments provided.
-    The function also supports generating graphs and updating consensus structures.
-
-    :return: None
     """
     args = get_args()
-    octant = args.octant
-    binary = args.binary
-    threads = args.threads
-    do_graph = args.graph
-    cutoff = args.cutoff
-    do_update = args.update
-    verbose = args.verbose
-    forge = args.forge
-    env = args.env
+    octant: bool = args.octant
+    binary: bool = args.binary
+    threads: int = args.threads
+    do_graph: bool = args.graph
+    cutoff: float = args.cutoff
+    do_update: bool = args.update
+    verbose: bool = args.verbose
+    forge: str = args.forge
+    env: str = args.env
 
-    # Clear the terminal window
+    if threads < 1:
+        raise ValueError("Number of threads must be positive")
+
     print("\033c", end="")
-
     print("Starting Disulfide Class analysis with arguments:")
     print(
         f"Binary:                {binary}\n"
@@ -575,7 +527,6 @@ def main():
 
     if do_update:
         print("Updating repository with consensus classes.")
-
         update_repository(DATA_DIR, REPO_DIR, binary=binary, octant=octant)
         update_repository(DATA_DIR, MODULE_DIR, binary=binary, octant=octant)
 
@@ -586,33 +537,34 @@ def main():
 
         if verbose:
             print(f"Updating environment SS class files from: {DATA_DIR} to {venv_dir}")
-
         update_repository(DATA_DIR, venv_dir, binary=binary, octant=octant)
         return
 
-    pdb_ss = DisulfideLoader(verbose=verbose, subset=False, cutoff=-1, sg_cutoff=-1)
-
-    analyze_classes(
-        pdb_ss,
-        binary,
-        octant,
-        threads=threads,
-        do_graph=do_graph,
-        cutoff=cutoff,
-    )
+    try:
+        pdb_ss = DisulfideLoader(verbose=verbose, subset=False, cutoff=-1, sg_cutoff=-1)
+        analyze_classes(
+            pdb_ss,
+            binary,
+            octant,
+            threads=threads,
+            do_graph=do_graph,
+            cutoff=cutoff,
+        )
+    except Exception as e:
+        _logger.error("Analysis failed: %s", e)
+        raise
 
 
 if __name__ == "__main__":
-    start = time.time()
-    main()
+    start: float = time.time()
+    try:
+        main()
+    finally:
+        end: float = time.time()
+        elapsed: float = end - start
+        print(
+            f"\n----------------------\nDisulfide Class Analysis Complete!"
+            f"\nElapsed time: {timedelta(seconds=elapsed)} (h:m:s)"
+        )
 
-    end = time.time()
-
-    elapsed = end - start
-
-    print(
-        f"\n----------------------\nDisulfide Class Analysis Complete!"
-        f"\nElapsed time: {timedelta(seconds=elapsed)} (h:m:s)"
-    )
-
-# end of file
+# EOF
