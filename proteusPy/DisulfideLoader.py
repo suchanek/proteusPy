@@ -3,7 +3,7 @@ This module is part of the proteusPy package, a Python package for
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
-Last revision: 2025-01-17 18:27:03 -egs-
+Last revision: 2025-02-21 16:33:56 -egs-
 """
 
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
@@ -19,20 +19,21 @@ Last revision: 2025-01-17 18:27:03 -egs-
 import copy
 import pickle
 import time
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Dict, List, Optional
 
 import gdown
-import numpy as np
 import pandas as pd
-import plotly.graph_objects as go
 import plotly_express as px
 from pympler import asizeof
 
 from proteusPy import __version__
-from proteusPy.Disulfide import Disulfide
-from proteusPy.DisulfideClass_Constructor import DisulfideClass_Constructor
+from proteusPy.DisulfideBase import Disulfide, DisulfideList
+from proteusPy.DisulfideClassManager import DisulfideClassManager
 from proteusPy.DisulfideExceptions import DisulfideParseWarning
-from proteusPy.DisulfideList import DisulfideList
+from proteusPy.DisulfideStats import DisulfideStats
+from proteusPy.DisulfideVisualization import DisulfideVisualization
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
     CA_CUTOFF,
@@ -43,9 +44,9 @@ from proteusPy.ProteusGlobals import (
     SS_LIST_URL,
     SS_PICKLE_FILE,
 )
-from proteusPy.utility import set_plotly_theme
 
 _logger = create_logger(__name__)
+
 
 try:
     # Check if running in Jupyter
@@ -58,6 +59,7 @@ except NameError:
     from tqdm import tqdm
 
 
+@dataclass
 class DisulfideLoader:
     """
     This class represents the disulfide database itself and is its primary means of accession.
@@ -78,47 +80,59 @@ class DisulfideLoader:
     The difference is that the latter function loads the compressed database from its single
     source. The `DisulfideLoader` class is used to build the Disulifde database with a
     specific cutoff, or for saving the database to a file.
+
+    :param verbose: Flag to control output verbosity
+    :type verbose: bool
+    :param datadir: Directory containing data files
+    :type datadir: str
+    :param picklefile: Name of the pickle file containing disulfide data
+    :type picklefile: str
+    :param quiet: Flag to suppress warnings
+    :type quiet: bool
+    :param subset: Flag to load only a subset of data
+    :type subset: bool
+    :param cutoff: Distance cutoff for filtering disulfides
+    :type cutoff: float
+    :param sg_cutoff: SG distance cutoff for filtering disulfides
+    :type sg_cutoff: float
     """
 
-    def __init__(
-        self,
-        verbose: bool = False,
-        datadir: str = DATA_DIR,  # the package installation data directory
-        picklefile: str = SS_PICKLE_FILE,  # PDB_all_ss.pkl by default
-        quiet: bool = True,
-        subset: bool = False,
-        cutoff: float = -1.0,
-        sg_cutoff: float = -1.0,
-    ) -> None:
+    # Instance attributes
+    SSList: DisulfideList = field(
+        default_factory=lambda: DisulfideList([], "ALL_PDB_SS")
+    )
+    SSDict: Dict = field(default_factory=dict)
+    TorsionDF: pd.DataFrame = field(default_factory=pd.DataFrame)
+    TotalDisulfides: int = field(default=0)
+    IDList: List = field(default_factory=list)
+    quiet: bool = field(default=False)
+    tclass: Optional[DisulfideClassManager] = field(default=None)
+    cutoff: float = field(default=-1.0)
+    sg_cutoff: float = field(default=-1.0)
+    verbose: bool = field(default=False)
+    percentile: float = field(default=-1.0)
+    timestamp: float = field(default_factory=time.time)
+    version: str = field(default=__version__)
+
+    # Initialization parameters
+    datadir: str = field(default=DATA_DIR)
+    picklefile: str = field(default=SS_PICKLE_FILE)
+    subset: bool = field(default=False)
+    cutoff: float = field(default=-1.0)
+    sg_cutoff: float = field(default=-1.0)
+    verbose: bool = field(default=False)
+    percentile: float = field(default=-1.0)
+
+    def __post_init__(self) -> None:
         """
-        Initializing the class initiates loading either the entire Disulfide dataset,
-        or the 'subset', which consists of the first 5000 disulfides. The subset
-        is useful for testing and debugging since it doesn't require nearly as much
-        memory or time. The name for the subset file is hard-coded. One can pass a
-        different data directory and file names for the pickle files. These different
-        directories are normally established with the proteusPy.Extract_Disulfides
-        program. The ``cutoff`` is the distance in Angstroms used to filter the disulfides
-        by Cα distance. The ``sg_cutoff`` is the distance in Angstroms used to filter the
-        disulfides by Sγ distance. The verbose flag controls the amount of output.
+        Initialize the DisulfideLoader after dataclass initialization.
+        This method handles loading and processing of the disulfide data.
         """
 
-        self.SSList = DisulfideList([], "ALL_PDB_SS")
-        self.SSDict = {}
-        self.TorsionDF = pd.DataFrame()
-        self.TotalDisulfides = 0
-        self.IDList = []
-        self._quiet = quiet
-        self.tclass = None  # disulfideClass_constructor to manage classes
-        self.cutoff = cutoff  # distance cutoff used to bulid the database
-        self.sg_cutoff = sg_cutoff  # distance cutoff used to bulid the database
-        self.verbose = verbose
-        self.timestamp = time.time()
-        self.version = __version__
-
-        _pickleFile = picklefile
+        cutoffs = {}
         old_length = new_length = 0
+        full_path = Path(self.datadir) / self.picklefile
 
-        full_path = Path(datadir) / _pickleFile
         if self.verbose and not self.quiet:
             _logger.info(
                 f"Reading disulfides from: {full_path}... ",
@@ -133,7 +147,7 @@ class DisulfideLoader:
                 _fname = Path(DATA_DIR) / fname
 
                 if not _fname.exists():
-                    if verbose:
+                    if self.verbose:
                         _logger.info(
                             "Master SS list unavailable. Downloading Disulfide Database from Drive..."
                         )
@@ -141,42 +155,68 @@ class DisulfideLoader:
 
             with open(full_path, "rb") as f:
                 sslist = pickle.load(f)
+
+                if self.percentile > 0.0:
+                    if self.percentile > 100.0:
+                        raise ValueError("Percentile must be between 0 and 100.")
+
+                    cutoffs = DisulfideStats.calculate_cutoff_from_percentile(
+                        sslist, percentile=self.percentile, verbose=self.verbose
+                    )
+
+                    ca_cutoff = cutoffs["ca_cutoff_percentile"]
+                    sg_cutoff = cutoffs["sg_cutoff_percentile"]
+                    self.cutoff = ca_cutoff
+                    self.sg_cutoff = sg_cutoff
+
+                    if self.verbose:
+                        _logger.info(
+                            f"Using percentile cutoffs: {ca_cutoff:.2f}, {sg_cutoff:.2f}"
+                        )
+
                 old_length = len(sslist)
-                filt = DisulfideList(sslist.filter_by_distance(cutoff), "filtered")
+                filt = sslist.filter_by_distance(
+                    distance=self.cutoff, distance_type="ca"
+                )
+                filt = DisulfideList(
+                    filt,
+                    f"filtered by Ca cutoff:{self.cutoff:.2f}, Sg cutoff: {self.sg_cutoff:.2f}",
+                )
+
                 new_length = len(filt)
 
                 if self.verbose:
                     _logger.info(
-                        "Filtering with Cα cutoff %f: old: %d, new: %d",
-                        cutoff,
+                        "Filtered with Cα cutoff %.2f: old: %d, new: %d",
+                        self.cutoff,
                         old_length,
                         new_length,
                     )
 
                 old_length = new_length
-                filt = filt.filter_by_sg_distance(sg_cutoff)
+                filt = filt.filter_by_distance(
+                    distance=self.sg_cutoff, distance_type="sg"
+                )
                 new_length = len(filt)
 
                 if self.verbose:
                     _logger.info(
-                        "Filtering Sγ: cutoff %f: old: %d, new: %d",
-                        sg_cutoff,
+                        "Filtered with Sγ: cutoff %.2f: old: %d, new: %d",
+                        self.sg_cutoff,
                         old_length,
                         new_length,
                     )
-                if subset:
+                if self.subset:
                     self.SSList = DisulfideList(filt[:5000], "SUBSET_PDB_SS")
                 else:
                     self.SSList = DisulfideList(filt, "ALL_PDB_SS")
-
-                self.TotalDisulfides = len(self.SSList)
 
                 self.SSDict = self.create_disulfide_dict()
                 self.IDList = list(self.SSDict.keys())
 
                 self.TorsionDF = self.SSList.torsion_df
                 self.TotalDisulfides = len(self.SSList)
-                self.tclass = DisulfideClass_Constructor(self, self.verbose)
+                self.tclass = DisulfideClassManager(self, self.verbose)
 
             if self.verbose:
                 _logger.info("Loader initialization complete.")
@@ -263,7 +303,7 @@ class DisulfideLoader:
         self.SSList[index] = self._validate_ss(item)
 
     def _validate_ss(self, value):
-        if isinstance(value, (Disulfide)):
+        if isinstance(value, Disulfide):
             return value
         raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
 
@@ -271,6 +311,7 @@ class DisulfideLoader:
     def average_resolution(self) -> float:
         """
         Return the average structure resolution for the given list.
+        Result is cached since resolution values don't change after loading.
 
         :return: Average resolution (A)
         """
@@ -285,6 +326,17 @@ class DisulfideLoader:
             return -1.0
 
         return sum(valid_resolutions) / len(valid_resolutions)
+
+    @staticmethod
+    def binary_to_class(binary_class: str, base=8) -> str:
+        """
+        Convert a binary class string to an octant class string.
+
+        :param binary_class: The binary class string to convert.
+        :param base: The base class to use, 2 or 8.
+        :return: The octant class string.
+        """
+        return DisulfideClassManager.binary_to_class(binary_class, base)
 
     def build_ss_from_idlist(self, idlist) -> DisulfideList:
         """
@@ -318,13 +370,13 @@ class DisulfideLoader:
         tors_df = self.TorsionDF
         match base:
             case 8:
-                field = "octant_class_string"
+                column = "octant_class_string"
             case 2:
-                field = "binary_class_string"
+                column = "binary_class_string"
             case _:
                 raise ValueError(f"Base must be 2 or 8, not {base}")
 
-        return tors_df[tors_df[field] == class_string].index
+        return tors_df[tors_df[column] == class_string].index
 
     def copy(self):
         """
@@ -356,6 +408,7 @@ class DisulfideLoader:
     def get_class_df(self, base=8) -> pd.DataFrame:
         """
         Return the class incidence dataframe for the input base.
+        Result is cached since class distributions don't change after loading.
 
         :param base: The base class to use, 2 or 8.
         :return: pd.DataFrame
@@ -405,6 +458,7 @@ class DisulfideLoader:
     def get_by_name(self, name) -> Disulfide:
         """
         Return the Disulfide with the given name from the list.
+        Result is cached since disulfide data doesn't change after loading.
         """
         for ss in self.SSList.data:
             if ss.name == name:
@@ -444,7 +498,7 @@ class DisulfideLoader:
         print(f"Sγ distance cutoff:              {sg_cutoff:.2f} Å")
         if memusg:
             print(f"Total RAM Used:                     {ram:.2f} GB.")
-        print(f"      ============== proteusPy: {vers} ===================")
+        print(f"               ===== proteusPy: {vers} =====")
 
     def display_overlay(self, pdbid, verbose=False) -> None:
         """
@@ -518,26 +572,6 @@ class DisulfideLoader:
         for k, v in enumerate(self.tclass.binaryclass_dict):
             print(f"Class: |{k}|, |{v}|")
 
-    @property
-    def quiet(self) -> bool:
-        """
-        The loader quiet state
-
-        :return: quiet parameter
-        :rtype: bool
-        """
-        return self._quiet
-
-    @quiet.setter
-    def quiet(self, perm: bool) -> None:
-        """
-        Sets the quiet attribute for the loader. This silences many of the BIO.PDB warnings.
-
-        :param perm: True or False
-        :type perm: bool
-        """
-        self._quiet = perm
-
     def plot_classes_vs_cutoff(
         self, cutoff: float, steps: int = 50, base=8, theme="auto", verbose=False
     ) -> None:
@@ -550,75 +584,11 @@ class DisulfideLoader:
         :param theme: The theme to use for the plot ('auto', 'light', or 'dark'), defaults to 'auto'.
         :return: None
         """
-        _cutoff = np.linspace(0, cutoff, steps)
-        tot_list = []
-        members_list = []
-        base_str = "Octant" if base == 8 else "Binary"
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
-        set_plotly_theme(theme)
-
-        for c in _cutoff:
-            class_df = self.tclass.filter_class_by_percentage(c, base=base)
-            tot = class_df["percentage"].sum()
-            tot_list.append(tot)
-            members_list.append(class_df.shape[0])
-            if verbose:
-                print(
-                    f"Cutoff: {c:5.3} accounts for {tot:7.2f}% and is {class_df.shape[0]:5} members long."
-                )
-
-        fig = go.Figure()
-
-        # Add total percentage trace
-        fig.add_trace(
-            go.Scatter(
-                x=_cutoff,
-                y=tot_list,
-                mode="lines+markers",
-                name="Total percentage",
-                yaxis="y1",
-                line=dict(color="blue"),
-            )
+        DisulfideVisualization.plot_classes_vs_cutoff(
+            self.tclass, cutoff, steps, base, theme, verbose
         )
-
-        # Add number of members trace
-        fig.add_trace(
-            go.Scatter(
-                x=_cutoff,
-                y=members_list,
-                mode="lines+markers",
-                name="Number of members",
-                yaxis="y2",
-                line=dict(color="red"),
-            )
-        )
-
-        # Update layout
-        fig.update_layout(
-            title={
-                "text": f"{base_str} Classes vs Cutoff, ({cutoff}%)",
-                "x": 0.5,
-                "yanchor": "top",
-                "xanchor": "center",
-            },
-            xaxis=dict(title="Cutoff"),
-            yaxis=dict(
-                title="Total percentage",
-                titlefont=dict(color="blue"),
-                tickfont=dict(color="blue"),
-            ),
-            yaxis2=dict(
-                title="Number of members",
-                titlefont=dict(color="red"),
-                tickfont=dict(color="red"),
-                overlaying="y",
-                side="right",
-                type="log",
-            ),
-            legend=dict(x=0.75, y=1.16),
-        )
-
-        fig.show()
 
     def plot_binary_to_eightclass_incidence(
         self,
@@ -627,35 +597,22 @@ class DisulfideLoader:
         savedir=".",
         verbose=False,
     ):
+        """Plot the incidence of all octant Disulfide classes for a given binary class.
+
+        :param tclass: DisulfideClassManager instance
+        :param theme: The theme to use for the plot
+        :param save: Whether to save the plots
+        :param savedir: Directory to save plots to
+        :param verbose: Whether to display verbose output
         """
-        Plot the incidence of all octant Disulfide classes for a given binary class.
 
-        :param loader: `proteusPy.DisulfideLoader` object
-        """
-
-        if verbose:
-            _logger.setLevel("INFO")
-
-        clslist = self.tclass.binaryclass_df["class_id"]
-        for cls in clslist:
-            eightcls = self.tclass.binary_to_class(cls, 8)
-            df = self.enumerate_class_fromlist(eightcls, base=8)
-            self.plot_count_vs_class_df(
-                df,
-                title=cls,
-                theme=theme,
-                save=save,
-                savedir=savedir,
-                base=8,
-                verbose=verbose,
-            )
-        if verbose:
-            _logger.info("Graph generation complete.")
-            _logger.setLevel("WARNING")
+        DisulfideVisualization.plot_binary_to_eightclass_incidence(
+            self.tclass, theme, save, savedir, verbose
+        )
 
     def plot_count_vs_class_df(
         self,
-        df,
+        class_string,
         title="title",
         theme="auto",
         save=False,
@@ -668,110 +625,104 @@ class DisulfideLoader:
         Plot a line graph of count vs class ID using Plotly for the given disulfide class. The
         base selects the class type to plot: 2, 6, or 8, for binary, sextant, or octant classes.
 
-        :param df: A pandas DataFrame containing the data to be plotted.
+        :param class_string: The binary class string to be plotted.
         :param title: A string representing the title of the plot (default is 'title').
-        :param theme: A string representing the name of the theme to use. Can be either 'notebook'
-        or 'plotly_dark'. Default is 'plotly_dark'.
-        :param save: A boolean flag indicating whether to save the plot to a file. Default is False.
-        :param savedir: A string representing the directory to save the plot to. Default is '.'.
-        :param base: An integer representing the base value for the enumeration. Default is 8.
-        :param verbose: A boolean flag indicating whether to display verbose output. Default is False.
-        :param log: A boolean flag indicating whether to use a log scale for the y-axis. Default is False.
-        :raises ValueError: If an invalid base value is provided, (2 or 8s).
-        :return: None
+        :param theme: Theme to use for the plot
+        :param save: Whether to save the plot
+        :param savedir: Directory to save the plot to
+        :param base: Base for class IDs (2 or 8)
+        :param verbose: Whether to display verbose output
+        :param log: Whether to use log scale for y-axis
         """
-        set_plotly_theme(theme)
-
-        _title = f"Binary Class: {title}"
-        _labels = {}
-        _prefix = "None"
-        if base == 8:
-            _labels = {"class_id": "Octant Class ID", "count": "Count"}
-            _prefix = "Octant"
-
-        elif base == 2:
-            _labels = {"class_id": "Binary Class ID", "count": "Count"}
-            _prefix = "Binary"
-            df = self.tclass.binaryclass_df
-        else:
-            raise ValueError("Invalid base. Must be 2 or 8.")
-
-        fig = px.line(
-            df,
-            x="class_id",
-            y="count",
-            title=f"{_title}",
-            labels=_labels,
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
+        class_list = self.tclass.binary_to_class(class_string, base)
+        df = self.enumerate_class_fromlist(class_list, base=base)
+        DisulfideVisualization.plot_count_vs_class_df(
+            df, title, theme, save, savedir, base, verbose, log
         )
 
-        fig.update_layout(
-            showlegend=True,
-            title_x=0.5,
-            title_font=dict(size=20),
-            xaxis_showgrid=False,
-            yaxis_showgrid=False,
-            autosize=True,
-            yaxis_type="log" if log else "linear",
+    def plot_count_vs_class_df_sampled(
+        self,
+        class_string,
+        title="title",
+        theme="auto",
+        save=False,
+        savedir=".",
+        base=8,
+        verbose=False,
+        log=True,
+        sample_size=1000,
+    ):
+        """
+        Plot a line graph of count vs class ID using Plotly for the given disulfide class with sampling.
+
+        :param df: DataFrame containing class data
+        :param title: Title for the plot
+        :param theme: Theme to use for the plot
+        :param save: Whether to save the plot
+        :param savedir: Directory to save the plot to
+        :param base: Base for class IDs (2 or 8)
+        :param verbose: Whether to display verbose output
+        :param log: Whether to use log scale for y-axis
+        :param sample_size: Number of items to sample
+        """
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
+        class_list = self.tclass.binary_to_class(class_string, base)
+        df = self.enumerate_class_fromlist(class_list, base=base)
+
+        DisulfideVisualization.plot_count_vs_class_df_sampled(
+            df, title, theme, save, savedir, base, verbose, log, sample_size
         )
-        fig.update_layout(autosize=True)
 
-        if save:
-            fname = Path(savedir) / f"{title}_{_prefix}.png"
+    def plot_count_vs_class_df_paginated(
+        self,
+        class_string,
+        title="title",
+        theme="auto",
+        save=False,
+        savedir=".",
+        base=8,
+        verbose=False,
+        log=True,
+        page_size=200,
+    ):
+        """
+        Plot a line graph of count vs class ID using Plotly for the given disulfide class with pagination.
 
-            if verbose:
-                _logger.info("Saving %s plot to %s", title, fname)
-            fig.write_image(fname, "png")
-        else:
-            fig.show()
+        :param df: DataFrame containing class data
+        :param title: Title for the plot
+        :param theme: Theme to use for the plot
+        :param save: Whether to save the plot
+        :param savedir: Directory to save the plot to
+        :param base: Base for class IDs (2 or 8)
+        :param verbose: Whether to display verbose output
+        :param log: Whether to use log scale for y-axis
+        :param page_size: Number of items per page
+        """
+        class_list = self.tclass.binary_to_class(class_string, base)
+        df = self.enumerate_class_fromlist(class_list, base=base)
 
-        return
+        DisulfideVisualization.plot_count_vs_class_df_paginated(
+            df, title, theme, save, savedir, base, verbose, log, page_size
+        )
 
     def plot_count_vs_classid(self, cls=None, theme="auto", base=8, log=True):
         """
         Plot a line graph of count vs class ID using Plotly.
 
-        :param df: A pandas DataFrame containing the data to be plotted.
-        :param title: A string representing the title of the plot (default is 'title').
-        :param theme: A string representing the theme of the plot. Anything other than `light` is in `plotly_dark`.
-        :param log: A boolean flag indicating whether to use a log scale for the y-axis. Default is False.
-        :return: None
+        :param cls: Specific class to plot (optional)
+        :param theme: Theme to use for the plot
+        :param base: Base for class IDs (2 or 8)
+        :param log: Whether to use log scale for y-axis
         """
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
-        set_plotly_theme(theme)
-
-        _title = None
-
-        match base:
-            case 8:
-                _title = "Octant Class Distribution"
-            case 2:
-                _title = "Binary Class Distribution"
-            case _:
-                raise ValueError("Invalid base. Must be 2 or 8")
-
-        df = self.tclass.binaryclass_df if base == 2 else self.tclass.eightclass_df
-
-        if cls is None:
-            fig = px.line(df, x="class_id", y="count", title=_title)
-        else:
-            subset = df[df["class_id"] == cls]
-            fig = px.line(subset, x="class_id", y="count", title=_title)
-
-        fig.update_layout(
-            xaxis_title="Class ID",
-            yaxis_title="Count",
-            showlegend=True,
-            title_x=0.5,
-            autosize=True,
-            yaxis_type="log" if log else "linear",
-        )
-
-        fig.show()
-        return
+        DisulfideVisualization.plot_count_vs_classid(self.tclass, cls, theme, base, log)
 
     def enumerate_class_fromlist(self, sslist, base=8):
         """
         Enumerate the classes from a list of class IDs and return a DataFrame with class IDs and their corresponding counts.
+        Results are cached for improved performance on repeated calls.
 
         :param sslist: A list of class IDs to enumerate.
         :param base: The base value for the enumeration, by default 8.
@@ -794,7 +745,14 @@ class DisulfideLoader:
         sslist_df["count"] = y
         return sslist_df
 
-    def save(self, savepath=DATA_DIR, subset=False, cutoff=-1.0, sg_cutoff=-1.0):
+    def save(
+        self,
+        savepath=DATA_DIR,
+        subset=False,
+        cutoff=-1.0,
+        sg_cutoff=-1.0,
+        verbose=False,
+    ):
         """
         Save a copy of the fully instantiated Loader to the specified file.
 
@@ -816,13 +774,14 @@ class DisulfideLoader:
             fname = LOADER_FNAME
 
         _fname = Path(savepath) / fname
-        if self.verbose:
-            _logger.info("Writing %s...", _fname)
+
+        if verbose:
+            _logger.info("Writing Disulfide Loader to: %s...", _fname)
 
         with open(str(_fname), "wb+") as f:
             pickle.dump(self, f)
 
-        if self.verbose:
+        if verbose:
             _logger.info("Done saving loader.")
 
     def plot_disulfides_vs_pdbid(self, cutoff=1):
@@ -865,19 +824,17 @@ class DisulfideLoader:
         """
         Plot the distances for the disulfides in the loader.
 
-        :param distance_type: The type of distance to plot ('ca' for Cα-Cα distance, 'sg' for Sγ-Sγ distance).
-        :type distance_type: str
-        :param cutoff: The cutoff value for the distance, defaults to -1 (no cutoff).
-        :type cutoff: float
-        :param comparison: if 'less' then plot distances less than the cutoff, if 'greater' then plot
-        distances greater than the cutoff.
-        :type flip: str
-        :param theme: The theme to use for the plot ('auto', 'light', or 'dark'), defaults to 'auto'.
-        :type theme: str
-        :param log: Whether to use a log scale for the y-axis, defaults to True.
-        :return: None
-        :rtype: None
+        :param distance_type: The type of distance to plot ('ca' for Cα-Cα distance, 'sg' for Sγ-Sγ distance)
+        :param cutoff: The cutoff value for the distance, defaults to -1 (no cutoff)
+        :param comparison: if 'less' then plot distances less than the cutoff, if 'greater' then plot distances greater than the cutoff
+        :param theme: The theme to use for the plot ('auto', 'light', or 'dark')
+        :param log: Whether to use a log scale for the y-axis
         """
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
+
+        # sslist = self.SSList
+        # distances = sslist.extract_distances(distance_type, comparison, cutoff)
+
         self.SSList.plot_distances(
             distance_type=distance_type,
             cutoff=cutoff,
@@ -905,6 +862,28 @@ class DisulfideLoader:
         """
         self.SSList.plot_deviation_histograms(theme=theme, verbose=verbose)
 
+    def plot_classes(
+        self, class_string, base=8, theme="auto", log=False, page_size=200
+    ):
+        """
+        Plot the distribution of disulfides for the given class string.
+
+        :param class_string: The class string to plot.
+        :type class_string: str
+        :param base: The base of the class string. Default is 8.
+        :type base: int
+        :param theme: The theme to use for the plot ('auto', 'light', or 'dark'), defaults to 'auto'.
+        :type theme: str
+        :return: None
+        """
+        classlist = self.tclass.binary_to_class(class_string, base)
+        df = self.enumerate_class_fromlist(classlist, base=base)
+        DisulfideVisualization.plot_count_vs_class_df_paginated(
+            df, title=class_string, theme=theme, base=base, log=log, page_size=page_size
+        )
+
+        return
+
     def sslist_from_class(self, class_string, base=8, cutoff=0.0) -> DisulfideList:
         """
         Return a DisulfideList containing Disulfides with the given class_string.
@@ -916,14 +895,6 @@ class DisulfideLoader:
         """
         sslist_name = f"{class_string}_{base}_{cutoff:.2f}"
         sslist = DisulfideList([], sslist_name)
-
-        match base:
-            case 8:
-                field = "octant_class_string"
-            case 2:
-                field = "binary_class_string"
-            case _:
-                raise ValueError(f"Base must be 2 or 8, not {base}")
 
         indices = self.class_indices_from_tors_df(class_string, base=base)
 
@@ -937,7 +908,7 @@ class DisulfideLoader:
         display=True,
         save=False,
         fname="ss_torsions.png",
-        theme="Auto",
+        theme="auto",
     ):
         """
         Display torsion and distance statistics for all Disulfides in the loader.
@@ -959,6 +930,17 @@ class DisulfideLoader:
             theme=theme,
         )
 
+    def classes_vs_cutoff(self, cutoff, base=8):
+        """
+        Return number of members for the octant class for a given cutoff value.
+
+        :param cutoff: Percent cutoff value for filtering the classes.
+        :return: None
+        """
+
+        class_df = self.tclass.filter_class_by_percentage(cutoff, base=base)
+        return class_df.shape[0]
+
 
 # class ends
 
@@ -972,29 +954,38 @@ def Load_PDB_SS(
     force=False,
 ) -> DisulfideLoader:
     """
-    Load the fully instantiated Disulfide database from the specified file. Use the
-    defaults unless you are building the database by hand. *This is the function
-    used to load the built database.*
+    Load the fully instantiated Disulfide database from the specified file. This function
+    will load the pre-built database if available, or bootstrap a new loader by downloading
+    the data from Google Drive if needed. Use the provided parameters to control the loading
+    behavior, filtering cutoffs, and verbosity.
 
-    :param loadpath: Path from which to load, defaults to DATA_DIR
+    :param loadpath: Path from which to load the database; defaults to DATA_DIR.
     :type loadpath: str
-    :param verbose: Verbosity, defaults to False
+    :param verbose: If True, enables verbose logging; defaults to False.
     :type verbose: bool
-    :param subset: If True, load the subset DB, otherwise load the full database
+    :param subset: If True, loads the subset database; otherwise loads the full database.
     :type subset: bool
-    :return: The loaded Disulfide database
-    :rtype: DisulfideList
+    :param cutoff: Cα distance cutoff used to filter disulfides; defaults to CA_CUTOFF.
+    :type cutoff: float
+    :param sg_cutoff: Sγ distance cutoff used to filter disulfides; defaults to SG_CUTOFF.
+    :type sg_cutoff: float
+    :param force: If True, forces re-loading from Google Drive even if the file exists; defaults to False.
+    :type force: bool
+    :param percentile: Percentile (0-100) to compute cutoffs dynamically; if set to -1.0, the percentile method is not used.
+    :type percentile: float
+    :return: An instance of DisulfideLoader containing the loaded disulfide database.
+    :rtype: DisulfideLoader
 
     Example:
-    >>> from proteusPy import Load_PDB_SS, create_logger
-    >>> import logging
-    >>> _logger = create_logger("testing")
-    >>> _logger.setLevel(logging.WARNING)
-    >>> PDB_SS = Load_PDB_SS(verbose=False, subset=True)
-    >>> PDB_SS[0]
-    <Disulfide 6dmb_203A_226A, Source: 6dmb, Resolution: 3.0 Å>
-
+        >>> from proteusPy import Load_PDB_SS, create_logger
+        >>> import logging
+        >>> _logger = create_logger("testing")
+        >>> _logger.setLevel(logging.WARNING)
+        >>> loader = Load_PDB_SS(verbose=False, subset=True)
+        >>> print(loader[0])
+        <Disulfide 6dmb_203A_226A, Source: 6dmb, Resolution: 3.0 Å>
     """
+
     # normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy
     # distribution. In that case we need to download the files for all disulfides and the subset
     # from my Google Drive. This is a one-time operation.
@@ -1039,9 +1030,10 @@ def Bootstrap_PDB_SS(
     loadpath=DATA_DIR,
     cutoff=-1.0,
     sg_cutoff=-1.0,
-    verbose=False,
+    verbose=True,
     subset=False,
     force=False,
+    fake=False,
 ):
     """
     Download and instantiate the disulfide databases from Google Drive.
@@ -1070,14 +1062,19 @@ def Bootstrap_PDB_SS(
     fname = SS_PICKLE_FILE
     url = SS_LIST_URL
 
-    _fname = Path(loadpath) / fname
+    # _fname = Path(loadpath) / fname
+    full_path = Path(loadpath) / fname
 
-    if not _fname.exists() or force is True:
+    if not full_path.exists() or force is True:
         if verbose:
-            _logger.info("Downloading Disulfide Database from Drive...")
-        gdown.download(url, str(_fname), quiet=False)
+            _logger.warning("Can't find %s. Downloading from Drive...", full_path)
 
-    full_path = Path(loadpath) / _fname
+        if not fake:
+            gdown.download(url, str(full_path), quiet=False)
+        else:
+            if verbose:
+                _logger.warning("Fake download: %s", full_path)
+                return None
     if verbose:
         _logger.info(
             "Building loader from: %s with cutoffs %f, %f...",

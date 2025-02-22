@@ -30,20 +30,17 @@ import subprocess
 import time
 from pathlib import Path
 
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import psutil
-from PIL import ImageFont
+from PIL import Image, ImageFont
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from proteusPy import Disulfide, DisulfideList, __version__
-from proteusPy.angle_annotation import AngleAnnotation
+# from proteusPy.DisulfideBase import DisulfideList
 from proteusPy.DisulfideExceptions import DisulfideIOException
-from proteusPy.logger_config import create_logger, set_logger_level
+from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
-    DPI,
     FONTSIZE,
     MODEL_DIR,
     PDB_DIR,
@@ -101,44 +98,10 @@ def get_jet_colormap(steps):
     of the array is (steps, 3).
     :rtype: numpy.ndarray
 
-    Example:
-        >>> get_viridis_colormap(5)
-        array([[ 68,   1,  84],
-               [ 72,  40, 120],
-               [ 32, 144, 140],
-               [ 94, 201,  98],
-               [253, 231,  37]], dtype=uint8)
     """
 
     norm = np.linspace(0.0, 1.0, steps)
     colormap = plt.get_cmap("viridis")
-    rgbcol = colormap(norm, bytes=True)[:, :3]
-
-    return rgbcol
-
-
-def Oget_jet_colormap(steps):
-    """
-    Return an array of uniformly spaced RGB values using the 'jet' colormap.
-
-    :param steps: The number of steps in the output array.
-
-    :return: An array of uniformly spaced RGB values using the 'jet' colormap. The shape
-    of the array is (steps, 3).
-    :rtype: numpy.ndarray
-
-    Example:
-        >>> get_jet_colormap(5)
-        array([[  0,   0, 127],
-               [  0, 128, 255],
-               [124, 255, 121],
-               [255, 148,   0],
-               [127,   0,   0]], dtype=uint8)
-    """
-
-    norm = np.linspace(0.0, 1.0, steps)
-    colormap = matplotlib.colormaps["jet"]
-    #    colormap = cm.get_cmap("jet", steps)
     rgbcol = colormap(norm, bytes=True)[:, :3]
 
     return rgbcol
@@ -179,11 +142,12 @@ def extract_firstchain_ss(sslist, verbose=False):
     :param sslist: Starting SS list
     :return: (Pruned SS list, xchain)
     """
+    from proteusPy.DisulfideBase import DisulfideList
 
     chain = ""
     chainlist = []
     pc = dc = ""
-    res = DisulfideList([], sslist.id)
+    res = DisulfideList([], sslist.pdb_id)
     xchain = 0
 
     # build list of chains
@@ -217,6 +181,8 @@ def prune_extra_ss(sslist):
 
     :param ssdict: input dictionary with disulfides
     """
+    from proteusPy.DisulfideBase import DisulfideList
+
     xchain = 0
 
     # print(f'Processing: {ss} with: {sslist}')
@@ -227,7 +193,7 @@ def prune_extra_ss(sslist):
     return copy.deepcopy(pruned_list), xchain
 
 
-def download_file(url, directory, verbose=False):
+def download_file(url: str, directory: str | Path, verbose: bool = False) -> None:
     """
     Download the given URL to the input directory
 
@@ -235,17 +201,34 @@ def download_file(url, directory, verbose=False):
     :param directory: Directory path for saving the file
     :param verbose: Verbosity, defaults to False
     """
-    file_name = url.split("/")[-1]
-    file_path = Path(directory) / file_name
+    if not url or not url.strip():
+        raise ValueError("URL cannot be empty")
 
-    if not os.path.exists(file_path):
+    directory = Path(directory)
+    if not directory.exists():
+        directory.mkdir(parents=True, exist_ok=True)
+    elif not os.access(directory, os.W_OK):
+        raise OSError(f"Directory not writable: {directory}")
+
+    file_name = url.split("/")[-1]
+    file_path = directory / file_name
+
+    if not file_path.exists():
         if verbose:
             _logger.info("Downloading %s...", file_name)
-        command = ["wget", "-P", directory, url]
-        subprocess.run(command, check=True)
-        print("Download complete.")
+        try:
+            command = ["wget", "-P", str(directory), url]
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
+            if verbose:
+                _logger.info(
+                    "Download complete with result %s for: %s", result, file_name
+                )
+        except subprocess.CalledProcessError as e:
+            _logger.error("Download failed: %s\nError: %s", file_name, e.stderr)
+            raise
     else:
-        print(f"{file_name} already exists in {directory}.")
+        if verbose:
+            _logger.info("File already exists: %s", file_path)
 
 
 def get_memory_usage():
@@ -274,12 +257,14 @@ def print_memory_used():
     """
     Print memory used by the proteusPy process (GB).
     """
+    from proteusPy import __version__
+
     mem = get_memory_usage() / (1024**3)  # to GB
 
     print(f"proteusPy {__version__}: Memory Used: {mem:.2f} GB")
 
 
-def image_to_ascii_art(fname, nwidth):
+def image_to_ascii_art(fname: str, nwidth: int) -> None:
     """
     Convert an image to ASCII art of given text width.
 
@@ -288,42 +273,40 @@ def image_to_ascii_art(fname, nwidth):
     :param fname: Input filename.
     :param nwidth: Output width in characters.
     """
-    from PIL import Image
-    from sklearn.preprocessing import minmax_scale  # type: ignore
 
-    # Open the image file
-    image = Image.open(fname)
+    if nwidth < 1:
+        raise ValueError("Width must be at least 1 character")
 
-    # Resize the image to reduce the number of pixels
-    width, height = image.size
+    if not os.path.exists(fname):
+        raise FileNotFoundError(f"Image file not found: {fname}")
+
+    # ASCII character set from darkest to lightest
+    CHAR_SET = ["@", "#", "8", "&", "o", ":", "*", ".", " "]
+
+    # Open and resize image
+    img = Image.open(fname)
+    width, height = img.size
     aspect_ratio = height / width
-    new_width = nwidth
-    new_height = aspect_ratio * new_width * 0.55  # 0.55 is an adjustment factor
-    image = image.resize((new_width, int(new_height)))
+    new_height = int(
+        aspect_ratio * nwidth * 0.55
+    )  # 0.55 compensates for character aspect ratio
+    img = img.resize((nwidth, new_height))
+    img = img.convert("L")  # Convert to grayscale
 
-    # Convert the image to grayscale.
-    image = image.convert("L")
+    # Convert pixel values to ASCII characters using numpy for better performance
+    pixels = np.array(img.getdata())
+    # Normalize to [0, len(CHAR_SET)-1] range
+    pixel_indices = (
+        (pixels - pixels.min())
+        * (len(CHAR_SET) - 1)
+        / (pixels.max() - pixels.min() + 1e-8)
+    ).astype(int)
+    chars = [CHAR_SET[idx] for idx in pixel_indices]
 
-    # Define the ASCII character set to use (inverted colormap)
-    char_set = ["@", "#", "8", "&", "o", ":", "*", ".", " "]
-
-    # Normalize the pixel values in the image.
-    pixel_data = list(image.getdata())
-    pixel_data_norm = minmax_scale(
-        pixel_data, feature_range=(0, len(char_set) - 1), copy=True
-    )
-    pixel_data_norm = [int(x) for x in pixel_data_norm]
-
-    char_array = [char_set[pixel] for pixel in pixel_data_norm]
-    # Generate the ASCII art string
+    # Generate and print ASCII art
     ascii_art = "\n".join(
-        [
-            "".join([char_array[i + j] for j in range(new_width)])
-            for i in range(0, len(char_array), new_width)
-        ]
+        "".join(chars[i : i + nwidth]) for i in range(0, len(chars), nwidth)
     )
-
-    # Print the ASCII art string.
     print(ascii_art)
 
 
@@ -538,7 +521,7 @@ def Download_Disulfides(
     return
 
 
-def remove_duplicate_ss(sslist: DisulfideList) -> list[Disulfide]:
+def remove_duplicate_ss(sslist) -> list:
     """Remove duplicate disulfides from the input list."""
     pruned = []
     for ss in sslist:
@@ -584,7 +567,8 @@ def Extract_Disulfides(
     :param dist_cutoff:    Ca distance cutoff to reject a Disulfide.
     :param prune:          Move bad files to bad directory, defaults to True
     """
-    from proteusPy.DisulfideList import load_disulfides_from_id
+    from proteusPy.DisulfideBase import DisulfideList
+    from proteusPy.DisulfideIO import load_disulfides_from_id
 
     def name_to_id(fname: str) -> str:
         """
@@ -796,7 +780,8 @@ def Extract_Disulfides_From_List(
     :param dist_cutoff:    Ca distance cutoff to reject a Disulfide.
     :param prune:          Move bad files to bad directory, defaults to True
     """
-    from proteusPy.DisulfideList import load_disulfides_from_id
+    from proteusPy.DisulfideBase import DisulfideList
+    from proteusPy.DisulfideIO import load_disulfides_from_id
 
     if quiet:
         _logger.setLevel(logging.ERROR)
@@ -940,38 +925,28 @@ def Extract_Disulfides_From_List(
     return
 
 
-import platform
-import subprocess
-
-
-def get_theme():
+def get_theme() -> str:
     """
     Determine the display theme for the current operating system.
 
     Returns:
     :return str: 'light' if the theme is light, 'dark' if the theme is dark, and 'light' otherwise
-
-    Example:
-    >>> get_theme()
-    'dark'
     """
     system = platform.system()
-    if system == "Darwin":
-        # macOS
-        try:
-            # AppleScript to get the appearance setting
-            script = """
-            tell application "System Events"
-                tell appearance preferences
-                    if dark mode is true then
-                        return "dark"
-                    else
-                        return "light"
-                    end if
-                end tell
+
+    def _get_macos_theme() -> str:
+        script = """
+        tell application "System Events"
+            tell appearance preferences
+                if dark mode is true then
+                    return "dark"
+                else
+                    return "light"
+                end if
             end tell
-            """
-            # Run the AppleScript
+        end tell
+        """
+        try:
             result = subprocess.run(
                 ["osascript", "-e", script],
                 stdout=subprocess.PIPE,
@@ -979,52 +954,43 @@ def get_theme():
                 text=True,
                 check=True,
             )
-            # print(f"AppleScript result: {result.stdout.strip()}")
-            # print(f"AppleScript stderr: {result.stderr.strip()}")
-            # print(f"AppleScript return code: {result.returncode}")
-            # Check the output
             if result.returncode == 0:
                 theme = result.stdout.strip().lower()
                 if theme in ["dark", "light"]:
                     return theme
-            return "light"
-
         except subprocess.CalledProcessError as e:
-            _logger.error(f"CalledProcessError occurred: {e}")
-            _logger.error(f"stderr: {e.stderr}")
-            # In case of any exception, return "light"
-            return "light"
-
+            _logger.error("Failed to get macOS theme: %s", e.stderr)
         except Exception as e:
-            _logger.error(f"Exception occurred: {e}")
-            # In case of any exception, return "light"
-            return "light"
+            _logger.error("Error getting macOS theme: %s", e)
+        return "light"
 
-    elif system == "Windows":
-        # Windows
+    def _get_windows_theme() -> str:
         try:
-            import winreg
+            # Lazy import winreg only on Windows
+            from winreg import (
+                HKEY_CURRENT_USER,
+                CloseKey,
+                ConnectRegistry,
+                OpenKey,
+                QueryValueEx,
+            )
 
-            registry = winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER)
+            registry = ConnectRegistry(None, HKEY_CURRENT_USER)
             key_path = r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
-            key = winreg.OpenKey(registry, key_path)
-            value, _ = winreg.QueryValueEx(key, "AppsUseLightTheme")
-            winreg.CloseKey(key)
-
-            if value == 0:
-                return "dark"
-            else:
-                return "light"
-
+            key = OpenKey(registry, key_path)
+            try:
+                value, _ = QueryValueEx(key, "AppsUseLightTheme")
+                return "dark" if value == 0 else "light"
+            finally:
+                CloseKey(key)
+        except ImportError:
+            _logger.warning("winreg module not available")
         except Exception as e:
-            print(f"Exception occurred: {e}")
-            # In case of any exception, return "light"
-            return "light"
+            _logger.error("Failed to get Windows theme: %s", e)
+        return "light"
 
-    elif system == "Linux":
-        # Linux
+    def _get_linux_theme() -> str:
         try:
-            # Check for GTK theme setting
             result = subprocess.run(
                 ["gsettings", "get", "org.gnome.desktop.interface", "gtk-theme"],
                 stdout=subprocess.PIPE,
@@ -1032,62 +998,21 @@ def get_theme():
                 text=True,
                 check=True,
             )
-
-            if result.returncode == 0:
-                theme = result.stdout.strip().lower()
-                if "dark" in theme:
-                    return "dark"
-                else:
-                    return "light"
-            return "light"
-
+            if result.returncode == 0 and "dark" in result.stdout.strip().lower():
+                return "dark"
         except Exception as e:
-            print(f"Exception occurred: {e}")
-            # In case of any exception, return "light"
-            return "light"
-
-    else:
-        # Unsupported OS
+            _logger.error("Failed to get Linux theme: %s", e)
         return "light"
 
+    # Use a dictionary to map system to theme getter function
+    theme_getters = {
+        "Darwin": _get_macos_theme,
+        "Windows": _get_windows_theme,
+        "Linux": _get_linux_theme,
+    }
 
-# functions to calculate statistics and filter disulfide lists via pandas
-
-
-def calculate_std_cutoff(df, column, num_std=2):
-    """
-    Calculate cutoff based on standard deviation.
-
-    :param df: DataFrame containing the deviations.
-    :type df: pd.DataFrame
-    :param column: Column name for which to calculate the cutoff.
-    :type column: str
-    :param num_std: Number of standard deviations to use for the cutoff.
-    :type num_std: int
-    :return: Cutoff value.
-    :rtype: float
-    """
-    mean = df[column].mean()
-    std = df[column].std()
-    cutoff = mean + num_std * std
-    return cutoff
-
-
-def calculate_percentile_cutoff(df, column, percentile=95):
-    """
-    Calculate cutoff based on percentile.
-
-    :param df: DataFrame containing the deviations.
-    :type df: pd.DataFrame
-    :param column: Column name for which to calculate the cutoff.
-    :type column: str
-    :param percentile: Percentile to use for the cutoff.
-    :type percentile: int
-    :return: Cutoff value.
-    :rtype: float
-    """
-    cutoff = np.percentile(df[column].dropna(), percentile)
-    return cutoff
+    # Get theme using appropriate function or default to light
+    return theme_getters.get(system, lambda: "light")()
 
 
 def save_list_to_file(input_list, filename):
@@ -1129,9 +1054,11 @@ def set_plotly_theme(theme: str, verbose=False) -> str:
 
     :param theme: The theme to set for Plotly. Must be 'auto', 'light', or 'dark'.
     :type theme: str
+    :param verbose: If True, logs the selected theme. Defaults to False.
+    :type verbose: bool, optional
     :raises ValueError: If an invalid theme is provided.
-    :return: None
-    :rtype: None
+    :return: The current Plotly template.
+    :rtype: str
     """
     from plotly import io as pio
 
@@ -1147,98 +1074,53 @@ def set_plotly_theme(theme: str, verbose=False) -> str:
         case "dark":
             pio.templates.default = "plotly_dark"
         case _:
-            _logger.error("Invalid theme. Must be 'auto', 'light', or 'dark'.")
-            pio.templates.default = "plotly_white"
-    
+            raise ValueError("Invalid theme. Must be 'auto', 'light', or 'dark'.")
+
     if verbose:
-        _logger.warning("Plotly theme set to: %s", pio.templates.default)
+        _logger.info("Plotly theme set to: %s", pio.templates.default)
 
     return pio.templates.default
 
 
-def plot_class_chart(classes: int) -> None:
+def set_pyvista_theme(theme: str, verbose=False) -> str:
     """
-    Create a Matplotlib pie chart with `classes` segments of equal size.
+    Set the PyVista theme based on the provided theme parameter.
 
-    This function returns a figure representing the angular layout of
-    disulfide torsional classes for input `n` classes.
+    This function sets the default PyVista theme to either 'document' or 'dark'
+    based on the input theme. If 'auto' is selected, the theme is determined automatically
+    based on the current system or application theme.
 
-    Parameters:
-        classes (int): The number of segments to create in the pie chart.
-
-    Returns:
-        None
-
-    Example:
-    >>> plot_class_chart(4)
-
-    This will create a pie chart with 4 equal segments.
+    :param theme: The theme to set for PyVista. Must be 'auto', 'light', or 'dark'.
+    :type theme: str
+    :param verbose: If True, logs the selected theme. Defaults to False.
+    :type verbose: bool, optional
+    :raises ValueError: If an invalid theme is provided.
+    :return: The current PyVista theme.
+    :rtype: str
     """
+    import pyvista as pv
 
-    matplotlib.use("TkAgg")  # or 'Qt5Agg', 'MacOSX', etc.
+    _theme = get_theme()
 
-    # Helper function to draw angle easily.
-    def plot_angle(ax, pos, angle, length=0.95, acol="C0", **kwargs):
-        vec2 = np.array([np.cos(np.deg2rad(angle)), np.sin(np.deg2rad(angle))])
-        xy = np.c_[[length, 0], [0, 0], vec2 * length].T + np.array(pos)
-        ax.plot(*xy.T, color=acol)
-        return AngleAnnotation(pos, xy[0], xy[2], ax=ax, **kwargs)
+    match theme.lower():
+        case "auto":
+            if _theme == "light":
+                pv.set_plot_theme("document")
+            else:
+                pv.set_plot_theme("dark")
+                _theme = "dark"
+        case "light":
+            pv.set_plot_theme("document")
+        case "dark":
+            pv.set_plot_theme("dark")
+            _theme = "dark"
+        case _:
+            raise ValueError("Invalid theme. Must be 'auto', 'light', or 'dark'.")
 
-    # fig = plt.figure(figsize=(WIDTH, HEIGHT), dpi=DPI)
-    fig, ax1 = plt.subplots(sharex=True)
+    if verbose:
+        _logger.info("PyVista theme set to: %s", _theme.lower())
 
-    # ax1, ax2 = fig.subplots(1, 2, sharey=True, sharex=True)
-
-    fig.suptitle("SS Torsion Classes")
-    fig.set_dpi(DPI)
-    fig.set_size_inches(6.2, 6)
-
-    fig.canvas.draw()  # Need to draw the figure to define renderer
-
-    # Showcase different text positions.
-    ax1.margins(y=0.4)
-    ax1.set_title("textposition")
-    _text = f"${360/classes}°$"
-    kw = dict(size=75, unit="points", text=_text)
-
-    plot_angle(ax1, (0, 0), 360 / classes, textposition="outside", **kw)
-
-    # Create a list of segment values
-    # !!!
-    values = [1 for _ in range(classes)]
-
-    # Create the pie chart
-    # fig, ax = plt.subplots()
-    wedges, _ = ax1.pie(
-        values,
-        startangle=0,
-        counterclock=False,
-        wedgeprops=dict(width=0.65),
-    )
-
-    # Set the chart title and size
-    ax1.set_title(f"{classes}-Class Angular Layout")
-
-    # Set the segment colors
-    color_palette = plt.cm.get_cmap("tab20", classes)
-    ax1.set_prop_cycle("color", [color_palette(i) for i in range(classes)])
-
-    # Create the legend
-    legend_labels = [f"Class {i+1}" for i in range(classes)]
-    legend = ax1.legend(
-        wedges,
-        legend_labels,
-        title="Classes",
-        loc="center left",
-        bbox_to_anchor=(1.1, 0.5),
-    )
-
-    # Set the legend fontsize
-    plt.setp(legend.get_title(), fontsize="large")
-    plt.setp(legend.get_texts(), fontsize="medium")
-
-    # Show the chart
-    fig.show()
+    return _theme
 
 
 def find_arial_font():

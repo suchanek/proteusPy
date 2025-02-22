@@ -67,65 +67,6 @@ def get_quadrant(angle_deg):
         raise ValueError("Invalid angle value: angle must be in the range [-180, 180).")
 
 
-def torsion_to_sixclass(tors):
-    """
-    Return the sextant class string for the input array of torsions.
-
-    :param tors: Array of five torsions
-    :return: Sextant string
-    """
-
-    res = [get_angle_class(x, 6) for x in tors]
-    return "".join([str(r) for r in res])
-
-
-def torsion_to_eightclass(tors):
-    """
-    Return the sextant class string for the input array of torsions.
-
-    :param tors: Array of five torsions
-    :return: Sextant string
-    """
-
-    res = [get_angle_class(x, 8) for x in tors]
-    return "".join([str(r) for r in res])
-
-
-def get_angle_class(angle_deg, base=8) -> str:
-    """
-    Return the class of the angle based on its degree value and the specified base.
-
-    The angle is divided into equal segments based on the base value, and the class is determined
-    by which segment the angle falls into.
-
-    :param _angle_deg: The angle in degrees.
-    :type _angle_deg: float
-    :param base: The number of segments to divide the angle into. Must be one of [4, 6, 8].
-    :type base: int, optional
-    :return: The class of the angle as a string.
-    :rtype: str
-    """
-    bases = [4, 6, 8]
-    if base not in bases:
-        raise ValueError(f"Invalid base value: base must be one of {bases}.")
-
-    angle = angle_deg % 360
-    deg = 360 // base
-    return str(base - (angle // deg))
-
-
-def torsion_to_class_string(tors, base=8):
-    """
-    Return the sextant class string for the input array of torsions.
-
-    :param tors: Array of five torsions
-    :return: Sextant string
-    """
-
-    res = [get_angle_class(x, base) for x in tors]
-    return "".join([str(r) for r in res])
-
-
 def filter_by_percentage(df: pd.DataFrame, cutoff) -> pd.DataFrame:
     """
     Filter a pandas DataFrame by percentage.
@@ -138,36 +79,6 @@ def filter_by_percentage(df: pd.DataFrame, cutoff) -> pd.DataFrame:
     :rtype: pandas.DataFrame
     """
     return df[df["percentage"] >= cutoff]
-
-
-def get_section(angle_deg, basis):
-    """
-    Returns the section in which an angle in degrees lies if the section is described by dividing a unit circle into `basis` equal segments.
-
-    Parameters:
-        angle_deg (float): The angle in degrees.
-        basis (int): The number of equal angular divisions into which the unit circle is divided.
-
-    Returns:
-        int: The section number (1-basis) that the angle belongs to.
-    """
-    # Normalize the angle to the range [-180, 180)
-    _angle_deg = angle_deg % 360
-    if _angle_deg < -180:
-        _angle_deg += 360
-    elif angle_deg >= 180:
-        angle_deg -= 360
-
-    # Calculate the size of each segment
-    segment_size = 360 / basis
-
-    # Calculate the section number
-    section = int(angle_deg // segment_size) + 1
-    if section <= 0:
-        section += basis
-
-    return str(section)
-
 
 def is_between(x, a, b):
     """

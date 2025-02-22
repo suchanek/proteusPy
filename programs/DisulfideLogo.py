@@ -7,8 +7,7 @@ import pandas as pd
 import pyvista as pv
 from pyvista import set_plot_theme
 
-from proteusPy.Disulfide import Disulfide
-from proteusPy.DisulfideList import DisulfideList
+from proteusPy.DisulfideBase import Disulfide, DisulfideList
 from proteusPy.DisulfideLoader import Load_PDB_SS
 
 
@@ -33,14 +32,8 @@ if __name__ == "__main__":
 
     best = PDB_SS.get_by_name("2q7q_75D_140D")
 
-    best.screenshot(
-        single=True, style="cpk", shadows=False, fname="img/logo_cpk.png"
-    )
-    best.screenshot(
-        single=True, style="bs", shadows=False, fname="img/logo_bs.png"
-    )
-    best.screenshot(
-        single=True, style="sb", shadows=False, fname="img/logo_sb.png"
-    )
+    best.screenshot(single=True, style="cpk", shadows=False, fname="img/logo_cpk.png")
+    best.screenshot(single=True, style="bs", shadows=False, fname="img/logo_bs.png")
+    best.screenshot(single=True, style="sb", shadows=False, fname="img/logo_sb.png")
 
     exit()

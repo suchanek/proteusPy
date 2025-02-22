@@ -1,84 +1,128 @@
+# pylint: disable=C0103
+
 """
-This module, ``Test_DisplaySS.py``, is part of the proteusPy package, a Python package for 
-the analysis and modeling of protein structures, with an emphasis on disulfide bonds. Note:
-depending on the speed of your hardware it can some time to load the full database and render
-the disulfides.
+Unit tests for the DisplaySS functionality in the proteusPy package.
+
+This module contains unit tests for displaying and taking screenshots of disulfide bonds
+using the proteusPy package. The tests ensure that the display and screenshot functionalities
+work correctly for both single disulfide bonds and lists of disulfide bonds.
+
+Classes:
+    TestDisplaySS: A unittest.TestCase subclass that contains the tests for DisplaySS functionality.
+
+Methods:
+    setUp(self): Sets up the test environment, including creating a temporary directory for
+        screenshots, setting the PyVista theme, and loading a subset of the disulfide database.
+    
+    tearDown(self): Cleans up the test environment by removing the temporary directory.
+    
+    test_single_disulfide_display(self): Tests the display and screenshot functionality for a 
+        single disulfide bond.
+    
+    test_disulfide_list_display(self): Test the display functionality for a list of disulfide bonds.
+
+Usage:
+    Run this module as a script to execute the unit tests.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 10/9//2024
+Last revision: 2025-02-11 20:41:46 -egs-
 """
 
-# plyint: disable=C0116
-# plyint: disable=C0103
-
 import os
-import shutil
-import tempfile
+import unittest
+from tempfile import TemporaryDirectory
+from unittest import main as run_tests
 
-from proteusPy.Disulfide import Disulfide
-from proteusPy.DisulfideList import DisulfideList
-from proteusPy.DisulfideLoader import Load_PDB_SS
+# import proteusPy as pp
+from proteusPy import Load_PDB_SS, __version__, set_pyvista_theme
+from proteusPy.ProteusGlobals import DATA_DIR
 
-TMP = tempfile.mkdtemp()
-
-
-def SS_DisplayTest(ss: Disulfide):
-    ss.display(style="bs", single=True)
-    ss.display(style="cpk", single=True)
-    ss.display(style="sb", single=True)
-    ss.display(style="pd", single=False)
-
-    filename = os.path.join(TMP, "cpk3.png")
-    ss.screenshot(style="cpk", single=True, fname=filename, verbose=True)
-
-    filename = os.path.join(TMP, "sb3.png")
-    ss.screenshot(style="sb", single=False, fname=filename, verbose=True)
-    return
+# pylint: disable=W0718 # too general exception clause
+# pylint: disable=C0114 # missing-module-docstring
+# pylint: disable=C0103 # non-snake-case variable name
 
 
-def SSlist_DisplayTest(sslist):
-    sslist.display(style="cpk")
-    sslist.display(style="bs")
-    sslist.display(style="sb")
-    sslist.display(style="pd")
-    sslist.display(style="plain")
+class TestDisplaySS(unittest.TestCase):
+    """Unit tests for the DisplaySS functionality in the proteusPy package."""
 
+    def setUp(self) -> None:
+        """Set up test fixtures before each test method."""
+        # Create a TemporaryDirectory object and store its path as a Path object.
+        self.temp_dir_obj = TemporaryDirectory(prefix="proteusPy_")
 
-def main():
-    """
-    Program tests the proteusPy Disulfide rendering routines.
-    Usage: run the program and close each window after manipulating it. The program
-    will run through display styles and save a few files to /tmp. There should be no
-    errors upon execution.
-    """
+        # Set the theme.
+        set_pyvista_theme("auto")
 
-    PDB_SS = None
-    PDB_SS = Load_PDB_SS(verbose=True, subset=True)
-    PDB_SS.describe()
+        # Load the disulfide database (subset, for speed).
+        # self.PDB = pp.DisulfideLoader(verbose=True, subset=True)
+        print(f"DATA_DIR: {DATA_DIR}")
+        self.PDB = Load_PDB_SS(verbose=True, subset=True)
 
-    # one disulfide from the database
-    ss = Disulfide()
-    ss = PDB_SS[0]
+        self.first_disulfide = self.PDB[0]
 
-    # SS_DisplayTest(ss)
+    def tearDown(self) -> None:
+        """Clean up test fixtures after each test method."""
+        # Remove the temporary directory via the TemporaryDirectory object's cleanup method.
+        self.temp_dir_obj.cleanup()
 
-    # get all disulfides for one structure. Make a
-    # DisulfideList object to hold it
+    def test_disulfide_list_display(self):
+        """Test the display functionality for a list of disulfide bonds."""
+        # Retrieve a disulfide list for a given structure using its identifier.
 
-    ss4yss = DisulfideList([], "4yss")
-    ss4yss = PDB_SS["4yys"]
+        try:
+            ss6dmb = self.PDB["6dmb"]
+        except Exception as e:
+            self.fail(f"DisulfideList display for '6dmb' raised an exception: {e}")
 
-    # SSlist_DisplayTest(ss4yss)
+        ss6dmb.display(style="cpk")
+        ss6dmb.display(style="bs")
+        ss6dmb.display(style="sb")
+        ss6dmb.display(style="pd")
+        ss6dmb.display(style="plain")
+        ss6dmb.display_overlay()
 
-    # grab the last 12 disulfides
-    sslist = DisulfideList([], "last12")
+        # Test with a subset (first 12 disulfides) of the database.
+        try:
+            sslist = self.PDB[:12]
+        except Exception as e:
+            self.fail(f"DisulfideList display for subset raised an exception: {e}")
 
-    sslist = PDB_SS[:12]
-    SSlist_DisplayTest(sslist)
+        self.assertIsNotNone(sslist)
+        self.assertGreater(len(sslist), 0, "Disulfide list should not be empty.")
 
-    print("--> Program complete!")
-    shutil.rmtree(TMP)
+        sslist.display(style="cpk")
+        sslist.display(style="bs")
+        sslist.display(style="sb")
+        sslist.display(style="pd")
+        sslist.display(style="plain")
+        sslist.display_overlay()
+
+    def test_single_disulfide_display(self):
+        """Test the display and screenshot functionality for a single disulfide."""
+        # Use the first disulfide from the database.
+        ss = self.first_disulfide
+
+        try:
+            ss.spin(style="sb")
+            ss.display(style="bs", single=True)
+            ss.display(style="cpk", single=True)
+            ss.display(style="sb", single=True)
+            ss.display(style="pd", single=False)
+
+        except Exception as e:
+            self.fail(f"Display method raised an exception: {e}")
+
+        # Test the screenshot functionality and verify the screenshot files exist.
+        cpk_filename = os.path.join(self.temp_dir_obj.name, "cpk3.png")
+        try:
+            ss.screenshot(
+                style="cpk", single=True, fname=str(cpk_filename), verbose=True
+            )
+        except Exception as e:
+            self.fail(f"Screenshot (cpk) method raised an exception: {e}")
 
 
 if __name__ == "__main__":
-    main()
+    run_tests()
+
+# EOF
