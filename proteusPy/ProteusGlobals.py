@@ -6,7 +6,9 @@ Author: Eric G. Suchanek, PhD
 Last revision: 2025-01-17 18:21:39 -egs-
 """
 
-# plyint: disable=C0103
+# pylint: disable=C0103 # snake case
+# pylint: disable=C0301 # line too long
+
 
 import importlib.resources as pkg_resources
 import math
@@ -32,16 +34,19 @@ MINIFORGE_DIR = HOME_DIR / Path("miniforge3/envs")
 MAMBAFORGE_DIR = HOME_DIR / Path("mambaforge/envs")
 
 VENV_DIR = Path("lib/python3.12/site-packages/proteusPy/data")
+VENV_DEV_DIR = Path("lib/python3.12/site-packages/ppydev/data")
 
 if not PDB_BASE.is_dir():
     print(f"Error: The directory {PDB_DIR} does not exist.")
     PDB_DIR = HOME_DIR
 
-DATA_DIR = Path(_this_dir) / "data"
-MODEL_DIR = PDB_BASE / "good"
+# DATA_DIR = Path(_this_dir) / "data"
+# MODEL_DIR = PDB_BASE / "good"
 
-# DATA_DIR = os.path.join(_this_dir, "data")
-# MODEL_DIR = os.path.join(PDB_DIR, "good")
+DATA_DIR = os.path.join(_this_dir, "data")
+MODEL_DIR = os.path.join(PDB_DIR, "good")
+
+_logger.info("DATA_DIR: %s", DATA_DIR)
 
 WINFRAME = 512  # single panel width
 WINSIZE = (1024, 1024)
@@ -134,11 +139,28 @@ CLASSOBJ_FNAME = "PDB_CLASS_OBJ.pkl"
 # for the most statistically reliable disulfide bonds.
 
 CA_CUTOFF = 6.71
+CA_MIN_CUTOFF = 1.0
+
 SG_CUTOFF = 2.12
+SG_MIN_CUTOFF = 1.0
 
-FONTSIZE = 12
 
-# columns for the torsions file dataframe.
+FONTSIZE = 10
+NBINS = 380
+
+# Columns for the distance dataframe
+Distance_DF_Cols = [
+    "source",
+    "ss_id",
+    "proximal",
+    "distal",
+    "energy",
+    "ca_distance",
+    "cb_distance",
+    "sg_distance",
+]
+
+# Columns for the torsions file dataframe
 Torsion_DF_Cols = [
     "source",
     "ss_id",

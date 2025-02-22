@@ -1,24 +1,46 @@
 # Makefile for proteusPy and associated programs
 # Author: Eric G. Suchanek, PhD
-# Last revision: 2024-12-17 19:05:22 -egs-
+# Last revision: 2025-01-26 17:06:12 -egs-
 
 VERS := $(shell python -c "exec(open('proteusPy/_version.py').read()); print(__version__)")
-RM := rm
 CONDA ?= conda
-MESS = "v0.98.5"
+MESS = $(VERS)
 DEVNAME = ppydev
+OS_NAME := $(shell uname -s)
 
-.PHONY: all vers newvers nuke pkg dev clean devclean install install_dev jup jup_dev format bld sdist docs upload tag push-tag commit tests docker docker_hub docker_github docker_all docker_run docker_purge
+ifeq ($(OS_NAME), Darwin)
+    RM := rm -rf
+else ifeq ($(OS_NAME), Linux)
+    RM := rm -rf
+else ifeq ($(OS_NAME), Windows_NT)
+    RM := del /Q
+else
+    RM := rm -rf
+endif
 
-all: sdist docs bld docker_all
+.PHONY: all vers newvers nuke pkg dev clean devclean install \
+	install_dev jup jup_dev format bld sdist docs upload tag push-tag commit \
+	tests docker docker_hub docker_github docker_all docker_run docker_purge \
+	update_pyproject_version
+
+all: docs bld docker_all
 
 vers:
 	@echo "Version = $(VERS)"
+	@echo "Operating system = $(OS_NAME)"
 
 newvers:
 	@echo "Current version number is: $(VERS)"	
 	@python -c "vers=input('Enter new version number: '); open('proteusPy/_version.py', 'w').write(f'__version__ = \"{vers}\"\\n')"
 	@echo "Version number updated."
+	@echo "Updating version in pyproject.toml to $(VERS)"
+	@sed -i '' 's/version = ".*"/version = "$(VERS)"/' pyproject.toml
+	@echo "pyproject.toml version updated to $(VERS)"
+
+update_pyproject_version: proteusPy/_version.py
+	@echo "Updating version in pyproject.toml to $(VERS)"
+	@sed -i '' 's/version = ".*"/version = "$(VERS)"/' pyproject.toml
+	@echo "pyproject.toml version updated to $(VERS)"
 
 nuke: clean devclean
 	-@$(RM) dist/*
@@ -30,7 +52,8 @@ pkg:
 
 dev:
 	@echo "Building development environment $(DEVNAME)..."
-	$(CONDA) create --name $(DEVNAME) -y python=3.12 numpy pandas
+	$(CONDA) create --name $(DEVNAME) -y python=3.12
+	pip install build
 	@echo "Step 1 done. Activate the environment with 'conda activate $(DEVNAME)' and run 'make install_dev'"
 
 clean devclean:
@@ -40,14 +63,13 @@ clean devclean:
 
 install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install .
+	pip install . -q
 	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Installation finished!"
 
-install_dev: sdist
+install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install .[all]
-	pip install pdoc twine black pytest build -q
+	pip install .[all] -q
 	python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
 	@echo "Development environment installation finished!"
 
@@ -66,22 +88,22 @@ jup_dev:
 format:
 	black proteusPy
 
-bld: sdist docs
+bld: wheels
 
-sdist: proteusPy/_version.py
-	@echo "Building source distribution and wheels..."
+wheels: proteusPy/_version.py
+	@echo "Building wheels..."
+	-@$(RM) dist/*
 	python -m build
 
 docs: $(wildcard proteusPy/**/*.py)
 	@echo "Generating documentation..."
 	pdoc -o docs --math --logo "./logo.png" ./proteusPy
 
-upload: sdist
+upload: wheels
 	twine upload -r proteusPy dist/proteusPy-$(VERS)*
 
 tag:
 	git tag -a $(VERS) -m $(MESS)
-	@echo $(VERS) > tag.out
 
 push-tag:
 	git push origin $(VERS)
@@ -92,9 +114,7 @@ commit:
 
 tests: 
 	pytest .
-	python tests/Test_DisplaySS.py
-	python proteusPy/Disulfide.py
-	python proteusPy/DisulfideLoader.py
+	python tests/test_DisplaySS.py
 	python proteusPy/DisulfideClasses.py
 
 docker: viewer/rcsb_viewer.py viewer/dockerfile

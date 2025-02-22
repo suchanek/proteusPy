@@ -51,9 +51,11 @@ from proteusPy import (
     toggle_stream_handler,
 )
 from proteusPy.ProteusGlobals import (
+    CA_CUTOFF,
     DATA_DIR,
     LOADER_FNAME,
     LOADER_SUBSET_FNAME,
+    SG_CUTOFF,
     SS_PICKLE_FILE,
     SS_SUBSET_PICKLE_FILE,
 )
@@ -64,14 +66,15 @@ from proteusPy.ProteusGlobals import (
 
 configure_master_logger("DisulfideExtractor.log")
 set_logger_level("proteusPy.ssparser", "ERROR")
-set_logger_level("proteusPy.DisulfideList", "INFO")
+set_logger_level("proteusPy.DisulfideBase.Disulfide", "INFO")
 # set_logger_level("proteusPy.DisulfideLoader", "INFO")
 
 # Disable the stream handlers for the following namespaces.
 # This will suppress the output to the console.
 toggle_stream_handler("proteusPy.ssparser", False)
-toggle_stream_handler("proteusPy.DisulfideList", False)
-toggle_stream_handler("proteusPy.DisulfideClass_Constructor", False)
+toggle_stream_handler("proteusPy.DisulfideBase", False)
+toggle_stream_handler("proteusPy.DisulfideIO", False)
+toggle_stream_handler("proteusPy.DisulfideClassManager", False)
 
 # Create a logger for this program.
 _logger = create_logger("DisulfideExtractor")
@@ -127,7 +130,7 @@ num_ent_files = len(ent_files)
 pdb_id_list = [Path(f).stem[3:7] for f in ent_files]
 
 
-__version__ = "2.3.1"
+__version__ = "2.3.2"
 
 
 def parse_arguments():
@@ -188,7 +191,7 @@ def parse_arguments():
         "-c",
         type=float,
         help="Disulfide Distance Cutoff, (Angstrom)",
-        default=-1.0,
+        default=CA_CUTOFF,
     )
     parser.add_argument(
         "--threads",
@@ -216,7 +219,7 @@ def parse_arguments():
         "-g",
         type=float,
         help="Sg cutoff distance",
-        default=-1.0,
+        default=SG_CUTOFF,
     )
 
     return parser.parse_args()
@@ -358,7 +361,7 @@ def do_build(verbose, full, subset, cutoff, sg_cutoff):
     if full:
         if verbose:
             print(
-                f"Building the compressed loader for the full dataset with cutoffs: Cα: {cutoff}Å, Sγ: {sg_cutoff}Å"
+                f"Building the loader for the full dataset with cutoffs: Cα: {cutoff}Å, Sγ: {sg_cutoff}Å"
             )
         PDB_SS = DisulfideLoader(
             datadir=DATA_DIR,
@@ -374,7 +377,7 @@ def do_build(verbose, full, subset, cutoff, sg_cutoff):
     elif subset:
         if verbose:
             print(
-                f"Building the packed loader for the Disulfide subset with cutoffs: {cutoff}, {sg_cutoff}..."
+                f"Building the loader for the Disulfide subset with cutoffs: {cutoff}, {sg_cutoff}..."
             )
         PDB_SS = DisulfideLoader(
             datadir=DATA_DIR,
@@ -504,7 +507,7 @@ def main():
         f"Data directory:            {DATA_DIR}\n"
         f"Module data directory:     {MODULE_DATA}\n"
         f"Repo data directory:       {REPO_DATA}\n"
-        f"Number of .ent files:      {num_ent_files}\n"
+        f"Number of .pdb files:      {num_ent_files}\n"
         f"Cα cutoff:                 {args.cutoff}\n"
         f"Sγ cutoff:                 {args.gamma}\n"
         f"Extract:                   {args.extract}\n"

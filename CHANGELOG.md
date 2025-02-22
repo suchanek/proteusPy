@@ -5,6 +5,34 @@ Notable changes to the ``proteusPy`` project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.99.3.pre] - 2024-2-21 unreleased
+
+### Added
+
+- Stronger type checking in general
+- Additional error checking for slicing lists
+- Several new Unittests
+
+
+### Changed
+
+- Refactored both ``Disufulfide`` and ``DisulfideList`` and moved plotting and statistics into new modules.
+- Created ``DisulfideVisualization`` and ``DisulfideStats`` classes for them.
+- Simplification and unification of accessing Disulfides via class strings
+- Generalized Disulfide class creation, can create up to 26-fold classes now.
+
+## [v0.99.1.dev0] - 2024-2-07 unreleased
+
+### Added
+
+- Disulfide.spin() - Spin the disulfide about the Y axis.
+- Test_DisplaySS.py - Unittest improvements.
+
+### Changed
+
+- Completely rewrote ``DisulfideClass_Constructor`` methods that generate the binary and octant class strings for simplicity.
+- The new ``DisulfideClass_Constructor.get_segment()`` is a more general version of ``DisulfideClass_Constructor.get_eighth_quadrant()``.
+
 ## [v0.98.5] - 2024-1-23
 
 ### Added
@@ -18,7 +46,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - vectorized binary and octant class string construction
 - added binary and octant class strings to the master ``loader.TorsionDF`` DataFrame.
 - Rewrote ``programs/DisulfideClass_Extractor.py`` to use the index-based address scheme described above. This resulted in about a 20x speedup in the program!
-
 
 ## [v0.98.4] - 2024-1-17
 
@@ -34,7 +61,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Optimized ``DisulfideList.create_deviation_dataframe()``.
 - Moved various class plotting routines into ``DisulfideLoader`` class.
 - Cleaned up ``DisulfideClasses.py``
-
 
 ## [v0.98.3] - 2024-1-12
 
@@ -70,7 +96,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - logging cleanup in ``DisulfideLoader.py`` and ``DisulfideList.py``.
 - ongoing documentation tweaks, cleanup
 
-
 ## [v0.98.1] - 2024-12-30
 
 ### Added
@@ -79,11 +104,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ``proteusPy.qt5viewer`` from command line will launch the program
 
-
 ### Changed
 
 - moved to Python 3.12
-
 
 ## [v0.98] - 2024-12-24
 
@@ -112,6 +135,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     pdb = Load_PDB_SS()
     ss = pdb["2q7q_75D_140D"]
   ```
+
   In prior versions one would need to use the loader.get_by_name() function.
 
 ### Removed
@@ -148,7 +172,6 @@ Launch with: ``docker -d -p 5006:5006 egsuchanek/rcsb_viewer:latest. Works under
 
 - I cannot get the QT5 viewer to build under linux. The pyQt5 library won't install.
 
-
 ## [V0.97.10]
 
 ### Added
@@ -156,7 +179,6 @@ Launch with: ``docker -d -p 5006:5006 egsuchanek/rcsb_viewer:latest. Works under
 - Disulfide QT5 viewer development, improvement
 - ``DisulfideList.display()`` added to provide a summary of the input DisulfideList
 - Additional analytics
-
 
 ### Fixed
 
