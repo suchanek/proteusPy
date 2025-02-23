@@ -53,7 +53,6 @@ pkg:
 dev:
 	@echo "Building development environment $(DEVNAME)..."
 	$(CONDA) create --name $(DEVNAME) -y python=3.12
-	pip install build
 	@echo "Step 1 done. Activate the environment with 'conda activate $(DEVNAME)' and run 'make install_dev'"
 
 clean devclean:
@@ -65,12 +64,16 @@ install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	pip install . -q
 	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
+	@echo "Downloading and building the Disulfide Databases..."
+	proteusPy.BootStrapper -v
 	@echo "Installation finished!"
 
 install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install .[all] -q
+	pip install .[all]
 	python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
+	@echo "Downloading and building the Disulfide Databases..."
+	proteusPy.BootStrapper -v
 	@echo "Development environment installation finished!"
 
 define jupyter-setup
