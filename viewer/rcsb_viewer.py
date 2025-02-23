@@ -1,7 +1,7 @@
 """
 RCSB Disulfide Bond Database Browser
 Author: Eric G. Suchanek, PhD
-Last revision: 2024-12-28 16:57:13 -egs-
+Last revision: 2025-02-23 16:41:02 -egs-
 """
 
 # pylint: disable=C0301 # line too long
@@ -845,7 +845,7 @@ def save_as_file():
         )
         plotter.screenshot(str(screenshot_path))
         _logger.info("Saved screenshot to %s", screenshot_path)
-    except Exception as e:
+    except (OSError, ValueError) as e:
         _logger.error("Failed to save file: %s, error: %s", screenshot_path, e)
 
 

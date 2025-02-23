@@ -5,11 +5,19 @@ Notable changes to the ``proteusPy`` project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v0.99.3] - 2024-2-22 unreleased
+## [v0.99.3] - 2024-2-23
+
+### Fixed
+
+- ``rcsb_viewer.py`` - refactored for new ``DisulfideVisualization`` classes.
+- Pushed to both DockerHub and GitHub repositories.
+-
+
+## [v0.99.3] - 2024-2-22
 
 ### Added
 
-- Stronger type checking in general
+- Stronger type checking across many functions
 - Additional error checking for slicing lists
 - Several new Unittests
 

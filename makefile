@@ -142,7 +142,7 @@ docker_github: viewer/rcsb_viewer.py viewer/dockerfile
 docker_all: docker docker_hub docker_github
 
 docker_run:
-	docker run -d -p 5006:5006 --name rcsb_viewer --restart unless-stopped rcsb_viewer:latest
+	docker run -d -p 5006:5006 --name rcsb_viewer --restart unless-stopped egsuchanek/rcsb_viewer:latest
 
 docker_purge:
 	docker system prune -a
