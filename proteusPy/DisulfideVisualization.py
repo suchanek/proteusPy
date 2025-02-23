@@ -552,13 +552,14 @@ class DisulfideVisualization:
     @staticmethod
     def display_overlay(
         sslist,
+        pl=None,
         screenshot=False,
         movie=False,
         verbose=False,
         fname="ss_overlay.png",
         light="auto",
         winsize=WINSIZE,
-    ):
+    ) -> pv.Plotter:
         """Display all disulfides in the list overlaid in stick mode against
         a common coordinate frame.
 
@@ -569,6 +570,8 @@ class DisulfideVisualization:
         :param fname: Filename to save for the movie or screenshot
         :param light: Background color
         :param winsize: Window size tuple (width, height)
+        :return: pyvista.Plotter instance
+        :rtype: pv.Plotter
         """
         pid = sslist.pdb_id
         ssbonds = sslist
@@ -591,9 +594,11 @@ class DisulfideVisualization:
         set_pyvista_theme(light)
 
         if movie:
-            pl = pv.Plotter(window_size=winsize, off_screen=True)
+            if not pl:
+                pl = pv.Plotter(window_size=winsize, off_screen=True)
         else:
-            pl = pv.Plotter(window_size=winsize, off_screen=False)
+            if not pl:
+                pl = pv.Plotter(window_size=winsize, off_screen=False)
 
         pl.add_title(title=title, font_size=fontsize)
         pl.enable_anti_aliasing("msaa")
@@ -647,6 +652,7 @@ class DisulfideVisualization:
                 print(f" -> display_overlay(): Saved mp4 animation to: {fname}")
         else:
             pl.show()
+        return pl
 
     @staticmethod
     def display_torsion_statistics(
@@ -982,7 +988,7 @@ class DisulfideVisualization:
             src = ss.pdb_id
             enrg = ss.energy
             title = f"{src} {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°"
-            fontsize = calculate_fontsize(title, panelsize)
+            fontsize = calculate_fontsize(title, panelsize[0])
             pl.add_title(title=title, font_size=fontsize)
             DisulfideVisualization._render_ss(
                 ss,
