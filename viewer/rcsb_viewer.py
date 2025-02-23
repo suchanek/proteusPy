@@ -28,6 +28,7 @@ from proteusPy import (
     WINSIZE,
     Disulfide,
     DisulfideList,
+    DisulfideVisualization,
     Load_PDB_SS,
     __version__,
     create_logger,
@@ -301,7 +302,7 @@ def plot(pl, ss, style="sb", light=True, panelsize=512, verbose=True) -> pv.Plot
         _logger.debug("Single View")
         plotter = pv.Plotter(window_size=WINSIZE)
         plotter.clear()
-        ss._render(plotter, style=style)
+        DisulfideVisualization._render_ss(ss, plotter, style=style)
 
     elif mode == "Multiview":
         _logger.debug("Multiview")
@@ -309,16 +310,16 @@ def plot(pl, ss, style="sb", light=True, panelsize=512, verbose=True) -> pv.Plot
         plotter.clear()
 
         plotter.subplot(0, 0)
-        ss._render(plotter, style="cpk")
+        DisulfideVisualization._render_ss(ss, plotter, style="cpk")
 
         plotter.subplot(0, 1)
-        ss._render(plotter, style="bs")
+        DisulfideVisualization._render_ss(ss, plotter, style="bs")
 
         plotter.subplot(1, 0)
-        ss._render(plotter, style="sb")
+        DisulfideVisualization._render_ss(ss, plotter, style="sb")
 
         plotter.subplot(1, 1)
-        ss._render(plotter, style="pd")
+        DisulfideVisualization._render_ss(ss, plotter, style="pd")
 
         plotter.link_views()
 
@@ -334,17 +335,17 @@ def plot(pl, ss, style="sb", light=True, panelsize=512, verbose=True) -> pv.Plot
 
         plotter = pv.Plotter(window_size=winsize, shape=(rows, cols))
         plotter.clear()
-        plotter = sslist._render(plotter, style)
+        plotter = DisulfideVisualization._render_sslist(plotter, sslist, style=style)
         plotter.enable_anti_aliasing("msaa")
         plotter.link_views()
     else:
         plotter = pv.Plotter(window_size=WINSIZE)
         plotter.clear()
-        _logger.debug("Overlay")
+        _logger.info("Overlay")
         pdbid = ss.pdb_id
         sslist = PDB_SS[pdbid]
 
-        plotter = display_overlay(sslist, plotter, verbose=verbose)
+        plotter = render_overlay(sslist, plotter, verbose=verbose)
 
     plotter.reset_camera()
     return plotter
@@ -446,13 +447,13 @@ def update_info(ss):
 
     info_string = f"""
     ### {ss.name}
-    **Resolution:** {ss.resolution:.2f} Å  
-    **Energy:** {ss.energy:.2f} kcal/mol  
-    **Cα distance:** {ss.ca_distance:.2f} Å  
-    **Sγ distance:** {ss.sg_distance:.2f} Å  
+    **Resolution:** {ss.resolution:.2f} Å
+    **Energy:** {ss.energy:.2f} kcal/mol
+    **Cα distance:** {ss.ca_distance:.2f} Å
+    **Sγ distance:** {ss.sg_distance:.2f} Å
     **Torsion Length:** {ss.torsion_length:.2f}°
-    **Rho:** {ss.rho:.2f}°  
-    **Secondary:** {ss.proximal_secondary} / {ss.distal_secondary} 
+    **Rho:** {ss.rho:.2f}°
+    **Secondary:** {ss.proximal_secondary} / {ss.distal_secondary}
     """
     info_md.object = info_string
 
@@ -467,7 +468,7 @@ def update_db_info(pdb):
 
     info_string = f"""**Version:** {vers}
     **Structures:** {pdbs}
-    **Average Resolution:** {res:.2f} Å  
+    **Average Resolution:** {res:.2f} Å
     **Total Disulfides:** {tot}
     """
     db_md.object = info_string
@@ -475,10 +476,10 @@ def update_db_info(pdb):
 
 def update_output(ss):
     """Update the output of the disulfide bond in the markdown pane."""
-    info_string = f"""**Cα-Cα:** {ss.ca_distance:.2f} Å  
-    **Cβ-Cβ:** {ss.cb_distance:.2f} Å  
-    **Torsion Length:** {ss.torsion_length:.2f}°  
-    **Resolution:** {ss.resolution:.2f} Å  
+    info_string = f"""**Cα-Cα:** {ss.ca_distance:.2f} Å
+    **Cβ-Cβ:** {ss.cb_distance:.2f} Å
+    **Torsion Length:** {ss.torsion_length:.2f}°
+    **Resolution:** {ss.resolution:.2f} Å
     **Energy:** {ss.energy:.2f} kcal/mol
     """
     output_md.object = info_string
@@ -551,7 +552,7 @@ def on_theme_change(event):
     vtkpan.object = plotter.ren_win  # Update the VTK pane object
 
 
-def display_overlay(
+def render_overlay(
     sslist,
     pl,
     verbose=False,
@@ -568,6 +569,9 @@ def display_overlay(
     :param fname: Filename to save for the movie or screenshot, defaults to 'ss_overlay.png'
     :param light: Background color, defaults to True for White. False for Dark.
     """
+
+    # pl = DisulfideVisualization.display_overlay(sslist, pl=pl, verbose=verbose)
+    # return pl
 
     ssbonds = sslist.data
     tot_ss = len(ssbonds)  # number off ssbonds
@@ -598,17 +602,12 @@ def display_overlay(
     brad = brad if tot_ss < 50 else brad * 0.7
     brad = brad if tot_ss < 100 else brad * 0.5
 
-    center_of_mass = sslist.center_of_mass
+    # center_of_mass = sslist.center_of_mass
 
     for i, ss in zip(range(tot_ss), ssbonds):
         color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
-        ss._render(
-            pl,
-            style="plain",
-            bondcolor=color,
-            translate=False,
-            bond_radius=brad,
-            res=res,
+        DisulfideVisualization._render_ss(
+            ss, pl, style="plain", bondcolor=color, res=res
         )
 
     pl.reset_camera()
@@ -721,7 +720,7 @@ help_items = [("About", "about"), ("Documentation", "documentation")]
 # Define the handler function
 def handle_file_menu(event):
     """Handle the file menu items."""
-    _logger.info(f"File menu item selected: %s", event)  # noqa
+    _logger.info("File menu item selected: %s", event)  # noqa
     item = event
     _logger.info("Selected item: %s", item)
     if item == "save":
@@ -761,7 +760,7 @@ def show_documentation_dialog():
 
 def handle_help_menu(event):
     """Handle the help menu items."""
-    _logger.info(f"Help menu item selected: %s", event)  # noqa
+    _logger.info("Help menu item selected: %s", event)  # noqa
     item = event
     if item == "about":
         _logger.info("Show about dialog")

@@ -10,7 +10,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PATH="/opt/conda/envs/proteusPy/bin:$PATH" \
     PYVISTA_OFF_SCREEN=true \
     DOCKER_RUNNING=true \
-    MPLCONFIGDIR=/tmp/matplotlib
+    MPLCONFIGDIR=/tmp/matplotlib \
+    PDB=/home/appuser
 
 
 # Install system dependencies
