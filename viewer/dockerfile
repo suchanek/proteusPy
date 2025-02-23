@@ -30,13 +30,11 @@ RUN apt-get update && \
 COPY environment.yml /tmp/environment.yml
 
 # Create the conda environment
-RUN conda env create -f /tmp/environment.yml && \
+RUN conda env create -f /tmp/environment.yml
+
+RUN /opt/conda/envs/proteusPy/bin/pip install --verbose proteusPy --upgrade && \
     conda clean -a -y
 
-RUN /opt/conda/envs/proteusPy/bin/pip install proteusPy
-
-# Update the login bash profile to activate the environment with interactive access.
-RUN echo "source activate proteusPy" > ~/.bashrc
 
 # Set the working directory in the container
 WORKDIR /app
@@ -50,6 +48,9 @@ RUN useradd -m appuser && \
     chown -R appuser:appuser /tmp/matplotlib && \
     chown -R appuser:appuser /app && \
     chmod +x /app/entrypoint.sh
+
+# Update the login bash profile to activate the environment with interactive access.
+RUN echo "source activate proteusPy" >> ~/.bashrc
 
 # Switch to the non-root user
 USER appuser

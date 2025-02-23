@@ -590,6 +590,7 @@ class DisulfideVisualization:
 
         title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), E: {avg_enrg:.2f} kcal/mol, Dist: {avg_dist:.2f} Å"
         fontsize = calculate_fontsize(title, winsize[0])
+        fontsize += 2
 
         set_pyvista_theme(light)
 
@@ -989,6 +990,7 @@ class DisulfideVisualization:
             enrg = ss.energy
             title = f"{src} {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°"
             fontsize = calculate_fontsize(title, panelsize[0])
+            fontsize += 2
             pl.add_title(title=title, font_size=fontsize)
             DisulfideVisualization._render_ss(
                 ss,
@@ -1004,14 +1006,13 @@ class DisulfideVisualization:
         ss,
         pvplot: pv.Plotter,
         style="bs",
-        plain=False,
         bondcolor=BOND_COLOR,
         bs_scale=BS_SCALE,
         spec=SPECULARITY,
         specpow=SPEC_POWER,
-        translate=True,
+        translate=False,
         bond_radius=BOND_RADIUS,
-        res=100,
+        res=64,
     ):
         """
         Update the passed pyVista plotter() object with the mesh data for the
@@ -1069,7 +1070,7 @@ class DisulfideVisualization:
             style="sb",
             bcolor=BOND_COLOR,
             all_atoms=True,
-            res=100,
+            res=res,
         ):
             """
             Generate the appropriate pyVista cylinder objects to represent
