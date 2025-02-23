@@ -53,7 +53,6 @@ pkg:
 dev:
 	@echo "Building development environment $(DEVNAME)..."
 	$(CONDA) create --name $(DEVNAME) -y python=3.12
-	pip install build
 	@echo "Step 1 done. Activate the environment with 'conda activate $(DEVNAME)' and run 'make install_dev'"
 
 clean devclean:
@@ -69,6 +68,7 @@ install:
 
 install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
+	pip install build -q
 	pip install .[all] -q
 	python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
 	@echo "Development environment installation finished!"
