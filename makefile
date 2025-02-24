@@ -123,7 +123,7 @@ tests:
 docker: viewer/rcsb_viewer.py viewer/dockerfile
 	docker build -t rcsb_viewer viewer/ --no-cache
 
-docker_hub: viewer/rcsb_viewer.py viewer/dockerfile
+docker_hub: viewer/rcsb_viewer.py viewer/dockerfile viewer/data/PDB_SS_ALL_LOADER.pkl
 	docker buildx use cloud-egsuchanek-rcsbviewer
 	docker buildx build viewer/ --platform linux/arm64,linux/amd64 \
 		-f viewer/dockerfile \
@@ -131,7 +131,7 @@ docker_hub: viewer/rcsb_viewer.py viewer/dockerfile
 		-t docker.io/egsuchanek/rcsb_viewer:$(VERS) \
 		--push --no-cache
 
-docker_github: viewer/rcsb_viewer.py viewer/dockerfile
+docker_github: viewer/rcsb_viewer.py viewer/dockerfile viewer/data/PDB_SS_ALL_LOADER.pkl
 	docker buildx use cloud-egsuchanek-rcsbviewer
 	docker buildx build viewer/ --platform linux/arm64,linux/amd64 \
 		-f viewer/dockerfile \
