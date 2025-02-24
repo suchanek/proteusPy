@@ -28,6 +28,7 @@ from proteusPy import (
     WINSIZE,
     Disulfide,
     DisulfideList,
+    DisulfideLoader,
     DisulfideVisualization,
     Load_PDB_SS,
     __version__,
@@ -338,6 +339,8 @@ def plot(pl, ss, style="sb", light=True, panelsize=512, verbose=True) -> pv.Plot
         plotter = DisulfideVisualization._render_sslist(plotter, sslist, style=style)
         plotter.enable_anti_aliasing("msaa")
         plotter.link_views()
+        update_sslist_info(sslist)
+
     else:
         plotter = pv.Plotter(window_size=WINSIZE)
         plotter.clear()
@@ -346,6 +349,7 @@ def plot(pl, ss, style="sb", light=True, panelsize=512, verbose=True) -> pv.Plot
         sslist = PDB_SS[pdbid]
 
         plotter = render_overlay(sslist, plotter, verbose=verbose)
+        update_sslist_info(sslist)
 
     plotter.reset_camera()
     return plotter
@@ -404,8 +408,19 @@ def click_plot(event):
     # Reuse the existing plotter and re-render the scene
     global plotter
 
+    # Store current view mode before render
+    current_mode = view_selector.value
+
     plotter = render_ss()  # Reuse the existing plotter
     plotter.reset_camera()
+
+    # If we're in List/Overlay mode, ensure list info stays displayed
+    if current_mode in ["List", "Overlay"]:
+        ss_id = rcsb_selector_widget.value
+        sslist = PDB_SS[ss_id]
+        if sslist:
+            update_sslist_info(sslist)
+
     # Update the vtkpan and trigger a refresh
     vtkpan.object = plotter.ren_win
 
@@ -442,7 +457,56 @@ def update_title(ss):
     title_md.object = title
 
 
-def update_info(ss):
+def update_sslist_info(sslist: DisulfideList) -> str:
+    """
+    Prints out relevant attributes of the given disulfideList.
+
+    :param disulfideList: A list of disulfide objects.
+    :param list_name: The name of the list.
+    """
+    name = sslist.pdb_id
+    avg_distance = sslist.average_ca_distance
+    avg_sg_distance = sslist.average_sg_distance
+    avg_energy = sslist.average_energy
+    avg_resolution = sslist.average_resolution
+    list_length = len(sslist.data)
+    dev_df = sslist.create_deviation_dataframe()
+    stats = dev_df.describe()
+    ca_std = stats.loc["std", "Ca_Distance"]
+    sg_std = stats.loc["std", "Sg_Distance"]
+    angle_std = stats.loc["std", "Angle_Deviation"]
+    bond_std = stats.loc["std", "Bondlength_Deviation"]
+
+    if list_length == 0:
+        avg_bondangle = 0
+        avg_bondlength = 0
+    else:
+        total_bondangle = 0
+        total_bondlength = 0
+
+        for ss in sslist.data:
+            total_bondangle += ss.bond_angle_ideality
+            total_bondlength += ss.bond_length_ideality
+
+        avg_bondangle = total_bondangle / list_length
+        avg_bondlength = total_bondlength / list_length
+
+    info_string = f"""
+    ### {name} Disulfide List
+    **Total Disulfides:** {list_length}
+    **Resolution:** {avg_resolution:.2f} Å
+    **Energy:** {avg_energy:.2f} kcal/mol
+    **Cα distance:** {avg_distance:.2f} +/- {ca_std:.2f} Å
+    **Sg distance:** {avg_sg_distance:.2f} +/- {sg_std:.2f} Å
+    **Avg Bond Angle Deviation:** {avg_bondangle:.2f} +/- {angle_std:.2f}°
+    **Avg Bond Length Deviation:** {avg_bondlength:.2f} +/- {bond_std:.2f} Å
+    """
+    info_md.object = info_string
+
+    return info_string
+
+
+def update_info(ss: Disulfide) -> str:
     """Update the information of the disulfide bond in the markdown pane."""
 
     info_string = f"""
@@ -456,9 +520,10 @@ def update_info(ss):
     **Secondary:** {ss.proximal_secondary} / {ss.distal_secondary}
     """
     info_md.object = info_string
+    return info_string
 
 
-def update_db_info(pdb):
+def update_db_info(pdb: DisulfideLoader) -> None:
     """Update the information of the disulfide bond in the markdown pane."""
 
     tot = pdb.TotalDisulfides
@@ -474,7 +539,7 @@ def update_db_info(pdb):
     db_md.object = info_string
 
 
-def update_output(ss):
+def update_output(ss: Disulfide) -> None:
     """Update the output of the disulfide bond in the markdown pane."""
     info_string = f"""**Cα-Cα:** {ss.ca_distance:.2f} Å
     **Cβ-Cβ:** {ss.cb_distance:.2f} Å
@@ -520,11 +585,13 @@ def render_ss():
         update_output(f"Cannot find ss_id {ss_id}! Returning!")
         return
 
-    # Update the UI
-    update_title(ss)
-    update_info(ss)
-    update_output(ss)
-    update_db_info(PDB_SS)
+    # Only update single SS info if not in List/Overlay mode
+    mode = view_selector.value
+    if mode not in ["List", "Overlay"]:
+        update_title(ss)
+        update_info(ss)
+        update_output(ss)
+        update_db_info(PDB_SS)
 
     # Reuse and clear the existing plotter before rendering
     style = styles[styles_group.value]
@@ -553,8 +620,8 @@ def on_theme_change(event):
 
 
 def render_overlay(
-    sslist,
-    pl,
+    sslist: DisulfideList,
+    pl: pv.Plotter,
     verbose=False,
     light="Auto",
 ):
@@ -576,16 +643,14 @@ def render_overlay(
     ssbonds = sslist.data
     tot_ss = len(ssbonds)  # number off ssbonds
 
-    res = 0
+    res = 64
 
     if tot_ss > 50:
-        res = 60
-    elif tot_ss > 40:
-        res = 30
-    elif tot_ss > 30:
         res = 16
-    else:
-        res = 100  # Default resolution if tot_ss is 30 or less
+    elif tot_ss > 40:
+        res = 24
+    elif tot_ss > 30:
+        res = 32
 
     pl.clear()
     pl.enable_anti_aliasing("msaa")

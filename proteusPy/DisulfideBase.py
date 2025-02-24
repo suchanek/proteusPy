@@ -239,6 +239,16 @@ class DisulfideList(UserList):
         return total_dist / tot
 
     @property
+    def average_sg_distance(self):
+        """Average Sg distance (Å) between all atoms in the list"""
+        sslist = self.data
+        tot = len(sslist)
+        if tot == 0:
+            return 0.0
+        total_dist = sum(ss.sg_distance for ss in sslist)
+        return total_dist / tot
+
+    @property
     def average_distance(self):
         """Average distance (Å) between all atoms in the list"""
         sslist = self.data
