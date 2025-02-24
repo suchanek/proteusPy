@@ -496,10 +496,10 @@ def update_sslist_info(sslist: DisulfideList) -> str:
     **Total Disulfides:** {list_length}
     **Resolution:** {avg_resolution:.2f} Å
     **Energy:** {avg_energy:.2f} kcal/mol
-    **Cα distance:** {avg_distance:.2f} +/- {ca_std:.2f} Å
-    **Sg distance:** {avg_sg_distance:.2f} +/- {sg_std:.2f} Å
-    **Avg Bond Angle Deviation:** {avg_bondangle:.2f} +/- {angle_std:.2f}°
-    **Avg Bond Length Deviation:** {avg_bondlength:.2f} +/- {bond_std:.2f} Å
+    **Cα distance:** {avg_distance:.2f} ± {ca_std:.2f} Å
+    **Sg distance:** {avg_sg_distance:.2f} ± {sg_std:.2f} Å
+    **Bond Angle Deviation:** {avg_bondangle:.2f} ± {angle_std:.2f}°
+    **Bond Length Deviation:** {avg_bondlength:.2f} ± {bond_std:.2f} Å
     """
     info_md.object = info_string
 
