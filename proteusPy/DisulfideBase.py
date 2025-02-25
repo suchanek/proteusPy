@@ -24,6 +24,7 @@ Last Modification: 2025-02-21 16:33:47
 
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
 
+
 import copy
 import logging
 import math
@@ -200,7 +201,7 @@ class DisulfideList(UserList):
         print(f"DisulfideList: {name}")
         print(f"Length: {list_length}")
         print(f"Average energy: {avg_energy:.2f} kcal/mol")
-        print(f"Average CA distance: {avg_distance:.2f} Å")
+        print(f"Average Cα distance: {avg_distance:.2f} Å")
         print(f"Average Resolution: {avg_resolution:.2f} Å")
         print(f"Bond angle deviation: {avg_bondangle:.2f}°")
         print(f"Bond length deviation: {avg_bondlength:.2f} Å")
@@ -240,7 +241,7 @@ class DisulfideList(UserList):
 
     @property
     def average_sg_distance(self):
-        """Average Sg distance (Å) between all atoms in the list"""
+        """Average Sγ distance (Å) between all atoms in the list"""
         sslist = self.data
         tot = len(sslist)
         if tot == 0:
@@ -515,13 +516,13 @@ class DisulfideList(UserList):
         :param winsize: Window size tuple (width, height)
         """
         DisulfideVisualization.display_overlay(
-            sslist=self, 
-            screenshot=screenshot, 
-            movie=movie, 
-            verbose=verbose, 
-            fname=fname, 
-            light=light, 
-            winsize=winsize
+            sslist=self,
+            screenshot=screenshot,
+            movie=movie,
+            verbose=verbose,
+            fname=fname,
+            light=light,
+            winsize=winsize,
         )
 
     def display_torsion_statistics(
@@ -582,7 +583,7 @@ class DisulfideList(UserList):
         return DisulfideList(reslist, f"filtered by distance < {distance:.2f}")
 
     def filter_by_sg_distance(self, distance: float = -1.0, minimum: float = 1.0):
-        """Return a DisulfideList filtered by to between the maxium Sg distance and
+        """Return a DisulfideList filtered by to between the maxium Sγ distance and
         the minimum, which defaults to 1.0A.
 
         :param distance: Distance in Å
