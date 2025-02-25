@@ -492,7 +492,7 @@ def update_sslist_info(sslist: DisulfideList) -> str:
         avg_bondlength = total_bondlength / list_length
 
     info_string = f"""
-    ### {name} Disulfide List
+    ### {name} Disulfides
     **Total Disulfides:** {list_length}
     **Resolution:** {avg_resolution:.2f} Å
     **Energy:** {avg_energy:.2f} kcal/mol

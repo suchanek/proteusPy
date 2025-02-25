@@ -79,7 +79,7 @@ class TestDisplaySS(unittest.TestCase):
         ss6dmb.display(style="sb")
         ss6dmb.display(style="pd")
         ss6dmb.display(style="plain")
-        ss6dmb.display_overlay()
+        ss6dmb.display_overlay(light="auto")
 
         # Test with a subset (first 12 disulfides) of the database.
         try:

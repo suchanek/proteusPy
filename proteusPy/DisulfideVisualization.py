@@ -552,7 +552,7 @@ class DisulfideVisualization:
 
     @staticmethod
     def display_overlay(
-        sslist,
+        sslist=None,
         pl=None,
         screenshot=False,
         movie=False,
@@ -958,7 +958,7 @@ class DisulfideVisualization:
         fig_bond_angle.show()
 
     @staticmethod
-    def _render_sslist(pl, sslist, style, res=100, panelsize=WINSIZE):
+    def _render_sslist(pl, sslist, style, res=100, panelsize=512):
         """Internal rendering engine that calculates and instantiates all bond
         cylinders and atomic sphere meshes.
 
@@ -990,8 +990,8 @@ class DisulfideVisualization:
             src = ss.pdb_id
             enrg = ss.energy
             title = f"{src} {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°"
-            fontsize = calculate_fontsize(title, panelsize[0])
-            fontsize += 2
+            fontsize = calculate_fontsize(title, panelsize)
+            # fontsize += 2
             pl.add_title(title=title, font_size=fontsize)
             DisulfideVisualization._render_ss(
                 ss,
