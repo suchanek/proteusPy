@@ -515,7 +515,13 @@ class DisulfideList(UserList):
         :param winsize: Window size tuple (width, height)
         """
         DisulfideVisualization.display_overlay(
-            self, screenshot, movie, verbose, fname, light, winsize
+            sslist=self, 
+            screenshot=screenshot, 
+            movie=movie, 
+            verbose=verbose, 
+            fname=fname, 
+            light=light, 
+            winsize=winsize
         )
 
     def display_torsion_statistics(
