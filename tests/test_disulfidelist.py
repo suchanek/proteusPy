@@ -331,7 +331,7 @@ def test_describe_method(pdb_5rsa, capsys):
     assert "DisulfideList" in output
     assert "Length:" in output
     assert "Average energy:" in output
-    assert "Average CA distance:" in output
+    assert "Average Cα distance:" in output
     assert "Average Resolution:" in output
 
 
