@@ -1553,7 +1553,7 @@ class DisulfideVisualization:
         set_pyvista_theme(light)
 
         if verbose:
-            _logger.info("Rendering screenshot to file {fname}")
+            _logger.info("Rendering screenshot to file %s", fname)
 
         if single:
             pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
