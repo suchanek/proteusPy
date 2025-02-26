@@ -2,7 +2,7 @@
 This module provides visualization functionality for disulfide bonds in the proteusPy package.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-02-23 16:41:36
+Last revision: 2025-02-25 23:50:54
 """
 
 # pylint: disable=C0301
@@ -10,6 +10,7 @@ Last revision: 2025-02-23 16:41:36
 # pylint: disable=C0103
 # pylint: disable=W0212
 
+import logging
 import math
 from pathlib import Path
 
@@ -38,6 +39,7 @@ from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import FONTSIZE, NBINS, PBAR_COLS, WINSIZE
 from proteusPy.utility import (
     calculate_fontsize,
+    dpi_adjusted_fontsize,
     get_jet_colormap,
     grid_dimensions,
     set_plotly_theme,
@@ -51,6 +53,11 @@ try:
         tqdm = tqdm_notebook
 except NameError:
     pass  # Use default tqdm import
+
+set_pyvista_theme("auto")
+
+# Suppress findfont debug messages
+logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
 
 _logger = create_logger(__name__)
 
@@ -591,7 +598,7 @@ class DisulfideVisualization:
 
         title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), E: {avg_enrg:.2f} kcal/mol, Dist: {avg_dist:.2f} Å"
         fontsize = calculate_fontsize(title, winsize[0])
-        fontsize += 2
+        fontsize = dpi_adjusted_fontsize(fontsize + 2)
 
         set_pyvista_theme(light)
 
@@ -973,12 +980,16 @@ class DisulfideVisualization:
         tot_ss = len(_ssList)
         rows, cols = grid_dimensions(tot_ss)
 
-        if tot_ss > 30:
-            res = 60
-        if tot_ss > 60:
-            res = 30
-        if tot_ss > 90:
+        if tot_ss > 20:
             res = 12
+        elif tot_ss > 10:
+            res = 18
+        elif tot_ss > 8:
+            res = 24
+        elif tot_ss > 6:
+            res = 32
+        else:
+            res = 32
 
         total_plots = rows * cols
         for idx in range(min(tot_ss, total_plots)):
@@ -991,7 +1002,7 @@ class DisulfideVisualization:
             enrg = ss.energy
             title = f"{src} {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°"
             fontsize = calculate_fontsize(title, panelsize)
-            # fontsize += 2
+            fontsize = dpi_adjusted_fontsize(fontsize)
             pl.add_title(title=title, font_size=fontsize)
             DisulfideVisualization._render_ss(
                 ss,
@@ -999,7 +1010,9 @@ class DisulfideVisualization:
                 style=style,
                 res=res,
             )
+            pl.reset_camera()
 
+        pl.link_views()
         return pl
 
     @staticmethod
@@ -1013,7 +1026,7 @@ class DisulfideVisualization:
         specpow=SPEC_POWER,
         translate=False,
         bond_radius=BOND_RADIUS,
-        res=64,
+        res=24,
     ):
         """
         Update the passed pyVista plotter() object with the mesh data for the
@@ -1346,7 +1359,7 @@ class DisulfideVisualization:
         title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Cα: {ss.ca_distance:.2f} Å Cβ: {ss.cb_distance:.2f} Å, Sg: {ss.sg_distance:.2f} Å Tors: {ss.torsion_length:.2f}°"
 
         set_pyvista_theme(light)
-        fontsize = 8
+        fontsize = dpi_adjusted_fontsize(8)
 
         if single:
             _pl = pv.Plotter(window_size=winsize)
@@ -1487,7 +1500,7 @@ class DisulfideVisualization:
 
         # Create a Plotter instance
         pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
-        pl.add_title(title=title, font_size=FONTSIZE)
+        pl.add_title(title=title, font_size=dpi_adjusted_fontsize(FONTSIZE))
 
         # Enable anti-aliasing for smoother rendering
         pl.enable_anti_aliasing("msaa")
@@ -1544,7 +1557,7 @@ class DisulfideVisualization:
 
         if single:
             pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
-            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=dpi_adjusted_fontsize(FONTSIZE))
             pl.enable_anti_aliasing("msaa")
             DisulfideVisualization._render_ss(
                 ss,
@@ -1566,7 +1579,7 @@ class DisulfideVisualization:
             pl = pv.Plotter(window_size=WINSIZE, shape=(2, 2), off_screen=False)
             pl.subplot(0, 0)
 
-            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=dpi_adjusted_fontsize(FONTSIZE))
             pl.enable_anti_aliasing("msaa")
 
             # pl.add_camera_orientation_widget()
@@ -1577,7 +1590,7 @@ class DisulfideVisualization:
             )
 
             pl.subplot(0, 1)
-            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=dpi_adjusted_fontsize(FONTSIZE))
             DisulfideVisualization._render_ss(
                 ss,
                 pl,
@@ -1585,7 +1598,7 @@ class DisulfideVisualization:
             )
 
             pl.subplot(1, 0)
-            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=dpi_adjusted_fontsize(FONTSIZE))
             DisulfideVisualization._render_ss(
                 ss,
                 pl,
@@ -1593,7 +1606,7 @@ class DisulfideVisualization:
             )
 
             pl.subplot(1, 1)
-            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=dpi_adjusted_fontsize(FONTSIZE))
             DisulfideVisualization._render_ss(
                 ss,
                 pl,
@@ -1615,6 +1628,84 @@ class DisulfideVisualization:
 
         if verbose:
             print(f"Screenshot saved as: {fname}")
+
+    @staticmethod
+    def display_worst_structures(df, top_n=10, sample_percent=10):
+        """
+        Highlight the worst structures for distance and angle deviations and annotate their names.
+        Also, add a subplot showing the worst structures aggregated by PDB_ID.
+
+        :param top_n: Number of worst structures to highlight.
+        :type top_n: int
+        """
+        rows = df.shape[0]
+        samplesize = int(rows * sample_percent / 100)
+
+        # Identify the worst structures for Bond Length Deviation
+        worst_distance = df.nlargest(top_n, "Bondlength_Deviation")
+
+        # Identify the worst structures for angle deviation
+        worst_angle = df.nlargest(top_n, "Angle_Deviation")
+
+        # Identify the worst structures for Cα distance
+        worst_ca = df.nlargest(top_n, "Ca_Distance")
+
+        # Combine the worst structures
+        worst_structures = pd.concat(
+            [worst_distance, worst_angle, worst_ca]
+        ).drop_duplicates()
+
+        # Aggregate worst structures by PDB_ID
+        worst_structures_agg = (
+            worst_structures.groupby("PDB_ID").size().reset_index(name="Count")
+        )
+
+        # Scatter plot for all structures
+        fig = px.scatter(
+            df.sample(samplesize),
+            x="Bondlength_Deviation",
+            y="Angle_Deviation",
+            title="Bond Length Deviation vs. Angle Deviation",
+            hover_data=["PDB_ID", "Bondlength_Deviation", "Angle_Deviation"],
+        )
+
+        fig.update_traces(
+            hovertemplate="<b>PDB ID: %{customdata[0]}</b><br>Bondlength Deviation: %{customdata[1]:.2f}<br>Angle Deviation: %{customdata[2]:.2f}<extra></extra>"
+        )
+
+        fig.add_scatter(
+            x=worst_structures["Bondlength_Deviation"],
+            y=worst_structures["Angle_Deviation"],
+            mode="markers",
+            marker=dict(color="red", size=10, symbol="x"),
+            customdata=worst_structures[
+                ["PDB_ID", "Bondlength_Deviation", "Angle_Deviation"]
+            ],
+            hovertemplate="<b>PDB ID: %{customdata[0]}</b><br>Bondlength Deviation: %{customdata[1]:.2f}<br>Angle Deviation: %{customdata[2]:.2f}<extra></extra>",
+            name="Worst Structures",
+        )
+        for _, row in worst_structures.iterrows():
+            fig.add_annotation(
+                x=row["Bondlength_Deviation"],
+                y=row["Angle_Deviation"],
+                text=row["SS_Name"],
+                showarrow=False,
+                arrowhead=1,
+                font=dict(size=6),  # Adjust the font size as needed
+                xshift=0,
+                yshift=10,
+            )
+        fig.show()
+
+        # Bar plot for worst structures aggregated by PDB_ID
+        fig = px.bar(
+            worst_structures_agg,
+            x="PDB_ID",
+            y="Count",
+            title="Worst Structures Aggregated by PDB_ID",
+        )
+        fig.update_layout(xaxis_title="PDB_ID", yaxis_title="Count")
+        fig.show()
 
 
 # EOF

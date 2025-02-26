@@ -47,22 +47,10 @@ from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, WINSIZE
 from proteusPy.Residue import build_residue
 from proteusPy.turtle3D import ORIENT_SIDECHAIN, Turtle3D
-from proteusPy.utility import set_pyvista_theme
 from proteusPy.vector3D import Vector3D, calc_dihedral, distance3d
 
 np.set_printoptions(suppress=True)
 
-set_pyvista_theme("auto")
-
-# Configure logging
-logging.basicConfig(
-    level=logging.WARNING,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-)
-
-
-# Suppress findfont debug messages
-logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
 
 ORIGIN = Vector3D(0.0, 0.0, 0.0)
 
@@ -542,6 +530,17 @@ class DisulfideList(UserList):
         DisulfideVisualization.display_torsion_statistics(
             self, display, save, fname, theme
         )
+
+    def display_worst_structures(self, top_n=10, sample_percent=10):
+        """
+        Highlight the worst structures for distance and angle deviations and annotate their names.
+        Also, add a subplot showing the worst structures aggregated by PDB_ID.
+
+        :param top_n: Number of worst structures to highlight.
+        :type top_n: int
+        """
+        df = self.create_deviation_dataframe(verbose=True)
+        DisulfideVisualization.display_worst_structures(df, top_n, sample_percent)
 
     # Properties for easy DataFrame access
     @property
