@@ -925,6 +925,39 @@ def Extract_Disulfides_From_List(
     return
 
 
+def get_platform_dpi_scale():
+    """
+    Get DPI scaling factor based on platform.
+
+    Returns:
+        float: A scaling factor to adjust font sizes for the current platform.
+               Windows typically needs smaller fonts due to higher DPI scaling.
+    """
+    system = platform.system()
+    if system == "Windows":
+        # Windows typically has higher DPI scaling
+        return 1.5  # Adjust this value based on testing
+    elif system == "Darwin":  # macOS
+        return 1.0
+    elif system == "Linux":
+        return 1.0
+    return 1.0  # Default fallback
+
+
+def dpi_adjusted_fontsize(base_size):
+    """
+    Return a font size adjusted for the platform's DPI.
+
+    Args:
+        base_size (int): The base font size to adjust
+
+    Returns:
+        int: Font size adjusted for the current platform's DPI
+    """
+    scale = get_platform_dpi_scale()
+    return int(base_size / scale)
+
+
 def get_theme() -> str:
     """
     Determine the display theme for the current operating system.
@@ -1082,13 +1115,13 @@ def set_plotly_theme(theme: str, verbose=False) -> str:
     return pio.templates.default
 
 
-def set_pyvista_theme(theme: str, verbose=False) -> str:
+def set_pyvista_theme(theme: str, verbose=True) -> str:
     """
     Set the PyVista theme based on the provided theme parameter.
 
     This function sets the default PyVista theme to either 'document' or 'dark'
     based on the input theme. If 'auto' is selected, the theme is determined automatically
-    based on the current system or application theme.
+    based on the current system or application theme. It also adjusts font settings based on platform.
 
     :param theme: The theme to set for PyVista. Must be 'auto', 'light', or 'dark'.
     :type theme: str
@@ -1117,8 +1150,25 @@ def set_pyvista_theme(theme: str, verbose=False) -> str:
         case _:
             raise ValueError("Invalid theme. Must be 'auto', 'light', or 'dark'.")
 
+    # Adjust font settings based on platform
+    system = platform.system()
+    dpi_scale = get_platform_dpi_scale()
+
+    # Set font sizes with DPI adjustment
+    base_font_size = FONTSIZE
+    base_title_size = FONTSIZE + 2
+
+    pv.global_theme.font.size = int(base_font_size / dpi_scale)
+    pv.global_theme.font.title_size = int(base_title_size / dpi_scale)
+
     if verbose:
         _logger.info("PyVista theme set to: %s", _theme.lower())
+        _logger.info(
+            "Font size set to: %s (base: %s, scale: %s)",
+            pv.global_theme.font.size,
+            base_font_size,
+            dpi_scale,
+        )
 
     return _theme
 
@@ -1156,20 +1206,24 @@ def find_arial_font():
 def calculate_fontsize(title, window_width, max_fontsize=FONTSIZE, min_fontsize=2):
     """
     Calculate the maximum font size for the title so that it fits within the window width in PyVista.
+    Adjusts for platform-specific DPI differences.
 
     :param title: The title text.
     :param window_width: The width of the window in pixels.
-    :param font_path: The path to the font file.
     :param max_fontsize: The maximum font size.
     :param min_fontsize: The minimum font size.
     :return: The calculated font size.
     """
-
     if not title:
         return min_fontsize  # Default to the smallest size if the title is empty
 
-    font_path = find_arial_font()
+    # Get platform-specific DPI scale
+    dpi_scale = get_platform_dpi_scale()
 
+    # Adjust window width based on DPI scale
+    effective_width = window_width / dpi_scale
+
+    font_path = find_arial_font()
     if not font_path:
         _logger.warning("Arial font not found.")
         return min_fontsize
@@ -1190,12 +1244,18 @@ def calculate_fontsize(title, window_width, max_fontsize=FONTSIZE, min_fontsize=
     fontsize = max_fontsize
     while fontsize > min_fontsize:
         text_width = get_text_width(title, fontsize)
-        if text_width <= window_width:
+        if text_width <= effective_width:
             break
         fontsize -= 1
 
-    _logger.debug("Calculated fontsize: %d", fontsize)
-    return fontsize // 2
+    # Apply DPI scaling to the final font size
+    adjusted_fontsize = int(fontsize / dpi_scale)
+
+    # Ensure we don't go below minimum
+    adjusted_fontsize = max(adjusted_fontsize, min_fontsize)
+
+    _logger.debug("Calculated fontsize: %d, adjusted: %d", fontsize, adjusted_fontsize)
+    return adjusted_fontsize
 
 
 if __name__ == "__main__":
