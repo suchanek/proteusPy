@@ -3,6 +3,8 @@ import os
 import unittest
 import tempfile
 from pathlib import Path
+from tempfile import TemporaryDirectory
+
 
 from proteusPy import (
     configure_master_logger,
@@ -27,6 +29,7 @@ class TestLoggingUtilities(unittest.TestCase):
         self.test_log_file = f"test_{self._testMethodName}.log"
         # Use tempfile to get a platform-independent temporary directory
         self.test_log_path = Path(tempfile.gettempdir()) / "proteuspy_test_logs"
+        self.temp_dir_obj = TemporaryDirectory(prefix="proteusPy_")
 
     def tearDown(self):
         """Cleanup after each test."""
@@ -45,6 +48,10 @@ class TestLoggingUtilities(unittest.TestCase):
                     root_logger.removeHandler(handler)
         
         # Now try to clean up the files
+        # Remove the temporary directory via the TemporaryDirectory object's cleanup method.
+        self.temp_dir_obj.cleanup()
+        return
+    
         try:
             if self.test_log_path.exists():
                 for file in self.test_log_path.iterdir():
