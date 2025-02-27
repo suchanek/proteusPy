@@ -475,8 +475,8 @@ def Download_Disulfides(
     try:
         ssfile = open(ssfilename, "r")
         Line = ssfile.readlines()
-    except Exception:
-        raise DisulfideIOException(f"Cannot open file: {ssfile}")
+    except Exception as exc:
+        raise DisulfideIOException(f"Cannot open file: {ssfile}") from exc
 
     for line in Line:
         entries = line.split(",")
@@ -1115,7 +1115,7 @@ def set_plotly_theme(theme: str, verbose=False) -> str:
     return pio.templates.default
 
 
-def set_pyvista_theme(theme: str, verbose=True) -> str:
+def set_pyvista_theme(theme: str, verbose=False) -> str:
     """
     Set the PyVista theme based on the provided theme parameter.
 
@@ -1151,7 +1151,6 @@ def set_pyvista_theme(theme: str, verbose=True) -> str:
             raise ValueError("Invalid theme. Must be 'auto', 'light', or 'dark'.")
 
     # Adjust font settings based on platform
-    system = platform.system()
     dpi_scale = get_platform_dpi_scale()
 
     # Set font sizes with DPI adjustment
