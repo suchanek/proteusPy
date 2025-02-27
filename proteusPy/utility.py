@@ -936,7 +936,7 @@ def get_platform_dpi_scale():
     system = platform.system()
     if system == "Windows":
         # Windows typically has higher DPI scaling
-        return 1.5  # Adjust this value based on testing
+        return 1.25  # Adjust this value based on testing
     elif system == "Darwin":  # macOS
         return 1.0
     elif system == "Linux":

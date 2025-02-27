@@ -139,7 +139,7 @@ SG_CUTOFF = 2.12
 SG_MIN_CUTOFF = 1.0
 
 
-FONTSIZE = 10
+FONTSIZE = 11
 NBINS = 380
 
 # Columns for the distance dataframe
