@@ -1556,7 +1556,7 @@ class DisulfideVisualization:
             _logger.info("Rendering screenshot to file %s", fname)
 
         if single:
-            pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
+            pl = pv.Plotter(window_size=WINSIZE, off_screen=True)
             pl.add_title(title=title, font_size=dpi_adjusted_fontsize(FONTSIZE))
             pl.enable_anti_aliasing("msaa")
             DisulfideVisualization._render_ss(
@@ -1568,15 +1568,16 @@ class DisulfideVisualization:
             if shadows:
                 pl.enable_shadows()
 
-            pl.show(auto_close=False)  # allows for manipulation
+            #pl.show(auto_close=True)  # allows for manipulation
             # Take the screenshot after ensuring the plotter is still active
             try:
                 pl.screenshot(fname)
+                pl.close()
             except RuntimeError as e:
                 _logger.error("Error saving screenshot: %s", e)
 
         else:
-            pl = pv.Plotter(window_size=WINSIZE, shape=(2, 2), off_screen=False)
+            pl = pv.Plotter(window_size=WINSIZE, shape=(2, 2), off_screen=True)
             pl.subplot(0, 0)
 
             pl.add_title(title=title, font_size=dpi_adjusted_fontsize(FONTSIZE))
@@ -1619,10 +1620,11 @@ class DisulfideVisualization:
                 pl.enable_shadows()
 
             # Take the screenshot after ensuring the plotter is still active
-            pl.show(auto_close=False)  # allows for manipulation
+            #pl.show(auto_close=True)  # allows for manipulation
 
             try:
                 pl.screenshot(fname)
+                pl.close()
             except RuntimeError as e:
                 _logger.error("Error saving screenshot: %s", e)
 
