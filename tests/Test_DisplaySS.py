@@ -25,21 +25,20 @@ Usage:
     Run this module as a script to execute the unit tests.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-02-11 20:41:46 -egs-
+Last revision: 2025-02-26 19:57:07 -egs-
 """
+
+# pylint: disable=W0718 # too general exception clause
+# pylint: disable=C0114 # missing-module-docstring
+# pylint: disable=C0103 # non-snake-case variable name
 
 import os
 import unittest
 from tempfile import TemporaryDirectory
 from unittest import main as run_tests
 
-# import proteusPy as pp
 from proteusPy import Load_PDB_SS, __version__, set_pyvista_theme
 from proteusPy.ProteusGlobals import DATA_DIR
-
-# pylint: disable=W0718 # too general exception clause
-# pylint: disable=C0114 # missing-module-docstring
-# pylint: disable=C0103 # non-snake-case variable name
 
 
 class TestDisplaySS(unittest.TestCase):
@@ -68,8 +67,7 @@ class TestDisplaySS(unittest.TestCase):
     def test_disulfide_list_display(self):
         """Test the display functionality for a list of disulfide bonds."""
         # Retrieve a disulfide list for a given structure using its identifier.
-        return
-        
+
         try:
             ss6dmb = self.PDB["6dmb"]
         except Exception as e:

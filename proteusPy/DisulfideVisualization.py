@@ -2,7 +2,7 @@
 This module provides visualization functionality for disulfide bonds in the proteusPy package.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-02-25 23:50:54
+Last revision: 2025-02-26 19:57:43
 """
 
 # pylint: disable=C0301
@@ -22,7 +22,6 @@ import pyvista as pv
 from plotly.subplots import make_subplots
 from scipy import stats
 from tqdm import tqdm
-from tqdm.notebook import tqdm as tqdm_notebook
 
 from proteusPy.atoms import (
     ATOM_COLORS,
@@ -588,12 +587,12 @@ class DisulfideVisualization:
         avg_dist = sslist.average_distance
         resolution = sslist.average_resolution
 
-        res = 64
-        if tot_ss > 30:
-            res = 48
-        if tot_ss > 60:
-            res = 16
-        if tot_ss > 90:
+        res = 32
+        if tot_ss > 10:
+            res = 18
+        if tot_ss > 15:
+            res = 12
+        if tot_ss > 20:
             res = 8
 
         title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), E: {avg_enrg:.2f} kcal/mol, Dist: {avg_dist:.2f} Å"
@@ -980,16 +979,14 @@ class DisulfideVisualization:
         tot_ss = len(_ssList)
         rows, cols = grid_dimensions(tot_ss)
 
-        if tot_ss > 20:
-            res = 12
-        elif tot_ss > 10:
+        if tot_ss > 10:
             res = 18
-        elif tot_ss > 8:
-            res = 24
-        elif tot_ss > 6:
-            res = 32
+        elif tot_ss > 15:
+            res = 12
+        elif tot_ss > 20:
+            res = 8
         else:
-            res = 32
+            res = 12
 
         total_plots = rows * cols
         for idx in range(min(tot_ss, total_plots)):
@@ -1000,7 +997,7 @@ class DisulfideVisualization:
             ss = _ssList[idx]
             src = ss.pdb_id
             enrg = ss.energy
-            title = f"{src} {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°"
+            title = f"{src} {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Ca: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°"
             fontsize = calculate_fontsize(title, panelsize)
             fontsize = dpi_adjusted_fontsize(fontsize)
             pl.add_title(title=title, font_size=fontsize)
@@ -1356,7 +1353,7 @@ class DisulfideVisualization:
         src = ss.pdb_id
         enrg = ss.energy
 
-        title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Cα: {ss.ca_distance:.2f} Å Cβ: {ss.cb_distance:.2f} Å, Sg: {ss.sg_distance:.2f} Å Tors: {ss.torsion_length:.2f}°"
+        title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Ca: {ss.ca_distance:.2f} Å, Sg: {ss.sg_distance:.2f} Å Tors: {ss.torsion_length:.2f}°"
 
         set_pyvista_theme(light)
         fontsize = dpi_adjusted_fontsize(8)
@@ -1491,7 +1488,7 @@ class DisulfideVisualization:
         src = ss.pdb_id
         enrg = ss.energy
 
-        title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}"
+        title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol, Ca: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}"
 
         set_pyvista_theme(theme)
 
@@ -1548,7 +1545,7 @@ class DisulfideVisualization:
 
         src = ss.pdb_id
         enrg = ss.energy
-        title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol, Cα: {ss.ca_distance:.2f} Å, Cβ: {ss.cb_distance:.2f} Å, Sγ: {ss.sg_distance:.2f} Å, Tors: {ss.torsion_length:.2f}"
+        title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol, Ca: {ss.ca_distance:.2f} Å, Sg: {ss.sg_distance:.2f} Å, Tors: {ss.torsion_length:.2f}"
 
         set_pyvista_theme(light)
 
@@ -1568,7 +1565,7 @@ class DisulfideVisualization:
             if shadows:
                 pl.enable_shadows()
 
-            #pl.show(auto_close=True)  # allows for manipulation
+            # pl.show(auto_close=True)  # allows for manipulation
             # Take the screenshot after ensuring the plotter is still active
             try:
                 pl.screenshot(fname)
@@ -1620,7 +1617,7 @@ class DisulfideVisualization:
                 pl.enable_shadows()
 
             # Take the screenshot after ensuring the plotter is still active
-            #pl.show(auto_close=True)  # allows for manipulation
+            # pl.show(auto_close=True)  # allows for manipulation
 
             try:
                 pl.screenshot(fname)

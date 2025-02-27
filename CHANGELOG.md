@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Finished refactoring for ``DisulfideIO.py``
 - Corrected parameter order in ``DisulfideBase.DisulfideList.display_overlay()``
+- Corrected the ``.screenshot()`` function to work correctly on Windows.
+- 
 
 ## [v0.99.31] - 2024-2-23
 
