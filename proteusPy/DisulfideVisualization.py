@@ -1510,9 +1510,10 @@ class DisulfideVisualization:
 
         pl.reset_camera()
         pl.show(auto_close=False)
+        nstep = 1 / steps
 
         # Orbit the camera along the generated path
-        pl.orbit_on_path(path, write_frames=False, step=1 / steps)
+        pl.orbit_on_path(path, write_frames=False, step=nstep)
 
         if verbose:
             print("Spinning completed.")
