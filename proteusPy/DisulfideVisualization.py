@@ -597,7 +597,7 @@ class DisulfideVisualization:
 
         title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), E: {avg_enrg:.2f} kcal/mol, Dist: {avg_dist:.2f} Å"
         fontsize = calculate_fontsize(title, winsize[0])
-        fontsize = dpi_adjusted_fontsize(fontsize + 2)
+        fontsize = dpi_adjusted_fontsize(fontsize)
 
         set_pyvista_theme(light)
 
@@ -964,7 +964,7 @@ class DisulfideVisualization:
         fig_bond_angle.show()
 
     @staticmethod
-    def _render_sslist(pl, sslist, style, res=100, panelsize=512):
+    def _render_sslist(pl, sslist, style, res=64, panelsize=512):
         """Internal rendering engine that calculates and instantiates all bond
         cylinders and atomic sphere meshes.
 
@@ -978,15 +978,15 @@ class DisulfideVisualization:
         _ssList = sslist
         tot_ss = len(_ssList)
         rows, cols = grid_dimensions(tot_ss)
-
+        _res = res
         if tot_ss > 10:
-            res = 18
+            _res = 18
         elif tot_ss > 15:
-            res = 12
+            _res = 12
         elif tot_ss > 20:
-            res = 8
+            _res = 8
         else:
-            res = 12
+            _res = 32
 
         total_plots = rows * cols
         for idx in range(min(tot_ss, total_plots)):
@@ -999,13 +999,13 @@ class DisulfideVisualization:
             enrg = ss.energy
             title = f"{src} {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Ca: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°"
             fontsize = calculate_fontsize(title, panelsize)
-            fontsize = dpi_adjusted_fontsize(fontsize)
+            fontsize = dpi_adjusted_fontsize(fontsize) - 2
             pl.add_title(title=title, font_size=fontsize)
             DisulfideVisualization._render_ss(
                 ss,
                 pl,
                 style=style,
-                res=res,
+                res=_res,
             )
             pl.reset_camera()
 
@@ -1023,7 +1023,7 @@ class DisulfideVisualization:
         specpow=SPEC_POWER,
         translate=False,
         bond_radius=BOND_RADIUS,
-        res=24,
+        res=64,
     ):
         """
         Update the passed pyVista plotter() object with the mesh data for the
@@ -1356,7 +1356,7 @@ class DisulfideVisualization:
         title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Ca: {ss.ca_distance:.2f} Å, Sg: {ss.sg_distance:.2f} Å Tors: {ss.torsion_length:.2f}°"
 
         set_pyvista_theme(light)
-        fontsize = dpi_adjusted_fontsize(8)
+        fontsize = dpi_adjusted_fontsize(FONTSIZE)
 
         if single:
             _pl = pv.Plotter(window_size=winsize)
