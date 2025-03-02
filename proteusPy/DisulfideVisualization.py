@@ -1713,12 +1713,12 @@ class DisulfideVisualization:
         pdb_full: "DisulfideLoader",
         percentile_range=(80, 99),
         num_steps=20,
-        figsize=(10, 6),
+        figsize=(12, 10),  # Increased height for two subplots
         save_path=None,
         verbose=False,
     ):
         """
-        Generate a graph showing Ca and Sg distance cutoffs as a function of percentile.
+        Generate a graph showing Ca and Sg distance cutoffs as well as bondlength and bondangle deviation cutoffs as a function of percentile.
 
         :param pdb_full: The PDB object containing the SSList attribute
         :type pdb_full: object
@@ -1748,6 +1748,8 @@ class DisulfideVisualization:
         # Initialize arrays to store cutoff values
         ca_cutoffs = []
         sg_cutoffs = []
+        bondlength_cutoffs = []
+        angle_cutoffs = []
 
         # Calculate cutoffs for each percentile
         for p in percentiles:
@@ -1757,51 +1759,85 @@ class DisulfideVisualization:
             sg_cutoff = DisulfideStats.calculate_percentile_cutoff(
                 dev_df, "Sg_Distance", percentile=p
             )
+            bondlength_cutoff = DisulfideStats.calculate_percentile_cutoff(
+                dev_df, "Bondlength_Deviation", percentile=p
+            )
+            angle_cutoff = DisulfideStats.calculate_percentile_cutoff(
+                dev_df, "Angle_Deviation", percentile=p
+            )
 
             ca_cutoffs.append(ca_cutoff)
             sg_cutoffs.append(sg_cutoff)
+            bondlength_cutoffs.append(bondlength_cutoff)
+            angle_cutoffs.append(angle_cutoff)
 
-        # Create the plot
-        fig, ax = plt.subplots(figsize=figsize)
+        # Create the plot with two subplots
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=figsize, sharex=True)
 
-        # Plot the data
-        ax.plot(percentiles, ca_cutoffs, "b-", marker="o", label="Cα-Cα Distance")
-        ax.plot(percentiles, sg_cutoffs, "r-", marker="s", label="Sγ-Sγ Distance")
+        # Plot distances in the first subplot
+        ax1.plot(percentiles, ca_cutoffs, "b-", marker="o", label="Cα-Cα Distance")
+        ax1.plot(percentiles, sg_cutoffs, "r-", marker="s", label="Sγ-Sγ Distance")
+        
+        # Add labels and title for first subplot
+        ax1.set_ylabel("Distance Cutoff (Å)")
+        ax1.set_title("Disulfide Bond Distance Cutoffs vs Percentile")
+        ax1.grid(True, linestyle="--", alpha=0.7)
+        ax1.legend()
 
-        # Add labels and title
-        ax.set_xlabel("Percentile")
-        ax.set_ylabel("Distance Cutoff (Å)")
-        ax.set_title("Disulfide Bond Distance Cutoffs vs Percentile")
-
-        # Add grid and legend
-        ax.grid(True, linestyle="--", alpha=0.7)
-        ax.legend()
-
-        # Annotate a few key percentiles
+        # Annotate key percentiles for distances
         for i, p in enumerate(percentiles):
-            if (
-                i % (num_steps // 4) == 0 or p == percentiles[-1]
-            ):  # Annotate every quarter and the last point
-                ax.annotate(
+            if i % (num_steps // 4) == 0 or p == percentiles[-1]:
+                ax1.annotate(
                     f"{p:.0f}%: {ca_cutoffs[i]:.2f}Å",
                     xy=(p, ca_cutoffs[i]),
                     xytext=(5, 5),
                     textcoords="offset points",
                 )
-                ax.annotate(
+                ax1.annotate(
                     f"{p:.0f}%: {sg_cutoffs[i]:.2f}Å",
                     xy=(p, sg_cutoffs[i]),
                     xytext=(5, -15),
                     textcoords="offset points",
                 )
 
+        # Plot deviations in the second subplot
+        ax2.plot(percentiles, bondlength_cutoffs, "g-", marker="^", label="Bondlength Deviation")
+        ax2.plot(percentiles, angle_cutoffs, "m-", marker="d", label="Angle Deviation")
+        
+        # Add labels for second subplot
+        ax2.set_xlabel("Percentile")
+        ax2.set_ylabel("Deviation Cutoff")
+        ax2.set_title("Disulfide Bond Deviation Cutoffs vs Percentile")
+        ax2.grid(True, linestyle="--", alpha=0.7)
+        ax2.legend()
+
+        # Annotate key percentiles for deviations
+        for i, p in enumerate(percentiles):
+            if i % (num_steps // 4) == 0 or p == percentiles[-1]:
+                ax2.annotate(
+                    f"{p:.0f}%: {bondlength_cutoffs[i]:.2f}",
+                    xy=(p, bondlength_cutoffs[i]),
+                    xytext=(5, 5),
+                    textcoords="offset points",
+                )
+                ax2.annotate(
+                    f"{p:.0f}%: {angle_cutoffs[i]:.2f}°",
+                    xy=(p, angle_cutoffs[i]),
+                    xytext=(5, -15),
+                    textcoords="offset points",
+                )
+
+        # Add a main title for the entire figure
+        fig.suptitle("Disulfide Bond Metrics vs Percentile", fontsize=16)
+        
         plt.tight_layout()
+        plt.subplots_adjust(top=0.92)  # Adjust to make room for the suptitle
 
         # Save the figure if a path is provided
         if save_path:
             plt.savefig(save_path, dpi=300, bbox_inches="tight")
             print(f"Figure saved to {save_path}")
 
-            return fig, ax
+        return fig, (ax1, ax2)
 
     # EOF
