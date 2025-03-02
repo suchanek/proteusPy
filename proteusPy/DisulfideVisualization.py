@@ -14,6 +14,7 @@ import logging
 import math
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -1707,5 +1708,100 @@ class DisulfideVisualization:
         fig.update_layout(xaxis_title="PDB_ID", yaxis_title="Count")
         fig.show()
 
+    @staticmethod
+    def plot_percentile_cutoffs(
+        pdb_full: "DisulfideLoader",
+        percentile_range=(80, 99),
+        num_steps=20,
+        figsize=(10, 6),
+        save_path=None,
+        verbose=False,
+    ):
+        """
+        Generate a graph showing Ca and Sg distance cutoffs as a function of percentile.
 
-# EOF
+        :param pdb_full: The PDB object containing the SSList attribute
+        :type pdb_full: object
+        :param percentile_range: Tuple containing the min and max percentiles to plot (inclusive)
+        :type percentile_range: tuple
+        :param num_steps: Number of percentile steps to calculate
+        :type num_steps: int
+        :param figsize: Figure size as (width, height) in inches
+        :type figsize: tuple
+        :param save_path: Path to save the figure, if None the figure is displayed but not saved
+        :type save_path: str or None
+        :param verbose: Whether to print the results, defaults to False
+        :type verbose: bool
+        :return: The figure and axes objects
+        :rtype: tuple
+        """
+        from proteusPy import DisulfideStats
+
+        # Create deviation dataframe
+        dev_df = DisulfideStats.create_deviation_dataframe(
+            pdb_full.SSList, verbose=verbose
+        )
+
+        # Generate percentile values
+        percentiles = np.linspace(percentile_range[0], percentile_range[1], num_steps)
+
+        # Initialize arrays to store cutoff values
+        ca_cutoffs = []
+        sg_cutoffs = []
+
+        # Calculate cutoffs for each percentile
+        for p in percentiles:
+            ca_cutoff = DisulfideStats.calculate_percentile_cutoff(
+                dev_df, "Ca_Distance", percentile=p
+            )
+            sg_cutoff = DisulfideStats.calculate_percentile_cutoff(
+                dev_df, "Sg_Distance", percentile=p
+            )
+
+            ca_cutoffs.append(ca_cutoff)
+            sg_cutoffs.append(sg_cutoff)
+
+        # Create the plot
+        fig, ax = plt.subplots(figsize=figsize)
+
+        # Plot the data
+        ax.plot(percentiles, ca_cutoffs, "b-", marker="o", label="Cα-Cα Distance")
+        ax.plot(percentiles, sg_cutoffs, "r-", marker="s", label="Sγ-Sγ Distance")
+
+        # Add labels and title
+        ax.set_xlabel("Percentile")
+        ax.set_ylabel("Distance Cutoff (Å)")
+        ax.set_title("Disulfide Bond Distance Cutoffs vs Percentile")
+
+        # Add grid and legend
+        ax.grid(True, linestyle="--", alpha=0.7)
+        ax.legend()
+
+        # Annotate a few key percentiles
+        for i, p in enumerate(percentiles):
+            if (
+                i % (num_steps // 4) == 0 or p == percentiles[-1]
+            ):  # Annotate every quarter and the last point
+                ax.annotate(
+                    f"{p:.0f}%: {ca_cutoffs[i]:.2f}Å",
+                    xy=(p, ca_cutoffs[i]),
+                    xytext=(5, 5),
+                    textcoords="offset points",
+                )
+                ax.annotate(
+                    f"{p:.0f}%: {sg_cutoffs[i]:.2f}Å",
+                    xy=(p, sg_cutoffs[i]),
+                    xytext=(5, -15),
+                    textcoords="offset points",
+                )
+
+        plt.tight_layout()
+
+        # Save the figure if a path is provided
+        if save_path:
+            plt.savefig(save_path, dpi=300, bbox_inches="tight")
+            print(f"Figure saved to {save_path}")
+
+            return fig, ax
+
+    # EOF
