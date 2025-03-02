@@ -48,11 +48,19 @@ nuke: clean devclean
 pkg:
 	@echo "Starting installation step 1/2..."
 	$(CONDA) create --name proteusPy -y python=3.12 numpy pandas
+ifeq ($(OS_NAME), Linux)
+	@echo "Linux detected, installing VTK..."
+	$(CONDA) install -n proteusPy vtk -y
+endif
 	@echo "Step 1 done. Activate the environment with 'conda activate proteusPy' and run 'make install'"
 
 dev:
 	@echo "Building development environment $(DEVNAME)..."
 	$(CONDA) create --name $(DEVNAME) -y python=3.12
+ifeq ($(OS_NAME), Linux)
+	@echo "Linux detected, installing VTK..."
+	$(CONDA) install -n $(DEVNAME) vtk -y
+endif
 	@echo "Step 1 done. Activate the environment with 'conda activate $(DEVNAME)' and run 'make install_dev'"
 
 clean devclean:
