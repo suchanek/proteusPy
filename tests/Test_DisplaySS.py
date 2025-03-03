@@ -32,10 +32,14 @@ Last revision: 2025-02-26 19:57:07 -egs-
 # pylint: disable=C0114 # missing-module-docstring
 # pylint: disable=C0103 # non-snake-case variable name
 
+
 import os
 import unittest
 from tempfile import TemporaryDirectory
 from unittest import main as run_tests
+
+# Add the parent directory to the path so we can import proteusPy
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from proteusPy import Load_PDB_SS, __version__, set_pyvista_theme
 from proteusPy.ProteusGlobals import DATA_DIR
