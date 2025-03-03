@@ -1175,8 +1175,9 @@ def set_pyvista_theme(theme: str, verbose=False) -> str:
 def find_arial_font():
     """
     Find the system font file arial.ttf for macOS, Windows, and Linux.
+    Falls back to common system fonts if Arial is not found.
 
-    :return: The path to the arial.ttf font file if found, otherwise None.
+    :return: The path to a usable font file if found, otherwise None.
     """
     font_paths = {
         "Windows": [r"C:\Windows\Fonts\arial.ttf", r"C:\Windows\Fonts\Arial.ttf"],
@@ -1191,6 +1192,12 @@ def find_arial_font():
             "/usr/share/fonts/truetype/msttcore/arial.ttf",
             "/usr/share/fonts/truetype/arial.ttf",
             "/usr/share/fonts/Arial.ttf",
+            # Common fallback fonts on Linux
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+            "/usr/share/fonts/TTF/DejaVuSans.ttf",
+            "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+            "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
+            "/usr/share/fonts/gnu-free/FreeSans.ttf",
         ],
     }
 
@@ -1199,6 +1206,28 @@ def find_arial_font():
         for path in font_paths[system]:
             if os.path.exists(path):
                 return path
+
+    # Last resort: try to find any TTF font on the system
+    if system == "Linux":
+        try:
+            # Use fc-list to find a sans-serif font
+            result = subprocess.run(
+                ["fc-list", ":spacing=proportional", "file"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=True,
+            )
+            if result.returncode == 0:
+                # Get the first font file path from the output
+                for line in result.stdout.splitlines():
+                    if line.strip() and line.lower().endswith(".ttf"):
+                        font_path = line.strip().split(":")[0]
+                        if os.path.exists(font_path):
+                            _logger.info("Using fallback font: %s", font_path)
+                            return font_path
+        except Exception as e:
+            _logger.error("Failed to find a system font: %s", e)
 
     return None
 
@@ -1225,22 +1254,32 @@ def calculate_fontsize(title, window_width, max_fontsize=FONTSIZE, min_fontsize=
 
     font_path = find_arial_font()
     if not font_path:
-        _logger.warning("Arial font not found.")
-        return min_fontsize
+        _logger.warning("No suitable font found. Using default font size.")
+        # Return a reasonable default size based on title length and window width
+        estimated_size = max(min(max_fontsize, int(effective_width / (len(title) * 0.6))), min_fontsize)
+        _logger.info("Estimated font size for title length %d: %d", len(title), estimated_size)
+        return estimated_size
 
-    def get_text_width(title, fontsize):
-        # Load the font with the given fontsize
-        font = ImageFont.truetype(font_path, fontsize)
-        # Calculate and return the text width using getbbox
-        sz = font.getbbox(title)
-        text_width = font.getbbox(title)[2]
+    # Define the function to get text width
+    def get_text_width(text, size):
+        # Load the font with the given size
+        try:
+            font = ImageFont.truetype(font_path, size)
+            # Calculate and return the text width using getbbox
+            sz = font.getbbox(text)
+            text_width = font.getbbox(text)[2]
 
-        _logger.debug(
-            "Font size: %d, bbox: %s, text width: %d", fontsize, sz, text_width
-        )
+            _logger.debug(
+                "Font size: %d, bbox: %s, text width: %d", size, sz, text_width
+            )
 
-        return text_width
+            return text_width
+        except Exception as e:
+            _logger.error("Error calculating text width: %s", e)
+            # Fallback to a simple estimation
+            return len(text) * size * 0.6
 
+    # Start with the maximum font size and decrease until it fits
     fontsize = max_fontsize
     while fontsize > min_fontsize:
         text_width = get_text_width(title, fontsize)
