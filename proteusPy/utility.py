@@ -1186,6 +1186,7 @@ def find_arial_font():
             "/System/Library/Fonts/Supplemental/Arial.ttf",
         ],
         "Linux": [
+            "/System/Library/Fonts/Supplemental/Arial.ttf",
             "/usr/share/fonts/truetype/msttcorefonts/arial.ttf",
             "/usr/share/fonts/truetype/msttcore/arial.ttf",
             "/usr/share/fonts/truetype/arial.ttf",
@@ -1202,7 +1203,7 @@ def find_arial_font():
     return None
 
 
-def calculate_fontsize(title, window_width, max_fontsize=FONTSIZE, min_fontsize=2):
+def calculate_fontsize(title, window_width, max_fontsize=FONTSIZE, min_fontsize=4):
     """
     Calculate the maximum font size for the title so that it fits within the window width in PyVista.
     Adjusts for platform-specific DPI differences.
