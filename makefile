@@ -73,15 +73,15 @@ install:
 	pip install . -q
 	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Downloading and building the Disulfide Databases..."
-	proteusPy.BootStrapper -v
+	proteusPy.bootstrapper -v
 	@echo "Installation finished!"
 
 install_dev:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install .[all]
+	pip install .[dev]
 	python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
 	@echo "Downloading and building the Disulfide Databases..."
-	proteusPy.BootStrapper -v
+	proteusPy.bootstrapper -v
 	@echo "Development environment installation finished!"
 
 define jupyter-setup
