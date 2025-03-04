@@ -40,7 +40,11 @@ def main():
 
     output_file = os.path.join(output_dir, "real_disulfide_schematic.png")
     fig1, ax1 = create_disulfide_schematic(
-        disulfide=ss, output_file=output_file, show_angles=True, style="publication"
+        disulfide=ss, 
+        output_file=output_file, 
+        show_angles=True, 
+        show_ca_ca_distance=True,  # Show the Cα-Cα distance
+        style="publication"
     )
     print(f"Saved schematic to: {output_file}")
 
@@ -55,6 +59,7 @@ def main():
         chi5=-60,
         output_file=output_file,
         show_angles=True,
+        show_ca_ca_distance=True,  # Show the Cα-Cα distance
     )
     print(f"Saved schematic to: {output_file}")
 

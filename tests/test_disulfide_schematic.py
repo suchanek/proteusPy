@@ -64,6 +64,26 @@ class TestDisulfideSchematic(unittest.TestCase):
         # Check that the figure and axis were returned
         self.assertIsNotNone(fig)
         self.assertIsNotNone(ax)
+        
+    def test_create_disulfide_schematic_with_ca_ca_distance(self):
+        """Test creating a schematic diagram with Ca-Ca distance line."""
+        # Test with a real disulfide and Ca-Ca distance line
+        output_file = os.path.join(self.temp_dir_obj.name, "test_schematic_ca_ca.png")
+        
+        fig, ax = create_disulfide_schematic(
+            disulfide=self.first_disulfide,
+            output_file=output_file,
+            show_angles=True,
+            show_ca_ca_distance=True,
+            style="publication"
+        )
+        
+        # Check that the output file was created
+        self.assertTrue(os.path.exists(output_file))
+        
+        # Check that the figure and axis were returned
+        self.assertIsNotNone(fig)
+        self.assertIsNotNone(ax)
 
     def test_create_disulfide_schematic_from_model(self):
         """Test creating a schematic diagram from model parameters."""
@@ -74,6 +94,25 @@ class TestDisulfideSchematic(unittest.TestCase):
             chi1=-60, chi2=-60, chi3=-90, chi4=-60, chi5=-60,
             output_file=output_file,
             show_angles=True
+        )
+        
+        # Check that the output file was created
+        self.assertTrue(os.path.exists(output_file))
+        
+        # Check that the figure and axis were returned
+        self.assertIsNotNone(fig)
+        self.assertIsNotNone(ax)
+        
+    def test_create_model_schematic_with_ca_ca_distance(self):
+        """Test creating a model schematic diagram with Ca-Ca distance line."""
+        # Test with model parameters and Ca-Ca distance line
+        output_file = os.path.join(self.temp_dir_obj.name, "test_model_schematic_ca_ca.png")
+        
+        fig, ax = create_disulfide_schematic_from_model(
+            chi1=-60, chi2=-60, chi3=-90, chi4=-60, chi5=-60,
+            output_file=output_file,
+            show_angles=True,
+            show_ca_ca_distance=True
         )
         
         # Check that the output file was created

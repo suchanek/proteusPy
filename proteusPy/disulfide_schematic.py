@@ -20,6 +20,7 @@ def create_disulfide_schematic(
     show_labels=True,
     show_angles=False,
     show_title=True,
+    show_ca_ca_distance=False,
     style="publication",
     dpi=300,
     figsize=(8, 6),
@@ -37,6 +38,8 @@ def create_disulfide_schematic(
     :type show_angles: bool, default=False
     :param show_title: Whether to show the title with disulfide information
     :type show_title: bool, default=True
+    :param show_ca_ca_distance: Whether to show a line indicating the Cα-Cα distance
+    :type show_ca_ca_distance: bool, default=False
     :param style: Visualization style ("publication", "simple", "detailed")
     :type style: str, default="publication"
     :param dpi: Resolution for raster outputs
@@ -96,13 +99,13 @@ def create_disulfide_schematic(
     atom_labels = {
         "N_prox": "N",
         "CA_prox": "Cα",
-        "C_prox": "C",
+        "C_prox": "C'",
         "O_prox": "O",
         "CB_prox": "Cβ",
         "SG_prox": "Sγ",
         "N_dist": "N",
         "CA_dist": "Cα",
-        "C_dist": "C",
+        "C_dist": "C'",
         "O_dist": "O",
         "CB_dist": "Cβ",
         "SG_dist": "Sγ",
@@ -176,7 +179,7 @@ def create_disulfide_schematic(
             # Normalize and rotate by 90 degrees for perpendicular offset
             nx, ny = -dy / length, dx / length
 
-            # Draw two parallel lines
+            # Draw two parallel lines (one solid, one dashed to indicate partial double bond character)
             ax.plot(
                 [x0 + offset * nx, x1 + offset * nx],
                 [y0 + offset * ny, y1 + offset * ny],
@@ -189,7 +192,8 @@ def create_disulfide_schematic(
                 [y0 - offset * ny, y1 - offset * ny],
                 color="gold",
                 linewidth=ss_edge_width,
-                solid_capstyle="round",
+                linestyle="dashed",  # Dashed line for partial double bond character
+                dash_capstyle="round",
             )
         elif (
             (edge[0] == "C_prox" and edge[1] == "O_prox")
@@ -246,7 +250,7 @@ def create_disulfide_schematic(
         # Draw the atom
         circle = plt.Circle(
             pos[node],
-            radius=node_size / 10000,
+            radius=node_size / 8000,
             facecolor=rgba_color,
             edgecolor="black",
             linewidth=1.0,
@@ -290,11 +294,11 @@ def create_disulfide_schematic(
         )
         # Chi4
         ax.text(
-            3.8, -1.5, f"χ₄: {disulfide.chi4:.1f}°", fontsize=font_size - 1, ha="right"
+            3.8, -1.5, f"χ₂′: {disulfide.chi4:.1f}°", fontsize=font_size - 1, ha="right"
         )
         # Chi5
         ax.text(
-            3.8, -0.5, f"χ₅: {disulfide.chi5:.1f}°", fontsize=font_size - 1, ha="right"
+            3.8, -0.5, f"χ₁′: {disulfide.chi5:.1f}°", fontsize=font_size - 1, ha="right"
         )
 
     # Add title if requested
@@ -324,6 +328,60 @@ def create_disulfide_schematic(
         bbox=dict(facecolor="white", alpha=0.7, edgecolor="black", pad=5),
     )
 
+    # Add Ca-Ca distance line if requested
+    if show_ca_ca_distance and disulfide:
+        # Get positions of CA atoms
+        ca_prox_pos = pos["CA_prox"]
+        ca_dist_pos = pos["CA_dist"]
+
+        # Create a curved path for the Ca-Ca distance line to go beneath the C' atoms
+        # Calculate control points for the curved line
+        # We'll use a quadratic Bezier curve that dips below the straight line
+        mid_x = (ca_prox_pos[0] + ca_dist_pos[0]) / 2
+        mid_y = (
+            ca_prox_pos[1] + ca_dist_pos[1]
+        ) / 2 - 0.5  # Offset below the straight line
+
+        # Create the curved path
+        import matplotlib.patches as patches
+        from matplotlib.path import Path
+
+        verts = [
+            ca_prox_pos,  # Start point (CA_prox)
+            (mid_x, mid_y),  # Control point
+            ca_dist_pos,  # End point (CA_dist)
+        ]
+
+        codes = [
+            Path.MOVETO,
+            Path.CURVE3,
+            Path.CURVE3,
+        ]
+
+        path = Path(verts, codes)
+        patch = patches.PathPatch(
+            path,
+            facecolor="none",
+            edgecolor="purple",
+            linestyle="--",
+            linewidth=1.5,
+            alpha=0.8,
+            zorder=1,  # Ensure it's drawn below other elements
+        )
+        ax.add_patch(patch)
+
+        # Add distance label at the bottom of the curve
+        ax.text(
+            mid_x,
+            mid_y + 0.05,  # Position below the curve
+            f"{disulfide.ca_distance:.2f} Å",
+            fontsize=font_size,
+            ha="center",
+            va="center",
+            color="purple",
+            zorder=2,  # Ensure it's drawn above the line
+        )
+
     # Set axis properties
     ax.set_aspect("equal")
     ax.axis("off")
@@ -349,6 +407,7 @@ def create_disulfide_schematic_from_model(
     output_file=None,
     show_labels=True,
     show_angles=True,
+    show_ca_ca_distance=False,
     style="publication",
     dpi=300,
     figsize=(8, 6),
@@ -372,6 +431,8 @@ def create_disulfide_schematic_from_model(
     :type show_labels: bool, default=True
     :param show_angles: Whether to show dihedral angles
     :type show_angles: bool, default=True
+    :param show_ca_ca_distance: Whether to show a line indicating the Cα-Cα distance
+    :type show_ca_ca_distance: bool, default=False
     :param style: Visualization style ("publication", "simple", "detailed")
     :type style: str, default="publication"
     :param dpi: Resolution for raster outputs
@@ -391,6 +452,7 @@ def create_disulfide_schematic_from_model(
         output_file=output_file,
         show_labels=show_labels,
         show_angles=show_angles,
+        show_ca_ca_distance=show_ca_ca_distance,
         style=style,
         dpi=dpi,
         figsize=figsize,

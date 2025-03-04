@@ -1710,7 +1710,7 @@ class DisulfideVisualization:
 
     @staticmethod
     def plot_percentile_cutoffs(
-        pdb_full: "DisulfideLoader",
+        pdb_full,
         percentile_range=(80, 99),
         num_steps=20,
         figsize=(12, 10),  # Increased height for two subplots
@@ -1777,7 +1777,7 @@ class DisulfideVisualization:
         # Plot distances in the first subplot
         ax1.plot(percentiles, ca_cutoffs, "b-", marker="o", label="Cα-Cα Distance")
         ax1.plot(percentiles, sg_cutoffs, "r-", marker="s", label="Sγ-Sγ Distance")
-        
+
         # Add labels and title for first subplot
         ax1.set_ylabel("Distance Cutoff (Å)")
         ax1.set_title("Disulfide Bond Distance Cutoffs vs Percentile")
@@ -1801,9 +1801,15 @@ class DisulfideVisualization:
                 )
 
         # Plot deviations in the second subplot
-        ax2.plot(percentiles, bondlength_cutoffs, "g-", marker="^", label="Bondlength Deviation")
+        ax2.plot(
+            percentiles,
+            bondlength_cutoffs,
+            "g-",
+            marker="^",
+            label="Bondlength Deviation",
+        )
         ax2.plot(percentiles, angle_cutoffs, "m-", marker="d", label="Angle Deviation")
-        
+
         # Add labels for second subplot
         ax2.set_xlabel("Percentile")
         ax2.set_ylabel("Deviation Cutoff")
@@ -1829,7 +1835,7 @@ class DisulfideVisualization:
 
         # Add a main title for the entire figure
         fig.suptitle("Disulfide Bond Metrics vs Percentile", fontsize=16)
-        
+
         plt.tight_layout()
         plt.subplots_adjust(top=0.92)  # Adjust to make room for the suptitle
 
