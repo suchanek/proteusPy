@@ -1187,7 +1187,6 @@ def find_arial_font():
             "/System/Library/Fonts/Supplemental/Arial.ttf",
         ],
         "Linux": [
-            "/System/Library/Fonts/Supplemental/Arial.ttf",
             "/usr/share/fonts/truetype/msttcorefonts/arial.ttf",
             "/usr/share/fonts/truetype/msttcore/arial.ttf",
             "/usr/share/fonts/truetype/arial.ttf",

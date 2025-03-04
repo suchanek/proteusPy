@@ -75,6 +75,7 @@ dev = [
     "pdoc",
     "wheel",
     "build",
+    "networkx"
 ]
 bio = ["Biopython"]
 pyqt5 = [
