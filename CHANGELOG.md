@@ -5,14 +5,22 @@ Notable changes to the ``proteusPy`` project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v0.99.32] - 2024-2-24
+## [v0.99.32] - unreleased
+
+### Added
+
+- disulfide_schematic.py which has two functions for creating cartoon
+drawings of Disulfides:
+  - ``create_disulfide_schematics()``
+  - ``create_disulfide_schematic_from_model()``
+  - test function in the tests/ directory
+  -
 
 ### Fixed
 
 - Finished refactoring for ``DisulfideIO.py``
 - Corrected parameter order in ``DisulfideBase.DisulfideList.display_overlay()``
 - Corrected the ``.screenshot()`` function to work correctly on Windows.
-- 
 
 ## [v0.99.31] - 2024-2-23
 
