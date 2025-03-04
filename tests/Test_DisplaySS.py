@@ -34,6 +34,7 @@ Last revision: 2025-02-26 19:57:07 -egs-
 
 
 import os
+import sys
 import unittest
 from tempfile import TemporaryDirectory
 from unittest import main as run_tests
