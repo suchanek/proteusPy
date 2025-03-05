@@ -17,15 +17,15 @@ from typing import Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-# Add the parent directory to the path so we can import proteusPy
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 import proteusPy as pp
 from proteusPy.disulfide_schematic import (
     create_disulfide_schematic,
     create_disulfide_schematic_from_model,
 )
-from proteusPy.ProteusGlobals import DATA_DIR
+
+# Add the parent directory to the path so we can import proteusPy
+# sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 
 PDB_SS = None
 best_id = "2q7q_75D_140D"
