@@ -3,14 +3,18 @@ This module provides statistical analysis functionality for disulfide bonds
 in the proteusPy package.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-02-19 23:17:44
+Last revision: 2025-02-25 17:34:59
 """
+
+# pylint: disable=C0301
+# pylint: disable=C0103
 
 import logging
 import math
 
 import numpy as np
 import pandas as pd
+from scipy.stats import norm
 from tqdm import tqdm
 
 from proteusPy.logger_config import create_logger, set_logger_level
@@ -186,7 +190,8 @@ class DisulfideStats:
 
     @staticmethod
     def extract_distances(sslist, distance_type="sg", comparison="less", cutoff=-1):
-        """Extract and filter the distance values from the disulfide list based on the specified type and comparison.
+        """Extract and filter the distance values from the disulfide list based on the
+        specified type and comparison.
 
         :param sslist: List of disulfide objects
         :param distance_type: Type of distance to extract ('sg' or 'ca')
@@ -440,10 +445,10 @@ class DisulfideStats:
         """
         Calculate the cutoff values for the standard deviation and percentile methods.
 
-        :return: Dictionary containing the cutoff values for the standard deviation and percentile methods.
+        :return: Dictionary containing the cutoff values for the standard
+        deviation and percentile methods.
         :rtype: dict
         """
-        from scipy.stats import norm
 
         # Set some parameters for the standard deviation and percentile methods
         std = 3.0

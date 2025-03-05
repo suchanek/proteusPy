@@ -2,16 +2,19 @@
 This module provides visualization functionality for disulfide bonds in the proteusPy package.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-02-12
+Last revision: 2025-02-26 19:57:43
 """
 
 # pylint: disable=C0301
+# pylint: disable=C0302
 # pylint: disable=C0103
 # pylint: disable=W0212
 
+import logging
 import math
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -20,7 +23,6 @@ import pyvista as pv
 from plotly.subplots import make_subplots
 from scipy import stats
 from tqdm import tqdm
-from tqdm.notebook import tqdm as tqdm_notebook
 
 from proteusPy.atoms import (
     ATOM_COLORS,
@@ -37,6 +39,7 @@ from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import FONTSIZE, NBINS, PBAR_COLS, WINSIZE
 from proteusPy.utility import (
     calculate_fontsize,
+    dpi_adjusted_fontsize,
     get_jet_colormap,
     grid_dimensions,
     set_plotly_theme,
@@ -50,6 +53,11 @@ try:
         tqdm = tqdm_notebook
 except NameError:
     pass  # Use default tqdm import
+
+set_pyvista_theme("auto")
+
+# Suppress findfont debug messages
+logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
 
 _logger = create_logger(__name__)
 
@@ -551,14 +559,15 @@ class DisulfideVisualization:
 
     @staticmethod
     def display_overlay(
-        sslist,
+        sslist=None,
+        pl=None,
         screenshot=False,
         movie=False,
         verbose=False,
         fname="ss_overlay.png",
         light="auto",
         winsize=WINSIZE,
-    ):
+    ) -> pv.Plotter:
         """Display all disulfides in the list overlaid in stick mode against
         a common coordinate frame.
 
@@ -569,6 +578,8 @@ class DisulfideVisualization:
         :param fname: Filename to save for the movie or screenshot
         :param light: Background color
         :param winsize: Window size tuple (width, height)
+        :return: pyvista.Plotter instance
+        :rtype: pv.Plotter
         """
         pid = sslist.pdb_id
         ssbonds = sslist
@@ -577,23 +588,26 @@ class DisulfideVisualization:
         avg_dist = sslist.average_distance
         resolution = sslist.average_resolution
 
-        res = 64
-        if tot_ss > 30:
-            res = 48
-        if tot_ss > 60:
-            res = 16
-        if tot_ss > 90:
+        res = 32
+        if tot_ss > 10:
+            res = 18
+        if tot_ss > 15:
+            res = 12
+        if tot_ss > 20:
             res = 8
 
         title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), E: {avg_enrg:.2f} kcal/mol, Dist: {avg_dist:.2f} Å"
         fontsize = calculate_fontsize(title, winsize[0])
+        fontsize = dpi_adjusted_fontsize(fontsize)
 
         set_pyvista_theme(light)
 
         if movie:
-            pl = pv.Plotter(window_size=winsize, off_screen=True)
+            if not pl:
+                pl = pv.Plotter(window_size=winsize, off_screen=True)
         else:
-            pl = pv.Plotter(window_size=winsize, off_screen=False)
+            if not pl:
+                pl = pv.Plotter(window_size=winsize, off_screen=False)
 
         pl.add_title(title=title, font_size=fontsize)
         pl.enable_anti_aliasing("msaa")
@@ -647,6 +661,7 @@ class DisulfideVisualization:
                 print(f" -> display_overlay(): Saved mp4 animation to: {fname}")
         else:
             pl.show()
+        return pl
 
     @staticmethod
     def display_torsion_statistics(
@@ -950,7 +965,7 @@ class DisulfideVisualization:
         fig_bond_angle.show()
 
     @staticmethod
-    def _render_sslist(pl, sslist, style, res=100, panelsize=WINSIZE):
+    def _render_sslist(pl, sslist, style, res=64, panelsize=512):
         """Internal rendering engine that calculates and instantiates all bond
         cylinders and atomic sphere meshes.
 
@@ -964,13 +979,15 @@ class DisulfideVisualization:
         _ssList = sslist
         tot_ss = len(_ssList)
         rows, cols = grid_dimensions(tot_ss)
-
-        if tot_ss > 30:
-            res = 60
-        if tot_ss > 60:
-            res = 30
-        if tot_ss > 90:
-            res = 12
+        _res = res
+        if tot_ss > 10:
+            _res = 18
+        elif tot_ss > 15:
+            _res = 12
+        elif tot_ss > 20:
+            _res = 8
+        else:
+            _res = 32
 
         total_plots = rows * cols
         for idx in range(min(tot_ss, total_plots)):
@@ -981,16 +998,19 @@ class DisulfideVisualization:
             ss = _ssList[idx]
             src = ss.pdb_id
             enrg = ss.energy
-            title = f"{src} {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°"
+            title = f"{src} {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: E: {enrg:.2f}, Ca: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°"
             fontsize = calculate_fontsize(title, panelsize)
+            fontsize = dpi_adjusted_fontsize(fontsize) - 2
             pl.add_title(title=title, font_size=fontsize)
             DisulfideVisualization._render_ss(
                 ss,
                 pl,
                 style=style,
-                res=res,
+                res=_res,
             )
+            pl.reset_camera()
 
+        pl.link_views()
         return pl
 
     @staticmethod
@@ -998,14 +1018,13 @@ class DisulfideVisualization:
         ss,
         pvplot: pv.Plotter,
         style="bs",
-        plain=False,
         bondcolor=BOND_COLOR,
         bs_scale=BS_SCALE,
         spec=SPECULARITY,
         specpow=SPEC_POWER,
-        translate=True,
+        translate=False,
         bond_radius=BOND_RADIUS,
-        res=100,
+        res=64,
     ):
         """
         Update the passed pyVista plotter() object with the mesh data for the
@@ -1063,7 +1082,7 @@ class DisulfideVisualization:
             style="sb",
             bcolor=BOND_COLOR,
             all_atoms=True,
-            res=100,
+            res=res,
         ):
             """
             Generate the appropriate pyVista cylinder objects to represent
@@ -1335,10 +1354,10 @@ class DisulfideVisualization:
         src = ss.pdb_id
         enrg = ss.energy
 
-        title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Cα: {ss.ca_distance:.2f} Å Cβ: {ss.cb_distance:.2f} Å, Sg: {ss.sg_distance:.2f} Å Tors: {ss.torsion_length:.2f}°"
+        title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Ca: {ss.ca_distance:.2f} Å, Sg: {ss.sg_distance:.2f} Å Tors: {ss.torsion_length:.2f}°"
 
         set_pyvista_theme(light)
-        fontsize = 8
+        fontsize = dpi_adjusted_fontsize(FONTSIZE)
 
         if single:
             _pl = pv.Plotter(window_size=winsize)
@@ -1470,7 +1489,7 @@ class DisulfideVisualization:
         src = ss.pdb_id
         enrg = ss.energy
 
-        title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol, Cα: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}"
+        title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol, Ca: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}"
 
         set_pyvista_theme(theme)
 
@@ -1479,7 +1498,7 @@ class DisulfideVisualization:
 
         # Create a Plotter instance
         pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
-        pl.add_title(title=title, font_size=FONTSIZE)
+        pl.add_title(title=title, font_size=dpi_adjusted_fontsize(FONTSIZE))
 
         # Enable anti-aliasing for smoother rendering
         pl.enable_anti_aliasing("msaa")
@@ -1492,9 +1511,10 @@ class DisulfideVisualization:
 
         pl.reset_camera()
         pl.show(auto_close=False)
+        nstep = 1 / steps
 
         # Orbit the camera along the generated path
-        pl.orbit_on_path(path, write_frames=False, step=1 / steps)
+        pl.orbit_on_path(path, write_frames=False, step=nstep)
 
         if verbose:
             print("Spinning completed.")
@@ -1527,16 +1547,16 @@ class DisulfideVisualization:
 
         src = ss.pdb_id
         enrg = ss.energy
-        title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol, Cα: {ss.ca_distance:.2f} Å, Cβ: {ss.cb_distance:.2f} Å, Sγ: {ss.sg_distance:.2f} Å, Tors: {ss.torsion_length:.2f}"
+        title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol, Ca: {ss.ca_distance:.2f} Å, Sg: {ss.sg_distance:.2f} Å, Tors: {ss.torsion_length:.2f}"
 
         set_pyvista_theme(light)
 
         if verbose:
-            _logger.info("Rendering screenshot to file {fname}")
+            _logger.info("Rendering screenshot to file %s", fname)
 
         if single:
-            pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
-            pl.add_title(title=title, font_size=FONTSIZE)
+            pl = pv.Plotter(window_size=WINSIZE, off_screen=True)
+            pl.add_title(title=title, font_size=dpi_adjusted_fontsize(FONTSIZE))
             pl.enable_anti_aliasing("msaa")
             DisulfideVisualization._render_ss(
                 ss,
@@ -1547,18 +1567,19 @@ class DisulfideVisualization:
             if shadows:
                 pl.enable_shadows()
 
-            pl.show(auto_close=False)  # allows for manipulation
+            # pl.show(auto_close=True)  # allows for manipulation
             # Take the screenshot after ensuring the plotter is still active
             try:
                 pl.screenshot(fname)
+                pl.close()
             except RuntimeError as e:
                 _logger.error("Error saving screenshot: %s", e)
 
         else:
-            pl = pv.Plotter(window_size=WINSIZE, shape=(2, 2), off_screen=False)
+            pl = pv.Plotter(window_size=WINSIZE, shape=(2, 2), off_screen=True)
             pl.subplot(0, 0)
 
-            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=dpi_adjusted_fontsize(FONTSIZE))
             pl.enable_anti_aliasing("msaa")
 
             # pl.add_camera_orientation_widget()
@@ -1569,7 +1590,7 @@ class DisulfideVisualization:
             )
 
             pl.subplot(0, 1)
-            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=dpi_adjusted_fontsize(FONTSIZE))
             DisulfideVisualization._render_ss(
                 ss,
                 pl,
@@ -1577,7 +1598,7 @@ class DisulfideVisualization:
             )
 
             pl.subplot(1, 0)
-            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=dpi_adjusted_fontsize(FONTSIZE))
             DisulfideVisualization._render_ss(
                 ss,
                 pl,
@@ -1585,7 +1606,7 @@ class DisulfideVisualization:
             )
 
             pl.subplot(1, 1)
-            pl.add_title(title=title, font_size=FONTSIZE)
+            pl.add_title(title=title, font_size=dpi_adjusted_fontsize(FONTSIZE))
             DisulfideVisualization._render_ss(
                 ss,
                 pl,
@@ -1598,15 +1619,231 @@ class DisulfideVisualization:
                 pl.enable_shadows()
 
             # Take the screenshot after ensuring the plotter is still active
-            pl.show(auto_close=False)  # allows for manipulation
+            # pl.show(auto_close=True)  # allows for manipulation
 
             try:
                 pl.screenshot(fname)
+                pl.close()
             except RuntimeError as e:
                 _logger.error("Error saving screenshot: %s", e)
 
         if verbose:
             print(f"Screenshot saved as: {fname}")
 
+    @staticmethod
+    def display_worst_structures(df, top_n=10, sample_percent=10):
+        """
+        Highlight the worst structures for distance and angle deviations and annotate their names.
+        Also, add a subplot showing the worst structures aggregated by PDB_ID.
 
-# EOF
+        :param top_n: Number of worst structures to highlight.
+        :type top_n: int
+        """
+        rows = df.shape[0]
+        samplesize = int(rows * sample_percent / 100)
+
+        # Identify the worst structures for Bond Length Deviation
+        worst_distance = df.nlargest(top_n, "Bondlength_Deviation")
+
+        # Identify the worst structures for angle deviation
+        worst_angle = df.nlargest(top_n, "Angle_Deviation")
+
+        # Identify the worst structures for Cα distance
+        worst_ca = df.nlargest(top_n, "Ca_Distance")
+
+        # Combine the worst structures
+        worst_structures = pd.concat(
+            [worst_distance, worst_angle, worst_ca]
+        ).drop_duplicates()
+
+        # Aggregate worst structures by PDB_ID
+        worst_structures_agg = (
+            worst_structures.groupby("PDB_ID").size().reset_index(name="Count")
+        )
+
+        # Scatter plot for all structures
+        fig = px.scatter(
+            df.sample(samplesize),
+            x="Bondlength_Deviation",
+            y="Angle_Deviation",
+            title="Bond Length Deviation vs. Angle Deviation",
+            hover_data=["PDB_ID", "Bondlength_Deviation", "Angle_Deviation"],
+        )
+
+        fig.update_traces(
+            hovertemplate="<b>PDB ID: %{customdata[0]}</b><br>Bondlength Deviation: %{customdata[1]:.2f}<br>Angle Deviation: %{customdata[2]:.2f}<extra></extra>"
+        )
+
+        fig.add_scatter(
+            x=worst_structures["Bondlength_Deviation"],
+            y=worst_structures["Angle_Deviation"],
+            mode="markers",
+            marker=dict(color="red", size=10, symbol="x"),
+            customdata=worst_structures[
+                ["PDB_ID", "Bondlength_Deviation", "Angle_Deviation"]
+            ],
+            hovertemplate="<b>PDB ID: %{customdata[0]}</b><br>Bondlength Deviation: %{customdata[1]:.2f}<br>Angle Deviation: %{customdata[2]:.2f}<extra></extra>",
+            name="Worst Structures",
+        )
+        for _, row in worst_structures.iterrows():
+            fig.add_annotation(
+                x=row["Bondlength_Deviation"],
+                y=row["Angle_Deviation"],
+                text=row["SS_Name"],
+                showarrow=False,
+                arrowhead=1,
+                font=dict(size=6),  # Adjust the font size as needed
+                xshift=0,
+                yshift=10,
+            )
+        fig.show()
+
+        # Bar plot for worst structures aggregated by PDB_ID
+        fig = px.bar(
+            worst_structures_agg,
+            x="PDB_ID",
+            y="Count",
+            title="Worst Structures Aggregated by PDB_ID",
+        )
+        fig.update_layout(xaxis_title="PDB_ID", yaxis_title="Count")
+        fig.show()
+
+    @staticmethod
+    def plot_percentile_cutoffs(
+        pdb_full,
+        percentile_range=(80, 99),
+        num_steps=20,
+        figsize=(12, 10),  # Increased height for two subplots
+        save_path=None,
+        verbose=False,
+    ):
+        """
+        Generate a graph showing Ca and Sg distance cutoffs as well as bondlength and bondangle deviation cutoffs as a function of percentile.
+
+        :param pdb_full: The PDB object containing the SSList attribute
+        :type pdb_full: object
+        :param percentile_range: Tuple containing the min and max percentiles to plot (inclusive)
+        :type percentile_range: tuple
+        :param num_steps: Number of percentile steps to calculate
+        :type num_steps: int
+        :param figsize: Figure size as (width, height) in inches
+        :type figsize: tuple
+        :param save_path: Path to save the figure, if None the figure is displayed but not saved
+        :type save_path: str or None
+        :param verbose: Whether to print the results, defaults to False
+        :type verbose: bool
+        :return: The figure and axes objects
+        :rtype: tuple
+        """
+        from proteusPy import DisulfideStats
+
+        # Create deviation dataframe
+        dev_df = DisulfideStats.create_deviation_dataframe(
+            pdb_full.SSList, verbose=verbose
+        )
+
+        # Generate percentile values
+        percentiles = np.linspace(percentile_range[0], percentile_range[1], num_steps)
+
+        # Initialize arrays to store cutoff values
+        ca_cutoffs = []
+        sg_cutoffs = []
+        bondlength_cutoffs = []
+        angle_cutoffs = []
+
+        # Calculate cutoffs for each percentile
+        for p in percentiles:
+            ca_cutoff = DisulfideStats.calculate_percentile_cutoff(
+                dev_df, "Ca_Distance", percentile=p
+            )
+            sg_cutoff = DisulfideStats.calculate_percentile_cutoff(
+                dev_df, "Sg_Distance", percentile=p
+            )
+            bondlength_cutoff = DisulfideStats.calculate_percentile_cutoff(
+                dev_df, "Bondlength_Deviation", percentile=p
+            )
+            angle_cutoff = DisulfideStats.calculate_percentile_cutoff(
+                dev_df, "Angle_Deviation", percentile=p
+            )
+
+            ca_cutoffs.append(ca_cutoff)
+            sg_cutoffs.append(sg_cutoff)
+            bondlength_cutoffs.append(bondlength_cutoff)
+            angle_cutoffs.append(angle_cutoff)
+
+        # Create the plot with two subplots
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=figsize, sharex=True)
+
+        # Plot distances in the first subplot
+        ax1.plot(percentiles, ca_cutoffs, "b-", marker="o", label="Cα-Cα Distance")
+        ax1.plot(percentiles, sg_cutoffs, "r-", marker="s", label="Sγ-Sγ Distance")
+
+        # Add labels and title for first subplot
+        ax1.set_ylabel("Distance Cutoff (Å)")
+        ax1.set_title("Disulfide Bond Distance Cutoffs vs Percentile")
+        ax1.grid(True, linestyle="--", alpha=0.7)
+        ax1.legend()
+
+        # Annotate key percentiles for distances
+        for i, p in enumerate(percentiles):
+            if i % (num_steps // 4) == 0 or p == percentiles[-1]:
+                ax1.annotate(
+                    f"{p:.0f}%: {ca_cutoffs[i]:.2f}Å",
+                    xy=(p, ca_cutoffs[i]),
+                    xytext=(5, 5),
+                    textcoords="offset points",
+                )
+                ax1.annotate(
+                    f"{p:.0f}%: {sg_cutoffs[i]:.2f}Å",
+                    xy=(p, sg_cutoffs[i]),
+                    xytext=(5, -15),
+                    textcoords="offset points",
+                )
+
+        # Plot deviations in the second subplot
+        ax2.plot(
+            percentiles,
+            bondlength_cutoffs,
+            "g-",
+            marker="^",
+            label="Bondlength Deviation",
+        )
+        ax2.plot(percentiles, angle_cutoffs, "m-", marker="d", label="Angle Deviation")
+
+        # Add labels for second subplot
+        ax2.set_xlabel("Percentile")
+        ax2.set_ylabel("Deviation Cutoff")
+        ax2.set_title("Disulfide Bond Deviation Cutoffs vs Percentile")
+        ax2.grid(True, linestyle="--", alpha=0.7)
+        ax2.legend()
+
+        # Annotate key percentiles for deviations
+        for i, p in enumerate(percentiles):
+            if i % (num_steps // 4) == 0 or p == percentiles[-1]:
+                ax2.annotate(
+                    f"{p:.0f}%: {bondlength_cutoffs[i]:.2f}",
+                    xy=(p, bondlength_cutoffs[i]),
+                    xytext=(5, 5),
+                    textcoords="offset points",
+                )
+                ax2.annotate(
+                    f"{p:.0f}%: {angle_cutoffs[i]:.2f}°",
+                    xy=(p, angle_cutoffs[i]),
+                    xytext=(5, -15),
+                    textcoords="offset points",
+                )
+
+        # Add a main title for the entire figure
+        fig.suptitle("Disulfide Bond Metrics vs Percentile", fontsize=16)
+
+        plt.tight_layout()
+        plt.subplots_adjust(top=0.92)  # Adjust to make room for the suptitle
+
+        # Save the figure if a path is provided
+        if save_path:
+            plt.savefig(save_path, dpi=300, bbox_inches="tight")
+            print(f"Figure saved to {save_path}")
+
+        return fig, (ax1, ax2)
+
+    # EOF

@@ -100,7 +100,7 @@ from .logger_config import (
     set_logging_level_for_all_handlers,
     toggle_stream_handler,
 )
-from .Plotting import highlight_worst_structures, plot_class_chart
+from .Plotting import plot_class_chart
 from .ProteusGlobals import (
     _ANG_INIT,
     _FLOAT_INIT,

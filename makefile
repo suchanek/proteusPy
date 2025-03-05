@@ -48,12 +48,19 @@ nuke: clean devclean
 pkg:
 	@echo "Starting installation step 1/2..."
 	$(CONDA) create --name proteusPy -y python=3.12 numpy pandas
+ifeq ($(OS_NAME), Linux)
+	@echo "Linux detected, installing VTK..."
+	$(CONDA) install -n proteusPy vtk -y
+endif
 	@echo "Step 1 done. Activate the environment with 'conda activate proteusPy' and run 'make install'"
 
 dev:
 	@echo "Building development environment $(DEVNAME)..."
 	$(CONDA) create --name $(DEVNAME) -y python=3.12
-	pip install build
+ifeq ($(OS_NAME), Linux)
+	@echo "Linux detected, installing VTK..."
+	$(CONDA) install -n $(DEVNAME) vtk -y
+endif
 	@echo "Step 1 done. Activate the environment with 'conda activate $(DEVNAME)' and run 'make install_dev'"
 
 clean devclean:
@@ -63,14 +70,19 @@ clean devclean:
 
 install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install . -q
+	pip install --upgrade proteusPy -q
 	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
+	@echo "Downloading and building the Disulfide Databases..."
+	proteusPy.bootstrapper -v
 	@echo "Installation finished!"
 
-install_dev:
+install_dev: bld
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install .[all] -q
+	pip uninstall -y proteusPy
+	pip install --no-index --find-links=dist/ proteusPy[dev]==$(VERS)
 	python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
+	@echo "Downloading and building the Disulfide Databases..."
+	proteusPy.bootstrapper -v
 	@echo "Development environment installation finished!"
 
 define jupyter-setup
@@ -120,7 +132,7 @@ tests:
 docker: viewer/rcsb_viewer.py viewer/dockerfile
 	docker build -t rcsb_viewer viewer/ --no-cache
 
-docker_hub: viewer/rcsb_viewer.py viewer/dockerfile
+docker_hub: viewer/rcsb_viewer.py viewer/dockerfile viewer/data/PDB_SS_ALL_LOADER.pkl
 	docker buildx use cloud-egsuchanek-rcsbviewer
 	docker buildx build viewer/ --platform linux/arm64,linux/amd64 \
 		-f viewer/dockerfile \
@@ -128,7 +140,7 @@ docker_hub: viewer/rcsb_viewer.py viewer/dockerfile
 		-t docker.io/egsuchanek/rcsb_viewer:$(VERS) \
 		--push --no-cache
 
-docker_github: viewer/rcsb_viewer.py viewer/dockerfile
+docker_github: viewer/rcsb_viewer.py viewer/dockerfile viewer/data/PDB_SS_ALL_LOADER.pkl
 	docker buildx use cloud-egsuchanek-rcsbviewer
 	docker buildx build viewer/ --platform linux/arm64,linux/amd64 \
 		-f viewer/dockerfile \

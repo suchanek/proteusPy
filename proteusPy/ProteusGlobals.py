@@ -26,21 +26,8 @@ _this_dir = pkg_resources.files("proteusPy")
 HOME_DIR = Path.home()
 
 # Get the PDB directory from environment variable
-PDB_DIR = os.environ.get("PDB")
-if not PDB_DIR:
-    _logger.error(
-        "Environment variable 'PDB' is not set. Defaulting to HOME_DIR: %s",
-        str(HOME_DIR),
-    )
-    PDB_DIR = str(HOME_DIR)
-
-PDB_BASE = Path(PDB_DIR)
-if not (PDB_BASE.exists() and PDB_BASE.is_dir()):
-    _logger.error(
-        "Invalid PDB directory '%s'. Defaulting to HOME_DIR: %s", PDB_DIR, str(HOME_DIR)
-    )
-    PDB_DIR = str(HOME_DIR)
-    PDB_BASE = HOME_DIR
+PDB_DIR = os.environ.get("PDB", str(HOME_DIR))  # Use HOME_DIR as default
+PDB_BASE = Path(PDB_DIR)  # Now PDB_DIR will never be None
 
 GOOD_PDB_FILE = "good_pdb.pkl"
 
