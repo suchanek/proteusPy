@@ -383,28 +383,28 @@ def load_disulfides_from_id(
 
         i += 1
 
-    # restore default logging level
-    if quiet:
-        _logger.setLevel(logging.WARNING)
-
     num_ssbonds = len(SSList)
 
     if cutoff > 0:
-        SSList = SSList.filter_by_ca_distance(cutoff)
+        SSList = SSList.filter_by_distance(distance=cutoff, distance_type="ca")
         delta = num_ssbonds - len(SSList)
         if delta:
-            _logger.error(
+            _logger.info(
                 f"Filtered {num_ssbonds} -> {len(SSList)} SSBonds by Ca distance, {pdb_id}, delta is: {delta}"
             )
         num_ssbonds = len(SSList)
 
     if sg_cutoff > 0:
-        SSList = SSList.filter_by_sg_distance(sg_cutoff)
+        SSList = SSList.filter_by_distance(distance=sg_cutoff, distance_type="sg")
         delta = num_ssbonds - len(SSList)
         if delta:
-            _logger.error(
+            _logger.info(
                 f"Filtered {num_ssbonds} -> {len(SSList)} SSBonds by Sγ distance, {pdb_id}, delta is: {delta}"
             )
+
+    # restore default logging level
+    if quiet:
+        _logger.setLevel(logging.WARNING)
 
     return copy.deepcopy(SSList)
 

@@ -1,18 +1,21 @@
-"""Module for testing DisulfideList class."""
+"""
+Module for testing DisulfideList class.
 
-# pylint: disable=C0103
-
-import numpy as np
-import pytest
-
-from proteusPy import Disulfide, DisulfideList, load_disulfides_from_id
-from proteusPy.ProteusGlobals import DATA_DIR
+Author: Eric G. Suchanek, PhD
+Last Modification: 2025-02-25 17:44:53
+"""
 
 # pylint: disable=C0103
 # pylint: disable=C0116
 # pylint: disable=C0114
 # pylint: disable=W0621
 # pylint: disable=W0613
+
+import numpy as np
+import pytest
+
+from proteusPy import Disulfide, DisulfideList, load_disulfides_from_id
+from proteusPy.ProteusGlobals import DATA_DIR
 
 
 @pytest.fixture
@@ -200,14 +203,14 @@ def test_average_energy_with_multiple_disulfides(disulfide_list):
 # Filter Tests
 def test_filter_by_ca_distance(pdb_5rsa):
     """Test filtering by CA distance"""
-    filtered = pdb_5rsa.filter_by_ca_distance(distance=6.0)
+    filtered = pdb_5rsa.filter_by_distance(distance=6.0, distance_type="ca")
     assert isinstance(filtered, DisulfideList)
     assert all(ss.ca_distance < 6.0 for ss in filtered)
 
 
 def test_filter_by_sg_distance(pdb_5rsa):
     """Test filtering by SG distance"""
-    filtered = pdb_5rsa.filter_by_sg_distance(distance=3.0)
+    filtered = pdb_5rsa.filter_by_distance(distance=3.0, distance_type="sg")
     assert isinstance(filtered, DisulfideList)
     assert all(ss.sg_distance < 3.0 for ss in filtered)
 
@@ -215,7 +218,7 @@ def test_filter_by_sg_distance(pdb_5rsa):
 def test_filter_by_distance_with_invalid_type(pdb_5rsa):
     """Test filtering with invalid distance type raises ValueError"""
     with pytest.raises(ValueError):
-        pdb_5rsa.filter_by_distance(distance_type="invalid")
+        pdb_5rsa.filter_by_distance(distance=0, distance_type="invalid")
 
 
 # Neighbor Finding Tests
@@ -331,7 +334,7 @@ def test_describe_method(pdb_5rsa, capsys):
     assert "DisulfideList" in output
     assert "Length:" in output
     assert "Average energy:" in output
-    assert "Average CA distance:" in output
+    assert "Average Cα distance:" in output
     assert "Average Resolution:" in output
 
 

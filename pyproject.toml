@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "proteusPy"
-version = "0.99.3"  # Replace with your version variable
+version = "0.99.32.dev2"  # Replace with your version variable
 description = "proteusPy - Protein Structure Analysis and Modeling Tools"
 readme = "README.md"
 authors = [
@@ -75,6 +75,7 @@ dev = [
     "pdoc",
     "wheel",
     "build",
+    "networkx"
 ]
 bio = ["Biopython"]
 pyqt5 = [
@@ -91,6 +92,7 @@ all = [
     "pyvistaqt",
     "wheel",
     "build",
+    "networkx",
 ]
 
 [project.urls]
@@ -126,6 +128,7 @@ proteusPy = [
 "proteusPy.qt5viewer" = "proteusPy.qt5viewer:main"
 "proteusPy.DisulfideExtractor" = "proteusPy.DisulfideExtractor_mp:main"
 "proteusPy.bootstrapper" = "proteusPy.bootstrapper:main"
+"proteusPy.render_disulfide_schematic" = "proteusPy.render_disulfide_schematic:main"
 
 [tool.pytest.ini_options]
 addopts = "--ignore=tests/test_DisplaySS.py"

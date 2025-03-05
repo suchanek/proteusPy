@@ -24,6 +24,7 @@ Last Modification: 2025-02-21 16:33:47
 
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
 
+
 import copy
 import logging
 import math
@@ -46,22 +47,10 @@ from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import _ANG_INIT, _FLOAT_INIT, WINSIZE
 from proteusPy.Residue import build_residue
 from proteusPy.turtle3D import ORIENT_SIDECHAIN, Turtle3D
-from proteusPy.utility import set_pyvista_theme
 from proteusPy.vector3D import Vector3D, calc_dihedral, distance3d
 
 np.set_printoptions(suppress=True)
 
-set_pyvista_theme("auto")
-
-# Configure logging
-logging.basicConfig(
-    level=logging.WARNING,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-)
-
-
-# Suppress findfont debug messages
-logging.getLogger("matplotlib.font_manager").setLevel(logging.WARNING)
 
 ORIGIN = Vector3D(0.0, 0.0, 0.0)
 
@@ -200,7 +189,7 @@ class DisulfideList(UserList):
         print(f"DisulfideList: {name}")
         print(f"Length: {list_length}")
         print(f"Average energy: {avg_energy:.2f} kcal/mol")
-        print(f"Average CA distance: {avg_distance:.2f} Å")
+        print(f"Average Cα distance: {avg_distance:.2f} Å")
         print(f"Average Resolution: {avg_resolution:.2f} Å")
         print(f"Bond angle deviation: {avg_bondangle:.2f}°")
         print(f"Bond length deviation: {avg_bondlength:.2f} Å")
@@ -236,6 +225,16 @@ class DisulfideList(UserList):
         if tot == 0:
             return 0.0
         total_dist = sum(ss.ca_distance for ss in sslist)
+        return total_dist / tot
+
+    @property
+    def average_sg_distance(self):
+        """Average Sγ distance (Å) between all atoms in the list"""
+        sslist = self.data
+        tot = len(sslist)
+        if tot == 0:
+            return 0.0
+        total_dist = sum(ss.sg_distance for ss in sslist)
         return total_dist / tot
 
     @property
@@ -505,7 +504,13 @@ class DisulfideList(UserList):
         :param winsize: Window size tuple (width, height)
         """
         DisulfideVisualization.display_overlay(
-            self, screenshot, movie, verbose, fname, light, winsize
+            sslist=self,
+            screenshot=screenshot,
+            movie=movie,
+            verbose=verbose,
+            fname=fname,
+            light=light,
+            winsize=winsize,
         )
 
     def display_torsion_statistics(
@@ -525,6 +530,17 @@ class DisulfideList(UserList):
         DisulfideVisualization.display_torsion_statistics(
             self, display, save, fname, theme
         )
+
+    def display_worst_structures(self, top_n=10, sample_percent=10):
+        """
+        Highlight the worst structures for distance and angle deviations and annotate their names.
+        Also, add a subplot showing the worst structures aggregated by PDB_ID.
+
+        :param top_n: Number of worst structures to highlight.
+        :type top_n: int
+        """
+        df = self.create_deviation_dataframe(verbose=True)
+        DisulfideVisualization.display_worst_structures(df, top_n, sample_percent)
 
     # Properties for easy DataFrame access
     @property
@@ -566,7 +582,7 @@ class DisulfideList(UserList):
         return DisulfideList(reslist, f"filtered by distance < {distance:.2f}")
 
     def filter_by_sg_distance(self, distance: float = -1.0, minimum: float = 1.0):
-        """Return a DisulfideList filtered by to between the maxium Sg distance and
+        """Return a DisulfideList filtered by to between the maxium Sγ distance and
         the minimum, which defaults to 1.0A.
 
         :param distance: Distance in Å

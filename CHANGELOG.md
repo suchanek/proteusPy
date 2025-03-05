@@ -5,11 +5,42 @@ Notable changes to the ``proteusPy`` project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v0.99.3] - 2024-2-22 unreleased
+## [v0.99.32] - unreleased
 
 ### Added
 
-- Stronger type checking in general
+- disulfide_schematic.py which has two functions for creating schematic
+drawings of Disulfides in various styles:
+  - ``create_disulfide_schematics()``
+  - ``create_disulfide_schematic_from_model()``
+  - test function in the tests/ directory
+  - script endpoint: proteusPy.create_disulfide_schematics
+
+### Fixed
+
+- Finished refactoring for ``DisulfideIO.py``
+- Corrected parameter order in ``DisulfideBase.DisulfideList.display_overlay()``
+- Corrected the ``.screenshot()`` function to work correctly on Windows.
+- Corrected Makefile installation target to install from the wheel, not repo
+
+## [v0.99.31] - 2024-2-23
+
+### Added
+
+- ``DisulfideList.Average_Sg_Distance`` property
+- Disulfide List info added to the ``rcsb_viewer.py`` info pane
+
+### Fixed
+
+- ``rcsb_viewer.py`` - refactored for new ``DisulfideVisualization`` classes.
+- Pushed to both DockerHub and GitHub repositories.
+-
+
+## [v0.99.3] - 2024-2-22
+
+### Added
+
+- Stronger type checking across many functions
 - Additional error checking for slicing lists
 - Several new Unittests
 
