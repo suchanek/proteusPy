@@ -57,6 +57,7 @@ endif
 dev:
 	@echo "Building development environment $(DEVNAME)..."
 	$(CONDA) create --name $(DEVNAME) -y python=3.12
+	pip install build
 ifeq ($(OS_NAME), Linux)
 	@echo "Linux detected, installing VTK..."
 	$(CONDA) install -n $(DEVNAME) vtk -y
@@ -79,10 +80,10 @@ install:
 install_dev: bld
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	pip uninstall -y proteusPy
-	pip install --no-index --find-links=dist/ proteusPy[dev]==$(VERS)
+	pip install dist/proteusPy-$(VERS)-py3-none-any.whl[dev]  # Install specific wheel
 	python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
 	@echo "Downloading and building the Disulfide Databases..."
-	proteusPy.bootstrapper -v
+	# proteusPy.bootstrapper -v
 	@echo "Development environment installation finished!"
 
 define jupyter-setup
@@ -100,12 +101,16 @@ jup_dev:
 format:
 	black proteusPy
 
+.PHONY: bld
 bld: wheels
+	@echo "Build complete."
+
 
 wheels: proteusPy/_version.py
 	@echo "Building wheels..."
 	-@$(RM) dist/*
-	python -m build
+	python -m build --sdist --wheel .
+	@echo "Wheels built successfully."
 
 docs: $(wildcard proteusPy/**/*.py)
 	@echo "Generating documentation..."
