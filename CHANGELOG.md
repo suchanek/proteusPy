@@ -5,7 +5,14 @@ Notable changes to the ``proteusPy`` project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v0.99.32] - unreleased
+## [v0.99.33] - 2025-03-05
+
+### Fixed
+
+- a few small issues with testing under Linux
+- Makefile tweaks
+
+## [v0.99.32] - 2025-03-05
 
 ### Added
 
@@ -23,7 +30,7 @@ drawings of Disulfides in various styles:
 - Corrected the ``.screenshot()`` function to work correctly on Windows.
 - Corrected Makefile installation target to install from the wheel, not repo
 
-## [v0.99.31] - 2024-2-23
+## [v0.99.31] - 2025-2-23
 
 ### Added
 
