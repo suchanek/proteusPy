@@ -949,8 +949,8 @@ def Load_PDB_SS(
     loadpath=DATA_DIR,
     verbose=False,
     subset=False,
-    cutoff=CA_CUTOFF,
-    sg_cutoff=SG_CUTOFF,
+    cutoff=-1.0,
+    sg_cutoff=-1.0,
     force=False,
 ) -> DisulfideLoader:
     """
