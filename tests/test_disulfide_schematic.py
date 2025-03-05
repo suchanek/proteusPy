@@ -13,9 +13,6 @@ import sys
 import unittest
 from tempfile import TemporaryDirectory
 
-# Add the parent directory to the path so we can import proteusPy
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 import matplotlib.pyplot as plt
 
 from proteusPy import load_disulfides_from_id
