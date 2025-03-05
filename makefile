@@ -70,15 +70,16 @@ clean devclean:
 
 install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install . -q
+	pip install --upgrade proteusPy -q
 	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Downloading and building the Disulfide Databases..."
 	proteusPy.bootstrapper -v
 	@echo "Installation finished!"
 
-install_dev:
+install_dev: bld
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install .[dev]
+	pip uninstall -y proteusPy
+	pip install --no-index --find-links=dist/ proteusPy[dev]==$(VERS)
 	python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
 	@echo "Downloading and building the Disulfide Databases..."
 	proteusPy.bootstrapper -v
