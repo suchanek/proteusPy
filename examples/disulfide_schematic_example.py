@@ -24,42 +24,36 @@ from proteusPy.disulfide_schematic import (
 def main():
     """Main function demonstrating disulfide schematic creation."""
     # Create output directory if it doesn't exist
-    output_dir = "schematic_outputs"
+    output_dir = (
+        "/Users/egs/repos/proteusPy_priv/Disulfide_Chapter/SpringerBookChapter/Figures"
+    )
     os.makedirs(output_dir, exist_ok=True)
 
-    print("Loading disulfide database (subset)...")
+    print("Loading disulfide database (full)...")
     # Load a disulfide from the database
-    PDB_SS = pp.Load_PDB_SS(verbose=False, subset=True)
+    pdb = pp.Load_PDB_SS(verbose=True, subset=False)
+    best_id = "2q7q_75D_140D"
+    worst_id = "6vxk_801B_806B"
+    worst_ss = pdb[worst_id]
 
+    ss = pdb[best_id]
+
+
+    pdbid = ss.pdb_id
     # Example 1: Create a schematic from a real disulfide
     print("\nExample 1: Creating schematic from a real disulfide...")
-    ss = PDB_SS[0]  # Get the first disulfide
+
     print(
         f"Selected disulfide: {ss.pdb_id} {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}"
     )
 
     output_file = os.path.join(output_dir, "real_disulfide_schematic.png")
-    fig1, ax1 = create_disulfide_schematic(
-        disulfide=ss, 
-        output_file=output_file, 
-        show_angles=True, 
-        show_ca_ca_distance=True,  # Show the Cα-Cα distance
-        style="publication"
-    )
-    print(f"Saved schematic to: {output_file}")
-
-    # Example 2: Create a schematic from a model disulfide
-    print("\nExample 2: Creating schematic from a model disulfide...")
-    output_file = os.path.join(output_dir, "model_disulfide_schematic.png")
-    fig2, ax2 = create_disulfide_schematic_from_model(
-        chi1=-60,
-        chi2=-60,
-        chi3=-90,
-        chi4=-60,
-        chi5=-60,
+    create_disulfide_schematic(
+        disulfide=ss,
         output_file=output_file,
         show_angles=True,
         show_ca_ca_distance=True,  # Show the Cα-Cα distance
+        style="publication",
     )
     print(f"Saved schematic to: {output_file}")
 
@@ -67,14 +61,20 @@ def main():
     print("\nExample 3: Creating schematics with different styles...")
 
     # Simple style
-    output_file = os.path.join(output_dir, "simple_style_schematic.png")
-    create_disulfide_schematic(disulfide=ss, output_file=output_file, style="simple")
+    output_file = os.path.join(output_dir, f"{pdbid}_simple_style_schematic.png")
+    create_disulfide_schematic(
+        disulfide=ss, output_file=output_file, style="simple", show_ca_ca_distance=True
+    )
     print(f"Saved simple style schematic to: {output_file}")
 
     # Detailed style
-    output_file = os.path.join(output_dir, "detailed_style_schematic.png")
+    output_file = os.path.join(output_dir, f"{pdbid}_detailed_style_schematic.png")
     create_disulfide_schematic(
-        disulfide=ss, output_file=output_file, style="detailed", show_angles=True
+        disulfide=ss,
+        output_file=output_file,
+        style="detailed",
+        show_angles=True,
+        show_ca_ca_distance=True,
     )
     print(f"Saved detailed style schematic to: {output_file}")
 
@@ -82,17 +82,36 @@ def main():
     print("\nExample 4: Creating schematics in different formats...")
 
     # SVG format
-    output_file = os.path.join(output_dir, "disulfide_schematic.svg")
-    create_disulfide_schematic(disulfide=ss, output_file=output_file)
+    output_file = os.path.join(output_dir, f"{pdbid}_disulfide_schematic.svg")
+    create_disulfide_schematic(
+        disulfide=ss,
+        output_file=output_file,
+        style="detailed",
+        show_angles=True,
+        show_ca_ca_distance=True,
+    )
     print(f"Saved SVG schematic to: {output_file}")
+
+    output_file = os.path.join(output_dir, f"{pdbid}_disulfide_schematic.png")
+    create_disulfide_schematic(
+        disulfide=ss,
+        output_file=output_file,
+        show_angles=True,
+        show_ca_ca_distance=True,
+        style="detailed",
+    )
+    print(f"Saved PNG schematic to: {output_file}")
 
     # PDF format
     output_file = os.path.join(output_dir, "disulfide_schematic.pdf")
-    create_disulfide_schematic(disulfide=ss, output_file=output_file)
+    create_disulfide_schematic(
+        disulfide=ss,
+        output_file=output_file,
+        show_angles=True,
+        show_ca_ca_distance=True,
+        style="detailed",
+    )
     print(f"Saved PDF schematic to: {output_file}")
-
-    print("\nAll examples completed successfully!")
-    print(f"Output files can be found in the '{output_dir}' directory.")
 
 
 if __name__ == "__main__":

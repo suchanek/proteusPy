@@ -3,12 +3,14 @@ This module provides functionality to create 2D schematic diagrams of disulfide 
 for publication purposes.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-03-03
+Last revision: 2025-03-04 10:15:04
 """
 
+import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import to_rgba
+from matplotlib.path import Path
 
 from proteusPy.atoms import ATOM_COLORS
 from proteusPy.DisulfideBase import Disulfide
@@ -308,11 +310,19 @@ def create_disulfide_schematic(
             title += f"\nEnergy: {disulfide.energy:.2f} kcal/mol, Torsion Length: {disulfide.torsion_length:.2f}°"
         ax.set_title(title, fontsize=font_size + 2)
 
-    # Add residue labels
+    # Add residue labels with actual residue information if available
+    proximal_label = "Proximal Cysteine"
+    distal_label = "Distal Cysteine"
+
+    # If we have a real disulfide (not a model), use the actual residue information
+    if disulfide and disulfide.name != "model":
+        proximal_label = f"Cys {disulfide.proximal}{disulfide.proximal_chain}"
+        distal_label = f"Cys {disulfide.distal}{disulfide.distal_chain}"
+
     ax.text(
         1,
         1,
-        "Proximal Cysteine",
+        proximal_label,
         fontsize=font_size + 1,
         ha="center",
         va="center",
@@ -321,7 +331,7 @@ def create_disulfide_schematic(
     ax.text(
         4,
         1,
-        "Distal Cysteine",
+        distal_label,
         fontsize=font_size + 1,
         ha="center",
         va="center",
@@ -343,8 +353,6 @@ def create_disulfide_schematic(
         ) / 2 - 0.5  # Offset below the straight line
 
         # Create the curved path
-        import matplotlib.patches as patches
-        from matplotlib.path import Path
 
         verts = [
             ca_prox_pos,  # Start point (CA_prox)

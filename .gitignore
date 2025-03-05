@@ -7,7 +7,7 @@
 .eggs
 build/
 dist/
-schematic-outputs/
+schematic_outputs/
 data/*.png
 data/Nclasses/*
 data/classes/*

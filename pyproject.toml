@@ -127,6 +127,7 @@ proteusPy = [
 "proteusPy.qt5viewer" = "proteusPy.qt5viewer:main"
 "proteusPy.DisulfideExtractor" = "proteusPy.DisulfideExtractor_mp:main"
 "proteusPy.bootstrapper" = "proteusPy.bootstrapper:main"
+"proteusPy.render_disulfide_schematic" = "proteusPy.render_disulfide_schematic:main"
 
 [tool.pytest.ini_options]
 addopts = "--ignore=tests/test_DisplaySS.py"
