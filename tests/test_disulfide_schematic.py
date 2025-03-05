@@ -32,8 +32,7 @@ class TestDisulfideSchematic(unittest.TestCase):
         self.temp_dir_obj = TemporaryDirectory(prefix="proteusPy_")
 
         # Load the disulfide database (subset, for speed)
-        # self.PDB = pp.Load_PDB_SS(verbose=False, subset=True)
-        self.pdb = load_disulfides_from_id("5RSA", pdb_dir=DATA_DIR)
+        self.PDB = pp.Load_PDB_SS(verbose=False, subset=True)
 
         # Get the first disulfide for testing
         self.first_disulfide = self.pdb[0]
