@@ -9,18 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- disulfide_schematic.py which has two functions for creating cartoon
-drawings of Disulfides:
+- disulfide_schematic.py which has two functions for creating schematic
+drawings of Disulfides in various styles:
   - ``create_disulfide_schematics()``
   - ``create_disulfide_schematic_from_model()``
   - test function in the tests/ directory
-  -
+  - script endpoint: proteusPy.create_disulfide_schematics
 
 ### Fixed
 
 - Finished refactoring for ``DisulfideIO.py``
 - Corrected parameter order in ``DisulfideBase.DisulfideList.display_overlay()``
 - Corrected the ``.screenshot()`` function to work correctly on Windows.
+- Corrected Makefile installation target to install from the wheel, not repo
 
 ## [v0.99.31] - 2024-2-23
 
