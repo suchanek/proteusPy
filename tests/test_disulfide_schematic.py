@@ -15,12 +15,11 @@ from tempfile import TemporaryDirectory
 
 import matplotlib.pyplot as plt
 
-from proteusPy import load_disulfides_from_id
+from proteusPy import Load_PDB_SS
 from proteusPy.disulfide_schematic import (
     create_disulfide_schematic,
     create_disulfide_schematic_from_model,
 )
-from proteusPy.ProteusGlobals import DATA_DIR
 
 
 class TestDisulfideSchematic(unittest.TestCase):
@@ -32,10 +31,10 @@ class TestDisulfideSchematic(unittest.TestCase):
         self.temp_dir_obj = TemporaryDirectory(prefix="proteusPy_")
 
         # Load the disulfide database (subset, for speed)
-        self.PDB = pp.Load_PDB_SS(verbose=False, subset=True)
+        self.PDB = Load_PDB_SS(verbose=False, subset=True)
 
         # Get the first disulfide for testing
-        self.first_disulfide = self.pdb[0]
+        self.first_disulfide = self.PDB[0]
 
     def tearDown(self) -> None:
         """Clean up test fixtures after each test method."""
