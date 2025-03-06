@@ -20,7 +20,11 @@ jobs:
           run: |
               python -m pip install --upgrade pip
               pip install wheel pytest
-              pip install proteusPy
+              pip install -e .  # Install the package in development mode from the repo
+
+        - name: Bootstrap data
+          run: |
+              python -c "import proteusPy; proteusPy.Bootstrap_PDB_SS(verbose=True, force=True, subset=True)"
 
         - name: Test with pytest
           run: |
