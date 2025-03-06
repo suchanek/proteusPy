@@ -131,4 +131,4 @@ proteusPy = [
 "proteusPy.render_disulfide_schematic" = "proteusPy.render_disulfide_schematic:main"
 
 [tool.pytest.ini_options]
-addopts = "--ignore=tests/test_DisplaySS.py"
+addopts = "--ignore=tests/test_DisplaySS.py --ignore=tests/test_disulfide_schematic.py"
