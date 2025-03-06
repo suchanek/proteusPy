@@ -1,5 +1,5 @@
 """
-This module is part of the proteusPy package, a Python package for 
+This module is part of the proteusPy package, a Python package for
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
@@ -596,6 +596,7 @@ class DisulfideLoader:
         save=False,
         savedir=".",
         verbose=False,
+        log=False,
     ):
         """Plot the incidence of all octant Disulfide classes for a given binary class.
 
@@ -607,7 +608,12 @@ class DisulfideLoader:
         """
 
         DisulfideVisualization.plot_binary_to_eightclass_incidence(
-            self.tclass, theme, save, savedir, verbose
+            self.tclass,
+            theme=theme,
+            save=save,
+            savedir=savedir,
+            verbose=verbose,
+            log=log,
         )
 
     def plot_count_vs_class_df(

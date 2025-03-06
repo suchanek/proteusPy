@@ -4,10 +4,10 @@ Author: Eric G. Suchanek, PhD.
 License: BSD
 Last Modification: 2025-01-22 00:02:43 -egs-
 
-Disulfide Class creation and manipulation. Binary classes using the +/- formalism of Hogg et al. 
-(Biochem, 2006, 45, 7429-7433), are created for all 32 possible classes from the Disulfides 
-extracted. Classes are named per Hogg's convention. This approach is extended to create 
-eightfold classes based on the subdividing each dihedral angle chi1 - chi5 into 
+Disulfide Class creation and manipulation. Binary classes using the +/- formalism of Hogg et al.
+(Biochem, 2006, 45, 7429-7433), are created for all 32 possible classes from the Disulfides
+extracted. Classes are named per Hogg's convention. This approach is extended to create
+eightfold classes based on the subdividing each dihedral angle chi1 - chi5 into
 8 equal segments, effectively quantizing them.
 """
 
@@ -274,15 +274,18 @@ class DisulfideClassManager:
         :rtype: list
         :raises ValueError: If an invalid base value is provided.
         """
+        # binary 0 = negative, 2 = positive
+        # sextant and octant classes go counterclockwise from 0 degrees
+
         match base:
             case 6:
-                angle_maps = {"0": ["4", "5", "6"], "2": ["1", "2", "3"]}
+                angle_maps = {"2": ["4", "5", "6"], "0": ["1", "2", "3"]}
             case 8:
-                angle_maps = {"0": ["5", "6", "7", "8"], "2": ["1", "2", "3", "4"]}
+                angle_maps = {"2": ["5", "6", "7", "8"], "0": ["1", "2", "3", "4"]}
             case 10:
                 angle_maps = {
-                    "0": ["6", "7", "8", "9", "A"],
-                    "2": ["1", "2", "3", "4", "5"],
+                    "2": ["6", "7", "8", "9", "A"],
+                    "0": ["1", "2", "3", "4", "5"],
                 }
             case _:
                 raise ValueError("Invalid base value. Must be 6, 8, or 10.")
