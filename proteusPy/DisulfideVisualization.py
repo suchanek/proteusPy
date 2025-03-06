@@ -188,6 +188,7 @@ class DisulfideVisualization:
         save=False,
         savedir=".",
         verbose=False,
+        log=False,
     ):
         """Plot the incidence of all octant Disulfide classes for a given binary class.
 
@@ -214,6 +215,7 @@ class DisulfideVisualization:
                 savedir=savedir,
                 base=8,
                 verbose=verbose,
+                log=log,
             )
         if verbose:
             _logger.info("Graph generation complete.")
