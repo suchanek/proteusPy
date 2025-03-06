@@ -505,28 +505,40 @@ class DisulfideVisualization:
     @staticmethod
     def plot_classes(
         tclass: DisulfideClassManager,
-        class_string,
-        base=8,
-        theme="auto",
-        log=False,
-        page_size=200,
+        class_string: str = None,
+        base: int = 8,
+        theme: str = "auto",
+        log: bool = False,
+        page_size: int = 200,
+        paginated: bool = False,
     ):
-        """Plot the distribution of classes for the given class string.
+        """Plot the distribution of classes for the given binary class string.
 
         :param tclass: DisulfideClassManager instance
-        :param class_string: The class string to plot
+        :param class_string: The binary class string to plot
         :param base: Base for class IDs (2 or 8)
         :param theme: Theme to use for the plot
         :param log: Whether to use log scale for y-axis
         :param page_size: Number of items per page
+        :param paginated: Whether to paginate the output
         """
         classlist = tclass.binary_to_class(class_string, base)
         df = DisulfideVisualization.enumerate_class_fromlist(
             tclass, classlist, base=base
         )
-        DisulfideVisualization.plot_count_vs_class_df_paginated(
-            df, title=class_string, theme=theme, base=base, log=log, page_size=page_size
-        )
+        if paginated:
+            DisulfideVisualization.plot_count_vs_class_df_paginated(
+                df,
+                title=class_string,
+                theme=theme,
+                base=base,
+                log=log,
+                page_size=page_size,
+            )
+        else:
+            DisulfideVisualization.plot_count_vs_class_df(
+                df, title=class_string, theme=theme, base=base, log=log
+            )
 
     @staticmethod
     def display_sslist(sslist, style="sb", light="auto", panelsize=512):
