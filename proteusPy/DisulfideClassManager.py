@@ -384,6 +384,46 @@ class DisulfideClassManager:
 
     def create_classes(self, df, base=8) -> pd.DataFrame:
         """
+        Create a new DataFrame from the input with a 8-class encoding for input 'chi' values.
+
+        The function takes a pandas DataFrame containing the following columns:
+        'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'cb_distance',
+        'torsion_length', 'energy', and 'rho', and adds a class ID column based on the following rules:
+
+        1. A new column named `class_id` is added, which is the concatenation of the individual class IDs per Chi.
+        2. The DataFrame is grouped by the `class_id` column, and a new DataFrame is returned that shows the unique `ss_id` values for each group,
+        the count of unique `ss_id` values, the incidence of each group as a proportion of the total DataFrame, and the
+        percentage of incidence.
+
+        :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5',
+                'ca_distance', 'cb_distance', 'torsion_length', 'energy', and 'rho'
+        :return: The grouped DataFrame with the added class column.
+        """
+
+        _df = pd.DataFrame()
+        if base == 6:
+            for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
+                _df[col_name + "_t"] = df[col_name].apply(self.get_sixth_quadrant)
+        elif base == 8:
+            for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
+                _df[col_name + "_t"] = df[col_name].apply(self.get_eighth_quadrant)
+        else:
+            raise ValueError("Base must be either 6 or 8")
+
+        df["class_id"] = _df[["chi1_t", "chi2_t", "chi3_t", "chi4_t", "chi5_t"]].agg(
+            "".join, axis=1
+        )
+
+        grouped = df.groupby("class_id").agg({"ss_id": "unique"})
+        grouped["count"] = grouped["ss_id"].str.len()
+        grouped["incidence"] = grouped["count"] / len(df)
+        grouped["percentage"] = grouped["incidence"] * 100
+        grouped.reset_index(inplace=True)
+
+        return grouped
+
+    def Ocreate_classes(self, df, base=8) -> pd.DataFrame:
+        """
         Create a new DataFrame with 8-class encoding for input 'chi' values.
 
         The function takes a pandas DataFrame containing the following columns:
