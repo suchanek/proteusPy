@@ -395,18 +395,19 @@ class DisulfideVisualization:
         # This ensures consistent y-axis scaling across all pages
         global_y_min = df["count"].min() if len(df) > 0 else 0
         global_y_max = df["count"].max() if len(df) > 0 else 1
-        
+
         # Add some padding to the max value for better visualization
         global_y_max = global_y_max * 1.1  # 10% padding
-        
         # For log scale, ensure minimum is at least 1
         if log and global_y_min <= 0:
             global_y_min = 1
 
         if verbose:
-            _logger.info("Global y-axis range: [%s, %s]", 
-                         math.log10(global_y_min) if log else global_y_min,
-                         math.log10(global_y_max) if log else global_y_max)
+            _logger.info(
+                "Global y-axis range: [%s, %s]",
+                math.log10(global_y_min) if log else global_y_min,
+                math.log10(global_y_max) if log else global_y_max,
+            )
 
         total_pages = (len(df) + page_size - 1) // page_size
 
@@ -433,9 +434,11 @@ class DisulfideVisualization:
                 yaxis_type="log" if log else "linear",
                 # Set consistent y-axis range for all pages using the global values
                 yaxis=dict(
-                    range=[math.log10(global_y_min) if log else global_y_min, 
-                           math.log10(global_y_max) if log else global_y_max]
-                )
+                    range=[
+                        math.log10(global_y_min) if log else global_y_min,
+                        math.log10(global_y_max) if log else global_y_max,
+                    ]
+                ),
             )
             fig.update_layout(autosize=True)
 

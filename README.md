@@ -77,7 +77,7 @@ $ pip install proteusPy[dev]
 $ make tests
 ```
 
-The modules will run their docstring tests and disulfide visualization windows will open. Simply close them. If all goes normally there will be no errors. 
+The modules will run their docstring tests and disulfide visualization windows will open. Simply close them. If all goes normally there will be no errors.
 
 Docstring testing is sensitive to formatting; occasionally the ``black`` formatter changes the docstrings. As a result there may be some docstring tests that fail.
 
@@ -127,7 +127,13 @@ The first time one loads the database via [Load_PDB_SS()](https://suchanek.githu
 
 ## Quickstart
 
-After installation is complete launch jupyter:
+The fastest way to inspect disulfides in the database is to launch ``rcsb_viewer.py`` with (put in the path appropriate to your system)
+
+   ```console
+   $ panel serve ~/repos/proteusPy/viewer/rcsb_viewer.py --show --autoreload
+   ```
+
+If you want to play with the notebooks and interact with the package directly:
 
 ```console
 $ jupyter notebook 
@@ -139,7 +145,7 @@ and open [Analysis_2q7q.ipynb](https://github.com/suchanek/proteusPy/blob/master
 
 `proteusPy` now has four ways of visualizing the Disulfides in the database. I'll describe these briefly below:
 
-1) PyVista (built-in) - `proteusPy` utilizes the excellent PyVista library for visualization and manipulation of the Disulfides within the database. These routines are readily accessible from within the Jupyter notebook environment. It uses the VTK library on the backend and provides high-level access to 3D rendering. The menu strip provided in the Disulfide visualization windows allows the user to turn borders, rulers, bounding boxes on and off and reset the orientations. Please try them out! There is also a button for *local* vs *server* rendering. *Local* rendering is usually much smoother. To manipulate:
+1) PyVista (built-in) - `proteusPy` utilizes the excellent PyVista library for visualization and interactive manipulation of the Disulfides within the database. These routines are readily accessible from within the Jupyter notebook environment. It uses the VTK library on the backend and provides high-level access to 3D rendering. The menu strip provided in the Disulfide visualization windows allows the user to turn borders, rulers, bounding boxes on and off and reset the orientations. Please try them out! There is also a button for *local* vs *server* rendering. *Local* rendering is usually much smoother. To manipulate:
      - Click and drag your mouse to rotate
      - Use the mouse wheel to zoom (3 finger zoom on trackpad)
 
@@ -154,13 +160,14 @@ and open [Analysis_2q7q.ipynb](https://github.com/suchanek/proteusPy/blob/master
   ```console
   $ docker build -t rcsb_viewer .
   ```
+
 It's also possible to simply pull the Docker image directly from DockerHub and run it via:
 
   ```console
     $ docker run -d  -p 5006:5006  --n rcsb_viewer --restart unless-stopped egsuchanek/rcsb_viewer:latest
   ```
 
-1) [qt5_viewer.py](https://github.com/suchanek/proteusPy/blob/master/proteusPy/qt5_viewer.py) - I have added a pyqt5-based viewer into proteusPy itself. This is similar to the ``Panel`` program but uses ``pyqt5`` for rendering. This works under Macos and Windows, but can't run under Linux due to the inability to install pyqt5. If you'd like to try it out under MacOS or Windows install proteusPy as above. After installation install the pyqt5 libraries with:
+1) [qt5_viewer.py](https://github.com/suchanek/proteusPy/blob/master/proteusPy/qt5_viewer.py) - I have added a pyqt5-based viewer. This is similar to the ``Panel`` program but uses ``pyqt5`` for rendering. This works under Macos and Windows, but can't run under Linux due to the inability to install pyqt5. If you'd like to try it out under MacOS or Windows install proteusPy as above. After installation install the pyqt5 libraries with:
 
 ```console
   $ pip install proteusPy[pyqt5]
@@ -172,13 +179,12 @@ To launch the program simply type:
   $ proteusPy.qt5_viewer
   ```
 
-
 ## Pymol Integration
 
-I have integrated ``proteusPy`` with the wonderful visualization program ``Pymol`` in order to visualize Disulfides within the context of their parent protein. To use this feature one must have ``Pymol`` installed on the local machine:
+I have also integrated ``proteusPy`` with the wonderful visualization program ``Pymol`` in order to visualize Disulfides within the context of their parent protein. To use this feature one must have ``Pymol`` installed on the local machine:
 
   ```console
-  $ brew install pymol
+  $ brew install pymol (MacOS)
   ```
 
 To visualize the lowest energy structure in the database:
@@ -186,7 +192,7 @@ To visualize the lowest energy structure in the database:
 ```python
 from proteusPy import Load_PDB_SS, display_ss_pymol
 
-pdb = Load_PDB_SS(verbose=True, subset=False, cutoff=8.0)
+pdb = Load_PDB_SS(verbose=True, subset=False)
 display_ss_pymol('2q7q', chain='D', proximal=75, distal=140, ray=False, solvent=True, sas=True, fname='2q7q.png')
 
 ```
