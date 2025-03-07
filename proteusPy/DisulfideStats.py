@@ -1,5 +1,5 @@
 """
-This module provides statistical analysis functionality for disulfide bonds 
+This module provides statistical analysis functionality for disulfide bonds
 in the proteusPy package.
 
 Author: Eric G. Suchanek, PhD
@@ -218,6 +218,29 @@ class DisulfideStats:
             filtered_distances = [d for d in distances if d <= cutoff]
 
         return filtered_distances
+
+    @staticmethod
+    def extract_energies(sslist, comparison="less", cutoff=-1):
+        """Extract and filter the distance values from the disulfide list based on the
+        specified type and comparison.
+
+        :param sslist: List of disulfide objects
+        :param comparison: If 'less', return energies less than the cutoff value
+        :param cutoff: Cutoff value for filtering energies
+        :return: List of filtered energies values
+        """
+        filtered_energies = []
+        energies = [ds.energy for ds in sslist]
+
+        if cutoff == -1.0:
+            return energies
+
+        if comparison == "greater":
+            filtered_energies = [e for e in energies if e > cutoff]
+        else:
+            filtered_energies = [e for e in energies if e <= cutoff]
+
+        return filtered_energies
 
     @staticmethod
     def bond_angle_ideality(ss, verbose=False):
