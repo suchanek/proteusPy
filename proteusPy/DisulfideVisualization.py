@@ -845,6 +845,42 @@ class DisulfideVisualization:
             fig.write_image(fname)
 
     @staticmethod
+    def plot_energies(
+        energies,
+        theme="auto",
+        log=True,
+    ):
+        """Plot the energies as a histogram.
+
+        :param energies: List of energies
+        :param theme: The plotly theme to use
+        :param log: Whether to use a logarithmic scale for the y-axis
+        """
+        set_plotly_theme(theme)
+        yaxis_type = "log" if log else "linear"
+
+        column_name = "Energy"
+        title = "Disulfide Torsional Energy Distribution"
+        xtitle = "Energy (kcal/mol)"
+
+        df = pd.DataFrame(energies, columns=[column_name])
+
+        fig = px.histogram(
+            df,
+            x=column_name,
+            nbins=NBINS,
+            title=title,
+        )
+        fig.update_layout(
+            title={"text": title, "x": 0.5, "xanchor": "center"},
+            xaxis_title=xtitle,
+            yaxis_title="Frequency",
+            yaxis_type=yaxis_type,
+            bargap=0.2,
+        )
+        fig.show()
+
+    @staticmethod
     def plot_distances(
         distances,
         distance_type="sg",

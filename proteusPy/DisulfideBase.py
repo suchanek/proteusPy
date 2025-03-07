@@ -470,6 +470,10 @@ class DisulfideList(UserList):
             self.data, distance_type, comparison, cutoff
         )
 
+    def extract_energies(self, comparison="less", cutoff=-1):
+        """Extract and filter energy values"""
+        return DisulfideStats.extract_energies(self.data, comparison, cutoff)
+
     # Delegate to DisulfideVisualization
     def display(self, style="sb", light="auto", panelsize=512):
         """Display the Disulfide list in the specific rendering style.
@@ -621,6 +625,21 @@ class DisulfideList(UserList):
             distance_type=distance_type,
             cutoff=cutoff,
             comparison=comparison,
+            theme=theme,
+            log=log,
+        )
+
+    def plot_energies(self, theme="auto", log=True):
+        """Plot the energy values as a histogram.
+
+        :param theme: The plotly theme to use
+        :param log: Whether to use a logarithmic scale for the y-axis
+        """
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
+
+        energies = self.extract_energies()
+        DisulfideVisualization.plot_energies(
+            energies,
             theme=theme,
             log=log,
         )
