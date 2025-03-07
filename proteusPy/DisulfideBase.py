@@ -1,5 +1,5 @@
 """
-This module, *DisulfideBase*, is part of the proteusPy package, a Python package for 
+This module, *DisulfideBase*, is part of the proteusPy package, a Python package for
 the analysis and modeling of protein structures with an emphasis on disulfide bonds.
 It represents the core of the current implementation of *proteusPy* and includes the
 ``Disulfide`` and ``DisulfideList`` classes, which provide a Python object and methods representing
@@ -384,10 +384,10 @@ class DisulfideList(UserList):
         :raises ValueError: If the number of provided angles is not exactly 5.
 
         Example:
-            >>> import proteusPy as pp
-            >>> pdb_list = pp.Load_PDB_SS(verbose=False, subset=True).SSList
-            >>> # Using 5 individual angles:
-            >>> neighbors = pdb_list.nearest_neighbors(8, -60, -60, -90, -60, -60)
+        >>> import proteusPy as pp
+        >>> pdb_list = pp.Load_PDB_SS(verbose=False, subset=True).SSList
+        >>> # Using 5 individual angles:
+        >>> neighbors = pdb_list.nearest_neighbors(8, -60, -60, -90, -60, -60)
         """
 
         if len(args) == 1 and isinstance(args[0], list) and len(args[0]) == 5:
@@ -558,58 +558,12 @@ class DisulfideList(UserList):
         """Return the torsions as an array"""
         return np.array([ss.torsion_array for ss in self.data])
 
-    def filter_by_ca_distance(self, distance: float = -1.0, minimum: float = 2.0):
-        """Return a DisulfideList filtered by to between the maxium Ca distance and
-        the minimum, which defaults to 2.0A.
-
-        :param distance: Distance in Å
-        :param minimum: Distance in Å
-        :return: DisulfideList containing disulfides with the given distance.
-        """
-        reslist = []
-        sslist = self.data
-
-        # if distance is -1.0, return the entire list
-        if distance == -1.0:
-            return sslist.copy()
-
-        reslist = [
-            ss
-            for ss in sslist
-            if ss.ca_distance < distance and ss.ca_distance > minimum
-        ]
-
-        return DisulfideList(reslist, f"filtered by distance < {distance:.2f}")
-
-    def filter_by_sg_distance(self, distance: float = -1.0, minimum: float = 1.0):
-        """Return a DisulfideList filtered by to between the maxium Sγ distance and
-        the minimum, which defaults to 1.0A.
-
-        :param distance: Distance in Å
-        :param minimum: Distance in Å
-        :return: DisulfideList containing disulfides with the given distance.
-        """
-        reslist = []
-        sslist = self.data
-
-        # if distance is -1.0, return the entire list
-        if distance == -1.0:
-            return sslist.copy()
-
-        reslist = [
-            ss
-            for ss in sslist
-            if ss.sg_distance < distance and ss.sg_distance > minimum
-        ]
-
-        return DisulfideList(reslist, f"filtered by Sγ distance < {distance:.2f}")
-
     def filter_by_distance(
-        self, distance_type: str = "ca", distance: float = -1.0, minimum: float = 2.0
+        self, distance_type: str = "ca", distance: float = -1.0, minimum: float = -1.0
     ):
         """
         Return a DisulfideList filtered by the specified distance type (Ca or Sg) between the maximum distance and
-        the minimum, which defaults to 2.0A for Ca and 1.0A for Sg.
+        the minimum, which defaults to 0.0 Å.
 
         :param distance_type: Type of distance to filter by ('ca' or 'sg').
         :param distance: Distance in Å.
@@ -618,13 +572,9 @@ class DisulfideList(UserList):
         """
         reslist = []
         sslist = self.data
+        default_minimum = 0.0
 
-        # Set default minimum distance based on distance_type
-        if distance_type == "ca":
-            default_minimum = 2.0
-        elif distance_type == "sg":
-            default_minimum = 1.0
-        else:
+        if distance_type not in ["ca", "sg"]:
             raise ValueError("Invalid distance_type. Must be 'ca' or 'sg'.")
 
         # Use the provided minimum distance or the default

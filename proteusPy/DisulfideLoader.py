@@ -36,11 +36,9 @@ from proteusPy.DisulfideStats import DisulfideStats
 from proteusPy.DisulfideVisualization import DisulfideVisualization
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
-    CA_CUTOFF,
     DATA_DIR,
     LOADER_FNAME,
     LOADER_SUBSET_FNAME,
-    SG_CUTOFF,
     SS_LIST_URL,
     SS_PICKLE_FILE,
 )
@@ -81,6 +79,8 @@ class DisulfideLoader:
     source. The `DisulfideLoader` class is used to build the Disulifde database with a
     specific cutoff, or for saving the database to a file.
 
+    Cutoff values of -1.0 indicate imposing no cutoffs on the data.
+
     :param verbose: Flag to control output verbosity
     :type verbose: bool
     :param datadir: Directory containing data files
@@ -91,30 +91,17 @@ class DisulfideLoader:
     :type quiet: bool
     :param subset: Flag to load only a subset of data
     :type subset: bool
-    :param cutoff: Distance cutoff for filtering disulfides
+    :param cutoff: Distance cutoff, (A) for filtering disulfides. Defaults to -1.0.
     :type cutoff: float
-    :param sg_cutoff: SG distance cutoff for filtering disulfides
+    :param sg_cutoff: SG distance cutoff, (A) for filtering disulfides. Defaults to -1.0.
     :type sg_cutoff: float
+    :param percentile: Percentile cutoff for filtering disulfides. Must be between 0 and 100.
+    Filters based on statistical cutoffs derived from the data.
+    :type percentile: float
+
     """
 
-    # Instance attributes
-    SSList: DisulfideList = field(
-        default_factory=lambda: DisulfideList([], "ALL_PDB_SS")
-    )
-    SSDict: Dict = field(default_factory=dict)
-    TorsionDF: pd.DataFrame = field(default_factory=pd.DataFrame)
-    TotalDisulfides: int = field(default=0)
-    IDList: List = field(default_factory=list)
-    quiet: bool = field(default=False)
-    tclass: Optional[DisulfideClassManager] = field(default=None)
-    cutoff: float = field(default=-1.0)
-    sg_cutoff: float = field(default=-1.0)
-    verbose: bool = field(default=False)
-    percentile: float = field(default=-1.0)
-    timestamp: float = field(default_factory=time.time)
-    version: str = field(default=__version__)
-
-    # Initialization parameters
+    # Fields that serve as both instance attributes and initialization parameters
     datadir: str = field(default=DATA_DIR)
     picklefile: str = field(default=SS_PICKLE_FILE)
     subset: bool = field(default=False)
@@ -122,6 +109,20 @@ class DisulfideLoader:
     sg_cutoff: float = field(default=-1.0)
     verbose: bool = field(default=False)
     percentile: float = field(default=-1.0)
+    quiet: bool = field(default=False)
+    minimum: float = field(default=-1.0)
+
+    # Fields that are only used internally and don't need to be initialization parameters
+    SSList: DisulfideList = field(
+        default_factory=lambda: DisulfideList([], "ALL_PDB_SS"), init=False
+    )
+    SSDict: Dict = field(default_factory=dict, init=False)
+    TorsionDF: pd.DataFrame = field(default_factory=pd.DataFrame, init=False)
+    TotalDisulfides: int = field(default=0, init=False)
+    IDList: List = field(default_factory=list, init=False)
+    tclass: Optional[DisulfideClassManager] = field(default=None, init=False)
+    timestamp: float = field(default_factory=time.time, init=False)
+    version: str = field(default=__version__, init=False)
 
     def __post_init__(self) -> None:
         """
@@ -176,7 +177,7 @@ class DisulfideLoader:
 
                 old_length = len(sslist)
                 filt = sslist.filter_by_distance(
-                    distance=self.cutoff, distance_type="ca"
+                    distance=self.cutoff, distance_type="ca", minimum=-1.0
                 )
                 filt = DisulfideList(
                     filt,
@@ -195,7 +196,7 @@ class DisulfideLoader:
 
                 old_length = new_length
                 filt = filt.filter_by_distance(
-                    distance=self.sg_cutoff, distance_type="sg"
+                    distance=self.sg_cutoff, distance_type="sg", minimum=-1.0
                 )
                 new_length = len(filt)
 
