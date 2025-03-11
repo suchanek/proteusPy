@@ -1,5 +1,5 @@
 """
-This file contains global declarations for the *proteusPy* package, a Python package for 
+This file contains global declarations for the *proteusPy* package, a Python package for
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 
 Author: Eric G. Suchanek, PhD
@@ -140,7 +140,7 @@ SG_MIN_CUTOFF = 1.0
 
 
 FONTSIZE = 10
-NBINS = 380
+NBINS = 190
 
 # Columns for the distance dataframe
 Distance_DF_Cols = [

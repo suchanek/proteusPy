@@ -1,0 +1,64 @@
+\subsection{Disulfide Octant Quantization System}
+
+The disulfide octant quantization system is a method for classifying disulfide bonds based on their five dihedral angles ($\chi_1$-$\chi_5$). This approach extends the binary classification system described by Hogg et al. (Biochem, 2006, 45, 7429-7433) to provide a more granular classification.
+
+\subsubsection{Binary Classification (Original System)}
+In the binary system, each of the five dihedral angles ($\chi_1$-$\chi_5$) is classified as either positive (+) or negative (-), resulting in $2^5 = 32$ possible classes. These are represented as 5-digit strings where:
+\begin{itemize}
+    \item `0' represents a negative angle
+    \item `2' represents a positive angle
+\end{itemize}
+
+For example, the class ``00000'' represents a disulfide bond where all five dihedral angles are negative, known as a ``-LHSpiral'' (Left-Handed Spiral).
+
+\subsubsection{Octant Quantization (Extended System)}
+The octant quantization system divides the $360\degree$ range of each dihedral angle into 8 equal segments of $45\degree$ each, numbered from 1 to 8 counterclockwise starting from $0\degree$:
+\begin{itemize}
+    \item[1.] $315\degree$ to $360\degree$ (or $-45\degree$ to $0\degree$)
+    \item[2.] $270\degree$ to $315\degree$ (or $-90\degree$ to $-45\degree$)
+    \item[3.] $225\degree$ to $270\degree$ (or $-135\degree$ to $-90\degree$)
+    \item[4.] $180\degree$ to $225\degree$ (or $-180\degree$ to $-135\degree$)
+    \item[5.] $135\degree$ to $180\degree$
+    \item[6.] $90\degree$ to $135\degree$
+    \item[7.] $45\degree$ to $90\degree$
+    \item[8.] $0\degree$ to $45\degree$
+\end{itemize}
+
+This creates $8^5 = 32,768$ possible classes, providing much finer granularity in classifying disulfide conformations.
+
+\subsubsection{Mapping Between Systems}
+The binary and octant systems are related:
+\begin{itemize}
+    \item Binary `0' (negative angle) maps to octants 1, 2, 3, and 4
+    \item Binary `2' (positive angle) maps to octants 5, 6, 7, and 8
+\end{itemize}
+
+\subsubsection{Example: Mapping Dihedrals to a Class String}
+Let's consider a specific disulfide bond with the following dihedral angles:
+\begin{itemize}
+    \item $\chi_1 = -60\degree$
+    \item $\chi_2 = -60\degree$
+    \item $\chi_3 = -90\degree$
+    \item $\chi_4 = -60\degree$
+    \item $\chi_5 = -60\degree$
+\end{itemize}
+
+\paragraph{Binary Classification:}
+Since all angles are negative, they all map to `0' in the binary system:
+\begin{itemize}
+    \item Binary class string: ``00000'' (the ``-LHSpiral'' class)
+\end{itemize}
+
+\paragraph{Octant Classification:}
+\begin{itemize}
+    \item $\chi_1 = -60\degree$ falls in the range $-90\degree$ to $-45\degree$ $\rightarrow$ Octant 2
+    \item $\chi_2 = -60\degree$ falls in the range $-90\degree$ to $-45\degree$ $\rightarrow$ Octant 2
+    \item $\chi_3 = -90\degree$ falls in the range $-90\degree$ to $-45\degree$ $\rightarrow$ Octant 2
+    \item $\chi_4 = -60\degree$ falls in the range $-90\degree$ to $-45\degree$ $\rightarrow$ Octant 2
+    \item $\chi_5 = -60\degree$ falls in the range $-90\degree$ to $-45\degree$ $\rightarrow$ Octant 2
+    \item Octant class string: ``22222''
+\end{itemize}
+
+This example demonstrates how the same disulfide bond is classified as ``00000'' in the binary system and ``22222'' in the octant system. The octant system provides more detailed information about the specific conformation of the disulfide bond.
+
+The octant quantization system allows for more precise classification and analysis of disulfide bond conformations, which is valuable for understanding their structural and functional roles in proteins. This classification system is implemented in the DisulfideClassManager class, which provides methods for converting between binary and octant representations and for analyzing the distribution of disulfide classes in protein structures.

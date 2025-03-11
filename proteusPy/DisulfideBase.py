@@ -315,13 +315,13 @@ class DisulfideList(UserList):
         return ssmin, ssmax
 
     @property
-    def minmax_energy(self):
+    def minmax_energy(self) -> "DisulfideList":
         """Return the Disulfides with min/max energies"""
         sslist = self.data
         if not sslist:
             return None, None
         sslist = sorted(sslist, key=lambda ss: ss.energy)
-        return sslist[0], sslist[-1]
+        return DisulfideList([sslist[0], sslist[-1]], "minmax_energy")
 
     def get_by_name(self, name):
         """Returns the Disulfide with the given name"""
@@ -330,7 +330,7 @@ class DisulfideList(UserList):
                 return ss.copy()
         return None
 
-    def get_chains(self):
+    def get_chains(self) -> dict:
         """Return the chain IDs for chains within the Disulfide"""
         res_dict = {"xxx"}
         sslist = self.data
@@ -656,7 +656,7 @@ class DisulfideList(UserList):
         dev_df = self.create_deviation_dataframe(verbose)
         DisulfideVisualization.plot_deviation_scatterplots(dev_df, theme=theme)
 
-    def plot_deviation_histograms(self, theme="auto", verbose=True):
+    def plot_deviation_histograms(self, theme="auto", verbose=True, log=False):
         """
         Plot histograms for Bondlength_Deviation, Angle_Deviation, and Ca_Distance.
 
@@ -665,7 +665,7 @@ class DisulfideList(UserList):
         """
         # from proteusPy.DisulfideVisualization import DisulfideVisualization
         dev_df = self.create_deviation_dataframe(verbose)
-        DisulfideVisualization.plot_deviation_histograms(dev_df, theme=theme, log=True)
+        DisulfideVisualization.plot_deviation_histograms(dev_df, theme=theme, log=log)
 
 
 # class for the Disulfide bond

@@ -45,22 +45,22 @@ are named per the paper's convention.
 
 The octant class approach is unique to ``proteusPy``, wherein the dihedral circle
 for the dihedral angles X1-X5 is divided into 8 sections and then represented as
-a string of length 5, (class id) defined by characterizing each dihedral angle 
-into one of these sections. This yields $8^{5}$ or 32,768 possible classes. This 
+a string of length 5, (class id) defined by characterizing each dihedral angle
+into one of these sections. This yields $8^{5}$ or 32,768 possible classes. This
 program analyzes the RCSB database and creates graphs illustrating the membership
 across the binary and octant classes. The graphs are stored in the global SAVE_DIR
-location. 
+location.
 
 Initial release: 1/12/2024
 Binary analysis takes approximately 20 minutes with octant analysis taking
 about 75 minutes on a 2023 M3 Max Macbook Pro. (single-threaded).
 
-Update 8/28/2024 - multithreading is implemented and runs well up to around 10 
+Update 8/28/2024 - multithreading is implemented and runs well up to around 10
 threads on a 2023 M3 Max Macbook Pro. Octant analysis takes around 22 minutes with
 6 threads. Binary analysis takes around 25 minutes with 6 threads.
 
-Update 2/22/25 - after re-writing the DisulfideLoader class to use an index-based 
-approach to class selection, the octant and binary class analysis runs in about 2 
+Update 2/22/25 - after re-writing the DisulfideLoader class to use an index-based
+approach to class selection, the octant and binary class analysis runs in about 2
 minutes with 14 threads!
 
 
@@ -111,6 +111,7 @@ OCTANT.mkdir(parents=True, exist_ok=True)
 SEXTANT.mkdir(parents=True, exist_ok=True)
 BINARY.mkdir(parents=True, exist_ok=True)
 
+PERCENTILE: float = 95.0  # percentile cutoff for Sg and Ca filtering.
 # Initialize colorama
 init(autoreset=True)
 
@@ -541,7 +542,13 @@ def main() -> None:
         return
 
     try:
-        pdb_ss = DisulfideLoader(verbose=verbose, subset=False, cutoff=-1, sg_cutoff=-1)
+        pdb_ss = DisulfideLoader(
+            verbose=verbose,
+            subset=False,
+            cutoff=-1,
+            sg_cutoff=-1,
+            percentile=PERCENTILE,
+        )
         analyze_classes(
             pdb_ss,
             binary,
