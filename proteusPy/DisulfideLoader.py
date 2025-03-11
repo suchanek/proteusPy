@@ -3,7 +3,7 @@ This module is part of the proteusPy package, a Python package for
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
-Last revision: 2025-02-21 16:33:56 -egs-
+Last revision: 2025-03-09 19:36:06 -egs-
 """
 
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
@@ -13,6 +13,7 @@ Last revision: 2025-02-21 16:33:56 -egs-
 # pylint: disable=W1203
 # pylint: disable=C0103
 # pylint: disable=W0612
+# pylint: disable=R1702
 
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
 
@@ -98,7 +99,10 @@ class DisulfideLoader:
     :param percentile: Percentile cutoff for filtering disulfides. Must be between 0 and 100.
     Filters based on statistical cutoffs derived from the data.
     :type percentile: float
-
+    :param minimum: Minimum atom distance for filtering disulfides. -1 is no filtering.
+    :type minimum: float
+    :param save: Flag to save the Loader to a file
+    :type save: bool
     """
 
     # Fields that serve as both instance attributes and initialization parameters
@@ -111,6 +115,7 @@ class DisulfideLoader:
     percentile: float = field(default=-1.0)
     quiet: bool = field(default=False)
     minimum: float = field(default=-1.0)
+    saveit: bool = field(default=False)
 
     # Fields that are only used internally and don't need to be initialization parameters
     SSList: DisulfideList = field(
@@ -230,6 +235,14 @@ class DisulfideLoader:
         except Exception as e:
             _logger.error("An error occurred while loading the file: %s", full_path)
             raise e
+        if self.saveit:
+            self.save(
+                savepath=DATA_DIR,
+                subset=self.subset,
+                cutoff=self.cutoff,
+                sg_cutoff=self.sg_cutoff,
+                verbose=self.verbose,
+            )
 
     # overload __getitem__ to handle slicing and indexing, and access by name or classid
     def __getitem__(self, item):
@@ -486,15 +499,16 @@ class DisulfideLoader:
         cutoff = self.cutoff
         sg_cutoff = self.sg_cutoff
         timestr = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.timestamp))
-        ssMin, ssMax = self.SSList.minmax_energy
-
+        ssMinMax = self.SSList.minmax_energy
+        ssMin_name: Disulfide = ssMinMax[0].name
+        ssMax_name: Disulfide = ssMinMax[1].name
         print("    =========== RCSB Disulfide Database Summary ============")
         print(f"       =========== Built: {timestr} ===========")
         print(f"PDB IDs present:                 {pdbs}")
         print(f"Disulfides loaded:               {tot}")
         print(f"Average structure resolution:    {res:.2f} Å")
-        print(f"Lowest Energy Disulfide:         {ssMin.name}")
-        print(f"Highest Energy Disulfide:        {ssMax.name}")
+        print(f"Lowest Energy Disulfide:         {ssMin_name}")
+        print(f"Highest Energy Disulfide:        {ssMax_name}")
         print(f"Cα distance cutoff:              {cutoff:.2f} Å")
         print(f"Sγ distance cutoff:              {sg_cutoff:.2f} Å")
         if memusg:
@@ -601,7 +615,6 @@ class DisulfideLoader:
     ):
         """Plot the incidence of all octant Disulfide classes for a given binary class.
 
-        :param tclass: DisulfideClassManager instance
         :param theme: The theme to use for the plot
         :param save: Whether to save the plots
         :param savedir: Directory to save plots to
@@ -663,7 +676,7 @@ class DisulfideLoader:
         """
         Plot a line graph of count vs class ID using Plotly for the given disulfide class with sampling.
 
-        :param df: DataFrame containing class data
+        :param class_string: The binary class string to be plotted.
         :param title: Title for the plot
         :param theme: Theme to use for the plot
         :param save: Whether to save the plot
@@ -696,7 +709,7 @@ class DisulfideLoader:
         """
         Plot a line graph of count vs class ID using Plotly for the given disulfide class with pagination.
 
-        :param df: DataFrame containing class data
+        :param class_string: The binary class string to be plotted.
         :param title: Title for the plot
         :param theme: Theme to use for the plot
         :param save: Whether to save the plot

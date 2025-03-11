@@ -67,18 +67,20 @@ class DisulfideVisualization:
     statistical plots, and overlay displays."""
 
     @staticmethod
-    def enumerate_class_fromlist(tclass: DisulfideClassManager, sslist, base=8):
+    def enumerate_class_fromlist(
+        tclass: DisulfideClassManager, clslist, base=8
+    ) -> pd.DataFrame:
         """Enumerate the classes from a list of class IDs.
 
         :param tclass: DisulfideClassManager instance
-        :param sslist: List of class IDs to enumerate
+        :param clslist: List of class IDs to enumerate
         :param base: Base for class IDs (2 or 8)
         :return: DataFrame with class IDs and counts
         """
         x = []
         y = []
 
-        for cls in sslist:
+        for cls in clslist:
             if cls is not None:
                 _y = tclass.sslist_from_classid(cls, base=base)
                 # it's possible to have 0 SS in a class
@@ -762,8 +764,8 @@ class DisulfideVisualization:
         fig.add_trace(
             go.Bar(
                 x=["rho"],
-                y=[dist_mean_vals[4]],
-                name="ρ (°)",
+                y=[dist_mean_vals[4] * 100],
+                name="ρ (°) * 100",
                 error_y=dict(type="data", array=[dist_std_vals[4]], visible=True),
             ),
             row=1,
@@ -1429,7 +1431,7 @@ class DisulfideVisualization:
         src = ss.pdb_id
         enrg = ss.energy
 
-        title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Ca: {ss.ca_distance:.2f} Å, Sg: {ss.sg_distance:.2f} Å Tors: {ss.torsion_length:.2f}°"
+        title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Ca: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°"
 
         set_pyvista_theme(light)
         fontsize = dpi_adjusted_fontsize(FONTSIZE)
