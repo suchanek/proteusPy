@@ -341,16 +341,15 @@ class DisulfideLoader:
 
         return sum(valid_resolutions) / len(valid_resolutions)
 
-    @staticmethod
-    def binary_to_class(binary_class: str, base=8) -> str:
+    def binary_to_class(self, binary_class: str, base=8) -> list:
         """
         Convert a binary class string to an octant class string.
 
         :param binary_class: The binary class string to convert.
         :param base: The base class to use, 2 or 8.
-        :return: The octant class string.
+        :return: The octant class list.
         """
-        return DisulfideClassManager.binary_to_class(binary_class, base)
+        return self.tclass.binary_to_class(binary_class, base)
 
     def build_ss_from_idlist(self, idlist) -> DisulfideList:
         """
