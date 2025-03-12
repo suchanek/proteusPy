@@ -246,8 +246,10 @@ class DisulfideVisualization:
         :param log: Whether to use log scale for y-axis
         """
         set_plotly_theme(theme)
+        total_classes = df.shape[0]
+        total_disulfides = df["count"].sum()
 
-        _title = f"Binary Class: {title}"
+        _title = f"Class: {title}b, Classes: {total_classes}, SS: {total_disulfides}"
         _labels = {}
         _prefix = "None"
         if base == 8:
@@ -312,8 +314,9 @@ class DisulfideVisualization:
         :param sample_size: Number of items to sample
         """
         set_plotly_theme(theme)
+        total_classes = df.shape[0]
 
-        _title = f"Binary Class: {title}"
+        _title = f"Class: {title}b (Total: {total_classes})"
         _labels = {}
         _prefix = "None"
         if base == 8:
@@ -380,8 +383,9 @@ class DisulfideVisualization:
         :param page_size: Number of items per page
         """
         set_plotly_theme(theme)
+        total_classes = df.shape[0]
 
-        _title = f"Binary Class: {title}"
+        _title = f"Class: {title}b (Total: {total_classes})"
         _labels = {}
         _prefix = "None"
         if base == 8:

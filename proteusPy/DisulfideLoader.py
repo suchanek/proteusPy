@@ -217,7 +217,7 @@ class DisulfideLoader:
                 else:
                     self.SSList = DisulfideList(filt, "ALL_PDB_SS")
 
-                self.SSDict = self.create_disulfide_dict()
+                self.SSDict = self._create_disulfide_dict()
                 self.IDList = list(self.SSDict.keys())
 
                 self.TorsionDF = self.SSList.torsion_df
@@ -366,7 +366,7 @@ class DisulfideLoader:
                     res.append(self.SSList[ssid])
         return res
 
-    def class_indices_from_tors_df(self, class_string, base=8) -> pd.Index:
+    def _class_indices_from_tors_df(self, class_string, base=8) -> pd.Index:
         """
         Return the row indices of the torsion dataframe that match the class string.
 
@@ -400,10 +400,12 @@ class DisulfideLoader:
         """
         return copy.deepcopy(self)
 
-    def create_disulfide_dict(self):
+    def _create_disulfide_dict(self):
         """
         Create a dictionary from a list of disulfide objects where the key is the pdb_id
         and the value is a list of indices of the disulfide objects in the list.
+
+        This is an internal method used during initialization.
 
         :param disulfide_list: List of disulfide objects.
         :type disulfide_list: list
@@ -587,6 +589,37 @@ class DisulfideLoader:
         for k, v in enumerate(self.tclass.binaryclass_dict):
             print(f"Class: |{k}|, |{v}|")
 
+    def plot_Classes(
+        self,
+        base: int = 8,
+        class_string: str = None,
+        theme: str = "auto",
+        log: bool = False,
+        paginated: bool = False,
+        page_size: int = 200,
+    ):
+        """
+        Plot the classes for the given base.
+
+        :param base: The base class to use, 2 or 8.
+        :param class_string: The class string to plot.
+        :param theme: The theme to use for the plot ('auto', 'light', or 'dark').
+        :param log: Whether to use a log scale for the y-axis.
+        :param paginated: Whether to paginate the plot.
+        :param page_size: Number of items per page.
+        """
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
+
+        DisulfideVisualization.plot_classes(
+            self.tclass,
+            class_string=class_string,
+            base=base,
+            theme=theme,
+            log=log,
+            page_size=page_size,
+            paginated=paginated,
+        )
+
     def plot_classes_vs_cutoff(
         self, cutoff: float, steps: int = 50, base=8, theme="auto", verbose=False
     ) -> None:
@@ -656,7 +689,7 @@ class DisulfideLoader:
         """
         # from proteusPy.DisulfideVisualization import DisulfideVisualization
         class_list = self.tclass.binary_to_class(class_string, base)
-        df = self.enumerate_class_fromlist(class_list, base=base)
+        df = self._enumerate_class_fromlist(class_list, base=base)
         DisulfideVisualization.plot_count_vs_class_df(
             df, title, theme, save, savedir, base, verbose, log
         )
@@ -688,7 +721,7 @@ class DisulfideLoader:
         """
         # from proteusPy.DisulfideVisualization import DisulfideVisualization
         class_list = self.tclass.binary_to_class(class_string, base)
-        df = self.enumerate_class_fromlist(class_list, base=base)
+        df = self._enumerate_class_fromlist(class_list, base=base)
 
         DisulfideVisualization.plot_count_vs_class_df_sampled(
             df, title, theme, save, savedir, base, verbose, log, sample_size
@@ -720,7 +753,7 @@ class DisulfideLoader:
         :param page_size: Number of items per page
         """
         class_list = self.tclass.binary_to_class(class_string, base)
-        df = self.enumerate_class_fromlist(class_list, base=base)
+        df = self._enumerate_class_fromlist(class_list, base=base)
 
         DisulfideVisualization.plot_count_vs_class_df_paginated(
             df, title, theme, save, savedir, base, verbose, log, page_size
@@ -739,7 +772,7 @@ class DisulfideLoader:
 
         DisulfideVisualization.plot_count_vs_classid(self.tclass, cls, theme, base, log)
 
-    def enumerate_class_fromlist(self, sslist, base=8):
+    def _enumerate_class_fromlist(self, sslist, base=8):
         """
         Enumerate the classes from a list of class IDs and return a DataFrame with class IDs and their corresponding counts.
         Results are cached for improved performance on repeated calls.
@@ -897,7 +930,7 @@ class DisulfideLoader:
         :return: None
         """
         classlist = self.tclass.binary_to_class(class_string, base)
-        df = self.enumerate_class_fromlist(classlist, base=base)
+        df = self._enumerate_class_fromlist(classlist, base=base)
         DisulfideVisualization.plot_count_vs_class_df_paginated(
             df, title=class_string, theme=theme, base=base, log=log, page_size=page_size
         )
@@ -916,7 +949,7 @@ class DisulfideLoader:
         sslist_name = f"{class_string}_{base}_{cutoff:.2f}"
         sslist = DisulfideList([], sslist_name)
 
-        indices = self.class_indices_from_tors_df(class_string, base=base)
+        indices = self._class_indices_from_tors_df(class_string, base=base)
 
         for i in indices:
             sslist.append(self[i])
