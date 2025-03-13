@@ -1092,6 +1092,7 @@ class DisulfideVisualization:
             pl.reset_camera()
 
         pl.link_views()
+        pl.reset_camera()
         return pl
 
     @staticmethod
@@ -1816,6 +1817,8 @@ class DisulfideVisualization:
         :return: The figure and axes objects
         :rtype: tuple
         """
+        # pylint: disable=C0415
+
         from proteusPy import DisulfideStats
 
         # Create deviation dataframe
