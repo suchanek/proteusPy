@@ -305,7 +305,7 @@ class DisulfideList(UserList):
         sslist = sorted(self.data)
         return sslist[-1]
 
-    def minmax_distance(self):
+    def minmax_distance(self) -> tuple:
         """Return the Disulfides with min/max Cα distances"""
         sslist = self.data
         if not sslist:
@@ -523,6 +523,7 @@ class DisulfideList(UserList):
         save=False,
         fname="ss_torsions.png",
         theme="auto",
+        verbose=False,
     ):
         """Display torsion and distance statistics for a given Disulfide list.
 
@@ -605,6 +606,16 @@ class DisulfideList(UserList):
         return DisulfideList(
             reslist, f"filtered by {distance_type} distance < {distance:.2f}"
         )
+
+    def sort_by_ca_distance(self):
+        """
+        Return a copy of the DisulfideList sorted by Cα distance.
+
+        :return: A new DisulfideList containing the same Disulfide objects sorted by Cα distance.
+        :rtype: DisulfideList
+        """
+        sorted_list = sorted(self.data, key=lambda ss: ss.ca_distance)
+        return DisulfideList(sorted_list, f"{self.pdb_id}_sorted_by_ca_distance")
 
     def plot_distances(
         self, distance_type="ca", cutoff=-1, comparison="less", theme="auto", log=True

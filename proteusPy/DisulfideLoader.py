@@ -439,7 +439,8 @@ class DisulfideLoader:
         :return: The list of disulfide bonds from the class.
         """
 
-        cls = clsid[:5]
+        # cls = clsid[:5]
+        cls = clsid
 
         try:
             ss_ids = self.tclass[clsid]
@@ -489,6 +490,7 @@ class DisulfideLoader:
         :param memusg: If True, don't display the RAM used by the `DisulfideLoader` object.
         :return: None
         """
+        # pylint: disable=E1101
         vers = self.version
         tot = self.TotalDisulfides
         pdbs = len(self.SSDict)
@@ -671,7 +673,9 @@ class DisulfideLoader:
         savedir=".",
         base=8,
         verbose=False,
-        log=True,
+        log=False,
+        sample_size=None,
+        page_size=None,
     ):
         """
         Plot a line graph of count vs class ID using Plotly for the given disulfide class. The
@@ -685,78 +689,33 @@ class DisulfideLoader:
         :param base: Base for class IDs (2 or 8)
         :param verbose: Whether to display verbose output
         :param log: Whether to use log scale for y-axis
-        """
-        # from proteusPy.DisulfideVisualization import DisulfideVisualization
-        class_list = self.tclass.binary_to_class(class_string, base)
-        df = self._enumerate_class_fromlist(class_list, base=base)
-        DisulfideVisualization.plot_count_vs_class_df(
-            df, title, theme, save, savedir, base, verbose, log
-        )
-
-    def plot_count_vs_class_df_sampled(
-        self,
-        class_string,
-        title="title",
-        theme="auto",
-        save=False,
-        savedir=".",
-        base=8,
-        verbose=False,
-        log=True,
-        sample_size=1000,
-    ):
-        """
-        Plot a line graph of count vs class ID using Plotly for the given disulfide class with sampling.
-
-        :param class_string: The binary class string to be plotted.
-        :param title: Title for the plot
-        :param theme: Theme to use for the plot
-        :param save: Whether to save the plot
-        :param savedir: Directory to save the plot to
-        :param base: Base for class IDs (2 or 8)
-        :param verbose: Whether to display verbose output
-        :param log: Whether to use log scale for y-axis
         :param sample_size: Number of items to sample
-        """
-        # from proteusPy.DisulfideVisualization import DisulfideVisualization
-        class_list = self.tclass.binary_to_class(class_string, base)
-        df = self._enumerate_class_fromlist(class_list, base=base)
-
-        DisulfideVisualization.plot_count_vs_class_df_sampled(
-            df, title, theme, save, savedir, base, verbose, log, sample_size
-        )
-
-    def plot_count_vs_class_df_paginated(
-        self,
-        class_string,
-        title="title",
-        theme="auto",
-        save=False,
-        savedir=".",
-        base=8,
-        verbose=False,
-        log=True,
-        page_size=200,
-    ):
-        """
-        Plot a line graph of count vs class ID using Plotly for the given disulfide class with pagination.
-
-        :param class_string: The binary class string to be plotted.
-        :param title: Title for the plot
-        :param theme: Theme to use for the plot
-        :param save: Whether to save the plot
-        :param savedir: Directory to save the plot to
-        :param base: Base for class IDs (2 or 8)
-        :param verbose: Whether to display verbose output
-        :param log: Whether to use log scale for y-axis
         :param page_size: Number of items per page
         """
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
         class_list = self.tclass.binary_to_class(class_string, base)
         df = self._enumerate_class_fromlist(class_list, base=base)
 
-        DisulfideVisualization.plot_count_vs_class_df_paginated(
-            df, title, theme, save, savedir, base, verbose, log, page_size
-        )
+        if sample_size:
+            DisulfideVisualization.plot_count_vs_class_df_sampled(
+                df,
+                title,
+                theme,
+                save,
+                savedir,
+                base,
+                verbose,
+                log,
+                sample_size,
+            )
+        elif page_size:
+            DisulfideVisualization.plot_count_vs_class_df_paginated(
+                df, title, theme, save, savedir, base, verbose, log, page_size
+            )
+        else:
+            DisulfideVisualization.plot_count_vs_class_df(
+                df, title, theme, save, savedir, base, verbose, log
+            )
 
     def plot_count_vs_classid(self, cls=None, theme="auto", base=8, log=True):
         """
@@ -930,7 +889,7 @@ class DisulfideLoader:
         """
         classlist = self.tclass.binary_to_class(class_string, base)
         df = self._enumerate_class_fromlist(classlist, base=base)
-        DisulfideVisualization.plot_count_vs_class_df_paginated(
+        self.plot_count_vs_class_df(
             df, title=class_string, theme=theme, base=base, log=log, page_size=page_size
         )
 
@@ -957,14 +916,18 @@ class DisulfideLoader:
 
     def display_torsion_statistics(
         self,
+        class_id=None,
         display=True,
         save=False,
         fname="ss_torsions.png",
         theme="auto",
+        verbose=False,
     ):
         """
-        Display torsion and distance statistics for all Disulfides in the loader.
+        Display torsion and distance statistics for Disulfides in the loader.
 
+        :param class_id: The class ID to display statistics for. Default is None.
+        :type class_id: str
         :param display: Whether to display the plot in the notebook. Default is True.
         :type display: bool
         :param save: Whether to save the plot as an image file. Default is False.
@@ -973,14 +936,22 @@ class DisulfideLoader:
         :type fname: str
         :param theme: One of 'Auto', 'Light', or 'Dark'. Default is 'Auto'.
         :type theme: str
+        :param verbose: Whether to display verbose output. Default is False.
+        :type verbose: bool
         :return: None
         """
-        self.SSList.display_torsion_statistics(
-            display=display,
-            save=save,
-            fname=fname,
-            theme=theme,
-        )
+        if class_id:
+            sslist = self.extract_class(class_id, verbose=verbose)
+            sslist.display_torsion_statistics(
+                display=display, save=save, fname=fname, theme=theme
+            )
+        else:
+            self.SSList.display_torsion_statistics(
+                display=display,
+                save=save,
+                fname=fname,
+                theme=theme,
+            )
 
     def classes_vs_cutoff(self, cutoff, base=8):
         """

@@ -306,6 +306,7 @@ class DisulfideClassManager:
         :rtype: None
         """
 
+        # pylint: disable=C0415
         from proteusPy import __version__
 
         self.version = __version__
