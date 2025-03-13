@@ -441,6 +441,8 @@ class DisulfideLoader:
 
         # cls = clsid[:5]
         cls = clsid
+        ss_ids = []
+        class_disulfides = None
 
         try:
             ss_ids = self.tclass[clsid]

@@ -2,7 +2,7 @@
 This module provides visualization functionality for disulfide bonds in the proteusPy package.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-02-26 19:57:43
+Last revision: 2025-03-13 18:04:49
 """
 
 # pylint: disable=C0301
