@@ -1,6 +1,6 @@
 # pylint: disable=C0301
 # pylint: disable=C0103
-# Last modification: 2025-02-22 15:44:59 -egs-
+# Last modification: 2025-03-14 12:53:46 -egs-
 
 """
 Disulfide class consensus structure extraction using `proteusPy.Disulfide` package.
@@ -75,8 +75,10 @@ import threading
 import time
 from datetime import timedelta
 from pathlib import Path
-from typing import List
+from typing import Dict, List, Tuple
 
+import numpy as np
+import pandas as pd
 from colorama import Fore, Style, init
 from tqdm import tqdm
 
@@ -212,6 +214,7 @@ def task(
     start_idx: int,
     end_idx: int,
     result_list: DisulfideList,
+    metrics_list: List[Dict],
     pbar: tqdm,
     cutoff: float,
     do_graph: bool,
@@ -233,6 +236,8 @@ def task(
     :type end_idx: int
     :param result_list: List to store the resulting disulfides
     :type result_list: DisulfideList
+    :param metrics_list: List to store metrics for each class
+    :type metrics_list: List[Dict]
     :param pbar: Progress bar for thread-specific progress
     :type pbar: tqdm
     :param cutoff: Cutoff percentage to filter classes (0.04 is good)
@@ -251,9 +256,10 @@ def task(
     try:
         for idx in range(start_idx, end_idx):
             cls = classlist[idx]
-            tot_class_ss = len(loader.class_indices_from_tors_df(cls, base))
+            tot_class_ss = len(loader._class_indices_from_tors_df(cls, base))
+            percentage = 100 * tot_class_ss / loader.TotalDisulfides
 
-            if 100 * tot_class_ss / loader.TotalDisulfides < cutoff:
+            if percentage < cutoff:
                 pbar.set_postfix({"SKP": cls})
                 pbar.update(1)
                 overall_pbar.update(1)
@@ -273,6 +279,29 @@ def task(
                     theme="light",
                 )
 
+            # Calculate metrics
+            avg_ca_distance = class_disulfides.average_ca_distance
+            avg_energy = class_disulfides.average_energy
+
+            # Calculate standard deviations
+            ca_distances = [ss.ca_distance for ss in class_disulfides.data]
+            energies = [ss.energy for ss in class_disulfides.data]
+
+            std_ca_distance = np.std(ca_distances) if ca_distances else 0.0
+            std_energy = np.std(energies) if energies else 0.0
+
+            # Store metrics
+            metrics = {
+                "class": cls,
+                "count": tot_class_ss,
+                "percentage": percentage,
+                "avg_ca_distance": avg_ca_distance,
+                "std_ca_distance": std_ca_distance,
+                "avg_energy": avg_energy,
+                "std_energy": std_energy,
+            }
+            metrics_list.append(metrics)
+
             avg_conformation = class_disulfides.average_conformation
             ssname = f"{cls}"
             exemplar = Disulfide(ssname, torsions=avg_conformation)
@@ -289,7 +318,7 @@ def analyze_classes_threaded(
     num_threads: int = 8,
     do_octant: bool = True,
     prefix: str = "ss",
-) -> DisulfideList:
+) -> Tuple[DisulfideList, pd.DataFrame]:
     """
     Analyze the classes of disulfide bonds using multithreading.
 
@@ -305,14 +334,15 @@ def analyze_classes_threaded(
     :type do_octant: bool
     :param prefix: Prefix for output filenames
     :type prefix: str
-    :return: List of disulfide bonds representing average conformations
-    :rtype: DisulfideList
+    :return: Tuple containing list of disulfide bonds representing average conformations and DataFrame with metrics
+    :rtype: Tuple[DisulfideList, pd.DataFrame]
     """
     save_dir = None
     tors_df = loader.TorsionDF
 
     if do_octant:
         class_filename = Path(DATA_DIR) / SS_CONSENSUS_OCT_FILE
+        metrics_filename = Path(OCTANT) / f"octant_class_metrics_{cutoff:.2f}.csv"
         save_dir = OCTANT
         base = 8
         eight_or_bin = loader.tclass.eightclass_df
@@ -325,6 +355,7 @@ def analyze_classes_threaded(
             print(f"Expecting {pix} graphs for the octant classes.")
     else:
         class_filename = Path(DATA_DIR) / SS_CONSENSUS_BIN_FILE
+        metrics_filename = Path(BINARY) / f"binary_class_metrics_{cutoff:.2f}.csv"
         save_dir = BINARY
         eight_or_bin = loader.tclass.binaryclass_df
         total_classes = eight_or_bin.shape[0]  # 32
@@ -337,6 +368,7 @@ def analyze_classes_threaded(
     threads = []
     chunk_size = total_classes // num_threads
     result_lists = [DisulfideList([]) for _ in range(num_threads)]
+    metrics_lists = [[] for _ in range(num_threads)]
 
     overall_pbar = tqdm(
         total=total_classes,
@@ -368,6 +400,7 @@ def analyze_classes_threaded(
                 start_idx,
                 end_idx,
                 result_lists[i],
+                metrics_lists[i],
                 pbar,
                 cutoff,
                 do_graph,
@@ -385,18 +418,34 @@ def analyze_classes_threaded(
 
     overall_pbar.close()
 
+    # Combine results from all threads
     for result_list in result_lists:
         res_list.extend(result_list)
+
+    # Combine metrics from all threads
+    all_metrics = []
+    for metrics_list in metrics_lists:
+        all_metrics.extend(metrics_list)
+
+    # Create DataFrame from metrics
+    metrics_df = pd.DataFrame(all_metrics)
+
+    # Sort by percentage (descending)
+    if not metrics_df.empty:
+        metrics_df = metrics_df.sort_values(by="class", ascending=True)
 
     try:
         print(f"Writing consensus structures to: {class_filename}")
         with open(class_filename, "wb+") as f:
             pickle.dump(res_list, f)
+
+        print(f"Writing class metrics to: {metrics_filename}")
+        metrics_df.to_csv(metrics_filename, index=False)
     except IOError as e:
-        _logger.error("Failed to write consensus file: %s", e)
+        _logger.error("Failed to write output files: %s", e)
         raise
 
-    return res_list
+    return res_list, metrics_df
 
 
 def analyze_classes(
@@ -425,7 +474,7 @@ def analyze_classes(
     """
     if octant:
         print("Analyzing octant classes.")
-        analyze_classes_threaded(
+        result_list, metrics_df = analyze_classes_threaded(
             loader,
             do_graph=do_graph,
             cutoff=cutoff,
@@ -433,10 +482,11 @@ def analyze_classes(
             do_octant=True,
             prefix="ss_oct",
         )
+        print(f"Octant class analysis complete. Found {len(metrics_df)} classes.")
 
     if binary:
         print("Analyzing binary classes.")
-        analyze_classes_threaded(
+        result_list, metrics_df = analyze_classes_threaded(
             loader,
             do_graph=do_graph,
             cutoff=0.0,
@@ -444,6 +494,7 @@ def analyze_classes(
             do_octant=False,
             prefix="ss_bin",
         )
+        print(f"Binary class analysis complete. Found {len(metrics_df)} classes.")
 
 
 def update_repository(
