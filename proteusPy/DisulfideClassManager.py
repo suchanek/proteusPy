@@ -637,7 +637,7 @@ class DisulfideClassManager:
             case _:
                 raise ValueError("Invalid number of angles. Must be 1 or 5.")
 
-    def sslist_from_classid(self, cls: str, base=8) -> pd.DataFrame:
+    def sslist_from_classid(self, cls: str, base=8) -> list:
         """
         Return the 'ss_id' value in the given DataFrame that corresponds to the
         input 'cls' string in the class description
@@ -657,7 +657,7 @@ class DisulfideClassManager:
         if len(filtered_df) > 1:
             raise ValueError(f"Multiple rows found for class_id '{cls}'")
 
-        return filtered_df.iloc[0]["ss_id"]
+        return list(filtered_df.iloc[0]["ss_id"])
 
     def class_to_binary(self, cls_str, base=8):
         """
@@ -678,19 +678,19 @@ class DisulfideClassManager:
             match base:
                 case 6:
                     if char in ["1", "2", "3"]:
-                        output_str += "2"
-                    elif char in ["4", "5", "6"]:
                         output_str += "0"
+                    elif char in ["4", "5", "6"]:
+                        output_str += "2"
                 case 8:
                     if char in ["1", "2", "3", "4"]:
-                        output_str += "2"
-                    elif char in ["5", "6", "7", "8"]:
                         output_str += "0"
+                    elif char in ["5", "6", "7", "8"]:
+                        output_str += "2"
                 case 10:
                     if char in ["1", "2", "3", "4", "5"]:
-                        output_str += "2"
-                    elif char in ["6", "7", "8", "9", "A"]:
                         output_str += "0"
+                    elif char in ["6", "7", "8", "9", "A"]:
+                        output_str += "2"
                 case _:
                     raise ValueError("Invalid base. Must be either 6, 8, or 10")
         return output_str
