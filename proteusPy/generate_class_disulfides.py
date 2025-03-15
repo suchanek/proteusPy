@@ -14,9 +14,8 @@ Last Modification: 2025-03-15
 """
 
 import itertools
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Union
 
-import numpy as np
 import pandas as pd
 
 from proteusPy.DisulfideBase import Disulfide, DisulfideList
@@ -198,9 +197,9 @@ class DisulfideClassGenerator:
             disulfides.append(disulfide)
 
         # Create a DisulfideList with all the generated disulfides
-        disulfide_list = DisulfideList(disulfides, f"Class_{class_id}_{class_str}")
+        _disulfide_list = DisulfideList(disulfides, f"Class_{class_id}_{class_str}")
 
-        return disulfide_list
+        return _disulfide_list
 
 
 # For backward compatibility
@@ -219,6 +218,8 @@ def generate_disulfides_for_class(csv_row: pd.Series) -> DisulfideList:
             dihedral angles for the given class.
     :rtype: DisulfideList
     """
+    # pylint: disable=W0212
+
     _generator = DisulfideClassGenerator()
     return _generator._generate_disulfides_for_class(csv_row)
 
@@ -233,7 +234,7 @@ def generate_disulfides_for_all_classes(csv_file: str) -> Dict[str, DisulfideLis
     :rtype: Dict[str, DisulfideList]
     """
     _generator = DisulfideClassGenerator(csv_file)
-    return generator.generate_for_all_classes()
+    return _generator.generate_for_all_classes()
 
 
 def generate_disulfides_for_selected_classes(

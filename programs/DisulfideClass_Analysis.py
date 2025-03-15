@@ -253,6 +253,8 @@ def task(
     :param classlist: List of class names
     :type classlist: List[str]
     """
+    # pylint: disable=W0212
+
     try:
         for idx in range(start_idx, end_idx):
             cls = classlist[idx]
@@ -291,7 +293,7 @@ def task(
             std_energy = np.std(energies) if energies else 0.0
 
             class_str = convert_class_to_string(cls)
-            tor_vals, dist_vals = class_disulfides.calculate_torsion_statistics()
+            tor_vals, _ = class_disulfides.calculate_torsion_statistics()
 
             tor_mean_vals = tor_vals.loc["mean"]
             tor_std_vals = tor_vals.loc["std"]
@@ -497,7 +499,7 @@ def analyze_classes(
     """
     if octant:
         print("Analyzing octant classes.")
-        result_list, metrics_df = analyze_classes_threaded(
+        analyze_classes_threaded(
             loader,
             do_graph=do_graph,
             cutoff=cutoff,
@@ -505,11 +507,10 @@ def analyze_classes(
             do_octant=True,
             prefix="ss_oct",
         )
-        print(f"Octant class analysis complete. Found {len(metrics_df)} classes.")
 
     if binary:
         print("Analyzing binary classes.")
-        result_list, metrics_df = analyze_classes_threaded(
+        analyze_classes_threaded(
             loader,
             do_graph=do_graph,
             cutoff=0.0,
@@ -517,7 +518,6 @@ def analyze_classes(
             do_octant=False,
             prefix="ss_bin",
         )
-        print(f"Binary class analysis complete. Found {len(metrics_df)} classes.")
 
 
 def convert_class_to_string(cls: str) -> str:
