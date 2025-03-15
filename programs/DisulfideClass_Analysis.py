@@ -113,7 +113,7 @@ OCTANT.mkdir(parents=True, exist_ok=True)
 SEXTANT.mkdir(parents=True, exist_ok=True)
 BINARY.mkdir(parents=True, exist_ok=True)
 
-PERCENTILE: float = 95.0  # percentile cutoff for Sg and Ca filtering.
+PERCENTILE: float = -1  # percentile cutoff for Sg and Ca filtering.
 # Initialize colorama
 init(autoreset=True)
 
@@ -290,15 +290,32 @@ def task(
             std_ca_distance = np.std(ca_distances) if ca_distances else 0.0
             std_energy = np.std(energies) if energies else 0.0
 
+            class_str = convert_class_to_string(cls)
+            tor_vals, dist_vals = class_disulfides.calculate_torsion_statistics()
+
+            tor_mean_vals = tor_vals.loc["mean"]
+            tor_std_vals = tor_vals.loc["std"]
+
             # Store metrics
             metrics = {
                 "class": cls,
+                "class_str": class_str,
                 "count": tot_class_ss,
                 "percentage": percentage,
                 "avg_ca_distance": avg_ca_distance,
                 "std_ca_distance": std_ca_distance,
                 "avg_energy": avg_energy,
                 "std_energy": std_energy,
+                "chi1_mean": tor_mean_vals[0],
+                "chi2_mean": tor_mean_vals[1],
+                "chi3_mean": tor_mean_vals[2],
+                "chi4_mean": tor_mean_vals[3],
+                "chi5_mean": tor_mean_vals[4],
+                "chi1_std": tor_std_vals[0],
+                "chi2_std": tor_std_vals[1],
+                "chi3_std": tor_std_vals[2],
+                "chi4_std": tor_std_vals[3],
+                "chi5_std": tor_std_vals[4],
             }
             metrics_list.append(metrics)
 
@@ -339,6 +356,13 @@ def analyze_classes_threaded(
     """
     save_dir = None
     tors_df = loader.TorsionDF
+    class_filename = None
+    metrics_filename = None
+    eight_or_bin = None
+    res_list = None
+    pix = None
+    base = None
+    classlist = None
 
     if do_octant:
         class_filename = Path(DATA_DIR) / SS_CONSENSUS_OCT_FILE
@@ -349,7 +373,6 @@ def analyze_classes_threaded(
         res_list = DisulfideList([], f"SS_32class_Avg_SS_{cutoff:.2f}")
         pix = loader.classes_vs_cutoff(cutoff, base=base)
         classlist = tors_df["octant_class_string"].unique()
-        total_classes = len(classlist)
 
         if do_graph:
             print(f"Expecting {pix} graphs for the octant classes.")
@@ -363,8 +386,8 @@ def analyze_classes_threaded(
         pix = 32
         base = 2
         classlist = tors_df["binary_class_string"].unique()
-        total_classes = len(classlist)
 
+    total_classes = len(classlist)
     threads = []
     chunk_size = total_classes // num_threads
     result_lists = [DisulfideList([]) for _ in range(num_threads)]
@@ -432,7 +455,7 @@ def analyze_classes_threaded(
 
     # Sort by percentage (descending)
     if not metrics_df.empty:
-        metrics_df = metrics_df.sort_values(by="class", ascending=True)
+        metrics_df = metrics_df.sort_values(by="class", ascending=False)
 
     try:
         print(f"Writing consensus structures to: {class_filename}")
@@ -495,6 +518,25 @@ def analyze_classes(
             prefix="ss_bin",
         )
         print(f"Binary class analysis complete. Found {len(metrics_df)} classes.")
+
+
+def convert_class_to_string(cls: str) -> str:
+    """
+    Converts a binary class representation to a string where both '0' is converted to '-' and '1'
+    is converted to '+'.
+
+    :param cls: The binary class string to convert
+    :type cls: str
+    :return: The converted string with '-' for each character
+    :rtype: str
+    """
+    class_str = ""
+    for char in cls:
+        if char == "0":
+            class_str += "-"
+        else:
+            class_str += "+"
+    return class_str
 
 
 def update_repository(
@@ -574,7 +616,7 @@ def main() -> None:
         f"PDB directory:         {PDB}\n"
         f"Forge:                 {forge}\n"
         f"Env:                   {env}\n"
-        f"Loading PDB SS data...\n"
+        f"Loading PDB SS data..."
     )
 
     if do_update:
