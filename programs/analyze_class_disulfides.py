@@ -190,7 +190,7 @@ def find_minimum_energy_disulfide(disulfide_list: DisulfideList) -> Disulfide:
 def main():
     """
     Main function demonstrating advanced analysis of generated disulfides.
-    
+
     This function:
     1. Initializes a DisulfideClassGenerator with a CSV file of class metrics
     2. Generates disulfides for a specific class (default: "+++++", RH Spiral)
@@ -198,20 +198,20 @@ def main():
     4. Finds and saves the minimum energy disulfide
     5. Calculates and saves the average conformation
     6. Saves the complete disulfide list for further analysis
-    
+
     :return: None
     """
     # Path to the CSV file
-    csv_file = "~/repos/proteusPy/binary_class_metrics_0.00.csv"
+    csv_file = "~/repos/proteusPy/octant_class_metrics_0.04.csv"
     generator = DisulfideClassGenerator(csv_file)
 
     # Select a class to analyze
-    class_str = "+++++"  # The "+++++" class (RH Spiral)
+    class_str = "22222"  # The "+++++" class (RH Spiral)
 
     print(f"Generating and analyzing disulfides for class {class_str}...")
 
     # Generate disulfides for the class
-    disulfide_list = generator.generate_for_class(class_str)
+    disulfide_list = generator.generate_for_class(class_str, use_class_str=False)
 
     if disulfide_list:
         # Get the class string representation
@@ -222,7 +222,7 @@ def main():
         analyze_energy_distribution(disulfide_list, class_str)
 
         # Analyze the dihedral angle distributions
-        analyze_dihedral_distributions(disulfide_list, class_str)
+        # analyze_dihedral_distributions(disulfide_list, class_str)
 
         # Find the disulfide with the minimum energy
         min_energy_disulfide = find_minimum_energy_disulfide(disulfide_list)
