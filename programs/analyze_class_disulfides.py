@@ -37,7 +37,7 @@ import numpy as np
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from proteusPy import Disulfide, DisulfideList
-from proteusPy.generate_class_disulfides import DisulfideClassGenerator
+from proteusPy.DisulfideClassGenerator import DisulfideClassGenerator
 
 
 def analyze_energy_distribution(disulfide_list: DisulfideList, class_str: str) -> None:
@@ -202,8 +202,8 @@ def main():
     :return: None
     """
     # Path to the CSV file
-    csv_file = "~/repos/proteusPy/octant_class_metrics_0.04.csv"
-    generator = DisulfideClassGenerator(csv_file)
+    csv_file = "~/repos/proteusPy/binary_class_metrics_0.00.csv"
+    generator = DisulfideClassGenerator(csv_file, base=2)
 
     # Select a class to analyze
     class_str = "22222"  # The "+++++" class (RH Spiral)

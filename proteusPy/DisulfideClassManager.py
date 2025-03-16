@@ -659,7 +659,8 @@ class DisulfideClassManager:
 
         return list(filtered_df.iloc[0]["ss_id"])
 
-    def class_to_binary(self, cls_str, base=8):
+    @staticmethod
+    def class_to_binary(cls_str, base=8):
         """
         Return a string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees
         into a string of 5 characters, where each character is either '0' if the corresponding input character represents a

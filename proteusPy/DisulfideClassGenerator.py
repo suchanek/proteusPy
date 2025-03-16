@@ -14,29 +14,54 @@ Last Modification: 2025-03-15
 """
 
 import itertools
+import os
+from pathlib import Path
 from typing import Dict, List, Union
 
 import pandas as pd
 
 from proteusPy.DisulfideBase import Disulfide, DisulfideList
+from proteusPy.logger_config import create_logger
+
+# Create a logger for this program
+_logger = create_logger(__name__)
+_logger.setLevel("WARNING")
+
+# Constants
+HOME_DIR: Path = Path.home()
+PDB: Path = Path(os.getenv("PDB", HOME_DIR / "pdb"))
+DATA_DIR: Path = PDB / "data"
+SAVE_DIR: Path = HOME_DIR / "Documents" / "proteusPyDocs" / "classes"
+MODULE_DIR: Path = HOME_DIR / "repos" / "proteusPy" / "proteusPy" / "data"
+REPO_DIR: Path = HOME_DIR / "repos" / "proteusPy" / "data"
+OCTANT: Path = SAVE_DIR / "octant"
+BINARY: Path = SAVE_DIR / "binary"
+MINIFORGE_DIR: Path = HOME_DIR / Path("miniforge3/envs")
+MAMBAFORGE_DIR: Path = HOME_DIR / Path("mambaforge/envs")
+VENV_DIR: Path = Path("lib/python3.12/site-packages/proteusPy/data")
 
 
 class DisulfideClassGenerator:
     """
     A class for generating disulfide conformations for different structural classes
-    based on mean and standard deviation values for dihedral angles.
+    based on mean and standard deviation values for dihedral angles. This creates
+    243 combinations of dihedral angles for each class.
     """
 
-    def __init__(self, csv_file=None):
+    def __init__(self, csv_file: str = None, base: int = None):
         """
         Initialize the DisulfideClassGenerator.
 
         :param csv_file: Path to the CSV file containing class metrics.
             If provided, the CSV file will be loaded during initialization.
         :type csv_file: str, optional
+        :param base: Optionally specify a base for disulfides.
+        :type base: Optional[int]
         """
         self.df = None
         self.class_disulfides = {}
+        self.base = base
+
         if csv_file:
             self.load_csv(csv_file)
 
@@ -82,10 +107,7 @@ class DisulfideClassGenerator:
 
         # Update self.class_disulfides with the generated disulfides
         if _disulfide_list:
-            if use_class_str:
-                self.class_disulfides[class_id] = _disulfide_list
-            else:
-                self.class_disulfides[row.iloc[0]["class"]] = _disulfide_list
+            self.class_disulfides[class_id] = _disulfide_list
 
         return _disulfide_list
 
@@ -179,6 +201,7 @@ class DisulfideClassGenerator:
 
         # Generate all combinations of dihedral angles
         disulfides = []
+        base_str = ""
 
         # For each dihedral angle, consider mean-std, mean, and mean+std
         chi_values = []
@@ -189,10 +212,12 @@ class DisulfideClassGenerator:
 
         # Generate all combinations (3^5 = 243 combinations)
         combinations = list(itertools.product(*chi_values))
+        if self.base:
+            base_str = "b" if self.base == 2 else "o"
 
         # Create a Disulfide object for each combination
         for i, combination in enumerate(combinations):
-            name = f"{class_id}_{class_str}_comb{i+1}"
+            name = f"{class_str}{base_str}_comb{i+1}"
             disulfide = Disulfide(name=name, torsions=list(combination))
             disulfides.append(disulfide)
 
@@ -202,43 +227,25 @@ class DisulfideClassGenerator:
         return _disulfide_list
 
 
-# For backward compatibility
-def generate_disulfides_for_class(csv_row: pd.Series) -> DisulfideList:
-    """
-    Generate disulfides for a structural class based on the mean and standard deviation
-    values for each dihedral angle.
-
-    For each dihedral angle, three values are considered: mean-std, mean, and mean+std.
-    With 5 dihedral angles, this results in 3^5 = 243 combinations per class.
-
-    :param csv_row: A row from the binary_class_metrics CSV file containing
-                   mean and standard deviation values for each dihedral angle.
-    :type csv_row: pd.Series
-    :return: A list of Disulfide objects representing all combinations of
-            dihedral angles for the given class.
-    :rtype: DisulfideList
-    """
-    # pylint: disable=W0212
-
-    _generator = DisulfideClassGenerator()
-    return _generator._generate_disulfides_for_class(csv_row)
-
-
-def generate_disulfides_for_all_classes(csv_file: str) -> Dict[str, DisulfideList]:
+def generate_disulfides_for_all_classes(
+    csv_file: str, base=None
+) -> Dict[str, DisulfideList]:
     """
     Generate disulfides for all structural classes in the CSV file.
 
     :param csv_file: Path to the CSV file containing class metrics.
     :type csv_file: str
+    :param base: Optionally specify a base for disulfides.
+    :type base: Optional[Any]
     :return: A dictionary mapping class IDs to DisulfideLists.
     :rtype: Dict[str, DisulfideList]
     """
-    _generator = DisulfideClassGenerator(csv_file)
+    _generator = DisulfideClassGenerator(csv_file, base=base)
     return _generator.generate_for_all_classes()
 
 
 def generate_disulfides_for_selected_classes(
-    csv_file: str, class_ids: List[str]
+    csv_file: str, class_ids: List[str], base: int = None, use_class_str: bool = False
 ) -> Dict[str, DisulfideList]:
     """
     Generate disulfides for selected structural classes in the CSV file.
@@ -247,11 +254,15 @@ def generate_disulfides_for_selected_classes(
     :type csv_file: str
     :param class_ids: List of class IDs to generate disulfides for.
     :type class_ids: List[str]
+    :param base: Optionally specify a base for disulfides.
+    :type base: Optional[Any]
     :return: A dictionary mapping class IDs to DisulfideLists.
     :rtype: Dict[str, DisulfideList]
     """
-    _generator = DisulfideClassGenerator(csv_file)
-    return _generator.generate_for_selected_classes(class_ids, use_class_str=False)
+    _generator = DisulfideClassGenerator(csv_file, base=base)
+    return _generator.generate_for_selected_classes(
+        class_ids, use_class_str=use_class_str
+    )
 
 
 def generate_disulfides_for_class_from_csv(
@@ -289,6 +300,12 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
+        "--base",
+        help="Generate disulfides for a specific base.",
+        default=None,
+    )
+
+    parser.add_argument(
         "--output", help="Output file to save the generated disulfides."
     )
 
@@ -312,6 +329,7 @@ if __name__ == "__main__":
                 with open(args.output, "wb") as f:
                     pickle.dump(disulfide_list, f)
                 print(f"Saved disulfides to {args.output}.")
+
     elif args.class_str:
         disulfide_list = generator.generate_for_class(
             args.class_str, use_class_str=True
@@ -327,7 +345,7 @@ if __name__ == "__main__":
 
                 with open(args.output, "wb") as f:
                     pickle.dump(disulfide_list, f)
-                print(f"Saved disulfides to {args.output}.")
+                    print(f"Saved disulfides to {args.output}.")
     else:
         print("Please specify a class String using the --class_str argument.")
 
