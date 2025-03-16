@@ -467,7 +467,7 @@ def analyze_classes_threaded(
 
     # Sort by percentage (descending)
     if not metrics_df.empty:
-        metrics_df = metrics_df.sort_values(by="class", ascending=False)
+        metrics_df = metrics_df.sort_values(by="class", ascending=True)
 
     try:
         print(f"Writing consensus structures to: {class_filename}")
