@@ -2,7 +2,7 @@
 DisulfideBond Class Analysis Dictionary creation
 Author: Eric G. Suchanek, PhD.
 License: BSD
-Last Modification: 2025-01-22 00:02:43 -egs-
+Last Modification: 2025-03-16 19:55:18 -egs-
 
 Disulfide Class creation and manipulation. Binary classes using the +/- formalism of Hogg et al.
 (Biochem, 2006, 45, 7429-7433), are created for all 32 possible classes from the Disulfides
@@ -383,7 +383,7 @@ class DisulfideClassManager:
 
         return grouped
 
-    def create_classes(self, df, base=8) -> pd.DataFrame:
+    def Ocreate_classes(self, df, base=8) -> pd.DataFrame:
         """
         Create a new DataFrame from the input with a 8-class encoding for input 'chi' values.
 
@@ -423,7 +423,7 @@ class DisulfideClassManager:
 
         return grouped
 
-    def Ocreate_classes(self, df, base=8) -> pd.DataFrame:
+    def create_classes(self, df, base=8) -> pd.DataFrame:
         """
         Create a new DataFrame with 8-class encoding for input 'chi' values.
 
@@ -479,7 +479,7 @@ class DisulfideClassManager:
             case 2:
                 df = self.binaryclass_df
             case _:
-                raise ValueError("Invalid base. Must be 6 or 8.")
+                raise ValueError("Invalid base. Must be 2 or 8.")
 
         return df[df["percentage"] >= cutoff].copy()
 
