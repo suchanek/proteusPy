@@ -7,13 +7,13 @@
 # pylint: disable=C0103
 
 """
-``proteusPy`` is a Python package specializing in the modeling and analysis 
-of proteins of known structure with an emphasis on Disulfide bonds. This package 
-reprises my molecular modeling program [Proteus](https://doi.org/10.1021/bi00368a023), 
+``proteusPy`` is a Python package specializing in the modeling and analysis
+of proteins of known structure with an emphasis on Disulfide bonds. This package
+reprises my molecular modeling program [Proteus](https://doi.org/10.1021/bi00368a023),
 a structure-based program developed as part of my graduate thesis.
 
 The package utilizes several base classes to create and analyze Disulfide Bonds:
-- Turtle3D: to build disulfides through the manipulation of local coordinate systems. 
+- Turtle3D: to build disulfides through the manipulation of local coordinate systems.
 - DisulfideBase: basic characteristics of individual DisulfideBonds
 - DisulfideList: to store and calculate properties of Disulfide Bonds
 - DisulfideClassManager: to manage DisulfideBond classes
@@ -23,10 +23,10 @@ The package utilizes several base classes to create and analyze Disulfide Bonds:
 needed to build the structural classes and physical properties of the DisulfideBonds.
 
 
-This implementation of proteusPy focuses on the Disulfide class. This class implements methods to 
+This implementation of proteusPy focuses on the Disulfide class. This class implements methods to
 analyze the protein structure stabilizing element known as a Disulfide Bond. Its
 underlying methods are being used to create a database of over 36,000 high quality disulfide
-bonds in order to perform a structural analysis of over 36,900 disulfide-bond 
+bonds in order to perform a structural analysis of over 36,900 disulfide-bond
 containing proteins in the RCSB protein data bank s(<https://www.rcsb.org>).
 """
 
@@ -72,6 +72,7 @@ from .DisulfideClasses import (
     get_quadrant,
     is_between,
 )
+from .DisulfideClassGenerator import DisulfideClassGenerator
 from .DisulfideClassManager import DisulfideClassManager
 from .DisulfideExceptions import (
     DisulfideConstructionException,

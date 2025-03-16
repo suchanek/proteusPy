@@ -86,6 +86,7 @@ from proteusPy import (
     SS_CONSENSUS_BIN_FILE,
     SS_CONSENSUS_OCT_FILE,
     Disulfide,
+    DisulfideClassManager,
     DisulfideList,
     DisulfideLoader,
     configure_master_logger,
@@ -271,7 +272,9 @@ def task(
             class_disulfides = loader.sslist_from_class(cls, base=base, cutoff=cutoff)
             pbar.update(1)
 
-            fname = Path(save_dir) / f"{prefix}_{cutoff}_{cls}_{tot_class_ss}.png"
+            sub = "o" if base == 8 else "b"
+
+            fname = Path(save_dir) / f"{cls}{sub}_{cutoff}_{tot_class_ss}.png"
 
             if do_graph:
                 class_disulfides.display_torsion_statistics(
@@ -292,7 +295,7 @@ def task(
             std_ca_distance = np.std(ca_distances) if ca_distances else 0.0
             std_energy = np.std(energies) if energies else 0.0
 
-            class_str = convert_class_to_string(cls)
+            class_str = DisulfideClassManager.class_to_binary(cls)
             tor_vals, _ = class_disulfides.calculate_torsion_statistics()
 
             tor_mean_vals = tor_vals.loc["mean"]
@@ -322,7 +325,7 @@ def task(
             metrics_list.append(metrics)
 
             avg_conformation = class_disulfides.average_conformation
-            ssname = f"{cls}"
+            ssname = f"{cls}b" if base == 2 else f"{cls}o"
             exemplar = Disulfide(ssname, torsions=avg_conformation)
             result_list.append(exemplar)
             overall_pbar.update(1)

@@ -20,10 +20,10 @@ import pickle
 import sys
 from pathlib import Path
 
-# Add the parent directory to the Python path to import proteusPy modules
-#sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from proteusPy.DisulfideClassGenerator import DisulfideClassGenerator
 
-from proteusPy.generate_class_disulfides import DisulfideClassGenerator
+# Add the parent directory to the Python path to import proteusPy modules
+# sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def main():
@@ -36,10 +36,10 @@ def main():
     print("Creating DisulfideClassGenerator instance...")
 
     # Create a generator instance and load the CSV file
-    generator = DisulfideClassGenerator(csv_file)
+    generator = DisulfideClassGenerator(csv_file, base=2)
 
     # Example 1: Generate disulfides for a specific class using class_str
-    class_str = "++++++"  # The RH Spiral class - this should be "+++++", not "+++++"
+    class_str = "+++++"  # The RH Spiral class - this should be "+++++", not "+++++"
     print(f"\nGenerating disulfides for class {class_str}...")
 
     disulfide_list = generator.generate_for_class(class_str, use_class_str=True)
