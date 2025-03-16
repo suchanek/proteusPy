@@ -671,12 +671,17 @@ class DisulfideClassManager:
         :raises ValueError: If the base is not 6 or 8 or 10.
         :return str: A string of length 5, where each character is either '0' or '2', representing the sign of the corresponding input angle.
         """
-        if base not in [6, 8, 10]:
-            raise ValueError("Base must be either 6, 8, or 10")
+        if base not in [2, 6, 8, 10]:
+            raise ValueError("Base must be either 2, 6, 8, or 10")
 
         output_str = ""
         for char in cls_str:
             match base:
+                case 2:
+                    if char in ["2"]:
+                        output_str += "+"
+                    elif char in ["0"]:
+                        output_str += "-"
                 case 6:
                     if char in ["1", "2", "3"]:
                         output_str += "0"
@@ -693,7 +698,7 @@ class DisulfideClassManager:
                     elif char in ["6", "7", "8", "9", "A"]:
                         output_str += "2"
                 case _:
-                    raise ValueError("Invalid base. Must be either 6, 8, or 10")
+                    raise ValueError("Invalid base. Must be either 2, 6, 8, or 10")
         return output_str
 
     def get_class_df(self, base=8):

@@ -302,7 +302,7 @@ def task(
             std_ca_distance = np.std(ca_distances) if ca_distances else 0.0
             std_energy = np.std(energies) if energies else 0.0
 
-            class_str = DisulfideClassManager.class_to_binary(cls)
+            class_str = DisulfideClassManager.class_to_binary(cls, base=base)
             tor_vals, _ = class_disulfides.calculate_torsion_statistics()
 
             tor_mean_vals = tor_vals.loc["mean"]
