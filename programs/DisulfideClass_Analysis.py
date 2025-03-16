@@ -1,6 +1,6 @@
 # pylint: disable=C0301
 # pylint: disable=C0103
-# Last modification: 2025-03-14 12:53:46 -egs-
+# Last modification: 2025-03-16 15:08:03 -egs-
 
 """
 Disulfide class consensus structure extraction using `proteusPy.Disulfide` package.
@@ -189,6 +189,13 @@ def get_args() -> argparse.Namespace:
         "-c",
         "--cutoff",
         help="Cutoff percentage for class filtering.",
+        type=float,
+        default=-1.0,
+    )
+    parser.add_argument(
+        "-p",
+        "--percentile",
+        help="Cutoff percentage for building the database",
         type=float,
         default=-1.0,
     )
@@ -598,6 +605,7 @@ def main() -> None:
     verbose: bool = args.verbose
     forge: str = args.forge
     env: str = args.env
+    percentile = args.percentile
 
     if threads < 1:
         raise ValueError("Number of threads must be positive")
@@ -609,6 +617,7 @@ def main() -> None:
         f"Octant:                {octant}\n"
         f"Threads:               {threads}\n"
         f"Cutoff:                {cutoff}%\n"
+        f"Percentile:            {percentile}\n"
         f"Graph:                 {do_graph}\n"
         f"Update:                {do_update}\n"
         f"Verbose:               {verbose}\n"
@@ -643,7 +652,7 @@ def main() -> None:
             subset=False,
             cutoff=-1,
             sg_cutoff=-1,
-            percentile=PERCENTILE,
+            percentile=percentile,
         )
         analyze_classes(
             pdb_ss,
