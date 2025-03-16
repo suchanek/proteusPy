@@ -474,7 +474,7 @@ class DisulfideStats:
         """
 
         # Set some parameters for the standard deviation and percentile methods
-        std = 3.0
+        std = 2.0
         dev_df = sslist.create_deviation_dataframe(verbose)
 
         # Calculate cutoffs using DisulfideStats methods
@@ -506,13 +506,6 @@ class DisulfideStats:
         )
 
         if verbose:
-            print(
-                f"Bond Length Deviation Cutoff ({std:.2f} Std Dev): {distance_cutoff_std:.2f}"
-            )
-            print(f"Angle Deviation Cutoff ({std:.2f} Std Dev): {angle_cutoff_std:.2f}")
-            print(f"Ca Distance Cutoff ({std:.2f} Std Dev): {ca_cutoff_std:.2f}")
-            print(f"Sg Distance Cutoff ({std:.2f} Std Dev): {sg_cutoff_std:.2f}")
-
             print(
                 f"\nBond Length Deviation Cutoff ({percentile:.2f}th Percentile): {distance_cutoff_percentile:.2f}"
             )
