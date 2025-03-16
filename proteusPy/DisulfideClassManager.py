@@ -660,43 +660,81 @@ class DisulfideClassManager:
         return list(filtered_df.iloc[0]["ss_id"])
 
     @staticmethod
-    def class_to_binary(cls_str, base=8):
+    def class_to_binary(cls_str: str, base: int = None) -> str:
         """
         Return a string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees
         into a string of 5 characters, where each character is either '0' if the corresponding input character represents a
         negative angle or '2' if it represents a positive angle.
 
         :param cls_str (str): A string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees.
-        :param base (int): The base of the ordinal section (6 or 8).
-        :raises ValueError: If the base is not 6 or 8 or 10.
-        :return str: A string of length 5, where each character is either '0' or '2', representing the sign of the corresponding input angle.
+        :param base (int): The base of the ordinal section (2, 8, or 10).
+        :raises ValueError: If the base is not 2, 8, or 10.
+        :return str: A string of length 5, where each character is either '0' or '2', representing the sign of the corresponding input
+        angle. The binary class itself is a special case, where the base is 2. ``+`` is returned for positive angles and ``-``
+        for negative angles.
+
+        Example:
+        >>> from proteusPy.DisulfideClassManager import DisulfideClassManager
+        >>> DisulfideClassManager.class_to_binary('00000', base=2)
+        '-----'
+        >>> DisulfideClassManager.class_to_binary('00000b')
+        '-----'
+        >>> DisulfideClassManager.class_to_binary('13538o')
+        '00202'
         """
+
+        if base is None and len(cls_str) == 5:
+            raise ValueError(
+                "Base must be specified if the class string is of length 5."
+            )
+
+        if base is None and len(cls_str) == 6:
+            bstr = cls_str[-1]
+            if bstr == "b":
+                base = 2
+            elif bstr == "s":
+                base = 6
+            elif bstr == "o":
+                base = 8
+            elif bstr == "t":
+                base = 10
+            else:
+                raise ValueError("Invalid base suffix. Must be b, o, or t.")
+
         if base not in [2, 6, 8, 10]:
             raise ValueError("Base must be either 2, 6, 8, or 10")
 
         output_str = ""
-        for char in cls_str:
+        for char in cls_str[:5]:
             match base:
                 case 2:
-                    if char in ["2"]:
+                    if char == "2":
                         output_str += "+"
-                    elif char in ["0"]:
+                    elif char == "0":
                         output_str += "-"
+                    else:
+                        raise ValueError("Invalid binary class string.")
                 case 6:
                     if char in ["1", "2", "3"]:
                         output_str += "0"
                     elif char in ["4", "5", "6"]:
                         output_str += "2"
+                    else:
+                        raise ValueError("Invalid base 6 class string.")
                 case 8:
                     if char in ["1", "2", "3", "4"]:
                         output_str += "0"
                     elif char in ["5", "6", "7", "8"]:
                         output_str += "2"
+                    else:
+                        raise ValueError("Invalid base 8 class string.")
                 case 10:
                     if char in ["1", "2", "3", "4", "5"]:
                         output_str += "0"
                     elif char in ["6", "7", "8", "9", "A"]:
                         output_str += "2"
+                    else:
+                        raise ValueError("Invalid base 10 class string.")
                 case _:
                     raise ValueError("Invalid base. Must be either 2, 6, 8, or 10")
         return output_str
@@ -725,5 +763,10 @@ class DisulfideClassManager:
 
 
 # class definition ends
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
 
 # end of file
