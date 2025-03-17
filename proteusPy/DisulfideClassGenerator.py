@@ -1,20 +1,17 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 """
 Generate disulfide conformations for structural classes based on CSV data.
 
-This script provides functionality to create disulfide conformations for different
+This module provides functionality to create disulfide conformations for different
 structural classes using the mean and standard deviation values for each dihedral angle.
 For each class, it generates all combinations of dihedral angles (mean-std, mean, mean+std)
 for each of the 5 dihedral angles, resulting in 3^5 = 243 combinations per class.
 
 Author: Eric G. Suchanek, PhD
-Last Modification: 2025-03-15
+Last Modification: 2025-03-17 08:09:57
 """
 
 import itertools
-import os
+import pickle
 from pathlib import Path
 from typing import Dict, List, Union
 
@@ -22,23 +19,15 @@ import pandas as pd
 
 from proteusPy.DisulfideBase import Disulfide, DisulfideList
 from proteusPy.logger_config import create_logger
+from proteusPy.ProteusGlobals import (
+    BINARY_CLASS_METRICS_FILE,
+    DATA_DIR,
+    OCTANT_CLASS_METRICS_FILE,
+)
 
 # Create a logger for this program
 _logger = create_logger(__name__)
 _logger.setLevel("WARNING")
-
-# Constants
-HOME_DIR: Path = Path.home()
-PDB: Path = Path(os.getenv("PDB", HOME_DIR / "pdb"))
-DATA_DIR: Path = PDB / "data"
-SAVE_DIR: Path = HOME_DIR / "Documents" / "proteusPyDocs" / "classes"
-MODULE_DIR: Path = HOME_DIR / "repos" / "proteusPy" / "proteusPy" / "data"
-REPO_DIR: Path = HOME_DIR / "repos" / "proteusPy" / "data"
-OCTANT: Path = SAVE_DIR / "octant"
-BINARY: Path = SAVE_DIR / "binary"
-MINIFORGE_DIR: Path = HOME_DIR / Path("miniforge3/envs")
-MAMBAFORGE_DIR: Path = HOME_DIR / Path("mambaforge/envs")
-VENV_DIR: Path = Path("lib/python3.12/site-packages/proteusPy/data")
 
 
 class DisulfideClassGenerator:
@@ -62,8 +51,40 @@ class DisulfideClassGenerator:
         self.class_disulfides = {}
         self.base = base
 
+        binary_path = Path(DATA_DIR) / BINARY_CLASS_METRICS_FILE
+        octant_path = Path(DATA_DIR) / OCTANT_CLASS_METRICS_FILE
+
         if csv_file:
             self.load_csv(csv_file)
+        else:
+            # try to load the pkl files for binary and octant
+            if base == 2:
+                if binary_path.exists():
+                    _logger.info("Loading binary file %s", binary_path)
+                    with open(binary_path, "rb") as f:
+                        binary_metrics = pickle.load(f)
+                        self.df = binary_metrics
+                        # Convert class column to string to ensure string comparisons work
+                        self.df["class"] = self.df["class"].astype(str)
+                        self.df["class_str"] = self.df["class_str"].astype(str)
+                else:
+                    _logger.error("Binary metrics file %s not found.", binary_path)
+            elif base == 8:
+                if octant_path.exists():
+                    _logger.info("Loading octant file %s", octant_path)
+                    with open(octant_path, "rb") as f:
+                        octant_metrics = pickle.load(f)
+                        self.df = octant_metrics
+                        # Convert class column to string to ensure string comparisons work
+                        self.df["class"] = self.df["class"].astype(str)
+                        self.df["class_str"] = self.df["class_str"].astype(str)
+                else:
+                    _logger.error("Octant file %s not found.", octant_path)
+            else:
+                raise ValueError("Base must be 2 or 8.")
+
+        if self.df is None:
+            _logger.error("No metrics loaded.")
 
     def load_csv(self, csv_file):
         """
@@ -74,10 +95,11 @@ class DisulfideClassGenerator:
         :return: Self for method chaining.
         :rtype: DisulfideClassGenerator
         """
+        # Ensure class and class_str columns are loaded as strings
         self.df = pd.read_csv(csv_file, dtype={"class": str, "class_str": str})
         return self
 
-    def generate_for_class(self, class_id, use_class_str=True):
+    def generate_for_class(self, class_id: str, use_class_str=True):
         """
         Generate disulfides for a specific structural class.
 
@@ -99,7 +121,7 @@ class DisulfideClassGenerator:
             row = self.df[self.df["class"] == class_id]
 
         if row.empty:
-            print(f"Class ID {class_id} not found in the CSV file.")
+            print(f"Class ID {class_id} not found in the file.")
             return None
 
         # Generate disulfides for the class
@@ -169,7 +191,7 @@ class DisulfideClassGenerator:
 
         return class_disulfides
 
-    def _generate_disulfides_for_class(self, csv_row):
+    def _generate_disulfides_for_class(self, csv_row) -> DisulfideList:
         """
         Generate disulfides for a structural class based on the mean and standard deviation
         values for each dihedral angle.
@@ -324,8 +346,6 @@ if __name__ == "__main__":
 
             if args.output:
                 # Save the disulfide list to a file
-                import pickle
-
                 with open(args.output, "wb") as f:
                     pickle.dump(disulfide_list, f)
                 print(f"Saved disulfides to {args.output}.")
@@ -341,8 +361,6 @@ if __name__ == "__main__":
 
             if args.output:
                 # Save the disulfide list to a file
-                import pickle
-
                 with open(args.output, "wb") as f:
                     pickle.dump(disulfide_list, f)
                     print(f"Saved disulfides to {args.output}.")
