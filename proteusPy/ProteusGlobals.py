@@ -72,6 +72,9 @@ SS_CLASS_DICT_FILE = "PDB_ss_classes_dict.pkl"
 SS_CONSENSUS_OCT_FILE = "SS_consensus_class_oct.pkl"
 SS_CONSENSUS_BIN_FILE = "SS_consensus_class_32.pkl"
 
+BINARY_CLASS_METRICS_FILE = "binary_class_metrics.pkl"
+OCTANT_CLASS_METRICS_FILE = "octant_class_metrics.pkl"
+
 LOADER_FNAME = "PDB_SS_ALL_LOADER.pkl"
 LOADER_SUBSET_FNAME = "PDB_SS_SUBSET_LOADER.pkl"
 

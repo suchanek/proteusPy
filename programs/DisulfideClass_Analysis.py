@@ -83,6 +83,8 @@ from colorama import Fore, Style, init
 from tqdm import tqdm
 
 from proteusPy import (
+    BINARY_CLASS_METRICS_FILE,
+    OCTANT_CLASS_METRICS_FILE,
     SS_CONSENSUS_BIN_FILE,
     SS_CONSENSUS_OCT_FILE,
     Disulfide,
@@ -378,7 +380,7 @@ def analyze_classes_threaded(
 
     if do_octant:
         class_filename = Path(DATA_DIR) / SS_CONSENSUS_OCT_FILE
-        metrics_filename = Path(OCTANT) / f"octant_class_metrics_{cutoff:.2f}.csv"
+        metrics_filename = Path(DATA_DIR) / OCTANT_CLASS_METRICS_FILE
         save_dir = OCTANT
         base = 8
         eight_or_bin = loader.tclass.eightclass_df
@@ -390,7 +392,7 @@ def analyze_classes_threaded(
             print(f"Expecting {pix} graphs for the octant classes.")
     else:
         class_filename = Path(DATA_DIR) / SS_CONSENSUS_BIN_FILE
-        metrics_filename = Path(BINARY) / f"binary_class_metrics_{cutoff:.2f}.csv"
+        metrics_filename = Path(DATA_DIR) / BINARY_CLASS_METRICS_FILE
         save_dir = BINARY
         eight_or_bin = loader.tclass.binaryclass_df
         total_classes = eight_or_bin.shape[0]  # 32
@@ -574,21 +576,43 @@ def update_repository(
         source = Path(source_dir) / SS_CONSENSUS_BIN_FILE
         dest = Path(repo_dir) / SS_CONSENSUS_BIN_FILE
         if verbose:
-            print(f"Copying binary consensus classes from: {source} to {dest}")
+            print(
+                f"\nCopying binary consensus structures from:\n -> {source} to \n -> {dest}"
+            )
         try:
             shutil.copy(source, dest)
         except IOError as e:
             _logger.error("Failed to copy binary consensus: %s", e)
 
+        source = Path(source_dir) / BINARY_CLASS_METRICS_FILE
+        dest = Path(repo_dir) / BINARY_CLASS_METRICS_FILE
+        if verbose:
+            print(f"\nCopying binary metrics df from:\n -> {source} to \n -> {dest}")
+        try:
+            shutil.copy(source, dest)
+        except IOError as e:
+            _logger.error("Failed to copy binary metrics: %s", e)
+
     if octant:
         source = Path(source_dir) / SS_CONSENSUS_OCT_FILE
         dest = Path(repo_dir) / SS_CONSENSUS_OCT_FILE
         if verbose:
-            print(f"Copying octant consensus structures from {source} to {dest}")
+            print(
+                f"\nCopying octant consensus structures from\n -> {source} to \n -> {dest}"
+            )
         try:
             shutil.copy(source, dest)
         except IOError as e:
             _logger.error("Failed to copy octant consensus: %s", e)
+
+        source = Path(source_dir) / OCTANT_CLASS_METRICS_FILE
+        dest = Path(repo_dir) / OCTANT_CLASS_METRICS_FILE
+        if verbose:
+            print(f"\nCopying octant metrics df from:\n -> {source} to \n -> {dest}")
+        try:
+            shutil.copy(source, dest)
+        except IOError as e:
+            _logger.error("Failed to copy octant metrics: %s", e)
 
 
 def main() -> None:
