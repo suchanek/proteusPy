@@ -477,10 +477,13 @@ def analyze_classes_threaded(
             pickle.dump(res_list, f)
 
         print(f"Writing class metrics to: {metrics_filename}")
-        metrics_df.to_csv(metrics_filename, index=False)
+        # metrics_df.to_csv(metrics_filename, index=False)
+        with open(metrics_filename, "wb+") as f:
+            pickle.dump(metrics_df, f)
+
     except IOError as e:
         _logger.error("Failed to write output files: %s", e)
-        raise
+        raise e
 
     return res_list, metrics_df
 
