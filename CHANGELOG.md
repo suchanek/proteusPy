@@ -9,7 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- statistical calculations for classes in DisulfideClass_Analysis.py, writes the .csv to the appropriate dir.
+- statistical calculations for classes in DisulfideClass_Analysis.py, writes the .pkl to the appropriate dir. The .csv metrics file is saved under $PDB/data.
+- ``DisulfideClassGenerator.py``. This new class manages all aspects of the generation
+  of disulfide structures that represent the overall envelope of structures accessible
+  to a given structural class consensus disulfide. For instance, if a binary class
+  (00000b) has a consensus structure of chi1-chi5 +/- five degrees it can generate the
+  243, (3^5) structures and calculate statistics for this 'tree'.
+
+  ### Changed
+
+  - ``DisulfideClass_Analysis.py`` now creates the binary and octant torsion metrics
+  files needed for the new ``DisulfideClassGenerator`` class. These are needed upon
+  class instantiation and are bundled into the package. Note that the octant class
+  metrics file will be dependent on the overall cutoff used during the program run.
+  I typically use 0.04, which generates 329 overall consensus structures.
 
 ### Fixed
 
