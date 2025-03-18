@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "proteusPy"
-version = "0.99.34.dev1"  # Replace with your version variable
+version = "0.99.34.dev2"  # Replace with your version variable
 description = "proteusPy - Protein Structure Analysis and Modeling Tools"
 readme = "README.md"
 authors = [
@@ -114,6 +114,8 @@ proteusPy = [
     "data/ss_ids.txt",
     "data/SS_consensus_class_oct.pkl",
     "data/SS_consensus_class_32.pkl",
+    "data/binary_class_metrics.pkl",
+    "data/octant_class_metrics.pkl",
     "data/2q7q_seqsim.csv",
 ]
 
@@ -129,6 +131,6 @@ proteusPy = [
 "proteusPy.DisulfideExtractor" = "proteusPy.DisulfideExtractor_mp:main"
 "proteusPy.bootstrapper" = "proteusPy.bootstrapper:main"
 "proteusPy.render_disulfide_schematic" = "proteusPy.render_disulfide_schematic:main"
-
+"proteusPy.display_class_disulfides" = "proteusPy.display_class_disulfides:main"
 [tool.pytest.ini_options]
 addopts = "--ignore=tests/test_DisplaySS.py --ignore=tests/test_disulfide_schematic.py"
