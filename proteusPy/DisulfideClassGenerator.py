@@ -10,14 +10,15 @@ Author: Eric G. Suchanek, PhD
 Last Modification: 2025-03-17
 """
 
-# pylint: disable=C0103
-
 import itertools
 import pickle
 from pathlib import Path
 from typing import Dict, List, Union
 
 import pandas as pd
+
+# pylint: disable=C0103
+import tqdm
 
 from proteusPy.DisulfideBase import Disulfide, DisulfideList
 from proteusPy.logger_config import create_logger
@@ -39,7 +40,7 @@ class DisulfideClassGenerator:
     243 combinations of dihedral angles for each class.
     """
 
-    def __init__(self, csv_file: str = None, base: int = None):
+    def __init__(self, csv_file: str = None, base: int = None, verbose: bool = True):
         """
         Initialize the DisulfideClassGenerator.
 
@@ -47,9 +48,12 @@ class DisulfideClassGenerator:
         :type csv_file: str, optional
         :param base: Base for disulfides (2 for binary, 8 for octant).
         :type base: int, optional
+        :param verbose: If True, log debug messages.
+        :type verbose: bool
         :raises ValueError: If no valid data source is provided or schema is invalid.
         """
         self.df = None
+        self.verbose = verbose
         self.class_disulfides: Dict[str, DisulfideList] = {}
         self.base = base
         binary_path = Path(DATA_DIR) / BINARY_CLASS_METRICS_FILE
@@ -95,7 +99,7 @@ class DisulfideClassGenerator:
         return self
 
     def generate_for_class(
-        self, class_id: str, use_class_str: bool = True
+        self, class_id: str, use_class_str: bool = False
     ) -> Union[DisulfideList, None]:
         """
         Generate disulfides for a specific structural class.
@@ -127,10 +131,11 @@ class DisulfideClassGenerator:
         return disulfide_list
 
     def generate_for_selected_classes(
-        self, class_ids: List[str], use_class_str: bool = True
+        self, class_ids: List[str], use_class_str: bool = False
     ) -> Dict[str, DisulfideList]:
         """
         Generate disulfides for selected structural classes.
+        Displays a tqdm progress bar if self.verbose is True.
 
         :param class_ids: List of class IDs or class strings to generate disulfides for.
         :type class_ids: List[str]
@@ -150,7 +155,17 @@ class DisulfideClassGenerator:
             return {}
 
         class_disulfides = {}
-        for _, row in df_filtered.iterrows():
+        # Use tqdm for progress bar if verbose is True
+        iterator = (
+            tqdm.tqdm(
+                df_filtered.iterrows(),
+                total=len(df_filtered),
+                desc="Generating selected disulfides",
+            )
+            if self.verbose
+            else df_filtered.iterrows()
+        )
+        for _, row in iterator:
             class_id = row[col]
             disulfide_list = self._generate_disulfides_for_class(row)
             class_disulfides[class_id] = disulfide_list
@@ -161,6 +176,7 @@ class DisulfideClassGenerator:
     def generate_for_all_classes(self) -> Dict[str, DisulfideList]:
         """
         Generate disulfides for all structural classes in the DataFrame.
+        Displays a tqdm progress bar if self.verbose is True.
 
         :return: A dictionary mapping class IDs to DisulfideLists.
         :rtype: Dict[str, DisulfideList]
@@ -170,13 +186,42 @@ class DisulfideClassGenerator:
             raise ValueError("CSV file not loaded.")
 
         class_disulfides = {}
-        for _, row in self.df.iterrows():
+        # Use tqdm for progress bar if verbose is True
+        iterator = (
+            tqdm.tqdm(
+                self.df.iterrows(), total=len(self.df), desc="Generating disulfides"
+            )
+            if self.verbose
+            else self.df.iterrows()
+        )
+        for _, row in iterator:
             class_id = row["class"]
             disulfide_list = self._generate_disulfides_for_class(row)
             class_disulfides[class_id] = disulfide_list
             self.class_disulfides[class_id] = disulfide_list
         _logger.info("Generated disulfides for all %d classes", len(class_disulfides))
         return class_disulfides
+
+    def display(self, class_id: str, use_class_str: bool = False) -> None:
+        """
+        Display an overlay of all disulfides for a specific structural class.
+
+        :param class_id: The class ID or class string to display disulfides for.
+        :type class_id: str
+        :param use_class_str: If True, match on class_str column, otherwise match on class column.
+        :type use_class_str: bool
+        :raises ValueError: If CSV file is not loaded or class is not found.
+        """
+        # First check if we already have this class generated
+        if class_id in self.class_disulfides:
+            disulfide_list = self.class_disulfides[class_id]
+        else:
+            # Generate if not already present
+            disulfide_list = self.generate_for_class(class_id, use_class_str)
+            if disulfide_list is None:
+                raise ValueError(f"Class ID {class_id} not found in the data.")
+
+        disulfide_list.display_overlay()
 
     def _generate_disulfides_for_class(self, csv_row) -> DisulfideList:
         """
@@ -265,6 +310,8 @@ def generate_disulfides_for_class_from_csv(
     :type csv_file: str
     :param class_id: The class ID or class string to generate disulfides for.
     :type class_id: str
+    :param base: Base for disulfides (2 or 8).
+    :type base: int, optional
     :return: A DisulfideList or None if the class ID is not found.
     :rtype: Union[DisulfideList, None]
     """
@@ -288,9 +335,12 @@ if __name__ == "__main__":
     parser.add_argument("--all", action="store_true", help="Process all classes.")
     parser.add_argument("--base", type=int, choices=[2, 8], help="Base (2 or 8).")
     parser.add_argument("--output", help="Output file for pickled results.")
+    parser.add_argument("--verbose", action="store_true", help="Display progress bars.")
     args = parser.parse_args()
 
-    generator = DisulfideClassGenerator(args.csv_file, base=args.base)
+    generator = DisulfideClassGenerator(
+        args.csv_file, base=args.base, verbose=args.verbose
+    )
     if args.all:
         result = generator.generate_for_all_classes()
         print(f"Generated disulfides for {len(result)} classes.")
