@@ -202,7 +202,16 @@ class DisulfideClassGenerator:
         _logger.info("Generated disulfides for all %d classes", len(class_disulfides))
         return class_disulfides
 
-    def display(self, class_id: str, use_class_str: bool = False) -> None:
+    def display(
+        self,
+        class_id: str,
+        use_class_str: bool = False,
+        screenshot: bool = False,
+        movie: bool = False,
+        fname: str = "ss_overlay.png",
+        theme: str = "auto",
+        winsize: tuple = (1024, 1024),
+    ) -> None:
         """
         Display an overlay of all disulfides for a specific structural class.
 
@@ -210,6 +219,16 @@ class DisulfideClassGenerator:
         :type class_id: str
         :param use_class_str: If True, match on class_str column, otherwise match on class column.
         :type use_class_str: bool
+        :param screenshot: If True, save a screenshot of the overlay.
+        :type screenshot: bool
+        :param movie: If True, save a movie of the overlay.
+        :type movie: bool
+        :param fname: Filename for screenshot or movie.
+        :type fname: str
+        :param theme: Color theme for the overlay.
+        :type theme: str
+        :param winsize: Window size for the overlay.
+        :type winsize: tuple
         :raises ValueError: If CSV file is not loaded or class is not found.
         """
         # First check if we already have this class generated
@@ -221,7 +240,18 @@ class DisulfideClassGenerator:
             if disulfide_list is None:
                 raise ValueError(f"Class ID {class_id} not found in the data.")
 
-        disulfide_list.display_overlay()
+            disulfide_list = self.generate_for_class(class_id, use_class_str)
+            if disulfide_list is None:
+                raise ValueError(f"Class ID {class_id} not found in the data.")
+
+        disulfide_list.display_overlay(
+            screenshot=screenshot,
+            movie=movie,
+            verbose=self.verbose,
+            fname=fname,
+            winsize=winsize,
+            light=theme,
+        )
 
     def _generate_disulfides_for_class(self, csv_row) -> DisulfideList:
         """
@@ -258,6 +288,76 @@ class DisulfideClassGenerator:
 
         # Return a DisulfideList
         return DisulfideList(disulfides, f"Class_{class_id}_{class_str}")
+
+    @staticmethod
+    def display_class_disulfides(
+        class_string,
+        base=8,
+        light="auto",
+        screenshot=False,
+        movie=False,
+        verbose=False,
+        fname="ss_overlay.png",
+        winsize=(1024, 1024),
+    ):
+        """
+        Display disulfides belonging to a specific class using DisulfideClassGenerator.
+
+        :param class_string: The binary or octant class string (e.g., "00000" for binary,
+        "22632" for octant)
+        :type class_string: str
+        :param base: The base of the class string (2 for binary, 8 for octant)
+        :type base: int
+        :param light: The background color theme ("auto", "light", or "dark")
+        :type light: str
+        :param screenshot: Whether to save a screenshot
+        :type screenshot: bool
+        :param movie: Whether to save a movie
+        :type movie: bool
+        :param verbose: Whether to display verbose output
+        :type verbose: bool
+        :param fname: Filename to save for the movie or screenshot
+        :type fname: str
+        :param winsize: Window size for the display (width, height)
+        :type winsize: tuple
+        """
+        if verbose:
+            print(f"Creating DisulfideClassGenerator with base {base}...")
+
+        _base = base
+        _generator = None
+        use_class_str = False
+
+        # Determine if we should use class_str based on the base
+        if "+" in class_string or "-" in class_string:
+            use_class_str = True
+            _base = 2
+
+        if "0" in class_string:
+            _base = 2
+
+        # Create a DisulfideClassGenerator with the specified base
+        _generator = DisulfideClassGenerator(base=_base, verbose=verbose)
+
+        if verbose:
+            print(f"Displaying disulfides for class {class_string}...")
+
+        # Display the disulfides for the specified class
+        try:
+            _generator.display(
+                class_string,
+                use_class_str=use_class_str,
+                screenshot=screenshot,
+                movie=movie,
+                fname=fname,
+                theme=light,
+                winsize=winsize,
+            )
+        except ValueError as e:
+            print(f"Error: {e}")
+
+
+# class ends
 
 
 def generate_disulfides_for_all_classes(

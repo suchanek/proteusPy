@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   to a given structural class consensus disulfide. For instance, if a binary class
   (00000b) has a consensus structure of chi1-chi5 +/- five degrees it can generate the
   243, (3^5) structures and calculate statistics for this 'tree'.
+- ``display_class_disufides`` entrypoint added. This utilizes the new class to display a given
+  disulfide class in a separate window using the ``DisulfideList.display_overlay()`` function.
 
   ### Changed
 
