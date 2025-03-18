@@ -7,8 +7,10 @@ For each class, it generates all combinations of dihedral angles (mean-std, mean
 for each of the 5 dihedral angles, resulting in 3^5 = 243 combinations per class.
 
 Author: Eric G. Suchanek, PhD
-Last Modification: 2025-03-17 08:09:57
+Last Modification: 2025-03-17
 """
+
+# pylint: disable=C0103
 
 import itertools
 import pickle
@@ -42,51 +44,45 @@ class DisulfideClassGenerator:
         Initialize the DisulfideClassGenerator.
 
         :param csv_file: Path to the CSV file containing class metrics.
-            If provided, the CSV file will be loaded during initialization.
         :type csv_file: str, optional
-        :param base: Optionally specify a base for disulfides.
-        :type base: Optional[int]
+        :param base: Base for disulfides (2 for binary, 8 for octant).
+        :type base: int, optional
+        :raises ValueError: If no valid data source is provided or schema is invalid.
         """
         self.df = None
-        self.class_disulfides = {}
+        self.class_disulfides: Dict[str, DisulfideList] = {}
         self.base = base
-
         binary_path = Path(DATA_DIR) / BINARY_CLASS_METRICS_FILE
         octant_path = Path(DATA_DIR) / OCTANT_CLASS_METRICS_FILE
 
         if csv_file:
             self.load_csv(csv_file)
+        elif base == 2 and binary_path.exists():
+            _logger.info("Loading binary metrics from %s", binary_path)
+            self.df = pd.read_pickle(binary_path)
+        elif base == 8 and octant_path.exists():
+            _logger.info("Loading octant metrics from %s", octant_path)
+            self.df = pd.read_pickle(octant_path)
         else:
-            # try to load the pkl files for binary and octant
-            if base == 2:
-                if binary_path.exists():
-                    _logger.info("Loading binary file %s", binary_path)
-                    with open(binary_path, "rb") as f:
-                        binary_metrics = pickle.load(f)
-                        self.df = binary_metrics
-                        # Convert class column to string to ensure string comparisons work
-                        self.df["class"] = self.df["class"].astype(str)
-                        self.df["class_str"] = self.df["class_str"].astype(str)
-                else:
-                    _logger.error("Binary metrics file %s not found.", binary_path)
-            elif base == 8:
-                if octant_path.exists():
-                    _logger.info("Loading octant file %s", octant_path)
-                    with open(octant_path, "rb") as f:
-                        octant_metrics = pickle.load(f)
-                        self.df = octant_metrics
-                        # Convert class column to string to ensure string comparisons work
-                        self.df["class"] = self.df["class"].astype(str)
-                        self.df["class_str"] = self.df["class_str"].astype(str)
-                else:
-                    _logger.error("Octant file %s not found.", octant_path)
-            else:
-                raise ValueError("Base must be 2 or 8.")
+            raise ValueError(
+                "Provide csv_file or valid base (2 or 8) with existing file."
+            )
 
-        if self.df is None:
-            _logger.error("No metrics loaded.")
+        self._validate_df()
+        self.df["class"] = self.df["class"].astype(str)
+        self.df["class_str"] = self.df["class_str"].astype(str)
 
-    def load_csv(self, csv_file):
+    def _validate_df(self):
+        """Validate that the DataFrame has all required columns."""
+        required = ["class", "class_str"] + [
+            f"chi{i}_{stat}" for i in range(1, 6) for stat in ["mean", "std"]
+        ]
+        missing = [col for col in required if col not in self.df.columns]
+        if missing:
+            raise ValueError(f"DataFrame missing required columns: {missing}")
+        _logger.debug("DataFrame validated with columns: %s", list(self.df.columns))
+
+    def load_csv(self, csv_file: str):
         """
         Load the CSV file containing class metrics.
 
@@ -95,11 +91,12 @@ class DisulfideClassGenerator:
         :return: Self for method chaining.
         :rtype: DisulfideClassGenerator
         """
-        # Ensure class and class_str columns are loaded as strings
         self.df = pd.read_csv(csv_file, dtype={"class": str, "class_str": str})
         return self
 
-    def generate_for_class(self, class_id: str, use_class_str=True):
+    def generate_for_class(
+        self, class_id: str, use_class_str: bool = True
+    ) -> Union[DisulfideList, None]:
         """
         Generate disulfides for a specific structural class.
 
@@ -112,28 +109,26 @@ class DisulfideClassGenerator:
         :raises ValueError: If CSV file is not loaded.
         """
         if self.df is None:
-            raise ValueError("CSV file not loaded. Call load_csv() first.")
+            raise ValueError(
+                "CSV file not loaded. Call load_csv() or initialize with valid base."
+            )
 
-        # Find the row for the specified class ID
-        if use_class_str:
-            row = self.df[self.df["class_str"] == class_id]
-        else:
-            row = self.df[self.df["class"] == class_id]
-
+        col = "class_str" if use_class_str else "class"
+        row = self.df[self.df[col] == class_id]
         if row.empty:
-            print(f"Class ID {class_id} not found in the file.")
+            _logger.warning("Class ID %s not found in the data.", class_id)
             return None
 
-        # Generate disulfides for the class
-        _disulfide_list = self._generate_disulfides_for_class(row.iloc[0])
+        disulfide_list = self._generate_disulfides_for_class(row.iloc[0])
+        self.class_disulfides[class_id] = disulfide_list
+        _logger.info(
+            "Generated %d disulfides for class %s", len(disulfide_list), class_id
+        )
+        return disulfide_list
 
-        # Update self.class_disulfides with the generated disulfides
-        if _disulfide_list:
-            self.class_disulfides[class_id] = _disulfide_list
-
-        return _disulfide_list
-
-    def generate_for_selected_classes(self, class_ids, use_class_str=True):
+    def generate_for_selected_classes(
+        self, class_ids: List[str], use_class_str: bool = True
+    ) -> Dict[str, DisulfideList]:
         """
         Generate disulfides for selected structural classes.
 
@@ -146,49 +141,41 @@ class DisulfideClassGenerator:
         :raises ValueError: If CSV file is not loaded.
         """
         if self.df is None:
-            raise ValueError("CSV file not loaded. Call load_csv() first.")
+            raise ValueError("CSV file not loaded.")
 
-        # Filter rows for selected class IDs
-        if use_class_str:
-            df_filtered = self.df[self.df["class_str"].isin(class_ids)]
-            id_col = "class_str"
-        else:
-            df_filtered = self.df[self.df["class"].isin(class_ids)]
-            id_col = "class"
+        col = "class_str" if use_class_str else "class"
+        df_filtered = self.df[self.df[col].isin(class_ids)]
+        if df_filtered.empty:
+            _logger.warning("No matching classes found for IDs: %s", class_ids)
+            return {}
 
-        # Generate disulfides for each selected class
         class_disulfides = {}
         for _, row in df_filtered.iterrows():
-            class_id = row[id_col]
-            _disulfide_list = self._generate_disulfides_for_class(row)
-            class_disulfides[class_id] = _disulfide_list
-
-            # Update self.class_disulfides with the generated disulfides
-            self.class_disulfides[class_id] = _disulfide_list
-
+            class_id = row[col]
+            disulfide_list = self._generate_disulfides_for_class(row)
+            class_disulfides[class_id] = disulfide_list
+            self.class_disulfides[class_id] = disulfide_list
+        _logger.info("Generated disulfides for %d classes", len(class_disulfides))
         return class_disulfides
 
-    def generate_for_all_classes(self):
+    def generate_for_all_classes(self) -> Dict[str, DisulfideList]:
         """
-        Generate disulfides for all structural classes in the CSV file.
+        Generate disulfides for all structural classes in the DataFrame.
 
         :return: A dictionary mapping class IDs to DisulfideLists.
         :rtype: Dict[str, DisulfideList]
         :raises ValueError: If CSV file is not loaded.
         """
         if self.df is None:
-            raise ValueError("CSV file not loaded. Call load_csv() first.")
+            raise ValueError("CSV file not loaded.")
 
-        # Generate disulfides for each class
         class_disulfides = {}
         for _, row in self.df.iterrows():
             class_id = row["class"]
-            _disulfide_list = self._generate_disulfides_for_class(row)
-            class_disulfides[class_id] = _disulfide_list
-
-            # Update self.class_disulfides with the generated disulfides
-            self.class_disulfides[class_id] = _disulfide_list
-
+            disulfide_list = self._generate_disulfides_for_class(row)
+            class_disulfides[class_id] = disulfide_list
+            self.class_disulfides[class_id] = disulfide_list
+        _logger.info("Generated disulfides for all %d classes", len(class_disulfides))
         return class_disulfides
 
     def _generate_disulfides_for_class(self, csv_row) -> DisulfideList:
@@ -196,69 +183,48 @@ class DisulfideClassGenerator:
         Generate disulfides for a structural class based on the mean and standard deviation
         values for each dihedral angle.
 
-        :param csv_row: A row from the binary_class_metrics CSV file.
+        :param csv_row: A row from the DataFrame.
         :type csv_row: pd.Series
-        :return: A list of Disulfide objects.
+        :return: A DisulfideList containing all 243 combinations.
         :rtype: DisulfideList
         """
         class_id = csv_row["class"]
         class_str = csv_row["class_str"]
 
         # Extract mean and standard deviation values for each dihedral angle
-        chi_means = [
-            csv_row["chi1_mean"],
-            csv_row["chi2_mean"],
-            csv_row["chi3_mean"],
-            csv_row["chi4_mean"],
-            csv_row["chi5_mean"],
-        ]
+        chi_means = [csv_row[f"chi{i}_mean"] for i in range(1, 6)]
+        chi_stds = [csv_row[f"chi{i}_std"] for i in range(1, 6)]
 
-        chi_stds = [
-            csv_row["chi1_std"],
-            csv_row["chi2_std"],
-            csv_row["chi3_std"],
-            csv_row["chi4_std"],
-            csv_row["chi5_std"],
+        # Generate all combinations (mean - std, mean, mean + std) for each angle
+        chi_values = [
+            [mean - std, mean, mean + std] for mean, std in zip(chi_means, chi_stds)
         ]
+        combinations = list(itertools.product(*chi_values))  # 3^5 = 243 combinations
 
-        # Generate all combinations of dihedral angles
+        # Determine base string
+        base_str = "b" if self.base == 2 else "o" if self.base == 8 else ""
+
+        # Create Disulfide objects for each combination
         disulfides = []
-        base_str = ""
-
-        # For each dihedral angle, consider mean-std, mean, and mean+std
-        chi_values = []
-        for i in range(5):
-            mean = chi_means[i]
-            std = chi_stds[i]
-            chi_values.append([mean - std, mean, mean + std])
-
-        # Generate all combinations (3^5 = 243 combinations)
-        combinations = list(itertools.product(*chi_values))
-        if self.base:
-            base_str = "b" if self.base == 2 else "o"
-
-        # Create a Disulfide object for each combination
-        for i, combination in enumerate(combinations):
+        for i, combo in enumerate(combinations):
             name = f"{class_str}{base_str}_comb{i+1}"
-            disulfide = Disulfide(name=name, torsions=list(combination))
+            disulfide = Disulfide(name=name, torsions=list(combo))
             disulfides.append(disulfide)
 
-        # Create a DisulfideList with all the generated disulfides
-        _disulfide_list = DisulfideList(disulfides, f"Class_{class_id}_{class_str}")
-
-        return _disulfide_list
+        # Return a DisulfideList
+        return DisulfideList(disulfides, f"Class_{class_id}_{class_str}")
 
 
 def generate_disulfides_for_all_classes(
-    csv_file: str, base=None
+    csv_file: str, base: int = None
 ) -> Dict[str, DisulfideList]:
     """
     Generate disulfides for all structural classes in the CSV file.
 
     :param csv_file: Path to the CSV file containing class metrics.
     :type csv_file: str
-    :param base: Optionally specify a base for disulfides.
-    :type base: Optional[Any]
+    :param base: Base for disulfides (2 or 8).
+    :type base: int, optional
     :return: A dictionary mapping class IDs to DisulfideLists.
     :rtype: Dict[str, DisulfideList]
     """
@@ -276,8 +242,10 @@ def generate_disulfides_for_selected_classes(
     :type csv_file: str
     :param class_ids: List of class IDs to generate disulfides for.
     :type class_ids: List[str]
-    :param base: Optionally specify a base for disulfides.
-    :type base: Optional[Any]
+    :param base: Base for disulfides (2 or 8).
+    :type base: int, optional
+    :param use_class_str: If True, match on class_str column.
+    :type use_class_str: bool
     :return: A dictionary mapping class IDs to DisulfideLists.
     :rtype: Dict[str, DisulfideList]
     """
@@ -288,7 +256,7 @@ def generate_disulfides_for_selected_classes(
 
 
 def generate_disulfides_for_class_from_csv(
-    csv_file: str, class_id: str
+    csv_file: str = None, class_id: str = "", base: int = None
 ) -> Union[DisulfideList, None]:
     """
     Generate disulfides for a specific structural class from the CSV file.
@@ -297,13 +265,16 @@ def generate_disulfides_for_class_from_csv(
     :type csv_file: str
     :param class_id: The class ID or class string to generate disulfides for.
     :type class_id: str
-    :return: A DisulfideList containing all combinations of
-            dihedral angles for the given class, or None if
-            the class ID is not found in the CSV file.
+    :return: A DisulfideList or None if the class ID is not found.
     :rtype: Union[DisulfideList, None]
     """
-    _generator = DisulfideClassGenerator(csv_file)
-    return _generator.generate_for_class(class_id, use_class_str=True)
+    _generator = DisulfideClassGenerator(csv_file, base=base)
+    if base == 2:
+        return _generator.generate_for_class(class_id, use_class_str=True)
+    elif base == 8:
+        return _generator.generate_for_class(class_id, use_class_str=False)
+    else:
+        raise ValueError("Provide a valid base (2 or 8).")
 
 
 if __name__ == "__main__":
@@ -312,59 +283,27 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Generate disulfides for structural classes."
     )
-    parser.add_argument(
-        "csv_file", help="Path to the CSV file containing class metrics."
-    )
-
-    parser.add_argument(
-        "--class_id",
-        help="Generate disulfides for a specific class id.",
-    )
-
-    parser.add_argument(
-        "--base",
-        help="Generate disulfides for a specific base.",
-        default=None,
-    )
-
-    parser.add_argument(
-        "--output", help="Output file to save the generated disulfides."
-    )
-
+    parser.add_argument("csv_file", help="Path to CSV file with class metrics.")
+    parser.add_argument("--class_ids", nargs="+", help="List of class IDs to process.")
+    parser.add_argument("--all", action="store_true", help="Process all classes.")
+    parser.add_argument("--base", type=int, choices=[2, 8], help="Base (2 or 8).")
+    parser.add_argument("--output", help="Output file for pickled results.")
     args = parser.parse_args()
 
-    generator = DisulfideClassGenerator(args.csv_file)
-
-    if args.class_id:
-        disulfide_list = generator.generate_for_class(
-            args.class_id, use_class_str=False
+    generator = DisulfideClassGenerator(args.csv_file, base=args.base)
+    if args.all:
+        result = generator.generate_for_all_classes()
+        print(f"Generated disulfides for {len(result)} classes.")
+    elif args.class_ids:
+        result = generator.generate_for_selected_classes(
+            args.class_ids, use_class_str=False
         )
-        if disulfide_list:
-            print(
-                f"Generated {len(disulfide_list)} disulfides for class {args.class_id}."
-            )
-
-            if args.output:
-                # Save the disulfide list to a file
-                with open(args.output, "wb") as f:
-                    pickle.dump(disulfide_list, f)
-                print(f"Saved disulfides to {args.output}.")
-
-    elif args.class_str:
-        disulfide_list = generator.generate_for_class(
-            args.class_str, use_class_str=True
-        )
-        if disulfide_list:
-            print(
-                f"Generated {len(disulfide_list)} disulfides for class {args.class_id}."
-            )
-
-            if args.output:
-                # Save the disulfide list to a file
-                with open(args.output, "wb") as f:
-                    pickle.dump(disulfide_list, f)
-                    print(f"Saved disulfides to {args.output}.")
+        print(f"Generated disulfides for {len(result)} classes.")
     else:
-        print("Please specify a class String using the --class_str argument.")
+        print("Specify --class_ids or --all.")
+        exit(1)
 
-# end of file
+    if args.output and result:
+        with open(args.output, "wb") as f:
+            pickle.dump(result, f)
+        print(f"Saved to {args.output}.")
