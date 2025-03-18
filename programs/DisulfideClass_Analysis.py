@@ -83,7 +83,9 @@ from colorama import Fore, Style, init
 from tqdm import tqdm
 
 from proteusPy import (
+    BINARY_CLASS_METRICS_CSV_FILE,
     BINARY_CLASS_METRICS_FILE,
+    OCTANT_CLASS_METRICS_CSV_FILE,
     OCTANT_CLASS_METRICS_FILE,
     SS_CONSENSUS_BIN_FILE,
     SS_CONSENSUS_OCT_FILE,
@@ -372,6 +374,7 @@ def analyze_classes_threaded(
     tors_df = loader.TorsionDF
     class_filename = None
     metrics_filename = None
+    metrics_csv_filename = None
     eight_or_bin = None
     res_list = None
     pix = None
@@ -381,6 +384,7 @@ def analyze_classes_threaded(
     if do_octant:
         class_filename = Path(DATA_DIR) / SS_CONSENSUS_OCT_FILE
         metrics_filename = Path(DATA_DIR) / OCTANT_CLASS_METRICS_FILE
+        metrics_csv_filename = Path(DATA_DIR) / OCTANT_CLASS_METRICS_CSV_FILE
         save_dir = OCTANT
         base = 8
         eight_or_bin = loader.tclass.eightclass_df
@@ -393,6 +397,7 @@ def analyze_classes_threaded(
     else:
         class_filename = Path(DATA_DIR) / SS_CONSENSUS_BIN_FILE
         metrics_filename = Path(DATA_DIR) / BINARY_CLASS_METRICS_FILE
+        metrics_csv_filename = Path(DATA_DIR) / BINARY_CLASS_METRICS_CSV_FILE
         save_dir = BINARY
         eight_or_bin = loader.tclass.binaryclass_df
         total_classes = eight_or_bin.shape[0]  # 32
@@ -477,7 +482,9 @@ def analyze_classes_threaded(
             pickle.dump(res_list, f)
 
         print(f"Writing class metrics to: {metrics_filename}")
-        # metrics_df.to_csv(metrics_filename, index=False)
+
+        metrics_df.to_csv(metrics_csv_filename, index=False)
+
         with open(metrics_filename, "wb+") as f:
             pickle.dump(metrics_df, f)
 

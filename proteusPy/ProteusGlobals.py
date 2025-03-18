@@ -75,6 +75,9 @@ SS_CONSENSUS_BIN_FILE = "SS_consensus_class_32.pkl"
 BINARY_CLASS_METRICS_FILE = "binary_class_metrics.pkl"
 OCTANT_CLASS_METRICS_FILE = "octant_class_metrics.pkl"
 
+BINARY_CLASS_METRICS_CSV_FILE = "binary_class_metrics.csv"
+OCTANT_CLASS_METRICS_CSV_FILE = "octant_class_metrics.csv"
+
 LOADER_FNAME = "PDB_SS_ALL_LOADER.pkl"
 LOADER_SUBSET_FNAME = "PDB_SS_SUBSET_LOADER.pkl"
 
