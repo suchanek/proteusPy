@@ -716,23 +716,23 @@ class DisulfideClassManager:
                         raise ValueError("Invalid binary class string.")
                 case 6:
                     if char in ["1", "2", "3"]:
-                        output_str += "0"
+                        output_str += "-"
                     elif char in ["4", "5", "6"]:
-                        output_str += "2"
+                        output_str += "+"
                     else:
                         raise ValueError("Invalid base 6 class string.")
                 case 8:
                     if char in ["1", "2", "3", "4"]:
-                        output_str += "0"
+                        output_str += "-"
                     elif char in ["5", "6", "7", "8"]:
-                        output_str += "2"
+                        output_str += "+"
                     else:
                         raise ValueError("Invalid base 8 class string.")
                 case 10:
                     if char in ["1", "2", "3", "4", "5"]:
-                        output_str += "0"
+                        output_str += "-"
                     elif char in ["6", "7", "8", "9", "A"]:
-                        output_str += "2"
+                        output_str += "+"
                     else:
                         raise ValueError("Invalid base 10 class string.")
                 case _:

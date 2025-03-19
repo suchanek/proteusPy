@@ -15,6 +15,7 @@ import pickle
 from pathlib import Path
 from typing import Dict, List, Union
 
+import numpy as np
 import pandas as pd
 
 # pylint: disable=C0103
@@ -56,7 +57,8 @@ class DisulfideClassGenerator:
         self.binary_df = None
         self.octant_df = None
         self.verbose = verbose
-        self.class_disulfides: Dict[str, DisulfideList] = {}
+        self.binary_class_disulfides: Dict[str, DisulfideList] = {}
+        self.octant_class_disulfides: Dict[str, DisulfideList] = {}
         self.base = base
         binary_path = Path(DATA_DIR) / BINARY_CLASS_METRICS_FILE
         octant_path = Path(DATA_DIR) / OCTANT_CLASS_METRICS_FILE
@@ -107,6 +109,67 @@ class DisulfideClassGenerator:
         self.df = pd.read_csv(csv_file, dtype={"class": str, "class_str": str})
         return self
 
+    def class_to_sslist(self, clsid: str, base: int = 8) -> np.ndarray:
+        """
+        Return the list of disulfides corresponding to the input `clsid`.
+        This list is a list of disulfide identifiers, not the Disulfide objects themselves.
+
+        :param clsid: The class name to extract. Must be a string
+        in the format '11111' or '11111b' or '11111o'. The suffix 'b' or 'o' indicates
+        binary or octant classes, respectively.
+        :type clsid: str
+        :param base: The base class to use, 2 or 8. Default is 8.
+        :type base: int
+        :param verbose: If True, display progress bars, by default False.
+        :type verbose: bool
+        :return: The list of disulfide bonds from the class. NB: this is the list
+        of disulfide identifiers, not the Disulfide objects themselves.
+        :rtype: DisulfideList
+        :raises ValueError: If an invalid base value is provided.
+        :raises KeyError: If the clsid is not found in the dictionary.
+        """
+        cls = clsid[:5]
+        _base = base
+
+        if not isinstance(clsid, str):
+            _logger.error("Invalid class ID: %s", clsid)
+            return
+
+        match len(clsid):
+            case 6:
+                match clsid[-1]:
+                    case "b":
+                        _base = 2
+                    case "o":
+                        _base = 8
+                    case _:
+                        _logger.error("Invalid class ID suffix: %s", clsid)
+                        return np.ndarray([])
+
+            case 5:
+                match _base:
+                    case 8:
+                        _base = 8
+                    case 2:
+                        _base = 2
+                    case _:
+                        _logger.error("Invalid base: %d", base)
+                        return np.ndarray([])
+            case _:
+                _logger.error("Invalid class ID length: %s", clsid)
+                return np.ndarray([])
+
+        try:
+            if _base == 2:
+                ss_ids = self.binary_class_disulfides[cls[:5]]
+            else:  # _base == 8
+                ss_ids = self.octant_class_disulfides[cls[:5]]
+        except KeyError:
+            _logger.error("Cannot find key %s in SSBond DB", clsid)
+            return np.array([])
+
+        return ss_ids
+
     def generate_for_class(
         self, class_id: str, use_class_str: bool = False
     ) -> Union[DisulfideList, None]:
@@ -133,7 +196,10 @@ class DisulfideClassGenerator:
             return None
 
         disulfide_list = self._generate_disulfides_for_class(row.iloc[0])
-        self.class_disulfides[class_id] = disulfide_list
+        if self.base == 2:
+            self.binary_class_disulfides[class_id] = disulfide_list
+        else:  # self.base == 8
+            self.octant_class_disulfides[class_id] = disulfide_list
         _logger.info(
             "Generated %d disulfides for class %s", len(disulfide_list), class_id
         )
@@ -178,7 +244,10 @@ class DisulfideClassGenerator:
             class_id = row[col]
             disulfide_list = self._generate_disulfides_for_class(row)
             class_disulfides[class_id] = disulfide_list
-            self.class_disulfides[class_id] = disulfide_list
+            if self.base == 2:
+                self.binary_class_disulfides[class_id] = disulfide_list
+            else:  # self.base == 8
+                self.octant_class_disulfides[class_id] = disulfide_list
         _logger.info("Generated disulfides for %d classes", len(class_disulfides))
         return class_disulfides
 
@@ -207,7 +276,10 @@ class DisulfideClassGenerator:
             class_id = row["class"]
             disulfide_list = self._generate_disulfides_for_class(row)
             class_disulfides[class_id] = disulfide_list
-            self.class_disulfides[class_id] = disulfide_list
+            if self.base == 2:
+                self.binary_class_disulfides[class_id] = disulfide_list
+            else:  # self.base == 8
+                self.octant_class_disulfides[class_id] = disulfide_list
         _logger.info("Generated disulfides for all %d classes", len(class_disulfides))
         return class_disulfides
 
@@ -241,8 +313,11 @@ class DisulfideClassGenerator:
         :raises ValueError: If CSV file is not loaded or class is not found.
         """
         # First check if we already have this class generated
-        if class_id in self.class_disulfides:
-            disulfide_list = self.class_disulfides[class_id]
+        disulfide_list = None
+        if self.base == 2 and class_id in self.binary_class_disulfides:
+            disulfide_list = self.binary_class_disulfides[class_id]
+        elif self.base == 8 and class_id in self.octant_class_disulfides:
+            disulfide_list = self.octant_class_disulfides[class_id]
         else:
             # Generate if not already present
             disulfide_list = self.generate_for_class(class_id, use_class_str)
