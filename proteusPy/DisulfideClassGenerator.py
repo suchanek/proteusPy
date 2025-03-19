@@ -53,20 +53,29 @@ class DisulfideClassGenerator:
         :raises ValueError: If no valid data source is provided or schema is invalid.
         """
         self.df = None
+        self.binary_df = None
+        self.octant_df = None
         self.verbose = verbose
         self.class_disulfides: Dict[str, DisulfideList] = {}
         self.base = base
         binary_path = Path(DATA_DIR) / BINARY_CLASS_METRICS_FILE
         octant_path = Path(DATA_DIR) / OCTANT_CLASS_METRICS_FILE
 
+        # Load both .pkl files at once if they exist
+        if binary_path.exists():
+            _logger.info("Loading binary metrics from %s", binary_path)
+            self.binary_df = pd.read_pickle(binary_path)
+
+        if octant_path.exists():
+            _logger.info("Loading octant metrics from %s", octant_path)
+            self.octant_df = pd.read_pickle(octant_path)
+
         if csv_file:
             self.load_csv(csv_file)
-        elif base == 2 and binary_path.exists():
-            _logger.info("Loading binary metrics from %s", binary_path)
-            self.df = pd.read_pickle(binary_path)
-        elif base == 8 and octant_path.exists():
-            _logger.info("Loading octant metrics from %s", octant_path)
-            self.df = pd.read_pickle(octant_path)
+        elif base == 2 and self.binary_df is not None:
+            self.df = self.binary_df
+        elif base == 8 and self.octant_df is not None:
+            self.df = self.octant_df
         else:
             raise ValueError(
                 "Provide csv_file or valid base (2 or 8) with existing file."
@@ -236,10 +245,6 @@ class DisulfideClassGenerator:
             disulfide_list = self.class_disulfides[class_id]
         else:
             # Generate if not already present
-            disulfide_list = self.generate_for_class(class_id, use_class_str)
-            if disulfide_list is None:
-                raise ValueError(f"Class ID {class_id} not found in the data.")
-
             disulfide_list = self.generate_for_class(class_id, use_class_str)
             if disulfide_list is None:
                 raise ValueError(f"Class ID {class_id} not found in the data.")
