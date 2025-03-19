@@ -95,7 +95,8 @@ class TestDisulfideClassGenerator:
         assert len(generator.df) == 2
         assert "class" in generator.df.columns
         assert "class_str" in generator.df.columns
-        assert generator.class_disulfides == {}
+        assert generator.binary_class_disulfides == {}
+        assert generator.octant_class_disulfides == {}
 
     def test_init_with_binary_base(self):
         """Test initialization with binary base."""
@@ -107,7 +108,7 @@ class TestDisulfideClassGenerator:
         generator = DisulfideClassGenerator(base=2)
         assert generator.df is not None
         assert generator.base == 2
-        assert generator.class_disulfides == {}
+        assert generator.binary_class_disulfides == {}
 
     def test_init_with_octant_base(self):
         """Test initialization with octant base."""
@@ -119,7 +120,7 @@ class TestDisulfideClassGenerator:
         generator = DisulfideClassGenerator(base=8)
         assert generator.df is not None
         assert generator.base == 8
-        assert generator.class_disulfides == {}
+        assert generator.octant_class_disulfides == {}
 
     def test_init_with_invalid_params(self):
         """Test initialization with invalid parameters."""
@@ -185,8 +186,8 @@ class TestDisulfideClassGenerator:
         assert len(disulfide_list) == 243  # 3^5 combinations
         assert disulfide_list.pdb_id == "Class_1_+-+++"
         
-        # Verify the class is stored in class_disulfides
-        assert "+-+++" in binary_generator.class_disulfides
+        # Verify the class is stored in binary_class_disulfides
+        assert "+-+++" in binary_generator.binary_class_disulfides
         
         # Test with invalid class ID
         result = binary_generator.generate_for_class("invalid", use_class_str=True)
@@ -228,9 +229,9 @@ class TestDisulfideClassGenerator:
         assert all(isinstance(ss_list, DisulfideList) for ss_list in result.values())
         assert all(len(ss_list) == 243 for ss_list in result.values())
         
-        # Verify all classes are stored in class_disulfides
-        assert len(binary_generator.class_disulfides) == 2
-        assert all(key in binary_generator.class_disulfides for key in result.keys())
+        # Verify all classes are stored in binary_class_disulfides
+        assert len(binary_generator.binary_class_disulfides) == 2
+        assert all(key in binary_generator.binary_class_disulfides for key in result.keys())
 
     def test_generate_disulfides_for_class(self, binary_generator):
         """Test the _generate_disulfides_for_class method."""
