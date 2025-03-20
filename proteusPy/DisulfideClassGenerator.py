@@ -190,7 +190,7 @@ class DisulfideClassGenerator:
                         _base = 8
                     case _:
                         _logger.error("Invalid class ID suffix: %s", clsid)
-                        return np.ndarray([])
+                        return np.array([])
 
             case 5:
                 match _base:
@@ -200,10 +200,10 @@ class DisulfideClassGenerator:
                         _base = 2
                     case _:
                         _logger.error("Invalid base: %d", base)
-                        return np.ndarray([])
+                        return np.array([])
             case _:
                 _logger.error("Invalid class ID length: %s", clsid)
-                return np.ndarray([])
+                return np.array([])
 
         try:
             if _base == 2:
@@ -692,58 +692,16 @@ class DisulfideClassGenerator:
 # class ends
 
 
-def generate_disulfides_for_all_classes(csv_file: str) -> Dict[str, DisulfideList]:
-    """
-    Generate disulfides for all structural classes in the CSV file.
-
-    :param csv_file: Path to the CSV file containing class metrics.
-    :type csv_file: str
-    :return: A dictionary mapping class IDs to DisulfideLists.
-    :rtype: Dict[str, DisulfideList]
-    """
-    _generator = DisulfideClassGenerator(csv_file)
-    return _generator.generate_for_all_classes()
-
-
-def generate_disulfides_for_selected_classes(
-    csv_file: str, class_ids: List[str]
-) -> Dict[str, DisulfideList]:
-    """
-    Generate disulfides for selected structural classes in the CSV file.
-
-    :param csv_file: Path to the CSV file containing class metrics.
-    :type csv_file: str
-    :param class_ids: List of class IDs to generate disulfides for.
-    :type class_ids: List[str]
-    :param use_class_str: If True, match on class_str column.
-    :type use_class_str: bool
-    :return: A dictionary mapping class IDs to DisulfideLists.
-    :rtype: Dict[str, DisulfideList]
-    """
-    _generator = DisulfideClassGenerator(csv_file)
-    return _generator.generate_for_selected_classes(class_ids)
-
-
-def generate_disulfides_for_class_from_csv(
-    csv_file: str = None, class_id: str = ""
-) -> Union[DisulfideList, None]:
-    """
-    Generate disulfides for a specific structural class from the CSV file.
-
-    :param csv_file: Path to the CSV file containing class metrics.
-    :type csv_file: str
-    :param class_id: The class ID or class string to generate disulfides for.
-    :type class_id: str
-    :return: A DisulfideList or None if the class ID is not found.
-    :rtype: Union[DisulfideList, None]
-    """
-    _generator = DisulfideClassGenerator(csv_file)
-    # Determine the base from the class_id
-
-    # Try to generate disulfides for the class
-    _result = _generator.generate_for_class(class_id)
-
-    return _result
+# Helper functions have been removed as they were redundant with class methods.
+# Use the DisulfideClassGenerator class methods directly instead:
+# 
+# Example:
+#   generator = DisulfideClassGenerator(csv_file)
+#   result = generator.generate_for_class(class_id)
+#   # or
+#   result = generator.generate_for_selected_classes(class_ids)
+#   # or
+#   result = generator.generate_for_all_classes()
 
 
 if __name__ == "__main__":

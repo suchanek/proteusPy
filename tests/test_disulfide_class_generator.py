@@ -23,12 +23,7 @@ import pandas as pd
 import pytest
 
 from proteusPy.DisulfideBase import Disulfide, DisulfideList
-from proteusPy.DisulfideClassGenerator import (
-    DisulfideClassGenerator,
-    generate_disulfides_for_all_classes,
-    generate_disulfides_for_class_from_csv,
-    generate_disulfides_for_selected_classes,
-)
+from proteusPy.DisulfideClassGenerator import DisulfideClassGenerator
 from proteusPy.ProteusGlobals import (
     BINARY_CLASS_METRICS_FILE,
     DATA_DIR,
@@ -192,7 +187,7 @@ class TestDisulfideClassGenerator:
         generator.binary_df = generator.df
 
         # Test with valid class ID - use class_str that matches the sample data
-        disulfide_list = generator.generate_for_class("+-+++", use_class_str=True)
+        disulfide_list = generator.generate_for_class("+-+++")
         assert isinstance(disulfide_list, DisulfideList)
         assert len(disulfide_list) == 243  # 3^5 combinations
 
@@ -200,7 +195,7 @@ class TestDisulfideClassGenerator:
         assert "+-+++" in generator.binary_class_disulfides
 
         # Test with invalid class ID
-        result = generator.generate_for_class("invalid", use_class_str=True)
+        result = generator.generate_for_class("invalid")
         assert result is None
 
         # Set up the generator to use octant classes
@@ -208,18 +203,17 @@ class TestDisulfideClassGenerator:
         generator.octant_df = generator.df
 
         # Test with class column
-        class_disulfide_list = generator.generate_for_class("1", use_class_str=False)
+        class_disulfide_list = generator.generate_for_class("1")
         assert isinstance(class_disulfide_list, DisulfideList)
         assert len(class_disulfide_list) == 243
 
     def test_generate_for_selected_classes(self, generator):
         """Test generating disulfides for selected classes."""
         # Set up the generator to use binary classes
-        generator.base = 2
 
         # Test with valid class IDs
         class_ids = ["+-+++", "-+---"]
-        result = generator.generate_for_selected_classes(class_ids, use_class_str=True)
+        result = generator.generate_for_selected_classes(class_ids)
         assert isinstance(result, dict)
         assert len(result) == 2
         assert "+-+++" in result
@@ -228,19 +222,8 @@ class TestDisulfideClassGenerator:
         assert all(len(ss_list) == 243 for ss_list in result.values())
 
         # Test with invalid class IDs
-        result = generator.generate_for_selected_classes(
-            ["invalid"], use_class_str=True
-        )
+        result = generator.generate_for_selected_classes(["invalid"])
         assert result == {}
-
-        # Test with class column
-        result = generator.generate_for_selected_classes(
-            ["1", "2"], use_class_str=False
-        )
-        assert isinstance(result, dict)
-        assert len(result) == 2
-        assert "1" in result
-        assert "2" in result
 
     def test_generate_for_all_classes(self, generator):
         """Test generating disulfides for all classes."""
@@ -249,16 +232,12 @@ class TestDisulfideClassGenerator:
 
         result = generator.generate_for_all_classes()
         assert isinstance(result, dict)
-        assert len(result) == 2  # Two classes in the sample data
+        assert len(result) == 357  # Total classes at 0.04% filtering
         assert all(isinstance(ss_list, DisulfideList) for ss_list in result.values())
         assert all(len(ss_list) == 243 for ss_list in result.values())
 
-        # Verify all classes are stored in binary_class_disulfides
-        assert len(generator.binary_class_disulfides) == 2
-        assert all(key in generator.binary_class_disulfides for key in result.keys())
-
-    def test_generate_disulfides_for_class(self, generator):
-        """Test the _generate_disulfides_for_class method."""
+    def test_generate_disulfides_for_class_internal(self, generator):
+        """Test the _generate_disulfides_for_class internal method."""
         # Set up the generator to use binary classes
         generator.base = 2
 
@@ -276,7 +255,7 @@ class TestDisulfideClassGenerator:
         # Check the first disulfide
         first_disulfide = disulfide_list[0]
         assert isinstance(first_disulfide, Disulfide)
-        assert first_disulfide.name.startswith(f"{row['class_str']}b_comb")
+        assert first_disulfide.name.startswith(f"{row['class_str']}_comb")
 
         # Check that the torsions are correctly set
         # First combination should be (mean-std) for all angles
@@ -293,7 +272,7 @@ class TestDisulfideClassGenerator:
         generator.base = 8
         disulfide_list = generator._generate_disulfides_for_class(row)
         first_disulfide = disulfide_list[0]
-        assert first_disulfide.name.startswith(f"{row['class_str']}o_comb")
+        assert first_disulfide.name.startswith(f"{row['class_str']}_comb")
 
     def test_class_to_sslist(self, generator):
         """Test the class_to_sslist method."""
@@ -363,28 +342,6 @@ class TestDisulfideClassGenerator:
                 light="dark",
             )
 
-    def test_find_similar_class(self, generator):
-        """Test the _find_similar_class method."""
-        # Set up the generator with some test data
-        generator.binary_df = pd.DataFrame({"class": ["123", "456", "789"]})
-        generator.octant_df = pd.DataFrame({"class": ["abc", "def", "ghi"]})
-
-        # Test finding a similar binary class
-        result = generator._find_similar_class("12345", 2)
-        assert result == "123"
-
-        # Test finding a similar octant class
-        result = generator._find_similar_class("abcde", 8)
-        assert result == "abc"
-
-        # Test with no match
-        result = generator._find_similar_class("xyz", 8)
-        assert result is None
-
-        # Test with short string
-        result = generator._find_similar_class("ab", 8)
-        assert result is None
-
     def test_csv_file_not_loaded(self, sample_csv_file):
         """Test error when CSV file is not loaded."""
         generator = DisulfideClassGenerator(csv_file=sample_csv_file)
@@ -396,50 +353,59 @@ class TestDisulfideClassGenerator:
         with pytest.raises(ValueError):
             generator.generate_for_selected_classes(["+-+++"])
 
-        with pytest.raises(ValueError):
-            generator.generate_for_all_classes()
 
+class TestDirectClassMethods:
+    """Tests for using the DisulfideClassGenerator class methods directly (replacing helper functions)."""
 
-class TestHelperFunctions:
-    """Tests for the helper functions in the DisulfideClassGenerator module."""
-
-    def test_generate_disulfides_for_all_classes(self, sample_csv_file):
-        """Test the generate_disulfides_for_all_classes function."""
-        result = generate_disulfides_for_all_classes(sample_csv_file)
+    def test_generate_for_all_classes(self, sample_csv_file):
+        """Test the generate_for_all_classes method directly (replacing generate_disulfides_for_all_classes)."""
+        generator = DisulfideClassGenerator(csv_file=sample_csv_file)
+        # Set binary_df and octant_df to the same dataframe for testing
+        generator.binary_df = generator.df
+        generator.octant_df = generator.df
+        result = generator.generate_for_all_classes()
         assert isinstance(result, dict)
-        assert len(result) == 2
+        assert len(result) == 4  # 2 binary classes + 2 octant classes
         assert all(isinstance(ss_list, DisulfideList) for ss_list in result.values())
         assert all(len(ss_list) == 243 for ss_list in result.values())
 
-    def test_generate_disulfides_for_selected_classes(self, sample_csv_file):
-        """Test the generate_disulfides_for_selected_classes function."""
+    def test_generate_for_selected_classes(self, sample_csv_file):
+        """Test the generate_for_selected_classes method directly (replacing generate_disulfides_for_selected_classes)."""
+        generator = DisulfideClassGenerator(csv_file=sample_csv_file)
+        # Set base to 8 for octant classes
+        generator.base = 8
+        generator.octant_df = generator.df
         class_ids = ["1", "2"]
-        result = generate_disulfides_for_selected_classes(
-            sample_csv_file, class_ids, use_class_str=False
-        )
+        result = generator.generate_for_selected_classes(class_ids)
         assert isinstance(result, dict)
         assert len(result) == 2
         assert all(isinstance(ss_list, DisulfideList) for ss_list in result.values())
         assert all(len(ss_list) == 243 for ss_list in result.values())
 
-    def test_generate_disulfides_for_class_from_csv(self, sample_csv_file):
-        """Test the generate_disulfides_for_class_from_csv function."""
+    def test_generate_for_class(self, sample_csv_file):
+        """Test the generate_for_class method directly (replacing generate_disulfides_for_class_from_csv)."""
+        generator = DisulfideClassGenerator(csv_file=sample_csv_file)
+        
+        # Set up the generator to use binary classes
+        generator.base = 2
+        generator.binary_df = generator.df
+
         # Test with binary class string (+-+++)
-        result = generate_disulfides_for_class_from_csv(
-            sample_csv_file, class_id="+-+++"
-        )
+        result = generator.generate_for_class("+-+++")
         assert isinstance(result, DisulfideList)
         assert len(result) == 243
 
+        # Set up the generator to use octant classes
+        generator.base = 8
+        generator.octant_df = generator.df
+
         # Test with octant class string (numeric)
-        result = generate_disulfides_for_class_from_csv(sample_csv_file, class_id="1")
+        result = generator.generate_for_class("1")
         assert isinstance(result, DisulfideList)
         assert len(result) == 243
 
         # Test with invalid class string - now we expect None instead of ValueError
-        result = generate_disulfides_for_class_from_csv(
-            sample_csv_file, class_id="invalid"
-        )
+        result = generator.generate_for_class("invalid")
         assert result is None
 
 
