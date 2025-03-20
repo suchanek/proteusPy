@@ -210,6 +210,8 @@ class TestDisulfideClassGenerator:
     def test_generate_for_selected_classes(self, generator):
         """Test generating disulfides for selected classes."""
         # Set up the generator to use binary classes
+        generator.base = 2
+        generator.binary_df = generator.df
 
         # Test with valid class IDs
         class_ids = ["+-+++", "-+---"]
@@ -229,10 +231,12 @@ class TestDisulfideClassGenerator:
         """Test generating disulfides for all classes."""
         # Set up the generator to use binary classes
         generator.base = 2
+        generator.binary_df = generator.df
+        generator.octant_df = generator.df
 
         result = generator.generate_for_all_classes()
         assert isinstance(result, dict)
-        assert len(result) == 357  # Total classes at 0.04% filtering
+        assert len(result) == 4  # 2 binary classes + 2 octant classes
         assert all(isinstance(ss_list, DisulfideList) for ss_list in result.values())
         assert all(len(ss_list) == 243 for ss_list in result.values())
 
@@ -355,10 +359,10 @@ class TestDisulfideClassGenerator:
 
 
 class TestDirectClassMethods:
-    """Tests for using the DisulfideClassGenerator class methods directly (replacing helper functions)."""
+    """Tests for using the DisulfideClassGenerator class methods directly."""
 
     def test_generate_for_all_classes(self, sample_csv_file):
-        """Test the generate_for_all_classes method directly (replacing generate_disulfides_for_all_classes)."""
+        """Test the generate_for_all_classes method directly."""
         generator = DisulfideClassGenerator(csv_file=sample_csv_file)
         # Set binary_df and octant_df to the same dataframe for testing
         generator.binary_df = generator.df
@@ -370,7 +374,7 @@ class TestDirectClassMethods:
         assert all(len(ss_list) == 243 for ss_list in result.values())
 
     def test_generate_for_selected_classes(self, sample_csv_file):
-        """Test the generate_for_selected_classes method directly (replacing generate_disulfides_for_selected_classes)."""
+        """Test the generate_for_selected_classes method directly."""
         generator = DisulfideClassGenerator(csv_file=sample_csv_file)
         # Set base to 8 for octant classes
         generator.base = 8
@@ -383,9 +387,9 @@ class TestDirectClassMethods:
         assert all(len(ss_list) == 243 for ss_list in result.values())
 
     def test_generate_for_class(self, sample_csv_file):
-        """Test the generate_for_class method directly (replacing generate_disulfides_for_class_from_csv)."""
+        """Test the generate_for_class method directly."""
         generator = DisulfideClassGenerator(csv_file=sample_csv_file)
-        
+
         # Set up the generator to use binary classes
         generator.base = 2
         generator.binary_df = generator.df
