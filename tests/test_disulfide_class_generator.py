@@ -5,12 +5,18 @@ This module contains pytest tests for the DisulfideClassGenerator class, which i
 for generating disulfide conformations for different structural classes based on CSV data.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-03-17
+Last revision: 2025-03-19
 """
+
+# pylint: disable=W0613
+# pylint: disable=W0621
+# pylint: disable=W0212
+
 
 import os
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
@@ -34,7 +40,7 @@ from proteusPy.ProteusGlobals import (
 def sample_csv_file():
     """
     Create a temporary CSV file with sample class metrics data for testing.
-    
+
     :return: Path to the temporary CSV file
     :rtype: str
     """
@@ -60,29 +66,17 @@ def sample_csv_file():
 
 
 @pytest.fixture
-def binary_generator(sample_csv_file):
+def generator(sample_csv_file):
     """
-    Create a DisulfideClassGenerator instance with binary base.
-    
+    Create a DisulfideClassGenerator instance.
+
     :param sample_csv_file: Path to the sample CSV file
     :type sample_csv_file: str
     :return: DisulfideClassGenerator instance
     :rtype: DisulfideClassGenerator
     """
-    return DisulfideClassGenerator(csv_file=sample_csv_file, base=2)
-
-
-@pytest.fixture
-def octant_generator(sample_csv_file):
-    """
-    Create a DisulfideClassGenerator instance with octant base.
-    
-    :param sample_csv_file: Path to the sample CSV file
-    :type sample_csv_file: str
-    :return: DisulfideClassGenerator instance
-    :rtype: DisulfideClassGenerator
-    """
-    return DisulfideClassGenerator(csv_file=sample_csv_file, base=8)
+    generator = DisulfideClassGenerator(csv_file=sample_csv_file)
+    return generator
 
 
 class TestDisulfideClassGenerator:
@@ -95,40 +89,35 @@ class TestDisulfideClassGenerator:
         assert len(generator.df) == 2
         assert "class" in generator.df.columns
         assert "class_str" in generator.df.columns
-        assert generator.binary_class_disulfides == {}
-        assert generator.octant_class_disulfides == {}
+        assert not generator.binary_class_disulfides
+        assert not generator.octant_class_disulfides
 
-    def test_init_with_binary_base(self):
-        """Test initialization with binary base."""
+    def test_init_with_binary_and_octant_metrics(self):
+        """Test initialization with binary and octant metrics files."""
         # Skip if binary metrics file doesn't exist
         binary_path = Path(DATA_DIR) / BINARY_CLASS_METRICS_FILE
-        if not binary_path.exists():
-            pytest.skip(f"Binary metrics file not found: {binary_path}")
-        
-        generator = DisulfideClassGenerator(base=2)
-        assert generator.df is not None
-        assert generator.base == 2
-        assert generator.binary_class_disulfides == {}
-
-    def test_init_with_octant_base(self):
-        """Test initialization with octant base."""
-        # Skip if octant metrics file doesn't exist
         octant_path = Path(DATA_DIR) / OCTANT_CLASS_METRICS_FILE
-        if not octant_path.exists():
-            pytest.skip(f"Octant metrics file not found: {octant_path}")
-        
-        generator = DisulfideClassGenerator(base=8)
+
+        if not binary_path.exists() or not octant_path.exists():
+            pytest.skip(f"Metrics files not found: {binary_path} or {octant_path}")
+
+        generator = DisulfideClassGenerator()
         assert generator.df is not None
-        assert generator.base == 8
-        assert generator.octant_class_disulfides == {}
+        assert generator.binary_df is not None
+        assert generator.octant_df is not None
 
     def test_init_with_invalid_params(self):
         """Test initialization with invalid parameters."""
-        with pytest.raises(ValueError):
-            DisulfideClassGenerator()  # No parameters provided
-        
-        with pytest.raises(ValueError):
-            DisulfideClassGenerator(base=3)  # Invalid base
+        # Create a non-existent file path
+        non_existent_file = "/tmp/non_existent_file_" + str(os.getpid()) + ".csv"
+
+        # Ensure the file doesn't exist
+        if os.path.exists(non_existent_file):
+            os.unlink(non_existent_file)
+
+        # Now try to initialize with this non-existent file
+        with pytest.raises(FileNotFoundError):
+            DisulfideClassGenerator(csv_file=non_existent_file)
 
     def test_validate_df_missing_columns(self, sample_csv_file):
         """Test validation of DataFrame with missing columns."""
@@ -141,16 +130,16 @@ class TestDisulfideClassGenerator:
             }
             df = pd.DataFrame(data)
             df.to_csv(tmp.name, index=False)
-            
+
             with pytest.raises(ValueError):
                 DisulfideClassGenerator(csv_file=tmp.name)
-            
+
             os.unlink(tmp.name)
 
     def test_load_csv(self, sample_csv_file):
         """Test loading a CSV file."""
         generator = DisulfideClassGenerator(csv_file=sample_csv_file)
-        
+
         # Create a new CSV file
         with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp:
             data = {
@@ -169,88 +158,126 @@ class TestDisulfideClassGenerator:
             }
             df = pd.DataFrame(data)
             df.to_csv(tmp.name, index=False)
-            
+
             # Load the new CSV
             generator.load_csv(tmp.name)
             assert len(generator.df) == 2
             assert "3" in generator.df["class"].values
             assert "4" in generator.df["class"].values
-            
+
             os.unlink(tmp.name)
 
-    def test_generate_for_class(self, binary_generator):
+    def test_parse_class_string(self):
+        """Test the parse_class_string method."""
+        # Test binary class strings
+        assert DisulfideClassGenerator.parse_class_string("+-+++") == (2, "+-+++")
+        assert DisulfideClassGenerator.parse_class_string("+-+++b") == (2, "+-+++")
+
+        # Test octant class strings
+        assert DisulfideClassGenerator.parse_class_string("12345") == (8, "12345")
+        assert DisulfideClassGenerator.parse_class_string("12345o") == (8, "12345")
+
+        # Test invalid class strings
+        with pytest.raises(ValueError):
+            DisulfideClassGenerator.parse_class_string("12345x")
+
+        # Test non-string input
+        with pytest.raises(ValueError):
+            DisulfideClassGenerator.parse_class_string(12345)
+
+    def test_generate_for_class(self, generator):
         """Test generating disulfides for a specific class."""
-        # Test with valid class ID
-        disulfide_list = binary_generator.generate_for_class("+-+++", use_class_str=True)
+        # Set up the generator to use binary classes
+        generator.base = 2
+        generator.binary_df = generator.df
+
+        # Test with valid class ID - use class_str that matches the sample data
+        disulfide_list = generator.generate_for_class("+-+++", use_class_str=True)
         assert isinstance(disulfide_list, DisulfideList)
         assert len(disulfide_list) == 243  # 3^5 combinations
-        assert disulfide_list.pdb_id == "Class_1_+-+++"
-        
+
         # Verify the class is stored in binary_class_disulfides
-        assert "+-+++" in binary_generator.binary_class_disulfides
-        
+        assert "+-+++" in generator.binary_class_disulfides
+
         # Test with invalid class ID
-        result = binary_generator.generate_for_class("invalid", use_class_str=True)
+        result = generator.generate_for_class("invalid", use_class_str=True)
         assert result is None
-        
+
+        # Set up the generator to use octant classes
+        generator.base = 8
+        generator.octant_df = generator.df
+
         # Test with class column
-        class_disulfide_list = binary_generator.generate_for_class("1", use_class_str=False)
+        class_disulfide_list = generator.generate_for_class("1", use_class_str=False)
         assert isinstance(class_disulfide_list, DisulfideList)
         assert len(class_disulfide_list) == 243
 
-    def test_generate_for_selected_classes(self, binary_generator):
+    def test_generate_for_selected_classes(self, generator):
         """Test generating disulfides for selected classes."""
+        # Set up the generator to use binary classes
+        generator.base = 2
+
         # Test with valid class IDs
         class_ids = ["+-+++", "-+---"]
-        result = binary_generator.generate_for_selected_classes(class_ids, use_class_str=True)
+        result = generator.generate_for_selected_classes(class_ids, use_class_str=True)
         assert isinstance(result, dict)
         assert len(result) == 2
         assert "+-+++" in result
         assert "-+---" in result
         assert all(isinstance(ss_list, DisulfideList) for ss_list in result.values())
         assert all(len(ss_list) == 243 for ss_list in result.values())
-        
+
         # Test with invalid class IDs
-        result = binary_generator.generate_for_selected_classes(["invalid"], use_class_str=True)
+        result = generator.generate_for_selected_classes(
+            ["invalid"], use_class_str=True
+        )
         assert result == {}
-        
+
         # Test with class column
-        result = binary_generator.generate_for_selected_classes(["1", "2"], use_class_str=False)
+        result = generator.generate_for_selected_classes(
+            ["1", "2"], use_class_str=False
+        )
         assert isinstance(result, dict)
         assert len(result) == 2
         assert "1" in result
         assert "2" in result
 
-    def test_generate_for_all_classes(self, binary_generator):
+    def test_generate_for_all_classes(self, generator):
         """Test generating disulfides for all classes."""
-        result = binary_generator.generate_for_all_classes()
+        # Set up the generator to use binary classes
+        generator.base = 2
+
+        result = generator.generate_for_all_classes()
         assert isinstance(result, dict)
         assert len(result) == 2  # Two classes in the sample data
         assert all(isinstance(ss_list, DisulfideList) for ss_list in result.values())
         assert all(len(ss_list) == 243 for ss_list in result.values())
-        
-        # Verify all classes are stored in binary_class_disulfides
-        assert len(binary_generator.binary_class_disulfides) == 2
-        assert all(key in binary_generator.binary_class_disulfides for key in result.keys())
 
-    def test_generate_disulfides_for_class(self, binary_generator):
+        # Verify all classes are stored in binary_class_disulfides
+        assert len(generator.binary_class_disulfides) == 2
+        assert all(key in generator.binary_class_disulfides for key in result.keys())
+
+    def test_generate_disulfides_for_class(self, generator):
         """Test the _generate_disulfides_for_class method."""
+        # Set up the generator to use binary classes
+        generator.base = 2
+
         # Get the first row from the DataFrame
-        row = binary_generator.df.iloc[0]
-        
+        row = generator.df.iloc[0]
+
         # Generate disulfides
-        disulfide_list = binary_generator._generate_disulfides_for_class(row)
-        
+        disulfide_list = generator._generate_disulfides_for_class(row)
+
         # Verify the result
         assert isinstance(disulfide_list, DisulfideList)
         assert len(disulfide_list) == 243
         assert disulfide_list.pdb_id == f"Class_{row['class']}_{row['class_str']}"
-        
+
         # Check the first disulfide
         first_disulfide = disulfide_list[0]
         assert isinstance(first_disulfide, Disulfide)
         assert first_disulfide.name.startswith(f"{row['class_str']}b_comb")
-        
+
         # Check that the torsions are correctly set
         # First combination should be (mean-std) for all angles
         expected_torsions = [
@@ -262,17 +289,113 @@ class TestDisulfideClassGenerator:
         ]
         assert np.allclose(first_disulfide.dihedrals, expected_torsions)
 
+        # Set up the generator to use octant classes and test again
+        generator.base = 8
+        disulfide_list = generator._generate_disulfides_for_class(row)
+        first_disulfide = disulfide_list[0]
+        assert first_disulfide.name.startswith(f"{row['class_str']}o_comb")
+
+    def test_class_to_sslist(self, generator):
+        """Test the class_to_sslist method."""
+        # Set up the generator with some test data
+        generator.binary_class_disulfides = {"+-+++": DisulfideList([], "test_binary")}
+        generator.octant_class_disulfides = {"12345": DisulfideList([], "test_octant")}
+
+        # Test binary class
+        result = generator.class_to_sslist("+-+++", base=2)
+        assert result.pdb_id == "test_binary"
+
+        # Test octant class
+        result = generator.class_to_sslist("12345", base=8)
+        assert result.pdb_id == "test_octant"
+
+        # Test with suffix
+        result = generator.class_to_sslist("+-+++b")
+        assert result.pdb_id == "test_binary"
+
+        result = generator.class_to_sslist("12345o")
+        assert result.pdb_id == "test_octant"
+
+        # Test with invalid class
+        result = generator.class_to_sslist("invalid", base=2)
+        assert isinstance(result, np.ndarray)
+        assert len(result) == 0
+
+    def test_display(self, generator):
+        """Test the display method."""
+        # Mock the DisulfideList.display_overlay method
+        with patch(
+            "proteusPy.DisulfideBase.DisulfideList.display_overlay"
+        ) as mock_display:
+            # Set up the generator with some test data
+            generator.binary_class_disulfides = {
+                "+-+++": DisulfideList([], "test_binary")
+            }
+            generator.octant_class_disulfides = {
+                "12345": DisulfideList([], "test_octant")
+            }
+
+            # Test displaying a binary class
+            generator.display("+-+++")
+            mock_display.assert_called_once()
+            mock_display.reset_mock()
+
+            # Test displaying an octant class
+            generator.display("12345")
+            mock_display.assert_called_once()
+            mock_display.reset_mock()
+
+            # Test with parameters
+            generator.display(
+                "+-+++",
+                screenshot=True,
+                movie=True,
+                fname="test.png",
+                theme="dark",
+                winsize=(800, 600),
+            )
+            mock_display.assert_called_once_with(
+                screenshot=True,
+                movie=True,
+                verbose=True,
+                fname="test.png",
+                winsize=(800, 600),
+                light="dark",
+            )
+
+    def test_find_similar_class(self, generator):
+        """Test the _find_similar_class method."""
+        # Set up the generator with some test data
+        generator.binary_df = pd.DataFrame({"class": ["123", "456", "789"]})
+        generator.octant_df = pd.DataFrame({"class": ["abc", "def", "ghi"]})
+
+        # Test finding a similar binary class
+        result = generator._find_similar_class("12345", 2)
+        assert result == "123"
+
+        # Test finding a similar octant class
+        result = generator._find_similar_class("abcde", 8)
+        assert result == "abc"
+
+        # Test with no match
+        result = generator._find_similar_class("xyz", 8)
+        assert result is None
+
+        # Test with short string
+        result = generator._find_similar_class("ab", 8)
+        assert result is None
+
     def test_csv_file_not_loaded(self, sample_csv_file):
         """Test error when CSV file is not loaded."""
         generator = DisulfideClassGenerator(csv_file=sample_csv_file)
         generator.df = None
-        
+
         with pytest.raises(ValueError):
             generator.generate_for_class("+-+++")
-        
+
         with pytest.raises(ValueError):
             generator.generate_for_selected_classes(["+-+++"])
-        
+
         with pytest.raises(ValueError):
             generator.generate_for_all_classes()
 
@@ -282,7 +405,7 @@ class TestHelperFunctions:
 
     def test_generate_disulfides_for_all_classes(self, sample_csv_file):
         """Test the generate_disulfides_for_all_classes function."""
-        result = generate_disulfides_for_all_classes(sample_csv_file, base=2)
+        result = generate_disulfides_for_all_classes(sample_csv_file)
         assert isinstance(result, dict)
         assert len(result) == 2
         assert all(isinstance(ss_list, DisulfideList) for ss_list in result.values())
@@ -292,7 +415,7 @@ class TestHelperFunctions:
         """Test the generate_disulfides_for_selected_classes function."""
         class_ids = ["1", "2"]
         result = generate_disulfides_for_selected_classes(
-            sample_csv_file, class_ids, base=2, use_class_str=False
+            sample_csv_file, class_ids, use_class_str=False
         )
         assert isinstance(result, dict)
         assert len(result) == 2
@@ -301,25 +424,23 @@ class TestHelperFunctions:
 
     def test_generate_disulfides_for_class_from_csv(self, sample_csv_file):
         """Test the generate_disulfides_for_class_from_csv function."""
-        # Test with binary base
+        # Test with binary class string (+-+++)
         result = generate_disulfides_for_class_from_csv(
-            sample_csv_file, class_id="+-+++", base=2
+            sample_csv_file, class_id="+-+++"
         )
         assert isinstance(result, DisulfideList)
         assert len(result) == 243
-        
-        # Test with octant base
-        result = generate_disulfides_for_class_from_csv(
-            sample_csv_file, class_id="1", base=8
-        )
+
+        # Test with octant class string (numeric)
+        result = generate_disulfides_for_class_from_csv(sample_csv_file, class_id="1")
         assert isinstance(result, DisulfideList)
         assert len(result) == 243
-        
-        # Test with invalid base
-        with pytest.raises(ValueError):
-            generate_disulfides_for_class_from_csv(
-                sample_csv_file, class_id="1", base=3
-            )
+
+        # Test with invalid class string - now we expect None instead of ValueError
+        result = generate_disulfides_for_class_from_csv(
+            sample_csv_file, class_id="invalid"
+        )
+        assert result is None
 
 
 if __name__ == "__main__":
