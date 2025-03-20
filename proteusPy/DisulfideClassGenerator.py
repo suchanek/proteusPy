@@ -7,7 +7,7 @@ For each class, it generates all combinations of dihedral angles (mean-std, mean
 for each of the 5 dihedral angles, resulting in 3^5 = 243 combinations per class.
 
 Author: Eric G. Suchanek, PhD
-Last Modification: 2025-03-17
+Last Modification: 2025-03-19 22:07:58
 """
 
 # pylint: disable=C0301
@@ -75,11 +75,17 @@ class DisulfideClassGenerator:
         # Check for binary class indicators (+ or -)
         elif "+" in class_str or "-" in class_str:
             base = 2
-            clean_string = class_str
+            clean_string = class_str[:5]
 
         return base, clean_string
 
-    def __init__(self, csv_file: str = None, verbose: bool = True):
+    def __init__(
+        self,
+        csv_file: str = None,
+        verbose: bool = True,
+        precalc: bool = False,
+        csv_base: int = None,
+    ):
         """
         Initialize the DisulfideClassGenerator.
 
@@ -87,6 +93,10 @@ class DisulfideClassGenerator:
         :type csv_file: str, optional
         :param verbose: If True, log debug messages.
         :type verbose: bool
+        :param precalc: If True, pre-calculate disulfides for all classes in the DataFrame.
+        :type precalc: bool
+        :param base: The base class to use, 2 or 8. Default is None.
+        :type base: int, optional
         :raises ValueError: If no valid data source is provided or schema is invalid.
         """
         self.df = None
@@ -96,63 +106,93 @@ class DisulfideClassGenerator:
         self.binary_class_disulfides: Dict[str, DisulfideList] = {}
         self.octant_class_disulfides: Dict[str, DisulfideList] = {}
         self.base = None  # Will be determined based on class_str
+
         binary_path = Path(DATA_DIR) / BINARY_CLASS_METRICS_FILE
         octant_path = Path(DATA_DIR) / OCTANT_CLASS_METRICS_FILE
 
-        # Load both .pkl files at once if they exist
-        if binary_path.exists():
-            _logger.info("Loading binary metrics from %s", binary_path)
-            self.binary_df = pd.read_pickle(binary_path)
-
-        if octant_path.exists():
-            _logger.info("Loading octant metrics from %s", octant_path)
-            self.octant_df = pd.read_pickle(octant_path)
-
         if csv_file:
-            self.load_csv(csv_file)
+            self.load_csv(csv_file, base=csv_base)
+            self._validate_df()
         else:
+            # Load both .pkl files at once if they exist
+            if binary_path.exists():
+                _logger.info("Loading binary metrics from %s", binary_path)
+                self.binary_df = pd.read_pickle(binary_path)
+                self.binary_df["class"] = self.binary_df["class"].astype(str)
+                self.binary_df["class_str"] = self.binary_df["class_str"].astype(str)
+                self.df = self.binary_df
+                self._validate_df()
+
+            if octant_path.exists():
+                _logger.info("Loading octant metrics from %s", octant_path)
+                self.octant_df = pd.read_pickle(octant_path)
+                self.octant_df["class"] = self.octant_df["class"].astype(str)
+                self.octant_df["class_str"] = self.octant_df["class_str"].astype(str)
+                self.df = self.octant_df
+                self._validate_df()
+
             # Default to octant if no specific file is provided
             self.df = self.octant_df if self.octant_df is not None else self.binary_df
-            if self.df is None:
-                raise ValueError(
-                    "No valid data source available. Provide csv_file or ensure .pkl files exist."
-                )
 
-        self._validate_df()
+        if self.df is None:
+            raise ValueError(
+                "No valid data source available. Provide csv_file or ensure .pkl files exist."
+            )
+
         self.df["class"] = self.df["class"].astype(str)
         self.df["class_str"] = self.df["class_str"].astype(str)
 
         # Pre-calculate binary and octant dictionaries
-        """
-        if self.binary_df is not None:
-            _logger.info("Pre-calculating binary class disulfides...")
-            self._pre_calculate_class_disulfides(self.binary_df, is_binary=True)
+        if precalc:
+            if self.binary_df is not None:
+                _logger.info("Pre-calculating binary class disulfides...")
+                self._pre_calculate_class_disulfides(self.binary_df, is_binary=True)
 
-        if self.octant_df is not None:
-            _logger.info("Pre-calculating octant class disulfides...")
-            self._pre_calculate_class_disulfides(self.octant_df, is_binary=False)
-        """
+            if self.octant_df is not None:
+                _logger.info("Pre-calculating octant class disulfides...")
+                self._pre_calculate_class_disulfides(self.octant_df, is_binary=False)
+
+        return
 
     def _validate_df(self):
         """Validate that the DataFrame has all required columns."""
         required = ["class", "class_str"] + [
             f"chi{i}_{stat}" for i in range(1, 6) for stat in ["mean", "std"]
         ]
-        missing = [col for col in required if col not in self.df.columns]
-        if missing:
-            raise ValueError(f"DataFrame missing required columns: {missing}")
-        _logger.debug("DataFrame validated with columns: %s", list(self.df.columns))
 
-    def load_csv(self, csv_file: str):
+        # Only validate self.df if it's not the same as octant_df or binary_df
+        if self.df is not None:
+            missing = [col for col in required if col not in self.df.columns]
+            if missing:
+                raise ValueError(f"DataFrame missing required columns: {missing}")
+            _logger.debug(
+                "Custom DataFrame validated with columns: %s", list(self.df.columns)
+            )
+
+    def load_csv(self, csv_file: str, base: int = None) -> "DisulfideClassGenerator":
         """
         Load the CSV file containing class metrics.
 
         :param csv_file: Path to the CSV file.
         :type csv_file: str
+        :param base: The base class to use, 2 or 8. Default is None.
+        :type base: int, optional
         :return: Self for method chaining.
         :rtype: DisulfideClassGenerator
         """
         self.df = pd.read_csv(csv_file, dtype={"class": str, "class_str": str})
+        self.df["class"] = self.df["class"].astype(str)
+        self.df["class_str"] = self.df["class_str"].astype(str)
+        self.base = base
+
+        if base is not None:
+            if base == 2:
+                self.binary_df = self.df
+            elif base == 8:
+                self.octant_df = self.df
+            else:
+                raise ValueError(f"Invalid base class: {base}")
+
         return self
 
     def class_to_sslist(self, clsid: str, base: int = 8) -> np.ndarray:
@@ -224,9 +264,11 @@ class DisulfideClassGenerator:
         :type class_id: str
         :param use_class_str: If True, match on class_str column, otherwise match on class column.
         :rtype: DisulfideList or None
-        :raises ValueError: If CSV file is not loaded.
+        :raises ValueError: If no valid data source is provided or class is not found.
         """
+
         # Check if self.df is None (for backward compatibility with tests)
+
         if self.df is None:
             raise ValueError(
                 "No valid dataframe available for the specified class base."
@@ -291,10 +333,12 @@ class DisulfideClassGenerator:
         :type use_class_str: bool
         :return: A dictionary mapping class IDs to DisulfideLists.
         :rtype: Dict[str, DisulfideList]
-        :raises ValueError: If CSV file is not loaded.
+        :raises ValueError: If no valid data source is provided or no classes are found.
         """
         if self.df is None:
-            raise ValueError("CSV file not loaded.")
+            raise ValueError(
+                "No valid dataframe available for the specified class base."
+            )
 
         class_disulfides = {}
         # Use tqdm for progress bar if verbose is True
@@ -302,7 +346,7 @@ class DisulfideClassGenerator:
             tqdm.tqdm(
                 class_ids,
                 total=len(class_ids),
-                desc="Generating selected disulfides",
+                desc="Generating selected classes",
             )
             if self.verbose
             else class_ids
@@ -506,7 +550,7 @@ class DisulfideClassGenerator:
         :type theme: str
         :param winsize: Window size for the overlay.
         :type winsize: tuple
-        :raises ValueError: If CSV file is not loaded or class is not found.
+        :raises ValueError: If no valid data source is provided or class is not found.
         """
         # First check if we already have this class generated
         disulfide_list = None
@@ -694,7 +738,7 @@ class DisulfideClassGenerator:
 
 # Helper functions have been removed as they were redundant with class methods.
 # Use the DisulfideClassGenerator class methods directly instead:
-# 
+#
 # Example:
 #   generator = DisulfideClassGenerator(csv_file)
 #   result = generator.generate_for_class(class_id)
