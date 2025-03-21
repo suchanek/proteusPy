@@ -56,7 +56,6 @@ def main():
 
     DisulfideClassGenerator.display_class_disulfides(
         args.class_string,
-        base=args.base,
         light=args.theme,
         screenshot=args.screenshot,
         movie=args.movie,
