@@ -36,7 +36,7 @@ def main():
     print("Creating DisulfideClassGenerator instance...")
 
     # Create a generator instance and load the CSV file
-    generator = DisulfideClassGenerator(csv_file, base=2)
+    generator = DisulfideClassGenerator()
 
     # Example 1: Generate disulfides for a specific class using class_str
     class_str = "+++++"  # The RH Spiral class - this should be "+++++", not "+++++"

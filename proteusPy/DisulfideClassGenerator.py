@@ -534,6 +534,7 @@ class DisulfideClassGenerator:
         fname: str = "ss_overlay.png",
         theme: str = "auto",
         winsize: tuple = (1024, 1024),
+        verbose: bool = False,
     ) -> None:
         """
         Display an overlay of all disulfides for a specific structural class.
@@ -550,6 +551,8 @@ class DisulfideClassGenerator:
         :type theme: str
         :param winsize: Window size for the overlay.
         :type winsize: tuple
+        :param verbose: If True, display verbose output.
+        :type verbose: bool
         :raises ValueError: If no valid data source is provided or class is not found.
         """
         # First check if we already have this class generated
@@ -588,7 +591,7 @@ class DisulfideClassGenerator:
         disulfide_list.display_overlay(
             screenshot=screenshot,
             movie=movie,
-            verbose=self.verbose,
+            verbose=verbose,
             fname=fname,
             winsize=winsize,
             light=theme,
