@@ -12,6 +12,7 @@ Last revision: 2025-03-13 18:04:49
 
 import logging
 import math
+import time
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -603,6 +604,68 @@ class DisulfideVisualization:
         pl.show()
 
     @staticmethod
+    def simulate_orbit_on_path(plotter, steps=360, step_size=None, sleep_time=0.02):
+        """
+        Simulate the orbit_on_path function by manually updating the camera position
+        over a number of steps.
+
+        :param plotter: The PyVista plotter object
+        :type plotter: pv.Plotter
+        :param steps: Number of steps for one complete rotation, defaults to 360
+        :type steps: int, optional
+        :param step_size: Step size for the animation, defaults to 1.0/steps if None
+        :type step_size: float, optional
+        :param sleep_time: Time to sleep between steps in seconds, defaults to 0.02
+        :type sleep_time: float, optional
+        """
+
+        # Get the current camera focal point and position
+        focal_point = np.array(plotter.camera.focal_point)
+        current_position = np.array(plotter.camera.position)
+
+        # Compute radius as the distance from camera to focal point
+        radius = np.linalg.norm(current_position - focal_point)
+
+        # Calculate the initial angle in the XY plane
+        initial_angle = np.arctan2(
+            current_position[1] - focal_point[1], current_position[0] - focal_point[0]
+        )
+
+        # Calculate step size if not provided
+        if step_size is None:
+            step_size = 1.0 / steps
+
+        # Calculate the total number of steps based on step_size
+        total_steps = int(1.0 / step_size) if step_size > 0 else steps
+
+        # Start the orbit animation
+        for step in range(total_steps):
+            # Compute the angle for this step in radians
+            angle = initial_angle + 2 * np.pi * step / total_steps
+
+            # Create a new position orbiting in the XY plane (keeping Z constant)
+            new_position = focal_point + np.array(
+                [
+                    radius * np.cos(angle),
+                    radius * np.sin(angle),
+                    current_position[2],  # maintain the original Z level
+                ]
+            )
+
+            # Update the camera: new position, focal point, and an up vector
+            plotter.camera_position = (
+                new_position.tolist(),
+                focal_point.tolist(),
+                [0, 0, 1],
+            )
+            plotter.render()
+
+            # Pause briefly to control animation speed
+            time.sleep(sleep_time)
+
+        return
+
+    @staticmethod
     def display_overlay(
         sslist=None,
         pl=None,
@@ -612,17 +675,29 @@ class DisulfideVisualization:
         fname="ss_overlay.png",
         light="auto",
         winsize=WINSIZE,
+        spin=False,
+        steps=360,
+        step_size=None,
     ) -> pv.Plotter:
         """Display all disulfides in the list overlaid in stick mode against
         a common coordinate frame.
 
         :param sslist: List of Disulfide objects
+        :type sslist: DisulfideList
         :param screenshot: Save a screenshot
+        :type screenshot: bool
         :param movie: Save a movie
+        :type movie: bool
         :param verbose: Verbosity
+        :type verbose: bool
         :param fname: Filename to save for the movie or screenshot
+        :type fname: str
         :param light: Background color
+        :type light: str
         :param winsize: Window size tuple (width, height)
+        :type winsize: tuple
+        :param spin: Whether to spin the plot
+        :type spin: bool
         :return: pyvista.Plotter instance
         :rtype: pv.Plotter
         """
@@ -635,11 +710,11 @@ class DisulfideVisualization:
 
         res = 32
         if tot_ss > 10:
-            res = 18
+            res = 24
         if tot_ss > 15:
-            res = 12
+            res = 18
         if tot_ss > 20:
-            res = 8
+            res = 12
 
         title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), E: {avg_enrg:.2f} kcal/mol, Dist: {avg_dist:.2f} Å"
         fontsize = calculate_fontsize(title, winsize[0])
@@ -696,6 +771,7 @@ class DisulfideVisualization:
         elif movie:
             if verbose:
                 print(f" -> display_overlay(): Saving mp4 animation to: {fname}")
+            _logger.debug("Saving mp4 animation to: %s", fname)
 
             pl.open_movie(fname)
             path = pl.generate_orbital_path(n_points=360)
@@ -704,6 +780,35 @@ class DisulfideVisualization:
 
             if verbose:
                 print(f" -> display_overlay(): Saved mp4 animation to: {fname}")
+        elif spin:
+            _logger.debug("Spinning the plot.")
+            # Reset camera before generating the path
+            # pl.reset_camera()
+
+            # Generate the orbital path
+            # path = pl.generate_orbital_path(n_points=steps)
+
+            # Calculate step size if not provided
+            if step_size is None:
+                step_size = 1.0 / steps
+
+            if verbose:
+                print(
+                    " -> display_overlay(): Spinning the plot. Window will remain open after spinning."
+                )
+
+            # First show the plot to initialize the window
+            pl.show(auto_close=False)
+
+            # Then apply the orbit path - this will spin the view and keep the window open
+            try:
+                # Use our custom simulation function instead of orbit_on_path
+                DisulfideVisualization.simulate_orbit_on_path(
+                    pl, steps=steps, step_size=step_size
+                )
+            except Exception as e:
+                _logger.error("Error during simulate_orbit_on_path: %s", e)
+
         else:
             pl.show()
         return pl
@@ -1154,6 +1259,8 @@ class DisulfideVisualization:
                     smooth_shading=True,
                     specular=spec,
                     specular_power=specpow,
+                    theta_resolution=res,
+                    phi_resolution=res,
                 )
 
         def draw_bonds(
@@ -1312,8 +1419,18 @@ class DisulfideVisualization:
                 if i >= 11:  # prev and next residue atoms for phi/psi calcs
                     bradius = bradius * 0.5  # make smaller to distinguish
 
-                cap1 = pv.Sphere(center=prox_pos, radius=bradius)
-                cap2 = pv.Sphere(center=distal_pos, radius=bradius)
+                cap1 = pv.Sphere(
+                    center=prox_pos,
+                    radius=bradius,
+                    theta_resolution=res,
+                    phi_resolution=res,
+                )
+                cap2 = pv.Sphere(
+                    center=distal_pos,
+                    radius=bradius,
+                    theta_resolution=res,
+                    phi_resolution=res,
+                )
 
                 if style == "plain":
                     cyl = pv.Cylinder(
@@ -1532,8 +1649,9 @@ class DisulfideVisualization:
 
         if verbose:
             print(f"Rendering animation to {fname}...")
+        set_pyvista_theme("auto")
 
-        pl = pv.Plotter(window_size=WINSIZE, off_screen=True, theme="document")
+        pl = pv.Plotter(window_size=WINSIZE, off_screen=True)
         pl.open_movie(fname)
         path = pl.generate_orbital_path(n_points=steps)
 
@@ -1553,7 +1671,9 @@ class DisulfideVisualization:
             print(f"Saved mp4 animation to: {fname}")
 
     @staticmethod
-    def spin(ss, style="sb", verbose=False, steps=360, theme="auto") -> None:
+    def spin(
+        ss, style="sb", pl=None, verbose=False, steps=360, theme="auto"
+    ) -> pv.Plotter:
         """
         Spin the object by rotating it one revolution about the Y axis in the given style.
 
@@ -1579,27 +1699,39 @@ class DisulfideVisualization:
             _logger.info("Spinning object: %d steps...", steps)
 
         # Create a Plotter instance
-        pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
+        if not pl:
+            pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
+
         pl.add_title(title=title, font_size=dpi_adjusted_fontsize(FONTSIZE))
 
         # Enable anti-aliasing for smoother rendering
         pl.enable_anti_aliasing("msaa")
 
         # Generate an orbital path for spinning
-        path = pl.generate_orbital_path(n_points=steps)
+        # path = pl.generate_orbital_path(n_points=steps)
 
         # Render the object in the specified style
         pl = DisulfideVisualization._render_ss(ss, pl, style=style)
 
         pl.reset_camera()
         pl.show(auto_close=False)
-        nstep = 1 / steps
+
+        step_size = 1 / steps
+
+        try:
+            # Use our custom simulation function instead of orbit_on_path
+            DisulfideVisualization.simulate_orbit_on_path(
+                pl, steps=steps, step_size=step_size
+            )
+        except Exception as e:
+            _logger.error("Error during simulate_orbit_on_path: %s", e)
 
         # Orbit the camera along the generated path
-        pl.orbit_on_path(path, write_frames=False, step=nstep)
 
         if verbose:
             print("Spinning completed.")
+
+        return pl
 
     @staticmethod
     def screenshot(
@@ -1930,4 +2062,57 @@ class DisulfideVisualization:
 
         return fig, (ax1, ax2)
 
+    @staticmethod
+    def plot_energy_by_class(
+        metrics_df: pd.DataFrame,
+        title: str = "Energy Distribution by Class",
+        theme: str = "auto",
+        save: bool = False,
+        savedir: str = ".",
+        verbose: bool = False
+    ) -> None:
+        """
+        Create a box plot showing energy distribution by class_id using plotly_express.
+        
+        :param metrics_df: DataFrame containing the metrics data with class_id and energy columns
+        :param title: Title for the plot
+        :param theme: Theme to use for the plot ('auto', 'light', or 'dark')
+        :param save: Whether to save the plot
+        :param savedir: Directory to save the plot to
+        :param verbose: Whether to display verbose output
+        """
+        # Set the plotly theme
+        set_plotly_theme(theme)
+        
+        # Create box plot using plotly_express
+        fig = px.box(
+            metrics_df,
+            x="class",  # x-axis: class IDs
+            y="energy",    # y-axis: energy values
+            title=title,
+            labels={
+                "class": "Class ID",
+                "energy": "Energy (kcal/mol)"
+            }
+        )
+        
+        # Update layout for consistent styling
+        fig.update_layout(
+            showlegend=True,
+            title_x=0.5,
+            title_font=dict(size=20),
+            xaxis_showgrid=False,
+            yaxis_showgrid=False,
+            autosize=True
+        )
+        
+        # Save or display the plot
+        if save:
+            fname = Path(savedir) / f"{title.lower().replace(' ', '_')}.png"
+            if verbose:
+                _logger.info("Saving plot to %s", fname)
+            fig.write_image(fname, "png")
+        else:
+            fig.show()
+    
     # EOF
