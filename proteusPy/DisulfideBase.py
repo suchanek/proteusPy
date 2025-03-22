@@ -33,6 +33,7 @@ from itertools import combinations
 from math import cos
 
 import numpy as np
+import pyvista as pv
 from scipy.optimize import minimize
 
 from proteusPy.DisulfideClassManager import DisulfideClassManager
@@ -305,6 +306,7 @@ class DisulfideList(UserList):
         sslist = sorted(self.data)
         return sslist[-1]
 
+    @property
     def minmax_distance(self) -> tuple:
         """Return the Disulfides with min/max Cα distances"""
         sslist = self.data
@@ -496,6 +498,7 @@ class DisulfideList(UserList):
         fname="ss_overlay.png",
         light="auto",
         winsize=(1024, 1024),
+        spin=False,
     ):
         """Display all disulfides in the list overlaid in stick mode against
         a common coordinate frame.
@@ -507,15 +510,34 @@ class DisulfideList(UserList):
         :param light: Background color
         :param winsize: Window size tuple (width, height)
         """
+
+        # pl = pv.Plotter(window_size=winsize, off_screen=False)
+        # pl.show(auto_close=False)
+
         DisulfideVisualization.display_overlay(
             sslist=self,
+            pl=None,
             screenshot=screenshot,
             movie=movie,
             verbose=verbose,
             fname=fname,
             light=light,
             winsize=winsize,
+            spin=spin,
         )
+
+        if spin:
+            DisulfideVisualization.display_overlay(
+                sslist=self,
+                pl=None,
+                screenshot=False,
+                movie=False,
+                verbose=verbose,
+                fname=fname,
+                light=light,
+                winsize=winsize,
+                spin=False,
+            )
 
     def display_torsion_statistics(
         self,
@@ -1594,7 +1616,16 @@ class Disulfide:
         :param verbose: Verbosity, defaults to False
         :param steps: Number of steps for one complete rotation, defaults to 360.
         """
-        DisulfideVisualization.spin(self, style, verbose, steps, theme)
+
+        pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
+
+        pl = DisulfideVisualization.spin(
+            self, pl=pl, style=style, verbose=verbose, steps=steps, theme=theme
+        )
+
+        self.display(style=style)
+
+        # pl.show(auto_close=False)
 
     def pprint(self) -> None:
         """

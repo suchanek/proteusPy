@@ -526,6 +526,103 @@ class DisulfideClassGenerator:
 
         print("\n" + "=" * 80 + "\n")
 
+    def prepare_energy_data(self) -> pd.DataFrame:
+        """
+        Prepare a DataFrame containing energy values for each class.
+        This data is suitable for creating box plots showing energy distribution by class.
+        
+        :return: DataFrame with columns for class_id and energy values
+        :rtype: pd.DataFrame
+        """
+        energy_data = []
+        
+        # Process binary classes if available
+        if self.binary_class_disulfides:
+            for class_id, disulfide_list in self.binary_class_disulfides.items():
+                for ss in disulfide_list:
+                    energy_data.append({
+                        "class": class_id,
+                        "class_str": class_id,
+                        "energy": ss.energy,
+                        "base": 2
+                    })
+        
+        # Process octant classes if available
+        if self.octant_class_disulfides:
+            for class_id, disulfide_list in self.octant_class_disulfides.items():
+                for ss in disulfide_list:
+                    energy_data.append({
+                        "class": class_id,
+                        "class_str": class_id,
+                        "energy": ss.energy,
+                        "base": 8
+                    })
+        
+        # Create DataFrame from collected data
+        energy_df = pd.DataFrame(energy_data)
+        
+        if not energy_df.empty:
+            _logger.info("Created energy DataFrame with %d entries", len(energy_df))
+        else:
+            _logger.warning("No energy data available. Generate disulfides first.")
+            
+        return energy_df
+    
+    def plot_energy_by_class(
+        self,
+        base: int = None,
+        title: str = "Energy Distribution by Class",
+        theme: str = "auto",
+        save: bool = False,
+        savedir: str = ".",
+        verbose: bool = False
+    ) -> None:
+        """
+        Create a box plot showing energy distribution by class_id.
+        
+        :param base: The base class to use (2 for binary, 8 for octant). If None, use all available data.
+        :type base: int, optional
+        :param title: Title for the plot
+        :type title: str
+        :param theme: Theme to use for the plot ('auto', 'light', or 'dark')
+        :type theme: str
+        :param save: Whether to save the plot
+        :type save: bool
+        :param savedir: Directory to save the plot to
+        :type savedir: str
+        :param verbose: Whether to display verbose output
+        :type verbose: bool
+        """
+        from proteusPy.DisulfideVisualization import DisulfideVisualization
+        
+        # Prepare energy data
+        energy_df = self.prepare_energy_data()
+        
+        if energy_df.empty:
+            _logger.warning("No energy data available. Generate disulfides first.")
+            return
+        
+        # Filter by base if specified
+        if base is not None:
+            if base not in [2, 8]:
+                raise ValueError("Base must be 2 (binary) or 8 (octant)")
+            
+            energy_df = energy_df[energy_df["base"] == base]
+            base_str = "Binary" if base == 2 else "Octant"
+            plot_title = f"{base_str} Class {title}"
+        else:
+            plot_title = title
+        
+        # Create the box plot
+        DisulfideVisualization.plot_energy_by_class(
+            energy_df,
+            title=plot_title,
+            theme=theme,
+            save=save,
+            savedir=savedir,
+            verbose=verbose
+        )
+    
     def display(
         self,
         class_id: str,
@@ -731,24 +828,13 @@ class DisulfideClassGenerator:
                 fname=fname,
                 theme=light,
                 winsize=winsize,
+                verbose=verbose,
             )
         except ValueError as e:
             print(f"Error: {e}")
 
 
 # class ends
-
-
-# Helper functions have been removed as they were redundant with class methods.
-# Use the DisulfideClassGenerator class methods directly instead:
-#
-# Example:
-#   generator = DisulfideClassGenerator(csv_file)
-#   result = generator.generate_for_class(class_id)
-#   # or
-#   result = generator.generate_for_selected_classes(class_ids)
-#   # or
-#   result = generator.generate_for_all_classes()
 
 
 if __name__ == "__main__":
