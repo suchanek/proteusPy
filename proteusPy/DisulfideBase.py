@@ -1384,6 +1384,41 @@ class Disulfide:
         # Return the square root of the mean squared difference as the RMS distance
         return math.sqrt(mean_squared_diff)
 
+    def Torsion_RMS_sslist(self, sslist: DisulfideList) -> float:
+        """
+        Calculate the Average RMS distance between the dihedral angles of self and a DisulfideList.
+
+        :param sslist: DisulfideList object to compare against.
+        :type sslist: DisulfideList
+        :return: RMS distance in degrees.
+        :rtype: float
+        :raises ValueError: If the torsion arrays of self and other are not of equal length.
+        """
+        # Get internal coordinates of both objects
+        ic1 = self.torsion_array
+        rms_list = []
+
+        for other in sslist:
+            ic2 = other.torsion_array
+
+            # Ensure both torsion arrays have the same length
+            if len(ic1) != len(ic2):
+                raise ValueError("Torsion arrays must be of the same length.")
+
+            # Compute the total squared difference between corresponding internal coordinates
+            total_squared_diff = sum(
+                (angle1 - angle2) ** 2 for angle1, angle2 in zip(ic1, ic2)
+            )
+            mean_squared_diff = total_squared_diff / len(ic1)
+            rms = math.sqrt(mean_squared_diff)
+            rms_list.append(rms)
+
+        rms_tot = 0
+        for rms in rms_list:
+            rms_tot += rms
+
+        return rms_tot / len(rms_list) if rms_list else 0.0
+
     def get_chains(self) -> tuple:
         """
         Return the proximal and distal chain IDs for the Disulfide.
