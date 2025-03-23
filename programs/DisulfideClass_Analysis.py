@@ -295,6 +295,11 @@ def task(
                     theme="light",
                 )
 
+            avg_conformation = class_disulfides.average_conformation
+            ssname = f"{cls}b" if base == 2 else f"{cls}o"
+            exemplar = Disulfide(ssname, torsions=avg_conformation)
+            avg_torsion_distance = exemplar.Torsion_RMS_sslist(class_disulfides)
+
             # Calculate metrics
             avg_ca_distance = class_disulfides.average_ca_distance
             avg_energy = class_disulfides.average_energy
@@ -322,6 +327,7 @@ def task(
                 "std_energy": std_energy,
                 "avg_ca_distance": avg_ca_distance,
                 "std_ca_distance": std_ca_distance,
+                "avg_torsion_distance": avg_torsion_distance,
                 "chi1_mean": tor_mean_vals[0],
                 "chi1_std": tor_std_vals[0],
                 "chi2_mean": tor_mean_vals[1],
@@ -335,9 +341,6 @@ def task(
             }
             metrics_list.append(metrics)
 
-            avg_conformation = class_disulfides.average_conformation
-            ssname = f"{cls}b" if base == 2 else f"{cls}o"
-            exemplar = Disulfide(ssname, torsions=avg_conformation)
             result_list.append(exemplar)
             overall_pbar.update(1)
     finally:

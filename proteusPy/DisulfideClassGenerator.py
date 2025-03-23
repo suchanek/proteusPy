@@ -530,44 +530,48 @@ class DisulfideClassGenerator:
         """
         Prepare a DataFrame containing energy values for each class.
         This data is suitable for creating box plots showing energy distribution by class.
-        
+
         :return: DataFrame with columns for class_id and energy values
         :rtype: pd.DataFrame
         """
         energy_data = []
-        
+
         # Process binary classes if available
         if self.binary_class_disulfides:
             for class_id, disulfide_list in self.binary_class_disulfides.items():
                 for ss in disulfide_list:
-                    energy_data.append({
-                        "class": class_id,
-                        "class_str": class_id,
-                        "energy": ss.energy,
-                        "base": 2
-                    })
-        
+                    energy_data.append(
+                        {
+                            "class": class_id,
+                            "class_str": class_id,
+                            "energy": ss.energy,
+                            "base": 2,
+                        }
+                    )
+
         # Process octant classes if available
         if self.octant_class_disulfides:
             for class_id, disulfide_list in self.octant_class_disulfides.items():
                 for ss in disulfide_list:
-                    energy_data.append({
-                        "class": class_id,
-                        "class_str": class_id,
-                        "energy": ss.energy,
-                        "base": 8
-                    })
-        
+                    energy_data.append(
+                        {
+                            "class": class_id,
+                            "class_str": class_id,
+                            "energy": ss.energy,
+                            "base": 8,
+                        }
+                    )
+
         # Create DataFrame from collected data
         energy_df = pd.DataFrame(energy_data)
-        
+
         if not energy_df.empty:
             _logger.info("Created energy DataFrame with %d entries", len(energy_df))
         else:
             _logger.warning("No energy data available. Generate disulfides first.")
-            
+
         return energy_df
-    
+
     def plot_energy_by_class(
         self,
         base: int = None,
@@ -575,11 +579,15 @@ class DisulfideClassGenerator:
         theme: str = "auto",
         save: bool = False,
         savedir: str = ".",
-        verbose: bool = False
+        verbose: bool = False,
+        split: bool = False,
+        max_classes_per_plot: int = 330,
+        dpi: int = 600,
+        suffix: str = "png",
     ) -> None:
         """
         Create a box plot showing energy distribution by class_id.
-        
+
         :param base: The base class to use (2 for binary, 8 for octant). If None, use all available data.
         :type base: int, optional
         :param title: Title for the plot
@@ -592,27 +600,34 @@ class DisulfideClassGenerator:
         :type savedir: str
         :param verbose: Whether to display verbose output
         :type verbose: bool
+        :param split: Whether to split the plot into multiple plots if there are many classes
+        :type split: bool
+        :param max_classes_per_plot: Maximum number of classes to include in each plot when splitting
+        :type max_classes_per_plot: int
+        :param dpi: DPI (dots per inch) for the saved image, controls the resolution (default: 300)
+        :type dpi: int
         """
         from proteusPy.DisulfideVisualization import DisulfideVisualization
-        
+
         # Prepare energy data
         energy_df = self.prepare_energy_data()
-        
+
         if energy_df.empty:
             _logger.warning("No energy data available. Generate disulfides first.")
             return
-        
+
         # Filter by base if specified
         if base is not None:
             if base not in [2, 8]:
                 raise ValueError("Base must be 2 (binary) or 8 (octant)")
-            
+
             energy_df = energy_df[energy_df["base"] == base]
             base_str = "Binary" if base == 2 else "Octant"
             plot_title = f"{base_str} Class {title}"
+
         else:
             plot_title = title
-        
+
         # Create the box plot
         DisulfideVisualization.plot_energy_by_class(
             energy_df,
@@ -620,9 +635,124 @@ class DisulfideClassGenerator:
             theme=theme,
             save=save,
             savedir=savedir,
-            verbose=verbose
+            verbose=verbose,
+            split=split,
+            max_classes_per_plot=max_classes_per_plot,
+            dpi=dpi,
+            suffix=suffix,
         )
-    
+
+    def plot_torsion_distance_by_class(
+        self,
+        base: int = None,
+        title: str = "Torsion Distance by Class",
+        theme: str = "auto",
+        save: bool = False,
+        savedir: str = ".",
+        verbose: bool = False,
+        split: bool = False,
+        max_classes_per_plot: int = 330,
+        dpi: int = 300,
+        suffix: str = "png",
+    ) -> None:
+        """
+        Create a bar chart showing torsion distance by class_id.
+
+        :param base: The base class to use (2 for binary, 8 for octant). If None, use all available data.
+        :type base: int, optional
+        :param title: Title for the plot
+        :type title: str
+        :param theme: Theme to use for the plot ('auto', 'light', or 'dark')
+        :type theme: str
+        :param save: Whether to save the plot
+        :type save: bool
+        :param savedir: Directory to save the plot to
+        :type savedir: str
+        :param verbose: Whether to display verbose output
+        :type verbose: bool
+        :param split: Whether to split the plot into multiple plots if there are many classes
+        :type split: bool
+        :param max_classes_per_plot: Maximum number of classes to include in each plot when splitting
+        :type max_classes_per_plot: int
+        :param dpi: DPI (dots per inch) for the saved image, controls the resolution (default: 600)
+        :type dpi: int
+        :param suffix: File format for saved images (default: "png")
+        :type suffix: str
+        """
+        from proteusPy.DisulfideVisualization import DisulfideVisualization
+
+        # Determine which DataFrame to use based on base parameter
+        if base is not None:
+            if base not in [2, 8]:
+                raise ValueError("Base must be 2 (binary) or 8 (octant)")
+
+            df_to_use = self.binary_df if base == 2 else self.octant_df
+            base_str = "Binary" if base == 2 else "Octant"
+            plot_title = f"{base_str} {title}"
+        else:
+            # Default to octant if available, otherwise binary
+            df_to_use = self.octant_df if self.octant_df is not None else self.binary_df
+            plot_title = title
+
+        if df_to_use is None or df_to_use.empty:
+            _logger.warning("No data available for the specified base.")
+            return
+
+        # Check if avg_torsion_distance column exists
+        if "avg_torsion_distance" not in df_to_use.columns:
+            _logger.warning("avg_torsion_distance column not found in the DataFrame.")
+            return
+
+        # Create a copy of the DataFrame to avoid modifying the original
+        plot_df = df_to_use.copy()
+
+        # If not splitting or few classes, create a single plot
+        if not split or len(plot_df) <= max_classes_per_plot:
+            # Create line plot using plotly_express
+            DisulfideVisualization.plot_torsion_distance_by_class(
+                plot_df,
+                title=plot_title,
+                theme=theme,
+                save=save,
+                savedir=savedir,
+                verbose=verbose,
+                dpi=dpi,
+                suffix=suffix,
+            )
+        else:
+            # Split into multiple plots
+            num_plots = (
+                len(plot_df) + max_classes_per_plot - 1
+            ) // max_classes_per_plot
+
+            if verbose:
+                _logger.info(
+                    "Splitting into %d plots with up to %d classes each",
+                    num_plots,
+                    max_classes_per_plot,
+                )
+
+            for i in range(num_plots):
+                start_idx = i * max_classes_per_plot
+                end_idx = min((i + 1) * max_classes_per_plot, len(plot_df))
+                subset_df = plot_df.iloc[start_idx:end_idx]
+
+                # Create plot title for this subset
+                subset_title = f"{plot_title} (Part {i+1} of {num_plots})"
+                fname_prefix = f"{plot_title.lower().replace(' ', '_')}_part_{i+1}"
+                # Create line plot for this subset
+                DisulfideVisualization.plot_torsion_distance_by_class(
+                    subset_df,
+                    title=subset_title,
+                    theme=theme,
+                    save=save,
+                    savedir=savedir,
+                    verbose=verbose,
+                    dpi=dpi,
+                    suffix=suffix,
+                    fname_prefix=fname_prefix,
+                )
+
     def display(
         self,
         class_id: str,

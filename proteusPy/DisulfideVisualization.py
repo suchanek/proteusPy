@@ -2069,50 +2069,205 @@ class DisulfideVisualization:
         theme: str = "auto",
         save: bool = False,
         savedir: str = ".",
-        verbose: bool = False
+        verbose: bool = False,
+        split: bool = False,
+        max_classes_per_plot: int = 32,
+        dpi: int = 300,
+        suffix: str = "png",
     ) -> None:
         """
         Create a box plot showing energy distribution by class_id using plotly_express.
-        
+
         :param metrics_df: DataFrame containing the metrics data with class_id and energy columns
         :param title: Title for the plot
         :param theme: Theme to use for the plot ('auto', 'light', or 'dark')
         :param save: Whether to save the plot
         :param savedir: Directory to save the plot to
         :param verbose: Whether to display verbose output
+        :param split: Whether to split the plot into multiple plots if there are many classes
+        :param max_classes_per_plot: Maximum number of classes to include in each plot when splitting
+        :param dpi: DPI (dots per inch) for the saved image, controls the resolution (default: 300)
         """
         # Set the plotly theme
         set_plotly_theme(theme)
-        
-        # Create box plot using plotly_express
-        fig = px.box(
+
+        # If not splitting or few classes, create a single plot
+        if not split or len(metrics_df["class"].unique()) <= max_classes_per_plot:
+            # Create box plot using plotly_express
+            fig = px.box(
+                metrics_df,
+                x="class",  # x-axis: class IDs
+                y="energy",  # y-axis: energy values
+                title=title,
+                labels={"class": "Class ID", "energy": "Energy (kcal/mol)"},
+            )
+
+            # Update layout for consistent styling
+            fig.update_layout(
+                showlegend=True,
+                title_x=0.5,
+                title_font=dict(size=20),
+                xaxis_showgrid=False,
+                yaxis_showgrid=False,
+                autosize=True,
+            )
+
+            # Save or display the plot
+            if save:
+                fname = Path(savedir) / f"{title.lower().replace(' ', '_')}.png"
+                if verbose:
+                    _logger.info("Saving plot to %s with DPI %d", fname, dpi)
+                # Convert DPI to scale factor (300 DPI is considered standard, so scale = dpi/300)
+                scale = dpi / 300
+                fig.write_image(fname, suffix, scale=scale)
+            else:
+                fig.show()
+        else:
+            # Split into multiple plots
+            unique_classes = metrics_df["class"].unique()
+            num_plots = (
+                len(unique_classes) + max_classes_per_plot - 1
+            ) // max_classes_per_plot
+
+            if verbose:
+                _logger.info(
+                    "Splitting into %d plots with up to %d classes each",
+                    num_plots,
+                    max_classes_per_plot,
+                )
+
+            for i in range(num_plots):
+                start_idx = i * max_classes_per_plot
+                end_idx = min((i + 1) * max_classes_per_plot, len(unique_classes))
+                classes_subset = unique_classes[start_idx:end_idx]
+
+                # Filter DataFrame for current subset of classes
+                subset_df = metrics_df[metrics_df["class"].isin(classes_subset)]
+
+                # Create plot title for this subset
+                subset_title = f"{title} (Part {i+1}/{num_plots})"
+
+                # Create box plot for this subset
+                fig = px.box(
+                    subset_df,
+                    x="class",
+                    y="energy",
+                    title=subset_title,
+                    labels={"class": "Class ID", "energy": "Energy (kcal/mol)"},
+                )
+
+                # Update layout for consistent styling
+                fig.update_layout(
+                    showlegend=True,
+                    title_x=0.5,
+                    title_font=dict(size=20),
+                    xaxis_showgrid=False,
+                    yaxis_showgrid=False,
+                    autosize=True,
+                )
+
+                # Save or display the plot
+                if save:
+                    fname = (
+                        Path(savedir)
+                        / f"{title.lower().replace(' ', '_')}_part_{i+1}.{suffix}"
+                    )
+                    if verbose:
+                        _logger.info(
+                            "Saving plot part %d to %s with DPI %d", i + 1, fname, dpi
+                        )
+                    # Convert DPI to scale factor (300 DPI is considered standard, so scale = dpi/300)
+                    scale = dpi / 300
+                    fig.write_image(fname, suffix, scale=scale)
+                else:
+                    fig.show()
+
+    @staticmethod
+    def plot_torsion_distance_by_class(
+        metrics_df: pd.DataFrame,
+        title: str = "Torsion Distance by Class",
+        theme: str = "auto",
+        save: bool = False,
+        savedir: str = ".",
+        verbose: bool = False,
+        dpi: int = 300,
+        suffix: str = "png",
+        fname_prefix: str = "",
+    ) -> None:
+        """
+        Create a bar chart showing torsion distance by class_id using plotly_express.
+
+        :param metrics_df: DataFrame containing the metrics data with class_id and avg_torsion_distance columns
+        :param title: Title for the plot
+        :param theme: Theme to use for the plot ('auto', 'light', or 'dark')
+        :param save: Whether to save the plot
+        :param savedir: Directory to save the plot to
+        :param verbose: Whether to display verbose output
+        :param dpi: DPI (dots per inch) for the saved image, controls the resolution (default: 300)
+        :param suffix: File format for saved images (default: "png")
+        """
+        # Set the plotly theme
+        set_plotly_theme(theme)
+
+        # Check if avg_torsion_distance column exists
+        if "avg_torsion_distance" not in metrics_df.columns:
+            _logger.warning("avg_torsion_distance column not found in the DataFrame.")
+            return
+
+        # Calculate threshold for high occupancy classes (mean + 1 std dev)
+        count_threshold = metrics_df["count"].mean() + metrics_df["count"].std()
+
+        # Create color array based on threshold
+        colors = [
+            (
+                "rgba(65, 105, 225, 0.7)"
+                if x < count_threshold
+                else "rgba(220, 20, 60, 0.7)"
+            )
+            for x in metrics_df["count"]
+        ]
+
+        # Create bar chart using plotly_express
+        fig = px.bar(
             metrics_df,
             x="class",  # x-axis: class IDs
-            y="energy",    # y-axis: energy values
+            y="avg_torsion_distance",  # y-axis: torsion distance values
             title=title,
             labels={
                 "class": "Class ID",
-                "energy": "Energy (kcal/mol)"
-            }
+                "avg_torsion_distance": "Average Torsion Distance (°)",
+                "count": "Count",
+            },
+            hover_data=["count"],  # Add count to hover information
         )
-        
+
+        # Update marker colors based on threshold
+        fig.update_traces(marker_color=colors)
+
         # Update layout for consistent styling
         fig.update_layout(
-            showlegend=True,
+            showlegend=False,  # No legend needed for a single bar series
             title_x=0.5,
             title_font=dict(size=20),
-            xaxis_showgrid=False,
-            yaxis_showgrid=False,
-            autosize=True
+            xaxis_showgrid=True,
+            yaxis_showgrid=True,
+            autosize=True,
+            xaxis=dict(
+                tickangle=-45,  # Angle the x-axis labels for better readability
+                tickmode="auto",
+            ),
         )
-        
+
         # Save or display the plot
         if save:
-            fname = Path(savedir) / f"{title.lower().replace(' ', '_')}.png"
+            fname = Path(savedir) / f"{fname_prefix}.{suffix}"
+
             if verbose:
-                _logger.info("Saving plot to %s", fname)
-            fig.write_image(fname, "png")
+                _logger.info("Saving plot to %s with DPI %d", fname, dpi)
+            # Convert DPI to scale factor (300 DPI is considered standard, so scale = dpi/300)
+            scale = dpi / 300
+            fig.write_image(fname, suffix, scale=scale)
         else:
             fig.show()
-    
+
     # EOF
