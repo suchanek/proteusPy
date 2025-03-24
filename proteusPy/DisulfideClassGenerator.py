@@ -13,15 +13,14 @@ Last Modification: 2025-03-23
 import itertools
 import pickle
 from concurrent.futures import ThreadPoolExecutor
-from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
-import numpy as np
 import pandas as pd
 import tqdm
 
 from proteusPy.DisulfideBase import Disulfide, DisulfideList
+from proteusPy.DisulfideVisualization import DisulfideVisualization
 from proteusPy.logger_config import create_logger
 from proteusPy.ProteusGlobals import (
     BINARY_CLASS_METRICS_FILE,
@@ -322,8 +321,8 @@ class DisulfideClassGenerator:
                 futures, desc="Generating classes", disable=not self.verbose
             ):
                 class_id = futures[future]
-                if (result := future.result()) is not None:
-                    class_disulfides[class_id] = result
+                if (_result := future.result()) is not None:
+                    class_disulfides[class_id] = _result
 
         _logger.info("Generated disulfides for %d classes", len(class_disulfides))
         return class_disulfides
@@ -467,7 +466,6 @@ class DisulfideClassGenerator:
         :type title: str
         :param kwargs: Additional plotting options.
         """
-        from proteusPy.DisulfideVisualization import DisulfideVisualization
 
         energy_df = self.prepare_energy_data()
         if energy_df.empty:
@@ -481,6 +479,116 @@ class DisulfideClassGenerator:
             raise ValueError("Base must be 2 or 8.")
 
         DisulfideVisualization.plot_energy_by_class(energy_df, title=title, **kwargs)
+
+    def plot_torsion_distance_by_class(
+        self,
+        base: int = None,
+        title: str = "Torsion Distance by Class",
+        theme: str = "auto",
+        save: bool = False,
+        savedir: str = ".",
+        verbose: bool = False,
+        split: bool = False,
+        max_classes_per_plot: int = 330,
+        dpi: int = 300,
+        suffix: str = "png",
+    ) -> None:
+        """
+        Create a bar chart showing torsion distance by class_id.
+
+        :param base: The base class to use (2 for binary, 8 for octant). If None, use all available data.
+        :type base: int, optional
+        :param title: Title for the plot
+        :type title: str
+        :param theme: Theme to use for the plot ('auto', 'light', or 'dark')
+        :type theme: str
+        :param save: Whether to save the plot
+        :type save: bool
+        :param savedir: Directory to save the plot to
+        :type savedir: str
+        :param verbose: Whether to display verbose output
+        :type verbose: bool
+        :param split: Whether to split the plot into multiple plots if there are many classes
+        :type split: bool
+        :param max_classes_per_plot: Maximum number of classes to include in each plot when splitting
+        :type max_classes_per_plot: int
+        :param dpi: DPI (dots per inch) for the saved image, controls the resolution (default: 600)
+        :type dpi: int
+        :param suffix: File format for saved images (default: "png")
+        :type suffix: str
+        """
+
+        # Determine which DataFrame to use based on base parameter
+        if base is not None:
+            if base not in [2, 8]:
+                raise ValueError("Base must be 2 (binary) or 8 (octant)")
+
+            df_to_use = self.binary_df if base == 2 else self.octant_df
+            base_str = "Binary" if base == 2 else "Octant"
+            plot_title = f"{base_str} {title}"
+        else:
+            # Default to octant if available, otherwise binary
+            df_to_use = self.octant_df if self.octant_df is not None else self.binary_df
+            plot_title = title
+
+        if df_to_use is None or df_to_use.empty:
+            _logger.warning("No data available for the specified base.")
+            return
+
+        # Check if avg_torsion_distance column exists
+        if "avg_torsion_distance" not in df_to_use.columns:
+            _logger.warning("avg_torsion_distance column not found in the DataFrame.")
+            return
+
+        # Create a copy of the DataFrame to avoid modifying the original
+        plot_df = df_to_use.copy()
+
+        # If not splitting or few classes, create a single plot
+        if not split or len(plot_df) <= max_classes_per_plot:
+            # Create line plot using plotly_express
+            DisulfideVisualization.plot_torsion_distance_by_class(
+                plot_df,
+                title=plot_title,
+                theme=theme,
+                save=save,
+                savedir=savedir,
+                verbose=verbose,
+                dpi=dpi,
+                suffix=suffix,
+            )
+        else:
+            # Split into multiple plots
+            num_plots = (
+                len(plot_df) + max_classes_per_plot - 1
+            ) // max_classes_per_plot
+
+            if verbose:
+                _logger.info(
+                    "Splitting into %d plots with up to %d classes each",
+                    num_plots,
+                    max_classes_per_plot,
+                )
+
+            for i in range(num_plots):
+                start_idx = i * max_classes_per_plot
+                end_idx = min((i + 1) * max_classes_per_plot, len(plot_df))
+                subset_df = plot_df.iloc[start_idx:end_idx]
+
+                # Create plot title for this subset
+                subset_title = f"{plot_title} (Part {i+1} of {num_plots})"
+                fname_prefix = f"{plot_title.lower().replace(' ', '_')}_part_{i+1}"
+                # Create line plot for this subset
+                DisulfideVisualization.plot_torsion_distance_by_class(
+                    subset_df,
+                    title=subset_title,
+                    theme=theme,
+                    save=save,
+                    savedir=savedir,
+                    verbose=verbose,
+                    dpi=dpi,
+                    suffix=suffix,
+                    fname_prefix=fname_prefix,
+                )
 
     def display(
         self,
@@ -520,9 +628,9 @@ class DisulfideClassGenerator:
 
         # Pass verbose=True and rename theme to light for compatibility with test
         kwargs_copy = kwargs.copy()
-        if 'theme' in kwargs_copy:
-            kwargs_copy['light'] = kwargs_copy.pop('theme')
-        
+        if "theme" in kwargs_copy:
+            kwargs_copy["light"] = kwargs_copy.pop("theme")
+
         disulfide_list.display_overlay(
             screenshot=screenshot, movie=movie, verbose=True, fname=fname, **kwargs_copy
         )
