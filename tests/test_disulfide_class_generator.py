@@ -247,14 +247,16 @@ class TestDisulfideClassGenerator:
 
         # Get the first row from the DataFrame
         row = generator.df.iloc[0]
-        
+
         # Extract the needed values from the row
-        class_id = row['class_str']
+        class_id = row["class_str"]
         chi_means = tuple(row[f"chi{i}_mean"] for i in range(1, 6))
         chi_stds = tuple(row[f"chi{i}_std"] for i in range(1, 6))
-        
+
         # Generate disulfides with the new method signature
-        disulfide_list = generator._generate_disulfides_for_class(class_id, chi_means, chi_stds)
+        disulfide_list = generator._generate_disulfides_for_class(
+            class_id, chi_means, chi_stds
+        )
 
         # Verify the result
         assert isinstance(disulfide_list, DisulfideList)
@@ -280,11 +282,13 @@ class TestDisulfideClassGenerator:
         # Set up the generator to use octant classes and test again
         generator.base = 8
         # For octant classes, we would use the 'class' column instead of 'class_str'
-        class_id = row['class']
+        class_id = row["class"]
         chi_means = tuple(row[f"chi{i}_mean"] for i in range(1, 6))
         chi_stds = tuple(row[f"chi{i}_std"] for i in range(1, 6))
-        
-        disulfide_list = generator._generate_disulfides_for_class(class_id, chi_means, chi_stds)
+
+        disulfide_list = generator._generate_disulfides_for_class(
+            class_id, chi_means, chi_stds
+        )
         first_disulfide = disulfide_list[0]
         assert first_disulfide.name.startswith(f"{class_id}_comb")
 
@@ -343,7 +347,7 @@ class TestDisulfideClassGenerator:
                 screenshot=True,
                 movie=True,
                 fname="test.png",
-                theme="dark",
+                light="dark",
                 winsize=(800, 600),
             )
             mock_display.assert_called_once_with(
