@@ -541,21 +541,39 @@ class DisulfideList(UserList):
 
     def display_torsion_statistics(
         self,
-        display=True,
-        save=False,
-        fname="ss_torsions.png",
-        theme="auto",
-        verbose=False,
+        display: bool = True,
+        save: bool = False,
+        fname: str = "ss_torsions.png",
+        theme: str = "auto",
+        verbose: bool = False,
+        dpi: int = 300,
+        figure_size=(4, 3),
     ):
         """Display torsion and distance statistics for a given Disulfide list.
 
         :param display: Whether to display the plot in the notebook
+        :type display: bool
         :param save: Whether to save the plot as an image file
+        :type save: bool
         :param fname: The name of the image file to save
+        :type fname: str
         :param theme: The theme to use for the plot
+        :type theme: str
+        :param verbose: Whether to display verbose output
+        :type verbose: bool
+        :param dpi: The resolution of the image file
+        :type dpi: int
+        :param figure_size: The size of the figure in pixels
+        :type figure_size: tuple
         """
         DisulfideVisualization.display_torsion_statistics(
-            self, display, save, fname, theme
+            sslist=self,
+            display=display,
+            save=save,
+            fname=fname,
+            theme=theme,
+            dpi=dpi,
+            figure_size=figure_size,
         )
 
     def display_worst_structures(self, top_n=10, sample_percent=10):

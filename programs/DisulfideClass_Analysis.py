@@ -293,6 +293,8 @@ def task(
                     save=True,
                     fname=fname,
                     theme="light",
+                    dpi=600,
+                    figure_size=(4, 3),
                 )
 
             avg_conformation = class_disulfides.average_conformation
