@@ -86,6 +86,19 @@ def main():
         theme="light",
     )
 
+    generator.plot_torsion_distance_by_class(
+        base=8,
+        title="Torsion Distances",
+        split=True,
+        max_classes_per_plot=85,
+        verbose=True,
+        save=False,
+        savedir=SAVE_DIR,
+        dpi=600,
+        suffix="png",
+        theme="light",
+    )
+
 
 print("Done!")
 
