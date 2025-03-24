@@ -44,7 +44,7 @@ DIHEDRAL_COLUMNS = [
 
 # Logger setup
 _logger = create_logger(__name__)
-_logger.setLevel("WARNING")
+_logger.setLevel("INFO")
 
 
 class DisulfideClassGenerator:
@@ -88,7 +88,7 @@ class DisulfideClassGenerator:
     def __init__(
         self,
         csv_file: str = None,
-        verbose: bool = True,
+        verbose: bool = False,
         precalc: bool = False,
         csv_base: int = None,
     ):
@@ -138,7 +138,8 @@ class DisulfideClassGenerator:
                     {"class": str, "class_str": str}
                 )
                 self.df = self.binary_df
-                _logger.info("Loaded binary metrics from %s", binary_path)
+                if self.verbose:
+                    _logger.info("Loaded binary metrics from %s", binary_path)
             if octant_path.exists():
                 self.octant_df = pd.read_pickle(octant_path).astype(
                     {"class": str, "class_str": str}
@@ -146,7 +147,8 @@ class DisulfideClassGenerator:
                 # Prefer octant metrics if available
                 if self.octant_df is not None:
                     self.df = self.octant_df
-                _logger.info("Loaded octant metrics from %s", octant_path)
+                    if self.verbose:
+                        _logger.info("Loaded octant metrics from %s", octant_path)
             if self.df is None:
                 raise ValueError("No valid data source provided.")
 
@@ -193,10 +195,10 @@ class DisulfideClassGenerator:
     def __getitem__(self, classid: str) -> DisulfideList:
         """
         Get a DisulfideList for a given class ID, generating it if it doesn't exist.
-        
+
         This method allows for dictionary-like access to class disulfides using
         the [] operator, e.g., generator["11111"] or generator["+-+++b"].
-        
+
         :param classid: Class ID (e.g., "11111", "11111b", "+-+++").
         :type classid: str
         :return: DisulfideList for the class.
@@ -207,29 +209,26 @@ class DisulfideClassGenerator:
         if not isinstance(classid, str):
             _logger.error("Class ID must be a string, got %s", type(classid))
             raise ValueError(f"Invalid class ID type: {type(classid)}")
-            
+
         parsed_base, clean_cls = self.parse_class_string(classid)
         target_dict = (
             self.binary_class_disulfides
             if parsed_base == BINARY_BASE
             else self.octant_class_disulfides
         )
-        
+
         # If the class is already generated, return it
         if clean_cls in target_dict:
             return target_dict[clean_cls]
-            
+
         # Otherwise, try to generate it
         sslist = self.generate_for_class(classid)
         if sslist is None:
-            _logger.error(
-                "Class %s not found or could not be generated",
-                classid
-            )
+            _logger.error("Class %s not found or could not be generated", classid)
             raise KeyError(f"Class {classid} not found or could not be generated")
-            
+
         return sslist
-        
+
     def class_to_sslist(self, clsid: str, base: int = OCTANT_BASE) -> DisulfideList:
         """
         Retrieve disulfide list for a given class ID.
