@@ -250,7 +250,7 @@ class DisulfideVisualization:
         total_classes = df.shape[0]
         total_disulfides = df["count"].sum()
 
-        _title = f"Class: {title}b, Classes: {total_classes}, SS: {total_disulfides}"
+        _title = f"Class: {title}, Classes: {total_classes}, SS: {total_disulfides}"
         _labels = {}
         _prefix = "None"
         if base == 8:

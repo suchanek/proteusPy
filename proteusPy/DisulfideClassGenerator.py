@@ -694,7 +694,7 @@ if __name__ == "__main__":
 
     if not result:
         print("Specify --class_ids or --all.")
-        exit(1)
+        sys.exit(1)
 
     print(f"Generated disulfides for {len(result)} classes.")
     if args.output:

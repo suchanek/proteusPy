@@ -523,7 +523,9 @@ class DisulfideLoader:
             print(f"Total RAM Used:                     {ram:.2f} GB.")
         print(f"               ===== proteusPy: {vers} =====")
 
-    def display_overlay(self, pdbid, verbose=False) -> None:
+    def display_overlay(
+        self, pdbid: str = "", verbose=False, spin: bool = False
+    ) -> None:
         """
         Display all disulfides for a given PDB ID overlaid in stick mode against
         a common coordinate frame. This allows us to see all of the disulfides
@@ -531,6 +533,10 @@ class DisulfideLoader:
 
         :param self: DisulfideLoader object initialized with the database.
         :param pdbid: the PDB id string, e.g. 4yys
+        :param verbose: If True, display progress bars, by default False
+        :type verbose: bool
+        :param spin: If True, spin the display, by default False
+        :type spin: bool
         :return: None
 
         Example:
@@ -556,7 +562,7 @@ class DisulfideLoader:
             _logger.error("Cannot find key %s in SSBond DB", pdbid)
             return
 
-        ssbonds.display_overlay(verbose=verbose)
+        ssbonds.display_overlay(verbose=verbose, spin=spin)
         return
 
     def getTorsions(self, pdbID=None) -> pd.DataFrame:
@@ -595,7 +601,7 @@ class DisulfideLoader:
         for k, v in enumerate(self.tclass.binaryclass_dict):
             print(f"Class: |{k}|, |{v}|")
 
-    def plot_Classes(
+    def plot_classes(
         self,
         base: int = 8,
         class_string: str = None,
@@ -877,28 +883,6 @@ class DisulfideLoader:
         Plot histograms for Bondlength_Deviation, Angle_Deviation, and Ca_Distance.
         """
         self.SSList.plot_deviation_histograms(theme=theme, verbose=verbose)
-
-    def plot_classes(
-        self, class_string, base=8, theme="auto", log=False, page_size=200
-    ):
-        """
-        Plot the distribution of disulfides for the given class string.
-
-        :param class_string: The class string to plot.
-        :type class_string: str
-        :param base: The base of the class string. Default is 8.
-        :type base: int
-        :param theme: The theme to use for the plot ('auto', 'light', or 'dark'), defaults to 'auto'.
-        :type theme: str
-        :return: None
-        """
-        classlist = self.tclass.binary_to_class(class_string, base)
-        df = self._enumerate_class_fromlist(classlist, base=base)
-        self.plot_count_vs_class_df(
-            df, title=class_string, theme=theme, base=base, log=log, page_size=page_size
-        )
-
-        return
 
     def sslist_from_class(self, class_string, base=8, cutoff=0.0) -> DisulfideList:
         """

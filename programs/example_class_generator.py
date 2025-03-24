@@ -30,8 +30,6 @@ def main():
     """
     Main function demonstrating how to use the DisulfideClassGenerator class.
     """
-    # Path to the CSV file
-    csv_file = "~/repos/proteusPy/binary_class_metrics_0.00.csv"
 
     print("Creating DisulfideClassGenerator instance...")
 
@@ -42,7 +40,7 @@ def main():
     class_str = "+++++"  # The RH Spiral class - this should be "+++++", not "+++++"
     print(f"\nGenerating disulfides for class {class_str}...")
 
-    disulfide_list = generator.generate_for_class(class_str, use_class_str=True)
+    disulfide_list = generator.generate_for_class(class_str)
 
     if disulfide_list:
         print(f"Generated {len(disulfide_list)} disulfides for class {class_str}.")
@@ -67,7 +65,7 @@ def main():
     else:
         print(f"Class {class_str} not found. Let's try with '+++++' instead.")
         class_str = "++++++"  # Corrected class string
-        disulfide_list = generator.generate_for_class("+++++", use_class_str=True)
+        disulfide_list = generator.generate_for_class("+++++")
         if disulfide_list:
             print(
                 f"Generated {len(disulfide_list)} disulfides for class '+++++' (RH Spiral)."
@@ -77,7 +75,7 @@ def main():
     class_id = "-----"  # The LH Spiral class
     print(f"\nGenerating disulfides for class ID {class_id}...")
 
-    disulfide_list = generator.generate_for_class(class_id, use_class_str=True)
+    disulfide_list = generator.generate_for_class(class_id)
 
     if disulfide_list:
         print(f"Generated {len(disulfide_list)} disulfides for class ID {class_id}.")
@@ -97,9 +95,7 @@ def main():
     ]  # RH Spiral, LH Spiral, and RH Staple
     print(f"\nGenerating disulfides for selected classes: {selected_classes}...")
 
-    class_disulfides = generator.generate_for_selected_classes(
-        selected_classes, use_class_str=True
-    )
+    class_disulfides = generator.generate_for_selected_classes(selected_classes)
 
     print("\nGenerated disulfides for the following classes:")
     for class_id, disulfide_list in class_disulfides.items():
