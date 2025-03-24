@@ -820,6 +820,8 @@ class DisulfideVisualization:
         save=False,
         fname="ss_torsions.png",
         theme="auto",
+        dpi=300,
+        figure_size=(4, 3),
     ):
         """Display torsion and distance statistics for a given Disulfide list.
 
@@ -828,10 +830,15 @@ class DisulfideVisualization:
         :param save: Whether to save the plot as an image file
         :param fname: The name of the image file to save
         :param theme: The theme to use for the plot
+        :param dpi: DPI (dots per inch) for the saved image, controls the resolution (default: 300)
+        :param figure_size: Tuple of (width, height) in pixels for the figure size (default: (1024, 1024))
         """
         if len(sslist) == 0:
             _logger.warning("Empty DisulfideList. Nothing to display.")
             return
+
+        _width = figure_size[0] * dpi
+        _height = figure_size[1] * dpi
 
         set_plotly_theme(theme)
         title = f"{sslist.pdb_id}: {len(sslist)} members"
@@ -855,8 +862,8 @@ class DisulfideVisualization:
                 "x": 0.5,
                 "yanchor": "top",
             },
-            width=1024,
-            height=1024,
+            width=_width,
+            height=_height,
         )
 
         fig.add_trace(
@@ -953,7 +960,9 @@ class DisulfideVisualization:
             fig.show()
 
         if save:
-            fig.write_image(fname)
+            # Convert DPI to scale factor (300 DPI is considered standard, so scale = dpi/300)
+            scale = 1
+            fig.write_image(fname, scale=scale)
 
     @staticmethod
     def plot_energies(
@@ -2270,4 +2279,4 @@ class DisulfideVisualization:
         else:
             fig.show()
 
-    # EOF
+    # End of file
