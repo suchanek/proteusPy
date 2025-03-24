@@ -10,6 +10,8 @@ Author: Eric G. Suchanek, PhD
 Last Modification: 2025-03-23
 """
 
+# pylint: disable=C0103
+
 import itertools
 import pickle
 from concurrent.futures import ThreadPoolExecutor
@@ -496,7 +498,8 @@ class DisulfideClassGenerator:
         """
         Create a bar chart showing torsion distance by class_id.
 
-        :param base: The base class to use (2 for binary, 8 for octant). If None, use all available data.
+        :param base: The base class to use (2 for binary, 8 for octant). If None,
+        use all available data.
         :type base: int, optional
         :param title: Title for the plot
         :type title: str
@@ -510,7 +513,8 @@ class DisulfideClassGenerator:
         :type verbose: bool
         :param split: Whether to split the plot into multiple plots if there are many classes
         :type split: bool
-        :param max_classes_per_plot: Maximum number of classes to include in each plot when splitting
+        :param max_classes_per_plot: Maximum number of classes to include in each plot
+        when splitting
         :type max_classes_per_plot: int
         :param dpi: DPI (dots per inch) for the saved image, controls the resolution (default: 600)
         :type dpi: int
@@ -626,13 +630,8 @@ class DisulfideClassGenerator:
             if disulfide_list is None:
                 raise ValueError(f"Class {class_id} not found or failed to generate.")
 
-        # Pass verbose=True and rename theme to light for compatibility with test
-        kwargs_copy = kwargs.copy()
-        if "theme" in kwargs_copy:
-            kwargs_copy["light"] = kwargs_copy.pop("theme")
-
         disulfide_list.display_overlay(
-            screenshot=screenshot, movie=movie, verbose=True, fname=fname, **kwargs_copy
+            screenshot=screenshot, movie=movie, verbose=True, fname=fname, **kwargs
         )
 
 
