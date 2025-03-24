@@ -247,14 +247,19 @@ class TestDisulfideClassGenerator:
 
         # Get the first row from the DataFrame
         row = generator.df.iloc[0]
-
-        # Generate disulfides
-        disulfide_list = generator._generate_disulfides_for_class(row)
+        
+        # Extract the needed values from the row
+        class_id = row['class_str']
+        chi_means = tuple(row[f"chi{i}_mean"] for i in range(1, 6))
+        chi_stds = tuple(row[f"chi{i}_std"] for i in range(1, 6))
+        
+        # Generate disulfides with the new method signature
+        disulfide_list = generator._generate_disulfides_for_class(class_id, chi_means, chi_stds)
 
         # Verify the result
         assert isinstance(disulfide_list, DisulfideList)
         assert len(disulfide_list) == 243
-        assert disulfide_list.pdb_id == f"Class_{row['class']}_{row['class_str']}"
+        assert disulfide_list.pdb_id == f"Class_{class_id}"
 
         # Check the first disulfide
         first_disulfide = disulfide_list[0]
@@ -274,9 +279,14 @@ class TestDisulfideClassGenerator:
 
         # Set up the generator to use octant classes and test again
         generator.base = 8
-        disulfide_list = generator._generate_disulfides_for_class(row)
+        # For octant classes, we would use the 'class' column instead of 'class_str'
+        class_id = row['class']
+        chi_means = tuple(row[f"chi{i}_mean"] for i in range(1, 6))
+        chi_stds = tuple(row[f"chi{i}_std"] for i in range(1, 6))
+        
+        disulfide_list = generator._generate_disulfides_for_class(class_id, chi_means, chi_stds)
         first_disulfide = disulfide_list[0]
-        assert first_disulfide.name.startswith(f"{row['class_str']}_comb")
+        assert first_disulfide.name.startswith(f"{class_id}_comb")
 
     def test_class_to_sslist(self, generator):
         """Test the class_to_sslist method."""
@@ -299,10 +309,9 @@ class TestDisulfideClassGenerator:
         result = generator.class_to_sslist("12345o")
         assert result.pdb_id == "test_octant"
 
-        # Test with invalid class
-        result = generator.class_to_sslist("invalid", base=2)
-        assert isinstance(result, np.ndarray)
-        assert len(result) == 0
+        # Test with invalid class - should raise KeyError
+        with pytest.raises(KeyError, match="Class invalid not found"):
+            generator.class_to_sslist("invalid", base=2)
 
     def test_display(self, generator):
         """Test the display method."""
