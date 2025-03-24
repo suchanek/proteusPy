@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   243, (3^5) structures and calculate statistics for this 'tree'.
 - ``display_class_disufides`` entrypoint added. This utilizes the new class to display a given
   disulfide class in a separate window using the ``DisulfideList.display_overlay()`` function.
+- 
 
   ### Changed
 

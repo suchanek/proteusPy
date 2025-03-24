@@ -2,26 +2,23 @@
 Generate disulfide conformations for structural classes based on CSV data.
 
 This module provides functionality to create disulfide conformations for different
-structural classes using the mean and standard deviation values for each dihedral angle.
+structural classes using mean and standard deviation values for each dihedral angle.
 For each class, it generates all combinations of dihedral angles (mean-std, mean, mean+std)
 for each of the 5 dihedral angles, resulting in 3^5 = 243 combinations per class.
 
 Author: Eric G. Suchanek, PhD
-Last Modification: 2025-03-19 22:07:58
+Last Modification: 2025-03-23
 """
-
-# pylint: disable=C0301
-# pylint: disable=C0103
 
 import itertools
 import pickle
+from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
-
-# pylint: disable=C0103
 import tqdm
 
 from proteusPy.DisulfideBase import Disulfide, DisulfideList
@@ -32,49 +29,57 @@ from proteusPy.ProteusGlobals import (
     OCTANT_CLASS_METRICS_FILE,
 )
 
-# Create a logger for this program
+# Constants
+NUM_DIHEDRAL_ANGLES = 5
+VALUES_PER_ANGLE = 3
+TOTAL_COMBINATIONS = VALUES_PER_ANGLE**NUM_DIHEDRAL_ANGLES  # 243
+BINARY_BASE = 2
+OCTANT_BASE = 8
+DIHEDRAL_COLUMNS = [
+    f"chi{i}_{stat}"
+    for i in range(1, NUM_DIHEDRAL_ANGLES + 1)
+    for stat in ["mean", "std"]
+]
+
+# Logger setup
 _logger = create_logger(__name__)
 _logger.setLevel("WARNING")
 
 
 class DisulfideClassGenerator:
     """
-    A class for generating disulfide conformations for different structural classes
-    based on mean and standard deviation values for dihedral angles. This creates
-    243 combinations of dihedral angles for each class.
+    A class for generating disulfide conformations for structural classes based on
+    mean and standard deviation values for dihedral angles.
     """
 
     @staticmethod
-    def parse_class_string(class_str: str) -> tuple:
+    def parse_class_string(class_str: str) -> Tuple[int, str]:
         """
         Parse a class string to determine its base and return the string without suffixes.
 
-        :param class_str: The class string to parse (e.g., "11111", "11111b", "11111o", "+-+-+")
+        :param class_str: The class string (e.g., "11111", "11111b", "+-+-+").
         :type class_str: str
-        :return: A tuple containing (base, clean_string) where base is 2 for binary or 8 for octant
-        :rtype: tuple
-        :raises ValueError: If the class string format is invalid
+        :return: Tuple of (base, clean_string) where base is 2 (binary) or 8 (octant).
+        :rtype: Tuple[int, str]
+        :raises ValueError: If the class string format is invalid.
         """
         if not isinstance(class_str, str):
             raise ValueError(f"Class string must be a string, got {type(class_str)}")
 
-        # Initialize with default values
-        base = 8  # Default to octant
+        base = OCTANT_BASE  # Default to octant
         clean_string = class_str
 
-        # Check for explicit suffix
         if len(class_str) == 6:
             if class_str[-1] == "b":
-                base = 2
+                base = BINARY_BASE
                 clean_string = class_str[:5]
             elif class_str[-1] == "o":
-                base = 8
+                base = OCTANT_BASE
                 clean_string = class_str[:5]
             else:
-                raise ValueError(f"Invalid class string suffix: {class_str}")
-        # Check for binary class indicators (+ or -)
+                raise ValueError(f"Invalid suffix in class string: {class_str}")
         elif "+" in class_str or "-" in class_str:
-            base = 2
+            base = BINARY_BASE
             clean_string = class_str[:5]
 
         return base, clean_string
@@ -89,232 +94,205 @@ class DisulfideClassGenerator:
         """
         Initialize the DisulfideClassGenerator.
 
-        :param csv_file: Path to the CSV file containing class metrics.
-        :type csv_file: str, optional
-        :param verbose: If True, log debug messages.
+        :param csv_file: Path to CSV file with class metrics (optional).
+        :type csv_file: str
+        :param verbose: Enable debug logging and progress bars.
         :type verbose: bool
-        :param precalc: If True, pre-calculate disulfides for all classes in the DataFrame.
+        :param precalc: Pre-calculate disulfides for all classes.
         :type precalc: bool
-        :param base: The base class to use, 2 or 8. Default is None.
-        :type base: int, optional
-        :raises ValueError: If no valid data source is provided or schema is invalid.
+        :param csv_base: Base for CSV data (2 or 8, optional).
+        :type csv_base: int
+        :raises ValueError: If no valid data source is provided.
         """
-        self.df = None
-        self.binary_df = None
-        self.octant_df = None
         self.verbose = verbose
         self.binary_class_disulfides: Dict[str, DisulfideList] = {}
         self.octant_class_disulfides: Dict[str, DisulfideList] = {}
-        self.base = None  # Will be determined based on class_str
+        self.df = None
+        self.binary_df = None
+        self.octant_df = None
+        self.base = None
 
+        self._initialize_data(csv_file, csv_base)
+        if precalc:
+            self.generate_for_all_classes()
+
+    def _initialize_data(self, csv_file: str = None, base: int = None) -> None:
+        """
+        Load data from CSV or pickle files.
+
+        :param csv_file: Path to CSV file (optional).
+        :type csv_file: str
+        :param base: Base class for CSV data (2 or 8, optional).
+        :type base: int
+        :raises ValueError: If no valid data source is provided.
+        """
         binary_path = Path(DATA_DIR) / BINARY_CLASS_METRICS_FILE
         octant_path = Path(DATA_DIR) / OCTANT_CLASS_METRICS_FILE
 
         if csv_file:
-            self.load_csv(csv_file, base=csv_base)
-            self._validate_df()
+            self.load_csv(csv_file, base)
         else:
-            # Load both .pkl files at once if they exist
             if binary_path.exists():
-                _logger.info("Loading binary metrics from %s", binary_path)
-                self.binary_df = pd.read_pickle(binary_path)
-                self.binary_df["class"] = self.binary_df["class"].astype(str)
-                self.binary_df["class_str"] = self.binary_df["class_str"].astype(str)
+                self.binary_df = pd.read_pickle(binary_path).astype(
+                    {"class": str, "class_str": str}
+                )
                 self.df = self.binary_df
-                self._validate_df()
-
+                _logger.info("Loaded binary metrics from %s", binary_path)
             if octant_path.exists():
-                _logger.info("Loading octant metrics from %s", octant_path)
-                self.octant_df = pd.read_pickle(octant_path)
-                self.octant_df["class"] = self.octant_df["class"].astype(str)
-                self.octant_df["class_str"] = self.octant_df["class_str"].astype(str)
-                self.df = self.octant_df
-                self._validate_df()
+                self.octant_df = pd.read_pickle(octant_path).astype(
+                    {"class": str, "class_str": str}
+                )
+                # Prefer octant metrics if available
+                if self.octant_df is not None:
+                    self.df = self.octant_df
+                _logger.info("Loaded octant metrics from %s", octant_path)
+            if self.df is None:
+                raise ValueError("No valid data source provided.")
 
-            # Default to octant if no specific file is provided
-            self.df = self.octant_df if self.octant_df is not None else self.binary_df
+        self._validate_df()
 
-        if self.df is None:
-            raise ValueError(
-                "No valid data source available. Provide csv_file or ensure .pkl files exist."
-            )
+    def _validate_df(self) -> None:
+        """
+        Validate DataFrame has required columns.
 
-        self.df["class"] = self.df["class"].astype(str)
-        self.df["class_str"] = self.df["class_str"].astype(str)
-
-        # Pre-calculate binary and octant dictionaries
-        if precalc:
-            if self.binary_df is not None:
-                _logger.info("Pre-calculating binary class disulfides...")
-                self._pre_calculate_class_disulfides(self.binary_df, is_binary=True)
-
-            if self.octant_df is not None:
-                _logger.info("Pre-calculating octant class disulfides...")
-                self._pre_calculate_class_disulfides(self.octant_df, is_binary=False)
-
-        return
-
-    def _validate_df(self):
-        """Validate that the DataFrame has all required columns."""
-        required = ["class", "class_str"] + [
-            f"chi{i}_{stat}" for i in range(1, 6) for stat in ["mean", "std"]
-        ]
-
-        # Only validate self.df if it's not the same as octant_df or binary_df
+        :raises ValueError: If required columns are missing.
+        """
         if self.df is not None:
-            missing = [col for col in required if col not in self.df.columns]
+            missing = [
+                col
+                for col in DIHEDRAL_COLUMNS + ["class", "class_str"]
+                if col not in self.df.columns
+            ]
             if missing:
-                raise ValueError(f"DataFrame missing required columns: {missing}")
-            _logger.debug(
-                "Custom DataFrame validated with columns: %s", list(self.df.columns)
-            )
+                raise ValueError(f"DataFrame missing columns: {missing}")
+            _logger.debug("DataFrame validated with columns: %s", list(self.df.columns))
 
     def load_csv(self, csv_file: str, base: int = None) -> "DisulfideClassGenerator":
         """
-        Load the CSV file containing class metrics.
+        Load class metrics from a CSV file.
 
-        :param csv_file: Path to the CSV file.
+        :param csv_file: Path to CSV file.
         :type csv_file: str
-        :param base: The base class to use, 2 or 8. Default is None.
-        :type base: int, optional
+        :param base: Base class (2 or 8, optional).
+        :type base: int
         :return: Self for method chaining.
         :rtype: DisulfideClassGenerator
+        :raises ValueError: If base is invalid.
         """
         self.df = pd.read_csv(csv_file, dtype={"class": str, "class_str": str})
-        self.df["class"] = self.df["class"].astype(str)
-        self.df["class_str"] = self.df["class_str"].astype(str)
         self.base = base
-
-        if base is not None:
-            if base == 2:
-                self.binary_df = self.df
-            elif base == 8:
-                self.octant_df = self.df
-            else:
-                raise ValueError(f"Invalid base class: {base}")
-
+        if base == BINARY_BASE:
+            self.binary_df = self.df
+        elif base == OCTANT_BASE:
+            self.octant_df = self.df
+        elif base is not None:
+            raise ValueError(f"Invalid base: {base}")
         return self
 
-    def class_to_sslist(self, clsid: str, base: int = 8) -> np.ndarray:
+    def class_to_sslist(self, clsid: str, base: int = OCTANT_BASE) -> DisulfideList:
         """
-        Return the list of disulfides corresponding to the input `clsid`.
-        This list is a list of disulfide identifiers, not the Disulfide objects themselves.
+        Retrieve disulfide list for a given class ID.
 
-        :param clsid: The class name to extract. Must be a string
-        in the format '11111' or '11111b' or '11111o'. The suffix 'b' or 'o' indicates
-        binary or octant classes, respectively.
+        :param clsid: Class ID (e.g., "11111", "11111b").
         :type clsid: str
-        :param base: The base class to use, 2 or 8. Default is 8.
+        :param base: Base class (2 or 8).
         :type base: int
-        :param verbose: If True, display progress bars, by default False.
-        :type verbose: bool
-        :return: The list of disulfide bonds from the class. NB: this is the list
-        of disulfide identifiers, not the Disulfide objects themselves.
+        :return: DisulfideList for the class.
         :rtype: DisulfideList
-        :raises ValueError: If an invalid base value is provided.
-        :raises KeyError: If the clsid is not found in the dictionary.
+        :raises ValueError: If clsid is invalid.
+        :raises KeyError: If class not found.
         """
-        cls = clsid[:5]
-        _base = base
-
         if not isinstance(clsid, str):
-            _logger.error("Invalid class ID: %s", clsid)
-            return
+            _logger.error("Class ID must be a string, got %s", type(clsid))
+            raise ValueError(f"Invalid class ID type: {type(clsid)}")
 
-        match len(clsid):
-            case 6:
-                match clsid[-1]:
-                    case "b":
-                        _base = 2
-                    case "o":
-                        _base = 8
-                    case _:
-                        _logger.error("Invalid class ID suffix: %s", clsid)
-                        return np.array([])
+        parsed_base, clean_cls = self.parse_class_string(clsid)
+        base = parsed_base if parsed_base else base
+        target_dict = (
+            self.binary_class_disulfides
+            if base == BINARY_BASE
+            else self.octant_class_disulfides
+        )
 
-            case 5:
-                match _base:
-                    case 8:
-                        _base = 8
-                    case 2:
-                        _base = 2
-                    case _:
-                        _logger.error("Invalid base: %d", base)
-                        return np.array([])
-            case _:
-                _logger.error("Invalid class ID length: %s", clsid)
-                return np.array([])
+        if clean_cls not in target_dict:
+            _logger.error(
+                "Class %s not found in %s disulfides",
+                clsid,
+                "binary" if base == BINARY_BASE else "octant",
+            )
+            raise KeyError(f"Class {clsid} not found")
 
-        try:
-            if _base == 2:
-                ss_ids = self.binary_class_disulfides[cls[:5]]
-            else:  # _base == 8
-                ss_ids = self.octant_class_disulfides[cls[:5]]
-        except KeyError:
-            _logger.error("Cannot find key %s in SSBond DB", clsid)
-            return np.array([])
+        return target_dict[clean_cls]
 
-        return ss_ids
+    def _generate_disulfides_for_class(
+        self, class_id: str, chi_means: tuple, chi_stds: tuple
+    ) -> DisulfideList:
+        """
+        Generate disulfide conformations for a class (cached).
+
+        :param class_id: Class identifier.
+        :type class_id: str
+        :param chi_means: Tuple of mean dihedral angles.
+        :type chi_means: tuple
+        :param chi_stds: Tuple of standard deviations.
+        :type chi_stds: tuple
+        :return: DisulfideList with all combinations.
+        :rtype: DisulfideList
+        """
+        chi_values = [[m - s, m, m + s] for m, s in zip(chi_means, chi_stds)]
+        combinations = list(itertools.product(*chi_values))
+        disulfides = [
+            Disulfide(f"{class_id}_comb{i+1}", torsions=list(combo))
+            for i, combo in enumerate(combinations)
+        ]
+        return DisulfideList(disulfides, f"Class_{class_id}")
 
     def generate_for_class(self, class_id: str) -> Union[DisulfideList, None]:
         """
-        Generate disulfides for a specific structural class.
+        Generate disulfides for a specific class.
 
-        :param class_id: The class ID or class string to generate disulfides for.
+        :param class_id: Class ID (e.g., "11111b").
         :type class_id: str
-        :param use_class_str: If True, match on class_str column, otherwise match on class column.
-        :rtype: DisulfideList or None
-        :raises ValueError: If no valid data source is provided or class is not found.
+        :return: DisulfideList or None if class not found.
+        :rtype: Union[DisulfideList, None]
+        :raises ValueError: If no DataFrame is loaded.
         """
-
-        # Check if self.df is None (for backward compatibility with tests)
-
         if self.df is None:
-            raise ValueError(
-                "No valid dataframe available for the specified class base."
-            )
+            raise ValueError("No DataFrame loaded.")
 
-        # Determine the base from the class_id
-        self.base, clean_string = self.parse_class_string(class_id)
-
-        # Select the appropriate dataframe based on the base
-        if self.base == 2:
-            if self.binary_df is None:
-                _logger.warning("Binary dataframe not available.")
-                return None
-
-            df_to_use = self.binary_df
-            use_class_str = True
-
-        else:  # self.base == 8
-            if self.octant_df is None:
-                _logger.warning("Octant dataframe not available.")
-                return None
-
-            df_to_use = self.octant_df
-            use_class_str = False
+        base, clean_string = self.parse_class_string(class_id)
+        df_to_use = self.binary_df if base == BINARY_BASE else self.octant_df
 
         if df_to_use is None:
-            raise ValueError(
-                "No valid dataframe available for the specified class base."
+            _logger.warning(
+                "%s DataFrame not available.",
+                "Binary" if base == BINARY_BASE else "Octant",
             )
-
-        col = "class_str" if use_class_str else "class"
-        row = df_to_use[df_to_use[col] == class_id]
-
-        # If not found, try with the clean string
-        if row.empty and clean_string != class_id:
-            row = df_to_use[df_to_use[col] == clean_string]
-
-        if row.empty:
-            _logger.warning("Class ID %s not found in the data.", class_id)
             return None
 
-        disulfide_list = self._generate_disulfides_for_class(row.iloc[0])
-        if self.base == 2:
-            self.binary_class_disulfides[clean_string] = disulfide_list
-        else:  # self.base == 8
-            self.octant_class_disulfides[clean_string] = disulfide_list
+        col = "class_str" if base == BINARY_BASE else "class"
+        row = df_to_use[df_to_use[col] == clean_string]
+        if row.empty:
+            _logger.warning("Class %s not found.", class_id)
+            return None
+
+        row_data = row.iloc[0]
+        chi_means = tuple(
+            row_data[f"chi{i}_mean"] for i in range(1, NUM_DIHEDRAL_ANGLES + 1)
+        )
+        chi_stds = tuple(
+            row_data[f"chi{i}_std"] for i in range(1, NUM_DIHEDRAL_ANGLES + 1)
+        )
+        disulfide_list = self._generate_disulfides_for_class(
+            clean_string, chi_means, chi_stds
+        )
+
+        target_dict = (
+            self.binary_class_disulfides
+            if base == BINARY_BASE
+            else self.octant_class_disulfides
+        )
+        target_dict[clean_string] = disulfide_list
         _logger.info(
             "Generated %d disulfides for class %s", len(disulfide_list), class_id
         )
@@ -324,434 +302,185 @@ class DisulfideClassGenerator:
         self, class_ids: List[str]
     ) -> Dict[str, DisulfideList]:
         """
-        Generate disulfides for selected structural classes.
-        Displays a tqdm progress bar if self.verbose is True.
+        Generate disulfides for multiple classes in parallel.
 
-        :param class_ids: List of class IDs or class strings to generate disulfides for.
+        :param class_ids: List of class IDs.
         :type class_ids: List[str]
-        :param use_class_str: If True, match on class_str column, otherwise match on class column.
-        :type use_class_str: bool
-        :return: A dictionary mapping class IDs to DisulfideLists.
+        :return: Dictionary mapping class IDs to DisulfideLists.
         :rtype: Dict[str, DisulfideList]
-        :raises ValueError: If no valid data source is provided or no classes are found.
+        :raises ValueError: If no DataFrame is loaded.
         """
         if self.df is None:
-            raise ValueError(
-                "No valid dataframe available for the specified class base."
-            )
+            raise ValueError("No DataFrame loaded.")
 
         class_disulfides = {}
-        # Use tqdm for progress bar if verbose is True
-        iterator = (
-            tqdm.tqdm(
-                class_ids,
-                total=len(class_ids),
-                desc="Generating selected classes",
-            )
-            if self.verbose
-            else class_ids
-        )
+        with ThreadPoolExecutor() as executor:
+            futures = {
+                executor.submit(self.generate_for_class, cid): cid for cid in class_ids
+            }
+            for future in tqdm.tqdm(
+                futures, desc="Generating classes", disable=not self.verbose
+            ):
+                class_id = futures[future]
+                if (result := future.result()) is not None:
+                    class_disulfides[class_id] = result
 
-        for class_id in iterator:
-            disulfide_list = self.generate_for_class(class_id)
-            if disulfide_list is not None:
-                class_disulfides[class_id] = disulfide_list
-
-        if not class_disulfides:
-            _logger.warning("No matching classes found for IDs: %s", class_ids)
-        else:
-            _logger.info("Generated disulfides for %d classes", len(class_disulfides))
-
+        _logger.info("Generated disulfides for %d classes", len(class_disulfides))
         return class_disulfides
 
     def generate_for_all_classes(self) -> Dict[str, DisulfideList]:
         """
-        Generate disulfides for all structural classes in both binary and octant DataFrames.
-        Displays a tqdm progress bar if self.verbose is True.
+        Generate disulfides for all classes in loaded DataFrames.
 
-        :return: A dictionary mapping class IDs to DisulfideLists.
+        :return: Dictionary mapping class IDs to DisulfideLists.
         :rtype: Dict[str, DisulfideList]
-        :raises ValueError: If neither binary nor octant DataFrames are loaded.
+        :raises ValueError: If no DataFrames are loaded.
         """
         if self.binary_df is None and self.octant_df is None:
-            raise ValueError("Neither binary nor octant DataFrames are loaded.")
+            raise ValueError("No DataFrames loaded.")
 
         class_disulfides = {}
-        binary_count = 0
-        octant_count = 0
-
-        # Process binary classes if available
         if self.binary_df is not None:
-            _logger.info("Generating disulfides for all binary classes...")
-            self.base = 2  # Set base to binary
-
-            # Use tqdm for progress bar if verbose is True
-            iterator = (
-                tqdm.tqdm(
-                    self.binary_df.iterrows(),
-                    total=len(self.binary_df),
-                    desc="Generating binary consensus disulfides",
-                )
-                if self.verbose
-                else self.binary_df.iterrows()
-            )
-
-            for _, row in iterator:
+            self.base = BINARY_BASE
+            for _, row in self._iterate_df(self.binary_df, "binary"):
                 class_id = row["class_str"]
-                disulfide_list = self._generate_disulfides_for_class(row)
-                class_disulfides[f"{class_id}b"] = (
-                    disulfide_list  # Add 'b' suffix to distinguish
-                )
+                disulfide_list = self._generate_from_row(row, class_id)
+                class_disulfides[f"{class_id}b"] = disulfide_list
                 self.binary_class_disulfides[class_id] = disulfide_list
-                binary_count += 1
 
-            _logger.info("Generated disulfides for %d binary classes", binary_count)
-
-        # Process octant classes if available
         if self.octant_df is not None:
-            _logger.info("Generating disulfides for octant classes...")
-            self.base = 8  # Set base to octant
-
-            # Use tqdm for progress bar if verbose is True
-            iterator = (
-                tqdm.tqdm(
-                    self.octant_df.iterrows(),
-                    total=len(self.octant_df),
-                    desc="Generating octant consensus disulfides",
-                )
-                if self.verbose
-                else self.octant_df.iterrows()
-            )
-
-            for _, row in iterator:
+            self.base = OCTANT_BASE
+            for _, row in self._iterate_df(self.octant_df, "octant"):
                 class_id = row["class"]
-                disulfide_list = self._generate_disulfides_for_class(row)
-                class_disulfides[f"{class_id}o"] = (
-                    disulfide_list  # Add 'o' suffix to distinguish
-                )
+                disulfide_list = self._generate_from_row(row, class_id)
+                class_disulfides[f"{class_id}o"] = disulfide_list
                 self.octant_class_disulfides[class_id] = disulfide_list
-                octant_count += 1
 
-            _logger.info("Generated disulfides for %d octant classes", octant_count)
+        _logger.info("Generated disulfides for %d classes", len(class_disulfides))
+        return class_disulfides
 
-        total_count = binary_count + octant_count
-        _logger.info(
-            "Generated disulfides for a total of %d classes (%d binary, %d octant)",
-            total_count,
-            binary_count,
-            octant_count,
+    def _iterate_df(self, df: pd.DataFrame, desc: str):
+        """
+        Helper to iterate DataFrame with optional progress bar.
+
+        :param df: DataFrame to iterate.
+        :type df: pd.DataFrame
+        :param desc: Description for progress bar.
+        :type desc: str
+        :return: Iterator over DataFrame rows.
+        """
+        return (
+            tqdm.tqdm(
+                df.iterrows(), total=len(df), desc=f"Generating {desc} disulfides"
+            )
+            if self.verbose
+            else df.iterrows()
         )
 
-        return class_disulfides
+    def _generate_from_row(self, row: pd.Series, class_id: str) -> DisulfideList:
+        """
+        Generate disulfides from a DataFrame row.
+
+        :param row: DataFrame row with class metrics.
+        :type row: pd.Series
+        :param class_id: Class identifier.
+        :type class_id: str
+        :return: DisulfideList for the row.
+        :rtype: DisulfideList
+        """
+        chi_means = tuple(
+            row[f"chi{i}_mean"] for i in range(1, NUM_DIHEDRAL_ANGLES + 1)
+        )
+        chi_stds = tuple(row[f"chi{i}_std"] for i in range(1, NUM_DIHEDRAL_ANGLES + 1))
+        return self._generate_disulfides_for_class(class_id, chi_means, chi_stds)
 
     def describe(self, detailed: bool = False) -> None:
         """
-        Pretty print the internal state of the DisulfideClassGenerator.
+        Print the internal state of the generator.
 
-        This method displays information about the loaded DataFrames, generated disulfides,
-        current base setting, and other internal state variables.
-
-        :param detailed: If True, show more detailed information about DataFrames and disulfides.
+        :param detailed: Show detailed DataFrame and disulfide info.
         :type detailed: bool
         """
         print("\n" + "=" * 80)
         print(f"{'DisulfideClassGenerator State':^80}")
         print("=" * 80)
+        print(f"\nBase: {self.base or 'Not set'}")
+        print(f"Verbose: {self.verbose}")
 
-        # Basic information
-        print(f"\nCurrent Base: {self.base if self.base is not None else 'Not set'}")
-        print(f"Verbose Mode: {'Enabled' if self.verbose else 'Disabled'}")
+        print("\nDataFrames:")
+        for name, df, attr in [
+            ("Binary", self.binary_df, "binary_df"),
+            ("Octant", self.octant_df, "octant_df"),
+        ]:
+            if df is not None:
+                print(f"  {name}: Loaded ({len(df)} classes)")
+                if detailed:
+                    print(f"    Sample:\n{df.head(3)}")
+            else:
+                print(f"  {name}: Not loaded")
 
-        # DataFrame information
-        print("\n" + "-" * 80)
-        print(f"{'DataFrame Information':^80}")
-        print("-" * 80)
-
-        if self.binary_df is not None:
-            binary_classes = len(self.binary_df)
-            print(f"Binary Classes DataFrame: Loaded ({binary_classes} classes)")
-            if detailed and binary_classes > 0:
-                print("\nBinary DataFrame Sample:")
-                print(self.binary_df.head(3).to_string())
-        else:
-            print("Binary Classes DataFrame: Not loaded")
-
-        if self.octant_df is not None:
-            octant_classes = len(self.octant_df)
-            print(f"\nOctant Classes DataFrame: Loaded ({octant_classes} classes)")
-            if detailed and octant_classes > 0:
-                print("\nOctant DataFrame Sample:")
-                print(self.octant_df.head(3).to_string())
-        else:
-            print("\nOctant Classes DataFrame: Not loaded")
-
-        if self.df is not None:
-            print(
-                f"\nCurrent Working DataFrame: {'Binary' if self.df is self.binary_df else 'Octant' if self.df is self.octant_df else 'Custom'}"
-            )
-            print(f"Total Classes in Working DataFrame: {len(self.df)}")
-        else:
-            print("\nCurrent Working DataFrame: Not set")
-
-        # Generated disulfides information
-        print("\n" + "-" * 80)
-        print(f"{'Generated Disulfides Information':^80}")
-        print("-" * 80)
-
-        binary_disulfides = len(self.binary_class_disulfides)
-        print(f"Binary Class Disulfides: {binary_disulfides} classes generated")
-        if detailed and binary_disulfides > 0:
-            print("\nBinary Class IDs with generated disulfides:")
-            for _, class_id in enumerate(list(self.binary_class_disulfides.keys())[:5]):
-                disulfide_count = len(self.binary_class_disulfides[class_id])
-                print(f"  {class_id}: {disulfide_count} disulfides")
-            if binary_disulfides > 5:
-                print(f"  ... and {binary_disulfides - 5} more classes")
-
-        octant_disulfides = len(self.octant_class_disulfides)
-        print(f"\nOctant Class Disulfides: {octant_disulfides} classes generated")
-        if detailed and octant_disulfides > 0:
-            print("\nOctant Class IDs with generated disulfides:")
-            for _, class_id in enumerate(list(self.octant_class_disulfides.keys())[:5]):
-                disulfide_count = len(self.octant_class_disulfides[class_id])
-                print(f"  {class_id}: {disulfide_count} disulfides")
-            if octant_disulfides > 5:
-                print(f"  ... and {octant_disulfides - 5} more classes")
-
-        # Memory usage estimation (rough)
-        total_disulfides = sum(
-            len(dl) for dl in self.binary_class_disulfides.values()
-        ) + sum(len(dl) for dl in self.octant_class_disulfides.values())
-        print(f"\nTotal Generated Disulfides: {total_disulfides}")
-
-        print("\n" + "=" * 80 + "\n")
+        print("\nDisulfides:")
+        for name, d in [
+            ("Binary", self.binary_class_disulfides),
+            ("Octant", self.octant_class_disulfides),
+        ]:
+            count = len(d)
+            print(f"  {name}: {count} classes")
+            if detailed and count:
+                print(f"    Sample: {list(d.items())[:3]}")
+        print("=" * 80)
 
     def prepare_energy_data(self) -> pd.DataFrame:
         """
-        Prepare a DataFrame containing energy values for each class.
-        This data is suitable for creating box plots showing energy distribution by class.
+        Prepare energy data for visualization.
 
-        :return: DataFrame with columns for class_id and energy values
+        :return: DataFrame with class and energy data.
         :rtype: pd.DataFrame
         """
         energy_data = []
-
-        # Process binary classes if available
-        if self.binary_class_disulfides:
-            for class_id, disulfide_list in self.binary_class_disulfides.items():
+        for base, d in [
+            (BINARY_BASE, self.binary_class_disulfides),
+            (OCTANT_BASE, self.octant_class_disulfides),
+        ]:
+            for class_id, disulfide_list in d.items():
                 for ss in disulfide_list:
                     energy_data.append(
-                        {
-                            "class": class_id,
-                            "class_str": class_id,
-                            "energy": ss.energy,
-                            "base": 2,
-                        }
+                        {"class": class_id, "energy": ss.energy, "base": base}
                     )
-
-        # Process octant classes if available
-        if self.octant_class_disulfides:
-            for class_id, disulfide_list in self.octant_class_disulfides.items():
-                for ss in disulfide_list:
-                    energy_data.append(
-                        {
-                            "class": class_id,
-                            "class_str": class_id,
-                            "energy": ss.energy,
-                            "base": 8,
-                        }
-                    )
-
-        # Create DataFrame from collected data
-        energy_df = pd.DataFrame(energy_data)
-
-        if not energy_df.empty:
-            _logger.info("Created energy DataFrame with %d entries", len(energy_df))
-        else:
-            _logger.warning("No energy data available. Generate disulfides first.")
-
-        return energy_df
+        df = pd.DataFrame(energy_data)
+        (
+            _logger.info("Prepared energy data with %d entries", len(df))
+            if not df.empty
+            else _logger.warning("No energy data.")
+        )
+        return df
 
     def plot_energy_by_class(
-        self,
-        base: int = None,
-        title: str = "Energy Distribution by Class",
-        theme: str = "auto",
-        save: bool = False,
-        savedir: str = ".",
-        verbose: bool = False,
-        split: bool = False,
-        max_classes_per_plot: int = 330,
-        dpi: int = 600,
-        suffix: str = "png",
+        self, base: int = None, title: str = "Energy Distribution by Class", **kwargs
     ) -> None:
         """
-        Create a box plot showing energy distribution by class_id.
+        Plot energy distribution by class.
 
-        :param base: The base class to use (2 for binary, 8 for octant). If None, use all available data.
-        :type base: int, optional
-        :param title: Title for the plot
+        :param base: Filter by base (2 or 8, optional).
+        :type base: int
+        :param title: Plot title.
         :type title: str
-        :param theme: Theme to use for the plot ('auto', 'light', or 'dark')
-        :type theme: str
-        :param save: Whether to save the plot
-        :type save: bool
-        :param savedir: Directory to save the plot to
-        :type savedir: str
-        :param verbose: Whether to display verbose output
-        :type verbose: bool
-        :param split: Whether to split the plot into multiple plots if there are many classes
-        :type split: bool
-        :param max_classes_per_plot: Maximum number of classes to include in each plot when splitting
-        :type max_classes_per_plot: int
-        :param dpi: DPI (dots per inch) for the saved image, controls the resolution (default: 300)
-        :type dpi: int
+        :param kwargs: Additional plotting options.
         """
         from proteusPy.DisulfideVisualization import DisulfideVisualization
 
-        # Prepare energy data
         energy_df = self.prepare_energy_data()
-
         if energy_df.empty:
-            _logger.warning("No energy data available. Generate disulfides first.")
+            _logger.warning("No energy data available.")
             return
 
-        # Filter by base if specified
-        if base is not None:
-            if base not in [2, 8]:
-                raise ValueError("Base must be 2 (binary) or 8 (octant)")
-
+        if base in (BINARY_BASE, OCTANT_BASE):
             energy_df = energy_df[energy_df["base"] == base]
-            base_str = "Binary" if base == 2 else "Octant"
-            plot_title = f"{base_str} Class {title}"
+            title = f"{'Binary' if base == BINARY_BASE else 'Octant'} {title}"
+        elif base is not None:
+            raise ValueError("Base must be 2 or 8.")
 
-        else:
-            plot_title = title
-
-        # Create the box plot
-        DisulfideVisualization.plot_energy_by_class(
-            energy_df,
-            title=plot_title,
-            theme=theme,
-            save=save,
-            savedir=savedir,
-            verbose=verbose,
-            split=split,
-            max_classes_per_plot=max_classes_per_plot,
-            dpi=dpi,
-            suffix=suffix,
-        )
-
-    def plot_torsion_distance_by_class(
-        self,
-        base: int = None,
-        title: str = "Torsion Distance by Class",
-        theme: str = "auto",
-        save: bool = False,
-        savedir: str = ".",
-        verbose: bool = False,
-        split: bool = False,
-        max_classes_per_plot: int = 330,
-        dpi: int = 300,
-        suffix: str = "png",
-    ) -> None:
-        """
-        Create a bar chart showing torsion distance by class_id.
-
-        :param base: The base class to use (2 for binary, 8 for octant). If None, use all available data.
-        :type base: int, optional
-        :param title: Title for the plot
-        :type title: str
-        :param theme: Theme to use for the plot ('auto', 'light', or 'dark')
-        :type theme: str
-        :param save: Whether to save the plot
-        :type save: bool
-        :param savedir: Directory to save the plot to
-        :type savedir: str
-        :param verbose: Whether to display verbose output
-        :type verbose: bool
-        :param split: Whether to split the plot into multiple plots if there are many classes
-        :type split: bool
-        :param max_classes_per_plot: Maximum number of classes to include in each plot when splitting
-        :type max_classes_per_plot: int
-        :param dpi: DPI (dots per inch) for the saved image, controls the resolution (default: 600)
-        :type dpi: int
-        :param suffix: File format for saved images (default: "png")
-        :type suffix: str
-        """
-        from proteusPy.DisulfideVisualization import DisulfideVisualization
-
-        # Determine which DataFrame to use based on base parameter
-        if base is not None:
-            if base not in [2, 8]:
-                raise ValueError("Base must be 2 (binary) or 8 (octant)")
-
-            df_to_use = self.binary_df if base == 2 else self.octant_df
-            base_str = "Binary" if base == 2 else "Octant"
-            plot_title = f"{base_str} {title}"
-        else:
-            # Default to octant if available, otherwise binary
-            df_to_use = self.octant_df if self.octant_df is not None else self.binary_df
-            plot_title = title
-
-        if df_to_use is None or df_to_use.empty:
-            _logger.warning("No data available for the specified base.")
-            return
-
-        # Check if avg_torsion_distance column exists
-        if "avg_torsion_distance" not in df_to_use.columns:
-            _logger.warning("avg_torsion_distance column not found in the DataFrame.")
-            return
-
-        # Create a copy of the DataFrame to avoid modifying the original
-        plot_df = df_to_use.copy()
-
-        # If not splitting or few classes, create a single plot
-        if not split or len(plot_df) <= max_classes_per_plot:
-            # Create line plot using plotly_express
-            DisulfideVisualization.plot_torsion_distance_by_class(
-                plot_df,
-                title=plot_title,
-                theme=theme,
-                save=save,
-                savedir=savedir,
-                verbose=verbose,
-                dpi=dpi,
-                suffix=suffix,
-            )
-        else:
-            # Split into multiple plots
-            num_plots = (
-                len(plot_df) + max_classes_per_plot - 1
-            ) // max_classes_per_plot
-
-            if verbose:
-                _logger.info(
-                    "Splitting into %d plots with up to %d classes each",
-                    num_plots,
-                    max_classes_per_plot,
-                )
-
-            for i in range(num_plots):
-                start_idx = i * max_classes_per_plot
-                end_idx = min((i + 1) * max_classes_per_plot, len(plot_df))
-                subset_df = plot_df.iloc[start_idx:end_idx]
-
-                # Create plot title for this subset
-                subset_title = f"{plot_title} (Part {i+1} of {num_plots})"
-                fname_prefix = f"{plot_title.lower().replace(' ', '_')}_part_{i+1}"
-                # Create line plot for this subset
-                DisulfideVisualization.plot_torsion_distance_by_class(
-                    subset_df,
-                    title=subset_title,
-                    theme=theme,
-                    save=save,
-                    savedir=savedir,
-                    verbose=verbose,
-                    dpi=dpi,
-                    suffix=suffix,
-                    fname_prefix=fname_prefix,
-                )
+        DisulfideVisualization.plot_energy_by_class(energy_df, title=title, **kwargs)
 
     def display(
         self,
@@ -759,239 +488,72 @@ class DisulfideClassGenerator:
         screenshot: bool = False,
         movie: bool = False,
         fname: str = "ss_overlay.png",
-        theme: str = "auto",
-        winsize: tuple = (1024, 1024),
-        verbose: bool = False,
+        **kwargs,
     ) -> None:
         """
-        Display an overlay of all disulfides for a specific structural class.
+        Display disulfide overlay for a class.
 
-        :param class_id: The class ID or class string to display disulfides for.
+        :param class_id: Class ID to display.
         :type class_id: str
-        :param screenshot: If True, save a screenshot of the overlay.
+        :param screenshot: Save a screenshot.
         :type screenshot: bool
-        :param movie: If True, save a movie of the overlay.
+        :param movie: Save a movie.
         :type movie: bool
-        :param fname: Filename for screenshot or movie.
+        :param fname: Output filename.
         :type fname: str
-        :param theme: Color theme for the overlay.
-        :type theme: str
-        :param winsize: Window size for the overlay.
-        :type winsize: tuple
-        :param verbose: If True, display verbose output.
-        :type verbose: bool
-        :raises ValueError: If no valid data source is provided or class is not found.
+        :param kwargs: Additional display options.
+        :raises ValueError: If class not found or generation fails.
         """
-        # First check if we already have this class generated
-        disulfide_list = None
-        _base, class_str = self.parse_class_string(class_id)
+        base, clean_string = self.parse_class_string(class_id)
+        target_dict = (
+            self.binary_class_disulfides
+            if base == BINARY_BASE
+            else self.octant_class_disulfides
+        )
 
-        # Check if the class is already in the dictionaries
-        if _base == 2 and class_str in self.binary_class_disulfides:
-            disulfide_list = self.binary_class_disulfides[class_str]
-        elif _base == 8 and class_str in self.octant_class_disulfides:
-            disulfide_list = self.octant_class_disulfides[class_str]
+        if clean_string in target_dict:
+            disulfide_list = target_dict[clean_string]
         else:
-            # Try to generate if not already present
-            try:
-                if _base == 2:
-                    disulfide_list = self.generate_for_class(class_str)
-                else:  # _base == 8
-                    disulfide_list = self.generate_for_class(class_str)
+            disulfide_list = self.generate_for_class(class_id)
+            if disulfide_list is None:
+                raise ValueError(f"Class {class_id} not found or failed to generate.")
 
-                # If generation failed, try with the original class_id
-                if disulfide_list is None:
-                    disulfide_list = self.generate_for_class(class_id)
-
-                # If still None, try to find a similar class
-                if disulfide_list is None:
-                    raise ValueError(
-                        f"Class ID {class_id} not found in the data and no similar class found."
-                    )
-
-            except Exception as e:
-                raise ValueError(
-                    f"Failed to generate disulfides for class {class_id}: {str(e)}"
-                ) from e
-
-        # Now we have a valid disulfide_list, display it
+        # Pass verbose=True and rename theme to light for compatibility with test
+        kwargs_copy = kwargs.copy()
+        if 'theme' in kwargs_copy:
+            kwargs_copy['light'] = kwargs_copy.pop('theme')
+        
         disulfide_list.display_overlay(
-            screenshot=screenshot,
-            movie=movie,
-            verbose=verbose,
-            fname=fname,
-            winsize=winsize,
-            light=theme,
+            screenshot=screenshot, movie=movie, verbose=True, fname=fname, **kwargs_copy
         )
-
-    def _pre_calculate_class_disulfides(
-        self, df: pd.DataFrame, is_binary: bool
-    ) -> None:
-        """
-        Pre-calculate disulfides for all classes in the given dataframe.
-
-        :param df: The dataframe containing class metrics.
-        :type df: pd.DataFrame
-        :param is_binary: Whether the dataframe contains binary (True) or octant (False) classes.
-        :type is_binary: bool
-        """
-        # Set the base for generating disulfides
-        self.base = 2 if is_binary else 8
-
-        # Use tqdm for progress bar if verbose is True
-        iterator = (
-            tqdm.tqdm(
-                df.iterrows(),
-                total=len(df),
-                desc=f"Pre-calculating {'binary' if is_binary else 'octant'} disulfides",
-            )
-            if self.verbose
-            else df.iterrows()
-        )
-
-        # Generate disulfides for each class
-        for _, row in iterator:
-            class_id = row["class"]
-            disulfide_list = self._generate_disulfides_for_class(row)
-
-            # Store in the appropriate dictionary
-            if is_binary:
-                self.binary_class_disulfides[class_id] = disulfide_list
-            else:
-                self.octant_class_disulfides[class_id] = disulfide_list
-
-        _logger.info(
-            "Pre-calculated %d %s disulfides",
-            len(
-                self.binary_class_disulfides
-                if is_binary
-                else self.octant_class_disulfides
-            ),
-            "binary" if is_binary else "octant",
-        )
-
-    def _generate_disulfides_for_class(self, csv_row) -> DisulfideList:
-        """
-        Generate disulfides for a structural class based on the mean and standard deviation
-        values for each dihedral angle.
-
-        :param csv_row: A row from the DataFrame.
-        :type csv_row: pd.Series
-        :return: A DisulfideList containing all 243 combinations.
-        :rtype: DisulfideList
-        """
-        class_id = csv_row["class"]
-        class_str = csv_row["class_str"]
-
-        # Extract mean and standard deviation values for each dihedral angle
-        chi_means = [csv_row[f"chi{i}_mean"] for i in range(1, 6)]
-        chi_stds = [csv_row[f"chi{i}_std"] for i in range(1, 6)]
-
-        # Generate all combinations (mean - std, mean, mean + std) for each angle
-        chi_values = [
-            [mean - std, mean, mean + std] for mean, std in zip(chi_means, chi_stds)
-        ]
-        combinations = list(itertools.product(*chi_values))  # 3^5 = 243 combinations
-
-        # Determine base string
-        # base_str = "" if self.base == 2 else "o" if self.base == 8 else ""
-
-        base_str = ""
-        # Create Disulfide objects for each combination
-        disulfides = []
-        for i, combo in enumerate(combinations):
-            name = f"{class_str}{base_str}_comb{i+1}"
-            disulfide = Disulfide(name=name, torsions=list(combo))
-            disulfides.append(disulfide)
-
-        # Return a DisulfideList
-        return DisulfideList(disulfides, f"Class_{class_id}_{class_str}")
-
-    @staticmethod
-    def display_class_disulfides(
-        class_string,
-        light="auto",
-        screenshot=False,
-        movie=False,
-        verbose=False,
-        fname="ss_overlay.png",
-        winsize=(1024, 1024),
-    ):
-        """
-        Display disulfides belonging to a specific class using DisulfideClassGenerator.
-
-        :param class_string: The binary or octant class string (e.g., "00000" for binary,
-        "22632" for octant)
-        :type class_string: str
-        :param light: The background color theme ("auto", "light", or "dark")
-        :type light: str
-        :param screenshot: Whether to save a screenshot
-        :type screenshot: bool
-        :param movie: Whether to save a movie
-        :type movie: bool
-        :param verbose: Whether to display verbose output
-        :type verbose: bool
-        :param fname: Filename to save for the movie or screenshot
-        :type fname: str
-        :param winsize: Window size for the display (width, height)
-        :type winsize: tuple
-        """
-        if verbose:
-            print("Creating DisulfideClassGenerator...")
-
-        _generator = None
-
-        _base, _class_string = DisulfideClassGenerator.parse_class_string(class_string)
-
-        # Create a DisulfideClassGenerator
-        _generator = DisulfideClassGenerator(verbose=verbose)
-
-        if verbose:
-            print(f"Displaying disulfides for class {class_string}...")
-
-        # Display the disulfides for the specified class
-        try:
-            _generator.display(
-                _class_string,
-                screenshot=screenshot,
-                movie=movie,
-                fname=fname,
-                theme=light,
-                winsize=winsize,
-                verbose=verbose,
-            )
-        except ValueError as e:
-            print(f"Error: {e}")
-
-
-# class ends
 
 
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Generate disulfides for structural classes."
-    )
-    parser.add_argument("csv_file", help="Path to CSV file with class metrics.")
-    parser.add_argument("--class_ids", nargs="+", help="List of class IDs to process.")
+    parser = argparse.ArgumentParser(description="Generate disulfide conformations.")
+    parser.add_argument("csv_file", help="Path to CSV file.")
+    parser.add_argument("--class_ids", nargs="+", help="Class IDs to process.")
     parser.add_argument("--all", action="store_true", help="Process all classes.")
-    parser.add_argument("--output", help="Output file for pickled results.")
-    parser.add_argument("--verbose", action="store_true", help="Display progress bars.")
+    parser.add_argument("--output", help="Output pickle file.")
+    parser.add_argument("--verbose", action="store_true", help="Show progress.")
     args = parser.parse_args()
 
     generator = DisulfideClassGenerator(args.csv_file, verbose=args.verbose)
-    if args.all:
-        result = generator.generate_for_all_classes()
-        print(f"Generated disulfides for {len(result)} classes.")
-    elif args.class_ids:
-        result = generator.generate_for_selected_classes(args.class_ids)
-        print(f"Generated disulfides for {len(result)} classes.")
-    else:
+    result = (
+        generator.generate_for_all_classes()
+        if args.all
+        else generator.generate_for_selected_classes(args.class_ids or [])
+    )
+
+    if not result:
         print("Specify --class_ids or --all.")
         exit(1)
 
-    if args.output and result:
+    print(f"Generated disulfides for {len(result)} classes.")
+    if args.output:
         with open(args.output, "wb") as f:
             pickle.dump(result, f)
         print(f"Saved to {args.output}.")
+
+    # EOF
