@@ -214,7 +214,7 @@ class TestDisulfideClassGenerator:
         generator.binary_df = generator.df
 
         # Test with valid class IDs
-        class_ids = ["+-+++", "-+---"]
+        class_ids = ["+-+++", "-+---", "+++++", "-----", "++-++", "--+--", "+-+-+", "-+-+-", "+--++", "-++--"]
         result = generator.generate_for_selected_classes(class_ids)
         assert isinstance(result, dict)
         assert len(result) == 2
@@ -291,6 +291,43 @@ class TestDisulfideClassGenerator:
         )
         first_disulfide = disulfide_list[0]
         assert first_disulfide.name.startswith(f"{class_id}_comb")
+
+    def test_getitem(self, generator):
+        """Test the __getitem__ method."""
+        # Set up the generator with some test data
+        generator.binary_class_disulfides = {"+-+++": DisulfideList([], "test_binary")}
+        generator.octant_class_disulfides = {"12345": DisulfideList([], "test_octant")}
+
+        # Test binary class
+        result = generator["+-+++"]
+        assert result.pdb_id == "test_binary"
+
+        # Test octant class
+        result = generator["12345"]
+        assert result.pdb_id == "test_octant"
+
+        # Test with suffix
+        result = generator["+-+++b"]
+        assert result.pdb_id == "test_binary"
+
+        result = generator["12345o"]
+        assert result.pdb_id == "test_octant"
+
+        # Test with class that needs to be generated
+        # Mock the generate_for_class method to return a test DisulfideList
+        with patch.object(
+            generator, 
+            "generate_for_class", 
+            return_value=DisulfideList([], "generated_class")
+        ):
+            result = generator["new_class"]
+            assert result.pdb_id == "generated_class"
+            generator.generate_for_class.assert_called_once_with("new_class")
+
+        # Test with invalid class that can't be generated
+        with patch.object(generator, "generate_for_class", return_value=None):
+            with pytest.raises(KeyError, match="Class invalid not found or could not be generated"):
+                generator["invalid"]
 
     def test_class_to_sslist(self, generator):
         """Test the class_to_sslist method."""
