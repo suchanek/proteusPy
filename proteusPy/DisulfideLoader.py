@@ -3,7 +3,7 @@ This module is part of the proteusPy package, a Python package for
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
-Last revision: 2025-03-09 19:36:06 -egs-
+Last revision: 2025-03-23 23:46:36 -egs-
 """
 
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
@@ -31,6 +31,7 @@ from pympler import asizeof
 
 from proteusPy import __version__
 from proteusPy.DisulfideBase import Disulfide, DisulfideList
+from proteusPy.DisulfideClassGenerator import DisulfideClassGenerator
 from proteusPy.DisulfideClassManager import DisulfideClassManager
 from proteusPy.DisulfideExceptions import DisulfideParseWarning
 from proteusPy.DisulfideStats import DisulfideStats
@@ -126,6 +127,7 @@ class DisulfideLoader:
     TotalDisulfides: int = field(default=0, init=False)
     IDList: List = field(default_factory=list, init=False)
     tclass: Optional[DisulfideClassManager] = field(default=None, init=False)
+    class_generator: Optional[DisulfideClassGenerator] = field(default=None, init=False)
     timestamp: float = field(default_factory=time.time, init=False)
     version: str = field(default=__version__, init=False)
 
@@ -223,6 +225,7 @@ class DisulfideLoader:
                 self.TorsionDF = self.SSList.torsion_df
                 self.TotalDisulfides = len(self.SSList)
                 self.tclass = DisulfideClassManager(self, self.verbose)
+                self.class_generator = DisulfideClassGenerator(verbose=self.verbose)
 
             if self.verbose:
                 _logger.info("Loader initialization complete.")
