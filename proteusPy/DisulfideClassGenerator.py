@@ -640,6 +640,7 @@ class DisulfideClassGenerator:
         screenshot: bool = False,
         movie: bool = False,
         fname: str = "ss_overlay.png",
+        dpi: int = 300,
         **kwargs,
     ) -> None:
         """
@@ -671,7 +672,12 @@ class DisulfideClassGenerator:
                 raise ValueError(f"Class {class_id} not found or failed to generate.")
 
         disulfide_list.display_overlay(
-            screenshot=screenshot, movie=movie, verbose=True, fname=fname, **kwargs
+            screenshot=screenshot,
+            movie=movie,
+            verbose=True,
+            fname=fname,
+            dpi=dpi,
+            **kwargs,
         )
 
 

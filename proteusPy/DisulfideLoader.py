@@ -476,7 +476,7 @@ class DisulfideLoader:
         """
         return copy.deepcopy(self.SSList)
 
-    def get_by_name(self, name) -> Disulfide:
+    def get_by_name(self, name: str = None) -> Disulfide:
         """
         Return the Disulfide with the given name from the list.
         Result is cached since disulfide data doesn't change after loading.
@@ -633,16 +633,28 @@ class DisulfideLoader:
         )
 
     def plot_classes_vs_cutoff(
-        self, cutoff: float, steps: int = 50, base=8, theme="auto", verbose=False
+        self,
+        cutoff: float,
+        steps: int = 50,
+        base: int = 8,
+        theme: str = "auto",
+        verbose: bool = False,
     ) -> None:
         """
         Plot the total percentage and number of members for each octant class against the cutoff value.
 
         :param cutoff: Percent cutoff value for filtering the classes.
+        :type cutoff: float
         :param steps: Number of steps to take in the cutoff.
+        :type steps: int
         :param base: The base class to use, 6 or 8.
+        :type base: int
         :param theme: The theme to use for the plot ('auto', 'light', or 'dark'), defaults to 'auto'.
+        :type theme: str
+        :param verbose: Whether to display verbose output, defaults to False.
+        :type verbose: bool
         :return: None
+        :rtype: None
         """
         # from proteusPy.DisulfideVisualization import DisulfideVisualization
 
@@ -652,18 +664,26 @@ class DisulfideLoader:
 
     def plot_binary_to_eightclass_incidence(
         self,
-        theme="light",
-        save=False,
-        savedir=".",
-        verbose=False,
-        log=False,
-    ):
+        theme: str = "light",
+        save: bool = False,
+        savedir: str = ".",
+        verbose: bool = False,
+        log: bool = False,
+    ) -> None:
         """Plot the incidence of all octant Disulfide classes for a given binary class.
 
         :param theme: The theme to use for the plot
+        :type theme: str
         :param save: Whether to save the plots
+        :type save: bool
         :param savedir: Directory to save plots to
+        :type savedir: str
         :param verbose: Whether to display verbose output
+        :type verbose: bool
+        :param log: Whether to use a log scale for the y-axis
+        :type log: bool
+        :return: None
+        :rtype: None
         """
 
         DisulfideVisualization.plot_binary_to_eightclass_incidence(
@@ -728,7 +748,13 @@ class DisulfideLoader:
                 df, title, theme, save, savedir, base, verbose, log
             )
 
-    def plot_count_vs_classid(self, cls=None, theme="auto", base=8, log=True):
+    def plot_count_vs_classid(
+        self,
+        cls: Optional[str] = None,
+        theme: str = "auto",
+        base: int = 8,
+        log: bool = True,
+    ) -> None:
         """
         Plot a line graph of count vs class ID using Plotly.
 
@@ -769,11 +795,11 @@ class DisulfideLoader:
 
     def save(
         self,
-        savepath=DATA_DIR,
-        subset=False,
-        cutoff=-1.0,
-        sg_cutoff=-1.0,
-        verbose=False,
+        savepath: str = DATA_DIR,
+        subset: bool = False,
+        cutoff: float = -1.0,
+        sg_cutoff: float = -1.0,
+        verbose: bool = False,
     ):
         """
         Save a copy of the fully instantiated Loader to the specified file.
@@ -806,7 +832,7 @@ class DisulfideLoader:
         if verbose:
             _logger.info("Done saving loader.")
 
-    def plot_disulfides_vs_pdbid(self, cutoff=1):
+    def plot_disulfides_vs_pdbid(self, cutoff: int = 1):
         """
         Plots the number of disulfides versus pdbid.
 
@@ -841,8 +867,13 @@ class DisulfideLoader:
         return pdbids, num_disulfides
 
     def plot_distances(
-        self, distance_type="ca", cutoff=-1, comparison="less", theme="auto", log=True
-    ):
+        self,
+        distance_type: str = "ca",
+        cutoff: float = -1,
+        comparison: str = "less",
+        theme: str = "auto",
+        log: bool = True,
+    ) -> None:
         """
         Plot the distances for the disulfides in the loader.
 
@@ -905,15 +936,18 @@ class DisulfideLoader:
 
     def display_torsion_statistics(
         self,
-        class_id=None,
-        display=True,
-        save=False,
-        fname="ss_torsions.png",
-        theme="auto",
-        verbose=False,
+        class_id: str = None,
+        display: bool = True,
+        save: bool = False,
+        fname: str = "ss_torsions.png",
+        theme: str = "auto",
+        verbose: bool = False,
+        dpi: int = 300,
+        figure_size: tuple = (4, 3),
     ):
         """
-        Display torsion and distance statistics for Disulfides in the loader.
+        Display torsion and distance statistics for all Disulfides in the loader.
+        If a class ID is provided, display statistics for that class only.
 
         :param class_id: The class ID to display statistics for. Default is None.
         :type class_id: str
@@ -927,12 +961,22 @@ class DisulfideLoader:
         :type theme: str
         :param verbose: Whether to display verbose output. Default is False.
         :type verbose: bool
+        :param dpi: Dots per inch for the plot. Default is 300.
+        :type dpi: int
+        :param figure_size: Size of the figure as a tuple (width, height). Default is (4, 3).
+        :type figure_size: tuple
         :return: None
         """
         if class_id:
-            sslist = self.extract_class(class_id, verbose=verbose)
-            sslist.display_torsion_statistics(
-                display=display, save=save, fname=fname, theme=theme
+            DisulfideVisualization.display_torsion_class_df(
+                self.TorsionDF,
+                class_id,
+                display=display,
+                save=save,
+                fname=fname,
+                theme=theme,
+                dpi=dpi,
+                figure_size=figure_size,
             )
         else:
             self.SSList.display_torsion_statistics(
@@ -940,6 +984,9 @@ class DisulfideLoader:
                 save=save,
                 fname=fname,
                 theme=theme,
+                verbose=verbose,
+                dpi=dpi,
+                figure_size=figure_size,
             )
 
     def classes_vs_cutoff(self, cutoff, base=8):
@@ -952,6 +999,39 @@ class DisulfideLoader:
 
         class_df = self.tclass.filter_class_by_percentage(cutoff, base=base)
         return class_df.shape[0]
+
+    def display_torsion_class_df(
+        self,
+        class_id,
+        display=True,
+        save=False,
+        fname="ss_torsions.png",
+        theme="auto",
+        dpi=300,
+        figure_size=(4, 3),
+    ):
+        """
+        Display torsion and distance statistics for a given class ID using the TorsionDF dataframe.
+
+        :param class_id: The class ID to display statistics for (e.g. '11111b' for binary or '11111o' for octant)
+        :param display: Whether to display the plot in the notebook
+        :param save: Whether to save the plot as an image file
+        :param fname: The name of the image file to save
+        :param theme: The theme to use for the plot ('auto', 'light', or 'dark')
+        :param dpi: DPI (dots per inch) for the saved image, controls the resolution
+        :param figure_size: Tuple of (width, height) in inches for the figure size
+        """
+
+        DisulfideVisualization.display_torsion_class_df(
+            self.TorsionDF,
+            class_id,
+            display=display,
+            save=save,
+            fname=fname,
+            theme=theme,
+            dpi=dpi,
+            figure_size=figure_size,
+        )
 
 
 # class ends

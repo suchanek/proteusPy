@@ -678,6 +678,7 @@ class DisulfideVisualization:
         spin=False,
         steps=360,
         step_size=None,
+        dpi=300,
     ) -> pv.Plotter:
         """Display all disulfides in the list overlaid in stick mode against
         a common coordinate frame.
@@ -698,6 +699,12 @@ class DisulfideVisualization:
         :type winsize: tuple
         :param spin: Whether to spin the plot
         :type spin: bool
+        :param steps: Number of steps for spinning
+        :type steps: int
+        :param step_size: Step size for spinning
+        :type step_size: float
+        :param dpi: DPI for the saved image
+        :type dpi: int
         :return: pyvista.Plotter instance
         :rtype: pv.Plotter
         """
@@ -707,6 +714,7 @@ class DisulfideVisualization:
         avg_enrg = sslist.average_energy
         avg_dist = sslist.average_distance
         resolution = sslist.average_resolution
+        scale = dpi / 300
 
         res = 32
         if tot_ss > 10:
@@ -762,7 +770,7 @@ class DisulfideVisualization:
         if screenshot:
             pl.show(auto_close=False)
             try:
-                pl.screenshot(fname)
+                pl.screenshot(fname, scale=scale)
                 if verbose:
                     print(f" -> display_overlay(): Saved image to: {fname}")
             except RuntimeError as e:
@@ -831,14 +839,25 @@ class DisulfideVisualization:
         :param fname: The name of the image file to save
         :param theme: The theme to use for the plot
         :param dpi: DPI (dots per inch) for the saved image, controls the resolution (default: 300)
-        :param figure_size: Tuple of (width, height) in pixels for the figure size (default: (1024, 1024))
+        :param figure_size: Tuple of (width, height) in inches for the figure size (default: (4, 3))
         """
         if len(sslist) == 0:
             _logger.warning("Empty DisulfideList. Nothing to display.")
             return
 
+        # Calculate pixel dimensions
         _width = figure_size[0] * dpi
         _height = figure_size[1] * dpi
+
+        # Calculate scale factor based on DPI (300 DPI is the reference)
+        scale_factor = dpi / 300
+
+        # Scale font sizes based on DPI
+        title_font_size = int(20 * scale_factor)
+        axis_font_size = int(14 * scale_factor)
+        tick_font_size = int(12 * scale_factor)
+        text_font_size = int(10 * scale_factor)
+        legend_font_size = int(10 * scale_factor)
 
         set_plotly_theme(theme)
         title = f"{sslist.pdb_id}: {len(sslist)} members"
@@ -851,8 +870,11 @@ class DisulfideVisualization:
         dist_mean_vals = dist_vals.loc["mean"]
         dist_std_vals = dist_vals.loc["std"]
 
+        # Adjust vertical spacing based on scale factor
+        vertical_spacing = 0.125 * (1 + 0.2 * (scale_factor - 1))
+
         fig = make_subplots(
-            rows=2, cols=2, vertical_spacing=0.125, column_widths=[1, 1]
+            rows=2, cols=2, vertical_spacing=vertical_spacing, column_widths=[1, 1]
         )
 
         fig.update_layout(
@@ -861,9 +883,19 @@ class DisulfideVisualization:
                 "xanchor": "center",
                 "x": 0.5,
                 "yanchor": "top",
+                "font": {"size": title_font_size},
             },
             width=_width,
             height=_height,
+            margin=dict(t=50 * scale_factor, b=50 * scale_factor),
+            legend=dict(
+                font=dict(size=legend_font_size),
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1,
+            ),
         )
 
         fig.add_trace(
@@ -871,7 +903,20 @@ class DisulfideVisualization:
                 x=["X1", "X2", "X3", "X4", "X5"],
                 y=tor_mean_vals[:5],
                 name="Torsion Angle (°) ",
-                error_y=dict(type="data", array=tor_std_vals, visible=True),
+                error_y=dict(
+                    type="data",
+                    array=tor_std_vals,
+                    visible=True,
+                    thickness=2 * scale_factor,
+                ),
+                text=[
+                    f"{val:.2f} ± {std:.2f}"
+                    for val, std in zip(tor_mean_vals[:5], tor_std_vals[:5])
+                ],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="torsion",
+                showlegend=True,
             ),
             row=1,
             col=1,
@@ -882,16 +927,36 @@ class DisulfideVisualization:
                 x=["rho"],
                 y=[dist_mean_vals[4] * 100],
                 name="ρ (°) * 100",
-                error_y=dict(type="data", array=[dist_std_vals[4]], visible=True),
+                error_y=dict(
+                    type="data",
+                    array=[dist_std_vals[4]],
+                    visible=True,
+                    thickness=2 * scale_factor,
+                ),
+                text=[f"{dist_mean_vals[4] * 100:.2f} ± {dist_std_vals[4]:.2f}"],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="rho",
+                showlegend=True,
             ),
             row=1,
             col=1,
         )
 
         fig.update_yaxes(
-            title_text="Dihedral Angle (°)", range=[-200, 200], row=1, col=1
+            title_text="Dihedral Angle (°)",
+            range=[-200, 200],
+            row=1,
+            col=1,
+            title_font=dict(size=axis_font_size),
+            tickfont=dict(size=tick_font_size),
         )
-        fig.update_yaxes(range=[0, 320], row=2, col=2)
+        fig.update_yaxes(
+            range=[0, 320],
+            row=2,
+            col=2,
+            tickfont=dict(size=tick_font_size),
+        )
 
         fig.add_trace(
             go.Bar(
@@ -901,16 +966,29 @@ class DisulfideVisualization:
                 error_y=dict(
                     type="data",
                     array=[dist_std_vals[3].tolist()],
-                    width=0.25,
+                    width=0.25 * scale_factor,
                     visible=True,
+                    thickness=2 * scale_factor,
                 ),
+                text=[f"{dist_mean_vals[3]:.2f} ± {dist_std_vals[3]:.2f}"],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="energy",
+                showlegend=True,
             ),
             row=1,
             col=2,
         )
-        fig.update_traces(width=0.25, row=1, col=2)
+        fig.update_traces(width=0.25 * scale_factor, row=1, col=2)
 
-        fig.update_yaxes(title_text="kcal/mol", range=[0, 8], row=1, col=2)
+        fig.update_yaxes(
+            title_text="kcal/mol",
+            range=[0, 8],
+            row=1,
+            col=2,
+            title_font=dict(size=axis_font_size),
+            tickfont=dict(size=tick_font_size),
+        )
 
         fig.add_trace(
             go.Bar(
@@ -924,15 +1002,32 @@ class DisulfideVisualization:
                         dist_std_vals[1].tolist(),
                         dist_std_vals[2].tolist(),
                     ],
-                    width=0.25,
+                    width=0.25 * scale_factor,
                     visible=True,
+                    thickness=2 * scale_factor,
                 ),
+                text=[
+                    f"{dist_mean_vals[0]:.2f} ± {dist_std_vals[0]:.2f}",
+                    f"{dist_mean_vals[1]:.2f} ± {dist_std_vals[1]:.2f}",
+                    f"{dist_mean_vals[2]:.2f} ± {dist_std_vals[2]:.2f}",
+                ],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="distances",
+                showlegend=True,
             ),
             row=2,
             col=1,
         )
-        fig.update_yaxes(title_text="Distance (A)", range=[0, 8], row=2, col=1)
-        fig.update_traces(width=0.25, row=2, col=1)
+        fig.update_yaxes(
+            title_text="Distance (Å)",
+            range=[0, 8],
+            row=2,
+            col=1,
+            title_font=dict(size=axis_font_size),
+            tickfont=dict(size=tick_font_size),
+        )
+        fig.update_traces(width=0.25 * scale_factor, row=2, col=1)
 
         fig.add_trace(
             go.Bar(
@@ -940,28 +1035,40 @@ class DisulfideVisualization:
                 y=[tor_mean_vals[5]],
                 name="Torsion Length (Å)",
                 error_y=dict(
-                    type="data", array=[tor_std_vals[5]], width=0.25, visible=True
+                    type="data",
+                    array=[tor_std_vals[5]],
+                    width=0.25 * scale_factor,
+                    visible=True,
+                    thickness=2 * scale_factor,
                 ),
+                text=[f"{tor_mean_vals[5]:.2f} ± {tor_std_vals[5]:.2f}"],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="torsion_length",
+                showlegend=True,
             ),
             row=2,
             col=2,
         )
-        fig.update_yaxes(title_text="Torsion Length", range=[0, 350], row=2, col=2)
-        fig.update_traces(width=0.25, row=2, col=2)
-
-        fig.update_traces(
-            error_y_thickness=2,
-            error_y_color="gray",
-            texttemplate="%{y:.2f} ± %{error_y.array:.2f}",
-            textposition="outside",
+        fig.update_yaxes(
+            title_text="Torsion Length",
+            range=[0, 350],
+            row=2,
+            col=2,
+            title_font=dict(size=axis_font_size),
+            tickfont=dict(size=tick_font_size),
         )
+        fig.update_traces(width=0.25 * scale_factor, row=2, col=2)
+
+        # Update x-axis fonts
+        fig.update_xaxes(tickfont=dict(size=tick_font_size))
 
         if display:
             fig.show()
 
         if save:
             # Convert DPI to scale factor (300 DPI is considered standard, so scale = dpi/300)
-            scale = 1
+            scale = dpi / 300
             fig.write_image(fname, scale=scale)
 
     @staticmethod
@@ -1263,13 +1370,16 @@ class DisulfideVisualization:
                 if style == "bs" and i > 11:
                     rad *= 0.75
                 pvp.add_mesh(
-                    pv.Sphere(center=coords[i], radius=rad),
+                    pv.Sphere(
+                        center=coords[i],
+                        radius=rad,
+                        theta_resolution=res,
+                        phi_resolution=res,
+                    ),
                     color=colors[atom],
                     smooth_shading=True,
                     specular=spec,
                     specular_power=specpow,
-                    theta_resolution=res,
-                    phi_resolution=res,
                 )
 
         def draw_bonds(
@@ -2202,6 +2312,7 @@ class DisulfideVisualization:
         dpi: int = 300,
         suffix: str = "png",
         fname_prefix: str = "",
+        window_size: tuple = (1024, 1024),
     ) -> None:
         """
         Create a bar chart showing torsion distance by class_id using plotly_express.
@@ -2261,6 +2372,8 @@ class DisulfideVisualization:
             xaxis_showgrid=True,
             yaxis_showgrid=True,
             autosize=True,
+            width=window_size[0],
+            height=window_size[1],
             xaxis=dict(
                 tickangle=-45,  # Angle the x-axis labels for better readability
                 tickmode="auto",
@@ -2278,5 +2391,280 @@ class DisulfideVisualization:
             fig.write_image(fname, suffix, scale=scale)
         else:
             fig.show()
+
+    @staticmethod
+    def display_torsion_class_df(
+        torsion_df: pd.DataFrame,
+        class_id: str,
+        display: bool = True,
+        save: bool = False,
+        fname: str = "ss_torsions.png",
+        theme: str = "auto",
+        dpi: int = 300,
+        figure_size: tuple = (4, 3),
+    ) -> None:
+        """
+        Display torsion and distance statistics for a given class ID using a TorsionDF dataframe.
+
+        :param torsion_df: The TorsionDF dataframe containing the torsion data
+        :param class_id: The class ID to display statistics for (e.g. '11111b' for binary or '11111o' for octant)
+        :param display: Whether to display the plot in the notebook
+        :param save: Whether to save the plot as an image file
+        :param fname: The name of the image file to save
+        :param theme: The theme to use for the plot ('auto', 'light', or 'dark')
+        :param dpi: DPI (dots per inch) for the saved image, controls the resolution
+        :param figure_size: Tuple of (width, height) in inches for the figure size
+        """
+        # Determine if binary or octant class based on suffix
+        if class_id.endswith("b"):
+            class_column = "binary_class_string"
+            class_str = class_id[:-1]  # Remove 'b' suffix
+        elif class_id.endswith("o"):
+            class_column = "octant_class_string"
+            class_str = class_id[:-1]  # Remove 'o' suffix
+        else:
+            # Default to octant if no suffix
+            class_column = "octant_class_string"
+            class_str = class_id
+
+        # Filter TorsionDF for the specified class
+        class_df = torsion_df[torsion_df[class_column] == class_str]
+
+        if len(class_df) == 0:
+            _logger.warning(f"No disulfides found for class {class_id}")
+            return
+
+        # Calculate means and standard deviations
+        tor_means = class_df[
+            ["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]
+        ].mean()
+        tor_stds = class_df[
+            ["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]
+        ].std()
+
+        dist_means = class_df[
+            ["ca_distance", "cb_distance", "sg_distance", "energy", "rho"]
+        ].mean()
+        dist_stds = class_df[
+            ["ca_distance", "cb_distance", "sg_distance", "energy", "rho"]
+        ].std()
+
+        # Calculate pixel dimensions
+        _width = figure_size[0] * dpi
+        _height = figure_size[1] * dpi
+
+        # Calculate scale factor based on DPI (300 DPI is the reference)
+        scale_factor = dpi / 300
+
+        # Scale font sizes based on DPI
+        title_font_size = int(20 * scale_factor)
+        axis_font_size = int(14 * scale_factor)
+        tick_font_size = int(12 * scale_factor)
+        text_font_size = int(10 * scale_factor)
+        legend_font_size = int(10 * scale_factor)
+
+        set_plotly_theme(theme)
+        title = f"Class {class_id}: {len(class_df)} members"
+
+        # Adjust vertical spacing based on scale factor
+        vertical_spacing = 0.125 * (1 + 0.2 * (scale_factor - 1))
+
+        fig = make_subplots(
+            rows=2, cols=2, vertical_spacing=vertical_spacing, column_widths=[1, 1]
+        )
+
+        fig.update_layout(
+            title={
+                "text": title,
+                "xanchor": "center",
+                "x": 0.5,
+                "yanchor": "top",
+                "font": {"size": title_font_size},
+            },
+            legend=dict(
+                font=dict(size=legend_font_size),
+                orientation="v",
+                yanchor="top",
+                xanchor="right",
+                y=1.02,
+                x=1,
+            ),
+            width=_width,
+            height=_height,
+            margin=dict(t=50 * scale_factor, b=50 * scale_factor),
+        )
+
+        fig.add_trace(
+            go.Bar(
+                x=["X1", "X2", "X3", "X4", "X5"],
+                y=tor_means[:5],
+                name="Torsion Angle (°) ",
+                error_y=dict(
+                    type="data",
+                    array=tor_stds,
+                    visible=True,
+                    thickness=2 * scale_factor,
+                ),
+                text=[
+                    f"{val:.2f} ± {std:.2f}"
+                    for val, std in zip(tor_means[:5], tor_stds[:5])
+                ],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="torsion",
+                showlegend=True,
+            ),
+            row=1,
+            col=1,
+        )
+
+        fig.add_trace(
+            go.Bar(
+                x=["rho"],
+                y=[dist_means[4] * 100],
+                name="ρ (°) * 100",
+                error_y=dict(
+                    type="data",
+                    array=[dist_stds[4]],
+                    visible=True,
+                    thickness=2 * scale_factor,
+                ),
+                text=[f"{dist_means[4] * 100:.2f} ± {dist_stds[4]:.2f}"],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="rho",
+                showlegend=True,
+            ),
+            row=1,
+            col=1,
+        )
+
+        fig.update_yaxes(
+            title_text="Dihedral Angle (°)",
+            range=[-200, 200],
+            row=1,
+            col=1,
+            title_font=dict(size=axis_font_size),
+            tickfont=dict(size=tick_font_size),
+        )
+        fig.update_yaxes(
+            range=[0, 320],
+            row=2,
+            col=2,
+            tickfont=dict(size=tick_font_size),
+        )
+
+        fig.add_trace(
+            go.Bar(
+                x=["Strain Energy (kcal/mol)"],
+                y=[dist_means[3]],
+                name="Energy (kcal/mol)",
+                error_y=dict(
+                    type="data",
+                    array=[dist_stds[3].tolist()],
+                    width=0.25 * scale_factor,
+                    visible=True,
+                    thickness=2 * scale_factor,
+                ),
+                text=[f"{dist_means[3]:.2f} ± {dist_stds[3]:.2f}"],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="energy",
+                showlegend=True,
+            ),
+            row=1,
+            col=2,
+        )
+        fig.update_traces(width=0.25 * scale_factor, row=1, col=2)
+
+        fig.update_yaxes(
+            title_text="kcal/mol",
+            range=[0, 8],
+            row=1,
+            col=2,
+            title_font=dict(size=axis_font_size),
+            tickfont=dict(size=tick_font_size),
+        )
+
+        fig.add_trace(
+            go.Bar(
+                x=["Cα Distance (Å)", "Cβ Distance (Å)", "Sγ Distance (Å)"],
+                y=[dist_means[0], dist_means[1], dist_means[2]],
+                name="Distances (Å)",
+                error_y=dict(
+                    type="data",
+                    array=[
+                        dist_stds[0].tolist(),
+                        dist_stds[1].tolist(),
+                        dist_stds[2].tolist(),
+                    ],
+                    width=0.25 * scale_factor,
+                    visible=True,
+                    thickness=2 * scale_factor,
+                ),
+                text=[
+                    f"{dist_means[0]:.2f} ± {dist_stds[0]:.2f}",
+                    f"{dist_means[1]:.2f} ± {dist_stds[1]:.2f}",
+                    f"{dist_means[2]:.2f} ± {dist_stds[2]:.2f}",
+                ],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="distances",
+                showlegend=True,
+            ),
+            row=2,
+            col=1,
+        )
+        fig.update_yaxes(
+            title_text="Distance (Å)",
+            range=[0, 8],
+            row=2,
+            col=1,
+            title_font=dict(size=axis_font_size),
+            tickfont=dict(size=tick_font_size),
+        )
+        fig.update_traces(width=0.25 * scale_factor, row=2, col=1)
+
+        fig.add_trace(
+            go.Bar(
+                x=["Torsion Length (Å)"],
+                y=[tor_means[5]],
+                name="Torsion Length (Å)",
+                error_y=dict(
+                    type="data",
+                    array=[tor_stds[5]],
+                    width=0.25 * scale_factor,
+                    visible=True,
+                    thickness=2 * scale_factor,
+                ),
+                text=[f"{tor_means[5]:.2f} ± {tor_stds[5]:.2f}"],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="torsion_length",
+                showlegend=True,
+            ),
+            row=2,
+            col=2,
+        )
+        fig.update_yaxes(
+            title_text="Torsion Length",
+            range=[0, 350],
+            row=2,
+            col=2,
+            title_font=dict(size=axis_font_size),
+            tickfont=dict(size=tick_font_size),
+        )
+        fig.update_traces(width=0.25 * scale_factor, row=2, col=2)
+
+        # Update x-axis fonts
+        fig.update_xaxes(tickfont=dict(size=tick_font_size))
+
+        if display:
+            fig.show()
+
+        if save:
+            # Convert DPI to scale factor (300 DPI is considered standard, so scale = dpi/300)
+            scale = dpi / 300
+            fig.write_image(fname, scale=scale)
 
     # End of file
