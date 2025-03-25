@@ -119,6 +119,10 @@ SEXTANT.mkdir(parents=True, exist_ok=True)
 BINARY.mkdir(parents=True, exist_ok=True)
 
 PERCENTILE: float = -1  # percentile cutoff for Sg and Ca filtering.
+
+DPI = 600
+FIG_SIZE = (4, 3)
+
 # Initialize colorama
 init(autoreset=True)
 
@@ -138,6 +142,7 @@ def get_args() -> argparse.Namespace:
     - `-f`, `--forge`: Forge directory (default: "miniforge3").
     - `-e`, `--env`: ProteusPy environment (default: "ppydev").
     - `-g`, `--graph`: Create class graphs (default: False).
+    - `-p`, `--percentile`: Cutoff percentage for building the database (default: -1.0).
     - `-c`, `--cutoff`: Cutoff percentage for class filtering (default: -1.0).
     - `-v`, `--verbose`: Enable verbose output (default: False).
     - `-u`, `--update`: Update repository with the consensus classes (default: True).
@@ -204,6 +209,12 @@ def get_args() -> argparse.Namespace:
         default=-1.0,
     )
     parser.add_argument(
+        "--dpi",
+        help="DPI for the graphs.",
+        type=float,
+        default=300.0,
+    )
+    parser.add_argument(
         "-v",
         "--verbose",
         help="Verbose output.",
@@ -234,6 +245,7 @@ def task(
     prefix: str,
     base: int,
     classlist: List[str],
+    dpi: float = 300.0,
 ) -> None:
     """
     Processes a range of lines in the disulfide class dict for the binary or octant disulfide classes.
@@ -293,8 +305,8 @@ def task(
                     save=True,
                     fname=fname,
                     theme="light",
-                    dpi=600,
-                    figure_size=(4, 3),
+                    dpi=dpi,
+                    figure_size=FIG_SIZE,
                 )
 
             avg_conformation = class_disulfides.average_conformation
@@ -356,6 +368,7 @@ def analyze_classes_threaded(
     num_threads: int = 8,
     do_octant: bool = True,
     prefix: str = "ss",
+    dpi: float = 300.0,
 ) -> Tuple[DisulfideList, pd.DataFrame]:
     """
     Analyze the classes of disulfide bonds using multithreading.
@@ -372,6 +385,8 @@ def analyze_classes_threaded(
     :type do_octant: bool
     :param prefix: Prefix for output filenames
     :type prefix: str
+    :param dpi: DPI for the graphs
+    :type dpi: float
     :return: Tuple containing list of disulfide bonds representing average conformations and DataFrame with metrics
     :rtype: Tuple[DisulfideList, pd.DataFrame]
     """
@@ -455,6 +470,7 @@ def analyze_classes_threaded(
                 prefix,
                 base,
                 classlist,
+                dpi,
             ),
         )
         threads.append(thread)
@@ -507,6 +523,7 @@ def analyze_classes(
     threads: int = 4,
     do_graph: bool = False,
     cutoff: float = 0.0,
+    dpi: float = 300.0,
 ) -> None:
     """
     Analyzes disulfide bond classes using the provided loader.
@@ -523,6 +540,8 @@ def analyze_classes(
     :type do_graph: bool
     :param cutoff: The cutoff value for filtering disulfides
     :type cutoff: float
+    :param dpi: The DPI for the generated graphs
+    :type dpi: float
     """
     if octant:
         print("Analyzing octant classes.")
@@ -533,6 +552,7 @@ def analyze_classes(
             num_threads=threads,
             do_octant=True,
             prefix="ss_oct",
+            dpi=dpi,
         )
 
     if binary:
@@ -544,6 +564,7 @@ def analyze_classes(
             num_threads=threads,
             do_octant=False,
             prefix="ss_bin",
+            dpi=dpi,
         )
 
 
@@ -658,6 +679,7 @@ def main() -> None:
         f"Cutoff:                {cutoff}%\n"
         f"Percentile:            {percentile}\n"
         f"Graph:                 {do_graph}\n"
+        f"DPI:                   {DPI}\n"
         f"Update:                {do_update}\n"
         f"Verbose:               {verbose}\n"
         f"Data directory:        {DATA_DIR}\n"

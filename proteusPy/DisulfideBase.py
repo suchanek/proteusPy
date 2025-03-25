@@ -499,6 +499,7 @@ class DisulfideList(UserList):
         light="auto",
         winsize=(1024, 1024),
         spin=False,
+        dpi=300,
     ):
         """Display all disulfides in the list overlaid in stick mode against
         a common coordinate frame.
@@ -524,8 +525,9 @@ class DisulfideList(UserList):
             light=light,
             winsize=winsize,
             spin=spin,
+            dpi=dpi,
         )
-
+        # force a redisplay to keep the window open. otherwise it closes!
         if spin:
             DisulfideVisualization.display_overlay(
                 sslist=self,
@@ -537,6 +539,7 @@ class DisulfideList(UserList):
                 light=light,
                 winsize=winsize,
                 spin=False,
+                dpi=dpi,
             )
 
     def display_torsion_statistics(
