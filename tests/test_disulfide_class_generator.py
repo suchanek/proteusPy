@@ -214,7 +214,18 @@ class TestDisulfideClassGenerator:
         generator.binary_df = generator.df
 
         # Test with valid class IDs
-        class_ids = ["+-+++", "-+---", "+++++", "-----", "++-++", "--+--", "+-+-+", "-+-+-", "+--++", "-++--"]
+        class_ids = [
+            "+-+++",
+            "-+---",
+            "+++++",
+            "-----",
+            "++-++",
+            "--+--",
+            "+-+-+",
+            "-+-+-",
+            "+--++",
+            "-++--",
+        ]
         result = generator.generate_for_selected_classes(class_ids)
         assert isinstance(result, dict)
         assert len(result) == 2
@@ -316,9 +327,9 @@ class TestDisulfideClassGenerator:
         # Test with class that needs to be generated
         # Mock the generate_for_class method to return a test DisulfideList
         with patch.object(
-            generator, 
-            "generate_for_class", 
-            return_value=DisulfideList([], "generated_class")
+            generator,
+            "generate_for_class",
+            return_value=DisulfideList([], "generated_class"),
         ):
             result = generator["new_class"]
             assert result.pdb_id == "generated_class"
@@ -326,7 +337,9 @@ class TestDisulfideClassGenerator:
 
         # Test with invalid class that can't be generated
         with patch.object(generator, "generate_for_class", return_value=None):
-            with pytest.raises(KeyError, match="Class invalid not found or could not be generated"):
+            with pytest.raises(
+                KeyError, match="Class invalid not found or could not be generated"
+            ):
                 generator["invalid"]
 
     def test_class_to_sslist(self, generator):
@@ -394,6 +407,7 @@ class TestDisulfideClassGenerator:
                 fname="test.png",
                 winsize=(800, 600),
                 light="dark",
+                dpi=300,
             )
 
     def test_csv_file_not_loaded(self, sample_csv_file):

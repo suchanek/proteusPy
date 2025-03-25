@@ -641,6 +641,8 @@ class DisulfideClassGenerator:
         movie: bool = False,
         fname: str = "ss_overlay.png",
         dpi: int = 300,
+        winsize: tuple = None,
+        light: str = None,
         **kwargs,
     ) -> None:
         """
@@ -654,6 +656,12 @@ class DisulfideClassGenerator:
         :type movie: bool
         :param fname: Output filename.
         :type fname: str
+        :param dpi: DPI for the output image.
+        :type dpi: int
+        :param winsize: Window size for the display.
+        :type winsize: tuple
+        :param light: Light source for the display.
+        :type light: str
         :param kwargs: Additional display options.
         :raises ValueError: If class not found or generation fails.
         """
@@ -676,6 +684,8 @@ class DisulfideClassGenerator:
             movie=movie,
             verbose=True,
             fname=fname,
+            winsize=winsize,
+            light=light,
             dpi=dpi,
             **kwargs,
         )
