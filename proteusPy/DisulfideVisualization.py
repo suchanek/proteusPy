@@ -890,11 +890,13 @@ class DisulfideVisualization:
             margin=dict(t=50 * scale_factor, b=50 * scale_factor),
             legend=dict(
                 font=dict(size=legend_font_size),
-                orientation="h",
-                yanchor="bottom",
-                y=1.02,
+                orientation="v",
+                yanchor="top",
+                y=0.95,
                 xanchor="right",
                 x=1,
+                tracegroupgap=5,
+                itemsizing="constant",
             ),
         )
 
@@ -906,8 +908,9 @@ class DisulfideVisualization:
                 error_y=dict(
                     type="data",
                     array=tor_std_vals,
+                    width=4 * scale_factor,
                     visible=True,
-                    thickness=2 * scale_factor,
+                    thickness=1.25 * scale_factor,
                 ),
                 text=[
                     f"{val:.2f} ± {std:.2f}"
@@ -930,8 +933,9 @@ class DisulfideVisualization:
                 error_y=dict(
                     type="data",
                     array=[dist_std_vals[4]],
+                    width=4.0 * scale_factor,
                     visible=True,
-                    thickness=2 * scale_factor,
+                    thickness=1.25 * scale_factor,
                 ),
                 text=[f"{dist_mean_vals[4] * 100:.2f} ± {dist_std_vals[4]:.2f}"],
                 textposition="outside",
@@ -966,9 +970,9 @@ class DisulfideVisualization:
                 error_y=dict(
                     type="data",
                     array=[dist_std_vals[3].tolist()],
-                    width=0.25 * scale_factor,
+                    width=4.0 * scale_factor,
                     visible=True,
-                    thickness=2 * scale_factor,
+                    thickness=1.25 * scale_factor,
                 ),
                 text=[f"{dist_mean_vals[3]:.2f} ± {dist_std_vals[3]:.2f}"],
                 textposition="outside",
@@ -979,7 +983,7 @@ class DisulfideVisualization:
             row=1,
             col=2,
         )
-        fig.update_traces(width=0.25 * scale_factor, row=1, col=2)
+        fig.update_traces(width=0.5 * scale_factor, row=1, col=2)
 
         fig.update_yaxes(
             title_text="kcal/mol",
@@ -1002,9 +1006,9 @@ class DisulfideVisualization:
                         dist_std_vals[1].tolist(),
                         dist_std_vals[2].tolist(),
                     ],
-                    width=0.25 * scale_factor,
+                    width=4 * scale_factor,
                     visible=True,
-                    thickness=2 * scale_factor,
+                    thickness=1.25 * scale_factor,
                 ),
                 text=[
                     f"{dist_mean_vals[0]:.2f} ± {dist_std_vals[0]:.2f}",
@@ -1027,7 +1031,7 @@ class DisulfideVisualization:
             title_font=dict(size=axis_font_size),
             tickfont=dict(size=tick_font_size),
         )
-        fig.update_traces(width=0.25 * scale_factor, row=2, col=1)
+        fig.update_traces(width=0.5 * scale_factor, row=2, col=1)
 
         fig.add_trace(
             go.Bar(
@@ -1037,9 +1041,9 @@ class DisulfideVisualization:
                 error_y=dict(
                     type="data",
                     array=[tor_std_vals[5]],
-                    width=0.25 * scale_factor,
+                    width=4.0 * scale_factor,
                     visible=True,
-                    thickness=2 * scale_factor,
+                    thickness=1.25 * scale_factor,
                 ),
                 text=[f"{tor_mean_vals[5]:.2f} ± {tor_std_vals[5]:.2f}"],
                 textposition="outside",
@@ -1058,7 +1062,7 @@ class DisulfideVisualization:
             title_font=dict(size=axis_font_size),
             tickfont=dict(size=tick_font_size),
         )
-        fig.update_traces(width=0.25 * scale_factor, row=2, col=2)
+        fig.update_traces(width=0.5 * scale_factor, row=2, col=2)
 
         # Update x-axis fonts
         fig.update_xaxes(tickfont=dict(size=tick_font_size))
@@ -2431,7 +2435,7 @@ class DisulfideVisualization:
         class_df = torsion_df[torsion_df[class_column] == class_str]
 
         if len(class_df) == 0:
-            _logger.warning(f"No disulfides found for class {class_id}")
+            _logger.warning("No disulfides found for class %s", class_id)
             return
 
         # Calculate means and standard deviations
@@ -2467,7 +2471,7 @@ class DisulfideVisualization:
         title = f"Class {class_id}: {len(class_df)} members"
 
         # Adjust vertical spacing based on scale factor
-        vertical_spacing = 0.125 * (1 + 0.2 * (scale_factor - 1))
+        vertical_spacing = 0.125 * (1 + 0.1 * (scale_factor - 1))
 
         fig = make_subplots(
             rows=2, cols=2, vertical_spacing=vertical_spacing, column_widths=[1, 1]
@@ -2496,14 +2500,16 @@ class DisulfideVisualization:
 
         fig.add_trace(
             go.Bar(
-                x=["X1", "X2", "X3", "X4", "X5"],
+                x=["X1", "X2", "X3", "X2'", "X1'"],
                 y=tor_means[:5],
                 name="Torsion Angle (°) ",
+                width=0.67,  # Control individual bar widths
                 error_y=dict(
                     type="data",
                     array=tor_stds,
+                    width=4 * scale_factor,
                     visible=True,
-                    thickness=2 * scale_factor,
+                    thickness=1.25 * scale_factor,
                 ),
                 text=[
                     f"{val:.2f} ± {std:.2f}"
@@ -2526,8 +2532,9 @@ class DisulfideVisualization:
                 error_y=dict(
                     type="data",
                     array=[dist_stds[4]],
+                    width=4 * scale_factor,
                     visible=True,
-                    thickness=2 * scale_factor,
+                    thickness=1.25 * scale_factor,
                 ),
                 text=[f"{dist_means[4] * 100:.2f} ± {dist_stds[4]:.2f}"],
                 textposition="outside",
@@ -2562,9 +2569,9 @@ class DisulfideVisualization:
                 error_y=dict(
                     type="data",
                     array=[dist_stds[3].tolist()],
-                    width=0.25 * scale_factor,
+                    width=4 * scale_factor,
                     visible=True,
-                    thickness=2 * scale_factor,
+                    thickness=1.25 * scale_factor,
                 ),
                 text=[f"{dist_means[3]:.2f} ± {dist_stds[3]:.2f}"],
                 textposition="outside",
@@ -2575,7 +2582,7 @@ class DisulfideVisualization:
             row=1,
             col=2,
         )
-        fig.update_traces(width=0.25 * scale_factor, row=1, col=2)
+        fig.update_traces(width=0.5 * scale_factor, row=1, col=2)
 
         fig.update_yaxes(
             title_text="kcal/mol",
@@ -2591,6 +2598,7 @@ class DisulfideVisualization:
                 x=["Cα Distance (Å)", "Cβ Distance (Å)", "Sγ Distance (Å)"],
                 y=[dist_means[0], dist_means[1], dist_means[2]],
                 name="Distances (Å)",
+                width=0.3,  # Control individual bar widths
                 error_y=dict(
                     type="data",
                     array=[
@@ -2598,9 +2606,9 @@ class DisulfideVisualization:
                         dist_stds[1].tolist(),
                         dist_stds[2].tolist(),
                     ],
-                    width=0.25 * scale_factor,
+                    width=4.0 * scale_factor,
                     visible=True,
-                    thickness=2 * scale_factor,
+                    thickness=1.25 * scale_factor,
                 ),
                 text=[
                     f"{dist_means[0]:.2f} ± {dist_stds[0]:.2f}",
@@ -2623,7 +2631,11 @@ class DisulfideVisualization:
             title_font=dict(size=axis_font_size),
             tickfont=dict(size=tick_font_size),
         )
-        fig.update_traces(width=0.25 * scale_factor, row=2, col=1)
+        # Update layout for the distance subplot to control bar spacing
+        fig.update_layout(
+            bargap=0.3,  # Increase gap between bars
+            bargroupgap=0.1,  # Gap between bar groups
+        )
 
         fig.add_trace(
             go.Bar(
@@ -2633,9 +2645,9 @@ class DisulfideVisualization:
                 error_y=dict(
                     type="data",
                     array=[tor_stds[5]],
-                    width=0.25 * scale_factor,
+                    width=4 * scale_factor,
                     visible=True,
-                    thickness=2 * scale_factor,
+                    thickness=1.25 * scale_factor,
                 ),
                 text=[f"{tor_means[5]:.2f} ± {tor_stds[5]:.2f}"],
                 textposition="outside",
@@ -2654,7 +2666,7 @@ class DisulfideVisualization:
             title_font=dict(size=axis_font_size),
             tickfont=dict(size=tick_font_size),
         )
-        fig.update_traces(width=0.25 * scale_factor, row=2, col=2)
+        fig.update_traces(width=0.5 * scale_factor, row=2, col=2)
 
         # Update x-axis fonts
         fig.update_xaxes(tickfont=dict(size=tick_font_size))
@@ -2666,5 +2678,208 @@ class DisulfideVisualization:
             # Convert DPI to scale factor (300 DPI is considered standard, so scale = dpi/300)
             scale = dpi / 300
             fig.write_image(fname, scale=scale)
+
+    @staticmethod
+    def plot_3d_hexbin_leftright(
+        loader,
+        width: int = 800,
+        height: int = 600,
+        gridsize: int = 30,
+        tormin: float = -180.0,
+        tormax: float = 180.0,
+        scaling: str = "sqrt",
+        column1: str = "chi2",
+        column2: str = "chi4",
+    ) -> None:
+        """
+        Create 3D hexbin plots for left and right-handed chi2-chi4 correlations with customizable z-scaling.
+
+        :param loader: Loader object to retrieve torsion data
+        :type loader: proteusPy.PDB_SS
+        :param width: Window width in pixels
+        :type width: int, optional
+        :default width: 800
+        :param height: Window height in pixels
+        :type height: int, optional
+        :default height: 600
+        :param gridsize: Number of bins for hexbin
+        :type gridsize: int, optional
+        :default gridsize: 30
+        :param tormin: Minimum torsion angle
+        :type tormin: float, optional
+        :default tormin: -180.0
+        :param tormax: Maximum torsion angle
+        :type tormax: float, optional
+        :default tormax: 180.0
+        :param scaling: Scaling method for z-values ('linear', 'sqrt', 'log', 'power')
+        :type scaling: str, optional
+        :default scaling: 'sqrt'
+        :param column1: Name of the first column (x-axis)
+        :type column1: str, optional
+        :default column1: 'chi2'
+        :param column2: Name of the second column (y-axis)
+        :type column2: str, optional
+        :default column2: 'chi4'
+        """
+
+        _SS_df = loader.getTorsions()
+
+        _left = _SS_df["chi3"] <= 0.0
+        _right = _SS_df["chi3"] > 0.0
+
+        _SS_df_Left = _SS_df[_left]
+        _SS_df_Right = _SS_df[_right]
+
+        try:
+            # Ensure width and height are integers
+            width = int(width)
+            height = int(height)
+
+            # Extract data
+            x_left = _SS_df_Left[column1]
+            y_left = _SS_df_Left[column2]
+            x_right = _SS_df_Right[column1]
+            y_right = _SS_df_Right[column2]
+
+            # Create 2D histogram bins for both datasets
+            bins_left, xedges_left, yedges_left = np.histogram2d(
+                x_left,
+                y_left,
+                bins=gridsize,
+                range=[[tormin - 1, tormax + 1], [tormin - 1, tormax + 1]],
+            )
+            bins_right, xedges_right, yedges_right = np.histogram2d(
+                x_right, y_right, bins=gridsize, range=[[tormin, tormax], [-180, 180]]
+            )
+
+            # Apply scaling to bin counts using match
+            match scaling:
+                case "linear":
+                    scaled_bins_left = bins_left.T
+                    scaled_bins_right = bins_right.T
+                    scale_label = "linear scale"
+                case "sqrt":
+                    scaled_bins_left = np.sqrt(bins_left.T)
+                    scaled_bins_right = np.sqrt(bins_right.T)
+                    scale_label = "sqrt scale"
+                case "log":
+                    scaled_bins_left = np.log1p(bins_left.T)
+                    scaled_bins_right = np.log1p(bins_right.T)
+                    scale_label = "log scale"
+                case "power":
+                    power = 0.3
+                    scaled_bins_left = np.power(bins_left.T, power)
+                    scaled_bins_right = np.power(bins_right.T, power)
+                    scale_label = f"power scale ({power})"
+                case _:
+                    raise ValueError(
+                        f"Unsupported scaling method: {scaling}. Use 'linear', 'sqrt', 'log', or 'power'."
+                    )
+
+            # Debug: Print min and max of scaled values
+            print(
+                f"Left plot - Min: {scaled_bins_left.min()}, Max: {scaled_bins_left.max()}"
+            )
+            print(
+                f"Right plot - Min: {scaled_bins_right.min()}, Max: {scaled_bins_right.max()}"
+            )
+
+            # Create mesh grid for plotting
+            x_grid, y_grid = np.meshgrid(xedges_left[:-1], yedges_left[:-1])
+            x_grid_r, y_grid_r = np.meshgrid(xedges_right[:-1], yedges_right[:-1])
+
+            # Create PyVista plotter with two subplots
+            plotter = pv.Plotter(shape=(1, 2), window_size=[width * 2, height])
+
+            # Left-handed plot (subplot 0)
+            plotter.subplot(0, 0)
+            grid_left = pv.StructuredGrid(x_grid, y_grid, scaled_bins_left)
+            grid_left.point_data["Height"] = scaled_bins_left.ravel(order="F")
+            plotter.add_mesh(
+                grid_left,
+                scalars="Height",
+                cmap="nipy_spectral",
+                show_edges=False,
+                clim=[scaled_bins_left.min(), scaled_bins_left.max()],
+                show_scalar_bar=False,  # Add this line to hide the scalar bar
+            )
+            plotter.add_title(
+                f"{column1} - {column2} Correlation (Left-handed, {scale_label})",
+                font_size=8,
+            )
+            plotter.show_grid()
+            # Add axes with custom labels
+            plotter.add_axes(
+                xlabel=column1,
+                ylabel=column2,
+                zlabel="Incidence",
+                line_width=2,
+                color="black",
+                interactive=True,
+            )
+
+            plotter.view_xy()
+            plotter.enable_parallel_projection()
+
+            # Right-handed plot (subplot 1)
+            plotter.subplot(0, 1)
+            grid_right = pv.StructuredGrid(x_grid_r, y_grid_r, scaled_bins_right)
+            grid_right.point_data["Height"] = scaled_bins_right.ravel(order="F")
+            plotter.add_mesh(
+                grid_right,
+                scalars="Height",
+                cmap="nipy_spectral",
+                show_edges=False,
+                clim=[scaled_bins_right.min(), scaled_bins_right.max()],
+                show_scalar_bar=False,  # Add this line to hide the scalar bar
+            )
+            plotter.add_title(
+                f"{column1} - {column2} Correlation (Right-handed, {scale_label})",
+                font_size=8,
+            )
+            plotter.show_grid()
+            plotter.view_xy()
+            # Add axes with custom labels
+            plotter.add_axes(
+                xlabel=column1,
+                ylabel=column2,
+                zlabel="Incidence",
+                line_width=2,
+                color="black",
+                interactive=True,
+            )
+
+            plotter.enable_parallel_projection()
+            plotter.add_scalar_bar(
+                title="Incidence",
+                vertical=True,
+                position_x=0.9,  # Right side
+                position_y=0.25,
+                width=0.05,
+                height=0.5,
+                title_font_size=14,
+                label_font_size=12,
+            )
+
+            # Final adjustments
+            plotter.reset_camera()
+            plotter.link_views()
+            plotter.show(
+                jupyter_backend=(
+                    "pythreejs" if "jupyter" in str(type(plotter)) else "trame"
+                )
+            )
+
+        except AttributeError as e:
+            print(
+                f"Error: DataFrame might be missing required columns (chi2, chi4): {e}"
+            )
+        except ValueError as e:
+            print(f"Error: Invalid parameter value: {e}")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            print(
+                "Please ensure WIDTH and HEIGHT are integers and DataFrames contain valid data."
+            )
 
     # End of file

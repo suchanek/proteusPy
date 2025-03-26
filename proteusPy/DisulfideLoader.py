@@ -3,7 +3,7 @@ This module is part of the proteusPy package, a Python package for
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 This work is based on the original C/C++ implementation by Eric G. Suchanek. \n
 
-Last revision: 2025-03-23 23:46:36 -egs-
+Last revision: 2025-03-26 13:14:09 -egs-
 """
 
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
@@ -1031,6 +1031,60 @@ class DisulfideLoader:
             theme=theme,
             dpi=dpi,
             figure_size=figure_size,
+        )
+
+    def plot_3d_hexbin_leftright(
+        self,
+        width: int = 800,
+        height: int = 600,
+        gridsize: int = 30,
+        tormin: float = -180.0,
+        tormax: float = 180.0,
+        scaling: str = "sqrt",
+        column1: str = "chi2",
+        column2: str = "chi4",
+    ) -> None:
+        """
+        Create 3D hexbin plots for left and right-handed chi2-chi4 correlations with customizable z-scaling.
+
+        :param loader: Loader object to retrieve torsion data
+        :type loader: proteusPy.PDB_SS
+        :param width: Window width in pixels
+        :type width: int, optional
+        :default width: 800
+        :param height: Window height in pixels
+        :type height: int, optional
+        :default height: 600
+        :param gridsize: Number of bins for hexbin
+        :type gridsize: int, optional
+        :default gridsize: 30
+        :param tormin: Minimum torsion angle
+        :type tormin: float, optional
+        :default tormin: -180.0
+        :param tormax: Maximum torsion angle
+        :type tormax: float, optional
+        :default tormax: 180.0
+        :param scaling: Scaling method for z-values ('linear', 'sqrt', 'log', 'power')
+        :type scaling: str, optional
+        :default scaling: 'sqrt'
+        :param column1: Name of the first column (x-axis)
+        :type column1: str, optional
+        :default column1: 'chi2'
+        :param column2: Name of the second column (y-axis)
+        :type column2: str, optional
+        :default column2: 'chi4'
+        """
+
+        DisulfideVisualization.plot_3d_hexbin_leftright(
+            self,
+            width=width,
+            height=height,
+            gridsize=gridsize,
+            tormin=tormin,
+            tormax=tormax,
+            scaling=scaling,
+            column1=column1,
+            column2=column2,
         )
 
 
