@@ -1037,7 +1037,7 @@ class DisulfideLoader:
         self,
         width: int = 800,
         height: int = 600,
-        gridsize: int = 30,
+        gridsize: int = 80,
         tormin: float = -180.0,
         tormax: float = 180.0,
         scaling: str = "sqrt",
