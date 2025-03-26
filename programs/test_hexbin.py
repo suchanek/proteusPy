@@ -4,9 +4,7 @@
 # Cα Cβ Sγ
 
 import logging
-import os
 import sys
-from pathlib import Path
 
 import numpy as np  # type: ignore
 import pyvista as pv  # type: ignore
@@ -14,11 +12,7 @@ import pyvista as pv  # type: ignore
 import proteusPy as pp
 from proteusPy.ProteusGlobals import Torsion_DF_Cols
 
-pv.set_jupyter_backend("trame")
-
-HOME = Path.home()
-PDB = Path(os.getenv("PDB", HOME / "pdb"))
-PBAR_COLS = 78
+# pv.set_jupyter_backend("trame")
 
 pp.configure_master_logger("test_hexbin.log")
 pp.set_logger_level_for_module("proteusPy", logging.INFO)
@@ -28,21 +22,13 @@ _logger = pp.create_logger(__name__)
 pp.set_pyvista_theme("auto")
 
 
-DPI = 300
-WIDTH = 5.0
-HEIGHT = 4.0
-TORMIN = -179.0
-TORMAX = 180.0
-GRIDSIZE = 10
-
-
 def plot_3d_hexbin_single(
     df: "pandas.DataFrame",
     column1: str,
     column2: str,
     width: int = 800,
     height: int = 800,
-    gridsize: int = 30,
+    gridsize: int = 80,
     tormin: float = -180.0,
     tormax: float = 180.0,
     scaling: str = "sqrt",
@@ -180,241 +166,27 @@ def plot_3d_hexbin_single(
     return
 
 
-def plot_3d_hexbin_leftright(
-    loader,
-    width: int = 800,
-    height: int = 600,
-    gridsize: int = 30,
-    tormin: float = -180.0,
-    tormax: float = 180.0,
-    scaling: str = "sqrt",
-    column1: str = "chi2",
-    column2: str = "chi4",
-) -> None:
-    """
-    Create 3D hexbin plots for left and right-handed chi2-chi4 correlations with customizable z-scaling.
-
-    :param loader: Loader object to retrieve torsion data
-    :type loader: proteusPy.PDB_SS
-    :param width: Window width in pixels
-    :type width: int, optional
-    :default width: 800
-    :param height: Window height in pixels
-    :type height: int, optional
-    :default height: 600
-    :param gridsize: Number of bins for hexbin
-    :type gridsize: int, optional
-    :default gridsize: 30
-    :param tormin: Minimum torsion angle
-    :type tormin: float, optional
-    :default tormin: -180.0
-    :param tormax: Maximum torsion angle
-    :type tormax: float, optional
-    :default tormax: 180.0
-    :param scaling: Scaling method for z-values ('linear', 'sqrt', 'log', 'power')
-    :type scaling: str, optional
-    :default scaling: 'sqrt'
-    :param column1: Name of the first column (x-axis)
-    :type column1: str, optional
-    :default column1: 'chi2'
-    :param column2: Name of the second column (y-axis)
-    :type column2: str, optional
-    :default column2: 'chi4'
-    """
-
-    _SS_df = loader.getTorsions()
-
-    _left = _SS_df["chi3"] <= 0.0
-    _right = _SS_df["chi3"] > 0.0
-
-    _SS_df_Left = _SS_df[_left]
-    _SS_df_Right = _SS_df[_right]
-
-    try:
-        # Ensure width and height are integers
-        width = int(width)
-        height = int(height)
-
-        # Extract data
-        x_left = _SS_df_Left[column1]
-        y_left = _SS_df_Left[column2]
-        x_right = _SS_df_Right[column1]
-        y_right = _SS_df_Right[column2]
-
-        # Create 2D histogram bins for both datasets
-        bins_left, xedges_left, yedges_left = np.histogram2d(
-            x_left,
-            y_left,
-            bins=gridsize,
-            range=[[tormin - 1, tormax + 1], [tormin - 1, tormax + 1]],
-        )
-        bins_right, xedges_right, yedges_right = np.histogram2d(
-            x_right, y_right, bins=gridsize, range=[[tormin, tormax], [-180, 180]]
-        )
-
-        # Apply scaling to bin counts using match
-        match scaling:
-            case "linear":
-                scaled_bins_left = bins_left.T
-                scaled_bins_right = bins_right.T
-                scale_label = "linear scale"
-            case "sqrt":
-                scaled_bins_left = np.sqrt(bins_left.T)
-                scaled_bins_right = np.sqrt(bins_right.T)
-                scale_label = "sqrt scale"
-            case "log":
-                scaled_bins_left = np.log1p(bins_left.T)
-                scaled_bins_right = np.log1p(bins_right.T)
-                scale_label = "log scale"
-            case "power":
-                power = 0.3
-                scaled_bins_left = np.power(bins_left.T, power)
-                scaled_bins_right = np.power(bins_right.T, power)
-                scale_label = f"power scale ({power})"
-            case _:
-                raise ValueError(
-                    f"Unsupported scaling method: {scaling}. Use 'linear', 'sqrt', 'log', or 'power'."
-                )
-
-        # Debug: Print min and max of scaled values
-        print(
-            f"Left plot - Min: {scaled_bins_left.min()}, Max: {scaled_bins_left.max()}"
-        )
-        print(
-            f"Right plot - Min: {scaled_bins_right.min()}, Max: {scaled_bins_right.max()}"
-        )
-
-        # Create mesh grid for plotting
-        x_grid, y_grid = np.meshgrid(xedges_left[:-1], yedges_left[:-1])
-        x_grid_r, y_grid_r = np.meshgrid(xedges_right[:-1], yedges_right[:-1])
-
-        # Create PyVista plotter with two subplots
-        plotter = pv.Plotter(shape=(1, 2), window_size=[width * 2, height])
-
-        # Left-handed plot (subplot 0)
-        plotter.subplot(0, 0)
-        grid_left = pv.StructuredGrid(x_grid, y_grid, scaled_bins_left)
-        grid_left.point_data["Height"] = scaled_bins_left.ravel(order="F")
-        plotter.add_mesh(
-            grid_left,
-            scalars="Height",
-            cmap="nipy_spectral",
-            show_edges=False,
-            clim=[scaled_bins_left.min(), scaled_bins_left.max()],
-            show_scalar_bar=False,  # Add this line to hide the scalar bar
-        )
-        plotter.add_title(
-            f"{column1} - {column2} Correlation (Left-handed, {scale_label})",
-            font_size=8,
-        )
-        plotter.show_grid()
-        # Add axes with custom labels
-        plotter.add_axes(
-            xlabel=column1,
-            ylabel=column2,
-            zlabel="Incidence",
-            line_width=2,
-            color="black",
-            interactive=True,
-        )
-
-        plotter.view_xy()
-        plotter.enable_parallel_projection()
-
-        # Right-handed plot (subplot 1)
-        plotter.subplot(0, 1)
-        grid_right = pv.StructuredGrid(x_grid_r, y_grid_r, scaled_bins_right)
-        grid_right.point_data["Height"] = scaled_bins_right.ravel(order="F")
-        plotter.add_mesh(
-            grid_right,
-            scalars="Height",
-            cmap="nipy_spectral",
-            show_edges=False,
-            clim=[scaled_bins_right.min(), scaled_bins_right.max()],
-            show_scalar_bar=False,  # Add this line to hide the scalar bar
-        )
-        plotter.add_title(
-            f"{column1} - {column2} Correlation (Right-handed, {scale_label})",
-            font_size=8,
-        )
-        plotter.show_grid()
-        plotter.view_xy()
-        # Add axes with custom labels
-        plotter.add_axes(
-            xlabel=column1,
-            ylabel=column2,
-            zlabel="Incidence",
-            line_width=2,
-            color="black",
-            interactive=True,
-        )
-
-        plotter.enable_parallel_projection()
-        plotter.add_scalar_bar(
-            title="Incidence",
-            vertical=True,
-            position_x=0.9,  # Right side
-            position_y=0.25,
-            width=0.05,
-            height=0.5,
-            title_font_size=14,
-            label_font_size=12,
-        )
-
-        # Final adjustments
-        plotter.reset_camera()
-        plotter.link_views()
-        plotter.show(
-            jupyter_backend="pythreejs" if "jupyter" in str(type(plotter)) else "trame"
-        )
-
-    except AttributeError as e:
-        print(f"Error: DataFrame might be missing required columns (chi2, chi4): {e}")
-    except ValueError as e:
-        print(f"Error: Invalid parameter value: {e}")
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        print(
-            "Please ensure WIDTH and HEIGHT are integers and DataFrames contain valid data."
-        )
-
-
-# Example usage in Jupyter:
-# pv.set_jupyter_backend('pythreejs')  # Add this at the start of your notebook
-# plot_3d_hexbin(SS_df_Left, SS_df_Right, scaling='sqrt')
-
-# Run the plot
-# plot_3d_hexbin_single(
-#    SS_df_Left, "chi2", "chi4", scaling="sqrt", width=1024, height=1024, gridsize=50
-# )
-
-
 def main():
     # default parameters will read from the package itself.
-    PDB_SS = pp.Load_PDB_SS(verbose=True, subset=False, cutoff=-1.0, sg_cutoff=-1.0)
-    _SSdf = PDB_SS.getTorsions()
+    PDB = pp.Load_PDB_SS(verbose=True, subset=False, cutoff=-1.0, sg_cutoff=-1.0)
 
-    _near = _SSdf["ca_distance"] <= 8.0
-
-    SS_df = _SSdf[_near]
-
-    SS_df = SS_df[Torsion_DF_Cols].copy()
-
-    _left = SS_df["chi3"] <= 0.0
-    _right = SS_df["chi3"] > 0.0
-
-    SS_df_Left = SS_df[_left]
-    SS_df_Right = SS_df[_right]
-
-    print(f"Left Handed: {SS_df_Left.shape[0]}, Right Handed: {SS_df_Right.shape[0]}")
-
-    PDB_SS.plot_3d_hexbin_leftright(
+    PDB.plot_3d_hexbin_leftright(
         scaling="sqrt",
         width=1024,
         height=1024,
-        gridsize=50,
+        gridsize=90,
         column1="chi2",
         column2="chi4",
+    )
+
+    pp.DisulfideVisualization.plot_3d_hexbin_df(
+        df=PDB.TorsionDF,
+        column1="chi2",
+        column2="chi4",
+        width=1024,
+        height=1024,
+        gridsize=80,
+        scaling="sqrt",
     )
 
 

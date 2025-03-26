@@ -721,6 +721,61 @@ class DisulfideList(UserList):
         dev_df = self.create_deviation_dataframe(verbose)
         DisulfideVisualization.plot_deviation_histograms(dev_df, theme=theme, log=log)
 
+    def plot_3d_hexbin_df(
+        self,
+        column1: str,
+        column2: str,
+        width: int = 1024,
+        height: int = 1024,
+        gridsize: int = 80,
+        tormin: float = -180.0,
+        tormax: float = 180.0,
+        scaling: str = "sqrt",
+    ) -> None:
+        """
+        Create a 3D hexbin plot for correlations between two columns from a
+        single DataFrame with customizable z-scaling.
+
+        :param df: Data containing the specified columns
+        :type df: pandas.DataFrame
+        :param column1: Name of the first column (x-axis)
+        :type column1: str
+        :param column2: Name of the second column (y-axis)
+        :type column2: str
+        :param width: Window width in pixels
+        :type width: int, optional
+        :default width: 1024
+        :param height: Window height in pixels
+        :type height: int, optional
+        :default height: 1024
+        :param gridsize: Number of bins for hexbin
+        :type gridsize: int, optional
+        :default gridsize: 80
+        :param tormin: Minimum torsion angle
+        :type tormin: float, optional
+        :default tormin: -180
+        :param tormax: Maximum torsion angle
+        :type tormax: float, optional
+        :default tormax: 180
+        :param scaling: Scaling method for z-values ('linear', 'sqrt', 'log', 'power')
+        :type scaling: str, optional
+        :default scaling: 'sqrt'
+        """
+        df = self.build_torsion_df()
+
+        DisulfideVisualization.plot_3d_hexbin_df(
+            df=df,
+            column1=column1,
+            column2=column2,
+            width=width,
+            height=height,
+            gridsize=gridsize,
+            tormin=tormin,
+            tormax=tormax,
+            scaling=scaling,
+        )
+        return None
+
 
 # class for the Disulfide bond
 class Disulfide:
