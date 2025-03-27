@@ -242,8 +242,7 @@ class DisulfideLoader:
             self.save(
                 savepath=DATA_DIR,
                 subset=self.subset,
-                cutoff=self.cutoff,
-                sg_cutoff=self.sg_cutoff,
+                percentile=self.percentile,
                 verbose=self.verbose,
             )
 
@@ -506,6 +505,7 @@ class DisulfideLoader:
         res = self.average_resolution
         cutoff = self.cutoff
         sg_cutoff = self.sg_cutoff
+        percentile = self.percentile
         timestr = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.timestamp))
         ssMinMax = self.SSList.minmax_energy
         ssMin_name: Disulfide = ssMinMax[0].name
@@ -519,6 +519,7 @@ class DisulfideLoader:
         print(f"Highest Energy Disulfide:        {ssMax_name}")
         print(f"Cα distance cutoff:              {cutoff:.2f} Å")
         print(f"Sγ distance cutoff:              {sg_cutoff:.2f} Å")
+        print(f"Percentile cutoff:               {percentile:.2f} %")
         if memusg:
             print(f"Total RAM Used:                     {ram:.2f} GB.")
         print(f"               ===== proteusPy: {vers} =====")
@@ -797,8 +798,7 @@ class DisulfideLoader:
         self,
         savepath: str = DATA_DIR,
         subset: bool = False,
-        cutoff: float = -1.0,
-        sg_cutoff: float = -1.0,
+        percentile: float = -1.0,
         verbose: bool = False,
     ):
         """
@@ -807,12 +807,10 @@ class DisulfideLoader:
         :param savepath: Path to save the file, defaults to DATA_DIR
         :param fname: Filename, defaults to LOADER_FNAME
         :param verbose: Verbosity, defaults to False
-        :param cutoff: Ca-Ca Distance cutoff used to build the database, -1 means no cutoff.
-        :param sg_cutoff: Sg-Sg Distance cutoff used to build the database, -1 means no cutoff.
+        :param percentile: Percentile used to filter data before saving, -1 means no filtering.
         """
         self.version = __version__
-        self.cutoff = cutoff
-        self.sg_cutoff = sg_cutoff
+        self.percentile = percentile
 
         fname = None
 
@@ -1043,6 +1041,7 @@ class DisulfideLoader:
         scaling: str = "sqrt",
         column1: str = "chi2",
         column2: str = "chi4",
+        title: str = None,
     ) -> None:
         """
         Create 3D hexbin plots for left and right-handed chi2-chi4 correlations with customizable z-scaling.
@@ -1073,6 +1072,8 @@ class DisulfideLoader:
         :param column2: Name of the second column (y-axis)
         :type column2: str, optional
         :default column2: 'chi4'
+        :param title: Title of the plot
+        :type title: str, optional
         """
 
         DisulfideVisualization.plot_3d_hexbin_leftright(
@@ -1085,6 +1086,7 @@ class DisulfideLoader:
             scaling=scaling,
             column1=column1,
             column2=column2,
+            title=title,
         )
 
 
@@ -1095,8 +1097,7 @@ def Load_PDB_SS(
     loadpath=DATA_DIR,
     verbose=False,
     subset=False,
-    cutoff=-1.0,
-    sg_cutoff=-1.0,
+    percentile=-1.0,
     force=False,
 ) -> DisulfideLoader:
     """
@@ -1140,6 +1141,8 @@ def Load_PDB_SS(
     _fname_all = Path(loadpath) / LOADER_FNAME
     _fpath = _fname_sub if subset else _fname_all
 
+    sg_cutoff = ca_cutoff = -1.0
+
     if not _fpath.exists() or force is True:
         if verbose:
             _logger.info(f"Bootstrapping new loader: {str(_fpath)}... ")
@@ -1149,14 +1152,11 @@ def Load_PDB_SS(
             verbose=verbose,
             subset=subset,
             force=force,
-            cutoff=cutoff,
-            sg_cutoff=sg_cutoff,
+            percentile=percentile,
         )
         loader.save(
             savepath=loadpath,
-            subset=subset,
-            cutoff=cutoff,
-            sg_cutoff=sg_cutoff,
+            percentile=percentile,
         )
         return loader
 
@@ -1174,13 +1174,12 @@ def Load_PDB_SS(
 
 def Bootstrap_PDB_SS(
     loadpath=DATA_DIR,
-    cutoff=-1.0,
-    sg_cutoff=-1.0,
     verbose=True,
     subset=False,
     force=False,
     fake=False,
-):
+    percentile=-1.0,
+) -> DisulfideLoader:
     """
     Download and instantiate the disulfide databases from Google Drive.
 
@@ -1223,18 +1222,16 @@ def Bootstrap_PDB_SS(
                 return None
     if verbose:
         _logger.info(
-            "Building loader from: %s with cutoffs %f, %f...",
+            "Building loader from: %s with cutoffs %s s...",
             full_path,
-            cutoff,
-            sg_cutoff,
+            percentile,
         )
 
     loader = DisulfideLoader(
         datadir=DATA_DIR,
         subset=subset,
         verbose=verbose,
-        cutoff=cutoff,
-        sg_cutoff=sg_cutoff,
+        percentile=percentile,
     )
 
     if loader.TotalDisulfides == 0:

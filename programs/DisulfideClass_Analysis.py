@@ -711,8 +711,6 @@ def main() -> None:
         pdb_ss = DisulfideLoader(
             verbose=verbose,
             subset=False,
-            cutoff=-1,
-            sg_cutoff=-1,
             percentile=percentile,
         )
         analyze_classes(
