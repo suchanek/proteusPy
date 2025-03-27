@@ -22,7 +22,7 @@ import pickle
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import gdown
 import pandas as pd
@@ -46,7 +46,6 @@ from proteusPy.ProteusGlobals import (
 )
 
 _logger = create_logger(__name__)
-
 
 try:
     # Check if running in Jupyter
@@ -85,7 +84,7 @@ class DisulfideLoader:
 
     :param verbose: Flag to control output verbosity
     :type verbose: bool
-    :param datadir: Directory containing data files
+    :param datadir: Directory containingA data files
     :type datadir: str
     :param picklefile: Name of the pickle file containing disulfide data
     :type picklefile: str
@@ -245,7 +244,7 @@ class DisulfideLoader:
             )
 
     # overload __getitem__ to handle slicing and indexing, and access by name or classid
-    def __getitem__(self, item):
+    def __getitem__(self, item: int | slice | str) -> DisulfideList | Disulfide:
         """
         Implements indexing and slicing to retrieve DisulfideList objects from the
         DisulfideLoader. Supports:
@@ -313,10 +312,10 @@ class DisulfideLoader:
             _logger.error("DisulfideLoader(): Cannot find key %s in SSBond DB", item)
         return res
 
-    def __setitem__(self, index, item):
+    def __setitem__(self, index: int, item: Disulfide) -> None:
         self.SSList[index] = self._validate_ss(item)
 
-    def _validate_ss(self, value):
+    def _validate_ss(self, value: Any) -> Disulfide:
         if isinstance(value, Disulfide):
             return value
         raise TypeError(f"Disulfide object expected, got {type(value).__name__}")
@@ -341,7 +340,7 @@ class DisulfideLoader:
 
         return sum(valid_resolutions) / len(valid_resolutions)
 
-    def binary_to_class(self, binary_class: str, base=8) -> list:
+    def binary_to_class(self, binary_class: str, base: int = 8) -> list[str]:
         """
         Convert a binary class string to an octant class string.
 
@@ -351,7 +350,7 @@ class DisulfideLoader:
         """
         return self.tclass.binary_to_class(binary_class, base)
 
-    def build_ss_from_idlist(self, idlist) -> DisulfideList:
+    def build_ss_from_idlist(self, idlist: List[str]) -> DisulfideList:
         """
         Return a DisulfideList of Disulfides for a given list of PDBIDs
 
@@ -365,7 +364,7 @@ class DisulfideLoader:
                     res.append(self.SSList[ssid])
         return res
 
-    def _class_indices_from_tors_df(self, class_string, base=8) -> pd.Index:
+    def _class_indices_from_tors_df(self, class_string: str, base: int = 8) -> pd.Index:
         """
         Return the row indices of the torsion dataframe that match the class string.
 
@@ -391,7 +390,7 @@ class DisulfideLoader:
 
         return tors_df[tors_df[column] == class_string].index
 
-    def copy(self):
+    def copy(self) -> "DisulfideLoader":
         """
         Return a copy of self.
 
@@ -399,7 +398,7 @@ class DisulfideLoader:
         """
         return copy.deepcopy(self)
 
-    def _create_disulfide_dict(self):
+    def _create_disulfide_dict(self) -> Dict[str, List[int]]:
         """
         Create a dictionary from a list of disulfide objects where the key is the pdb_id
         and the value is a list of indices of the disulfide objects in the list.
@@ -420,7 +419,7 @@ class DisulfideLoader:
             disulfide_dict[disulfide.pdb_id].append(index)
         return disulfide_dict
 
-    def get_class_df(self, base=8) -> pd.DataFrame:
+    def get_class_df(self, base: int = 8) -> pd.DataFrame:
         """
         Return the class incidence dataframe for the input base.
         Result is cached since class distributions don't change after loading.
@@ -473,7 +472,7 @@ class DisulfideLoader:
         """
         return copy.deepcopy(self.SSList)
 
-    def get_by_name(self, name: str = None) -> Disulfide:
+    def get_by_name(self, name: str = None) -> Optional[Disulfide]:
         """
         Return the Disulfide with the given name from the list.
         Result is cached since disulfide data doesn't change after loading.
@@ -483,7 +482,7 @@ class DisulfideLoader:
                 return ss  # or ss.copy() !!!
         return None
 
-    def describe(self, memusg=False) -> None:
+    def describe(self, memusg: bool = False) -> None:
         """
         Display information about the Disulfide database contained in `self`. if `quick` is False
         then display the total RAM used by the object. This takes some time to compute; approximately
@@ -523,7 +522,7 @@ class DisulfideLoader:
         print(f"               ===== proteusPy: {vers} =====")
 
     def display_overlay(
-        self, pdbid: str = "", verbose=False, spin: bool = False
+        self, pdbid: str = "", verbose: bool = False, spin: bool = False
     ) -> None:
         """
         Display all disulfides for a given PDB ID overlaid in stick mode against
@@ -564,7 +563,7 @@ class DisulfideLoader:
         ssbonds.display_overlay(verbose=verbose, spin=spin)
         return
 
-    def getTorsions(self, pdbID=None) -> pd.DataFrame:
+    def getTorsions(self, pdbID: Optional[str] = None) -> pd.DataFrame:
         """
         Return the torsions, distances and energies defined by Torsion_DF_cols
 
@@ -595,7 +594,7 @@ class DisulfideLoader:
         else:
             return copy.deepcopy(self.TorsionDF)
 
-    def list_binary_classes(self):
+    def list_binary_classes(self) -> None:
         """Enumerate the binary classes"""
         for k, v in enumerate(self.tclass.binaryclass_dict):
             print(f"Class: |{k}|, |{v}|")
@@ -603,12 +602,12 @@ class DisulfideLoader:
     def plot_classes(
         self,
         base: int = 8,
-        class_string: str = None,
+        class_string: Optional[str] = None,
         theme: str = "auto",
         log: bool = False,
         paginated: bool = False,
         page_size: int = 200,
-    ):
+    ) -> None:
         """
         Plot the classes for the given base.
 
@@ -696,17 +695,17 @@ class DisulfideLoader:
 
     def plot_count_vs_class_df(
         self,
-        class_string,
-        title="title",
-        theme="auto",
-        save=False,
-        savedir=".",
-        base=8,
-        verbose=False,
-        log=False,
-        sample_size=None,
-        page_size=None,
-    ):
+        class_string: str,
+        title: str = "title",
+        theme: str = "auto",
+        save: bool = False,
+        savedir: str = ".",
+        base: int = 8,
+        verbose: bool = False,
+        log: bool = False,
+        sample_size: Optional[int] = None,
+        page_size: Optional[int] = None,
+    ) -> None:
         """
         Plot a line graph of count vs class ID using Plotly for the given disulfide class. The
         base selects the class type to plot: 2, 6, or 8, for binary, sextant, or octant classes.
@@ -766,7 +765,9 @@ class DisulfideLoader:
 
         DisulfideVisualization.plot_count_vs_classid(self.tclass, cls, theme, base, log)
 
-    def _enumerate_class_fromlist(self, sslist, base=8):
+    def _enumerate_class_fromlist(
+        self, sslist: List[str], base: int = 8
+    ) -> pd.DataFrame:
         """
         Enumerate the classes from a list of class IDs and return a DataFrame with class IDs and their corresponding counts.
         Results are cached for improved performance on repeated calls.
@@ -796,8 +797,8 @@ class DisulfideLoader:
         self,
         savepath: str = DATA_DIR,
         verbose: bool = False,
-        fname: str = None,
-    ):
+        fname: Optional[str] = None,
+    ) -> None:
         """
         Save a copy of the fully instantiated Loader to the specified file.
 
@@ -824,7 +825,7 @@ class DisulfideLoader:
         if verbose:
             _logger.info("Done saving loader.")
 
-    def plot_disulfides_vs_pdbid(self, cutoff: int = 1):
+    def plot_disulfides_vs_pdbid(self, cutoff: int = 1) -> Tuple[List[str], List[int]]:
         """
         Plots the number of disulfides versus pdbid.
 
@@ -888,7 +889,9 @@ class DisulfideLoader:
             log=log,
         )
 
-    def plot_deviation_scatterplots(self, verbose=False, theme="auto"):
+    def plot_deviation_scatterplots(
+        self, verbose: bool = False, theme: str = "auto"
+    ) -> None:
         """
         Plot scatter plots for Bondlength_Deviation, Angle_Deviation Ca_Distance
         and SG_Distance.
@@ -901,13 +904,17 @@ class DisulfideLoader:
         """
         self.SSList.plot_deviation_scatterplots(verbose=verbose, theme=theme)
 
-    def plot_deviation_histograms(self, theme="auto", verbose=True):
+    def plot_deviation_histograms(
+        self, theme: str = "auto", verbose: bool = True
+    ) -> None:
         """
         Plot histograms for Bondlength_Deviation, Angle_Deviation, and Ca_Distance.
         """
         self.SSList.plot_deviation_histograms(theme=theme, verbose=verbose)
 
-    def sslist_from_class(self, class_string, base=8, cutoff=0.0) -> DisulfideList:
+    def sslist_from_class(
+        self, class_string: str, base: int = 8, cutoff: float = 0.0
+    ) -> DisulfideList:
         """
         Return a DisulfideList containing Disulfides with the given class_string.
 
@@ -928,15 +935,15 @@ class DisulfideLoader:
 
     def display_torsion_statistics(
         self,
-        class_id: str = None,
+        class_id: Optional[str] = None,
         display: bool = True,
         save: bool = False,
         fname: str = "ss_torsions.png",
         theme: str = "auto",
         verbose: bool = False,
         dpi: int = 300,
-        figure_size: tuple = (4, 3),
-    ):
+        figure_size: tuple[int, int] = (4, 3),
+    ) -> None:
         """
         Display torsion and distance statistics for all Disulfides in the loader.
         If a class ID is provided, display statistics for that class only.
@@ -981,7 +988,7 @@ class DisulfideLoader:
                 figure_size=figure_size,
             )
 
-    def classes_vs_cutoff(self, cutoff, base=8):
+    def classes_vs_cutoff(self, cutoff: float, base: int = 8) -> int:
         """
         Return number of members for the octant class for a given cutoff value.
 
@@ -994,14 +1001,14 @@ class DisulfideLoader:
 
     def display_torsion_class_df(
         self,
-        class_id,
-        display=True,
-        save=False,
-        fname="ss_torsions.png",
-        theme="auto",
-        dpi=300,
-        figure_size=(4, 3),
-    ):
+        class_id: str,
+        display: bool = True,
+        save: bool = False,
+        fname: str = "ss_torsions.png",
+        theme: str = "auto",
+        dpi: int = 300,
+        figure_size: tuple[int, int] = (4, 3),
+    ) -> None:
         """
         Display torsion and distance statistics for a given class ID using the TorsionDF dataframe.
 
@@ -1035,7 +1042,7 @@ class DisulfideLoader:
         scaling: str = "sqrt",
         column1: str = "chi2",
         column2: str = "chi4",
-        title: str = None,
+        title: Optional[str] = None,
     ) -> None:
         """
         Create 3D hexbin plots for left and right-handed chi2-chi4 correlations with customizable z-scaling.
@@ -1088,11 +1095,11 @@ class DisulfideLoader:
 
 
 def Load_PDB_SS(
-    loadpath=DATA_DIR,
-    verbose=False,
-    subset=False,
-    percentile=-1.0,
-    force=False,
+    loadpath: str = DATA_DIR,
+    verbose: bool = False,
+    subset: bool = False,
+    percentile: float = -1.0,
+    force: bool = False,
 ) -> DisulfideLoader:
     """
     Load the fully instantiated Disulfide database from the specified file. This function
@@ -1167,13 +1174,13 @@ def Load_PDB_SS(
 
 
 def Bootstrap_PDB_SS(
-    loadpath=DATA_DIR,
-    verbose=True,
-    subset=False,
-    force=False,
-    fake=False,
-    percentile=-1.0,
-) -> DisulfideLoader:
+    loadpath: str = DATA_DIR,
+    verbose: bool = True,
+    subset: bool = False,
+    force: bool = False,
+    fake: bool = False,
+    percentile: float = -1.0,
+) -> Optional[DisulfideLoader]:
     """
     Download and instantiate the disulfide databases from Google Drive.
 

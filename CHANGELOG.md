@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   243, (3^5) structures and calculate statistics for this 'tree'.
 - ``display_class_disufides`` entrypoint added. This utilizes the new class to display a given
   disulfide class in a separate window using the ``DisulfideList.display_overlay()`` function.
-- 
+- ``hexbin_plot`` entrypoint added. This program creates 3D interactive plots showing dihedral angle correlations between left-handed and right-handed disulfides.
 
   ### Changed
 
@@ -26,10 +26,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   class instantiation and are bundled into the package. Note that the octant class
   metrics file will be dependent on the overall cutoff used during the program run.
   I typically use 0.04, which generates 329 overall consensus structures.
+  - Removed explicit ca and sg cutoffs from ``DisulfideLoader.Load_PDB_SS()``. Now
+  it uses percentile only.
 
 ### Fixed
 
 - class string calculation was flipped.
+- ``DisulfideLoader`` cutoff values weren't propagating properly
 
 ## [v0.99.33] - 2025-03-05
 
