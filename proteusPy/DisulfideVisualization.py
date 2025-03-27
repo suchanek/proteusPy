@@ -814,7 +814,7 @@ class DisulfideVisualization:
                 DisulfideVisualization.simulate_orbit_on_path(
                     pl, steps=steps, step_size=step_size
                 )
-            except Exception as e:
+            except ValueError as e:
                 _logger.error("Error during simulate_orbit_on_path: %s", e)
 
         else:
@@ -1846,7 +1846,7 @@ class DisulfideVisualization:
             DisulfideVisualization.simulate_orbit_on_path(
                 pl, steps=steps, step_size=step_size
             )
-        except Exception as e:
+        except ValueError as e:
             _logger.error("Error during simulate_orbit_on_path: %s", e)
 
         # Orbit the camera along the generated path
@@ -2690,6 +2690,7 @@ class DisulfideVisualization:
         scaling: str = "sqrt",
         column1: str = "chi2",
         column2: str = "chi4",
+        title: str = None,
     ) -> None:
         """
         Create 3D hexbin plots for left and right-handed chi2-chi4 correlations with customizable z-scaling.
@@ -2721,6 +2722,7 @@ class DisulfideVisualization:
         :type column2: str, optional
         :default column2: 'chi4'
         """
+        title = f"{column1} - {column2} Correlation" if title is None else title
 
         _SS_df = loader.getTorsions()
 
@@ -2808,7 +2810,7 @@ class DisulfideVisualization:
                 show_scalar_bar=False,  # Add this line to hide the scalar bar
             )
             plotter.add_title(
-                f"{column1} - {column2} Correlation (Left-handed, {scale_label})",
+                f"{title} (Left-handed, {scale_label})",
                 font_size=8,
             )
             plotter.show_grid()
@@ -2816,7 +2818,7 @@ class DisulfideVisualization:
             plotter.add_axes(
                 xlabel=column1,
                 ylabel=column2,
-                zlabel="Incidence",
+                zlabel="cnt",
                 line_width=2,
                 color="black",
                 interactive=True,
@@ -2838,20 +2840,11 @@ class DisulfideVisualization:
                 show_scalar_bar=False,  # Add this line to hide the scalar bar
             )
             plotter.add_title(
-                f"{column1} - {column2} Correlation (Right-handed, {scale_label})",
+                f"{title} - (Right-handed, {scale_label})",
                 font_size=8,
             )
             plotter.show_grid()
             plotter.view_xy()
-            # Add axes with custom labels
-            plotter.add_axes(
-                xlabel=column1,
-                ylabel=column2,
-                zlabel="Incidence",
-                line_width=2,
-                color="black",
-                interactive=True,
-            )
 
             plotter.enable_parallel_projection()
             plotter.add_scalar_bar(
@@ -2868,11 +2861,7 @@ class DisulfideVisualization:
             # Final adjustments
             plotter.reset_camera()
             plotter.link_views()
-            plotter.show(
-                jupyter_backend=(
-                    "pythreejs" if "jupyter" in str(type(plotter)) else "trame"
-                )
-            )
+            plotter.show()
 
         except AttributeError as e:
             print(
@@ -2880,8 +2869,6 @@ class DisulfideVisualization:
             )
         except ValueError as e:
             print(f"Error: Invalid parameter value: {e}")
-        except Exception as e:
-            print(f"An unexpected error occurred: {e}")
 
     @staticmethod
     def plot_3d_hexbin_df(
@@ -2894,6 +2881,7 @@ class DisulfideVisualization:
         tormin: float = -180.0,
         tormax: float = 180.0,
         scaling: str = "sqrt",
+        title: str = None,
     ) -> None:
         """
         Create a 3D hexbin plot for correlations between two columns from a
@@ -2924,6 +2912,8 @@ class DisulfideVisualization:
         :type scaling: str, optional
         :default scaling: 'sqrt'
         """
+        title = f"{column1} - {column2} Correlation" if title is None else title
+
         try:
             # Validate column names exist in DataFrame
             if column1 not in df.columns or column2 not in df.columns:
@@ -2980,9 +2970,7 @@ class DisulfideVisualization:
                 clim=[scaled_bins.min(), scaled_bins.max()],
                 show_scalar_bar=False,  # Add this line to hide the scalar bar
             )
-            plotter.add_title(
-                f"{column1} - {column2} Correlation ({scale_label})", font_size=8
-            )
+            plotter.add_title(f"{title} - ({scale_label})", font_size=8)
 
             # Add grid
             plotter.show_grid()
@@ -2990,7 +2978,7 @@ class DisulfideVisualization:
             plotter.add_axes(
                 xlabel=column1,
                 ylabel=column2,
-                zlabel="Incidence",
+                zlabel="cnt",
                 line_width=2,
                 color="black",
                 interactive=True,
@@ -3011,14 +2999,7 @@ class DisulfideVisualization:
 
             # Final adjustments
             plotter.reset_camera()
-            # Handle native vs Jupyter rendering explicitly
-            if "jupyter" in str(type(plotter)):
-                backend = "pythreejs"
-                _logger.info("Using Jupyter backend: %s", backend)
-                plotter.show(jupyter_backend=backend)
-            else:
-                _logger.info("Using native VTK backend")
-                plotter.show()  # Native rendering
+            plotter.show()  # Native rendering
 
         except AttributeError as e:
             print(

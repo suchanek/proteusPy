@@ -36,9 +36,9 @@ def main():
         scaling="sqrt",
         width=1024,
         height=1024,
-        gridsize=80,
-        column1="chi1",
-        column2="chi5",
+        gridsize=120,
+        column1="chi2",
+        column2="chi4",
     )
 
     pp.DisulfideVisualization.plot_3d_hexbin_df(
