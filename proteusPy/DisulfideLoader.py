@@ -241,8 +241,6 @@ class DisulfideLoader:
         if self.saveit:
             self.save(
                 savepath=DATA_DIR,
-                subset=self.subset,
-                percentile=self.percentile,
                 verbose=self.verbose,
             )
 
@@ -797,9 +795,8 @@ class DisulfideLoader:
     def save(
         self,
         savepath: str = DATA_DIR,
-        subset: bool = False,
-        percentile: float = -1.0,
         verbose: bool = False,
+        fname: str = None,
     ):
         """
         Save a copy of the fully instantiated Loader to the specified file.
@@ -807,14 +804,11 @@ class DisulfideLoader:
         :param savepath: Path to save the file, defaults to DATA_DIR
         :param fname: Filename, defaults to LOADER_FNAME
         :param verbose: Verbosity, defaults to False
-        :param percentile: Percentile used to filter data before saving, -1 means no filtering.
         """
         self.version = __version__
-        self.percentile = percentile
 
         fname = None
-
-        if subset:
+        if self.subset:
             fname = LOADER_SUBSET_FNAME
         else:
             fname = LOADER_FNAME
@@ -1156,7 +1150,7 @@ def Load_PDB_SS(
         )
         loader.save(
             savepath=loadpath,
-            percentile=percentile,
+            verbose=verbose,
         )
         return loader
 
