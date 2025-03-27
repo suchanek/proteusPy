@@ -484,12 +484,12 @@ class DisulfideLoader:
 
     def describe(self, memusg: bool = False) -> None:
         """
-        Display information about the Disulfide database contained in `self`. if `quick` is False
-        then display the total RAM used by the object. This takes some time to compute; approximately
-        30 seconds on a 2024 MacBook Pro. M3 Max.
+        Reveal key details about the Disulfide database stored in `self`. If `memusg` is True,
+        the total RAM usage of the object is calculated and displayed — note that this process
+        may take around 30 seconds on a 2024 MacBook Pro, M3 Max.
 
-        :param memusg: If True, don't display the RAM used by the `DisulfideLoader` object.
-        :return: None
+        :param memusg: Set to True to include the RAM usage of the `DisulfideLoader` object.
+        :return: None — just the facts!
         """
         # pylint: disable=E1101
         vers = self.version
@@ -507,19 +507,24 @@ class DisulfideLoader:
         ssMinMax = self.SSList.minmax_energy
         ssMin_name: Disulfide = ssMinMax[0].name
         ssMax_name: Disulfide = ssMinMax[1].name
-        print("    =========== RCSB Disulfide Database Summary ============")
-        print(f"       =========== Built: {timestr} ===========")
-        print(f"PDB IDs present:                 {pdbs}")
-        print(f"Disulfides loaded:               {tot}")
-        print(f"Average structure resolution:    {res:.2f} Å")
-        print(f"Lowest Energy Disulfide:         {ssMin_name}")
-        print(f"Highest Energy Disulfide:        {ssMax_name}")
-        print(f"Cα distance cutoff:              {cutoff:.2f} Å")
-        print(f"Sγ distance cutoff:              {sg_cutoff:.2f} Å")
-        print(f"Percentile cutoff:               {percentile:.2f} %")
+
+        print("")
+        print("    🌟 RCSB Disulfide Database Summary 🌟")
+        print(f"       🕒 Constructed: {timestr} 🕒")
+        print(f"PDB IDs Present:               {pdbs}")
+        print(f"Disulfides Loaded:             {tot}")
+        print(f"Average Resolution:            {res:.2f} Å")
+        print(f"Lowest Energy Disulfide:       {ssMin_name}")
+        print(f"Highest Energy Disulfide:      {ssMax_name}")
+        print(f"Cα Distance Cutoff:            {cutoff:.2f} Å")
+        print(f"Sγ Distance Cutoff:            {sg_cutoff:.2f} Å")
+        print(f"Percentile Cutoff:             {percentile:.2f} %")
         if memusg:
-            print(f"Total RAM Used:                     {ram:.2f} GB.")
-        print(f"               ===== proteusPy: {vers} =====")
+            print(f"Total RAM Usage:            {ram:.2f} GB")
+        print(f"     ⚡ proteusPy Version: {vers} ⚡")
+        print("")
+
+        return
 
     def display_overlay(
         self, pdbid: str = "", verbose: bool = False, spin: bool = False
