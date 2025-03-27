@@ -505,26 +505,30 @@ class DisulfideStats:
             dev_df, "Sg_Distance", percentile=percentile
         )
 
-        if verbose:
-            print(
-                f"\nBond Length Deviation Cutoff ({percentile:.2f}th Percentile): {distance_cutoff_percentile:.2f}"
-            )
-            print(
-                f"Angle Deviation Cutoff ({percentile:.2f}th Percentile): {angle_cutoff_percentile:.2f}"
-            )
-            print(
-                f"Ca Distance Cutoff ({percentile:.2f}th Percentile): {ca_cutoff_percentile:.2f}"
-            )
-            print(
-                f"Sg Distance Cutoff ({percentile:.2f}th Percentile): {sg_cutoff_percentile:.2f}"
-            )
-
         # Calculate the Z-score for the percentile
         z_score = norm.ppf(percentile / 100.0)
 
         if verbose:
-            print(
-                f"The Z-score for the {percentile}th percentile is approximately {z_score:.3f}"
+            _logger.info(
+                "The Z-score for the %dth percentile is approximately %.3f",
+                percentile,
+                z_score,
+            )
+
+            _logger.info(
+                "Distance Cutoff (Std): %.2f, Angle Cutoff (Std): %.2f, Ca Cutoff (Std): %.2f, Sg Cutoff (Std): %.2f",
+                distance_cutoff_std,
+                angle_cutoff_std,
+                ca_cutoff_std,
+                sg_cutoff_std,
+            )
+
+            _logger.info(
+                "Distance Cutoff (Percentile): %.2f, Angle Cutoff (Percentile): %.2f, Ca Cutoff (Percentile): %.2f, Sg Cutoff (Percentile): %.2f",
+                distance_cutoff_percentile,
+                angle_cutoff_percentile,
+                ca_cutoff_percentile,
+                sg_cutoff_percentile,
             )
 
         return {
