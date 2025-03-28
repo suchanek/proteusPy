@@ -1,33 +1,34 @@
 # Initialization for the proteusPy package
-# Copyright (c) 2024 Eric G. Suchanek, PhD., all rights reserved
+# Copyright (c) 2025 Eric G. Suchanek, PhD., all rights reserved
 # Subject to the BSD public license.
-# Last updated: 2025-01-07 18:38:30 -egs-
+# Last updated: 2025-03-27 19:48:55 -egs-
 
 # pylint: disable=C0413
 # pylint: disable=C0103
 
 """
 ``proteusPy`` is a Python package specializing in the modeling and analysis
-of proteins of known structure with an emphasis on Disulfide bonds. This package
-reprises my molecular modeling program [Proteus](https://doi.org/10.1021/bi00368a023),
-a structure-based program developed as part of my graduate thesis.
+of proteins of known structure with an emphasis on disulfide bonds. This package
+reprises the molecular modeling program [Proteus](https://doi.org/10.1021/bi00368a023),
+a structure-based program developed as part of Eric Suchanek's graduate thesis,
+which was originally written in Common Lisp, ported to C++ and ultimately to Python.
 
-The package utilizes several base classes to create and analyze Disulfide Bonds:
+The package utilizes several base classes to create and analyze disulfide bonds:
 - Turtle3D: to build disulfides through the manipulation of local coordinate systems.
-- DisulfideBase: basic characteristics of individual DisulfideBonds
-- DisulfideList: to store and calculate properties of Disulfide Bonds
-- DisulfideClassManager: to manage DisulfideBond classes
-- DisulfideStats: to calculate statistics on DisulfideBonds
-- DisulfideVisualization: to visualize DisulfideBonds
-- DisulfideLoader: to load DisulfideBonds from the master list of Disulfides and create the various data structures
-needed to build the structural classes and physical properties of the DisulfideBonds.
+- DisulfideBase: basic characteristics of individual disulfide bonds, classes ``Disulfide`` and ``DisulfideList``
+- DisulfideClassManager: to manage ``Disulfide`` classes
+- DisulfideClassGenerator: to generate ``Disulfide`` structure ensembles from disulfide classes
+- DisulfideStats: to calculate statistics on disulfide bonds
+- DisulfideVisualization: to visualize disulfide bonds
+- DisulfideLoader: to load disulfide bonds from the master list of Disulfides and create the
+ various data structures needed to build the structural classes and physical properties of
+ the disulfide bonds.
 
 
-This implementation of proteusPy focuses on the Disulfide class. This class implements methods to
-analyze the protein structure stabilizing element known as a Disulfide Bond. Its
-underlying methods are being used to create a database of over 36,000 high quality disulfide
-bonds in order to perform a structural analysis of over 36,900 disulfide-bond
-containing proteins in the RCSB protein data bank s(<https://www.rcsb.org>).
+This implementation of ``proteusPy`` focuses on the ``Disulfide`` class. This class
+implements methods to analyze the protein structure stabilizing element known as a
+*Disulfide bond*. Its underlying methods  have been utilized to construct a database of over 36,000
+high-quality disulfide bonds from the RCSB protein data bank (https://www.rcsb.org) for structural analysis.
 """
 
 __pdoc__ = {
