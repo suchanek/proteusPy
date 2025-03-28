@@ -9,7 +9,7 @@ a physical disulfide bond either extracted from the RCSB protein databank or bui
 This work is based on the original C/C++ implementation by Eric G. Suchanek.
 
 Author: Eric G. Suchanek, PhD
-Last Modification: 2025-02-21 16:33:47
+Last Modification: 2025-02-21 16:33:47f
 """
 
 # pylint: disable=W1203 # use of print
@@ -1333,6 +1333,30 @@ class Disulfide:
         self._o_dist = Vector3D(turt.to_local(o2))
         self._cb_dist = Vector3D(turt.to_local(cb2))
         self._sg_dist = Vector3D(turt.to_local(sg2))
+
+    def calculate_dse(self):
+        """
+        Calculate Disulfide Energy (DSE) in kJ/mol based on chi angles.
+
+        Returns:
+        float: DSE value in kJ/mol
+        """
+        torsions = self.torsion_array
+        chi1 = torsions[0]
+        chi2 = torsions[1]
+        chi3 = torsions[2]
+        chi4 = torsions[3]
+        chi5 = torsions[4]
+        dse = (
+            8.37 * (1 + math.cos(3 * chi1))
+            + 8.37 * (1 + math.cos(3 * chi5))
+            + 4.18 * (1 + math.cos(3 * chi2))
+            + 4.18 * (1 + math.cos(3 * chi4))
+            + 14.64 * (1 + math.cos(2 * chi3))
+            + 2.51 * (1 + math.cos(3 * chi3))
+        )
+
+        return dse
 
     def _compute_torsional_energy(self) -> float:
         """
