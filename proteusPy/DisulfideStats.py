@@ -76,7 +76,7 @@ class DisulfideStats:
         if quiet:
             pbar = sslist
         else:
-            pbar = tqdm(sslist, ncols=PBAR_COLS, leave=False)
+            pbar = tqdm(sslist, ncols=PBAR_COLS, leave=False, desc="TorsionDF...")
 
         for ss in pbar:
             new_row = {
@@ -101,6 +101,7 @@ class DisulfideStats:
                 "rho": ss.rho,
                 "binary_class_string": ss.binary_class_string,
                 "octant_class_string": ss.octant_class_string,
+                "energy_kj": ss.TorsionEnergyKJ,
             }
             rows.append(new_row)
 

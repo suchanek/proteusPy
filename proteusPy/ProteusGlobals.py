@@ -183,4 +183,5 @@ Torsion_DF_Cols = [
     "rho",
     "binary_class_string",
     "octant_class_string",
+    "energy_kj",
 ]
