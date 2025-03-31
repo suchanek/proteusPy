@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ``display_class_disufides`` entrypoint added. This utilizes the new class to display a given
   disulfide class in a separate window using the ``DisulfideList.display_overlay()`` function.
 - ``hexbin_plot`` entrypoint added. This program creates 3D interactive plots showing dihedral angle correlations between left-handed and right-handed disulfides.
+- - ``proteusPy.DisulfideBase.Disulfide.TorsionEnergyKJ`` property and calculation to use Hogg's DSE potential function
 
   ### Changed
 
@@ -33,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - class string calculation was flipped.
 - ``DisulfideLoader`` cutoff values weren't propagating properly
+- continued catching small bugs
 
 ## [v0.99.33] - 2025-03-05
 
