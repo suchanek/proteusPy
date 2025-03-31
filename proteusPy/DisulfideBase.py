@@ -1334,7 +1334,7 @@ class Disulfide:
         self._cb_dist = Vector3D(turt.to_local(cb2))
         self._sg_dist = Vector3D(turt.to_local(sg2))
 
-    def calculate_dse(self):
+    def _calculate_dse(self) -> float:
         """
         Calculate Disulfide Energy (DSE) in kJ/mol based on chi angles.
 
@@ -1413,14 +1413,21 @@ class Disulfide:
     @property
     def TorsionEnergy(self) -> float:
         """
-        Return the energy of the Disulfide bond.
+        Return the energy of the Disulfide bond in kcal/mol.
         """
         return self._compute_torsional_energy()
 
     @property
+    def TorsionEnergyKJ(self) -> float:
+        """
+        Return the energy of the Disulfide bond in KJ/mol.
+        """
+        return self._calculate_dse()
+
+    @property
     def TorsionLength(self) -> float:
         """
-        Return the energy of the Disulfide bond.
+        Return the torsion length of the Disulfide bond.
         """
         return self._compute_torsion_length()
 
