@@ -136,7 +136,7 @@ ifeq ($(OS_NAME), Linux)
 	@echo "Running tests on Linux from outside repository..."
 	@mkdir -p /tmp/proteusPy_test_run
 	@cd /tmp/proteusPy_test_run && python -m pytest $(REPO_DIR)/tests
-	@python $(REPO_DIR)/tests/test_DisplaySS.py
+	@python $(REPO_DIR)/tests/Test_DisplaySS.py
 	@python $(REPO_DIR)/proteusPy/DisulfideClasses.py
 	@rm -rf /tmp/proteusPy_test_run
 else
