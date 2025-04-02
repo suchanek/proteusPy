@@ -7,6 +7,8 @@ CONDA ?= conda
 MESS = $(VERS)
 DEVNAME = ppydev
 OS_NAME := $(shell uname -s)
+# Repository location (can be overridden)
+REPO_DIR ?= $(shell pwd)
 
 ifeq ($(OS_NAME), Darwin)
     RM := rm -rf
@@ -57,7 +59,7 @@ endif
 dev:
 	@echo "Building development environment $(DEVNAME)..."
 	$(CONDA) create --name $(DEVNAME) -y python=3.12
-	pip install build
+	pip install build 
 ifeq ($(OS_NAME), Linux)
 	@echo "Linux detected, installing VTK..."
 	$(CONDA) install -n $(DEVNAME) vtk -y
@@ -80,7 +82,7 @@ install:
 install_dev: bld
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	pip uninstall -y proteusPy
-	pip install dist/proteusPy-$(VERS)-py3-none-any.whl[dev]  # Install specific wheel
+	pip install dist/proteusPy-$(VERS)-py3-none-any.whl[all]  # Install specific wheel
 	python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
 	@echo "Downloading and building the Disulfide Databases..."
 	# proteusPy.bootstrapper -v
@@ -129,10 +131,19 @@ commit:
 	git commit -a -m $(MESS)
 	git push origin
 
-tests: 
+tests:
+ifeq ($(OS_NAME), Linux)
+	@echo "Running tests on Linux from outside repository..."
+	@mkdir -p /tmp/proteusPy_test_run
+	@cd /tmp/proteusPy_test_run && python -m pytest $(REPO_DIR)/tests
+	@python $(REPO_DIR)/tests/Test_DisplaySS.py
+	@python $(REPO_DIR)/proteusPy/DisulfideClasses.py
+	@rm -rf /tmp/proteusPy_test_run
+else
 	pytest .
 	python tests/test_DisplaySS.py
 	python proteusPy/DisulfideClasses.py
+endif
 
 docker: viewer/rcsb_viewer.py viewer/dockerfile
 	docker build -t rcsb_viewer viewer/ --no-cache

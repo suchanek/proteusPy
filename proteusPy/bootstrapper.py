@@ -26,8 +26,7 @@ def main():
     DisulfideLoader with the specified parameters.
 
     Command-line arguments:
-    -c, --ca_cutoff: CA cutoff value (default: -1)
-    -s, --sg_cutoff: SG cutoff value (default: -1)
+    -p, --percentile: Percentile cutoff value (default: -1.0)
     -v, --verbose: Enable verbose output
 
     The function performs the following steps:
@@ -47,10 +46,7 @@ def main():
         description=helpstring,
     )
     parser.add_argument(
-        "-c", "--ca_cutoff", type=float, default=-1.0, help="CA cutoff value"
-    )
-    parser.add_argument(
-        "-s", "--sg_cutoff", type=float, default=-1.0, help="SG cutoff value"
+        "-p", "--percentile", type=float, default=-1.0, help="Percentile cutoff value"
     )
     parser.add_argument(
         "-v", "--verbose", action="store_true", help="Enable verbose output"
@@ -59,20 +55,18 @@ def main():
     args = parser.parse_args()
 
     print("proteusPy Bootstrapper v", VERSION)
-    print("CA cutoff: ", args.ca_cutoff)
-    print("SG cutoff: ", args.sg_cutoff)
+    print("Percentile cutoff: ", args.percentile)
     print("Verbose: ", args.verbose)
     print("Data Directory: ", DATA_DIR)
     print("-> Downloading total Disulfide list from Google Drive")
 
     pdb_ss = pp.Bootstrap_PDB_SS(
         loadpath=DATA_DIR,
-        cutoff=args.ca_cutoff,
-        sg_cutoff=args.sg_cutoff,
         verbose=args.verbose,
         subset=False,
         force=True,
         fake=False,
+        percentile=args.percentile,
     )
 
     print("-> Saving Complete Loader")
@@ -81,14 +75,14 @@ def main():
         print("-> Failed to download/build DisulfideLoader!")
         return
 
-    pdb_ss.save(cutoff=args.ca_cutoff, sg_cutoff=args.sg_cutoff, subset=False)
+    pdb_ss.save()
 
     print("-> Building Subset Loader")
 
     pdb_ss = pp.Bootstrap_PDB_SS(
         verbose=args.verbose,
-        cutoff=args.ca_cutoff,
-        sg_cutoff=args.sg_cutoff,
+        loadpath=DATA_DIR,
+        percentile=args.percentile,
         subset=True,
         force=False,
         fake=False,
@@ -96,7 +90,7 @@ def main():
 
     print("-> Saving subset Loader")
 
-    pdb_ss.save(cutoff=args.ca_cutoff, sg_cutoff=args.sg_cutoff, subset=True)
+    pdb_ss.save(verbose=args.verbose)
 
     print("-> Complete and Subset Loaders built and saved!")
     return

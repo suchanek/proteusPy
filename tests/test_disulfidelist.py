@@ -269,7 +269,7 @@ def test_minmax_energy(pdb_5rsa):
 
 def test_minmax_distance(pdb_5rsa):
     """Test getting min/max distance disulfides"""
-    min_ss, max_ss = pdb_5rsa.minmax_distance()
+    min_ss, max_ss = pdb_5rsa.minmax_distance
     assert isinstance(min_ss, Disulfide)
     assert isinstance(max_ss, Disulfide)
     assert min_ss.ca_distance <= max_ss.ca_distance
@@ -476,7 +476,7 @@ def test_empty_list_edge_cases(disulfide_list):
     assert disulfide_list.average_distance == 0.0
     assert disulfide_list.average_energy == 0.0
     assert disulfide_list.average_ca_distance == 0.0
-    assert disulfide_list.minmax_distance() == (None, None)
+    assert disulfide_list.minmax_distance == (None, None)
     assert disulfide_list.minmax_energy == (None, None)
     assert len(disulfide_list.get_chains()) == 0
 

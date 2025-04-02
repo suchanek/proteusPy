@@ -1,5 +1,5 @@
 """
-This module, *DisulfideBase*, is part of the proteusPy package, a Python package for 
+This module, *DisulfideBase*, is part of the proteusPy package, a Python package for
 the analysis and modeling of protein structures with an emphasis on disulfide bonds.
 It represents the core of the current implementation of *proteusPy* and includes the
 ``Disulfide`` and ``DisulfideList`` classes, which provide a Python object and methods representing
@@ -9,7 +9,7 @@ a physical disulfide bond either extracted from the RCSB protein databank or bui
 This work is based on the original C/C++ implementation by Eric G. Suchanek.
 
 Author: Eric G. Suchanek, PhD
-Last Modification: 2025-02-21 16:33:47
+Last Modification: 2025-02-21 16:33:47f
 """
 
 # pylint: disable=W1203 # use of print
@@ -33,6 +33,7 @@ from itertools import combinations
 from math import cos
 
 import numpy as np
+import pyvista as pv
 from scipy.optimize import minimize
 
 from proteusPy.DisulfideClassManager import DisulfideClassManager
@@ -305,7 +306,8 @@ class DisulfideList(UserList):
         sslist = sorted(self.data)
         return sslist[-1]
 
-    def minmax_distance(self):
+    @property
+    def minmax_distance(self) -> tuple:
         """Return the Disulfides with min/max Cα distances"""
         sslist = self.data
         if not sslist:
@@ -315,13 +317,13 @@ class DisulfideList(UserList):
         return ssmin, ssmax
 
     @property
-    def minmax_energy(self):
+    def minmax_energy(self) -> "DisulfideList":
         """Return the Disulfides with min/max energies"""
         sslist = self.data
         if not sslist:
             return None, None
         sslist = sorted(sslist, key=lambda ss: ss.energy)
-        return sslist[0], sslist[-1]
+        return DisulfideList([sslist[0], sslist[-1]], "minmax_energy")
 
     def get_by_name(self, name):
         """Returns the Disulfide with the given name"""
@@ -330,7 +332,7 @@ class DisulfideList(UserList):
                 return ss.copy()
         return None
 
-    def get_chains(self):
+    def get_chains(self) -> dict:
         """Return the chain IDs for chains within the Disulfide"""
         res_dict = {"xxx"}
         sslist = self.data
@@ -384,10 +386,10 @@ class DisulfideList(UserList):
         :raises ValueError: If the number of provided angles is not exactly 5.
 
         Example:
-            >>> import proteusPy as pp
-            >>> pdb_list = pp.Load_PDB_SS(verbose=False, subset=True).SSList
-            >>> # Using 5 individual angles:
-            >>> neighbors = pdb_list.nearest_neighbors(8, -60, -60, -90, -60, -60)
+        >>> import proteusPy as pp
+        >>> pdb_list = pp.Load_PDB_SS(verbose=False, subset=True).SSList
+        >>> # Using 5 individual angles:
+        >>> neighbors = pdb_list.nearest_neighbors(8, -60, -60, -90, -60, -60)
         """
 
         if len(args) == 1 and isinstance(args[0], list) and len(args[0]) == 5:
@@ -470,6 +472,10 @@ class DisulfideList(UserList):
             self.data, distance_type, comparison, cutoff
         )
 
+    def extract_energies(self, comparison="less", cutoff=-1):
+        """Extract and filter energy values"""
+        return DisulfideStats.extract_energies(self.data, comparison, cutoff)
+
     # Delegate to DisulfideVisualization
     def display(self, style="sb", light="auto", panelsize=512):
         """Display the Disulfide list in the specific rendering style.
@@ -492,6 +498,8 @@ class DisulfideList(UserList):
         fname="ss_overlay.png",
         light="auto",
         winsize=(1024, 1024),
+        spin=False,
+        dpi=300,
     ):
         """Display all disulfides in the list overlaid in stick mode against
         a common coordinate frame.
@@ -503,32 +511,72 @@ class DisulfideList(UserList):
         :param light: Background color
         :param winsize: Window size tuple (width, height)
         """
+
+        # pl = pv.Plotter(window_size=winsize, off_screen=False)
+        # pl.show(auto_close=False)
+
         DisulfideVisualization.display_overlay(
             sslist=self,
+            pl=None,
             screenshot=screenshot,
             movie=movie,
             verbose=verbose,
             fname=fname,
             light=light,
             winsize=winsize,
+            spin=spin,
+            dpi=dpi,
         )
+        # force a redisplay to keep the window open. otherwise it closes!
+        if spin:
+            DisulfideVisualization.display_overlay(
+                sslist=self,
+                pl=None,
+                screenshot=False,
+                movie=False,
+                verbose=verbose,
+                fname=fname,
+                light=light,
+                winsize=winsize,
+                spin=False,
+                dpi=dpi,
+            )
 
     def display_torsion_statistics(
         self,
-        display=True,
-        save=False,
-        fname="ss_torsions.png",
-        theme="auto",
+        display: bool = True,
+        save: bool = False,
+        fname: str = "ss_torsions.png",
+        theme: str = "auto",
+        verbose: bool = False,
+        dpi: int = 300,
+        figure_size=(4, 3),
     ):
         """Display torsion and distance statistics for a given Disulfide list.
 
         :param display: Whether to display the plot in the notebook
+        :type display: bool
         :param save: Whether to save the plot as an image file
+        :type save: bool
         :param fname: The name of the image file to save
+        :type fname: str
         :param theme: The theme to use for the plot
+        :type theme: str
+        :param verbose: Whether to display verbose output
+        :type verbose: bool
+        :param dpi: The resolution of the image file
+        :type dpi: int
+        :param figure_size: The size of the figure in pixels
+        :type figure_size: tuple
         """
         DisulfideVisualization.display_torsion_statistics(
-            self, display, save, fname, theme
+            sslist=self,
+            display=display,
+            save=save,
+            fname=fname,
+            theme=theme,
+            dpi=dpi,
+            figure_size=figure_size,
         )
 
     def display_worst_structures(self, top_n=10, sample_percent=10):
@@ -558,58 +606,12 @@ class DisulfideList(UserList):
         """Return the torsions as an array"""
         return np.array([ss.torsion_array for ss in self.data])
 
-    def filter_by_ca_distance(self, distance: float = -1.0, minimum: float = 2.0):
-        """Return a DisulfideList filtered by to between the maxium Ca distance and
-        the minimum, which defaults to 2.0A.
-
-        :param distance: Distance in Å
-        :param minimum: Distance in Å
-        :return: DisulfideList containing disulfides with the given distance.
-        """
-        reslist = []
-        sslist = self.data
-
-        # if distance is -1.0, return the entire list
-        if distance == -1.0:
-            return sslist.copy()
-
-        reslist = [
-            ss
-            for ss in sslist
-            if ss.ca_distance < distance and ss.ca_distance > minimum
-        ]
-
-        return DisulfideList(reslist, f"filtered by distance < {distance:.2f}")
-
-    def filter_by_sg_distance(self, distance: float = -1.0, minimum: float = 1.0):
-        """Return a DisulfideList filtered by to between the maxium Sγ distance and
-        the minimum, which defaults to 1.0A.
-
-        :param distance: Distance in Å
-        :param minimum: Distance in Å
-        :return: DisulfideList containing disulfides with the given distance.
-        """
-        reslist = []
-        sslist = self.data
-
-        # if distance is -1.0, return the entire list
-        if distance == -1.0:
-            return sslist.copy()
-
-        reslist = [
-            ss
-            for ss in sslist
-            if ss.sg_distance < distance and ss.sg_distance > minimum
-        ]
-
-        return DisulfideList(reslist, f"filtered by Sγ distance < {distance:.2f}")
-
     def filter_by_distance(
-        self, distance_type: str = "ca", distance: float = -1.0, minimum: float = 2.0
+        self, distance_type: str = "ca", distance: float = -1.0, minimum: float = -1.0
     ):
         """
         Return a DisulfideList filtered by the specified distance type (Ca or Sg) between the maximum distance and
-        the minimum, which defaults to 2.0A for Ca and 1.0A for Sg.
+        the minimum, which defaults to 0.0 Å.
 
         :param distance_type: Type of distance to filter by ('ca' or 'sg').
         :param distance: Distance in Å.
@@ -618,13 +620,9 @@ class DisulfideList(UserList):
         """
         reslist = []
         sslist = self.data
+        default_minimum = 0.0
 
-        # Set default minimum distance based on distance_type
-        if distance_type == "ca":
-            default_minimum = 2.0
-        elif distance_type == "sg":
-            default_minimum = 1.0
-        else:
+        if distance_type not in ["ca", "sg"]:
             raise ValueError("Invalid distance_type. Must be 'ca' or 'sg'.")
 
         # Use the provided minimum distance or the default
@@ -652,6 +650,16 @@ class DisulfideList(UserList):
             reslist, f"filtered by {distance_type} distance < {distance:.2f}"
         )
 
+    def sort_by_ca_distance(self):
+        """
+        Return a copy of the DisulfideList sorted by Cα distance.
+
+        :return: A new DisulfideList containing the same Disulfide objects sorted by Cα distance.
+        :rtype: DisulfideList
+        """
+        sorted_list = sorted(self.data, key=lambda ss: ss.ca_distance)
+        return DisulfideList(sorted_list, f"{self.pdb_id}_sorted_by_ca_distance")
+
     def plot_distances(
         self, distance_type="ca", cutoff=-1, comparison="less", theme="auto", log=True
     ):
@@ -675,6 +683,21 @@ class DisulfideList(UserList):
             log=log,
         )
 
+    def plot_energies(self, theme="auto", log=True):
+        """Plot the energy values as a histogram.
+
+        :param theme: The plotly theme to use
+        :param log: Whether to use a logarithmic scale for the y-axis
+        """
+        # from proteusPy.DisulfideVisualization import DisulfideVisualization
+
+        energies = self.extract_energies()
+        DisulfideVisualization.plot_energies(
+            energies,
+            theme=theme,
+            log=log,
+        )
+
     def plot_deviation_scatterplots(self, verbose=False, theme="auto"):
         """
         Plot scatter plots for Bondlength_Deviation, Angle_Deviation Ca_Distance and SG_Distance.
@@ -687,7 +710,7 @@ class DisulfideList(UserList):
         dev_df = self.create_deviation_dataframe(verbose)
         DisulfideVisualization.plot_deviation_scatterplots(dev_df, theme=theme)
 
-    def plot_deviation_histograms(self, theme="auto", verbose=True):
+    def plot_deviation_histograms(self, theme="auto", verbose=True, log=False):
         """
         Plot histograms for Bondlength_Deviation, Angle_Deviation, and Ca_Distance.
 
@@ -696,7 +719,62 @@ class DisulfideList(UserList):
         """
         # from proteusPy.DisulfideVisualization import DisulfideVisualization
         dev_df = self.create_deviation_dataframe(verbose)
-        DisulfideVisualization.plot_deviation_histograms(dev_df, theme=theme, log=True)
+        DisulfideVisualization.plot_deviation_histograms(dev_df, theme=theme, log=log)
+
+    def plot_3d_hexbin_df(
+        self,
+        column1: str,
+        column2: str,
+        width: int = 1024,
+        height: int = 1024,
+        gridsize: int = 80,
+        tormin: float = -180.0,
+        tormax: float = 180.0,
+        scaling: str = "sqrt",
+    ) -> None:
+        """
+        Create a 3D hexbin plot for correlations between two columns from a
+        single DataFrame with customizable z-scaling.
+
+        :param df: Data containing the specified columns
+        :type df: pandas.DataFrame
+        :param column1: Name of the first column (x-axis)
+        :type column1: str
+        :param column2: Name of the second column (y-axis)
+        :type column2: str
+        :param width: Window width in pixels
+        :type width: int, optional
+        :default width: 1024
+        :param height: Window height in pixels
+        :type height: int, optional
+        :default height: 1024
+        :param gridsize: Number of bins for hexbin
+        :type gridsize: int, optional
+        :default gridsize: 80
+        :param tormin: Minimum torsion angle
+        :type tormin: float, optional
+        :default tormin: -180
+        :param tormax: Maximum torsion angle
+        :type tormax: float, optional
+        :default tormax: 180
+        :param scaling: Scaling method for z-values ('linear', 'sqrt', 'log', 'power')
+        :type scaling: str, optional
+        :default scaling: 'sqrt'
+        """
+        df = self.build_torsion_df()
+
+        DisulfideVisualization.plot_3d_hexbin_df(
+            df=df,
+            column1=column1,
+            column2=column2,
+            width=width,
+            height=height,
+            gridsize=gridsize,
+            tormin=tormin,
+            tormax=tormax,
+            scaling=scaling,
+        )
+        return None
 
 
 # class for the Disulfide bond
@@ -1256,6 +1334,30 @@ class Disulfide:
         self._cb_dist = Vector3D(turt.to_local(cb2))
         self._sg_dist = Vector3D(turt.to_local(sg2))
 
+    def _calculate_dse(self) -> float:
+        """
+        Calculate Disulfide Energy (DSE) in kJ/mol based on chi angles.
+
+        Returns:
+        float: DSE value in kJ/mol
+        """
+        torsions = self.torsion_array
+        chi1 = torsions[0]
+        chi2 = torsions[1]
+        chi3 = torsions[2]
+        chi4 = torsions[3]
+        chi5 = torsions[4]
+        dse = (
+            8.37 * (1 + math.cos(3 * chi1))
+            + 8.37 * (1 + math.cos(3 * chi5))
+            + 4.18 * (1 + math.cos(3 * chi2))
+            + 4.18 * (1 + math.cos(3 * chi4))
+            + 14.64 * (1 + math.cos(2 * chi3))
+            + 2.51 * (1 + math.cos(3 * chi3))
+        )
+
+        return dse
+
     def _compute_torsional_energy(self) -> float:
         """
         Compute the approximate torsional energy for the Disulfide's
@@ -1311,14 +1413,21 @@ class Disulfide:
     @property
     def TorsionEnergy(self) -> float:
         """
-        Return the energy of the Disulfide bond.
+        Return the energy of the Disulfide bond in kcal/mol.
         """
         return self._compute_torsional_energy()
 
     @property
+    def TorsionEnergyKJ(self) -> float:
+        """
+        Return the energy of the Disulfide bond in KJ/mol.
+        """
+        return self._calculate_dse()
+
+    @property
     def TorsionLength(self) -> float:
         """
-        Return the energy of the Disulfide bond.
+        Return the torsion length of the Disulfide bond.
         """
         return self._compute_torsion_length()
 
@@ -1381,6 +1490,41 @@ class Disulfide:
 
         # Return the square root of the mean squared difference as the RMS distance
         return math.sqrt(mean_squared_diff)
+
+    def Torsion_RMS_sslist(self, sslist: DisulfideList) -> float:
+        """
+        Calculate the Average RMS distance between the dihedral angles of self and a DisulfideList.
+
+        :param sslist: DisulfideList object to compare against.
+        :type sslist: DisulfideList
+        :return: RMS distance in degrees.
+        :rtype: float
+        :raises ValueError: If the torsion arrays of self and other are not of equal length.
+        """
+        # Get internal coordinates of both objects
+        ic1 = self.torsion_array
+        rms_list = []
+
+        for other in sslist:
+            ic2 = other.torsion_array
+
+            # Ensure both torsion arrays have the same length
+            if len(ic1) != len(ic2):
+                raise ValueError("Torsion arrays must be of the same length.")
+
+            # Compute the total squared difference between corresponding internal coordinates
+            total_squared_diff = sum(
+                (angle1 - angle2) ** 2 for angle1, angle2 in zip(ic1, ic2)
+            )
+            mean_squared_diff = total_squared_diff / len(ic1)
+            rms = math.sqrt(mean_squared_diff)
+            rms_list.append(rms)
+
+        rms_tot = 0
+        for rms in rms_list:
+            rms_tot += rms
+
+        return rms_tot / len(rms_list) if rms_list else 0.0
 
     def get_chains(self) -> tuple:
         """
@@ -1614,7 +1758,16 @@ class Disulfide:
         :param verbose: Verbosity, defaults to False
         :param steps: Number of steps for one complete rotation, defaults to 360.
         """
-        DisulfideVisualization.spin(self, style, verbose, steps, theme)
+
+        pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
+
+        pl = DisulfideVisualization.spin(
+            self, pl=pl, style=style, verbose=verbose, steps=steps, theme=theme
+        )
+
+        self.display(style=style)
+
+        # pl.show(auto_close=False)
 
     def pprint(self) -> None:
         """

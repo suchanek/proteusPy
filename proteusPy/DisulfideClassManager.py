@@ -2,12 +2,12 @@
 DisulfideBond Class Analysis Dictionary creation
 Author: Eric G. Suchanek, PhD.
 License: BSD
-Last Modification: 2025-01-22 00:02:43 -egs-
+Last Modification: 2025-03-16 19:55:18 -egs-
 
-Disulfide Class creation and manipulation. Binary classes using the +/- formalism of Hogg et al. 
-(Biochem, 2006, 45, 7429-7433), are created for all 32 possible classes from the Disulfides 
-extracted. Classes are named per Hogg's convention. This approach is extended to create 
-eightfold classes based on the subdividing each dihedral angle chi1 - chi5 into 
+Disulfide Class creation and manipulation. Binary classes using the +/- formalism of Hogg et al.
+(Biochem, 2006, 45, 7429-7433), are created for all 32 possible classes from the Disulfides
+extracted. Classes are named per Hogg's convention. This approach is extended to create
+eightfold classes based on the subdividing each dihedral angle chi1 - chi5 into
 8 equal segments, effectively quantizing them.
 """
 
@@ -274,15 +274,18 @@ class DisulfideClassManager:
         :rtype: list
         :raises ValueError: If an invalid base value is provided.
         """
+        # binary 0 = negative, 2 = positive
+        # sextant and octant classes go counterclockwise from 0 degrees
+
         match base:
             case 6:
-                angle_maps = {"0": ["4", "5", "6"], "2": ["1", "2", "3"]}
+                angle_maps = {"2": ["4", "5", "6"], "0": ["1", "2", "3"]}
             case 8:
-                angle_maps = {"0": ["5", "6", "7", "8"], "2": ["1", "2", "3", "4"]}
+                angle_maps = {"2": ["5", "6", "7", "8"], "0": ["1", "2", "3", "4"]}
             case 10:
                 angle_maps = {
-                    "0": ["6", "7", "8", "9", "A"],
-                    "2": ["1", "2", "3", "4", "5"],
+                    "2": ["6", "7", "8", "9", "A"],
+                    "0": ["1", "2", "3", "4", "5"],
                 }
             case _:
                 raise ValueError("Invalid base value. Must be 6, 8, or 10.")
@@ -303,6 +306,7 @@ class DisulfideClassManager:
         :rtype: None
         """
 
+        # pylint: disable=C0415
         from proteusPy import __version__
 
         self.version = __version__
@@ -379,6 +383,46 @@ class DisulfideClassManager:
 
         return grouped
 
+    def Ocreate_classes(self, df, base=8) -> pd.DataFrame:
+        """
+        Create a new DataFrame from the input with a 8-class encoding for input 'chi' values.
+
+        The function takes a pandas DataFrame containing the following columns:
+        'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5', 'ca_distance', 'cb_distance',
+        'torsion_length', 'energy', and 'rho', and adds a class ID column based on the following rules:
+
+        1. A new column named `class_id` is added, which is the concatenation of the individual class IDs per Chi.
+        2. The DataFrame is grouped by the `class_id` column, and a new DataFrame is returned that shows the unique `ss_id` values for each group,
+        the count of unique `ss_id` values, the incidence of each group as a proportion of the total DataFrame, and the
+        percentage of incidence.
+
+        :param df: A pandas DataFrame containing columns 'ss_id', 'chi1', 'chi2', 'chi3', 'chi4', 'chi5',
+                'ca_distance', 'cb_distance', 'torsion_length', 'energy', and 'rho'
+        :return: The grouped DataFrame with the added class column.
+        """
+
+        _df = pd.DataFrame()
+        if base == 6:
+            for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
+                _df[col_name + "_t"] = df[col_name].apply(self.get_sixth_quadrant)
+        elif base == 8:
+            for col_name in ["chi1", "chi2", "chi3", "chi4", "chi5"]:
+                _df[col_name + "_t"] = df[col_name].apply(self.get_eighth_quadrant)
+        else:
+            raise ValueError("Base must be either 6 or 8")
+
+        df["class_id"] = _df[["chi1_t", "chi2_t", "chi3_t", "chi4_t", "chi5_t"]].agg(
+            "".join, axis=1
+        )
+
+        grouped = df.groupby("class_id").agg({"ss_id": "unique"})
+        grouped["count"] = grouped["ss_id"].str.len()
+        grouped["incidence"] = grouped["count"] / len(df)
+        grouped["percentage"] = grouped["incidence"] * 100
+        grouped.reset_index(inplace=True)
+
+        return grouped
+
     def create_classes(self, df, base=8) -> pd.DataFrame:
         """
         Create a new DataFrame with 8-class encoding for input 'chi' values.
@@ -435,7 +479,7 @@ class DisulfideClassManager:
             case 2:
                 df = self.binaryclass_df
             case _:
-                raise ValueError("Invalid base. Must be 6 or 8.")
+                raise ValueError("Invalid base. Must be 2 or 8.")
 
         return df[df["percentage"] >= cutoff].copy()
 
@@ -593,7 +637,7 @@ class DisulfideClassManager:
             case _:
                 raise ValueError("Invalid number of angles. Must be 1 or 5.")
 
-    def sslist_from_classid(self, cls: str, base=8) -> pd.DataFrame:
+    def sslist_from_classid(self, cls: str, base=8) -> list:
         """
         Return the 'ss_id' value in the given DataFrame that corresponds to the
         input 'cls' string in the class description
@@ -613,42 +657,86 @@ class DisulfideClassManager:
         if len(filtered_df) > 1:
             raise ValueError(f"Multiple rows found for class_id '{cls}'")
 
-        return filtered_df.iloc[0]["ss_id"]
+        return list(filtered_df.iloc[0]["ss_id"])
 
-    def class_to_binary(self, cls_str, base=8):
+    @staticmethod
+    def class_to_binary(cls_str: str, base: int = None) -> str:
         """
         Return a string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees
         into a string of 5 characters, where each character is either '0' if the corresponding input character represents a
         negative angle or '2' if it represents a positive angle.
 
         :param cls_str (str): A string of length 5 representing the ordinal section of a unit circle for an angle in range -180-180 degrees.
-        :param base (int): The base of the ordinal section (6 or 8).
-        :raises ValueError: If the base is not 6 or 8 or 10.
-        :return str: A string of length 5, where each character is either '0' or '2', representing the sign of the corresponding input angle.
+        :param base (int): The base of the ordinal section (2, 8, or 10).
+        :raises ValueError: If the base is not 2, 8, or 10.
+        :return str: A string of length 5, where each character is either '0' or '2', representing the sign of the corresponding input
+        angle. The binary class itself is a special case, where the base is 2. ``+`` is returned for positive angles and ``-``
+        for negative angles.
+
+        Example:
+        >>> from proteusPy.DisulfideClassManager import DisulfideClassManager
+        >>> DisulfideClassManager.class_to_binary('00000', base=2)
+        '-----'
+        >>> DisulfideClassManager.class_to_binary('00000b')
+        '-----'
+        >>> DisulfideClassManager.class_to_binary('13538o')
+        '00202'
         """
-        if base not in [6, 8, 10]:
-            raise ValueError("Base must be either 6, 8, or 10")
+
+        if base is None and len(cls_str) == 5:
+            raise ValueError(
+                "Base must be specified if the class string is of length 5."
+            )
+
+        if base is None and len(cls_str) == 6:
+            bstr = cls_str[-1]
+            if bstr == "b":
+                base = 2
+            elif bstr == "s":
+                base = 6
+            elif bstr == "o":
+                base = 8
+            elif bstr == "t":
+                base = 10
+            else:
+                raise ValueError("Invalid base suffix. Must be b, o, or t.")
+
+        if base not in [2, 6, 8, 10]:
+            raise ValueError("Base must be either 2, 6, 8, or 10")
 
         output_str = ""
-        for char in cls_str:
+        for char in cls_str[:5]:
             match base:
+                case 2:
+                    if char == "2":
+                        output_str += "+"
+                    elif char == "0":
+                        output_str += "-"
+                    else:
+                        raise ValueError("Invalid binary class string.")
                 case 6:
                     if char in ["1", "2", "3"]:
-                        output_str += "2"
+                        output_str += "-"
                     elif char in ["4", "5", "6"]:
-                        output_str += "0"
+                        output_str += "+"
+                    else:
+                        raise ValueError("Invalid base 6 class string.")
                 case 8:
                     if char in ["1", "2", "3", "4"]:
-                        output_str += "2"
+                        output_str += "-"
                     elif char in ["5", "6", "7", "8"]:
-                        output_str += "0"
+                        output_str += "+"
+                    else:
+                        raise ValueError("Invalid base 8 class string.")
                 case 10:
                     if char in ["1", "2", "3", "4", "5"]:
-                        output_str += "2"
+                        output_str += "-"
                     elif char in ["6", "7", "8", "9", "A"]:
-                        output_str += "0"
+                        output_str += "+"
+                    else:
+                        raise ValueError("Invalid base 10 class string.")
                 case _:
-                    raise ValueError("Invalid base. Must be either 6, 8, or 10")
+                    raise ValueError("Invalid base. Must be either 2, 6, 8, or 10")
         return output_str
 
     def get_class_df(self, base=8):
@@ -675,5 +763,10 @@ class DisulfideClassManager:
 
 
 # class definition ends
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()
 
 # end of file
