@@ -5,6 +5,37 @@ Notable changes to the ``proteusPy`` project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.99.34] - 2025-03-15
+
+### Added
+
+- statistical calculations for classes in DisulfideClass_Analysis.py, writes the .pkl to the appropriate dir. The .csv metrics file is saved under $PDB/data.
+- ``DisulfideClassGenerator.py``. This new class manages all aspects of the generation
+  of disulfide structures that represent the overall envelope of structures accessible
+  to a given structural class consensus disulfide. For instance, if a binary class
+  (00000b) has a consensus structure of chi1-chi5 +/- five degrees it can generate the
+  243, (3^5) structures and calculate statistics for this 'tree'.
+- ``display_class_disufides`` entrypoint added. This utilizes the new class to display a given
+  disulfide class in a separate window using the ``DisulfideList.display_overlay()`` function.
+- ``hexbin_plot`` entrypoint added. This program creates 3D interactive plots showing dihedral angle correlations between left-handed and right-handed disulfides.
+- - ``proteusPy.DisulfideBase.Disulfide.TorsionEnergyKJ`` property and calculation to use Hogg's DSE potential function
+
+  ### Changed
+
+  - ``DisulfideClass_Analysis.py`` now creates the binary and octant torsion metrics
+  files needed for the new ``DisulfideClassGenerator`` class. These are needed upon
+  class instantiation and are bundled into the package. Note that the octant class
+  metrics file will be dependent on the overall cutoff used during the program run.
+  I typically use 0.04, which generates 329 overall consensus structures.
+  - Removed explicit ca and sg cutoffs from ``DisulfideLoader.Load_PDB_SS()``. Now
+  it uses percentile only.
+
+### Fixed
+
+- class string calculation was flipped.
+- ``DisulfideLoader`` cutoff values weren't propagating properly
+- continued catching small bugs
+
 ## [v0.99.33] - 2025-03-05
 
 ### Fixed

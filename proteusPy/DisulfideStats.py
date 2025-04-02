@@ -1,5 +1,5 @@
 """
-This module provides statistical analysis functionality for disulfide bonds 
+This module provides statistical analysis functionality for disulfide bonds
 in the proteusPy package.
 
 Author: Eric G. Suchanek, PhD
@@ -76,7 +76,7 @@ class DisulfideStats:
         if quiet:
             pbar = sslist
         else:
-            pbar = tqdm(sslist, ncols=PBAR_COLS, leave=False)
+            pbar = tqdm(sslist, ncols=PBAR_COLS, leave=False, desc="TorsionDF...")
 
         for ss in pbar:
             new_row = {
@@ -101,6 +101,7 @@ class DisulfideStats:
                 "rho": ss.rho,
                 "binary_class_string": ss.binary_class_string,
                 "octant_class_string": ss.octant_class_string,
+                "energy_kj": ss.TorsionEnergyKJ,
             }
             rows.append(new_row)
 
@@ -218,6 +219,29 @@ class DisulfideStats:
             filtered_distances = [d for d in distances if d <= cutoff]
 
         return filtered_distances
+
+    @staticmethod
+    def extract_energies(sslist, comparison="less", cutoff=-1):
+        """Extract and filter the distance values from the disulfide list based on the
+        specified type and comparison.
+
+        :param sslist: List of disulfide objects
+        :param comparison: If 'less', return energies less than the cutoff value
+        :param cutoff: Cutoff value for filtering energies
+        :return: List of filtered energies values
+        """
+        filtered_energies = []
+        energies = [ds.energy for ds in sslist]
+
+        if cutoff == -1.0:
+            return energies
+
+        if comparison == "greater":
+            filtered_energies = [e for e in energies if e > cutoff]
+        else:
+            filtered_energies = [e for e in energies if e <= cutoff]
+
+        return filtered_energies
 
     @staticmethod
     def bond_angle_ideality(ss, verbose=False):
@@ -451,7 +475,7 @@ class DisulfideStats:
         """
 
         # Set some parameters for the standard deviation and percentile methods
-        std = 3.0
+        std = 2.0
         dev_df = sslist.create_deviation_dataframe(verbose)
 
         # Calculate cutoffs using DisulfideStats methods
@@ -482,33 +506,30 @@ class DisulfideStats:
             dev_df, "Sg_Distance", percentile=percentile
         )
 
-        if verbose:
-            print(
-                f"Bond Length Deviation Cutoff ({std:.2f} Std Dev): {distance_cutoff_std:.2f}"
-            )
-            print(f"Angle Deviation Cutoff ({std:.2f} Std Dev): {angle_cutoff_std:.2f}")
-            print(f"Ca Distance Cutoff ({std:.2f} Std Dev): {ca_cutoff_std:.2f}")
-            print(f"Sg Distance Cutoff ({std:.2f} Std Dev): {sg_cutoff_std:.2f}")
-
-            print(
-                f"\nBond Length Deviation Cutoff ({percentile:.2f}th Percentile): {distance_cutoff_percentile:.2f}"
-            )
-            print(
-                f"Angle Deviation Cutoff ({percentile:.2f}th Percentile): {angle_cutoff_percentile:.2f}"
-            )
-            print(
-                f"Ca Distance Cutoff ({percentile:.2f}th Percentile): {ca_cutoff_percentile:.2f}"
-            )
-            print(
-                f"Sg Distance Cutoff ({percentile:.2f}th Percentile): {sg_cutoff_percentile:.2f}"
-            )
-
         # Calculate the Z-score for the percentile
         z_score = norm.ppf(percentile / 100.0)
 
         if verbose:
-            print(
-                f"The Z-score for the {percentile}th percentile is approximately {z_score:.3f}"
+            _logger.info(
+                "The Z-score for the %dth percentile is approximately %.3f",
+                percentile,
+                z_score,
+            )
+
+            _logger.info(
+                "Distance Cutoff (Std): %.2f, Angle Cutoff (Std): %.2f, Ca Cutoff (Std): %.2f, Sg Cutoff (Std): %.2f",
+                distance_cutoff_std,
+                angle_cutoff_std,
+                ca_cutoff_std,
+                sg_cutoff_std,
+            )
+
+            _logger.info(
+                "Distance Cutoff (Percentile): %.2f, Angle Cutoff (Percentile): %.2f, Ca Cutoff (Percentile): %.2f, Sg Cutoff (Percentile): %.2f",
+                distance_cutoff_percentile,
+                angle_cutoff_percentile,
+                ca_cutoff_percentile,
+                sg_cutoff_percentile,
             )
 
         return {

@@ -1,5 +1,5 @@
 """
-This file contains global declarations for the *proteusPy* package, a Python package for 
+This file contains global declarations for the *proteusPy* package, a Python package for
 the analysis and modeling of protein structures, with an emphasis on disulfide bonds.
 
 Author: Eric G. Suchanek, PhD
@@ -72,6 +72,12 @@ SS_CLASS_DICT_FILE = "PDB_ss_classes_dict.pkl"
 SS_CONSENSUS_OCT_FILE = "SS_consensus_class_oct.pkl"
 SS_CONSENSUS_BIN_FILE = "SS_consensus_class_32.pkl"
 
+BINARY_CLASS_METRICS_FILE = "binary_class_metrics.pkl"
+OCTANT_CLASS_METRICS_FILE = "octant_class_metrics.pkl"
+
+BINARY_CLASS_METRICS_CSV_FILE = "binary_class_metrics.csv"
+OCTANT_CLASS_METRICS_CSV_FILE = "octant_class_metrics.csv"
+
 LOADER_FNAME = "PDB_SS_ALL_LOADER.pkl"
 LOADER_SUBSET_FNAME = "PDB_SS_SUBSET_LOADER.pkl"
 
@@ -140,7 +146,7 @@ SG_MIN_CUTOFF = 1.0
 
 
 FONTSIZE = 10
-NBINS = 380
+NBINS = 190
 
 # Columns for the distance dataframe
 Distance_DF_Cols = [
@@ -177,4 +183,5 @@ Torsion_DF_Cols = [
     "rho",
     "binary_class_string",
     "octant_class_string",
+    "energy_kj",
 ]

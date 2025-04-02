@@ -370,9 +370,7 @@ def do_build(verbose, full, subset, cutoff, sg_cutoff):
             cutoff=cutoff,
             sg_cutoff=sg_cutoff,
         )
-        PDB_SS.save(
-            savepath=DATA_DIR, subset=subset, cutoff=cutoff, sg_cutoff=sg_cutoff
-        )
+        PDB_SS.save(savepath=DATA_DIR)
 
     elif subset:
         if verbose:
@@ -383,12 +381,8 @@ def do_build(verbose, full, subset, cutoff, sg_cutoff):
             datadir=DATA_DIR,
             subset=True,
             verbose=verbose,
-            cutoff=cutoff,
-            sg_cutoff=sg_cutoff,
         )
-        PDB_SS.save(
-            savepath=DATA_DIR, subset=subset, cutoff=cutoff, sg_cutoff=sg_cutoff
-        )
+        PDB_SS.save(savepath=DATA_DIR)
     else:
         print("Error: No valid build option selected.")
         sys.exit(1)

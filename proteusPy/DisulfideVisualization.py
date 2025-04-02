@@ -2,7 +2,7 @@
 This module provides visualization functionality for disulfide bonds in the proteusPy package.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-02-26 19:57:43
+Last revision: 2025-03-13 18:04:49
 """
 
 # pylint: disable=C0301
@@ -12,6 +12,7 @@ Last revision: 2025-02-26 19:57:43
 
 import logging
 import math
+import time
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -67,18 +68,20 @@ class DisulfideVisualization:
     statistical plots, and overlay displays."""
 
     @staticmethod
-    def enumerate_class_fromlist(tclass: DisulfideClassManager, sslist, base=8):
+    def enumerate_class_fromlist(
+        tclass: DisulfideClassManager, clslist, base=8
+    ) -> pd.DataFrame:
         """Enumerate the classes from a list of class IDs.
 
         :param tclass: DisulfideClassManager instance
-        :param sslist: List of class IDs to enumerate
+        :param clslist: List of class IDs to enumerate
         :param base: Base for class IDs (2 or 8)
         :return: DataFrame with class IDs and counts
         """
         x = []
         y = []
 
-        for cls in sslist:
+        for cls in clslist:
             if cls is not None:
                 _y = tclass.sslist_from_classid(cls, base=base)
                 # it's possible to have 0 SS in a class
@@ -188,6 +191,7 @@ class DisulfideVisualization:
         save=False,
         savedir=".",
         verbose=False,
+        log=False,
     ):
         """Plot the incidence of all octant Disulfide classes for a given binary class.
 
@@ -214,6 +218,7 @@ class DisulfideVisualization:
                 savedir=savedir,
                 base=8,
                 verbose=verbose,
+                log=log,
             )
         if verbose:
             _logger.info("Graph generation complete.")
@@ -242,8 +247,10 @@ class DisulfideVisualization:
         :param log: Whether to use log scale for y-axis
         """
         set_plotly_theme(theme)
+        total_classes = df.shape[0]
+        total_disulfides = df["count"].sum()
 
-        _title = f"Binary Class: {title}"
+        _title = f"Class: {title}, Classes: {total_classes}, SS: {total_disulfides}"
         _labels = {}
         _prefix = "None"
         if base == 8:
@@ -308,8 +315,9 @@ class DisulfideVisualization:
         :param sample_size: Number of items to sample
         """
         set_plotly_theme(theme)
+        total_classes = df.shape[0]
 
-        _title = f"Binary Class: {title}"
+        _title = f"Class: {title}b (Total: {total_classes})"
         _labels = {}
         _prefix = "None"
         if base == 8:
@@ -376,8 +384,9 @@ class DisulfideVisualization:
         :param page_size: Number of items per page
         """
         set_plotly_theme(theme)
+        total_classes = df.shape[0]
 
-        _title = f"Binary Class: {title}"
+        _title = f"Class: {title}b (Total: {total_classes})"
         _labels = {}
         _prefix = "None"
         if base == 8:
@@ -388,6 +397,24 @@ class DisulfideVisualization:
             _prefix = "Binary"
         else:
             raise ValueError("Invalid base. Must be 2 or 8.")
+
+        # Calculate global min/max values from the entire dataset before pagination
+        # This ensures consistent y-axis scaling across all pages
+        global_y_min = df["count"].min() if len(df) > 0 else 0
+        global_y_max = df["count"].max() if len(df) > 0 else 1
+
+        # Add some padding to the max value for better visualization
+        global_y_max = global_y_max * 1.1  # 10% padding
+        # For log scale, ensure minimum is at least 1
+        if log and global_y_min <= 0:
+            global_y_min = 1
+
+        if verbose:
+            _logger.info(
+                "Global y-axis range: [%s, %s]",
+                math.log10(global_y_min) if log else global_y_min,
+                math.log10(global_y_max) if log else global_y_max,
+            )
 
         total_pages = (len(df) + page_size - 1) // page_size
 
@@ -412,6 +439,13 @@ class DisulfideVisualization:
                 yaxis_showgrid=False,
                 autosize=True,
                 yaxis_type="log" if log else "linear",
+                # Set consistent y-axis range for all pages using the global values
+                yaxis=dict(
+                    range=[
+                        math.log10(global_y_min) if log else global_y_min,
+                        math.log10(global_y_max) if log else global_y_max,
+                    ]
+                ),
             )
             fig.update_layout(autosize=True)
 
@@ -503,28 +537,40 @@ class DisulfideVisualization:
     @staticmethod
     def plot_classes(
         tclass: DisulfideClassManager,
-        class_string,
-        base=8,
-        theme="auto",
-        log=False,
-        page_size=200,
+        class_string: str = None,
+        base: int = 8,
+        theme: str = "auto",
+        log: bool = False,
+        page_size: int = 200,
+        paginated: bool = False,
     ):
-        """Plot the distribution of classes for the given class string.
+        """Plot the distribution of classes for the given binary class string.
 
         :param tclass: DisulfideClassManager instance
-        :param class_string: The class string to plot
+        :param class_string: The binary class string to plot
         :param base: Base for class IDs (2 or 8)
         :param theme: Theme to use for the plot
         :param log: Whether to use log scale for y-axis
         :param page_size: Number of items per page
+        :param paginated: Whether to paginate the output
         """
         classlist = tclass.binary_to_class(class_string, base)
         df = DisulfideVisualization.enumerate_class_fromlist(
             tclass, classlist, base=base
         )
-        DisulfideVisualization.plot_count_vs_class_df_paginated(
-            df, title=class_string, theme=theme, base=base, log=log, page_size=page_size
-        )
+        if paginated:
+            DisulfideVisualization.plot_count_vs_class_df_paginated(
+                df,
+                title=class_string,
+                theme=theme,
+                base=base,
+                log=log,
+                page_size=page_size,
+            )
+        else:
+            DisulfideVisualization.plot_count_vs_class_df(
+                df, title=class_string, theme=theme, base=base, log=log
+            )
 
     @staticmethod
     def display_sslist(sslist, style="sb", light="auto", panelsize=512):
@@ -558,6 +604,68 @@ class DisulfideVisualization:
         pl.show()
 
     @staticmethod
+    def simulate_orbit_on_path(plotter, steps=360, step_size=None, sleep_time=0.02):
+        """
+        Simulate the orbit_on_path function by manually updating the camera position
+        over a number of steps.
+
+        :param plotter: The PyVista plotter object
+        :type plotter: pv.Plotter
+        :param steps: Number of steps for one complete rotation, defaults to 360
+        :type steps: int, optional
+        :param step_size: Step size for the animation, defaults to 1.0/steps if None
+        :type step_size: float, optional
+        :param sleep_time: Time to sleep between steps in seconds, defaults to 0.02
+        :type sleep_time: float, optional
+        """
+
+        # Get the current camera focal point and position
+        focal_point = np.array(plotter.camera.focal_point)
+        current_position = np.array(plotter.camera.position)
+
+        # Compute radius as the distance from camera to focal point
+        radius = np.linalg.norm(current_position - focal_point)
+
+        # Calculate the initial angle in the XY plane
+        initial_angle = np.arctan2(
+            current_position[1] - focal_point[1], current_position[0] - focal_point[0]
+        )
+
+        # Calculate step size if not provided
+        if step_size is None:
+            step_size = 1.0 / steps
+
+        # Calculate the total number of steps based on step_size
+        total_steps = int(1.0 / step_size) if step_size > 0 else steps
+
+        # Start the orbit animation
+        for step in range(total_steps):
+            # Compute the angle for this step in radians
+            angle = initial_angle + 2 * np.pi * step / total_steps
+
+            # Create a new position orbiting in the XY plane (keeping Z constant)
+            new_position = focal_point + np.array(
+                [
+                    radius * np.cos(angle),
+                    radius * np.sin(angle),
+                    current_position[2],  # maintain the original Z level
+                ]
+            )
+
+            # Update the camera: new position, focal point, and an up vector
+            plotter.camera_position = (
+                new_position.tolist(),
+                focal_point.tolist(),
+                [0, 0, 1],
+            )
+            plotter.render()
+
+            # Pause briefly to control animation speed
+            time.sleep(sleep_time)
+
+        return
+
+    @staticmethod
     def display_overlay(
         sslist=None,
         pl=None,
@@ -567,17 +675,36 @@ class DisulfideVisualization:
         fname="ss_overlay.png",
         light="auto",
         winsize=WINSIZE,
+        spin=False,
+        steps=360,
+        step_size=None,
+        dpi=300,
     ) -> pv.Plotter:
         """Display all disulfides in the list overlaid in stick mode against
         a common coordinate frame.
 
         :param sslist: List of Disulfide objects
+        :type sslist: DisulfideList
         :param screenshot: Save a screenshot
+        :type screenshot: bool
         :param movie: Save a movie
+        :type movie: bool
         :param verbose: Verbosity
+        :type verbose: bool
         :param fname: Filename to save for the movie or screenshot
+        :type fname: str
         :param light: Background color
+        :type light: str
         :param winsize: Window size tuple (width, height)
+        :type winsize: tuple
+        :param spin: Whether to spin the plot
+        :type spin: bool
+        :param steps: Number of steps for spinning
+        :type steps: int
+        :param step_size: Step size for spinning
+        :type step_size: float
+        :param dpi: DPI for the saved image
+        :type dpi: int
         :return: pyvista.Plotter instance
         :rtype: pv.Plotter
         """
@@ -587,14 +714,15 @@ class DisulfideVisualization:
         avg_enrg = sslist.average_energy
         avg_dist = sslist.average_distance
         resolution = sslist.average_resolution
+        scale = dpi / 300
 
         res = 32
         if tot_ss > 10:
-            res = 18
+            res = 24
         if tot_ss > 15:
-            res = 12
+            res = 18
         if tot_ss > 20:
-            res = 8
+            res = 12
 
         title = f"<{pid}> {resolution:.2f} Å: ({tot_ss} SS), E: {avg_enrg:.2f} kcal/mol, Dist: {avg_dist:.2f} Å"
         fontsize = calculate_fontsize(title, winsize[0])
@@ -642,7 +770,7 @@ class DisulfideVisualization:
         if screenshot:
             pl.show(auto_close=False)
             try:
-                pl.screenshot(fname)
+                pl.screenshot(fname, scale=scale)
                 if verbose:
                     print(f" -> display_overlay(): Saved image to: {fname}")
             except RuntimeError as e:
@@ -651,6 +779,7 @@ class DisulfideVisualization:
         elif movie:
             if verbose:
                 print(f" -> display_overlay(): Saving mp4 animation to: {fname}")
+            _logger.debug("Saving mp4 animation to: %s", fname)
 
             pl.open_movie(fname)
             path = pl.generate_orbital_path(n_points=360)
@@ -659,6 +788,35 @@ class DisulfideVisualization:
 
             if verbose:
                 print(f" -> display_overlay(): Saved mp4 animation to: {fname}")
+        elif spin:
+            _logger.debug("Spinning the plot.")
+            # Reset camera before generating the path
+            # pl.reset_camera()
+
+            # Generate the orbital path
+            # path = pl.generate_orbital_path(n_points=steps)
+
+            # Calculate step size if not provided
+            if step_size is None:
+                step_size = 1.0 / steps
+
+            if verbose:
+                print(
+                    " -> display_overlay(): Spinning the plot. Window will remain open after spinning."
+                )
+
+            # First show the plot to initialize the window
+            pl.show(auto_close=False)
+
+            # Then apply the orbit path - this will spin the view and keep the window open
+            try:
+                # Use our custom simulation function instead of orbit_on_path
+                DisulfideVisualization.simulate_orbit_on_path(
+                    pl, steps=steps, step_size=step_size
+                )
+            except ValueError as e:
+                _logger.error("Error during simulate_orbit_on_path: %s", e)
+
         else:
             pl.show()
         return pl
@@ -670,6 +828,8 @@ class DisulfideVisualization:
         save=False,
         fname="ss_torsions.png",
         theme="auto",
+        dpi=300,
+        figure_size=(4, 3),
     ):
         """Display torsion and distance statistics for a given Disulfide list.
 
@@ -678,10 +838,26 @@ class DisulfideVisualization:
         :param save: Whether to save the plot as an image file
         :param fname: The name of the image file to save
         :param theme: The theme to use for the plot
+        :param dpi: DPI (dots per inch) for the saved image, controls the resolution (default: 300)
+        :param figure_size: Tuple of (width, height) in inches for the figure size (default: (4, 3))
         """
         if len(sslist) == 0:
             _logger.warning("Empty DisulfideList. Nothing to display.")
             return
+
+        # Calculate pixel dimensions
+        _width = figure_size[0] * dpi
+        _height = figure_size[1] * dpi
+
+        # Calculate scale factor based on DPI (300 DPI is the reference)
+        scale_factor = dpi / 300
+
+        # Scale font sizes based on DPI
+        title_font_size = int(20 * scale_factor)
+        axis_font_size = int(14 * scale_factor)
+        tick_font_size = int(12 * scale_factor)
+        text_font_size = int(10 * scale_factor)
+        legend_font_size = int(10 * scale_factor)
 
         set_plotly_theme(theme)
         title = f"{sslist.pdb_id}: {len(sslist)} members"
@@ -694,8 +870,11 @@ class DisulfideVisualization:
         dist_mean_vals = dist_vals.loc["mean"]
         dist_std_vals = dist_vals.loc["std"]
 
+        # Adjust vertical spacing based on scale factor
+        vertical_spacing = 0.125 * (1 + 0.2 * (scale_factor - 1))
+
         fig = make_subplots(
-            rows=2, cols=2, vertical_spacing=0.125, column_widths=[1, 1]
+            rows=2, cols=2, vertical_spacing=vertical_spacing, column_widths=[1, 1]
         )
 
         fig.update_layout(
@@ -704,9 +883,21 @@ class DisulfideVisualization:
                 "xanchor": "center",
                 "x": 0.5,
                 "yanchor": "top",
+                "font": {"size": title_font_size},
             },
-            width=1024,
-            height=1024,
+            width=_width,
+            height=_height,
+            margin=dict(t=50 * scale_factor, b=50 * scale_factor),
+            legend=dict(
+                font=dict(size=legend_font_size),
+                orientation="v",
+                yanchor="top",
+                y=0.95,
+                xanchor="right",
+                x=1,
+                tracegroupgap=5,
+                itemsizing="constant",
+            ),
         )
 
         fig.add_trace(
@@ -714,7 +905,21 @@ class DisulfideVisualization:
                 x=["X1", "X2", "X3", "X4", "X5"],
                 y=tor_mean_vals[:5],
                 name="Torsion Angle (°) ",
-                error_y=dict(type="data", array=tor_std_vals, visible=True),
+                error_y=dict(
+                    type="data",
+                    array=tor_std_vals,
+                    width=4 * scale_factor,
+                    visible=True,
+                    thickness=1.25 * scale_factor,
+                ),
+                text=[
+                    f"{val:.2f} ± {std:.2f}"
+                    for val, std in zip(tor_mean_vals[:5], tor_std_vals[:5])
+                ],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="torsion",
+                showlegend=True,
             ),
             row=1,
             col=1,
@@ -723,18 +928,39 @@ class DisulfideVisualization:
         fig.add_trace(
             go.Bar(
                 x=["rho"],
-                y=[dist_mean_vals[4]],
-                name="ρ (°)",
-                error_y=dict(type="data", array=[dist_std_vals[4]], visible=True),
+                y=[dist_mean_vals[4] * 100],
+                name="ρ (°) * 100",
+                error_y=dict(
+                    type="data",
+                    array=[dist_std_vals[4]],
+                    width=4.0 * scale_factor,
+                    visible=True,
+                    thickness=1.25 * scale_factor,
+                ),
+                text=[f"{dist_mean_vals[4] * 100:.2f} ± {dist_std_vals[4]:.2f}"],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="rho",
+                showlegend=True,
             ),
             row=1,
             col=1,
         )
 
         fig.update_yaxes(
-            title_text="Dihedral Angle (°)", range=[-200, 200], row=1, col=1
+            title_text="Dihedral Angle (°)",
+            range=[-200, 200],
+            row=1,
+            col=1,
+            title_font=dict(size=axis_font_size),
+            tickfont=dict(size=tick_font_size),
         )
-        fig.update_yaxes(range=[0, 320], row=2, col=2)
+        fig.update_yaxes(
+            range=[0, 320],
+            row=2,
+            col=2,
+            tickfont=dict(size=tick_font_size),
+        )
 
         fig.add_trace(
             go.Bar(
@@ -744,16 +970,29 @@ class DisulfideVisualization:
                 error_y=dict(
                     type="data",
                     array=[dist_std_vals[3].tolist()],
-                    width=0.25,
+                    width=4.0 * scale_factor,
                     visible=True,
+                    thickness=1.25 * scale_factor,
                 ),
+                text=[f"{dist_mean_vals[3]:.2f} ± {dist_std_vals[3]:.2f}"],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="energy",
+                showlegend=True,
             ),
             row=1,
             col=2,
         )
-        fig.update_traces(width=0.25, row=1, col=2)
+        fig.update_traces(width=0.5 * scale_factor, row=1, col=2)
 
-        fig.update_yaxes(title_text="kcal/mol", range=[0, 8], row=1, col=2)
+        fig.update_yaxes(
+            title_text="kcal/mol",
+            range=[0, 8],
+            row=1,
+            col=2,
+            title_font=dict(size=axis_font_size),
+            tickfont=dict(size=tick_font_size),
+        )
 
         fig.add_trace(
             go.Bar(
@@ -767,15 +1006,32 @@ class DisulfideVisualization:
                         dist_std_vals[1].tolist(),
                         dist_std_vals[2].tolist(),
                     ],
-                    width=0.25,
+                    width=4 * scale_factor,
                     visible=True,
+                    thickness=1.25 * scale_factor,
                 ),
+                text=[
+                    f"{dist_mean_vals[0]:.2f} ± {dist_std_vals[0]:.2f}",
+                    f"{dist_mean_vals[1]:.2f} ± {dist_std_vals[1]:.2f}",
+                    f"{dist_mean_vals[2]:.2f} ± {dist_std_vals[2]:.2f}",
+                ],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="distances",
+                showlegend=True,
             ),
             row=2,
             col=1,
         )
-        fig.update_yaxes(title_text="Distance (A)", range=[0, 8], row=2, col=1)
-        fig.update_traces(width=0.25, row=2, col=1)
+        fig.update_yaxes(
+            title_text="Distance (Å)",
+            range=[0, 8],
+            row=2,
+            col=1,
+            title_font=dict(size=axis_font_size),
+            tickfont=dict(size=tick_font_size),
+        )
+        fig.update_traces(width=0.5 * scale_factor, row=2, col=1)
 
         fig.add_trace(
             go.Bar(
@@ -783,27 +1039,77 @@ class DisulfideVisualization:
                 y=[tor_mean_vals[5]],
                 name="Torsion Length (Å)",
                 error_y=dict(
-                    type="data", array=[tor_std_vals[5]], width=0.25, visible=True
+                    type="data",
+                    array=[tor_std_vals[5]],
+                    width=4.0 * scale_factor,
+                    visible=True,
+                    thickness=1.25 * scale_factor,
                 ),
+                text=[f"{tor_mean_vals[5]:.2f} ± {tor_std_vals[5]:.2f}"],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="torsion_length",
+                showlegend=True,
             ),
             row=2,
             col=2,
         )
-        fig.update_yaxes(title_text="Torsion Length", range=[0, 350], row=2, col=2)
-        fig.update_traces(width=0.25, row=2, col=2)
-
-        fig.update_traces(
-            error_y_thickness=2,
-            error_y_color="gray",
-            texttemplate="%{y:.2f} ± %{error_y.array:.2f}",
-            textposition="outside",
+        fig.update_yaxes(
+            title_text="Torsion Length",
+            range=[0, 350],
+            row=2,
+            col=2,
+            title_font=dict(size=axis_font_size),
+            tickfont=dict(size=tick_font_size),
         )
+        fig.update_traces(width=0.5 * scale_factor, row=2, col=2)
+
+        # Update x-axis fonts
+        fig.update_xaxes(tickfont=dict(size=tick_font_size))
 
         if display:
             fig.show()
 
         if save:
-            fig.write_image(fname)
+            # Convert DPI to scale factor (300 DPI is considered standard, so scale = dpi/300)
+            scale = dpi / 300
+            fig.write_image(fname, scale=scale)
+
+    @staticmethod
+    def plot_energies(
+        energies,
+        theme="auto",
+        log=True,
+    ):
+        """Plot the energies as a histogram.
+
+        :param energies: List of energies
+        :param theme: The plotly theme to use
+        :param log: Whether to use a logarithmic scale for the y-axis
+        """
+        set_plotly_theme(theme)
+        yaxis_type = "log" if log else "linear"
+
+        column_name = "Energy"
+        title = "Disulfide Torsional Energy Distribution"
+        xtitle = "Energy (kcal/mol)"
+
+        df = pd.DataFrame(energies, columns=[column_name])
+
+        fig = px.histogram(
+            df,
+            x=column_name,
+            nbins=NBINS,
+            title=title,
+        )
+        fig.update_layout(
+            title={"text": title, "x": 0.5, "xanchor": "center"},
+            xaxis_title=xtitle,
+            yaxis_title="Frequency",
+            yaxis_type=yaxis_type,
+            bargap=0.2,
+        )
+        fig.show()
 
     @staticmethod
     def plot_distances(
@@ -1011,6 +1317,7 @@ class DisulfideVisualization:
             pl.reset_camera()
 
         pl.link_views()
+        pl.reset_camera()
         return pl
 
     @staticmethod
@@ -1067,7 +1374,12 @@ class DisulfideVisualization:
                 if style == "bs" and i > 11:
                     rad *= 0.75
                 pvp.add_mesh(
-                    pv.Sphere(center=coords[i], radius=rad),
+                    pv.Sphere(
+                        center=coords[i],
+                        radius=rad,
+                        theta_resolution=res,
+                        phi_resolution=res,
+                    ),
                     color=colors[atom],
                     smooth_shading=True,
                     specular=spec,
@@ -1230,8 +1542,18 @@ class DisulfideVisualization:
                 if i >= 11:  # prev and next residue atoms for phi/psi calcs
                     bradius = bradius * 0.5  # make smaller to distinguish
 
-                cap1 = pv.Sphere(center=prox_pos, radius=bradius)
-                cap2 = pv.Sphere(center=distal_pos, radius=bradius)
+                cap1 = pv.Sphere(
+                    center=prox_pos,
+                    radius=bradius,
+                    theta_resolution=res,
+                    phi_resolution=res,
+                )
+                cap2 = pv.Sphere(
+                    center=distal_pos,
+                    radius=bradius,
+                    theta_resolution=res,
+                    phi_resolution=res,
+                )
 
                 if style == "plain":
                     cyl = pv.Cylinder(
@@ -1354,7 +1676,7 @@ class DisulfideVisualization:
         src = ss.pdb_id
         enrg = ss.energy
 
-        title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Ca: {ss.ca_distance:.2f} Å, Sg: {ss.sg_distance:.2f} Å Tors: {ss.torsion_length:.2f}°"
+        title = f"{src}: {ss.proximal}{ss.proximal_chain}-{ss.distal}{ss.distal_chain}: {enrg:.2f} kcal/mol. Ca: {ss.ca_distance:.2f} Å, Tors: {ss.torsion_length:.2f}°"
 
         set_pyvista_theme(light)
         fontsize = dpi_adjusted_fontsize(FONTSIZE)
@@ -1450,8 +1772,9 @@ class DisulfideVisualization:
 
         if verbose:
             print(f"Rendering animation to {fname}...")
+        set_pyvista_theme("auto")
 
-        pl = pv.Plotter(window_size=WINSIZE, off_screen=True, theme="document")
+        pl = pv.Plotter(window_size=WINSIZE, off_screen=True)
         pl.open_movie(fname)
         path = pl.generate_orbital_path(n_points=steps)
 
@@ -1471,7 +1794,9 @@ class DisulfideVisualization:
             print(f"Saved mp4 animation to: {fname}")
 
     @staticmethod
-    def spin(ss, style="sb", verbose=False, steps=360, theme="auto") -> None:
+    def spin(
+        ss, style="sb", pl=None, verbose=False, steps=360, theme="auto"
+    ) -> pv.Plotter:
         """
         Spin the object by rotating it one revolution about the Y axis in the given style.
 
@@ -1497,27 +1822,39 @@ class DisulfideVisualization:
             _logger.info("Spinning object: %d steps...", steps)
 
         # Create a Plotter instance
-        pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
+        if not pl:
+            pl = pv.Plotter(window_size=WINSIZE, off_screen=False)
+
         pl.add_title(title=title, font_size=dpi_adjusted_fontsize(FONTSIZE))
 
         # Enable anti-aliasing for smoother rendering
         pl.enable_anti_aliasing("msaa")
 
         # Generate an orbital path for spinning
-        path = pl.generate_orbital_path(n_points=steps)
+        # path = pl.generate_orbital_path(n_points=steps)
 
         # Render the object in the specified style
         pl = DisulfideVisualization._render_ss(ss, pl, style=style)
 
         pl.reset_camera()
         pl.show(auto_close=False)
-        nstep = 1 / steps
+
+        step_size = 1 / steps
+
+        try:
+            # Use our custom simulation function instead of orbit_on_path
+            DisulfideVisualization.simulate_orbit_on_path(
+                pl, steps=steps, step_size=step_size
+            )
+        except ValueError as e:
+            _logger.error("Error during simulate_orbit_on_path: %s", e)
 
         # Orbit the camera along the generated path
-        pl.orbit_on_path(path, write_frames=False, step=nstep)
 
         if verbose:
             print("Spinning completed.")
+
+        return pl
 
     @staticmethod
     def screenshot(
@@ -1735,6 +2072,8 @@ class DisulfideVisualization:
         :return: The figure and axes objects
         :rtype: tuple
         """
+        # pylint: disable=C0415
+
         from proteusPy import DisulfideStats
 
         # Create deviation dataframe
@@ -1846,4 +2185,829 @@ class DisulfideVisualization:
 
         return fig, (ax1, ax2)
 
-    # EOF
+    @staticmethod
+    def plot_energy_by_class(
+        metrics_df: pd.DataFrame,
+        title: str = "Energy Distribution by Class",
+        theme: str = "auto",
+        save: bool = False,
+        savedir: str = ".",
+        verbose: bool = False,
+        split: bool = False,
+        max_classes_per_plot: int = 32,
+        dpi: int = 300,
+        suffix: str = "png",
+    ) -> None:
+        """
+        Create a box plot showing energy distribution by class_id using plotly_express.
+
+        :param metrics_df: DataFrame containing the metrics data with class_id and energy columns
+        :param title: Title for the plot
+        :param theme: Theme to use for the plot ('auto', 'light', or 'dark')
+        :param save: Whether to save the plot
+        :param savedir: Directory to save the plot to
+        :param verbose: Whether to display verbose output
+        :param split: Whether to split the plot into multiple plots if there are many classes
+        :param max_classes_per_plot: Maximum number of classes to include in each plot when splitting
+        :param dpi: DPI (dots per inch) for the saved image, controls the resolution (default: 300)
+        """
+        # Set the plotly theme
+        set_plotly_theme(theme)
+
+        # If not splitting or few classes, create a single plot
+        if not split or len(metrics_df["class"].unique()) <= max_classes_per_plot:
+            # Create box plot using plotly_express
+            fig = px.box(
+                metrics_df,
+                x="class",  # x-axis: class IDs
+                y="energy",  # y-axis: energy values
+                title=title,
+                labels={"class": "Class ID", "energy": "Energy (kcal/mol)"},
+            )
+
+            # Update layout for consistent styling
+            fig.update_layout(
+                showlegend=True,
+                title_x=0.5,
+                title_font=dict(size=20),
+                xaxis_showgrid=False,
+                yaxis_showgrid=False,
+                autosize=True,
+            )
+
+            # Save or display the plot
+            if save:
+                fname = Path(savedir) / f"{title.lower().replace(' ', '_')}.png"
+                if verbose:
+                    _logger.info("Saving plot to %s with DPI %d", fname, dpi)
+                # Convert DPI to scale factor (300 DPI is considered standard, so scale = dpi/300)
+                scale = dpi / 300
+                fig.write_image(fname, suffix, scale=scale)
+            else:
+                fig.show()
+        else:
+            # Split into multiple plots
+            unique_classes = metrics_df["class"].unique()
+            num_plots = (
+                len(unique_classes) + max_classes_per_plot - 1
+            ) // max_classes_per_plot
+
+            if verbose:
+                _logger.info(
+                    "Splitting into %d plots with up to %d classes each",
+                    num_plots,
+                    max_classes_per_plot,
+                )
+
+            for i in range(num_plots):
+                start_idx = i * max_classes_per_plot
+                end_idx = min((i + 1) * max_classes_per_plot, len(unique_classes))
+                classes_subset = unique_classes[start_idx:end_idx]
+
+                # Filter DataFrame for current subset of classes
+                subset_df = metrics_df[metrics_df["class"].isin(classes_subset)]
+
+                # Create plot title for this subset
+                subset_title = f"{title} (Part {i+1}/{num_plots})"
+
+                # Create box plot for this subset
+                fig = px.box(
+                    subset_df,
+                    x="class",
+                    y="energy",
+                    title=subset_title,
+                    labels={"class": "Class ID", "energy": "Energy (kcal/mol)"},
+                )
+
+                # Update layout for consistent styling
+                fig.update_layout(
+                    showlegend=True,
+                    title_x=0.5,
+                    title_font=dict(size=20),
+                    xaxis_showgrid=False,
+                    yaxis_showgrid=False,
+                    autosize=True,
+                )
+
+                # Save or display the plot
+                if save:
+                    fname = (
+                        Path(savedir)
+                        / f"{title.lower().replace(' ', '_')}_part_{i+1}.{suffix}"
+                    )
+                    if verbose:
+                        _logger.info(
+                            "Saving plot part %d to %s with DPI %d", i + 1, fname, dpi
+                        )
+                    # Convert DPI to scale factor (300 DPI is considered standard, so scale = dpi/300)
+                    scale = dpi / 300
+                    fig.write_image(fname, suffix, scale=scale)
+                else:
+                    fig.show()
+
+    @staticmethod
+    def plot_torsion_distance_by_class(
+        metrics_df: pd.DataFrame,
+        title: str = "Torsion Distance by Class",
+        theme: str = "auto",
+        save: bool = False,
+        savedir: str = ".",
+        verbose: bool = False,
+        dpi: int = 300,
+        suffix: str = "png",
+        fname_prefix: str = "",
+        window_size: tuple = (1024, 1024),
+    ) -> None:
+        """
+        Create a bar chart showing torsion distance by class_id using plotly_express.
+
+        :param metrics_df: DataFrame containing the metrics data with class_id and avg_torsion_distance columns
+        :param title: Title for the plot
+        :param theme: Theme to use for the plot ('auto', 'light', or 'dark')
+        :param save: Whether to save the plot
+        :param savedir: Directory to save the plot to
+        :param verbose: Whether to display verbose output
+        :param dpi: DPI (dots per inch) for the saved image, controls the resolution (default: 300)
+        :param suffix: File format for saved images (default: "png")
+        """
+        # Set the plotly theme
+        set_plotly_theme(theme)
+
+        # Check if avg_torsion_distance column exists
+        if "avg_torsion_distance" not in metrics_df.columns:
+            _logger.warning("avg_torsion_distance column not found in the DataFrame.")
+            return
+
+        # Calculate threshold for high occupancy classes (mean + 1 std dev)
+        count_threshold = metrics_df["count"].mean() + metrics_df["count"].std()
+
+        # Create color array based on threshold
+        colors = [
+            (
+                "rgba(65, 105, 225, 0.7)"
+                if x < count_threshold
+                else "rgba(220, 20, 60, 0.7)"
+            )
+            for x in metrics_df["count"]
+        ]
+
+        # Create bar chart using plotly_express
+        fig = px.bar(
+            metrics_df,
+            x="class",  # x-axis: class IDs
+            y="avg_torsion_distance",  # y-axis: torsion distance values
+            title=title,
+            labels={
+                "class": "Class ID",
+                "avg_torsion_distance": "Average Torsion Distance (°)",
+                "count": "Count",
+            },
+            hover_data=["count"],  # Add count to hover information
+        )
+
+        # Update marker colors based on threshold
+        fig.update_traces(marker_color=colors)
+
+        # Update layout for consistent styling
+        fig.update_layout(
+            showlegend=False,  # No legend needed for a single bar series
+            title_x=0.5,
+            title_font=dict(size=20),
+            xaxis_showgrid=True,
+            yaxis_showgrid=True,
+            autosize=True,
+            width=window_size[0],
+            height=window_size[1],
+            xaxis=dict(
+                tickangle=-45,  # Angle the x-axis labels for better readability
+                tickmode="auto",
+            ),
+        )
+
+        # Save or display the plot
+        if save:
+            fname = Path(savedir) / f"{fname_prefix}.{suffix}"
+
+            if verbose:
+                _logger.info("Saving plot to %s with DPI %d", fname, dpi)
+            # Convert DPI to scale factor (300 DPI is considered standard, so scale = dpi/300)
+            scale = dpi / 300
+            fig.write_image(fname, suffix, scale=scale)
+        else:
+            fig.show()
+
+    @staticmethod
+    def display_torsion_class_df(
+        torsion_df: pd.DataFrame,
+        class_id: str,
+        display: bool = True,
+        save: bool = False,
+        fname: str = "ss_torsions.png",
+        theme: str = "auto",
+        dpi: int = 300,
+        figure_size: tuple = (4, 3),
+    ) -> None:
+        """
+        Display torsion and distance statistics for a given class ID using a TorsionDF dataframe.
+
+        :param torsion_df: The TorsionDF dataframe containing the torsion data
+        :param class_id: The class ID to display statistics for (e.g. '11111b' for binary or '11111o' for octant)
+        :param display: Whether to display the plot in the notebook
+        :param save: Whether to save the plot as an image file
+        :param fname: The name of the image file to save
+        :param theme: The theme to use for the plot ('auto', 'light', or 'dark')
+        :param dpi: DPI (dots per inch) for the saved image, controls the resolution
+        :param figure_size: Tuple of (width, height) in inches for the figure size
+        """
+        # Determine if binary or octant class based on suffix
+        if class_id.endswith("b"):
+            class_column = "binary_class_string"
+            class_str = class_id[:-1]  # Remove 'b' suffix
+        elif class_id.endswith("o"):
+            class_column = "octant_class_string"
+            class_str = class_id[:-1]  # Remove 'o' suffix
+        else:
+            # Default to octant if no suffix
+            class_column = "octant_class_string"
+            class_str = class_id
+
+        # Filter TorsionDF for the specified class
+        class_df = torsion_df[torsion_df[class_column] == class_str]
+
+        if len(class_df) == 0:
+            _logger.warning("No disulfides found for class %s", class_id)
+            return
+
+        # Calculate means and standard deviations
+        tor_means = class_df[
+            ["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]
+        ].mean()
+        tor_stds = class_df[
+            ["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]
+        ].std()
+
+        dist_means = class_df[
+            ["ca_distance", "cb_distance", "sg_distance", "energy", "rho"]
+        ].mean()
+        dist_stds = class_df[
+            ["ca_distance", "cb_distance", "sg_distance", "energy", "rho"]
+        ].std()
+
+        # Calculate pixel dimensions
+        _width = figure_size[0] * dpi
+        _height = figure_size[1] * dpi
+
+        # Calculate scale factor based on DPI (300 DPI is the reference)
+        scale_factor = dpi / 300
+
+        # Scale font sizes based on DPI
+        title_font_size = int(20 * scale_factor)
+        axis_font_size = int(14 * scale_factor)
+        tick_font_size = int(12 * scale_factor)
+        text_font_size = int(10 * scale_factor)
+        legend_font_size = int(10 * scale_factor)
+
+        set_plotly_theme(theme)
+        title = f"Class {class_id}: {len(class_df)} members"
+
+        # Adjust vertical spacing based on scale factor
+        vertical_spacing = 0.125 * (1 + 0.1 * (scale_factor - 1))
+
+        fig = make_subplots(
+            rows=2, cols=2, vertical_spacing=vertical_spacing, column_widths=[1, 1]
+        )
+
+        fig.update_layout(
+            title={
+                "text": title,
+                "xanchor": "center",
+                "x": 0.5,
+                "yanchor": "top",
+                "font": {"size": title_font_size},
+            },
+            legend=dict(
+                font=dict(size=legend_font_size),
+                orientation="v",
+                yanchor="top",
+                xanchor="right",
+                y=1.02,
+                x=1,
+            ),
+            width=_width,
+            height=_height,
+            margin=dict(t=50 * scale_factor, b=50 * scale_factor),
+        )
+
+        fig.add_trace(
+            go.Bar(
+                x=["X1", "X2", "X3", "X2'", "X1'"],
+                y=tor_means[:5],
+                name="Torsion Angle (°) ",
+                width=0.67,  # Control individual bar widths
+                error_y=dict(
+                    type="data",
+                    array=tor_stds,
+                    width=4 * scale_factor,
+                    visible=True,
+                    thickness=1.25 * scale_factor,
+                ),
+                text=[
+                    f"{val:.2f} ± {std:.2f}"
+                    for val, std in zip(tor_means[:5], tor_stds[:5])
+                ],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="torsion",
+                showlegend=True,
+            ),
+            row=1,
+            col=1,
+        )
+
+        fig.add_trace(
+            go.Bar(
+                x=["rho"],
+                y=[dist_means[4] * 100],
+                name="ρ (°) * 100",
+                error_y=dict(
+                    type="data",
+                    array=[dist_stds[4]],
+                    width=4 * scale_factor,
+                    visible=True,
+                    thickness=1.25 * scale_factor,
+                ),
+                text=[f"{dist_means[4] * 100:.2f} ± {dist_stds[4]:.2f}"],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="rho",
+                showlegend=True,
+            ),
+            row=1,
+            col=1,
+        )
+
+        fig.update_yaxes(
+            title_text="Dihedral Angle (°)",
+            range=[-200, 200],
+            row=1,
+            col=1,
+            title_font=dict(size=axis_font_size),
+            tickfont=dict(size=tick_font_size),
+        )
+        fig.update_yaxes(
+            range=[0, 320],
+            row=2,
+            col=2,
+            tickfont=dict(size=tick_font_size),
+        )
+
+        fig.add_trace(
+            go.Bar(
+                x=["Strain Energy (kcal/mol)"],
+                y=[dist_means[3]],
+                name="Energy (kcal/mol)",
+                error_y=dict(
+                    type="data",
+                    array=[dist_stds[3].tolist()],
+                    width=4 * scale_factor,
+                    visible=True,
+                    thickness=1.25 * scale_factor,
+                ),
+                text=[f"{dist_means[3]:.2f} ± {dist_stds[3]:.2f}"],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="energy",
+                showlegend=True,
+            ),
+            row=1,
+            col=2,
+        )
+        fig.update_traces(width=0.5 * scale_factor, row=1, col=2)
+
+        fig.update_yaxes(
+            title_text="kcal/mol",
+            range=[0, 8],
+            row=1,
+            col=2,
+            title_font=dict(size=axis_font_size),
+            tickfont=dict(size=tick_font_size),
+        )
+
+        fig.add_trace(
+            go.Bar(
+                x=["Cα Distance (Å)", "Cβ Distance (Å)", "Sγ Distance (Å)"],
+                y=[dist_means[0], dist_means[1], dist_means[2]],
+                name="Distances (Å)",
+                width=0.3,  # Control individual bar widths
+                error_y=dict(
+                    type="data",
+                    array=[
+                        dist_stds[0].tolist(),
+                        dist_stds[1].tolist(),
+                        dist_stds[2].tolist(),
+                    ],
+                    width=4.0 * scale_factor,
+                    visible=True,
+                    thickness=1.25 * scale_factor,
+                ),
+                text=[
+                    f"{dist_means[0]:.2f} ± {dist_stds[0]:.2f}",
+                    f"{dist_means[1]:.2f} ± {dist_stds[1]:.2f}",
+                    f"{dist_means[2]:.2f} ± {dist_stds[2]:.2f}",
+                ],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="distances",
+                showlegend=True,
+            ),
+            row=2,
+            col=1,
+        )
+        fig.update_yaxes(
+            title_text="Distance (Å)",
+            range=[0, 8],
+            row=2,
+            col=1,
+            title_font=dict(size=axis_font_size),
+            tickfont=dict(size=tick_font_size),
+        )
+        # Update layout for the distance subplot to control bar spacing
+        fig.update_layout(
+            bargap=0.3,  # Increase gap between bars
+            bargroupgap=0.1,  # Gap between bar groups
+        )
+
+        fig.add_trace(
+            go.Bar(
+                x=["Torsion Length (Å)"],
+                y=[tor_means[5]],
+                name="Torsion Length (Å)",
+                error_y=dict(
+                    type="data",
+                    array=[tor_stds[5]],
+                    width=4 * scale_factor,
+                    visible=True,
+                    thickness=1.25 * scale_factor,
+                ),
+                text=[f"{tor_means[5]:.2f} ± {tor_stds[5]:.2f}"],
+                textposition="outside",
+                textfont=dict(size=text_font_size),
+                legendgroup="torsion_length",
+                showlegend=True,
+            ),
+            row=2,
+            col=2,
+        )
+        fig.update_yaxes(
+            title_text="Torsion Length",
+            range=[0, 350],
+            row=2,
+            col=2,
+            title_font=dict(size=axis_font_size),
+            tickfont=dict(size=tick_font_size),
+        )
+        fig.update_traces(width=0.5 * scale_factor, row=2, col=2)
+
+        # Update x-axis fonts
+        fig.update_xaxes(tickfont=dict(size=tick_font_size))
+
+        if display:
+            fig.show()
+
+        if save:
+            # Convert DPI to scale factor (300 DPI is considered standard, so scale = dpi/300)
+            scale = dpi / 300
+            fig.write_image(fname, scale=scale)
+
+    @staticmethod
+    def plot_3d_hexbin_leftright(
+        loader,
+        width: int = 800,
+        height: int = 600,
+        gridsize: int = 60,
+        tormin: float = -180.0,
+        tormax: float = 180.0,
+        scaling: str = "sqrt",
+        column1: str = "chi2",
+        column2: str = "chi4",
+        title: str = None,
+    ) -> None:
+        """
+        Create 3D hexbin plots for left and right-handed chi2-chi4 correlations with customizable z-scaling.
+
+        :param loader: Loader object to retrieve torsion data
+        :type loader: proteusPy.PDB_SS
+        :param width: Window width in pixels
+        :type width: int, optional
+        :default width: 800
+        :param height: Window height in pixels
+        :type height: int, optional
+        :default height: 600
+        :param gridsize: Number of bins for hexbin
+        :type gridsize: int, optional
+        :default gridsize: 30
+        :param tormin: Minimum torsion angle
+        :type tormin: float, optional
+        :default tormin: -180.0
+        :param tormax: Maximum torsion angle
+        :type tormax: float, optional
+        :default tormax: 180.0
+        :param scaling: Scaling method for z-values ('linear', 'sqrt', 'log', 'power')
+        :type scaling: str, optional
+        :default scaling: 'sqrt'
+        :param column1: Name of the first column (x-axis)
+        :type column1: str, optional
+        :default column1: 'chi2'
+        :param column2: Name of the second column (y-axis)
+        :type column2: str, optional
+        :default column2: 'chi4'
+        """
+        title = f"{column1} - {column2} Correlation" if title is None else title
+
+        _SS_df = loader.getTorsions()
+
+        _left = _SS_df["chi3"] <= 0.0
+        _right = _SS_df["chi3"] > 0.0
+
+        _SS_df_Left = _SS_df[_left]
+        _SS_df_Right = _SS_df[_right]
+
+        try:
+            # Ensure width and height are integers
+            width = int(width)
+            height = int(height)
+
+            # Extract data
+            x_left = _SS_df_Left[column1]
+            y_left = _SS_df_Left[column2]
+            x_right = _SS_df_Right[column1]
+            y_right = _SS_df_Right[column2]
+
+            # Create 2D histogram bins for both datasets
+            bins_left, xedges_left, yedges_left = np.histogram2d(
+                x_left,
+                y_left,
+                bins=gridsize,
+                range=[[tormin - 1, tormax + 1], [tormin - 1, tormax + 1]],
+            )
+            bins_right, xedges_right, yedges_right = np.histogram2d(
+                x_right, y_right, bins=gridsize, range=[[tormin, tormax], [-180, 180]]
+            )
+
+            # Apply scaling to bin counts using match
+            match scaling:
+                case "linear":
+                    scaled_bins_left = bins_left.T
+                    scaled_bins_right = bins_right.T
+                    scale_label = "linear scale"
+                case "sqrt":
+                    scaled_bins_left = np.sqrt(bins_left.T)
+                    scaled_bins_right = np.sqrt(bins_right.T)
+                    scale_label = "sqrt scale"
+                case "log":
+                    scaled_bins_left = np.log1p(bins_left.T)
+                    scaled_bins_right = np.log1p(bins_right.T)
+                    scale_label = "log scale"
+                case "power":
+                    power = 0.3
+                    scaled_bins_left = np.power(bins_left.T, power)
+                    scaled_bins_right = np.power(bins_right.T, power)
+                    scale_label = f"power scale ({power})"
+                case _:
+                    raise ValueError(
+                        f"Unsupported scaling method: {scaling}. Use 'linear', 'sqrt', 'log', or 'power'."
+                    )
+
+            # Debug: Print min and max of scaled values
+            _logger.debug(
+                "Left plot - Min: %s, Max: %s",
+                scaled_bins_left.min(),
+                scaled_bins_left.max(),
+            )
+            _logger.debug(
+                "Right plot - Min: %s, Max: %s",
+                scaled_bins_right.min(),
+                scaled_bins_right.max(),
+            )
+
+            # Create mesh grid for plotting
+            x_grid, y_grid = np.meshgrid(xedges_left[:-1], yedges_left[:-1])
+            x_grid_r, y_grid_r = np.meshgrid(xedges_right[:-1], yedges_right[:-1])
+
+            # Create PyVista plotter with two subplots
+            plotter = pv.Plotter(shape=(1, 2), window_size=[width * 2, height])
+
+            # Left-handed plot (subplot 0)
+            plotter.subplot(0, 0)
+            grid_left = pv.StructuredGrid(x_grid, y_grid, scaled_bins_left)
+            grid_left.point_data["Height"] = scaled_bins_left.ravel(order="F")
+            plotter.add_mesh(
+                grid_left,
+                scalars="Height",
+                cmap="nipy_spectral",
+                show_edges=False,
+                clim=[scaled_bins_left.min(), scaled_bins_left.max()],
+                show_scalar_bar=False,  # Add this line to hide the scalar bar
+            )
+            plotter.add_title(
+                f"{title} (Left-handed, {scale_label})",
+                font_size=8,
+            )
+            plotter.show_grid()
+            # Add axes with custom labels
+            plotter.add_axes(
+                xlabel=column1,
+                ylabel=column2,
+                zlabel="cnt",
+                line_width=2,
+                color="black",
+                interactive=True,
+            )
+
+            plotter.view_xy()
+            plotter.enable_parallel_projection()
+
+            # Right-handed plot (subplot 1)
+            plotter.subplot(0, 1)
+            grid_right = pv.StructuredGrid(x_grid_r, y_grid_r, scaled_bins_right)
+            grid_right.point_data["Height"] = scaled_bins_right.ravel(order="F")
+            plotter.add_mesh(
+                grid_right,
+                scalars="Height",
+                cmap="nipy_spectral",
+                show_edges=False,
+                clim=[scaled_bins_right.min(), scaled_bins_right.max()],
+                show_scalar_bar=False,  # Add this line to hide the scalar bar
+            )
+            plotter.add_title(
+                f"{title} - (Right-handed, {scale_label})",
+                font_size=8,
+            )
+            plotter.show_grid()
+            plotter.view_xy()
+
+            plotter.enable_parallel_projection()
+            plotter.add_scalar_bar(
+                title="Incidence",
+                vertical=True,
+                position_x=0.9,  # Right side
+                position_y=0.25,
+                width=0.05,
+                height=0.5,
+                title_font_size=14,
+                label_font_size=12,
+            )
+
+            # Final adjustments
+            plotter.reset_camera()
+            plotter.link_views()
+            plotter.show()
+
+        except AttributeError as e:
+            print(
+                f"Error: DataFrame might be missing required columns (chi2, chi4): {e}"
+            )
+        except ValueError as e:
+            print(f"Error: Invalid parameter value: {e}")
+
+    @staticmethod
+    def plot_3d_hexbin_df(
+        df: "pandas.DataFrame",
+        column1: str,
+        column2: str,
+        width: int = 1024,
+        height: int = 1024,
+        gridsize: int = 80,
+        tormin: float = -180.0,
+        tormax: float = 180.0,
+        scaling: str = "sqrt",
+        title: str = None,
+    ) -> None:
+        """
+        Create a 3D hexbin plot for correlations between two columns from a
+        single DataFrame with customizable z-scaling.
+
+        :param df: Data containing the specified columns
+        :type df: pandas.DataFrame
+        :param column1: Name of the first column (x-axis)
+        :type column1: str
+        :param column2: Name of the second column (y-axis)
+        :type column2: str
+        :param width: Window width in pixels
+        :type width: int, optional
+        :default width: 1024
+        :param height: Window height in pixels
+        :type height: int, optional
+        :default height: 1024
+        :param gridsize: Number of bins for hexbin
+        :type gridsize: int, optional
+        :default gridsize: 80
+        :param tormin: Minimum torsion angle
+        :type tormin: float, optional
+        :default tormin: -180
+        :param tormax: Maximum torsion angle
+        :type tormax: float, optional
+        :default tormax: 180
+        :param scaling: Scaling method for z-values ('linear', 'sqrt', 'log', 'power')
+        :type scaling: str, optional
+        :default scaling: 'sqrt'
+        """
+        title = f"{column1} - {column2} Correlation" if title is None else title
+
+        try:
+            # Validate column names exist in DataFrame
+            if column1 not in df.columns or column2 not in df.columns:
+                raise ValueError(
+                    f"Columns '{column1}' or '{column2}' not found in DataFrame"
+                )
+
+            # Extract data from specified columns
+            x = df[column1]
+            y = df[column2]
+
+            # Create 2D histogram bins
+            bins, xedges, yedges = np.histogram2d(
+                x, y, bins=gridsize, range=[[tormin, tormax], [tormin, tormax]]
+            )
+
+            # Apply scaling to bin counts using match
+            match scaling:
+                case "linear":
+                    scaled_bins = bins.T
+                    scale_label = "linear scale"
+                case "sqrt":
+                    scaled_bins = np.sqrt(bins.T)
+                    scale_label = "sqrt scale"
+                case "log":
+                    scaled_bins = np.log1p(bins.T)
+                    scale_label = "log scale"
+                case "power":
+                    power = 0.3
+                    scaled_bins = np.power(bins.T, power)
+                    scale_label = f"power scale ({power})"
+                case _:
+                    raise ValueError(
+                        f"Unsupported scaling method: {scaling}. Use 'linear', 'sqrt', 'log', or 'power'."
+                    )
+
+            # Debug: Print min and max of scaled values
+            print(f"Plot - Min: {scaled_bins.min()}, Max: {scaled_bins.max()}")
+
+            # Create mesh grid for plotting
+            x_grid, y_grid = np.meshgrid(xedges[:-1], yedges[:-1])
+
+            # Create PyVista plotter (single view)
+            plotter = pv.Plotter(window_size=[width, height])
+
+            # Create and plot the grid
+            grid = pv.StructuredGrid(x_grid, y_grid, scaled_bins)
+            grid.point_data["Height"] = scaled_bins.ravel(order="F")
+            plotter.add_mesh(
+                grid,
+                scalars="Height",
+                cmap="nipy_spectral",
+                show_edges=False,
+                clim=[scaled_bins.min(), scaled_bins.max()],
+                show_scalar_bar=False,  # Add this line to hide the scalar bar
+            )
+            plotter.add_title(f"{title} - ({scale_label})", font_size=8)
+
+            # Add grid
+            plotter.show_grid()
+            # Add axes with custom labels
+            plotter.add_axes(
+                xlabel=column1,
+                ylabel=column2,
+                zlabel="cnt",
+                line_width=2,
+                color="black",
+                interactive=True,
+            )
+            plotter.view_xy()
+            plotter.enable_parallel_projection()
+            # Scalar bar on the right side with smaller text
+            plotter.add_scalar_bar(
+                title="Incidence",
+                vertical=True,
+                position_x=0.9,  # Right side
+                position_y=0.25,
+                width=0.05,
+                height=0.5,
+                title_font_size=14,
+                label_font_size=8,
+            )
+
+            # Final adjustments
+            plotter.reset_camera()
+            plotter.show()  # Native rendering
+
+        except AttributeError as e:
+            print(
+                f"Error: DataFrame might be missing required columns ({column1}, {column2}): {e}"
+            )
+        except ValueError as e:
+            print(f"Error: Invalid parameter value: {e}")
+
+        return
+
+    # End of file
