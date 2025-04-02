@@ -7,6 +7,8 @@ CONDA ?= conda
 MESS = $(VERS)
 DEVNAME = ppydev
 OS_NAME := $(shell uname -s)
+# Repository location (can be overridden)
+REPO_DIR ?= $(shell pwd)
 
 ifeq ($(OS_NAME), Darwin)
     RM := rm -rf
@@ -129,10 +131,19 @@ commit:
 	git commit -a -m $(MESS)
 	git push origin
 
-tests: 
+tests:
+ifeq ($(OS_NAME), Linux)
+	@echo "Running tests on Linux from outside repository..."
+	@mkdir -p /tmp/proteusPy_test_run
+	@cd /tmp/proteusPy_test_run && python -m pytest $(REPO_DIR)/tests
+	@python $(REPO_DIR)/tests/test_DisplaySS.py
+	@python $(REPO_DIR)/proteusPy/DisulfideClasses.py
+	@rm -rf /tmp/proteusPy_test_run
+else
 	pytest .
 	python tests/test_DisplaySS.py
 	python proteusPy/DisulfideClasses.py
+endif
 
 docker: viewer/rcsb_viewer.py viewer/dockerfile
 	docker build -t rcsb_viewer viewer/ --no-cache
