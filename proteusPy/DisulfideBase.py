@@ -2180,7 +2180,7 @@ class Disulfide:
 
         >>> tot = low_energy_neighbors.length
         >>> print(f'Neighbors: {tot}')
-        Neighbors: 9
+        Neighbors: 8
         >>> low_energy_neighbors.display_overlay(light="auto")
 
         """
@@ -2210,55 +2210,60 @@ class Disulfide:
         self.n_next_dist += translation_vector
         self._compute_local_coords()
 
+    @staticmethod
+    def disulfide_energy_function(x: list) -> float:
+        """
+        Compute the approximate torsional energy (kcal/mpl) for the input dihedral angles.
+
+        :param x: A list of dihedral angles: [chi1, chi2, chi3, chi4, chi5]
+        :return: Energy in kcal/mol
+
+        Example:
+        >>> from proteusPy.Disulfide import disulfide_energy_function
+        >>> import numpy as np
+        >>> dihed = [-60.0, -60.0, -90.0, -60.0, -90.0]
+        >>> res = disulfide_energy_function(dihed)
+        >>> float(res)
+        2.5999999999999996
+        """
+
+        chi1, chi2, chi3, chi4, chi5 = x
+        energy = 2.0 * (np.cos(np.deg2rad(3.0 * chi1)) + np.cos(np.deg2rad(3.0 * chi5)))
+        energy += np.cos(np.deg2rad(3.0 * chi2)) + np.cos(np.deg2rad(3.0 * chi4))
+        energy += (
+            3.5 * np.cos(np.deg2rad(2.0 * chi3))
+            + 0.6 * np.cos(np.deg2rad(3.0 * chi3))
+            + 10.1
+        )
+        return energy
+
+    @staticmethod
+    def minimize_ss_energy(inputSS: "Disulfide"):
+        """
+        Minimizes the energy of a Disulfide object using the Nelder-Mead optimization method.
+
+        Parameters:
+            inputSS (Disulfide): The Disulfide object to be minimized.
+
+        Returns:
+            Disulfide: The minimized Disulfide object.
+
+        """
+
+        initial_guess = inputSS.torsion_array
+        result = minimize(
+            Disulfide.disulfide_energy_function, initial_guess, method="Nelder-Mead"
+        )
+        minimum_conformation = result.x
+        modelled_min = Disulfide("minimized", torsions=minimum_conformation)
+        difference = inputSS.torsion_distance(modelled_min)
+        print(f"Torsion Distance: {difference:.2f} degrees")
+        print(f"Energy: {result.fun:.2f} kcal/mol")
+        print(f"Conformation: {minimum_conformation}")
+        return modelled_min
+
 
 # Class defination ends
-
-
-def disulfide_energy_function(x: list) -> float:
-    """
-    Compute the approximate torsional energy (kcal/mpl) for the input dihedral angles.
-
-    :param x: A list of dihedral angles: [chi1, chi2, chi3, chi4, chi5]
-    :return: Energy in kcal/mol
-
-    Example:
-    >>> from proteusPy import disulfide_energy_function
-    >>> dihed = [-60.0, -60.0, -90.0, -60.0, -90.0]
-    >>> res = disulfide_energy_function(dihed)
-    >>> float(res)
-    2.5999999999999996
-    """
-
-    chi1, chi2, chi3, chi4, chi5 = x
-    energy = 2.0 * (np.cos(np.deg2rad(3.0 * chi1)) + np.cos(np.deg2rad(3.0 * chi5)))
-    energy += np.cos(np.deg2rad(3.0 * chi2)) + np.cos(np.deg2rad(3.0 * chi4))
-    energy += (
-        3.5 * np.cos(np.deg2rad(2.0 * chi3))
-        + 0.6 * np.cos(np.deg2rad(3.0 * chi3))
-        + 10.1
-    )
-    return energy
-
-
-def minimize_ss_energy(inputSS: Disulfide) -> Disulfide:
-    """
-    Minimizes the energy of a Disulfide object using the Nelder-Mead optimization method.
-
-    Parameters:
-        inputSS (Disulfide): The Disulfide object to be minimized.
-
-    Returns:
-        Disulfide: The minimized Disulfide object.
-
-    """
-
-    initial_guess = inputSS.torsion_array
-    result = minimize(disulfide_energy_function, initial_guess, method="Nelder-Mead")
-    minimum_conformation = result.x
-    modelled_min = Disulfide("minimized", minimum_conformation)
-    # modelled_min.dihedrals = minimum_conformation
-    # modelled_min.build_yourself()
-    return modelled_min
 
 
 if __name__ == "__main__":

@@ -61,12 +61,7 @@ from .atoms import (
     SPEC_POWER,
     SPECULARITY,
 )
-from .DisulfideBase import (
-    Disulfide,
-    DisulfideList,
-    disulfide_energy_function,
-    minimize_ss_energy,
-)
+from .DisulfideBase import Disulfide, DisulfideList
 from .DisulfideClasses import (
     angle_within_range,
     filter_by_percentage,
