@@ -641,8 +641,8 @@ class DisulfideClassGenerator:
         movie: bool = False,
         fname: str = "ss_overlay.png",
         dpi: int = 300,
-        winsize: tuple = None,
-        light: str = None,
+        winsize: tuple = (800, 600),
+        light: str = "auto",
         **kwargs,
     ) -> None:
         """
