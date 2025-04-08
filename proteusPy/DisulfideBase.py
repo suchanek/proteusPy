@@ -9,7 +9,7 @@ a physical disulfide bond either extracted from the RCSB protein databank or bui
 This work is based on the original C/C++ implementation by Eric G. Suchanek.
 
 Author: Eric G. Suchanek, PhD
-Last Modification: 2025-02-21 16:33:47f
+Last Modification: 2025-04-08 19:15:45
 """
 
 # pylint: disable=W1203 # use of print
@@ -1336,7 +1336,10 @@ class Disulfide:
 
     def _calculate_dse(self) -> float:
         """
-        Calculate Disulfide Energy (DSE) in kJ/mol based on chi angles.
+        Calculate Disulfide Energy (DSE) in kJ/mol based on chi angles. From Hogg et al.
+        Note that this function has an additional 3-fold term for chi3. This would be used
+        in assessing non-covalent free sulfhydryls, i.e. CYS. It is not used directly in
+        calculating the torsional energy of the disulfide bond in proteusPy.
 
         Returns:
         float: DSE value in kJ/mol
@@ -1353,7 +1356,7 @@ class Disulfide:
             + 4.18 * (1 + math.cos(3 * chi2))
             + 4.18 * (1 + math.cos(3 * chi4))
             + 14.64 * (1 + math.cos(2 * chi3))
-            + 2.51 * (1 + math.cos(3 * chi3))
+            + 2.51 * (1 + math.cos(3 * chi3))  # additional 3-fold term for free CYS.
         )
 
         return dse
