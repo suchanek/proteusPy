@@ -1,10 +1,11 @@
-import numpy as np
 from scipy.optimize import minimize
 
 from proteusPy import Disulfide, Load_PDB_SS
 
+# pylint disable=W0212
 
-def minimize_standard_energy(initial_conformation=[-60, -60, -90, -60, -60]):
+
+def minimize_standard_energy(initial_conformation=None):
     """
     Minimizes the standard energy (kcal/mol) of a Disulfide object using the Nelder-Mead optimization method.
 
@@ -15,6 +16,8 @@ def minimize_standard_energy(initial_conformation=[-60, -60, -90, -60, -60]):
     Returns:
         Disulfide: The minimized Disulfide object with optimal conformation
     """
+    if initial_conformation is None:
+        initial_conformation = [-60, -60, -90, -60, -60]
 
     def objective_function(x):
         """Calculate standard energy for given dihedral angles"""
@@ -33,7 +36,7 @@ def minimize_standard_energy(initial_conformation=[-60, -60, -90, -60, -60]):
     return minimized_ss
 
 
-def minimize_dse_energy(initial_conformation=[-60, -60, -90, -60, -60]):
+def minimize_dse_energy(initial_conformation=None):
     """
     Minimizes the DSE energy of a Disulfide object using the Nelder-Mead optimization method.
 
@@ -44,6 +47,8 @@ def minimize_dse_energy(initial_conformation=[-60, -60, -90, -60, -60]):
     Returns:
         Disulfide: The minimized Disulfide object with optimal conformation
     """
+    if initial_conformation is None:
+        initial_conformation = [-60, -60, -90, -60, -60]
 
     def objective_function(x):
         """Calculate DSE energy for given dihedral angles"""
