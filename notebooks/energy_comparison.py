@@ -35,40 +35,92 @@ def calculate_energy_components(chi1, chi2, chi3, chi4, chi5):
 # Create angle range for visualization
 angles = np.linspace(-180, 180, 360)
 
-# Calculate energy components across angle range
-chi_test = 0  # Fix other angles at 0 for visualization
-components_by_angle = {
-    angle: calculate_energy_components(angle, chi_test, chi_test, chi_test, chi_test)
-    for angle in angles
-}
+# Calculate energy components across angle range for each chi angle
+# We'll vary one angle at a time while keeping others at 0
+components_by_chi = {}
 
-# Extract components for plotting
-std_chi1_chi5 = [
-    components[0]["chi1_chi5"] for components in components_by_angle.values()
-]
-dse_chi1_chi5 = [
-    components[1]["chi1_chi5"] for components in components_by_angle.values()
-]
+for chi_to_vary in range(1, 6):
+    components_by_chi[f"chi{chi_to_vary}"] = []
+    for angle in angles:
+        # Set up the chi angles
+        chi1, chi2, chi3, chi4, chi5 = [0.0] * 5
+        if chi_to_vary == 1:
+            chi1 = angle
+        elif chi_to_vary == 2:
+            chi2 = angle
+        elif chi_to_vary == 3:
+            chi3 = angle
+        elif chi_to_vary == 4:
+            chi4 = angle
+        else:  # chi_to_vary == 5
+            chi5 = angle
 
-# Create figure with two subplots
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10))
+        # Get components
+        std_components, dse_components = calculate_energy_components(
+            chi1, chi2, chi3, chi4, chi5
+        )
+        components_by_chi[f"chi{chi_to_vary}"].append((std_components, dse_components))
+
+# Create figure with two rows for each energy model
+fig, axs = plt.subplots(2, 1, figsize=(12, 10))
+
+# Color map for different components
+colors = ["blue", "red", "green", "orange", "purple"]
+line_styles = ["-", "--", ":", "-."]
 
 # Plot standard energy components
-ax1.plot(angles, std_chi1_chi5, label="chi1+chi5 term", color="blue")
+ax1 = axs[0]
+for i, component_name in enumerate(["chi1_chi5", "chi2_chi4", "chi3", "constant"]):
+    for chi_idx, chi_name in enumerate(
+        ["chi1", "chi3", "chi5"]
+    ):  # Select a few key chi angles to avoid clutter
+        if chi_idx > 0 and component_name == "constant":
+            continue  # Skip constant for duplicate plots
+
+        values = [
+            components_by_chi[chi_name][j][0][component_name]
+            for j in range(len(angles))
+        ]
+        ax1.plot(
+            angles,
+            values,
+            label=f"{component_name} ({chi_name} varied)",
+            color=colors[i % len(colors)],
+            linestyle=line_styles[chi_idx % len(line_styles)],
+        )
+
 ax1.axhline(y=0, color="k", linestyle="--", alpha=0.3)
 ax1.set_title("Standard Energy Components (kcal/mol)")
 ax1.set_xlabel("Angle (degrees)")
 ax1.set_ylabel("Energy (kcal/mol)")
-ax1.legend()
+ax1.legend(loc="upper right", bbox_to_anchor=(1.15, 1))
 ax1.grid(True, alpha=0.3)
 
 # Plot DSE components
-ax2.plot(angles, dse_chi1_chi5, label="chi1+chi5 term", color="red")
+ax2 = axs[1]
+for i, component_name in enumerate(
+    ["chi1_chi5", "chi2_chi4", "chi3_2fold", "chi3_3fold"]
+):
+    for chi_idx, chi_name in enumerate(
+        ["chi1", "chi3", "chi5"]
+    ):  # Select a few key chi angles to avoid clutter
+        values = [
+            components_by_chi[chi_name][j][1][component_name]
+            for j in range(len(angles))
+        ]
+        ax2.plot(
+            angles,
+            values,
+            label=f"{component_name} ({chi_name} varied)",
+            color=colors[i % len(colors)],
+            linestyle=line_styles[chi_idx % len(line_styles)],
+        )
+
 ax2.axhline(y=0, color="k", linestyle="--", alpha=0.3)
 ax2.set_title("DSE Components (kJ/mol)")
 ax2.set_xlabel("Angle (degrees)")
 ax2.set_ylabel("Energy (kJ/mol)")
-ax2.legend()
+ax2.legend(loc="upper right", bbox_to_anchor=(1.15, 1))
 ax2.grid(True, alpha=0.3)
 
 plt.tight_layout()
@@ -130,7 +182,7 @@ print("Standard Energy Function (kJ/mol):")
 print(f"  Min: {energies_kcal_kj.min():.2f}")
 print(f"  Max: {energies_kcal_kj.max():.2f}")
 print(f"  Mean: {energies_kcal_kj.mean():.2f}")
-print(f"\nDSE Function (kJ/mol):")
+print("\nDSE Function (kJ/mol):")
 print(f"  Min: {energies_kj.min():.2f}")
 print(f"  Max: {energies_kj.max():.2f}")
 print(f"  Mean: {energies_kj.mean():.2f}")

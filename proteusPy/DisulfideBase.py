@@ -26,6 +26,7 @@ Last Modification: 2025-04-08 19:15:45
 
 
 import copy
+import itertools
 import logging
 import math
 from collections import UserList
@@ -242,15 +243,14 @@ class DisulfideList(UserList):
     def average_distance(self):
         """Average distance (Å) between all atoms in the list"""
         sslist = self.data
-        cnt = 1
         total = 0.0
-        for ss1 in sslist:
-            for ss2 in sslist:
-                if ss2 == ss1:
-                    continue
-                total += ss1.Distance_RMS(ss2)
-                cnt += 1
-        return total / cnt
+        cnt = 0
+
+        for ss1, ss2 in itertools.combinations(sslist, 2):
+            total += ss1.Distance_RMS(ss2)
+            cnt += 1
+
+        return total / cnt if cnt > 0 else 0.0
 
     @property
     def average_energy(self):
@@ -295,13 +295,13 @@ class DisulfideList(UserList):
         return total_cofmass / tot
 
     @property
-    def min(self) -> "Disulfide":
+    def _min(self) -> "Disulfide":
         """Return Disulfide with the minimum energy"""
         sslist = sorted(self.data)
         return sslist[0]
 
     @property
-    def max(self) -> "Disulfide":
+    def _max(self) -> "Disulfide":
         """Return Disulfide with the maximum energy"""
         sslist = sorted(self.data)
         return sslist[-1]
