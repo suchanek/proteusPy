@@ -1344,6 +1344,10 @@ class Disulfide:
         Returns:
         float: DSE value in kJ/mol
         """
+
+        def torad(deg):
+            return np.radians(deg)
+
         torsions = self.torsion_array
         chi1 = torsions[0]
         chi2 = torsions[1]
@@ -1351,12 +1355,12 @@ class Disulfide:
         chi4 = torsions[3]
         chi5 = torsions[4]
         dse = (
-            8.37 * (1 + math.cos(3 * chi1))
-            + 8.37 * (1 + math.cos(3 * chi5))
-            + 4.18 * (1 + math.cos(3 * chi2))
-            + 4.18 * (1 + math.cos(3 * chi4))
-            + 14.64 * (1 + math.cos(2 * chi3))
-            + 2.51 * (1 + math.cos(3 * chi3))  # additional 3-fold term for free CYS.
+            8.37 * (1 + math.cos(3 * torad(chi1)))
+            + 8.37 * (1 + math.cos(3 * torad(chi5)))
+            + 4.18 * (1 + math.cos(3 * torad(chi2)))
+            + 4.18 * (1 + math.cos(3 * torad(chi4)))
+            + 14.64 * (1 + math.cos(2 * torad(chi3)))
+            + 2.51 * (1 + math.cos(3 * torad(chi3)))
         )
 
         return dse
