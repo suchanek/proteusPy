@@ -1,3 +1,48 @@
+"""
+DisulfideEnergy.py - Energy calculation and analysis for disulfide bonds
+
+This module provides a specialized class for calculating, analyzing, and visualizing
+energy components in disulfide bonds. It serves as an extension to the DisulfideBase
+functionality by providing more detailed energy decomposition capabilities.
+
+The DisulfideEnergy class calculates two different energy models:
+1. Standard Energy (kcal/mol): The classical energy function used in the Disulfide class
+2. DSE (Disulfide Strain Energy) (kJ/mol): An alternative energy function with different components
+
+Key features:
+- Calculates individual energy components contributing to disulfide bond stability
+- Provides detailed energy breakdowns for analysis and comparison
+- Converts between energy units (kcal/mol and kJ/mol)
+- Creates energy component plots showing contributions across dihedral angle ranges
+- Generates surface plots to visualize energy landscapes across two chi angles
+
+Usage examples:
+    # Create an energy model with specific chi angles
+    energy = DisulfideEnergy(-60, -60, -85, -60, -60)  # Left-Handed Spiral conformation
+
+    # Get energy values
+    print(f"Standard energy: {energy.standard_energy} kcal/mol")
+    print(f"DSE energy: {energy.dse_energy} kJ/mol")
+
+    # Display detailed energy component breakdown
+    print(energy.summary())
+
+    # Visualize energy components across a range of chi3 values
+    energy.plot_energy_components_scan(angle_to_vary=3,
+                                      filename="energy_scan.png",
+                                      colorblind_friendly=True)
+
+    # Create a surface plot varying chi2 and chi3
+    DisulfideEnergy.create_surface_plot(chi_indices=(2, 3))
+
+Author: Eric G. Suchanek, PhD
+Last Revision: 2025-04-16 18:23:33
+License: BSD
+"""
+
+# pylint: disable=C0301
+# pylint: disable=C0103
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -127,12 +172,12 @@ class DisulfideEnergy:
         """
         # DSE components (kJ/mol)
         dse_components = {
-            "chi1_chi5": 8.37 * (1 + np.cos(3 * self._torad(self._chi1)))
-            + 8.37 * (1 + np.cos(3 * self._torad(self._chi5))),
-            "chi2_chi4": 4.18 * (1 + np.cos(3 * self._torad(self._chi2)))
-            + 4.18 * (1 + np.cos(3 * self._torad(self._chi4))),
-            "chi3_2fold": 14.64 * (1 + np.cos(2 * self._torad(self._chi3))),
-            "chi3_3fold": 2.51 * (1 + np.cos(3 * self._torad(self._chi3))),
+            "chi1_chi5": 8.37 * (1 + np.cos(self._torad(3 * self._chi1)))
+            + 8.37 * (1 + np.cos(self._torad(3 * self._chi5))),
+            "chi2_chi4": 4.18 * (1 + np.cos(self._torad(3 * self._chi2)))
+            + 4.18 * (1 + np.cos(self._torad(3 * self._chi4))),
+            "chi3_2fold": 14.64 * (1 + np.cos(self._torad(2 * self._chi3))),
+            "chi3_3fold": 2.51 * (1 + np.cos(self._torad(3 * self._chi3))),
             "constant": 0.0,
         }
         return dse_components
@@ -306,6 +351,7 @@ class DisulfideEnergy:
             "chi2_chi4": [],
             "chi3_2fold": [],
             "chi3_3fold": [],
+            "constant": [],
             "total": [],
         }
 
@@ -320,16 +366,16 @@ class DisulfideEnergy:
 
             # Get standard components
             std = self.calculate_standard_components()
-            for key in std_components.keys():
+            for key, value in std.items():
                 if key != "total":
-                    std_components[key].append(std.get(key, 0))
+                    std_components[key].append(value)
             std_components["total"].append(self.standard_energy)
 
             # Get DSE components (convert to kcal/mol for consistency)
             dse = self.calculate_dse_components_kcal()
-            for key in dse_components.keys():
+            for key, value in dse.items():
                 if key != "total":
-                    dse_components[key].append(dse.get(key, 0))
+                    dse_components[key].append(value)
             dse_components["total"].append(self.dse_energy_kcal)
 
         # Create colorblind-friendly palette if requested
@@ -428,3 +474,233 @@ class DisulfideEnergy:
             plt.show()
 
         return fig, (ax1, ax2)
+
+    def plot_energy_components_all_angles(
+        self,
+        angle_range=None,
+        fixed_angles=None,
+        filename=None,
+        colorblind_friendly=True,
+        show_plot=True,
+    ):
+        """
+        Create a single plot showing energy components across all 5 dihedral angles.
+
+        This function calls plot_energy_components_scan for each dihedral angle and
+        combines the results into a single figure with two subplots (standard and DSE energy).
+
+        :param angle_range: The range of angles to plot. Default is (-180, 180) with 90 points.
+        :type angle_range: tuple or list or ndarray or None
+        :param fixed_angles: List of 5 chi angles [chi1, chi2, chi3, chi4, chi5] to use as fixed values.
+                            Any None value will be set to the current corresponding angle in self.dihedrals.
+        :type fixed_angles: list or None
+        :param filename: If provided, save the plot to this filename
+        :type filename: str or None
+        :param colorblind_friendly: If True, use a colorblind-friendly palette
+        :type colorblind_friendly: bool
+        :param show_plot: If True (default), display the plot
+        :type show_plot: bool
+        :return: (figure, axes), the matplotlib figure and axes objects
+        :rtype: tuple
+        """
+        # Set up angle range
+        if angle_range is None:
+            angle_range = np.linspace(-180, 180, 90)
+
+        # Set up fixed angles
+        if fixed_angles is None:
+            fixed_angles = list(self.dihedrals)  # Use current dihedrals as default
+        else:
+            # Fill in any None values from current dihedrals
+            for i in range(5):
+                if fixed_angles[i] is None:
+                    fixed_angles[i] = self.dihedrals[i]
+
+        # Create a master figure with 5 rows and 2 columns
+        # Each row will contain the plots for one chi angle
+        master_fig = plt.figure(figsize=(12, 25))
+
+        # Create a 5x2 grid for the subplots
+        gs = master_fig.add_gridspec(5, 2)
+
+        # Lists to store all axes for later reference
+        all_axes = []
+
+        # For each dihedral angle
+        for i in range(1, 6):
+            # Calculate the row for this chi angle (0-based)
+            row = i - 1
+
+            # Create a temporary copy of the current object
+            temp_energy = DisulfideEnergy(*self.dihedrals)
+
+            # Get the energy components for this angle
+            temp_fig, (temp_ax1, temp_ax2) = temp_energy.plot_energy_components_scan(
+                angle_to_vary=i,
+                angle_range=angle_range,
+                fixed_angles=fixed_angles,
+                filename=None,  # Don't save individual plots
+                colorblind_friendly=colorblind_friendly,
+                show_plot=False,  # Don't show individual plots
+            )
+
+            # Create new axes in the master figure
+            ax1 = master_fig.add_subplot(gs[row, 0])  # Standard energy plot
+            ax2 = master_fig.add_subplot(gs[row, 1])  # DSE energy plot
+
+            # Copy the contents from the temporary axes to the master figure axes, excluding the "constant" line
+            for line in temp_ax1.get_lines():
+                if line.get_label() != "constant":  # Skip the constant line
+                    ax1.plot(
+                        line.get_xdata(),
+                        line.get_ydata(),
+                        label=line.get_label(),
+                        color=line.get_color(),
+                        linestyle=line.get_linestyle(),
+                        linewidth=line.get_linewidth(),
+                        alpha=line.get_alpha() if line.get_alpha() is not None else 1.0,
+                    )
+
+            for line in temp_ax2.get_lines():
+                if line.get_label() != "constant":  # Skip the constant line
+                    ax2.plot(
+                        line.get_xdata(),
+                        line.get_ydata(),
+                        label=line.get_label(),
+                        color=line.get_color(),
+                        linestyle=line.get_linestyle(),
+                        linewidth=line.get_linewidth(),
+                        alpha=line.get_alpha() if line.get_alpha() is not None else 1.0,
+                    )
+
+            # Copy titles and labels
+            ax1.set_title(f"Standard Energy - Chi{i} varied (kcal/mol)")
+            ax2.set_title(f"DSE Energy - Chi{i} varied (kcal/mol)")
+            ax1.set_ylabel("Energy (kcal/mol)")
+            ax2.set_ylabel("Energy (kcal/mol)")
+            ax1.set_xlabel("Angle (degrees)")
+            ax2.set_xlabel("Angle (degrees)")
+
+            # Add legends to individual subplots with explicit location
+            ax1.legend(loc="upper right", fontsize="small")
+            ax2.legend(loc="upper right", fontsize="small")
+
+            # Set y-axis limits for both plots to keep scales comparable
+            ax1.set_ylim(top=10.0)
+            ax2.set_ylim(top=10.0)
+
+            # Add grid
+            ax1.grid(True, alpha=0.3)
+            ax2.grid(True, alpha=0.3)
+
+            # Store the axes
+            all_axes.append((ax1, ax2))
+
+            # Close the temporary figure to free memory
+            plt.close(temp_fig)
+
+        # Adjust layout
+        plt.tight_layout()
+
+        # Save the figure if filename is provided
+        if filename:
+            plt.savefig(filename, dpi=300, bbox_inches="tight")
+
+        # Show the plot if requested
+        if show_plot:
+            plt.show()
+
+        return master_fig, all_axes
+
+    @staticmethod
+    def create_surface_plot(chi_indices=(2, 3)):
+        """
+        Create a surface plot showing energy variation with two chi angles
+
+        Parameters
+        ----------
+        chi_indices : tuple
+            Indices of the two chi angles to vary (1-based, like chi1, chi2, etc.)
+        """
+        print(
+            f"Creating surface plot for chi{chi_indices[0]} and chi{chi_indices[1]}..."
+        )
+
+        # Set default values for all chi angles
+        default_chi = [-60, -60, -85, -60, -60]  # Spiral conformation
+
+        # Create a grid of values for the two selected chi angles
+        angle_range = np.linspace(-180, 180, 60)
+        x, y = np.meshgrid(angle_range, angle_range)
+
+        # Arrays to store energy values
+        z_standard = np.zeros_like(x)
+        z_dse = np.zeros_like(x)
+
+        # Calculate energy for each combination of angles
+        for i in range(x.shape[0]):
+            for j in range(x.shape[1]):
+                # Create a copy of the default chi values
+                chi_values = default_chi.copy()
+
+                # Update the chi values being varied
+                chi_values[chi_indices[0] - 1] = x[i, j]
+                chi_values[chi_indices[1] - 1] = y[i, j]
+
+                # Calculate energy
+                energy = DisulfideEnergy(*chi_values)
+                z_standard[i, j] = energy.standard_energy
+                z_dse[i, j] = energy.dse_energy_kcal
+
+        # Create the surface plot
+        fig = plt.figure(figsize=(18, 8))
+
+        # Standard energy surface
+        ax1 = fig.add_subplot(1, 2, 1, projection="3d")
+        surf1 = ax1.plot_surface(
+            x, y, z_standard, cmap="viridis", linewidth=0, antialiased=True, alpha=0.8
+        )
+
+        ax1.set_title(
+            f"Standard Energy (kcal/mol) - chi{chi_indices[0]} vs chi{chi_indices[1]}"
+        )
+        ax1.set_xlabel(f"Chi{chi_indices[0]} (degrees)")
+        ax1.set_ylabel(f"Chi{chi_indices[1]} (degrees)")
+        ax1.set_zlabel("Energy (kcal/mol)")
+        fig.colorbar(surf1, ax=ax1, shrink=0.5, aspect=10, pad=0.1)
+
+        # DSE energy surface
+        ax2 = fig.add_subplot(1, 2, 2, projection="3d")
+        surf2 = ax2.plot_surface(
+            x, y, z_dse, cmap="plasma", linewidth=0, antialiased=True, alpha=0.8
+        )
+
+        ax2.set_title(
+            f"DSE Energy (kcal/mol) - chi{chi_indices[0]} vs chi{chi_indices[1]}"
+        )
+        ax2.set_xlabel(f"Chi{chi_indices[0]} (degrees)")
+        ax2.set_ylabel(f"Chi{chi_indices[1]} (degrees)")
+        ax2.set_zlabel("Energy (kcal/mol)")
+        fig.colorbar(surf2, ax=ax2, shrink=0.5, aspect=10, pad=0.1)
+
+        plt.tight_layout()
+        plt.savefig(
+            f"energy_surface_chi{chi_indices[0]}_chi{chi_indices[1]}.png",
+            dpi=300,
+            bbox_inches="tight",
+        )
+        plt.show()
+
+
+# class ends
+
+
+if __name__ == "__main__":
+    disulfide_energy = DisulfideEnergy(chi1=60, chi2=-60, chi3=-85, chi4=-60, chi5=-60)
+    print(disulfide_energy)
+    print(disulfide_energy.summary())
+    disulfide_energy.plot_energy_components_scan(angle_to_vary=3)
+    disulfide_energy.create_surface_plot(chi_indices=(2, 3))
+
+
+# end of file
