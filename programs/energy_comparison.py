@@ -1,36 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from proteusPy.DisulfideBase import Disulfide
-
-
-def calculate_energy_components(chi1, chi2, chi3, chi4, chi5):
-    """Calculate individual components of both energy functions"""
-
-    # Convert to radians for direct calculation
-    def torad(deg):
-        return np.deg2rad(deg)
-
-    # Standard energy components (kcal/mol)
-    std_components = {
-        "chi1_chi5": 2.0 * (np.cos(torad(3.0 * chi1)) + np.cos(torad(3.0 * chi5))),
-        "chi2_chi4": np.cos(torad(3.0 * chi2)) + np.cos(torad(3.0 * chi4)),
-        "chi3": 3.5 * np.cos(torad(2.0 * chi3)) + 0.6 * np.cos(torad(3.0 * chi3)),
-        "constant": 10.1,
-    }
-
-    # DSE components (kJ/mol)
-    dse_components = {
-        "chi1_chi5": 8.37
-        * ((1 + np.cos(3 * torad(chi1))) + (1 + np.cos(3 * torad(chi5)))),
-        "chi2_chi4": 4.18
-        * ((1 + np.cos(3 * torad(chi2))) + (1 + np.cos(3 * torad(chi4)))),
-        "chi3_2fold": 14.64 * (1 + np.cos(2 * torad(chi3))),
-        "chi3_3fold": 2.51 * (1 + np.cos(3 * torad(chi3))),
-    }
-
-    return std_components, dse_components
-
+from proteusPy import Disulfide
+from proteusPy.DisulfideEnergy import DisulfideEnergy
 
 # Create angle range for visualization
 angles = np.linspace(-180, 180, 360)
@@ -56,9 +28,9 @@ for chi_to_vary in range(1, 6):
             chi5 = angle
 
         # Get components
-        std_components, dse_components = calculate_energy_components(
-            chi1, chi2, chi3, chi4, chi5
-        )
+        energy = DisulfideEnergy(chi1, chi2, chi3, chi4, chi5)
+        std_components = energy.calculate_standard_components()
+        dse_components = energy.calculate_dse_components()
         components_by_chi[f"chi{chi_to_vary}"].append((std_components, dse_components))
 
 # Create figure with two rows for each energy model
@@ -142,6 +114,7 @@ energies_kj = np.zeros_like(chi2_vals)
 for i in range(chi2_vals.shape[0]):
     for j in range(chi2_vals.shape[1]):
         for k in range(chi2_vals.shape[2]):
+            # Use Disulfide for standard energy
             ss = Disulfide("test")
             ss.dihedrals = [
                 chi1,
@@ -150,8 +123,17 @@ for i in range(chi2_vals.shape[0]):
                 chi4_vals[i, j, k],
                 chi5,
             ]
-            energies_kcal[i, j, k] = ss.energy
-            energies_kj[i, j, k] = ss.TorsionEnergyKJ
+            energies_kcal[i, j, k] = ss.TorsionEnergy
+            
+            # Use DisulfideEnergy for DSE energy
+            ss_energy = DisulfideEnergy(
+                chi1,
+                chi2_vals[i, j, k],
+                chi3_vals[i, j, k],
+                chi4_vals[i, j, k],
+                chi5
+            )
+            energies_kj[i, j, k] = ss_energy.dse_energy
 
 # Convert standard energy to kJ/mol for comparison
 energies_kcal_kj = energies_kcal * 4.184
