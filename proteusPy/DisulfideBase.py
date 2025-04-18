@@ -1130,9 +1130,9 @@ class Disulfide:
         self.chi4 = dihedrals[3]
         self.chi5 = dihedrals[4]
         self.torsion_array = np.array(dihedrals)
-        self._compute_torsional_energy()
-        self._compute_torsion_length()
-        self._compute_rho()
+        self.energy = self._compute_torsional_energy()
+        self.torsion_length = self._compute_torsion_length()
+        self.rho = self._compute_rho()
 
     def bounding_box(self) -> np.array:
         """
@@ -1237,10 +1237,10 @@ class Disulfide:
         self.n_dist = n
         self.ca_dist = ca
         self.c_dist = c
-        self._compute_torsional_energy()
+        self.energy = self._compute_torsional_energy()
         self._compute_local_coords()
-        self._compute_torsion_length()
-        self._compute_rho()
+        self.torsion_length = self._compute_torsion_length()
+        self.rho = self._compute_rho()
         self.ca_distance = distance3d(self.ca_prox, self.ca_dist)
         self.cb_distance = distance3d(self.cb_prox, self.cb_dist)
         self.sg_distance = distance3d(self.sg_prox, self.sg_dist)
