@@ -5,7 +5,7 @@ convey logging information at a fine-grained level. The functions are completely
 independent of the application and can be used in any Python project.
 
 Author: Eric G. Suchanek, PhD
-Last updated 2025-02-19 23:43:45 -egs-
+Last updated 2025-04-25 09:43:43 -egs-
 """
 
 import logging
@@ -69,7 +69,7 @@ def disable_stream_handlers_for_namespace(namespace: str):
 
 def configure_master_logger(
     log_file: str,
-    file_path: str = "./logs",
+    file_path: str = "~/logs",
     log_level: int = logging.ERROR,
     disabled: bool = False,
 ) -> None:
@@ -226,13 +226,7 @@ def toggle_stream_handler(name, enable):
             stream_handler.setLevel(logger.level)
             stream_handler.setFormatter(formatter)
 
-            # Explicitly set the formatter for RichHandler
-            rich_handler = RichHandler(rich_tracebacks=True)
-            rich_formatter = logging.Formatter(
-                "proteusPy: %(levelname)s %(asctime)s - %(name)s.%(funcName)s - %(message)s"
-            )
-            rich_handler.setFormatter(rich_formatter)
-            logger.addHandler(rich_handler)
+            logger.addHandler(stream_handler)
     else:
         if stream_handler is not None:
             # Remove the existing StreamHandler
