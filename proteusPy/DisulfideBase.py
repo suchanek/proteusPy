@@ -2229,7 +2229,7 @@ class Disulfide:
         >>> from proteusPy.Disulfide import disulfide_energy_function
         >>> import numpy as np
         >>> dihed = [-60.0, -60.0, -90.0, -60.0, -90.0]
-        >>> res = disulfide_energy_function(dihed)
+        >>> res = Disulfide.disulfide_energy_function(dihed)
         >>> float(res)
         2.5999999999999996
         """
@@ -2259,7 +2259,7 @@ class Disulfide:
 
         initial_guess = inputSS.torsion_array
         result = minimize(
-            Disulfide.disulfide_energy_function, initial_guess, method="Nelder-Mead"
+            Disulfide.disulfide_energy_function, initial_guess, method="Nelder-Mead", options={'disp': True}
         )
         minimum_conformation = result.x
         modelled_min = Disulfide("minimized", torsions=minimum_conformation)
