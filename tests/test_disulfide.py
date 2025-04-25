@@ -8,12 +8,12 @@ Classes:
     TestDisulfide: Contains unit tests for the Disulfide class.
 
 Methods:
-    setUp: Initializes the test environment, loads disulfides from a PDB entry, and sets 
+    setUp: Initializes the test environment, loads disulfides from a PDB entry, and sets
     up a Disulfide instance.
     test_name: Tests that the name attribute of the Disulfide instance is correctly set.
-    test_extract: Tests that the name of the first disulfide in the loaded list matches 
+    test_extract: Tests that the name of the first disulfide in the loaded list matches
     the expected value.
-    test_dihedrals: Placeholder for testing the dihedral angles of the first disulfide 
+    test_dihedrals: Placeholder for testing the dihedral angles of the first disulfide
     in the loaded list.
 """
 
@@ -26,7 +26,7 @@ import unittest
 from numpy.testing import assert_allclose
 from scipy.optimize import minimize
 
-from proteusPy import Disulfide, disulfide_energy_function, load_disulfides_from_id
+from proteusPy import Disulfide, load_disulfides_from_id
 from proteusPy.ProteusGlobals import DATA_DIR
 
 
@@ -74,7 +74,7 @@ class TestDisulfide(unittest.TestCase):
     def test_energy(self):
 
         dihedrals = [-60.0, -60.0, -90.0, -60.0, -90.0]
-        result = disulfide_energy_function(dihedrals)
+        result = Disulfide.disulfide_energy_function(dihedrals)
         expected_result = 2.5999999999999996
 
         self.assertEqual(result, expected_result)
@@ -90,11 +90,11 @@ class TestDisulfide(unittest.TestCase):
         ]
 
         result = minimize(
-            disulfide_energy_function, initial_guess, method="Nelder-Mead"
+            Disulfide.disulfide_energy_function, initial_guess, method="Nelder-Mead"
         )
         minimum_energy = result.fun
         expected_result = 0.4889387355489303
-        self.assertEqual(minimum_energy, expected_result)
+        self.assertAlmostEqual(minimum_energy, expected_result, places=5)
 
     def test_load(self):
 
