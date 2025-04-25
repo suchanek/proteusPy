@@ -90,11 +90,6 @@ def configure_master_logger(
     handler.setLevel(log_level)
     root_logger.addHandler(handler)
 
-    # Ensure no StreamHandlers are present
-    for handler in root_logger.handlers[:]:
-        if isinstance(handler, logging.StreamHandler):
-            root_logger.removeHandler(handler)
-
     root_logger.disabled = disabled
 
 
