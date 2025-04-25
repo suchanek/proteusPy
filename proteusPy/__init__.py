@@ -45,8 +45,6 @@ logging.basicConfig(level=logging.CRITICAL)
 # Suppress findfont debug messages
 logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
 
-# Create a logger for the package itself. __name__ is the package name, proteusPy
-_logger = logging.getLogger(__name__)
 
 from ._version import __version__
 from .angle_annotation import AngleAnnotation, plot_angle
@@ -187,16 +185,20 @@ from .vector3D import (
 set_plotly_theme(theme="auto")
 set_pyvista_theme(theme="auto")
 
+# Create a logger for the package itself. __name__ is the package name, proteusPy
+
+_logger = create_logger(__name__)
+configure_master_logger("proteusPy.log", disabled=True)
+
 
 def describe():
     """
     Describe the proteusPy package.
     """
     set_logger_level_for_module("proteusPy", logging.INFO)
-    _logger.info("ProteusPy %s initialized.", __version__)
-    _logger.info("Plotly theme set to: %s", set_plotly_theme(theme="auto"))
-    _logger.info("PyVista theme set to: %s", set_pyvista_theme(theme="auto"))
-    _logger.info("Logging level setting to default: %s", DEFAULT_LOG_LEVEL)
+    _logger.info(
+        f"ProteusPy {__version__} initialized. Plotly theme set to: {set_plotly_theme(theme='auto')}. PyVista theme set to: {set_pyvista_theme(theme='auto')}. Logging level setting to default: {DEFAULT_LOG_LEVEL}"
+    )
     _logger.setLevel(DEFAULT_LOG_LEVEL)
     return
 
