@@ -126,6 +126,7 @@ def configure_master_logger(
 def create_logger(
     name: str,
     log_level: int = logging.INFO,
+    propagate: bool = False,
 ) -> logging.Logger:
     """
     Returns a logger with the specified name, configured to use both StreamHandler
@@ -160,7 +161,7 @@ def create_logger(
     logger.addHandler(rich_handler)
 
     # Allows log messages to propagate to the root logger
-    logger.propagate = True
+    logger.propagate = propagate
 
     return logger
 

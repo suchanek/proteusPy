@@ -187,7 +187,7 @@ set_pyvista_theme(theme="auto")
 
 # Create a logger for the package itself. __name__ is the package name, proteusPy
 
-_logger = create_logger(__name__)
+_logger = create_logger(__name__, log_level=DEFAULT_LOG_LEVEL)
 configure_master_logger("proteusPy.log", disabled=True)
 
 
