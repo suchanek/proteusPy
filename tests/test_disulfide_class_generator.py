@@ -5,7 +5,7 @@ This module contains pytest tests for the DisulfideClassGenerator class, which i
 for generating disulfide conformations for different structural classes based on CSV data.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-03-19
+Last revision: 2025-04-25 19:54:11
 """
 
 # pylint: disable=W0613
