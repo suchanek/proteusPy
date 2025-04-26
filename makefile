@@ -74,7 +74,7 @@ clean devclean:
 
 install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install dist/*.whl -q
+	pip install dist/proteuspy-$(VERS)-py3-none-any.whl -q
 	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Downloading and building the Disulfide Databases..."
 	proteusPy.bootstrapper -v
