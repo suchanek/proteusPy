@@ -73,7 +73,7 @@ clean devclean:
 
 install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install --upgrade proteusPy -q
+	pip install dist/*.whl -q
 	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Downloading and building the Disulfide Databases..."
 	proteusPy.bootstrapper -v
@@ -82,10 +82,10 @@ install:
 install_dev: bld
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	pip uninstall -y proteusPy
-	pip install dist/proteusPy-$(VERS)-py3-none-any.whl[all]  # Install specific wheel
+	pip install dist/*.whl
 	python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
 	@echo "Downloading and building the Disulfide Databases..."
-	# proteusPy.bootstrapper -v
+	proteusPy.bootstrapper -v
 	@echo "Development environment installation finished!"
 
 define jupyter-setup
