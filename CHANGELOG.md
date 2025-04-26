@@ -1,4 +1,6 @@
-# proteusPy ChangeLog
+<img src="logo.png" alt="ProteusPy Logo" style="width:25%;">
+
+# ChangeLog
 
 Notable changes to the ``proteusPy`` project will be documented in this file.
 
@@ -10,16 +12,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - ``DisulfideEnergy`` class to decompose the disulfide torsional strain calculations using the standard calculation and also the equation used by Hogg et al. in their Allosteric Disulfide Bond paper. @TODO refactor ``Disulfide`` to use this class rather than the currently built-in energy functions.
+- Moved several notebooks into the **examples/** directory.
 -
 
 ### Changed
 
 - Added ``rich`` text formatting to the logging functions, yielding more attractive log messages.
 - Cleaned up the global logging/file handling in ``logger_config.py``.
+- Enhanced the ``DisulfideLoader.summary()`` function for readability.
 
 ### Fixed
 
 - Low level bug with global logger which caused duplicate log messages.
+- Turned on translation to center of mass for visualization to center each disulfide.
+
+### Issues
+
+- ``Disulfide.spin()`` only works under MacOS. Throws a plotter error under Windows.
+-
 
 ## [v0.99.34] - 2025-04-02
 
@@ -34,16 +44,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ``display_class_disufides`` entrypoint added. This utilizes the new class to display a given
   disulfide class in a separate window using the ``DisulfideList.display_overlay()`` function.
 - ``hexbin_plot`` entrypoint added. This program creates 3D interactive plots showing dihedral angle correlations between left-handed and right-handed disulfides.
-- - ``proteusPy.DisulfideBase.Disulfide.TorsionEnergyKJ`` property and calculation to use Hogg's DSE potential function
+- ``proteusPy.DisulfideBase.Disulfide.TorsionEnergyKJ`` property and calculation to use Hogg's DSE potential function.
+- Enhanced ``DisulfideLoader`` to accept a percentile cutoff. This then calculates proper Ca and Sg distance cutoffs and applies them to the master disulfide list upon instantiation. This obviates the need for explicit Ca and Sg cutoffs.
 
-  ### Changed
+### Changed
 
-  - ``DisulfideClass_Analysis.py`` now creates the binary and octant torsion metrics
+- ``DisulfideClass_Analysis.py`` now creates the binary and octant torsion metrics
   files needed for the new ``DisulfideClassGenerator`` class. These are needed upon
   class instantiation and are bundled into the package. Note that the octant class
   metrics file will be dependent on the overall cutoff used during the program run.
   I typically use 0.04, which generates 329 overall consensus structures.
-  - Removed explicit ca and sg cutoffs from ``DisulfideLoader.Load_PDB_SS()``. Now
+- Removed explicit ca and sg cutoffs from ``DisulfideLoader.Load_PDB_SS()``. Now
   it uses percentile only.
 
 ### Fixed
