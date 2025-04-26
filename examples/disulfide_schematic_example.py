@@ -9,7 +9,6 @@ Last revision: 2025-03-03
 import os
 import sys
 
-import matplotlib.pyplot as plt
 
 # Add the parent directory to the path so we can import proteusPy
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -37,7 +36,6 @@ def main():
     worst_ss = pdb[worst_id]
 
     ss = pdb[best_id]
-
 
     pdbid = ss.pdb_id
     # Example 1: Create a schematic from a real disulfide

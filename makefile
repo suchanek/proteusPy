@@ -78,8 +78,8 @@ ifeq ($(OS_NAME), Linux)
 	pip install dist/*.whl
 else
 	pip install dist/proteuspy-$(VERS)-py3-none-any.whl[all]
-
 endif
+
 	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Downloading and building the Disulfide Databases..."
 	# proteusPy.bootstrapper -v
@@ -93,6 +93,7 @@ ifeq ($(OS_NAME), Linux)
 else
 	pip install dist/proteuspy-$(VERS)-py3-none-any.whl[all]
 endif
+
 	python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
 	@echo "Downloading and building the Disulfide Databases..."
 	proteusPy.bootstrapper -v
