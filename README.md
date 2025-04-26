@@ -204,6 +204,19 @@ This will display disulfide 75-140 in chain D and save an image to file 2q7q.png
 - Manipulating and searching through long lists of disulfides can take time. I've added progress bars for many of these operations.
 - Rendering many disulfides in `pyvista` can also take time to load and may be slow to display in real time, depending on your hardware. I added optimization to reduce cylinder complexity as a function of total cylinders rendered, but it can still be less than perfect. The faster your GPU the better!
 
+## Endpoints
+
+I have created a number of endpoints to facilitate easy access to some of the functions and visualization capabilities of ``proteusPy``:
+
+- ``proteusPy.qt5viewer`` - launches the QT5 viewer.
+- ``proteusPy.DisulfideExtractor`` - launches the main program to extract the RCSB database from the native .PDB files.
+- ``proteusPy.bootstrapper`` - bootstraps downloading the master disulfide list and building the main and subset ``DisulfideLoaders``.
+- ``proteusPy.render_disulfide_schematic`` - creates a cartoon of a specific disulfide bond.
+- ``proteusPy.display_class_disulfides`` - creates an image representing disulfides for a specific disulfide binary or octant class.
+- ``proteusPy.hexbin_plot`` - creates a 3D visualization of a hexbin plot to look at cross correlations between dihedral angles.
+
+Invoking the endpoint with ``--help`` will list the appropriate arguments.
+
 ## Contributing/Reporting
 
 I welcome anyone interested in collaborating on proteusPy! Feel free to contact me at mailto:suchanek@mac.com, fork the repository: <https://github.com/suchanek/proteusPy/> and get coding. Issues can be reported to <https://github.com/suchanek/proteusPy/issues>.
