@@ -59,7 +59,8 @@ endif
 dev:
 	@echo "Building development environment $(DEVNAME)..."
 	$(CONDA) create --name $(DEVNAME) -y python=3.12
-	pip install build 
+	$(CONDA) run -n $(DEVNAME) pip install build 
+
 ifeq ($(OS_NAME), Linux)
 	@echo "Linux detected, installing VTK..."
 	$(CONDA) install -n $(DEVNAME) vtk -y
@@ -82,7 +83,7 @@ install:
 install_dev: bld
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	pip uninstall -y proteusPy
-	pip install dist/*.whl
+	pip install dist/proteuspy$(VERS)-py3-none-any.whl
 	python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
 	@echo "Downloading and building the Disulfide Databases..."
 	proteusPy.bootstrapper -v
