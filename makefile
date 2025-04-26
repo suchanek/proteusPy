@@ -83,7 +83,7 @@ install:
 install_dev: bld
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	pip uninstall -y proteusPy
-	pip install dist/proteuspy$(VERS)-py3-none-any.whl
+	pip install dist/proteuspy-$(VERS)-py3-none-any.whl[all]
 	python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
 	@echo "Downloading and building the Disulfide Databases..."
 	proteusPy.bootstrapper -v
