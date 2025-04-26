@@ -74,16 +74,25 @@ clean devclean:
 
 install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install dist/proteuspy-$(VERS)-py3-none-any.whl -q
+ifeq ($(OS_NAME), Linux)
+	pip install dist/*.whl
+else
+	pip install dist/proteuspy-$(VERS)-py3-none-any.whl[all]
+
+endif
 	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Downloading and building the Disulfide Databases..."
-	proteusPy.bootstrapper -v
+	# proteusPy.bootstrapper -v
 	@echo "Installation finished!"
 
 install_dev: bld
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	pip uninstall -y proteusPy
+ifeq ($(OS_NAME), Linux)
+	pip install dist/*.whl
+else
 	pip install dist/proteuspy-$(VERS)-py3-none-any.whl[all]
+endif
 	python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
 	@echo "Downloading and building the Disulfide Databases..."
 	proteusPy.bootstrapper -v
