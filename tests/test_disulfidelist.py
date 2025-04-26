@@ -317,8 +317,8 @@ def test_length_property(pdb_5rsa):
 
 def test_min_max_properties(pdb_5rsa):
     """Test min and max properties"""
-    min_ss = pdb_5rsa.min
-    max_ss = pdb_5rsa.max
+    min_ss = pdb_5rsa._min
+    max_ss = pdb_5rsa._max
     assert isinstance(min_ss, Disulfide)
     assert isinstance(max_ss, Disulfide)
     assert min_ss.energy <= max_ss.energy

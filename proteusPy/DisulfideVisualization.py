@@ -1313,6 +1313,7 @@ class DisulfideVisualization:
                 pl,
                 style=style,
                 res=_res,
+                translate=True,
             )
             pl.reset_camera()
 
@@ -1690,6 +1691,7 @@ class DisulfideVisualization:
                 ss,
                 _pl,
                 style=style,
+                translate=True,
             )
             _pl.reset_camera()
             if shadows:
@@ -1709,6 +1711,7 @@ class DisulfideVisualization:
                 ss,
                 pl,
                 style="cpk",
+                translate=True,
             )
 
             pl.subplot(0, 1)
@@ -1718,6 +1721,7 @@ class DisulfideVisualization:
                 ss,
                 pl,
                 style="bs",
+                translate=True,
             )
 
             pl.subplot(1, 0)
@@ -1727,6 +1731,7 @@ class DisulfideVisualization:
                 ss,
                 pl,
                 style="sb",
+                translate=True,
             )
 
             pl.subplot(1, 1)
@@ -1736,6 +1741,7 @@ class DisulfideVisualization:
                 ss,
                 pl,
                 style="pd",
+                translate=True,
             )
 
             pl.link_views()
@@ -1785,6 +1791,7 @@ class DisulfideVisualization:
             ss,
             pl,
             style=style,
+            translate=True,
         )
         pl.reset_camera()
         pl.orbit_on_path(path, write_frames=True)
@@ -1834,7 +1841,7 @@ class DisulfideVisualization:
         # path = pl.generate_orbital_path(n_points=steps)
 
         # Render the object in the specified style
-        pl = DisulfideVisualization._render_ss(ss, pl, style=style)
+        pl = DisulfideVisualization._render_ss(ss, pl, style=style, translate=True)
 
         pl.reset_camera()
         pl.show(auto_close=False)
@@ -1899,6 +1906,7 @@ class DisulfideVisualization:
                 ss,
                 pl,
                 style=style,
+                translate=True,
             )
             pl.reset_camera()
             if shadows:
@@ -1924,6 +1932,7 @@ class DisulfideVisualization:
                 ss,
                 pl,
                 style="cpk",
+                translate=True,
             )
 
             pl.subplot(0, 1)
@@ -1932,6 +1941,7 @@ class DisulfideVisualization:
                 ss,
                 pl,
                 style="pd",
+                translate=True,
             )
 
             pl.subplot(1, 0)
@@ -1940,6 +1950,7 @@ class DisulfideVisualization:
                 ss,
                 pl,
                 style="bs",
+                translate=True,
             )
 
             pl.subplot(1, 1)
@@ -1948,6 +1959,7 @@ class DisulfideVisualization:
                 ss,
                 pl,
                 style="sb",
+                translate=True,
             )
 
             pl.link_views()

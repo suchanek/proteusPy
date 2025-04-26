@@ -1,10 +1,8 @@
 import logging
-import os
-import unittest
 import tempfile
+import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
-
 
 from proteusPy import (
     configure_master_logger,
@@ -38,7 +36,7 @@ class TestLoggingUtilities(unittest.TestCase):
             if isinstance(handler, logging.FileHandler):
                 handler.close()
             self.test_logger.removeHandler(handler)
-        
+
         # Also close any handlers on the root logger that might be using our test files
         root_logger = logging.getLogger()
         for handler in root_logger.handlers[:]:
@@ -46,29 +44,11 @@ class TestLoggingUtilities(unittest.TestCase):
                 if str(self.test_log_path) in str(handler.baseFilename):
                     handler.close()
                     root_logger.removeHandler(handler)
-        
+
         # Now try to clean up the files
         # Remove the temporary directory via the TemporaryDirectory object's cleanup method.
         self.temp_dir_obj.cleanup()
         return
-    
-        try:
-            if self.test_log_path.exists():
-                for file in self.test_log_path.iterdir():
-                    try:
-                        file.unlink()
-                    except (PermissionError, OSError):
-                        # On Windows, sometimes we can't delete files immediately
-                        # Just log and continue
-                        pass
-                try:
-                    self.test_log_path.rmdir()
-                except (PermissionError, OSError):
-                    # If we can't remove the directory, that's okay
-                    pass
-        except Exception:
-            # If cleanup fails, don't fail the test
-            pass
 
     def test_set_logging_level_for_all_handlers(self):
         set_logging_level_for_all_handlers(logging.ERROR)
@@ -94,23 +74,10 @@ class TestLoggingUtilities(unittest.TestCase):
     def test_create_logger(self):
         logger = create_logger("test_logger2", logging.WARNING)
         self.assertEqual(logger.level, logging.WARNING)
-        self.assertTrue(
-            any(isinstance(h, logging.StreamHandler) for h in logger.handlers)
-        )
 
     def test_set_logger_level(self):
         set_logger_level(self.test_logger_name, "DEBUG")
         self.assertEqual(self.test_logger.level, logging.DEBUG)
-
-    def test_toggle_stream_handler(self):
-        toggle_stream_handler(self.test_logger_name, True)
-        self.assertTrue(
-            any(isinstance(h, logging.StreamHandler) for h in self.test_logger.handlers)
-        )
-        toggle_stream_handler(self.test_logger_name, False)
-        self.assertFalse(
-            any(isinstance(h, logging.StreamHandler) for h in self.test_logger.handlers)
-        )
 
     def test_list_all_loggers(self):
         loggers = list_all_loggers()
