@@ -59,7 +59,8 @@ endif
 dev:
 	@echo "Building development environment $(DEVNAME)..."
 	$(CONDA) create --name $(DEVNAME) -y python=3.12
-	pip install build 
+	$(CONDA) run -n $(DEVNAME) pip install build 
+
 ifeq ($(OS_NAME), Linux)
 	@echo "Linux detected, installing VTK..."
 	$(CONDA) install -n $(DEVNAME) vtk -y
@@ -73,19 +74,29 @@ clean devclean:
 
 install:
 	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip install --upgrade proteusPy -q
+ifeq ($(OS_NAME), Linux)
+	pip install dist/*.whl
+else
+	pip install dist/proteuspy-$(VERS)-py3-none-any.whl[all]
+endif
+
 	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
 	@echo "Downloading and building the Disulfide Databases..."
-	proteusPy.bootstrapper -v
+	# proteusPy.bootstrapper -v
 	@echo "Installation finished!"
 
 install_dev: bld
 	@echo "Starting installation step 2/2 for $(VERS)..."
 	pip uninstall -y proteusPy
-	pip install dist/proteusPy-$(VERS)-py3-none-any.whl[all]  # Install specific wheel
+ifeq ($(OS_NAME), Linux)
+	pip install dist/*.whl
+else
+	pip install dist/proteuspy-$(VERS)-py3-none-any.whl[all]
+endif
+
 	python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
 	@echo "Downloading and building the Disulfide Databases..."
-	# proteusPy.bootstrapper -v
+	proteusPy.bootstrapper -v
 	@echo "Development environment installation finished!"
 
 define jupyter-setup

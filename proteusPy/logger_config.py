@@ -1,15 +1,17 @@
 """
-This module provides utility functions for configuring and managing loggers 
+This module provides utility functions for configuring and managing loggers
 within the proteusPy package. The functions are used within the package to
 convey logging information at a fine-grained level. The functions are completely
 independent of the application and can be used in any Python project.
 
 Author: Eric G. Suchanek, PhD
-Last updated 2025-02-19 23:43:45 -egs-
+Last update: 2025-04-25 19:10:55
 """
 
 import logging
 from pathlib import Path
+
+from rich.logging import RichHandler
 
 DEFAULT_LOG_LEVEL = logging.WARNING
 
@@ -21,20 +23,12 @@ def set_logging_level_for_all_handlers(log_level: int):
     :param log_level: The logging level to set.
     :type log_level: int
     """
-    # Get the root logger
     root_logger = logging.getLogger()
-
-    # Set the level for the root logger
     root_logger.setLevel(log_level)
 
-    # Iterate through all loggers
     for logger_name in logging.Logger.manager.loggerDict:
         _logger = logging.getLogger(logger_name)
-
-        # Set the level for the logger itself
         _logger.setLevel(log_level)
-
-        # Iterate through all handlers of the logger
         for handler in _logger.handlers:
             handler.setLevel(log_level)
 
@@ -46,21 +40,15 @@ def disable_stream_handlers_for_namespace(namespace: str):
     :param namespace: The namespace whose stream handlers should be disabled.
     :type namespace: str
     """
-    # First check the specific logger for the namespace
     logger = logging.getLogger(namespace)
-    for handler in logger.handlers[
-        :
-    ]:  # Create a copy of the list to safely modify during iteration
+    for handler in logger.handlers[:]:
         if isinstance(handler, logging.StreamHandler):
             logger.removeHandler(handler)
 
-    # Then check all loggers in the manager's dictionary that start with the namespace
     for logger_name in logging.Logger.manager.loggerDict:
         if logger_name.startswith(namespace):
             _logger = logging.getLogger(logger_name)
-            for handler in _logger.handlers[
-                :
-            ]:  # Create a copy of the list to safely modify during iteration
+            for handler in _logger.handlers[:]:
                 if isinstance(handler, logging.StreamHandler):
                     _logger.removeHandler(handler)
 
@@ -83,79 +71,62 @@ def configure_master_logger(
     :param disabled: If True, the logger will be disabled. Defaults to False.
     :type disabled: bool
     """
-    # Expand user path
     file_path = Path(file_path).expanduser()
-
-    # Ensure the directory exists
     file_path.mkdir(parents=True, exist_ok=True)
-
-    # Full path to the log file
     full_log_file_path = file_path / log_file
 
     root_logger = logging.getLogger()
-
-    # Set the root logger level to DEBUG to capture all messages
     root_logger.setLevel(log_level)
 
     # Remove all existing handlers
-    for handler in root_logger.handlers[:]:
-        root_logger.removeHandler(handler)
+    root_logger.handlers.clear()
 
-    # Create a new FileHandler
+    # Add FileHandler
     handler = logging.FileHandler(full_log_file_path, mode="w")
-
     formatter = logging.Formatter(
         "proteusPy: %(levelname)s %(asctime)s - %(name)s.%(funcName)s - %(message)s"
     )
     handler.setFormatter(formatter)
-
+    handler.setLevel(log_level)
     root_logger.addHandler(handler)
-    for handler in root_logger.handlers:
-        handler.setLevel(log_level)
 
-    if disabled:
-        root_logger.disabled = True
-    else:
-        root_logger.disabled = False  # Enable the root logger
-
-    return
+    root_logger.disabled = disabled
 
 
 def create_logger(
     name: str,
     log_level: int = logging.INFO,
+    propagate: bool = False,  # Default to False to avoid duplicates
 ) -> logging.Logger:
     """
-    Returns a logger with the specified name, configured to use both StreamHandler
-    and RotatingFileHandler with the predefined formats.
+    Returns a logger with the specified name, configured to use a RichHandler for console output.
 
     :param name: The name of the logger.
     :type name: str
     :param log_level: The logging level, defaults to logging.INFO
-    :type log_level: int, optional
+    :type log_level: int
+    :param propagate: Whether to propagate messages to parent loggers, defaults to False
+    :type propagate: bool
     :return: Configured logger instance.
     :rtype: logging.Logger
     """
     logger = logging.getLogger(name)
     logger.setLevel(log_level)
 
-    # Clear all existing handlers
-    if logger.hasHandlers():
-        logger.handlers.clear()
+    # Clear existing handlers
+    logger.handlers.clear()
 
-    # Define formatter
-    formatter = logging.Formatter(
+    # Add RichHandler for console output
+    rich_handler = RichHandler(rich_tracebacks=True)
+    rich_formatter = logging.Formatter(
         "proteusPy: %(levelname)s %(asctime)s - %(name)s.%(funcName)s - %(message)s"
     )
+    rich_handler.setLevel(log_level)
+    rich_handler.setFormatter(rich_formatter)
+    logger.addHandler(rich_handler)
 
-    # StreamHandler setup
-    stream_handler = logging.StreamHandler()
-    stream_handler.setLevel(log_level)
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
-
-    # Allows log messages to propagate to the root logger
-    logger.propagate = True
+    # Set propagation
+    logger.propagate = propagate
 
     return logger
 
@@ -179,10 +150,8 @@ def set_logger_level(name, level):
 
     if level not in level_dict:
         raise ValueError(
-            (
-                f"--> set_logger_level(): Invalid logging level: {level}."
-                f"Must be one of ['WARNING', 'ERROR', 'INFO', 'DEBUG']"
-            )
+            f"set_logger_level(): Invalid logging level: {level}. "
+            "Must be one of ['WARNING', 'ERROR', 'INFO', 'DEBUG']"
         )
 
     _logger = logging.getLogger(name)
@@ -204,7 +173,6 @@ def toggle_stream_handler(name, enable):
     logger = logging.getLogger(name)
     stream_handler = None
 
-    # Find the StreamHandler if it exists
     for handler in logger.handlers:
         if isinstance(handler, logging.StreamHandler):
             stream_handler = handler
@@ -212,18 +180,15 @@ def toggle_stream_handler(name, enable):
 
     if enable:
         if stream_handler is None:
-            # Define formatter
             formatter = logging.Formatter(
                 "stream proteusPy: %(levelname)-7s %(asctime)s - %(name)s.%(funcName)s - %(message)s"
             )
-            # Create and add a new StreamHandler
             stream_handler = logging.StreamHandler()
             stream_handler.setLevel(logger.level)
             stream_handler.setFormatter(formatter)
             logger.addHandler(stream_handler)
     else:
         if stream_handler is not None:
-            # Remove the existing StreamHandler
             logger.removeHandler(stream_handler)
 
 
