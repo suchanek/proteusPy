@@ -9,7 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- ``DisulfideEnergy`` class to decompose the disulfide torsional strain calculations using the standard calculation and also the equation used by Hogg et al. in their Allosteric Disulfide Bond paper.
+- ``DisulfideEnergy`` class to decompose the disulfide torsional strain calculations using the standard calculation and also the equation used by Hogg et al. in their Allosteric Disulfide Bond paper. @TODO refactor ``Disulfide`` to use this class rather than the currently built-in energy functions.
+-
+
+### Changed
+
+- Added ``rich`` text formatting to the logging functions, yielding more attractive log messages.
+- Cleaned up the global logging/file handling in ``logger_config.py``.
+
+### Fixed
+
+- Low level bug with global logger which caused duplicate log messages.
 
 ## [v0.99.34] - 2025-04-02
 
