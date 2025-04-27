@@ -7,29 +7,38 @@ Notable changes to the ``proteusPy`` project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v0.99.35] - 2025-4-26
+## [v0.99.36] - Unreleased
 
 ### Added
 
-- ``DisulfideEnergy`` class to decompose the disulfide torsional strain calculations using the standard calculation and also the equation used by Hogg et al. in their Allosteric Disulfide Bond paper. @TODO refactor ``Disulfide`` to use this class rather than the currently built-in energy functions.
-- Moved several notebooks into the **examples/** directory.
--
+- ...
 
 ### Changed
 
-- Added ``rich`` text formatting to the logging functions, yielding more attractive log messages.
-- Cleaned up the global logging/file handling in ``logger_config.py``.
-- Enhanced the ``DisulfideLoader.summary()`` function for readability.
+- Makefile - single step for the package and dev envs using ``conda run ...`
+  - make install
+  - make dev
 
-### Fixed
+## [v0.99.35] - 2025-4-26
 
-- Low level bug with global logger which caused duplicate log messages.
-- Turned on translation to center of mass for visualization to center each disulfide.
+This release introduces the `DisulfideEnergy` class, designed to analyze the contributions of each dihedral to the overall energy of a disulfide bond. Inspired by the energy function from Hogg et al.'s *Allosteric Disulfide Bond* paper, this class provides an alternative to the standard energy function used in `proteusPy`. The implementation allows for a comparative analysis between the two approaches. For detailed information, refer to the [API documentation](https://suchanek.github.io/proteusPy/proteusPy.html).
 
-### Issues
+## Added
 
-- ``Disulfide.spin()`` only works under MacOS. Throws a plotter error under Windows.
--
+- **DisulfideEnergy Class**: A new class to decompose disulfide torsional strain calculations. It supports both the standard `proteusPy` calculation and the energy equation from Hogg et al.'s *Allosteric Disulfide Bond* paper.  
+  *Note*: Future refactoring is planned to integrate this class into the `Disulfide` class, replacing the current built-in energy functions.
+- **Example Notebooks**: Relocated several Jupyter notebooks to the `examples/` directory for better organization and accessibility.
+
+## Changed
+
+- **Enhanced Logging**: Integrated `rich` text formatting into logging functions, resulting in visually appealing and readable log messages.
+- **Improved Logger Configuration**: Streamlined global logging and file handling in `logger_config.py` for better maintainability.
+- **Better Summary Output**: Upgraded the `DisulfideLoader.summary()` function to improve readability and presentation of output.
+
+## Fixed
+
+- **Logger Bug**: Resolved a low-level issue with the global logger that caused duplicate log messages.
+- **Visualization Improvement**: Enabled translation to the center of mass for disulfide visualizations, ensuring each disulfide is properly centered.
 
 ## [v0.99.34] - 2025-04-02
 
