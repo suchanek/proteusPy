@@ -93,7 +93,7 @@ else
 	$(CONDA) run -v -n $(DEVNAME) pip install dist/proteuspy-$(VERS)-py3-none-any.whl[all]
 endif
 	$(CONDA) run -n $(DEVNAME) python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
-	@echo "Downloading and building the Disulfide Databases..."
+	@echo "Downloading and building the Disulfide Databases. This will take some time..."
 	$(CONDA) run -v -n $(DEVNAME) proteusPy.bootstrapper -v
 	@echo "Development environment installation finished!"
 
