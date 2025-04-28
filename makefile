@@ -7,6 +7,8 @@ CONDA ?= conda
 MESS = $(VERS)
 DEVNAME = ppydev
 PKGNAME = proteusPy
+CONDA_PREFIX := $(shell conda info --base)
+CURRENT_ENV := $(shell echo $(CONDA_DEFAULT_ENV))
 
 OS_NAME := $(shell uname -s 2>/dev/null || echo Windows_NT)
 
@@ -24,9 +26,9 @@ else
 endif
 
 .PHONY: all vers newvers nuke pkg dev clean devclean install \
-	install_dev jup jup_dev format bld sdist docs upload tag push-tag commit \
+	install_dev jup jup_dev format sdist docs upload tag push-tag commit \
 	tests docker docker_hub docker_github docker_all docker_run docker_purge \
-	update_pyproject_version info
+	update_pyproject_version info conda_env bootstrap bld wheels
 
 all: docs bld docker_all
 
@@ -73,29 +75,36 @@ else
 	$(CONDA) run -v -n $(PKGNAME) pip install dist/proteuspy-$(VERS)-py3-none-any.whl
 endif
 	$(CONDA) run -n $(PKGNAME) python -m ipykernel install --user --name $(PKGNAME) --display-name "$(PKGNAME) ($(VERS))"
-	@echo "Downloading and building the Disulfide Databases..."
-	$(CONDA) run -n $(PKGNAME) proteusPy.bootstrapper -v
+	
 	@echo "proteusPy installation finished!"
+	@echo "Remember to activate the environment with 'conda activate $(PKG_NAME) and run 'make bootstrap to download and build the Disulfide Databases.'"
 
 ###
+
+bootstrap:
+	@if [ "$(CURRENT_ENV)" != "$(PKGNAME)" ] && [ "$(CURRENT_ENV)" != "$(DEVNAME)" ]; then \
+		echo "Error: Please activate either the $(PKGNAME) or $(DEVNAME) environment before running this target."; \
+		exit 1; \
+	fi
+	@echo "Downloading and building the Disulfide Databases into $(CURRENT_ENV). This will take some time..."
+	proteusPy.bootstrapper -v
 
 dev:
 	@echo "Building development environment $(DEVNAME)..."
 	$(CONDA) create --name $(DEVNAME) -y python=3.12
-	$(CONDA) run -n $(DEVNAME) pip install build 
+	$(CONDA) run -n $(DEVNAME) pip install build pytest twine pdoc black
 	-$(CONDA) run -n $(DEVNAME) pip uninstall -y proteusPy
 
 ifeq ($(OS_NAME), Linux)
 	@echo "Linux detected, installing VTK..."
-	$(CONDA) install -n $(DEVNAME) vtk -y
+	$(CONDA) install -n $(DEVNAME) vtk -y -q
 	$(CONDA) run -v -n $(DEVNAME) pip install dist/*.whl
 else
 	$(CONDA) run -v -n $(DEVNAME) pip install dist/proteuspy-$(VERS)-py3-none-any.whl[all]
 endif
 	$(CONDA) run -n $(DEVNAME) python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
-	@echo "Downloading and building the Disulfide Databases. This will take some time..."
-	$(CONDA) run -v -n $(DEVNAME) proteusPy.bootstrapper -v
-	@echo "Development environment installation finished!"
+	@echo "Development environment installation finished. Remember to activate the environment with 'conda activate $(DEVNAME)'"
+	@echo "and run 'make bootstrap to download and build the Disulfide Databases.'"
 
 clean devclean:
 	@echo "Removing $(if $(filter $@,clean),$(PKGNAME),$(DEVNAME)) environment..."
@@ -118,7 +127,6 @@ jup_dev:
 format:
 	black proteusPy
 
-.PHONY: bld
 bld: wheels
 	@echo "Build complete."
 
@@ -190,5 +198,6 @@ docker_purge:
 info:
 	@echo "Available targets in this Makefile:"
 	@grep -E '^[a-zA-Z0-9_-]+:' makefile | sed 's/:.*//' | sort | uniq
+
 
 # End of file
