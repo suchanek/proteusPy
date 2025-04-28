@@ -12,27 +12,29 @@ This script demonstrates how to:
 5. Visualize the minimum energy disulfides for comparison
 
 Author: Eric G. Suchanek, PhD
-Last Modification: 2025-03-15
+Last Modification: 2025-04-27
 """
 
 import os
 import pickle
-import sys
-from typing import Dict, List, Tuple
+from pathlib import Path
+from typing import Dict
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-
-# Add the parent directory to the Python path to import proteusPy modules
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from proteusPy import Disulfide, DisulfideList
 from proteusPy.DisulfideClassGenerator import DisulfideClassGenerator
 
+# Add a global save directory constant and create it
+SAVE_DIR = Path("schematic_outputs")
+SAVE_DIR.mkdir(exist_ok=True)
+
 
 def compare_energy_distributions(
-    class_disulfides: Dict[str, DisulfideList], class_names: Dict[str, str]
+    class_disulfides: Dict[str, DisulfideList],
+    class_names: Dict[str, str],
+    save_dir: Path = SAVE_DIR,
 ) -> None:
     """
     Compare the energy distributions of disulfides from different classes.
@@ -99,15 +101,18 @@ def compare_energy_distributions(
     plt.grid(True, alpha=0.3)
 
     # Save the plot
-    plt.savefig("class_energy_comparison.png", dpi=300, bbox_inches="tight")
-    print("Saved energy distribution comparison plot to class_energy_comparison.png")
+    outpath = save_dir / "class_energy_comparison.png"
+    plt.savefig(outpath, dpi=300, bbox_inches="tight")
+    print(f"Saved energy distribution comparison plot to {outpath}")
 
     # Show the plot (comment out if running in a non-interactive environment)
     # plt.show()
 
 
 def compare_dihedral_distributions(
-    class_disulfides: Dict[str, DisulfideList], class_names: Dict[str, str]
+    class_disulfides: Dict[str, DisulfideList],
+    class_names: Dict[str, str],
+    save_dir: Path = SAVE_DIR,
 ) -> None:
     """
     Compare the dihedral angle distributions of disulfides from different classes.
@@ -183,17 +188,18 @@ def compare_dihedral_distributions(
     plt.tight_layout(rect=[0.05, 0, 1, 0.97])
 
     # Save the plot
-    plt.savefig("class_dihedral_comparison.png", dpi=300, bbox_inches="tight")
-    print(
-        "Saved dihedral distribution comparison plot to class_dihedral_comparison.png"
-    )
+    outpath = save_dir / "class_dihedral_comparison.png"
+    plt.savefig(outpath, dpi=300, bbox_inches="tight")
+    print(f"Saved dihedral distribution comparison plot to {outpath}")
 
     # Show the plot (comment out if running in a non-interactive environment)
     # plt.show()
 
 
 def compare_minimum_energy_disulfides(
-    class_disulfides: Dict[str, DisulfideList], class_names: Dict[str, str]
+    class_disulfides: Dict[str, DisulfideList],
+    class_names: Dict[str, str],
+    save_dir: Path = SAVE_DIR,
 ) -> Dict[str, Disulfide]:
     """
     Compare the minimum energy disulfides from different classes.
@@ -225,7 +231,9 @@ def compare_minimum_energy_disulfides(
         )
 
         # Save the minimum energy disulfide to a file
-        min_energy_file = f"class_{class_id}_min_energy_disulfide.pkl"
+        min_energy_file = os.path.join(
+            save_dir, f"class_{class_id}_min_energy_disulfide.pkl"
+        )
         with open(min_energy_file, "wb") as f:
             pickle.dump(min_energy_disulfide, f)
 
@@ -239,8 +247,9 @@ def compare_minimum_energy_disulfides(
 
     # Define colors based on energy values (lower energy = greener, higher energy = redder)
     norm = plt.Normalize(min(energies), max(energies))
-    colors = plt.cm.RdYlGn_r(norm(energies))
-
+    cmap = plt.cm.get_cmap("RdYlGn")
+    colors = cmap(norm(energies))
+    cmap = plt.cm.get_cmap("viridis")  # Replace "RdYlGn" with "viridis"
     bars = plt.bar(class_ids, energies, color=colors)
 
     plt.title("Minimum Energy Comparison Between Classes")
@@ -249,10 +258,10 @@ def compare_minimum_energy_disulfides(
     plt.grid(True, alpha=0.3, axis="y")
 
     # Add class names as annotations
-    for i, bar in enumerate(bars):
+    for i, _bar in enumerate(bars):
         plt.text(
-            bar.get_x() + bar.get_width() / 2,
-            bar.get_height() + 0.1,
+            _bar.get_x() + _bar.get_width() / 2,
+            _bar.get_height() + 0.1,
             class_names[class_ids[i]],
             ha="center",
             va="bottom",
@@ -260,9 +269,9 @@ def compare_minimum_energy_disulfides(
         )
 
     # Save the plot
-    plt.tight_layout()
-    plt.savefig("class_min_energy_comparison.png", dpi=300, bbox_inches="tight")
-    print("Saved minimum energy comparison plot to class_min_energy_comparison.png")
+    outpath = os.path.join(save_dir, "class_min_energy_comparison.png")
+    plt.savefig(outpath, dpi=300, bbox_inches="tight")
+    print(f"Saved minimum energy comparison plot to {outpath}")
 
     # Show the plot (comment out if running in a non-interactive environment)
     # plt.show()
@@ -271,7 +280,9 @@ def compare_minimum_energy_disulfides(
 
 
 def compare_average_conformations(
-    class_disulfides: Dict[str, DisulfideList], class_names: Dict[str, str]
+    class_disulfides: Dict[str, DisulfideList],
+    class_names: Dict[str, str],
+    save_dir: str = SAVE_DIR,
 ) -> Dict[str, Disulfide]:
     """
     Compare the average conformations of disulfides from different classes.
@@ -308,7 +319,9 @@ def compare_average_conformations(
         )
 
         # Save the average conformation disulfide to a file
-        avg_file = f"class_{class_id}_avg_conformation_disulfide.pkl"
+        avg_file = os.path.join(
+            save_dir, f"class_{class_id}_avg_conformation_disulfide.pkl"
+        )
         with open(avg_file, "wb") as f:
             pickle.dump(avg_disulfide, f)
 
@@ -366,11 +379,9 @@ def compare_average_conformations(
     plt.title("Average Conformation Comparison Between Classes")
 
     # Save the plot
-    plt.tight_layout()
-    plt.savefig("class_avg_conformation_comparison.png", dpi=300, bbox_inches="tight")
-    print(
-        "Saved average conformation comparison plot to class_avg_conformation_comparison.png"
-    )
+    outpath = os.path.join(save_dir, "class_avg_conformation_comparison.png")
+    plt.savefig(outpath, dpi=300, bbox_inches="tight")
+    print(f"Saved average conformation comparison plot to {outpath}")
 
     # Show the plot (comment out if running in a non-interactive environment)
     # plt.show()
@@ -382,32 +393,25 @@ def main():
     """
     Main function demonstrating how to compare disulfides from different classes.
     """
-    # Path to the CSV file
-    csv_file = "binary_class_metrics_0.00.csv"
 
     # Select classes to compare
     selected_classes = [
-        "22222",  # "+++++" (RH Spiral)
-        "00000",  # "-----" (LH Spiral)
-        "02000",  # "-+---" (RH Staple)
-        "02020",  # "-+-+-" (LH Staple)
-        "20220",  # "+-++-" (RH Hook)
+        "+++++",  # "+++++" (RH Spiral)
+        "-----",  # "-----" (LH Spiral)
+        "-+---",  # "-+---" (RH Staple)
+        "-+-+-",  # "-+-+-" (LH Staple)
+        "+-++-",  # "+-++-" (RH Hook)
     ]
 
     print(f"Generating disulfides for selected classes: {selected_classes}...")
 
     # Create a generator instance and generate disulfides for the selected classes
-    generator = DisulfideClassGenerator(csv_file, base=2)
-    class_disulfides = generator.generate_for_selected_classes(
-        selected_classes, use_class_str=False
-    )
+    generator = DisulfideClassGenerator()
+    class_disulfides = generator.generate_for_selected_classes(selected_classes)
 
-    # Get class names from the CSV file
-    df = pd.read_csv(csv_file)
     class_names = {}
     for class_id in selected_classes:
-        row = df[df["class"] == class_id].iloc[0]
-        class_names[class_id] = row["class_str"]
+        class_names[class_id] = class_id
 
     # Print information about the generated disulfides
     print("\nGenerated Disulfides:")
@@ -431,18 +435,14 @@ def main():
     compare_dihedral_distributions(class_disulfides, class_names)
 
     # Compare the minimum energy disulfides
-    min_energy_disulfides = compare_minimum_energy_disulfides(
-        class_disulfides, class_names
-    )
+    compare_minimum_energy_disulfides(class_disulfides, class_names)
 
     # Compare the average conformations
-    avg_conformation_disulfides = compare_average_conformations(
-        class_disulfides, class_names
-    )
+    compare_average_conformations(class_disulfides, class_names)
 
     # Save all disulfides to a file
     for class_id, disulfide_list in class_disulfides.items():
-        output_file = f"class_{class_id}_disulfides.pkl"
+        output_file = os.path.join(SAVE_DIR, f"class_{class_id}_disulfides.pkl")
         with open(output_file, "wb") as f:
             pickle.dump(disulfide_list, f)
         print(f"Saved disulfides for class {class_id} to {output_file}.")
