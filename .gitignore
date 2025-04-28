@@ -2,12 +2,12 @@
 **/__pycache__
 **/.DS_Store
 **/.pytest_cache
+schematic_outputs/
 .venv
 .vscode
 .eggs
 build/
 dist/
-schematic_outputs/
 data/*.png
 data/Nclasses/*
 data/classes/*

@@ -1,6 +1,6 @@
 # Makefile for proteusPy and associated programs
 # Author: Eric G. Suchanek, PhD
-# Last revision: 2025-04-26 23:47:07 -egs-
+# Last revision: 2025-04-27 21:21:28 -egs-
 
 VERS = $(shell python -c "exec(open('proteusPy/_version.py').read()); print(__version__)")
 CONDA ?= conda
@@ -30,7 +30,7 @@ endif
 	tests docker docker_hub docker_github docker_all docker_run docker_purge \
 	update_pyproject_version info conda_env bootstrap bld wheels
 
-all: docs bld docker_all
+all: docs bld docker_all 
 
 vers:
 	@echo "Version = $(VERS)"
@@ -78,8 +78,6 @@ endif
 	
 	@echo "proteusPy installation finished!"
 	@echo "Remember to activate the environment with 'conda activate $(PKG_NAME) and run 'make bootstrap to download and build the Disulfide Databases.'"
-
-###
 
 bootstrap:
 	@if [ "$(CURRENT_ENV)" != "$(PKGNAME)" ] && [ "$(CURRENT_ENV)" != "$(DEVNAME)" ]; then \
