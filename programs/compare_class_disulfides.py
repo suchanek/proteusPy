@@ -38,9 +38,12 @@ def compare_energy_distributions(
     """
     Compare the energy distributions of disulfides from different classes.
 
-    Parameters:
-        class_disulfides (Dict[str, DisulfideList]): Dictionary mapping class IDs to DisulfideLists.
-        class_names (Dict[str, str]): Dictionary mapping class IDs to class names.
+    :param class_disulfides: Dictionary mapping class IDs to DisulfideLists.
+    :type class_disulfides: Dict[str, DisulfideList]
+    :param class_names: Dictionary mapping class IDs to class names.
+    :type class_names: Dict[str, str]
+    :param save_dir: Directory to save the output plots. Defaults to SAVE_DIR.
+    :type save_dir: Path
     """
     plt.figure(figsize=(12, 8))
 
@@ -285,6 +288,7 @@ def compare_average_conformations(
     Parameters:
         class_disulfides (Dict[str, DisulfideList]): Dictionary mapping class IDs to DisulfideLists.
         class_names (Dict[str, str]): Dictionary mapping class IDs to class names.
+        save_dir (str): Directory to save the output plots and files. Defaults to SAVE_DIR.
 
     Returns:
         Dict[str, Disulfide]: Dictionary mapping class IDs to average conformation disulfides.
@@ -330,19 +334,10 @@ def compare_average_conformations(
     angles = np.linspace(0, 2 * np.pi, 5, endpoint=False).tolist()
     angles += angles[:1]  # Close the loop
 
-    # Define a list of colors and markers for different classes
-    colors = [
-        "blue",
-        "red",
-        "green",
-        "orange",
-        "purple",
-        "brown",
-        "pink",
-        "gray",
-        "olive",
-        "cyan",
-    ]
+    # Generate dynamic colors using viridis colormap
+    colors = plt.get_cmap("viridis")(
+        np.linspace(0, 1, len(avg_conformation_disulfides))
+    )
     markers = ["o", "s", "^", "D", "v", ">", "<", "p", "*", "h"]
 
     # Plot each class
@@ -351,7 +346,7 @@ def compare_average_conformations(
         values = [(angle + 180) / 360 for angle in avg_disulfide.dihedrals]
         values += values[:1]  # Close the loop
 
-        color = colors[i % len(colors)]
+        color = colors[i]
         marker = markers[i % len(markers)]
 
         ax.plot(
@@ -368,10 +363,18 @@ def compare_average_conformations(
     ax.set_xticks(angles[:-1])
     ax.set_xticklabels(["Chi1", "Chi2", "Chi3", "Chi4", "Chi5"])
 
+    # Customize radial ticks to show actual dihedral angles
+    ax.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
+    ax.set_yticklabels(["-180°", "-90°", "0°", "90°", "180°"])
+
     # Add legend
     plt.legend(loc="upper right", bbox_to_anchor=(0.1, 0.1))
 
-    plt.title("Average Conformation Comparison Between Classes")
+    # Add title and note about normalization
+    plt.title(
+        "Average Conformation Comparison Between Classes\n(Normalized: -180° to 180° mapped to 0 to 1)",
+        pad=20,
+    )
 
     # Save the plot
     outpath = save_dir / "class_avg_conformation_comparison.png"
@@ -384,19 +387,23 @@ def compare_average_conformations(
     return avg_conformation_disulfides
 
 
-def main():
+def main(selected_classes=None):
     """
     Main function demonstrating how to compare disulfides from different classes.
+
+    :param selected_classes: List of class IDs to analyze. If None, defaults to predefined classes.
+    :type selected_classes: list[str] or None
     """
 
-    # Select classes to compare
-    selected_classes = [
-        "+++++",  # "+++++" (RH Spiral)
-        "-----",  # "-----" (LH Spiral)
-        "-+---",  # "-+---" (RH Staple)
-        "-+-+-",  # "-+-+-" (LH Staple)
-        "+-++-",  # "+-++-" (RH Hook)
-    ]
+    # Use provided classes or default to predefined classes
+    if selected_classes is None:
+        selected_classes = [
+            "+++++",  # "+++++" (RH Spiral)
+            "-----",  # "-----" (LH Spiral)
+            "-+---",  # "-+---" (RH Staple)
+            "-+-+-",  # "-+-+-" (LH Staple)
+            "+-++-",  # "+-++-" (RH Hook)
+        ]
 
     print(f"Generating disulfides for selected classes: {selected_classes}...")
 
@@ -446,4 +453,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+
+    # Parse command-line arguments for selected classes
+    selected_classes = sys.argv[1:] if len(sys.argv) > 1 else None
+    main(selected_classes)
