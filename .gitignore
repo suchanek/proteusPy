@@ -18,3 +18,4 @@ proteus_logo_sb.png
 *.out
 *.log
 binaryclass_cleaned.md
+logdir/
