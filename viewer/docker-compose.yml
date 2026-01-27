@@ -10,3 +10,10 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - DOCKER_RUNNING=true
+
+    # Memory configuration - critical for loading large PKL database files
+    # Prevents OOM (Out of Memory) kills when loading PDB_SS_ALL_LOADER.pkl
+    mem_limit: 8g              # Maximum memory the container can use
+    mem_reservation: 4g        # Soft limit - guaranteed minimum memory
+    memswap_limit: 12g         # Total memory including swap
+    shm_size: 2g               # Shared memory for VTK/PyVista operations

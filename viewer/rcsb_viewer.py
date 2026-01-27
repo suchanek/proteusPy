@@ -254,7 +254,7 @@ def set_state(event=None):
         "view_mode": view_selector.value,  # Added view mode state
     }
     pn.state.cache["ss_state"] = ss_state
-    _logger.info("Set state: %s", ss_state["view_mode"])
+    _logger.debug("Set state: %s", ss_state["view_mode"])
     click_plot(None)
 
 
@@ -344,7 +344,7 @@ def plot(pl, ss, style="sb", light=True, panelsize=512, verbose=True) -> pv.Plot
     else:
         plotter = pv.Plotter(window_size=WINSIZE)
         plotter.clear()
-        _logger.info("Overlay")
+        _logger.debug("Overlay")
         pdbid = ss.pdb_id
         sslist = PDB_SS[pdbid]
 
@@ -785,11 +785,11 @@ help_items = [("About", "about"), ("Documentation", "documentation")]
 # Define the handler function
 def handle_file_menu(event):
     """Handle the file menu items."""
-    _logger.info("File menu item selected: %s", event)  # noqa
+    _logger.debug("File menu item selected: %s", event)  # noqa
     item = event
-    _logger.info("Selected item: %s", item)
+    _logger.debug("Selected item: %s", item)
     if item == "save":
-        _logger.info("Save file dialog")
+        _logger.debug("Save file dialog")
         save_as_file()
         # Add your code to handle saving a file
 
@@ -825,15 +825,15 @@ def show_documentation_dialog():
 
 def handle_help_menu(event):
     """Handle the help menu items."""
-    _logger.info("Help menu item selected: %s", event)  # noqa
+    _logger.debug("Help menu item selected: %s", event)  # noqa
     item = event
     if item == "about":
-        _logger.info("Show about dialog")
+        _logger.debug("Show about dialog")
         show_about_dialog()
         # Add your code to show the about dialog
     elif item == "documentation":
         show_documentation_dialog()
-        _logger.info("Show documentation")
+        _logger.debug("Show documentation")
 
 
 # Create the menus
