@@ -19,3 +19,22 @@ proteus_logo_sb.png
 *.log
 binaryclass_cleaned.md
 logdir/
+lib/
+viewer/data/PDB_SS_ALL_LOADER.pkl
+proteusPy/data/PDB_all_ss.pkl
+
+# CodeKG generated artifacts — databases are transient/reproducible, snapshots are tracked
+# MUST include .codekg/snapshots!
+# This is the correct pattern
+.codekg/lancedb/
+.codekg/lancedb-*
+.codekg/graph.sqlite
+.codekg/graph.sqlite*
+.codekg/models
+
+# DocKG generated artifacts — same pattern as CodeKG; snapshots will be tracked once added
+.dockg/lancedb/
+.dockg/lancedb-*
+.dockg/graph.sqlite
+.dockg/graph.sqlite*
+.dockg/

@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "codekg": {
+      "command": "/Users/egs/repos/proteusPy/.venv/bin/codekg",
+      "args": [
+        "mcp",
+        "--repo", "/Users/egs/repos/proteusPy"
+      ]
+    },
+    "dockg": {
+      "command": "/Users/egs/repos/proteusPy/.venv/bin/dockg",
+      "args": [
+        "mcp",
+        "--repo", "/Users/egs/repos/proteusPy"
+      ]
+    },
+    "ftreekg": {
+      "command": "/Users/egs/repos/proteusPy/.venv/bin/ftreekg",
+      "args": [
+        "mcp",
+        "--repo", "/Users/egs/repos/proteusPy"
+      ]
+    }
+  }
+}

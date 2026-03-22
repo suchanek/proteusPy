@@ -17,7 +17,7 @@ authors = [
     {name = "Eric G. Suchanek, PhD", email = "suchanek@mac.com"}
 ]
 license = {text = "BSD"}
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.14"
 keywords = ["proteusPy", "suchanek", "disulfide"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -67,7 +67,12 @@ dependencies = [
     "vtk",
     "wheel",
     "networkx",
-    "rich"
+    "rich",
+    "kg-rag @ git+https://github.com/Flux-Frontiers/kgrag.git",
+    "doc-kg @ git+https://github.com/Flux-Frontiers/doc_kg.git",
+    "code-kg @ git+https://github.com/Flux-Frontiers/code_kg.git",
+    "ftree-kg @ git+https://github.com/Flux-Frontiers/ftree_kg.git",
+
 ]
 
 [project.optional-dependencies]
@@ -80,6 +85,8 @@ dev = [
     "build",
 ]
 bio = ["Biopython"]
+metabo = ["metabo-kg @ git+https://github.com/Flux-Frontiers/metabo_kg.git"]
+
 pyqt5 = [
     "pyqt5",
     "pyvistaqt",
@@ -138,3 +145,19 @@ proteusPy = [
 
 [tool.pytest.ini_options]
 addopts = "--ignore=tests/test_DisplaySS.py --ignore=tests/test_disulfide_schematic.py"
+
+[tool.codekg]
+# Directories to include in the knowledge graph build and analysis.
+# When unset, all directories are indexed.
+include = ["src"]
+# Directories to exclude at every depth during the file walk.
+# Combined with the built-in SKIP_DIRS (.git, .venv, __pycache__, etc.).
+# exclude = ["tests", "benchmarks"]
+
+[tool.dockg]
+# Exclude directories from the knowledge graph by default.
+exclude = [".dockg", ".codekg", "src", ".git", ".venv", "venv", "__pycache__",
+".mypy_cache", ".pytest_cache", "bundles", "dist"]
+
+
+
