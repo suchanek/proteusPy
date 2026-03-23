@@ -1,11 +1,12 @@
 """
-TreeVisualizer: Text and PNG rendering of DisulfideTree hierarchies.
+TreeVisualizer: Text, PNG, and 3D rendering of DisulfideTree hierarchies.
 
-Provides two output modes:
+Provides three output modes:
   1. **Text** — Unicode box-drawing for terminal / print / markdown
   2. **PNG**  — matplotlib schematic for publication / slides
+  3. **3D**   — interactive pyvista scene with spheres, cylinders, and labels
 
-Both renderers walk the DisulfideTree via its ``children()`` /
+All renderers walk the DisulfideTree via its ``children()`` /
 ``members()`` / ``node_data()`` API and require no additional
 graph libraries.
 
@@ -437,10 +438,296 @@ def png_tree(
 
 
 # ---------------------------------------------------------------------------
+# 3. Interactive 3D (pyvista) renderer
+# ---------------------------------------------------------------------------
+
+#: Level colors as RGB floats for pyvista meshes.
+_LEVEL_COLORS_RGB = {
+    "root": (0.173, 0.243, 0.314),  # #2c3e50
+    "binary": (0.906, 0.298, 0.235),  # #e74c3c
+    "quadrant": (0.902, 0.494, 0.133),  # #e67e22
+    "sextant": (0.945, 0.769, 0.059),  # #f1c40f
+    "octant": (0.180, 0.800, 0.443),  # #2ecc71
+    "member": (0.584, 0.647, 0.651),  # #95a5a6
+}
+
+#: Y spacing between hierarchy levels in the 3D scene.
+_LEVEL_Y_SPACING = 3.0
+
+#: Base sphere radius for nodes.
+_BASE_SPHERE_RADIUS = 0.3
+
+#: Cylinder radius for edges.
+_EDGE_RADIUS = 0.04
+
+
+def _collect_layout_3d(
+    tree: DisulfideTree,
+    node_key: str,
+    depth: int,
+    max_children: int,
+    max_depth: int,
+    show_members: bool,
+    counter: list[float],
+    x_spacing: float,
+) -> tuple[dict[str, np.ndarray], list[tuple[str, str]]]:
+    """Walk tree and assign 3D positions (x=leaf_order, y=-depth, z=0).
+
+    Returns (positions dict, edges list).
+    """
+    positions: dict[str, np.ndarray] = {}
+    edges: list[tuple[str, str]] = []
+
+    if depth > max_depth:
+        positions[node_key] = np.array(
+            [counter[0] * x_spacing, -depth * _LEVEL_Y_SPACING, 0.0]
+        )
+        counter[0] += 1
+        return positions, edges
+
+    children = tree.children(node_key)
+    members = []
+    if show_members and not children:
+        members = tree.members(node_key)
+
+    all_items = children + members
+    if max_children > 0 and len(all_items) > max_children:
+        all_items = all_items[:max_children]
+
+    if not all_items:
+        positions[node_key] = np.array(
+            [counter[0] * x_spacing, -depth * _LEVEL_Y_SPACING, 0.0]
+        )
+        counter[0] += 1
+        return positions, edges
+
+    child_positions: dict[str, np.ndarray] = {}
+    for child_key in all_items:
+        sub_pos, sub_edges = _collect_layout_3d(
+            tree,
+            child_key,
+            depth + 1,
+            max_children,
+            max_depth,
+            show_members,
+            counter,
+            x_spacing,
+        )
+        child_positions.update(sub_pos)
+        positions.update(sub_pos)
+        edges.extend(sub_edges)
+        edges.append((node_key, child_key))
+
+    # Parent x = mean of children x
+    child_xs = [child_positions[ck][0] for ck in all_items if ck in child_positions]
+    if child_xs:
+        parent_x = (min(child_xs) + max(child_xs)) / 2.0
+    else:
+        parent_x = counter[0] * x_spacing
+        counter[0] += 1
+
+    positions[node_key] = np.array(
+        [parent_x, -depth * _LEVEL_Y_SPACING, 0.0]
+    )
+    return positions, edges
+
+
+def _node_color_rgb(
+    data: Optional[TreeNodeData], node_key: str
+) -> tuple[float, float, float]:
+    """Return an RGB tuple for a tree node."""
+    if node_key == "root":
+        return _LEVEL_COLORS_RGB["root"]
+    if data is None:
+        return _LEVEL_COLORS_RGB["member"]
+    return _LEVEL_COLORS_RGB.get(data.level, (0.204, 0.596, 0.859))
+
+
+def _node_label_3d(node_key: str, data: Optional[TreeNodeData]) -> str:
+    """Compact label for 3D point labels."""
+    if node_key == "root":
+        if data:
+            return f"root ({data.occupancy:,})"
+        return "root"
+    if data is None:
+        return node_key
+    label = node_key
+    if data.class_name:
+        label += f" {data.class_name}"
+    label += f" n={data.occupancy:,}"
+    return label
+
+
+def tree_3d(
+    tree: DisulfideTree,
+    root: str = "root",
+    max_children: int = 6,
+    max_depth: int = 3,
+    show_members: bool = False,
+    title: str = "Disulfide Classification Tree",
+    x_spacing: float = 2.0,
+    shadows: bool = False,
+    light: str = "auto",
+    off_screen: bool = False,
+    screenshot: Optional[str] = None,
+    window_size: tuple[int, int] = (1024, 1024),
+) -> Optional[str]:
+    """Render a DisulfideTree as an interactive 3D pyvista scene.
+
+    Nodes are drawn as spheres sized by occupancy percentage, colored
+    by hierarchy level.  Edges are drawn as cylinders with thickness
+    proportional to child occupancy.  Labels are placed above each
+    sphere.
+
+    Parameters
+    ----------
+    tree : DisulfideTree
+        The tree to render.
+    root : str
+        Starting node key.
+    max_children : int
+        Maximum children per node.
+    max_depth : int
+        Maximum depth to draw.
+    show_members : bool
+        Whether to show leaf disulfide members.
+    title : str
+        Scene title.
+    x_spacing : float
+        Horizontal spacing between leaf nodes.
+    shadows : bool
+        Enable shadow rendering.
+    light : str
+        PyVista theme: ``"auto"``, ``"light"``, or ``"dark"``.
+    off_screen : bool
+        If True, render without displaying a window (for screenshots).
+    screenshot : str, optional
+        If given, save a screenshot to this path and close. Implies
+        ``off_screen=True``.
+    window_size : tuple[int, int]
+        Window size in pixels.
+
+    Returns
+    -------
+    str or None
+        The screenshot filename if saved, else None.
+    """
+    import pyvista as pv
+
+    from proteusPy.utility import dpi_adjusted_fontsize, set_pyvista_theme
+
+    set_pyvista_theme(light)
+
+    if screenshot:
+        off_screen = True
+
+    # Collect positions and edges
+    positions, edges = _collect_layout_3d(
+        tree, root, 0, max_children, max_depth, show_members, [0], x_spacing
+    )
+
+    pl = pv.Plotter(window_size=window_size, off_screen=off_screen)
+    pl.add_title(title=title, font_size=dpi_adjusted_fontsize(10))
+    pl.enable_anti_aliasing("msaa")
+
+    # --- Draw edges as cylinders ---
+    for src, tgt in edges:
+        if src not in positions or tgt not in positions:
+            continue
+
+        src_pos = positions[src]
+        tgt_pos = positions[tgt]
+
+        direction = tgt_pos - src_pos
+        height = float(np.linalg.norm(direction))
+        if height < 1e-6:
+            continue
+
+        midpoint = (src_pos + tgt_pos) / 2.0
+
+        # Edge thickness from child occupancy
+        tgt_data = tree.node_data(tgt)
+        edge_radius = _EDGE_RADIUS
+        if tgt_data and tgt_data.occupancy_pct > 0:
+            edge_radius = max(0.02, min(0.12, _EDGE_RADIUS * tgt_data.occupancy_pct / 3.0))
+
+        cyl = pv.Cylinder(
+            center=midpoint.tolist(),
+            direction=direction.tolist(),
+            radius=edge_radius,
+            height=height,
+            capping=True,
+            resolution=16,
+        )
+        pl.add_mesh(cyl, color="#bdc3c7", smooth_shading=True)
+
+    # --- Draw nodes as spheres ---
+    for node_key, pos in positions.items():
+        data = tree.node_data(node_key)
+        color = _node_color_rgb(data, node_key)
+        label = _node_label_3d(node_key, data)
+
+        # Scale radius by occupancy
+        radius = _BASE_SPHERE_RADIUS
+        if data and data.occupancy_pct > 0:
+            radius = max(
+                0.15,
+                min(0.8, _BASE_SPHERE_RADIUS * (data.occupancy_pct / 5.0)),
+            )
+
+        sphere = pv.Sphere(
+            center=pos.tolist(),
+            radius=radius,
+            theta_resolution=24,
+            phi_resolution=24,
+        )
+        pl.add_mesh(
+            sphere,
+            color=color,
+            smooth_shading=True,
+            specular=0.7,
+            specular_power=80,
+        )
+
+        # Label above sphere
+        label_pos = pos.copy()
+        label_pos[1] += radius + 0.2
+        pl.add_point_labels(
+            [label_pos.tolist()],
+            [label],
+            font_size=8,
+            point_size=0,
+            bold=True,
+            text_color=color,
+            shape_opacity=0.0,
+            always_visible=True,
+        )
+
+    # Camera: isometric view from above-front
+    pl.camera_position = "iso"
+    pl.reset_camera()
+
+    if shadows:
+        pl.enable_shadows()
+
+    if screenshot:
+        try:
+            pl.screenshot(screenshot)
+        except RuntimeError:
+            pass
+        pl.close()
+        return screenshot
+
+    pl.show()
+    return None
+
+
+# ---------------------------------------------------------------------------
 # Module exports
 # ---------------------------------------------------------------------------
 
 __all__ = [
     "text_tree",
     "png_tree",
+    "tree_3d",
 ]

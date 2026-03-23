@@ -92,6 +92,7 @@ from .disulfide_tree import (
 from .tree_visualizer import (
     png_tree,
     text_tree,
+    tree_3d,
 )
 from .DisulfideClasses import (
     angle_within_range,
