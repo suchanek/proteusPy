@@ -17,7 +17,6 @@ import pickle
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import Dict, List, Tuple, Union
 
 import pandas as pd
 import tqdm
@@ -55,7 +54,7 @@ class DisulfideClassGenerator:
     """
 
     @staticmethod
-    def parse_class_string(class_str: str) -> Tuple[int, str]:
+    def parse_class_string(class_str: str) -> tuple[int, str]:
         """
         Parse a class string to determine its base and return the string without suffixes.
 
@@ -107,8 +106,8 @@ class DisulfideClassGenerator:
         :raises ValueError: If no valid data source is provided.
         """
         self.verbose = verbose
-        self.binary_class_disulfides: Dict[str, DisulfideList] = {}
-        self.octant_class_disulfides: Dict[str, DisulfideList] = {}
+        self.binary_class_disulfides: dict[str, DisulfideList] = {}
+        self.octant_class_disulfides: dict[str, DisulfideList] = {}
         self.df = None
         self.binary_df = None
         self.octant_df = None
@@ -288,7 +287,7 @@ class DisulfideClassGenerator:
         ]
         return DisulfideList(disulfides, f"Class_{class_id}")
 
-    def generate_for_class(self, class_id: str) -> Union[DisulfideList, None]:
+    def generate_for_class(self, class_id: str) -> DisulfideList | None:
         """
         Generate disulfides for a specific class.
 
@@ -340,8 +339,8 @@ class DisulfideClassGenerator:
         return disulfide_list
 
     def generate_for_selected_classes(
-        self, class_ids: List[str]
-    ) -> Dict[str, DisulfideList]:
+        self, class_ids: list[str]
+    ) -> dict[str, DisulfideList]:
         """
         Generate disulfides for multiple classes in parallel.
 
@@ -369,7 +368,7 @@ class DisulfideClassGenerator:
         _logger.info("Generated disulfides for %d classes", len(class_disulfides))
         return class_disulfides
 
-    def generate_for_all_classes(self) -> Dict[str, DisulfideList]:
+    def generate_for_all_classes(self) -> dict[str, DisulfideList]:
         """
         Generate disulfides for all classes in loaded DataFrames.
 

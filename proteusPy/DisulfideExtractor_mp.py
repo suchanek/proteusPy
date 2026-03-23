@@ -52,7 +52,6 @@ from proteusPy import (
 )
 from proteusPy.ProteusGlobals import (
     CA_CUTOFF,
-    DATA_DIR,
     LOADER_FNAME,
     LOADER_SUBSET_FNAME,
     SG_CUTOFF,
@@ -145,7 +144,7 @@ def parse_arguments():
         and the DisulfideLoader object. The DisulfideLoader object is saved to the proteusPy module.
 
         The program expects the environment variable PDB to be set to the base location of the PDB files.
-        The PDB files are expected to be in the PDB/good directory. Relevant output files, 
+        The PDB files are expected to be in the PDB/good directory. Relevant output files,
         (SS_*LOADER*.pkl) are stored in PDB/data."""
     )
     parser.add_argument(
@@ -253,7 +252,7 @@ def extract_disulfides_chunk(args):
         position=pbar_index + 1,
         leave=False,
         ncols=PBAR_COLS,
-        bar_format="{l_bar}%s{bar}{r_bar}%s" % (Fore.YELLOW, Style.RESET_ALL),
+        bar_format=f"{{l_bar}}{Fore.YELLOW}{{bar}}{{r_bar}}{Style.RESET_ALL}",
         mininterval=1.0,
     )
 

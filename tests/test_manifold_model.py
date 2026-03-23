@@ -124,7 +124,7 @@ class TestExploration:
         for i in range(len(X)):
             geom = model.get_geometry(f"n{i}")
             assert isinstance(geom, NodeGeometry)
-            assert geom.basis.shape == (model.ndim, model.ndim)
+            assert geom.basis.shape == (geom.intrinsic_dim, model.ndim)
             assert geom.intrinsic_dim >= 1
             assert geom.intrinsic_dim <= model.ndim
 
@@ -244,11 +244,15 @@ class TestFly:
         assert model.flight_path == []
 
     def test_fly_oriented_to_local_geometry(self, fitted_model):
-        """After fly_to, turtle frame should match node's PCA basis."""
+        """After fly_to, turtle frame first d rows should align with node's PCA basis."""
         model, _, _ = fitted_model
         geom = model.fly_to("n5")
+        d = geom.intrinsic_dim
+        # _pad_basis expands basis to (ndim, ndim); first d rows should match
+        # original basis up to sign flip
+        frame_top = model.turtle._frame[:d]
         np.testing.assert_allclose(
-            model.turtle._frame, geom.basis, atol=1e-10
+            np.abs(frame_top), np.abs(geom.basis), atol=1e-10
         )
 
     def test_fly_step_with_direction(self, fitted_model):

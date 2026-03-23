@@ -51,7 +51,9 @@ for gpu in gpus:
     except RuntimeError:
         pass
 
-metal = any("METAL" in d.name.upper() for d in tf.config.list_physical_devices())
+# On macOS with tensorflow-metal, Metal GPUs appear as GPU-type devices.
+# "METAL" does NOT appear in device names — correct detection: darwin + GPU present.
+metal = sys.platform == "darwin" and len(gpus) > 0
 DEVICE_INFO = {
     "tensorflow_version": tf.__version__,
     "device_used": "Metal GPU" if metal else ("GPU" if gpus else "CPU"),

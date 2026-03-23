@@ -9,7 +9,7 @@ import argparse
 import logging
 
 import proteusPy as pp
-from proteusPy.ProteusGlobals import CA_CUTOFF, DATA_DIR, SG_CUTOFF
+from proteusPy.ProteusGlobals import DATA_DIR
 
 VERSION = "1.0.2"
 

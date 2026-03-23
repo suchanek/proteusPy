@@ -1,7 +1,7 @@
 """
-This module provides various utility functions for disulfide bond analysis, 
-including functions for highlighting worst-case structures based on distance 
-and angle deviations, as well as generating pie charts to visualize disulfide 
+This module provides various utility functions for disulfide bond analysis,
+including functions for highlighting worst-case structures based on distance
+and angle deviations, as well as generating pie charts to visualize disulfide
 torsional classes.
 
 Functions:

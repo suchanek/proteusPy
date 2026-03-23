@@ -7,6 +7,37 @@ Notable changes to the ``proteusPy`` project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.99.40] - 2026-03-23
+
+### Added
+
+- `ManifoldModel` — zero-parameter geometric classifier using local PCA, manifold-weighted knowledge graphs, and graph-walk voting for classification. Supports fly-mode manifold navigation.
+- `TurtleND` — N-dimensional turtle for manifold traversal, underpinning `ManifoldModel` navigation.
+- `ManifoldWalker` — manifold-aware graph traversal and path-finding.
+- `graph_reasoner.py` — `KnowledgeGraph` and `SemanticEdge` primitives used by `ManifoldModel`.
+- CIFAR-10 and Iris benchmarks for `ManifoldModel` vs. Euclidean KNN across PCA dimensionalities and tau values, with TensorBoard logging to `runs/`.
+- Full KGRAG integration: CodeKG, DocKG, and FileTreeKG indices built and snapshotted at v0.99.40 (baseline: 22,575 code nodes / 87.7% coverage, 2,315 doc nodes / 96.6% coverage, 465 file-tree nodes).
+- `[tool.codekg]`, `[tool.dockg]` configuration sections in `pyproject.toml`.
+
+### Changed
+
+- Migrated build backend from `setuptools` to `poetry-core>=2.0.0`; all metadata moved to `[tool.poetry]`.
+- `doc-kg` and `code-kg` declared as native Poetry git dependencies; `ftree-kg` as local path editable dep.
+- `tensorflow-metal` moved to optional `[metal]` extra to unblock cross-platform installs.
+- `pyvista` aligned with `code_kg` reference: `>=0.44.0` with `extras = ["jupyter"]`; `trame-jupyter-extension` replaced by `trame-vtk = ">=2.0.0"`.
+- `param`, `plotly` version pins relaxed to `>=` constraints matching `code_kg`.
+- Optional extras reorganised: `viz3d`, `kg`, `metal`, `all`; dev deps aligned with `code_kg` (`ruff`, `mypy`, `pre-commit`, `detect-secrets`, `pylint`).
+- `Optional[X]` type annotations modernised to `X | None` throughout `ManifoldModel`.
+- Ruff linting configured (`[tool.ruff]`) and codebase cleaned to zero violations.
+
+### Fixed
+
+- Removed unused `DATA_DIR` import in `DisulfideExtractor_mp.py` (shadowed by local redefinition).
+- Fixed `"pandas.DataFrame"` string annotation → `"pd.DataFrame"` in `DisulfideVisualization.py`.
+- Renamed ambiguous variable `l` → `left_vec` in `turtleND.py`.
+- Removed unused local variables (`res`, `sg_cutoff`, `ca_cutoff`, `child_base`) across `DisulfideLoader`, `disulfide_tree`.
+- Trailing whitespace and percent-format style issues cleaned across multiple modules.
+
 ## [v0.99.35] - 2025-4-26
 
 ### Added

@@ -5,8 +5,6 @@
 # Please see the LICENSE file that should have been included as part of this
 # package.
 
-import os
-import warnings
 
 from proteusPy.ProteusPyWarning import ProteusPyWarning
 

@@ -473,7 +473,7 @@ def Download_Disulfides(
 
     # list of IDs containing >1 SSBond record
     try:
-        ssfile = open(ssfilename, "r")
+        ssfile = open(ssfilename)
         Line = ssfile.readlines()
     except Exception as exc:
         raise DisulfideIOException(f"Cannot open file: {ssfile}") from exc
@@ -982,8 +982,7 @@ def get_theme() -> str:
         try:
             result = subprocess.run(
                 ["osascript", "-e", script],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                capture_output=True,
                 text=True,
                 check=True,
             )
@@ -1026,8 +1025,7 @@ def get_theme() -> str:
         try:
             result = subprocess.run(
                 ["gsettings", "get", "org.gnome.desktop.interface", "gtk-theme"],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                capture_output=True,
                 text=True,
                 check=True,
             )
@@ -1212,8 +1210,7 @@ def find_arial_font():
             # Use fc-list to find a sans-serif font
             result = subprocess.run(
                 ["fc-list", ":spacing=proportional", "file"],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                capture_output=True,
                 text=True,
                 check=True,
             )

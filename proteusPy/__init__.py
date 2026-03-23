@@ -59,28 +59,6 @@ from .atoms import (
     SPEC_POWER,
     SPECULARITY,
 )
-from .DisulfideBase import Disulfide, DisulfideList
-from .manifold_model import (
-    ManifoldModel,
-    NodeGeometry,
-)
-from .graph_reasoner import (
-    DirectedDiscoverer,
-    EdgeDiscoverer,
-    ExplorationSteering,
-    GradientSteering,
-    GraphReasoner,
-    KNNDiscoverer,
-    KnowledgeGraph,
-    RadiusDiscoverer,
-    ReasoningPath,
-    SemanticEdge,
-    SteeringStrategy,
-    TargetSteering,
-    angular_distance,
-    euclidean_distance,
-    graph_from_disulfides,
-)
 from .disulfide_tree import (
     DisulfideTree,
     TreeNodeData,
@@ -89,6 +67,7 @@ from .disulfide_tree import (
     snippet_for_disulfide,
     snippet_for_node,
 )
+from .DisulfideBase import Disulfide, DisulfideList
 from .DisulfideClasses import (
     angle_within_range,
     filter_by_percentage,
@@ -112,6 +91,23 @@ from .DisulfideIO import (
 from .DisulfideLoader import Bootstrap_PDB_SS, DisulfideLoader, Load_PDB_SS
 from .DisulfideStats import DisulfideStats
 from .DisulfideVisualization import DisulfideVisualization
+from .graph_reasoner import (
+    DirectedDiscoverer,
+    EdgeDiscoverer,
+    ExplorationSteering,
+    GradientSteering,
+    GraphReasoner,
+    KNNDiscoverer,
+    KnowledgeGraph,
+    RadiusDiscoverer,
+    ReasoningPath,
+    SemanticEdge,
+    SteeringStrategy,
+    TargetSteering,
+    angular_distance,
+    euclidean_distance,
+    graph_from_disulfides,
+)
 from .logger_config import (
     DEFAULT_LOG_LEVEL,
     configure_master_logger,
@@ -123,6 +119,10 @@ from .logger_config import (
     set_logger_level_for_module,
     set_logging_level_for_all_handlers,
     toggle_stream_handler,
+)
+from .manifold_model import (
+    ManifoldModel,
+    NodeGeometry,
 )
 from .Plotting import plot_class_chart
 from .ProteusGlobals import (
