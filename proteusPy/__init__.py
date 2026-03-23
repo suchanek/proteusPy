@@ -124,6 +124,10 @@ from .manifold_model import (
     ManifoldModel,
     NodeGeometry,
 )
+from .manifold_observer import (
+    ManifoldObserver,
+    ObservedGeometry,
+)
 from .Plotting import plot_class_chart
 from .ProteusGlobals import (
     _ANG_INIT,
@@ -176,6 +180,11 @@ from .ssparser import (
     get_phipsi_atoms_coordinates,
     get_residue_atoms_coordinates,
     print_disulfide_bond_info_dict,
+)
+from .tree_visualizer import (
+    png_tree,
+    text_tree,
+    tree_3d,
 )
 from .turtle3D import ORIENT_BACKBONE, ORIENT_SIDECHAIN, Turtle3D
 from .utility import (
