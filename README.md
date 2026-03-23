@@ -6,6 +6,23 @@
 
 <!-- markdownlint-disable MD014 -->
 
+# What's New in v0.99.50 — WaveRider Geometric ML Stack
+
+**proteusPy now ships the complete WaveRider stack** — a four-layer framework for manifold-aware machine learning with zero learned parameters. The core thesis: *the manifold IS the model*.
+
+| Layer | Module | What it does |
+|-------|--------|-------------|
+| 1 | `TurtleND` | N-dimensional navigation primitive: position + orthonormal frame, Givens rotations, QR orthonormalization |
+| 2 | `ManifoldWalker` / `ManifoldAdamWalker` | Riemannian-approximate gradient descent: KNN → local PCA → project gradient onto tangent plane → step |
+| 3 | `ManifoldModel` | Zero-parameter geometric classifier: manifold-weighted knowledge graph + tangent-space voting. No learned weights |
+| 3a | `ManifoldObserver` | (N+1)-dimensional observer: extends the walker's frame by one orthonormal dimension to gain the manifold normal — hovering above the surface to see curvature, topology, and class boundaries directly |
+
+The insight behind the ManifoldObserver: a TurtleND walking an N-dimensional manifold is a *Flatland creature* — it can only discover structure by searching. By appending one orthonormal dimension via QR, the observer gains a vantage point above the surface. What the ManifoldModel discovers by walking, the ManifoldObserver sees at a glance.
+
+See [`docs/waverider/waverider_stack_summary.md`](docs/waverider/waverider_stack_summary.md) for the full algorithmic reference and [`docs/manifold_observer/manifold_observer.md`](docs/manifold_observer/manifold_observer.md) for the mathematical treatment.
+
+---
+
 # Summary
 
 **proteusPy** is a Python package specializing in the modeling and analysis of proteins of known structure with an emphasis on Disulfide bonds. This package reprises my molecular modeling program [Proteus](https://doi.org/10.1021/bi00368a023), a structure-based program developed as part of my graduate thesis. The package relies on the [Turtle3D](https://suchanek.github.io/proteusPy/proteusPy/turtle3D.html) class to create and manipulate local coordinate systems. It does this by implementing the functions ``Move``, ``Roll``, ``Yaw``, ``Pitch`` and ``Turn`` for movement in a three-dimensional space.  The initial implementation focuses on the [Disulfide](https://suchanek.github.io/proteusPy/proteusPy/Disulfide.html) class. The class implements methods to analyze the protein structure stabilizing element known as a *Disulfide Bond*. This class and its underlying methods are being used to perform a structural analysis of over 36,900 disulfide-bond containing proteins in the RCSB protein data bank (<https://www.rcsb.org>).
@@ -243,7 +260,7 @@ The proteusPy package was developed by Eric G. Suchanek, PhD. If you find it use
   title = {proteusPy: A Package for Modeling and Analyzing Proteins of Known Structure},
   year = {2024},
   publisher = {GitHub},
-  version = {0.96},
+  version = {0.99.50},
   journal = {GitHub repository},
   url = {https://github.com/suchanek/proteusPy}
 }

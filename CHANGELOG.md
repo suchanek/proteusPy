@@ -7,6 +7,41 @@ Notable changes to the ``proteusPy`` project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.99.50] - 2026-03-23
+
+### Overview
+
+This release introduces the complete **WaveRider geometric ML stack** — a four-layer framework for manifold-aware machine learning that operates without learned parameters. The central thesis: *the manifold IS the model*. Real data occupies a low-dimensional manifold embedded in a high-dimensional ambient space (71–99% of dimensions are noise). WaveRider discovers that manifold, navigates it, classifies within it, and — with the new ManifoldObserver — sees its global topology from one dimension above.
+
+### Added
+
+- **`ManifoldObserver`** (Layer 3a) — An (N+1)-dimensional geometric observer that hovers above the N-dimensional data manifold. By extending the subject TurtleND's orthonormal frame by one dimension via QR, the observer gains the manifold normal — a literal vantage point above the surface. From there it can measure curvature (principal angles between neighboring tangent subspaces), height fields (reconstruction error from local tangent planes), global topology, and classify points by direct projection rather than graph search. What the ManifoldModel discovers by walking, the ManifoldObserver sees at a glance.
+- **`tree_visualizer`** — Visualization utilities for `DisulfideTree`: `text_tree` (ASCII), `png_tree` (matplotlib), `tree_3d` (interactive PyVista). All three exported from the top-level namespace.
+- **`ManifoldModel`** (Layer 3) — Zero-parameter geometric classifier. Builds a manifold-weighted knowledge graph via local PCA (SVD), classifies via graph-walk + tangent-space voting. No learned weights; the graph, local bases, and eigenvalue field *are* the model.
+- **`ManifoldWalker` / `ManifoldAdamWalker`** (Layer 2) — Riemannian-approximate gradient descent. Each step: KNN → local PCA → project gradient onto tangent plane → eigenvalue-weighted step. Adam variant replaces eigenvalue weighting with momentum + adaptive LR in global coordinates so momentum survives frame reorientations.
+- **`TurtleND`** (Layer 1) — N-dimensional generalization of Turtle3D. Carries position **p** ∈ ℝᴺ and an N×N orthonormal frame. All rotations are Givens rotations; QR re-orthonormalization prevents frame drift.
+- **`graph_reasoner`** — `KnowledgeGraph`, `SemanticEdge`, and steering strategies (`GradientSteering`, `TargetSteering`, `ExplorationSteering`) underpinning ManifoldModel navigation.
+- **WaveRider documentation** — `docs/waverider/waverider_stack_summary.md` (algorithmic reference for all four layers) and `docs/manifold_observer/manifold_observer.md` (mathematical treatment of the extrinsic observer construction).
+- **CIFAR-10, Iris, MNIST, Digits benchmarks** with TensorBoard logging. CIFAR-10: `PCA→30D + ManifoldModel (τ=0.85)` achieves 32.5% accuracy with zero learned parameters.
+- **KGRAG integration** — CodeKG, DocKG, FileTreeKG indices built and snapshotted at this version (22,575 code nodes / 87.7% docstring coverage; 2,315 doc nodes / 96.6% semantic coverage).
+
+### Changed
+
+- Migrated build backend from `setuptools` to `poetry-core>=2.0.0`.
+- `tensorflow-metal` moved to optional `[metal]` extra.
+- `pyvista >=0.44.0` with `extras = ["jupyter"]`; `trame-vtk >=2.0.0` replaces `trame-jupyter-extension`.
+- `doc-kg`, `code-kg` as native Poetry git deps; `ftree-kg` as local path editable dep.
+- CI updated to `poetry install --with dev`, `actions/checkout@v4`, `setup-python@v5`; now also triggers on pull requests.
+- Ruff enforced across `proteusPy/`, `benchmarks/`, `tests/`, `turtlend_package/`; zero violations.
+- `Optional[X]` modernised to `X | None` throughout the new ML stack.
+
+### Fixed
+
+- Removed unused `DATA_DIR` import in `DisulfideExtractor_mp.py`.
+- Fixed `"pandas.DataFrame"` string annotation in `DisulfideVisualization.py`.
+- Renamed ambiguous `l` → `left_vec` / `v` in `turtleND.py` and architecture benchmarks.
+- Removed unused local variables across `DisulfideLoader`, `disulfide_tree`, `manifold_observer`, `tree_visualizer`.
+
 ## [v0.99.40] - 2026-03-23
 
 ### Changed
