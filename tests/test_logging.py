@@ -13,7 +13,6 @@ from proteusPy import (
     set_logger_level,
     set_logger_level_for_module,
     set_logging_level_for_all_handlers,
-    toggle_stream_handler,
 )
 
 

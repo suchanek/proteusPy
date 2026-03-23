@@ -14,7 +14,7 @@ Author: Eric G. Suchanek, PhD
 
 __pdoc__ = {"__all__": True}
 
-from typing import Callable, Optional
+from collections.abc import Callable
 
 import numpy as np
 
@@ -91,12 +91,12 @@ class ManifoldWalker:
         return self._ndim
 
     @property
-    def eigenvalues(self) -> Optional[np.ndarray]:
+    def eigenvalues(self) -> np.ndarray | None:
         """Eigenvalues from the most recent local PCA (descending order)."""
         return self._eigenvalues
 
     @property
-    def intrinsic_dim(self) -> Optional[int]:
+    def intrinsic_dim(self) -> int | None:
         """Estimated local intrinsic dimensionality from most recent PCA."""
         return self._intrinsic_dim
 
@@ -200,7 +200,7 @@ class ManifoldWalker:
 
         return intrinsic_dim
 
-    def step(self, gradient: Optional[np.ndarray] = None) -> float:
+    def step(self, gradient: np.ndarray | None = None) -> float:
         """
         Take one manifold-aware step.
 
@@ -259,7 +259,7 @@ class ManifoldWalker:
     def walk(
         self,
         n_steps: int = 100,
-        gradient_fn: Optional[Callable[[np.ndarray], np.ndarray]] = None,
+        gradient_fn: Callable[[np.ndarray], np.ndarray] | None = None,
         tol: float = 1e-8,
         verbose: bool = False,
     ) -> np.ndarray:
@@ -407,7 +407,7 @@ class ManifoldAdamWalker(ManifoldWalker):
         self._v = np.zeros(self._ndim, dtype="d")  # second moment
         self._t = 0
 
-    def step(self, gradient: Optional[np.ndarray] = None) -> float:
+    def step(self, gradient: np.ndarray | None = None) -> float:
         """Take one manifold-aware Adam step.
 
         1. Orient turtle to local manifold via PCA

@@ -1,0 +1,44 @@
+{
+  "format": "1.0",
+  "last_update": "2026-03-23T03:55:19.932603+00:00",
+  "snapshots": [
+    {
+      "key": "9d642891f86da793c3505e331c3b506d2abcb2c6",
+      "branch": "feat.manifold",
+      "timestamp": "2026-03-23T03:55:19.932305+00:00",
+      "version": "0.99.40",
+      "file": "9d642891f86da793c3505e331c3b506d2abcb2c6.json",
+      "metrics": {
+        "db_path": ".dockg/graph.sqlite",
+        "total_nodes": 2315,
+        "total_edges": 14235,
+        "node_counts": {
+          "chunk": 437,
+          "document": 31,
+          "entity": 621,
+          "keyword": 679,
+          "section": 211,
+          "topic": 336
+        },
+        "edge_counts": {
+          "CONTAINS": 648,
+          "CO_OCCURS_WITH": 8354,
+          "HAS_KEYWORD": 1727,
+          "HAS_TOPIC": 436,
+          "MENTIONS_ENTITY": 1712,
+          "NEXT": 175,
+          "REFERENCES": 1,
+          "SIMILAR_TO": 1182
+        },
+        "meaningful_nodes": 2284,
+        "coverage_score": 0.9664378337147216,
+        "issues_count": 0,
+        "complexity_median": 18.0
+      },
+      "deltas": {
+        "vs_previous": null,
+        "vs_baseline": null
+      }
+    }
+  ]
+}

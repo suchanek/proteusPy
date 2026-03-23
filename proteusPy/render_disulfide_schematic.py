@@ -13,7 +13,6 @@ Last revision: 2025-03-04
 import argparse
 import os
 import sys
-from typing import Optional, Tuple
 
 import matplotlib.pyplot as plt
 
@@ -175,7 +174,7 @@ def parse_arguments() -> argparse.Namespace:
 
 def load_disulfide(
     args: argparse.Namespace,
-) -> Optional[pp.DisulfideBase.Disulfide]:
+) -> pp.DisulfideBase.Disulfide | None:
     """
     Load a disulfide based on the provided command-line arguments.
 
@@ -211,7 +210,7 @@ def load_disulfide(
 
 def get_output_filename(
     args: argparse.Namespace, disulfide: pp.DisulfideBase.Disulfide
-) -> Optional[str]:
+) -> str | None:
     """
     Determine the output filename based on command-line arguments and disulfide properties.
 
@@ -244,7 +243,7 @@ def get_output_filename(
 
 def render_disulfide_schematic(
     disulfide: pp.DisulfideBase.Disulfide, args: argparse.Namespace
-) -> Tuple[plt.Figure, plt.Axes]:
+) -> tuple[plt.Figure, plt.Axes]:
     """
     Render a disulfide schematic based on the provided disulfide and arguments.
 

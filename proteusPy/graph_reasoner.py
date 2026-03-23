@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 """
 GraphReasoner: A semantic reasoning engine for knowledge graphs.
 
@@ -26,8 +27,9 @@ __pdoc__ = {"__all__": True}
 
 import math
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable, Optional
+from typing import Any
 
 import numpy as np
 
@@ -170,7 +172,7 @@ class KnowledgeGraph:
         # Cached matrix for vectorized operations
         self._id_list: list[str] = []
         self._id_to_idx: dict[str, int] = {}
-        self._embedding_matrix: Optional[np.ndarray] = None
+        self._embedding_matrix: np.ndarray | None = None
         self._dirty = True
 
     # ----- Node operations -----
@@ -220,7 +222,7 @@ class KnowledgeGraph:
         self._discoverers.append(discoverer)
 
     def discover_neighbors(
-        self, node_id: str, heading: Optional[np.ndarray] = None
+        self, node_id: str, heading: np.ndarray | None = None
     ) -> list[SemanticEdge]:
         """Return all edges from *node_id*: pre-computed + dynamically discovered.
 
@@ -284,7 +286,7 @@ class EdgeDiscoverer(ABC):
         self,
         node_id: str,
         graph: KnowledgeGraph,
-        heading: Optional[np.ndarray] = None,
+        heading: np.ndarray | None = None,
     ) -> list[SemanticEdge]:
         """Discover edges from *node_id*.
 
@@ -626,7 +628,7 @@ class GraphReasoner:
         return self.turtle.heading
 
     @property
-    def current_node(self) -> Optional[str]:
+    def current_node(self) -> str | None:
         """ID of the node the reasoner is currently at."""
         return self._path.node_ids[-1] if self._path.node_ids else None
 
@@ -652,7 +654,7 @@ class GraphReasoner:
         )
         self._visited = {node_id}
 
-    def step(self, edge_type: Optional[str] = None) -> Optional[str]:
+    def step(self, edge_type: str | None = None) -> str | None:
         """Take one reasoning step.
 
         Discovers candidate edges from the current node, scores them using
@@ -719,7 +721,7 @@ class GraphReasoner:
         self,
         start_id: str,
         max_hops: int = 10,
-        edge_type: Optional[str] = None,
+        edge_type: str | None = None,
         min_score: float = -float("inf"),
     ) -> ReasoningPath:
         """Execute multi-hop reasoning from *start_id*.
@@ -761,7 +763,7 @@ class GraphReasoner:
         start_id: str,
         target_id: str,
         max_hops: int = 20,
-        edge_type: Optional[str] = None,
+        edge_type: str | None = None,
     ) -> ReasoningPath:
         """Find a reasoning path from *start_id* to *target_id*.
 
@@ -805,7 +807,7 @@ class GraphReasoner:
         start_id: str,
         max_hops: int = 10,
         beam_width: int = 3,
-        edge_type: Optional[str] = None,
+        edge_type: str | None = None,
         min_score: float = -float("inf"),
     ) -> list[ReasoningPath]:
         """Multi-path beam search through the knowledge graph.
@@ -898,7 +900,7 @@ class GraphReasoner:
 
         return [path for _, path, _ in beams]
 
-    def backtrack(self, n_steps: int = 1) -> Optional[str]:
+    def backtrack(self, n_steps: int = 1) -> str | None:
         """Back up *n_steps* along the reasoning path.
 
         Does not remove nodes from the visited set — the reasoner will not

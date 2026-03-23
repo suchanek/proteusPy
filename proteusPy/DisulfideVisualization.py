@@ -2884,7 +2884,7 @@ class DisulfideVisualization:
 
     @staticmethod
     def plot_3d_hexbin_df(
-        df: "pandas.DataFrame",
+        df: "pd.DataFrame",
         column1: str,
         column2: str,
         width: int = 1024,

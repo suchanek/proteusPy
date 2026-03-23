@@ -15,11 +15,11 @@ Part of proteusPy, https://github.com/suchanek/proteusPy
 Author: Eric G. Suchanek, PhD
 """
 
+import importlib.util
 import sys
 import time
 from pathlib import Path
 
-import importlib.util
 import numpy as np
 from sklearn.datasets import load_digits
 from sklearn.model_selection import StratifiedKFold

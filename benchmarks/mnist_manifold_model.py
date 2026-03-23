@@ -152,7 +152,7 @@ def main():
     input_dim = X_train.shape[1]
     n_classes = len(np.unique(y_train))
 
-    print(f"\nDataset: MNIST (real handwritten digits)")
+    print("\nDataset: MNIST (real handwritten digits)")
     print(f"  Full: {X_train_full.shape[0]} train, {X_test_full.shape[0]} test")
     print(f"  Subsample: {X_train.shape[0]} train, {X_test.shape[0]} test")
     print(f"  Dimensions: {input_dim} (28×28 pixels), Classes: {n_classes}")

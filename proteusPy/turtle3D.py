@@ -1,8 +1,8 @@
 """
 Implementation of a 3D 'Turtle' in Python.
 
-Part of the program proteusPy, https://github.com/suchanek/proteusPy, 
-a Python packages for the manipulation and analysis of macromolecules. 
+Part of the program proteusPy, https://github.com/suchanek/proteusPy,
+a Python packages for the manipulation and analysis of macromolecules.
 Based on the C implementation originally authored by Eric G. Suchanek PhD, 1990.
 
 """
@@ -19,7 +19,6 @@ numpy.set_printoptions(suppress=True)
 
 # from Bio.PDB.vectors import Vector, calc_angle, calc_dihedral
 from proteusPy.vector3D import Vector3D as Vector
-from proteusPy.vector3D import calc_angle, calc_dihedral
 
 _DOWN_ = -1
 _UP_ = 1
@@ -512,12 +511,12 @@ class Turtle3D:
 
         assert (
             self._orientation == 1 or self._orientation == 2
-        ), f"orient_at_residue() requires Turtle3D to be #1 or #2"
+        ), "orient_at_residue() requires Turtle3D to be #1 or #2"
 
         residue = chain[resnumb]
         assert (
             residue is not None
-        ), f"get_backbone_from_sidechain() requires valid residue number"
+        ), "get_backbone_from_sidechain() requires valid residue number"
 
         # by this point I'm pretty confident I have coordinates
         # we pull the actual numpy.array from the coordinates since that's what the
@@ -561,7 +560,7 @@ class Turtle3D:
 
         assert (
             orientation == 1 or orientation == 2
-        ), f"orient_at_residue() requires Turtle3D to be #1 or #2"
+        ), "orient_at_residue() requires Turtle3D to be #1 or #2"
 
         _n = n.copy()
         _ca = ca.copy()

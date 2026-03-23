@@ -23,7 +23,6 @@ from __future__ import annotations
 __pdoc__ = {"__all__": True}
 
 from dataclasses import dataclass, field
-from typing import Any, Optional
 
 import numpy as np
 
@@ -121,7 +120,7 @@ def parent_class_id(child_id: str, child_level: str, parent_level: str) -> str:
         5-character parent class ID.
     """
     dmap = _PARENT_MAPS[(child_level, parent_level)]
-    child_base = LEVEL_BASES[child_level]
+    LEVEL_BASES[child_level]
 
     parent_digits = []
     for ch in child_id[:N_CHI]:
@@ -183,7 +182,7 @@ class TreeNodeData:
     occupancy_pct: float = 0.0
     class_name: str = ""
     functional_annotation: str = ""
-    consensus_torsions: Optional[list[float]] = None
+    consensus_torsions: list[float] | None = None
     metadata: dict = field(default_factory=dict)
 
 
@@ -310,8 +309,8 @@ class DisulfideTree:
     def __init__(
         self,
         sslist=None,
-        class_names: Optional[dict[str, str]] = None,
-        functional_annotations: Optional[dict[str, str]] = None,
+        class_names: dict[str, str] | None = None,
+        functional_annotations: dict[str, str] | None = None,
     ):
         self._class_names = class_names or {}
         self._functional_annotations = functional_annotations or {}
@@ -498,7 +497,7 @@ class DisulfideTree:
         edges = self._graph._edges.get(node_key, [])
         return [e.target_id for e in edges if e.edge_type == "membership"]
 
-    def node_data(self, node_key: str) -> Optional[TreeNodeData]:
+    def node_data(self, node_key: str) -> TreeNodeData | None:
         """Return the :class:`TreeNodeData` for *node_key*."""
         return self._node_data.get(node_key)
 

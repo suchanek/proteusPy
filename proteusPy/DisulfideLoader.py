@@ -22,7 +22,7 @@ import pickle
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import gdown
 import pandas as pd
@@ -121,12 +121,12 @@ class DisulfideLoader:
     SSList: DisulfideList = field(
         default_factory=lambda: DisulfideList([], "ALL_PDB_SS"), init=False
     )
-    SSDict: Dict = field(default_factory=dict, init=False)
+    SSDict: dict = field(default_factory=dict, init=False)
     TorsionDF: pd.DataFrame = field(default_factory=pd.DataFrame, init=False)
     TotalDisulfides: int = field(default=0, init=False)
-    IDList: List = field(default_factory=list, init=False)
-    tclass: Optional[DisulfideClassManager] = field(default=None, init=False)
-    class_generator: Optional[DisulfideClassGenerator] = field(default=None, init=False)
+    IDList: list = field(default_factory=list, init=False)
+    tclass: DisulfideClassManager | None = field(default=None, init=False)
+    class_generator: DisulfideClassGenerator | None = field(default=None, init=False)
     timestamp: float = field(default_factory=time.time, init=False)
     version: str = field(default=__version__, init=False)
 
@@ -305,7 +305,7 @@ class DisulfideLoader:
                 # try to find the full disulfide name
                 res = self.SSList.get_by_name(item)  # full disulfide name
 
-        except KeyError as e:
+        except KeyError:
             res = self.SSList.get_by_name(item)  # full disulfide name
 
         if not res:
@@ -350,7 +350,7 @@ class DisulfideLoader:
         """
         return self.tclass.binary_to_class(binary_class, base)
 
-    def build_ss_from_idlist(self, idlist: List[str]) -> DisulfideList:
+    def build_ss_from_idlist(self, idlist: list[str]) -> DisulfideList:
         """
         Return a DisulfideList of Disulfides for a given list of PDBIDs
 
@@ -398,7 +398,7 @@ class DisulfideLoader:
         """
         return copy.deepcopy(self)
 
-    def _create_disulfide_dict(self) -> Dict[str, List[int]]:
+    def _create_disulfide_dict(self) -> dict[str, list[int]]:
         """
         Create a dictionary from a list of disulfide objects where the key is the pdb_id
         and the value is a list of indices of the disulfide objects in the list.
@@ -472,7 +472,7 @@ class DisulfideLoader:
         """
         return copy.deepcopy(self.SSList)
 
-    def get_by_name(self, name: str = None) -> Optional[Disulfide]:
+    def get_by_name(self, name: str = None) -> Disulfide | None:
         """
         Return the Disulfide with the given name from the list.
         Result is cached since disulfide data doesn't change after loading.
@@ -568,7 +568,7 @@ class DisulfideLoader:
         ssbonds.display_overlay(verbose=verbose, spin=spin)
         return
 
-    def getTorsions(self, pdbID: Optional[str] = None) -> pd.DataFrame:
+    def getTorsions(self, pdbID: str | None = None) -> pd.DataFrame:
         """
         Return the torsions, distances and energies defined by Torsion_DF_cols
 
@@ -588,7 +588,7 @@ class DisulfideLoader:
 
         if pdbID:
             try:
-                res = self.SSDict[pdbID]
+                self.SSDict[pdbID]
                 sel = self.TorsionDF["source"] == pdbID
                 res_df = self.TorsionDF[sel]
                 return res_df.copy()
@@ -607,7 +607,7 @@ class DisulfideLoader:
     def plot_classes(
         self,
         base: int = 8,
-        class_string: Optional[str] = None,
+        class_string: str | None = None,
         theme: str = "auto",
         log: bool = False,
         paginated: bool = False,
@@ -708,8 +708,8 @@ class DisulfideLoader:
         base: int = 8,
         verbose: bool = False,
         log: bool = False,
-        sample_size: Optional[int] = None,
-        page_size: Optional[int] = None,
+        sample_size: int | None = None,
+        page_size: int | None = None,
     ) -> None:
         """
         Plot a line graph of count vs class ID using Plotly for the given disulfide class. The
@@ -753,7 +753,7 @@ class DisulfideLoader:
 
     def plot_count_vs_classid(
         self,
-        cls: Optional[str] = None,
+        cls: str | None = None,
         theme: str = "auto",
         base: int = 8,
         log: bool = True,
@@ -771,7 +771,7 @@ class DisulfideLoader:
         DisulfideVisualization.plot_count_vs_classid(self.tclass, cls, theme, base, log)
 
     def _enumerate_class_fromlist(
-        self, sslist: List[str], base: int = 8
+        self, sslist: list[str], base: int = 8
     ) -> pd.DataFrame:
         """
         Enumerate the classes from a list of class IDs and return a DataFrame with class IDs and their corresponding counts.
@@ -802,7 +802,7 @@ class DisulfideLoader:
         self,
         savepath: str = DATA_DIR,
         verbose: bool = False,
-        fname: Optional[str] = None,
+        fname: str | None = None,
     ) -> None:
         """
         Save a copy of the fully instantiated Loader to the specified file.
@@ -830,7 +830,7 @@ class DisulfideLoader:
         if verbose:
             _logger.info("Done saving loader.")
 
-    def plot_disulfides_vs_pdbid(self, cutoff: int = 1) -> Tuple[List[str], List[int]]:
+    def plot_disulfides_vs_pdbid(self, cutoff: int = 1) -> tuple[list[str], list[int]]:
         """
         Plots the number of disulfides versus pdbid.
 
@@ -940,7 +940,7 @@ class DisulfideLoader:
 
     def display_torsion_statistics(
         self,
-        class_id: Optional[str] = None,
+        class_id: str | None = None,
         display: bool = True,
         save: bool = False,
         fname: str = "ss_torsions.png",
@@ -1047,7 +1047,7 @@ class DisulfideLoader:
         scaling: str = "sqrt",
         column1: str = "chi2",
         column2: str = "chi4",
-        title: Optional[str] = None,
+        title: str | None = None,
     ) -> None:
         """
         Create 3D hexbin plots for left and right-handed chi2-chi4 correlations with customizable z-scaling.
@@ -1147,7 +1147,6 @@ def Load_PDB_SS(
     _fname_all = Path(loadpath) / LOADER_FNAME
     _fpath = _fname_sub if subset else _fname_all
 
-    sg_cutoff = ca_cutoff = -1.0
 
     if not _fpath.exists() or force is True:
         if verbose:
@@ -1185,7 +1184,7 @@ def Bootstrap_PDB_SS(
     force: bool = False,
     fake: bool = False,
     percentile: float = -1.0,
-) -> Optional[DisulfideLoader]:
+) -> DisulfideLoader | None:
     """
     Download and instantiate the disulfide databases from Google Drive.
 

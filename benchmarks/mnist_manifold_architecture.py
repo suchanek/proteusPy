@@ -69,7 +69,6 @@ else:
 
 from tensorflow import keras  # noqa: E402
 
-
 # ---------------------------------------------------------------------------
 # Phase 1: Manifold Discovery
 # ---------------------------------------------------------------------------
@@ -288,8 +287,8 @@ def run_trial(build_fn, X_train, y_train, X_test, y_test, epochs, batch_size, tr
         "convergence_epoch": conv_epoch,
         "train_acc": [float(a) for a in history.history["accuracy"]],
         "val_acc": [float(a) for a in history.history["val_accuracy"]],
-        "train_loss": [float(l) for l in history.history["loss"]],
-        "val_loss": [float(l) for l in history.history["val_loss"]],
+        "train_loss": [float(v) for v in history.history["loss"]],
+        "val_loss": [float(v) for v in history.history["val_loss"]],
     }
 
 
@@ -369,7 +368,7 @@ def plot_results(all_results, intrinsic_dim, save_path):
     # Parameter efficiency
     ax = axes[1, 1]
     param_counts = [all_results[n][0]["n_params"] for n in names]
-    acc_per_param = [m / p * 1000 for m, p in zip(means, param_counts)]
+    [m / p * 1000 for m, p in zip(means, param_counts)]
     bars = ax.bar(short_names, param_counts, color=bar_colors, alpha=0.8)
     for bar, p, m in zip(bars, param_counts, means):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 50,
@@ -495,7 +494,7 @@ def main():
     for name, build_fn in architectures.items():
         model = build_fn()
         n_params = count_params(model)
-        layer_sizes = [int(np.prod(w.shape)) for w in model.trainable_weights]
+        [int(np.prod(w.shape)) for w in model.trainable_weights]
         print(f"\n{name}:")
         print(f"  Parameters: {n_params:,}")
         for layer in model.layers:
@@ -552,7 +551,8 @@ def main():
     print(f"  PCA to {d}D captures {var_explained * 100:.1f}% of global variance")
 
     pca_name = f"PCA→{d}D + MLP (2d→d)"
-    pca_build_fn = lambda: build_pca_model(n_classes, d, lr=args.lr)
+    def pca_build_fn():
+        return build_pca_model(n_classes, d, lr=args.lr)
 
     model = pca_build_fn()
     pca_params = count_params(model)

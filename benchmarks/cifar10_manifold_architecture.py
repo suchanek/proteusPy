@@ -51,7 +51,9 @@ for gpu in gpus:
     except RuntimeError:
         pass
 
-metal = any("METAL" in d.name.upper() for d in tf.config.list_physical_devices())
+# On macOS with tensorflow-metal, Metal GPUs appear as GPU-type devices.
+# "METAL" does NOT appear in device names — correct detection: darwin + GPU present.
+metal = sys.platform == "darwin" and len(gpus) > 0
 DEVICE_INFO = {
     "tensorflow_version": tf.__version__,
     "device_used": "Metal GPU" if metal else ("GPU" if gpus else "CPU"),
@@ -315,8 +317,8 @@ def run_trial(build_fn, X_train, y_train, X_test, y_test, epochs, batch_size, tr
         "convergence_epoch": conv_epoch,
         "train_acc": [float(a) for a in history.history["accuracy"]],
         "val_acc": [float(a) for a in history.history["val_accuracy"]],
-        "train_loss": [float(l) for l in history.history["loss"]],
-        "val_loss": [float(l) for l in history.history["val_loss"]],
+        "train_loss": [float(v) for v in history.history["loss"]],
+        "val_loss": [float(v) for v in history.history["val_loss"]],
     }
 
 
@@ -433,7 +435,7 @@ def _generate_synthetic_cifar10(
 
     # Shared random projection matrix: all classes embed through this,
     # but each class uses a different subspace + offset
-    shared_proj = rng.randn(ambient_dim, ambient_dim).astype("float32") * 0.01
+    rng.randn(ambient_dim, ambient_dim).astype("float32") * 0.01
 
     X_all, y_all = [], []
     n_total = n_train + n_test
@@ -448,7 +450,7 @@ def _generate_synthetic_cifar10(
         raw_basis = rng.randn(intrinsic_dim, ambient_dim).astype("float32")
 
         # Mix in basis vectors from neighboring classes for overlap
-        neighbor = (c + 1) % n_classes
+        (c + 1) % n_classes
         neighbor_basis = rng.randn(intrinsic_dim, ambient_dim).astype("float32")
         rng_state = rng.get_state()  # save state
         n_shared = intrinsic_dim // 3
@@ -664,7 +666,8 @@ def main():
     print(f"  PCA to {d}D captures {var_explained * 100:.1f}% of global variance")
 
     pca_name = f"PCA→{d}D + MLP (2d→d)"
-    pca_build_fn = lambda: build_pca_model(n_classes, d, lr=args.lr)
+    def pca_build_fn():
+        return build_pca_model(n_classes, d, lr=args.lr)
 
     model = pca_build_fn()
     pca_params = count_params(model)

@@ -1,16 +1,16 @@
 """
 Disulfide Structure Viewer
 
-This program is part of the proteusPy package, and is a PyQt5-based application for viewing 
-molecular structures with support for multiple disulfide bonds and various rendering styles. 
-It uses PyVista for 3D visualization and PyQt5 for the graphical user interface. The application 
-allows users to toggle between different rendering styles, switch between light and dark themes, 
+This program is part of the proteusPy package, and is a PyQt5-based application for viewing
+molecular structures with support for multiple disulfide bonds and various rendering styles.
+It uses PyVista for 3D visualization and PyQt5 for the graphical user interface. The application
+allows users to toggle between different rendering styles, switch between light and dark themes,
 and save or export the visualized scenes.
 
 Modules:
     os: Provides a way of using operating system dependent functionality.
     sys: Provides access to some variables used or maintained by the interpreter.
-    pyvista: A 3D plotting and mesh analysis through a streamlined interface for the Visualization 
+    pyvista: A 3D plotting and mesh analysis through a streamlined interface for the Visualization
     Toolkit (VTK).
     PyQt5.QtWidgets: Provides a set of UI elements to create classic desktop-style user interfaces.
     pyvistaqt: Provides a PyQt5 widget for embedding PyVista plots.

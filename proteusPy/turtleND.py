@@ -327,10 +327,10 @@ class TurtleND:
         self._frame[0] = h
 
         # Build left, orthogonal to heading
-        l = left - position
-        l = l - np.dot(l, h) * h
-        l = l / np.linalg.norm(l)
-        self._frame[1] = l
+        left_vec = left - position
+        left_vec = left_vec - np.dot(left_vec, h) * h
+        left_vec = left_vec / np.linalg.norm(left_vec)
+        self._frame[1] = left_vec
 
         # Build remaining basis vectors via Gram-Schmidt from random vectors
         # seeded deterministically

@@ -4,14 +4,14 @@
 ssparser.py
 
 This module provides functionality to parse PDB files to extract disulfide bond (SSBOND)
-and atom (ATOM) records. It includes functions to read SSBOND records from the header section 
-of PDB files, extract proximal and distal parameters, and collect relevant atom information. 
+and atom (ATOM) records. It includes functions to read SSBOND records from the header section
+of PDB files, extract proximal and distal parameters, and collect relevant atom information.
 The extracted data is organized into a dictionary format for further processing or analysis.
 
 Functions:
-- extract_ssbonds_and_atoms(input_pdb_file, verbose=False): Extracts SSBOND and ATOM records 
+- extract_ssbonds_and_atoms(input_pdb_file, verbose=False): Extracts SSBOND and ATOM records
 from a PDB file.
-- extract_and_write_ssbonds_and_atoms(input_pdb_file, output_pkl_file, verbose=False): Extracts 
+- extract_and_write_ssbonds_and_atoms(input_pdb_file, output_pkl_file, verbose=False): Extracts
 disulfide bonds and atom information from a PDB file and writes it to a .pkl file.
 
 Dependencies:
@@ -258,7 +258,7 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
     pdbid = extract_id_from_filename(input_pdb_file)
 
     # Read the PDB file and collect SSBOND, ATOM records, and RESOLUTION
-    with open(input_pdb_file, "r") as file:
+    with open(input_pdb_file) as file:
         lines = file.readlines()
 
     for line in lines:
