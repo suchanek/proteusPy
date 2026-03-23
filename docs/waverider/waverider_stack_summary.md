@@ -130,6 +130,58 @@
 
 ---
 
+## Layer 3a: ManifoldObserver — Extrinsic Observer
+
+*`proteusPy/manifold_observer.py`*
+
+**What it is**: An (N+1)-dimensional turtle that sees into the N-dimensional manifold from above. One extra orthonormal dimension = the manifold normal = sight.
+
+**Core insight**: The ManifoldModel walks *on* the surface — it can only discover structure by searching. The ManifoldObserver hovers *above* the surface — it can *see* curvature, topology, and class boundaries directly.
+
+### Construction
+
+1. Take subject's N×N frame **F** at any node
+2. Pad to (N+1)×(N+1): append zeros + normal vector [0,…,0,1]
+3. Orthonormalize via QR → valid (N+1)-dim frame
+4. Position: [p₀,…,p_{N-1}, altitude] in R^{N+1}
+
+### What It Sees (that the subject can't)
+
+| Observable | Method | Subject alternative |
+|-----------|--------|-------------------|
+| **Curvature** | Principal angles between neighboring tangent subspaces | Multi-hop walk |
+| **Height** | Reconstruction error from local tangent plane | Lives on surface — can't measure |
+| **Topology** | Full observation field in one pass | Explore node by node |
+| **Classification** | Project down, read label — O(n) | Graph walk + vote — O(hops × k) |
+
+### Key Methods
+
+| Method | What it does |
+|--------|-------------|
+| `observe()` | See entire manifold in one pass — curvature, height, intrinsic dim at every node |
+| `locate(query)` | Project straight down to surface — no graph walking |
+| `predict(X)` | Classify by observation, not by search |
+| `curvature_at(node)` | Local curvature from tangent-basis rotation rate |
+| `curvature_field()` | Curvature at all nodes |
+| `topology_summary()` | Manifold shape statistics from above |
+| `sync(node)` | Extend subject's N-dim frame to (N+1)-dim observer frame |
+| `lift_off(h)` / `look_down()` | Rise above / project back to surface |
+| `pan(dir, dist)` / `orbit(angle)` | Navigate (N+1)-space around the surface |
+
+### Data Structures
+
+**ObservedGeometry** (per node):
+- `position_lifted` — (N+1)-dim coordinates
+- `normal` — unit normal to manifold
+- `curvature` — rate of tangent-plane rotation (mean principal angle, radians)
+- `tangent_spread` — curvature variation among neighbors
+- `height` — distance from ideal tangent plane
+- `intrinsic_dim` — local dimensionality
+
+**For disulfides**: Subject is TurtleND(5) in torsion-angle space. Observer is TurtleND(6) — the 6th dimension is the normal to the 5D structural manifold.
+
+---
+
 ## Layer 4: GraphReasoner — Semantic Reasoning Engine
 
 *`proteusPy/graph_reasoner.py`*
