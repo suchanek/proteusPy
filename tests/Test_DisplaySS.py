@@ -13,12 +13,12 @@ Classes:
 Methods:
     setUp(self): Sets up the test environment, including creating a temporary directory for
         screenshots, setting the PyVista theme, and loading a subset of the disulfide database.
-    
+
     tearDown(self): Cleans up the test environment by removing the temporary directory.
-    
-    test_single_disulfide_display(self): Tests the display and screenshot functionality for a 
+
+    test_single_disulfide_display(self): Tests the display and screenshot functionality for a
         single disulfide bond.
-    
+
     test_disulfide_list_display(self): Test the display functionality for a list of disulfide bonds.
 
 Usage:
@@ -42,7 +42,7 @@ from unittest import main as run_tests
 # Add the parent directory to the path so we can import proteusPy
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from proteusPy import Load_PDB_SS, __version__, set_pyvista_theme
+from proteusPy import Load_PDB_SS, set_pyvista_theme
 from proteusPy.ProteusGlobals import DATA_DIR
 
 

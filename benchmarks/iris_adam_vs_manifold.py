@@ -24,7 +24,6 @@ import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 
@@ -173,7 +172,7 @@ class BenchmarkResult:
     test_loss: float = 0.0
     test_acc: float = 0.0
     wall_time: float = 0.0
-    convergence_epoch: Optional[int] = None  # epoch where acc first >= 0.95
+    convergence_epoch: int | None = None  # epoch where acc first >= 0.95
 
 
 # ---------------------------------------------------------------------------
@@ -542,7 +541,7 @@ class ManifoldAdamOptimizer:
         """
         n_train = len(self.X_train)
         bs = min(self.mini_batch_size, n_train)
-        center = self._get_flat_weights()
+        self._get_flat_weights()
 
         # Collect gradient samples from different mini-batches
         grad_samples = []

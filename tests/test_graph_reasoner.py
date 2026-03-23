@@ -333,7 +333,8 @@ class TestTargetSteering(unittest.TestCase):
 
 class TestGradientSteering(unittest.TestCase):
     def test_prefers_lower_energy(self):
-        field = lambda x: np.sum(x**2)
+        def field(x):
+            return np.sum(x**2)
         strategy = GradientSteering(field, minimize=True)
         current = np.array([5.0, 0.0, 0.0])
         heading = np.array([-1.0, 0.0, 0.0])
@@ -424,8 +425,8 @@ class TestGraphReasonerStep(unittest.TestCase):
         r = GraphReasoner(g, ExplorationSteering())
         r.start("n1")
         # n1 has neighbors n0 and n2
-        first = r.step()
-        second = r.step()
+        r.step()
+        r.step()
         # Should visit both neighbors, not revisit n1
         visited = set(r.path.node_ids)
         self.assertEqual(len(visited), r.path.length)

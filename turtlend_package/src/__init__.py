@@ -6,6 +6,6 @@
 #   manifold_walker - Manifold-aware navigation using local PCA
 #   manifold_model  - ManifoldModel classifier ("the manifold IS the model")
 
-from .turtleND import TurtleND
-from .manifold_walker import ManifoldWalker
 from .manifold_model import ManifoldModel
+from .manifold_walker import ManifoldWalker
+from .turtleND import TurtleND

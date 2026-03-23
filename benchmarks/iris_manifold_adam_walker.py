@@ -28,7 +28,6 @@ import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 
@@ -151,7 +150,7 @@ class BenchmarkResult:
     test_loss: float = 0.0
     test_acc: float = 0.0
     wall_time: float = 0.0
-    convergence_epoch: Optional[int] = None
+    convergence_epoch: int | None = None
     intrinsic_dims: list = field(default_factory=list)
 
 
@@ -580,7 +579,7 @@ def print_summary(adam_results, maw_results):
     for r in maw_results:
         all_dims.extend(r.intrinsic_dims)
     if all_dims:
-        print(f"\nIntrinsic dimensionality of loss landscape:")
+        print("\nIntrinsic dimensionality of loss landscape:")
         print(f"  Mean: {np.mean(all_dims):.1f} / {total_params} parameters")
         print(f"  Range: [{min(all_dims)}, {max(all_dims)}]")
         print(f"  -> {100 * (1 - np.mean(all_dims) / total_params):.1f}% of gradient "

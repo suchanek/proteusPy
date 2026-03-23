@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [v0.99.40] - 2026-03-23
 
+### Changed
+
+- Ruff linting extended to `benchmarks/`, `tests/`, and `turtlend_package/`; all directories now clean.
+- `turtlend_package/src/` synced with current `proteusPy/` sources (`turtleND`, `manifold_model`, `manifold_walker`, `turtle3D`).
+- `turtlend_package/benchmarks/` synced with latest benchmark scripts including TBLogger, plotting, and metal-detection fixes.
+- `turtlend_package/benchmarks/results/cifar10_manifold_model_results.json` updated with latest run.
+- `turtlend_package/tests/` synced with corrected basis-shape assertions.
+- Ruff `[tool.ruff.lint.per-file-ignores]` extended to cover `benchmarks/*.py` and `turtlend_package/` for intentional E402 bootstrap patterns and F401 re-exports.
+
+### Fixed
+
+- E741 ambiguous variable `l` in list comprehensions in `cifar10_manifold_architecture.py` and `mnist_manifold_architecture.py` → renamed to `v`.
+- Removed stale `turtlend_package.tar.gz` binary from repo.
+
+## [v0.99.40] - 2026-03-23 (initial)
+
 ### Added
 
 - `ManifoldModel` — zero-parameter geometric classifier using local PCA, manifold-weighted knowledge graphs, and graph-walk voting for classification. Supports fly-mode manifold navigation.

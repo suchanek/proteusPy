@@ -38,18 +38,15 @@ Author: Eric G. Suchanek, PhD
 
 __pdoc__ = {"__all__": True}
 
-from dataclasses import dataclass, field
-from typing import Optional
+from dataclasses import dataclass
 
 import numpy as np
 
 from proteusPy.graph_reasoner import (
     KnowledgeGraph,
-    KNNDiscoverer,
     SemanticEdge,
 )
 from proteusPy.turtleND import TurtleND
-
 
 # ---------------------------------------------------------------------------
 # Node geometry — stored at each graph node during exploration
@@ -145,19 +142,19 @@ class ManifoldModel:
 
         # State
         self._mode = self.EXPLORE
-        self._graph: Optional[KnowledgeGraph] = None
-        self._turtle: Optional[TurtleND] = None
-        self._X_train: Optional[np.ndarray] = None
-        self._y_train: Optional[np.ndarray] = None
-        self._ndim: Optional[int] = None
+        self._graph: KnowledgeGraph | None = None
+        self._turtle: TurtleND | None = None
+        self._X_train: np.ndarray | None = None
+        self._y_train: np.ndarray | None = None
+        self._ndim: int | None = None
         self._geometries: dict[str, NodeGeometry] = {}
 
         # Navigation state
-        self._current_node: Optional[str] = None
+        self._current_node: str | None = None
         self._flight_path: list[str] = []
 
         # Diagnostics
-        self._global_intrinsic_dim: Optional[float] = None
+        self._global_intrinsic_dim: float | None = None
 
     # ----- Properties -----
 
@@ -167,27 +164,27 @@ class ManifoldModel:
         return self._mode
 
     @property
-    def graph(self) -> Optional[KnowledgeGraph]:
+    def graph(self) -> KnowledgeGraph | None:
         """The underlying knowledge graph (available after fit)."""
         return self._graph
 
     @property
-    def turtle(self) -> Optional[TurtleND]:
+    def turtle(self) -> TurtleND | None:
         """The navigation turtle (available after fit)."""
         return self._turtle
 
     @property
-    def ndim(self) -> Optional[int]:
+    def ndim(self) -> int | None:
         """Ambient dimensionality."""
         return self._ndim
 
     @property
-    def intrinsic_dim(self) -> Optional[float]:
+    def intrinsic_dim(self) -> float | None:
         """Mean intrinsic dimensionality discovered during exploration."""
         return self._global_intrinsic_dim
 
     @property
-    def current_node(self) -> Optional[str]:
+    def current_node(self) -> str | None:
         """Node ID the turtle is currently at (during fly mode)."""
         return self._current_node
 
@@ -348,7 +345,7 @@ class ManifoldModel:
                 blended_dist = w * manifold_dist + (1 - w) * euclidean_dist
 
                 # Edge weight: inversely proportional to distance
-                max_dist = max(blended_dist, 1e-10)
+                max(blended_dist, 1e-10)
                 weight = 1.0 / (1.0 + blended_dist)
 
                 self._graph.add_edge(
@@ -569,7 +566,7 @@ class ManifoldModel:
         nearest_idx = np.argmin(dists)
         return self.fly_to(f"n{nearest_idx}")
 
-    def fly_step(self, direction: Optional[np.ndarray] = None) -> Optional[str]:
+    def fly_step(self, direction: np.ndarray | None = None) -> str | None:
         """Take one step along the manifold graph.
 
         Moves to the best neighbor of the current node, choosing the

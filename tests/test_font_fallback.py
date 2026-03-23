@@ -8,9 +8,7 @@ to verify that text rendering works correctly on Linux systems.
 Author: Eric G. Suchanek, PhD
 """
 
-import os
 import platform
-import sys
 
 from proteusPy import Load_PDB_SS, __version__
 from proteusPy.utility import find_arial_font

@@ -9,11 +9,11 @@ Tests cover:
   - Edge cases
 """
 
-import numpy as np
-import pytest
-
 import sys
 from pathlib import Path
+
+import numpy as np
+import pytest
 
 # Import directly to avoid heavy proteusPy dependencies
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -208,7 +208,7 @@ class TestFly:
 
     def test_fly_to_nearest(self, fitted_model):
         model, X, _ = fitted_model
-        geom = model.fly_to_nearest(X[42])
+        model.fly_to_nearest(X[42])
         assert model.current_node == "n42"
 
     def test_fly_step(self, fitted_model):

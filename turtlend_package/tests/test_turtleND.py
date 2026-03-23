@@ -6,8 +6,8 @@ import unittest
 import numpy as np
 from numpy.testing import assert_allclose
 
-from proteusPy.turtleND import TurtleND
 from proteusPy.turtle3D import Turtle3D
+from proteusPy.turtleND import TurtleND
 
 _tolerance = 1e-8
 

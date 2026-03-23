@@ -44,7 +44,6 @@ import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
 
-
 # ---------------------------------------------------------------------------
 # TensorBoard logger
 # ---------------------------------------------------------------------------
@@ -178,8 +177,8 @@ def plot_results(results: dict, dataset_label: str = "CIFAR-10",
     :param dataset_label: title label for the dataset
     :param save_path: if given, save figure to this path instead of showing
     """
-    import matplotlib.pyplot as plt
     import matplotlib.patches as mpatches
+    import matplotlib.pyplot as plt
 
     # --- colour palette by method family ------------------------------------
     def _color(name: str) -> str:

@@ -237,11 +237,11 @@ def main():
     methods = {
         "Euclidean KNN": lambda: KNeighborsClassifier(n_neighbors=k_vote, metric="euclidean"),
         "Cosine KNN": lambda: KNeighborsClassifier(n_neighbors=k_vote, metric="cosine"),
-        f"Manifold KNN (tau=0.95)": lambda: ManifoldKNN(k_vote=k_vote, k_pca=k_pca, variance_threshold=0.95),
-        f"Manifold KNN (tau=0.90)": lambda: ManifoldKNN(k_vote=k_vote, k_pca=k_pca, variance_threshold=0.90),
-        f"Manifold KNN (tau=0.85)": lambda: ManifoldKNN(k_vote=k_vote, k_pca=k_pca, variance_threshold=0.85),
-        f"EigenWeighted Manifold (tau=0.95)": lambda: EigenWeightedManifoldKNN(k_vote=k_vote, k_pca=k_pca, variance_threshold=0.95),
-        f"EigenWeighted Manifold (tau=0.90)": lambda: EigenWeightedManifoldKNN(k_vote=k_vote, k_pca=k_pca, variance_threshold=0.90),
+        "Manifold KNN (tau=0.95)": lambda: ManifoldKNN(k_vote=k_vote, k_pca=k_pca, variance_threshold=0.95),
+        "Manifold KNN (tau=0.90)": lambda: ManifoldKNN(k_vote=k_vote, k_pca=k_pca, variance_threshold=0.90),
+        "Manifold KNN (tau=0.85)": lambda: ManifoldKNN(k_vote=k_vote, k_pca=k_pca, variance_threshold=0.85),
+        "EigenWeighted Manifold (tau=0.95)": lambda: EigenWeightedManifoldKNN(k_vote=k_vote, k_pca=k_pca, variance_threshold=0.95),
+        "EigenWeighted Manifold (tau=0.90)": lambda: EigenWeightedManifoldKNN(k_vote=k_vote, k_pca=k_pca, variance_threshold=0.90),
     }
 
     results = {}

@@ -141,6 +141,10 @@ ignore = ["E501"]
 "proteusPy/graph_reasoner.py" = ["E402"]
 "proteusPy/qt5viewer.py" = ["E402"]
 "proteusPy/turtle3D.py" = ["E402"]
+"turtlend_package/src/turtle3D.py" = ["E402"]
+"turtlend_package/src/__init__.py" = ["F401"]
+"benchmarks/*.py" = ["E402"]
+"turtlend_package/benchmarks/*.py" = ["E402"]
 
 [tool.pytest.ini_options]
 addopts = "--ignore=tests/test_DisplaySS.py --ignore=tests/test_disulfide_schematic.py"

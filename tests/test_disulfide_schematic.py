@@ -9,7 +9,6 @@ Last revision: 2025-03-03
 """
 
 import os
-import sys
 import unittest
 from tempfile import TemporaryDirectory
 
