@@ -64,6 +64,10 @@ from .manifold_model import (
     ManifoldModel,
     NodeGeometry,
 )
+from .manifold_observer import (
+    ManifoldObserver,
+    ObservedGeometry,
+)
 from .graph_reasoner import (
     DirectedDiscoverer,
     EdgeDiscoverer,
