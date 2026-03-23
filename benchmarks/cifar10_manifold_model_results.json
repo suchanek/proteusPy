@@ -1,0 +1,67 @@
+{
+  "dataset": "synthetic_cifar10",
+  "input_dim": 3072,
+  "n_classes": 10,
+  "n_train_subsample": 2000,
+  "n_test_subsample": 1000,
+  "results": {
+    "Euclidean KNN (subsample)": {
+      "accuracy": 0.606,
+      "time": 0.0845816270002615,
+      "params": 0
+    },
+    "Euclidean KNN (full 50K)": {
+      "accuracy": 0.874,
+      "time": 1.5915240170002107,
+      "params": 0
+    },
+    "ManifoldModel (tau=0.95)": {
+      "accuracy": 0.442,
+      "time": 305.11493801899996,
+      "fit_time": 240.87820087,
+      "pred_time": 64.23673714899996,
+      "params": 0,
+      "geometry": {
+        "mean_intrinsic_dim": 46.0,
+        "std_intrinsic_dim": 0.0,
+        "min_intrinsic_dim": 46,
+        "max_intrinsic_dim": 46,
+        "n_nodes": 2000,
+        "ambient_dim": 3072,
+        "n_edges": 30000
+      }
+    },
+    "ManifoldModel (tau=0.9)": {
+      "accuracy": 0.436,
+      "time": 224.30095287699987,
+      "fit_time": 153.14381415399976,
+      "pred_time": 71.15713872300012,
+      "params": 0,
+      "geometry": {
+        "mean_intrinsic_dim": 43.0,
+        "std_intrinsic_dim": 0.0,
+        "min_intrinsic_dim": 43,
+        "max_intrinsic_dim": 43,
+        "n_nodes": 2000,
+        "ambient_dim": 3072,
+        "n_edges": 30000
+      }
+    },
+    "ManifoldModel (tau=0.85)": {
+      "accuracy": 0.443,
+      "time": 222.3786321419998,
+      "fit_time": 154.13487980799982,
+      "pred_time": 68.24375233399996,
+      "params": 0,
+      "geometry": {
+        "mean_intrinsic_dim": 40.0,
+        "std_intrinsic_dim": 0.0,
+        "min_intrinsic_dim": 40,
+        "max_intrinsic_dim": 40,
+        "n_nodes": 2000,
+        "ambient_dim": 3072,
+        "n_edges": 30000
+      }
+    }
+  }
+}

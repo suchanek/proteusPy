@@ -67,7 +67,10 @@ dependencies = [
     "vtk",
     "wheel",
     "networkx",
-    "rich"
+    "rich",
+    "scikit-learn",
+    "tensorflow==2.16.2",
+    "tensorflow-metal==1.1.0",
 ]
 
 [project.optional-dependencies]
