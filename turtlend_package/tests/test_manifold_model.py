@@ -12,43 +12,7 @@ Tests cover:
 import numpy as np
 import pytest
 
-import sys
-from pathlib import Path
-
-# Import directly to avoid heavy proteusPy dependencies
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
-import importlib.util
-
-# Bootstrap turtleND first (dependency of manifold_model)
-_tnd_spec = importlib.util.spec_from_file_location(
-    "proteusPy.turtleND",
-    Path(__file__).resolve().parent.parent / "proteusPy" / "turtleND.py",
-)
-_tnd_mod = importlib.util.module_from_spec(_tnd_spec)
-sys.modules["proteusPy.turtleND"] = _tnd_mod
-_tnd_spec.loader.exec_module(_tnd_mod)
-
-# Bootstrap graph_reasoner
-_gr_spec = importlib.util.spec_from_file_location(
-    "proteusPy.graph_reasoner",
-    Path(__file__).resolve().parent.parent / "proteusPy" / "graph_reasoner.py",
-)
-_gr_mod = importlib.util.module_from_spec(_gr_spec)
-sys.modules["proteusPy.graph_reasoner"] = _gr_mod
-_gr_spec.loader.exec_module(_gr_mod)
-
-# Now import the module under test
-_mm_spec = importlib.util.spec_from_file_location(
-    "proteusPy.manifold_model",
-    Path(__file__).resolve().parent.parent / "proteusPy" / "manifold_model.py",
-)
-_mm_mod = importlib.util.module_from_spec(_mm_spec)
-sys.modules["proteusPy.manifold_model"] = _mm_mod
-_mm_spec.loader.exec_module(_mm_mod)
-
-ManifoldModel = _mm_mod.ManifoldModel
-NodeGeometry = _mm_mod.NodeGeometry
+from proteusPy.manifold_model import ManifoldModel, NodeGeometry
 
 
 # ---------------------------------------------------------------------------

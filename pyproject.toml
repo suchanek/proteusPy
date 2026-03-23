@@ -70,7 +70,7 @@ dependencies = [
     "rich",
     "scikit-learn",
     "tensorflow==2.16.2",
-    "tensorflow-metal==1.1.0",
+    "tensorflow-metal==1.1.0; sys_platform == 'darwin'",
 ]
 
 [project.optional-dependencies]
