@@ -10,7 +10,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "proteusPy"
-version = "0.99.50"
+version = "0.99.60"
 description = "proteusPy - Protein Structure Analysis and Modeling Tools"
 readme = "README.md"
 authors = ["Eric G. Suchanek, PhD <suchanek@mac.com>"]
