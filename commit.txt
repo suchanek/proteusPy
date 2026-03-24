@@ -1,0 +1,24 @@
+feat(waverider): SSflight benchmark — manifold flight through disulfide torsional space
+
+Add canonical ManifoldWalker demonstration: fly between the two most
+distant octant-class centroids across the full proteusPy disulfide
+database (175 277 bonds, 5D χ₁–χ₅ space).  Extend ManifoldObserver
+with observe_path() so the flight trajectory can be viewed from one
+dimension above (per-hop height + curvature).  Add companion
+visualiser, full-run artefacts, MLP baseline, nomic embedding explorer,
+and the WaveRider arXiv manuscript (TeX/PDF/draft).
+
+Key changes:
+- ManifoldObserver.observe_path() — pen-down view from N+1 dimensions
+- ManifoldModel.fly_toward() gains patience param for sparse-graph stalls
+- benchmarks/disulfide_manifold_flight.py — SSflight demo (octant origin→dest)
+- benchmarks/disulfide_flight_visualizer.py — trajectory/curvature plots
+- benchmarks/disulfide_flight_results.{json,png,md} — first full-DB run
+- benchmarks/mlp_expand_first.py — expand-first MLP baseline
+- benchmarks/nomic_manifold_explorer.py — nomic embedding manifold analysis
+- docs/waverider/waverider_arxiv.{tex,pdf,md} — WaveRider arXiv paper
+- pyproject.toml: ignore turtlend_package in pytest
+- .gitignore: exclude PDB_SS_ALL_LOADER.pkl binary cache
+- BSD/Flux-Frontiers headers added to manifold_*.py, turtleND.py, disulfide_tree.py
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>

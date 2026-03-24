@@ -569,7 +569,11 @@ class ManifoldModel:
         nearest_idx = np.argmin(dists)
         return self.fly_to(f"n{nearest_idx}")
 
-    def fly_step(self, direction: np.ndarray | None = None) -> str | None:
+    def fly_step(
+        self,
+        direction: np.ndarray | None = None,
+        excluded: set | None = None,
+    ) -> str | None:
         """Take one step along the manifold graph.
 
         Moves to the best neighbor of the current node, choosing the
@@ -579,11 +583,14 @@ class ManifoldModel:
         ----------
         direction : np.ndarray, optional
             Preferred direction in ambient space. If None, uses turtle heading.
+        excluded : set of str, optional
+            Node IDs to skip when scoring candidates.  Used by
+            ``fly_toward`` to avoid revisiting nodes and break cycles.
 
         Returns
         -------
         str or None
-            Node ID moved to, or None if dead end.
+            Node ID moved to, or None if dead end or all neighbours excluded.
         """
         if self._current_node is None:
             raise RuntimeError("Must call fly_to() first")
@@ -610,6 +617,8 @@ class ManifoldModel:
         best_emb = None
 
         for edge in edges:
+            if excluded and edge.target_id in excluded:
+                continue
             target_emb = self._graph.get_embedding(edge.target_id)
             step_dir = target_emb - current_emb
             norm = np.linalg.norm(step_dir)
@@ -661,6 +670,9 @@ class ManifoldModel:
         target = np.asarray(target, dtype="d")
         path = []
         stall = 0
+        visited: set[str] = set()
+        if self._current_node is not None:
+            visited.add(self._current_node)
 
         for _ in range(max_steps):
             if self._current_node is None:
@@ -673,11 +685,13 @@ class ManifoldModel:
             if dist < 1e-8:
                 break
 
-            next_id = self.fly_step(direction)
+            next_id = self.fly_step(direction, excluded=visited)
             if next_id is None:
+                # All neighbours already visited — genuinely stuck
                 break
 
             path.append(next_id)
+            visited.add(next_id)
 
             new_emb = self._graph.get_embedding(next_id)
             new_dist = np.linalg.norm(target - new_emb)

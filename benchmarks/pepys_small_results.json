@@ -1,0 +1,46 @@
+{
+  "corpus_size": 366,
+  "date_range": [
+    "1660-01-01T08:00:00",
+    "1660-12-31T08:00:00"
+  ],
+  "full_dim": 768,
+  "twonn_id": -15.49,
+  "participation_ratio": 49.5,
+  "pca_id_90pct": 105,
+  "pca_id_95pct": 138,
+  "pca_id_99pct": 183,
+  "mrl_retrieval": [
+    {
+      "dim": 64,
+      "mrr": 1.0,
+      "var_explained": 1.0000001192092896,
+      "pca_id_90": 42
+    },
+    {
+      "dim": 128,
+      "mrr": 1.0,
+      "var_explained": 0.9999998807907104,
+      "pca_id_90": 67
+    },
+    {
+      "dim": 256,
+      "mrr": 1.0,
+      "var_explained": 0.9937424659729004,
+      "pca_id_90": 90
+    },
+    {
+      "dim": 512,
+      "mrr": 1.0,
+      "var_explained": 0.975598931312561,
+      "pca_id_90": 101
+    },
+    {
+      "dim": 768,
+      "mrr": 1.0,
+      "var_explained": 0.9678521156311035,
+      "pca_id_90": 105
+    }
+  ],
+  "flight": {}
+}
