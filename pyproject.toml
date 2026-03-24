@@ -76,6 +76,7 @@ wheel            = "*"
 networkx         = "*"
 rich             = "*"
 scikit-learn     = "*"
+pyvista          = ">=0.44.0"
 # Optional extras
 tensorflow-metal = { version = "1.1.0", optional = true }
 pyvistaqt        = { version = ">=0.11.0", optional = true }
@@ -110,7 +111,6 @@ imageio          = { version = "*", extras = ["ffmpeg"] }
 kaleido          = "*"
 panel            = "1.5.3"
 pymolPy3         = "0.1.2"
-pyvista          = { version = ">=0.44.0", extras = ["jupyter"] }
 
 [tool.poetry.group.viz]
 optional = true
