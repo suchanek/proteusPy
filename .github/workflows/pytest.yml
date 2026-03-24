@@ -24,7 +24,7 @@ jobs:
         run: pip install poetry
 
       - name: Install dependencies
-        run: poetry install --with dev
+        run: poetry install --with dev --without ml,jupyter,viz
 
       - name: Test with pytest
         run: poetry run pytest -k "not test_disulfide_class_generator"

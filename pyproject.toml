@@ -57,7 +57,43 @@ Biopython        = "*"
 colorama         = "0.4.6"
 darkdetect       = "0.8.0"
 gdown            = "5.2.0"
-imageio          = { version = "*", extras = ["ffmpeg"] }
+matplotlib       = "3.9.2"
+numpy            = "*"
+pandas           = "*"
+param            = ">=2.0.0"
+Pillow           = "11.0.0"
+plotly           = ">=5.14.0"
+plotly_express   = "0.4.1"
+psutil           = "*"
+Pympler          = "1.1"
+Requests         = "2.32.3"
+scipy            = "1.14.1"
+seaborn          = "0.13.2"
+setuptools       = "*"
+tabulate         = "*"
+tqdm             = "4.67.0"
+wheel            = "*"
+networkx         = "*"
+rich             = "*"
+scikit-learn     = "*"
+# Optional extras
+tensorflow-metal = { version = "1.1.0", optional = true }
+pyvistaqt        = { version = ">=0.11.0", optional = true }
+PyQt5            = { version = ">=5.15.0", optional = true }
+markdown         = { version = ">=3.6", optional = true }
+trame-vtk        = { version = ">=2.0.0", optional = true }
+doc-kg           = { git = "https://github.com/Flux-Frontiers/doc_kg.git", optional = true }
+code-kg          = { git = "https://github.com/Flux-Frontiers/code_kg.git", optional = true }
+ftree-kg         = { path = "../FTreeKG", develop = true, optional = true }
+
+[tool.poetry.group.ml.dependencies]
+tensorflow       = "2.16.2"
+tf-keras         = "*"
+
+[tool.poetry.group.ml]
+optional = true
+
+[tool.poetry.group.jupyter.dependencies]
 jupyter          = "1.1.1"
 notebook         = "7.2.2"
 nbconvert        = "*"
@@ -65,40 +101,19 @@ ipykernel        = "*"
 ipywidgets       = "*"
 jupyter_bokeh    = "4.0.5"
 jupyter_contrib_nbextensions = "*"
+
+[tool.poetry.group.jupyter]
+optional = true
+
+[tool.poetry.group.viz.dependencies]
+imageio          = { version = "*", extras = ["ffmpeg"] }
 kaleido          = "*"
-matplotlib       = "3.9.2"
-numpy            = "*"
-pandas           = "*"
 panel            = "1.5.3"
-param            = ">=2.0.0"
-Pillow           = "11.0.0"
-plotly           = ">=5.14.0"
-plotly_express   = "0.4.1"
-psutil           = "*"
 pymolPy3         = "0.1.2"
-Pympler          = "1.1"
 pyvista          = { version = ">=0.44.0", extras = ["jupyter"] }
-Requests         = "2.32.3"
-scipy            = "1.14.1"
-seaborn          = "0.13.2"
-setuptools       = "*"
-tabulate         = "*"
-tqdm             = "4.67.0"
-trame-vtk        = ">=2.0.0"
-wheel            = "*"
-networkx         = "*"
-rich             = "*"
-scikit-learn     = "*"
-tensorflow       = "2.16.2"
-tf-keras         = "*"
-# Optional
-tensorflow-metal = { version = "1.1.0", optional = true }
-pyvistaqt        = { version = ">=0.11.0", optional = true }
-PyQt5            = { version = ">=5.15.0", optional = true }
-markdown         = { version = ">=3.6", optional = true }
-doc-kg           = { git = "https://github.com/Flux-Frontiers/doc_kg.git", optional = true }
-code-kg          = { git = "https://github.com/Flux-Frontiers/code_kg.git", optional = true }
-ftree-kg         = { path = "../FTreeKG", develop = true, optional = true }
+
+[tool.poetry.group.viz]
+optional = true
 
 [tool.poetry.extras]
 metal  = ["tensorflow-metal"]
@@ -162,6 +177,6 @@ include = ["proteusPy"]
 [tool.dockg]
 # Add extra directories to exclude beyond the built-in SKIP_DIRS.
 # SKIP_DIRS already covers: .dockg, .git, .venv, venv, __pycache__, node_modules, etc.
-exclude = ["bundles", "dist","data","lib","old","programs","turtlend_package"]
+exclude = ["bundles", "dist","data","lib","old","programs","turtlend_package", "pepys"]
 
 
