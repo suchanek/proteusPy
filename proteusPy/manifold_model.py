@@ -34,6 +34,9 @@ Part of the program proteusPy, https://github.com/suchanek/proteusPy,
 a Python package for the manipulation and analysis of macromolecules.
 
 Author: Eric G. Suchanek, PhD
+Affiliation: Flux-Frontiers, https://github.com/Flux-Frontiers
+License: BSD
+Last revised: 2026-03-23 -egs-
 """
 
 __pdoc__ = {"__all__": True}
@@ -566,7 +569,11 @@ class ManifoldModel:
         nearest_idx = np.argmin(dists)
         return self.fly_to(f"n{nearest_idx}")
 
-    def fly_step(self, direction: np.ndarray | None = None) -> str | None:
+    def fly_step(
+        self,
+        direction: np.ndarray | None = None,
+        excluded: set | None = None,
+    ) -> str | None:
         """Take one step along the manifold graph.
 
         Moves to the best neighbor of the current node, choosing the
@@ -576,11 +583,14 @@ class ManifoldModel:
         ----------
         direction : np.ndarray, optional
             Preferred direction in ambient space. If None, uses turtle heading.
+        excluded : set of str, optional
+            Node IDs to skip when scoring candidates.  Used by
+            ``fly_toward`` to avoid revisiting nodes and break cycles.
 
         Returns
         -------
         str or None
-            Node ID moved to, or None if dead end.
+            Node ID moved to, or None if dead end or all neighbours excluded.
         """
         if self._current_node is None:
             raise RuntimeError("Must call fly_to() first")
@@ -607,6 +617,8 @@ class ManifoldModel:
         best_emb = None
 
         for edge in edges:
+            if excluded and edge.target_id in excluded:
+                continue
             target_emb = self._graph.get_embedding(edge.target_id)
             step_dir = target_emb - current_emb
             norm = np.linalg.norm(step_dir)
@@ -635,7 +647,7 @@ class ManifoldModel:
 
         return best_id
 
-    def fly_toward(self, target, max_steps: int = 20) -> list[str]:
+    def fly_toward(self, target, max_steps: int = 20, patience: int = 5) -> list[str]:
         """Fly toward a target point, following the graph.
 
         Parameters
@@ -644,6 +656,11 @@ class ManifoldModel:
             Target point in ambient space.
         max_steps : int
             Maximum number of graph hops.
+        patience : int
+            Number of consecutive non-improving hops allowed before stopping.
+            With sparse graphs (small k) a greedy step occasionally moves
+            sideways; patience lets the walker continue past local detours
+            rather than terminating at the first non-improving step.
 
         Returns
         -------
@@ -652,6 +669,10 @@ class ManifoldModel:
         """
         target = np.asarray(target, dtype="d")
         path = []
+        stall = 0
+        visited: set[str] = set()
+        if self._current_node is not None:
+            visited.add(self._current_node)
 
         for _ in range(max_steps):
             if self._current_node is None:
@@ -664,18 +685,22 @@ class ManifoldModel:
             if dist < 1e-8:
                 break
 
-            next_id = self.fly_step(direction)
+            next_id = self.fly_step(direction, excluded=visited)
             if next_id is None:
+                # All neighbours already visited — genuinely stuck
                 break
 
             path.append(next_id)
+            visited.add(next_id)
 
-            # Check if we're getting closer
             new_emb = self._graph.get_embedding(next_id)
             new_dist = np.linalg.norm(target - new_emb)
             if new_dist >= dist:
-                # Not making progress — stop
-                break
+                stall += 1
+                if stall >= patience:
+                    break
+            else:
+                stall = 0
 
         return path
 

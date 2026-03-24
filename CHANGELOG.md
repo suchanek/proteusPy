@@ -7,6 +7,44 @@ Notable changes to the ``proteusPy`` project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Pepys benchmark enriched embeddings** (`pepys_embeddings.json`) — precomputed nomic-embed-text-4k embeddings for the full Pepys diary corpus, cached for reproducible benchmark runs.
+- **Pepys benchmark results** (`pepys_manifold_results.json`) — manifold flight metrics (MRL retrieval, ManifoldWalker path, observer heights/curvatures) from the enriched-corpus run.
+- **5 new Pepys query topics** — Church/religion, Travel/locations, Money/finance, Social gathering, and Emotion/personal feelings added to `PEPYS_QUERIES` for broader semantic coverage of the diary corpus.
+- **`_NumpyEncoder`** in `pepys_manifold_explorer.py` — custom `json.JSONEncoder` subclass that serialises numpy scalar and array types, preventing `TypeError` when saving results that include numpy integers/floats.
+
+### Changed
+
+- **`pepys_manifold_explorer.py` — enriched embedding format**: `parse_diary()` now prepends `entry_type | category |` to each diary entry before embedding, so topic-level signal from `pepys_enriched_full.txt` is preserved in the embedding space. Comment lines (`#`) and blank lines are now silently skipped.
+- **`ManifoldModel` constructor** — `n_neighbors` parameter renamed to `k_graph` in all benchmark call-sites (`nomic_manifold_explorer.py`, `pepys_manifold_explorer.py`).
+- **`ManifoldModel.set_position()`** → **`ManifoldModel.fly_to()`** — updated `pepys_manifold_explorer.py` to use the renamed positioning method.
+- **`ManifoldObserver` constructor** — simplified from `ManifoldObserver(mm._graph, mm._geometries)` to `ManifoldObserver(mm)` in `pepys_manifold_explorer.py`.
+- **Observer path API** — `flight_obs["mean_height"]` / `flight_obs["mean_curvature"]` replaced by averaging over raw `flight_obs["heights"]` / `flight_obs["curvatures"]` lists, matching the updated `observe_path()` return schema.
+- **Code formatting** (`nomic_manifold_explorer.py`, `pepys_manifold_explorer.py`) — Black-style line-length fixes throughout; no logic changes.
+
+- **`ManifoldObserver.observe_path()`** — "pen-down view from above": given a walker's traced node path, the observer measures per-hop height (reconstruction error from the local tangent plane) and curvature (principal angle between consecutive tangent subspaces), returning a structured dict that summarises the full trajectory from one dimension above.
+- **`disulfide_manifold_flight.py`** benchmark — canonical end-to-end demonstration of manifold flight through the 5D disulfide torsional space (χ₁–χ₅) using the full proteusPy database (175 277 bonds). Selects the two most-distant **octant-class** centroids as origin and destination (the finest-grained, most distant landmarks in the hierarchy), flies the graph with `ManifoldWalker`, records per-hop class membership at all four hierarchy levels (binary/quadrant/sextant/octant), and feeds the path to `ManifoldObserver.observe_path()`.
+- **`disulfide_flight_visualizer.py`** — post-run visualisation: trajectory plots, curvature/height profiles, class-boundary crossing charts.
+- **`disulfide_flight_results.json` / `.png` / `_report.md`** — artefacts from the first full-database flight run (k=20, τ=0.9, w=0.8, 200-step budget, 992 s elapsed).
+- **`mlp_expand_first.py`** benchmark — "expand-first" MLP architecture comparison baseline against `ManifoldModel` on structured biological data.
+- **`nomic_manifold_explorer.py`** benchmark — intrinsic dimensionality analysis of nomic-embed-text-v1 embeddings (PCA elbow, Participation Ratio, TwoNN estimator) at all MRL checkpoints (64–768 D) with MRR@10 retrieval quality comparison.
+- **WaveRider arXiv manuscript** (`docs/waverider/waverider_arxiv.tex` / `.pdf` / `_draft.md`) — full paper describing the four-layer WaveRider geometric ML stack: TurtleND → ManifoldWalker → ManifoldModel/ManifoldObserver.
+
+### Changed
+
+- **`ManifoldModel.fly_toward()`** — added `patience` parameter (default 5). With sparse graphs a greedy step can move sideways; `patience` lets the walker continue past brief non-improving detours rather than terminating at the first stall.
+- **`pyproject.toml`** — extended pytest `--ignore` list to cover `turtlend_package/` so its tests do not run in the main test suite.
+- **`.gitignore`** — added `proteusPy/data/PDB_SS_ALL_LOADER.pkl` to avoid committing the large binary loader cache.
+
+### Fixed
+
+- Added missing BSD/Flux-Frontiers header blocks to `manifold_observer.py`, `manifold_model.py`, `manifold_walker.py`, `turtleND.py`, and `disulfide_tree.py`.
+
+---
+
 ## [v0.99.50] - 2026-03-23
 
 ### Overview

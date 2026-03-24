@@ -1,0 +1,15 @@
+feat(benchmarks): enrich Pepys embeddings, update ManifoldModel/Observer API call-sites
+
+- pepys_manifold_explorer: prepend entry_type|category to diary text before
+  embedding so topic signal from pepys_enriched_full.txt is captured; add 5
+  new query topics (Church, Travel, Money, Social, Emotion); add _NumpyEncoder
+  for reliable JSON serialisation of numpy scalars/arrays
+- Both explorers: rename ManifoldModel(n_neighbors=) → ManifoldModel(k_graph=),
+  set_position() → fly_to(), and ManifoldObserver(graph, geometries) →
+  ManifoldObserver(mm) to track updated API
+- Observer path metrics: average raw heights/curvatures lists instead of
+  accessing removed mean_height/mean_curvature dict keys
+- Add pepys_embeddings.json and pepys_manifold_results.json benchmark artefacts
+- Black-style formatting fixes throughout both scripts
+
+Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
