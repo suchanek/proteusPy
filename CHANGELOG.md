@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Pepys benchmark enriched embeddings** (`pepys_embeddings.json`) — precomputed nomic-embed-text-4k embeddings for the full Pepys diary corpus, cached for reproducible benchmark runs.
+- **Pepys benchmark results** (`pepys_manifold_results.json`) — manifold flight metrics (MRL retrieval, ManifoldWalker path, observer heights/curvatures) from the enriched-corpus run.
+- **5 new Pepys query topics** — Church/religion, Travel/locations, Money/finance, Social gathering, and Emotion/personal feelings added to `PEPYS_QUERIES` for broader semantic coverage of the diary corpus.
+- **`_NumpyEncoder`** in `pepys_manifold_explorer.py` — custom `json.JSONEncoder` subclass that serialises numpy scalar and array types, preventing `TypeError` when saving results that include numpy integers/floats.
+
+### Changed
+
+- **`pepys_manifold_explorer.py` — enriched embedding format**: `parse_diary()` now prepends `entry_type | category |` to each diary entry before embedding, so topic-level signal from `pepys_enriched_full.txt` is preserved in the embedding space. Comment lines (`#`) and blank lines are now silently skipped.
+- **`ManifoldModel` constructor** — `n_neighbors` parameter renamed to `k_graph` in all benchmark call-sites (`nomic_manifold_explorer.py`, `pepys_manifold_explorer.py`).
+- **`ManifoldModel.set_position()`** → **`ManifoldModel.fly_to()`** — updated `pepys_manifold_explorer.py` to use the renamed positioning method.
+- **`ManifoldObserver` constructor** — simplified from `ManifoldObserver(mm._graph, mm._geometries)` to `ManifoldObserver(mm)` in `pepys_manifold_explorer.py`.
+- **Observer path API** — `flight_obs["mean_height"]` / `flight_obs["mean_curvature"]` replaced by averaging over raw `flight_obs["heights"]` / `flight_obs["curvatures"]` lists, matching the updated `observe_path()` return schema.
+- **Code formatting** (`nomic_manifold_explorer.py`, `pepys_manifold_explorer.py`) — Black-style line-length fixes throughout; no logic changes.
+
 - **`ManifoldObserver.observe_path()`** — "pen-down view from above": given a walker's traced node path, the observer measures per-hop height (reconstruction error from the local tangent plane) and curvature (principal angle between consecutive tangent subspaces), returning a structured dict that summarises the full trajectory from one dimension above.
 - **`disulfide_manifold_flight.py`** benchmark — canonical end-to-end demonstration of manifold flight through the 5D disulfide torsional space (χ₁–χ₅) using the full proteusPy database (175 277 bonds). Selects the two most-distant **octant-class** centroids as origin and destination (the finest-grained, most distant landmarks in the hierarchy), flies the graph with `ManifoldWalker`, records per-hop class membership at all four hierarchy levels (binary/quadrant/sextant/octant), and feeds the path to `ManifoldObserver.observe_path()`.
 - **`disulfide_flight_visualizer.py`** — post-run visualisation: trajectory plots, curvature/height profiles, class-boundary crossing charts.

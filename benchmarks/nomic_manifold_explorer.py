@@ -51,13 +51,13 @@ console = Console()
 # ---------------------------------------------------------------------------
 OLLAMA_URL = "http://localhost:11434/api/embeddings"
 OLLAMA_MODEL = "nomic-embed-text"
-USE_API = False          # flip to True to use nomic.ai REST API
+USE_API = False  # flip to True to use nomic.ai REST API
 NOMIC_API_KEY = os.environ.get("NOMIC_API_KEY", "")
 NOMIC_API_URL = "https://api-atlas.nomic.ai/v1/embedding/text"
 
-MRL_DIMS = [64, 128, 256, 512, 768]   # Matryoshka checkpoints
-N_RETRIEVAL_QUERIES = 50              # how many query → ground-truth pairs
-K_RETRIEVAL = 10                       # MRR@K
+MRL_DIMS = [64, 128, 256, 512, 768]  # Matryoshka checkpoints
+N_RETRIEVAL_QUERIES = 50  # how many query → ground-truth pairs
+K_RETRIEVAL = 10  # MRR@K
 
 # ---------------------------------------------------------------------------
 # Corpus: short varied texts that stress different semantic dimensions
@@ -114,16 +114,16 @@ CORPUS = [
 
 # Ground-truth query → relevant index mapping for retrieval evaluation
 QUERIES_WITH_RELEVANT = [
-    ("How do proteins maintain their folded shape?",            [0, 1]),
-    ("What is the role of ribosomes in the cell?",             [6, 5]),
-    ("Explain principal component analysis",                   [9, 10]),
-    ("What is Plato's cave about?",                            [18]),
-    ("How does contrastive learning work?",                    [13, 11]),
-    ("Describe the structure of DNA",                          [3, 4]),
-    ("What is Kubernetes used for?",                           [26, 25]),
-    ("Tell me about quantum mechanics",                        [31, 32]),
-    ("Explain the attention mechanism in transformers",        [12, 11]),
-    ("What is the Riemannian manifold?",                       [8, 10]),
+    ("How do proteins maintain their folded shape?", [0, 1]),
+    ("What is the role of ribosomes in the cell?", [6, 5]),
+    ("Explain principal component analysis", [9, 10]),
+    ("What is Plato's cave about?", [18]),
+    ("How does contrastive learning work?", [13, 11]),
+    ("Describe the structure of DNA", [3, 4]),
+    ("What is Kubernetes used for?", [26, 25]),
+    ("Tell me about quantum mechanics", [31, 32]),
+    ("Explain the attention mechanism in transformers", [12, 11]),
+    ("What is the Riemannian manifold?", [8, 10]),
 ]
 
 
@@ -134,7 +134,9 @@ def embed_ollama(texts: list[str]) -> np.ndarray:
     """Embed texts one at a time via ollama."""
     vecs = []
     for text in tqdm(texts, desc="Embedding (ollama)"):
-        r = requests.post(OLLAMA_URL, json={"model": OLLAMA_MODEL, "prompt": text}, timeout=30)
+        r = requests.post(
+            OLLAMA_URL, json={"model": OLLAMA_MODEL, "prompt": text}, timeout=30
+        )
         r.raise_for_status()
         vecs.append(r.json()["embedding"])
     return np.array(vecs, dtype=np.float32)
@@ -142,13 +144,20 @@ def embed_ollama(texts: list[str]) -> np.ndarray:
 
 def embed_nomic_api(texts: list[str]) -> np.ndarray:
     """Embed texts in batches via nomic.ai API."""
-    headers = {"Authorization": f"Bearer {NOMIC_API_KEY}", "Content-Type": "application/json"}
+    headers = {
+        "Authorization": f"Bearer {NOMIC_API_KEY}",
+        "Content-Type": "application/json",
+    }
     batch_size = 32
     vecs = []
     for i in tqdm(range(0, len(texts), batch_size), desc="Embedding (API)"):
         batch = texts[i : i + batch_size]
-        r = requests.post(NOMIC_API_URL, headers=headers,
-                          json={"model": "nomic-embed-text-v1", "texts": batch}, timeout=60)
+        r = requests.post(
+            NOMIC_API_URL,
+            headers=headers,
+            json={"model": "nomic-embed-text-v1", "texts": batch},
+            timeout=60,
+        )
         r.raise_for_status()
         vecs.extend(r.json()["embeddings"])
     return np.array(vecs, dtype=np.float32)
@@ -166,7 +175,7 @@ def embed(texts: list[str]) -> np.ndarray:
 def participation_ratio(eigenvalues: np.ndarray) -> float:
     """PR = (Σλ)² / Σλ² — effective number of active dimensions."""
     lam = eigenvalues[eigenvalues > 0]
-    return float(lam.sum() ** 2 / (lam ** 2).sum())
+    return float(lam.sum() ** 2 / (lam**2).sum())
 
 
 def twonn_id(X: np.ndarray, n_neighbors: int = 2) -> float:
@@ -176,8 +185,8 @@ def twonn_id(X: np.ndarray, n_neighbors: int = 2) -> float:
     """
     nbrs = NearestNeighbors(n_neighbors=n_neighbors + 1, metric="cosine").fit(X)
     distances, _ = nbrs.kneighbors(X)
-    r1 = distances[:, 1]   # nearest neighbour distance
-    r2 = distances[:, 2]   # second nearest
+    r1 = distances[:, 1]  # nearest neighbour distance
+    r2 = distances[:, 2]  # second nearest
     # Avoid division by zero
     mask = r1 > 0
     mu = r2[mask] / r1[mask]
@@ -195,7 +204,9 @@ def elbow_pca(eigenvalues: np.ndarray, threshold: float = 0.90) -> int:
 # ---------------------------------------------------------------------------
 # Retrieval evaluation: MRR@K
 # ---------------------------------------------------------------------------
-def mrr_at_k(embeddings: np.ndarray, queries_idx: list, relevant: list, k: int = 10) -> float:
+def mrr_at_k(
+    embeddings: np.ndarray, queries_idx: list, relevant: list, k: int = 10
+) -> float:
     """
     Mean Reciprocal Rank @ K.
     queries_idx: indices into corpus used as query
@@ -230,7 +241,9 @@ def main():
         E = embed(CORPUS)
     except Exception as exc:
         console.print(f"[red]Embedding failed: {exc}[/red]")
-        console.print("Ensure ollama is running:  ollama serve && ollama pull nomic-embed-text")
+        console.print(
+            "Ensure ollama is running:  ollama serve && ollama pull nomic-embed-text"
+        )
         sys.exit(1)
 
     console.print(f"  Embedding matrix: {E.shape}  (dtype={E.dtype})")
@@ -281,10 +294,14 @@ def main():
         norms_q = np.linalg.norm(Q, axis=1, keepdims=True)
         Q = Q / np.clip(norms_q, 1e-8, None)
     except Exception as exc:
-        console.print(f"[yellow]Query embedding failed ({exc}); skipping retrieval eval.[/yellow]")
+        console.print(
+            f"[yellow]Query embedding failed ({exc}); skipping retrieval eval.[/yellow]"
+        )
         Q = None
 
-    retrieval_table = Table(title="MRR@10 by Embedding Dimension (MRL Truncation)", show_header=True)
+    retrieval_table = Table(
+        title="MRR@10 by Embedding Dimension (MRL Truncation)", show_header=True
+    )
     retrieval_table.add_column("Dimension", justify="right", style="cyan")
     retrieval_table.add_column("MRR@10", justify="right", style="green")
     retrieval_table.add_column("Variance Explained", justify="right")
@@ -311,7 +328,9 @@ def main():
             norms_qd = np.linalg.norm(Q_d, axis=1, keepdims=True)
             Q_d_norm = Q_d / np.clip(norms_qd, 1e-8, None)
 
-            nbrs = NearestNeighbors(n_neighbors=min(K_RETRIEVAL + 1, len(CORPUS)), metric="cosine").fit(E_d_norm)
+            nbrs = NearestNeighbors(
+                n_neighbors=min(K_RETRIEVAL + 1, len(CORPUS)), metric="cosine"
+            ).fit(E_d_norm)
             mrr_scores = []
             for qvec, rel in zip(Q_d_norm, rel_indices):
                 _, indices = nbrs.kneighbors(qvec.reshape(1, -1))
@@ -326,7 +345,9 @@ def main():
         else:
             mrr = float("nan")
 
-        results.append({"dim": d, "mrr": mrr, "var_explained": var_explained, "pca_id_90": id_d90})
+        results.append(
+            {"dim": d, "mrr": mrr, "var_explained": var_explained, "pca_id_90": id_d90}
+        )
         retrieval_table.add_row(
             str(d), f"{mrr:.3f}", f"{var_explained:.1%}", str(id_d90)
         )
@@ -339,10 +360,21 @@ def main():
     console.print("\n[bold]Step 4:[/bold] ManifoldWalker KNN dimensionality check …")
     try:
         from proteusPy.manifold_model import ManifoldModel
-        mm = ManifoldModel(n_neighbors=5, variance_threshold=0.90, manifold_weight=0.8)
+
+        mm = ManifoldModel(k_graph=5, variance_threshold=0.90, manifold_weight=0.8)
         mm.fit(E, np.zeros(len(E), dtype=int))  # dummy labels
-        mean_dim = float(np.mean([mm._geometries[f"n{i}"].intrinsic_dim for i in range(len(E)) if f"n{i}" in mm._geometries]))
-        console.print(f"  ManifoldModel mean local intrinsic dim: [green]{mean_dim:.1f}[/green]")
+        mean_dim = float(
+            np.mean(
+                [
+                    mm._geometries[f"n{i}"].intrinsic_dim
+                    for i in range(len(E))
+                    if f"n{i}" in mm._geometries
+                ]
+            )
+        )
+        console.print(
+            f"  ManifoldModel mean local intrinsic dim: [green]{mean_dim:.1f}[/green]"
+        )
     except Exception as exc:
         console.print(f"  [yellow]ManifoldModel check skipped: {exc}[/yellow]")
 
@@ -350,7 +382,8 @@ def main():
     # Summary
     # -----------------------------------------------------------------------
     console.rule("[bold]Summary[/bold]")
-    console.print(f"""
+    console.print(
+        f"""
   Full embedding dim  : {full_dim}
   TwoNN ID estimate   : {twonn:.1f}
   Participation Ratio : {pr:.1f}   (effective active dims)
@@ -363,7 +396,8 @@ def main():
   - MRL truncation to {d90}-{d95}d retains 90-95% of variance with minimal retrieval loss.
   - Embeddings live on a low-dim curved manifold inside ℝ^{full_dim}.
   - Our ManifoldWalker can traverse this space using only ~{round(twonn)} effective dims.
-""")
+"""
+    )
 
     # Save results
     out = {

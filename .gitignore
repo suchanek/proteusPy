@@ -41,3 +41,4 @@ logdir/
 lib/
 
 proteusPy/data/PDB_SS_ALL_LOADER.pkl
+benchmarks/pepys_embeddings.json

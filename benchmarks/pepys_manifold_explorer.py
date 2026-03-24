@@ -63,7 +63,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import requests
-from matplotlib.collections import LineCollection
 from rich.console import Console
 from rich.table import Table
 from sklearn.decomposition import PCA
@@ -76,7 +75,7 @@ console = Console()
 # Configuration
 # ---------------------------------------------------------------------------
 OLLAMA_URL = "http://localhost:11434/api/embeddings"
-OLLAMA_MODEL = "nomic-embed-text-4k"   # 4k-context variant handles long Pepys entries
+OLLAMA_MODEL = "nomic-embed-text-4k"  # 4k-context variant handles long Pepys entries
 USE_API = False
 NOMIC_API_KEY = os.environ.get("NOMIC_API_KEY", "")
 NOMIC_API_URL = "https://api-atlas.nomic.ai/v1/embedding/text"
@@ -97,14 +96,26 @@ DEFAULT_OUT_PNG = str(Path(__file__).parent / "pepys_manifold_results.png")
 # We mark corpus entries in that date range as "relevant".
 # ---------------------------------------------------------------------------
 PEPYS_QUERIES = [
-    ("The Great Plague of London, disease, death, sickness",     1665, 1666,  6, 12),
-    ("Great Fire of London, fire burning city",                  1666, 1666,  9,  9),
-    ("King Charles II coronation, restoration monarchy",         1660, 1661,  4,  6),
-    ("Theatre, playhouse, actors, entertainment, comedy",        1660, 1669,  1, 12),
-    ("Navy administration, fleet, ships, Admiral Sandwich",      1660, 1665,  1, 12),
-    ("Samuel Pepys wife Elizabeth, domestic life, household",    1660, 1669,  1, 12),
-    ("Parliament, politics, statecraft, Council",                1660, 1669,  1, 12),
-    ("Dutch War, naval battle, enemy fleet, de Ruyter",          1665, 1667,  1, 12),
+    ("The Great Plague of London, disease, death, sickness", 1665, 1666, 6, 12),
+    ("Great Fire of London, fire burning city", 1666, 1666, 9, 9),
+    ("King Charles II coronation, restoration monarchy", 1660, 1661, 4, 6),
+    ("Theatre, playhouse, actors, entertainment, comedy", 1660, 1669, 1, 12),
+    ("Navy administration, fleet, ships, Admiral Sandwich", 1660, 1665, 1, 12),
+    ("Samuel Pepys wife Elizabeth, domestic life, household", 1660, 1669, 1, 12),
+    ("Parliament, politics, statecraft, Council", 1660, 1669, 1, 12),
+    ("Dutch War, naval battle, enemy fleet, de Ruyter", 1665, 1667, 1, 12),
+    # ---- new topic types from pepys_enriched_full.txt ----
+    ("Church, sermon, prayer, religion, worship, God", 1660, 1669, 1, 12),
+    ("Travel, locations, streets, Thames, Westminster, Whitehall", 1660, 1669, 1, 12),
+    ("Money, accounts, fees, salary, expenses, financial dealings", 1660, 1669, 1, 12),
+    ("Social gathering, entertainment, friends, tavern, dining out", 1660, 1669, 1, 12),
+    (
+        "Emotion, fear, joy, anxiety, anger, personal feelings, health",
+        1660,
+        1669,
+        1,
+        12,
+    ),
 ]
 
 
@@ -118,6 +129,11 @@ def parse_diary(path: str, n: int = 0) -> tuple[list[str], list[datetime]]:
 
         TIMESTAMP | TYPE | CATEGORY | CONTENT
 
+    The ``TYPE`` (e.g. ``pepys_domestic``, ``pepys_naval``) and ``CATEGORY``
+    (e.g. ``Home``, ``Finance``, ``Health``) are prepended to the content so
+    that topic-level signal is preserved in the embedding space.  Comment
+    lines beginning with ``#`` and section headers are silently skipped.
+
     :param path: Path to the diary file.
     :param n: Maximum number of entries to return (0 = all).
     :return: Tuple of (content strings, datetime objects).
@@ -127,12 +143,12 @@ def parse_diary(path: str, n: int = 0) -> tuple[list[str], list[datetime]]:
     with open(path, encoding="utf-8") as fh:
         for line in fh:
             line = line.strip()
-            if not line:
+            if not line or line.startswith("#"):
                 continue
             parts = line.split("|", 3)
             if len(parts) < 4:
                 continue
-            ts_str, _, _, content = [p.strip() for p in parts]
+            ts_str, entry_type, category, content = [p.strip() for p in parts]
             content = content.strip()
             if not content or content == ".":
                 continue
@@ -140,7 +156,11 @@ def parse_diary(path: str, n: int = 0) -> tuple[list[str], list[datetime]]:
                 ts = datetime.fromisoformat(ts_str)
             except ValueError:
                 continue
-            texts.append(content)
+            # Prepend topic and category so the embedding captures
+            # the enriched classification from pepys_enriched_full.txt.
+            topic_label = entry_type.replace("_", " ").strip()
+            embed_text = f"{topic_label} | {category} | {content}"
+            texts.append(embed_text)
             timestamps.append(ts)
             if n and len(texts) >= n:
                 break
@@ -183,7 +203,7 @@ def embed_ollama(
                 break
             except Exception as exc:
                 if attempt < max_retries - 1:
-                    time.sleep(2 ** attempt)   # 1s, 2s backoff
+                    time.sleep(2**attempt)  # 1s, 2s backoff
                 else:
                     raise exc
         # Checkpoint every 50 entries
@@ -239,8 +259,9 @@ def embed(texts: list[str], model: str = OLLAMA_MODEL) -> np.ndarray:
 # ---------------------------------------------------------------------------
 # Embedding cache: save / load (timestamps stored as ISO strings)
 # ---------------------------------------------------------------------------
-def save_cache(path: str, embeddings: np.ndarray, texts: list[str],
-               timestamps: list[datetime]) -> None:
+def save_cache(
+    path: str, embeddings: np.ndarray, texts: list[str], timestamps: list[datetime]
+) -> None:
     """Persist embeddings and metadata to a JSON cache file.
 
     :param path: Output JSON path.
@@ -395,31 +416,36 @@ def make_figure(
     """
     dark = {
         "figure.facecolor": "#0d1117",
-        "axes.facecolor":   "#161b22",
-        "axes.edgecolor":   "#30363d",
-        "axes.labelcolor":  "#c9d1d9",
-        "xtick.color":      "#8b949e",
-        "ytick.color":      "#8b949e",
-        "text.color":       "#c9d1d9",
-        "grid.color":       "#21262d",
-        "grid.linewidth":   0.6,
+        "axes.facecolor": "#161b22",
+        "axes.edgecolor": "#30363d",
+        "axes.labelcolor": "#c9d1d9",
+        "xtick.color": "#8b949e",
+        "ytick.color": "#8b949e",
+        "text.color": "#c9d1d9",
+        "grid.color": "#21262d",
+        "grid.linewidth": 0.6,
     }
     mpl.rcParams.update(dark)
 
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-    fig.suptitle("Pepys Diary · nomic-embed-text Manifold", fontsize=15, color="#c9d1d9", y=0.98)
+    fig.suptitle(
+        "Pepys Diary · nomic-embed-text Manifold", fontsize=15, color="#c9d1d9", y=0.98
+    )
 
     years = np.array([ts.year for ts in timestamps])
-    year_min, year_max = years.min(), years.max()
 
     # --- Panel 1: temporal PCA scatter ---
     ax = axes[0, 0]
     pca2 = PCA(n_components=2)
     coords = pca2.fit_transform(E_full)
     sc = ax.scatter(
-        coords[:, 0], coords[:, 1],
-        c=years, cmap="plasma",
-        s=4, alpha=0.6, linewidths=0,
+        coords[:, 0],
+        coords[:, 1],
+        c=years,
+        cmap="plasma",
+        s=4,
+        alpha=0.6,
+        linewidths=0,
     )
     cb = fig.colorbar(sc, ax=ax, pad=0.02)
     cb.set_label("Year", color="#c9d1d9", fontsize=9)
@@ -437,23 +463,39 @@ def make_figure(
         dims = [r["dim"] for r in mrl]
         mrrs = [r["mrr"] for r in mrl]
         bars = ax.bar(
-            [str(d) for d in dims], mrrs,
+            [str(d) for d in dims],
+            mrrs,
             color=["#58a6ff" if d < 512 else "#3fb950" for d in dims],
-            alpha=0.85, width=0.6,
+            alpha=0.85,
+            width=0.6,
         )
         for bar, v in zip(bars, mrrs):
             ax.text(
-                bar.get_x() + bar.get_width() / 2, v + 0.005,
-                f"{v:.3f}", ha="center", va="bottom", fontsize=8, color="#c9d1d9",
+                bar.get_x() + bar.get_width() / 2,
+                v + 0.005,
+                f"{v:.3f}",
+                ha="center",
+                va="bottom",
+                fontsize=8,
+                color="#c9d1d9",
             )
         ax.set_ylim(0, max(mrrs) * 1.25 if mrrs else 1)
         ax.set_xlabel("Embedding Dimension (MRL)", fontsize=9)
         ax.set_ylabel("MRR@10", fontsize=9)
-        ax.set_title("Retrieval quality vs. MRL truncation", color="#c9d1d9", fontsize=11)
+        ax.set_title(
+            "Retrieval quality vs. MRL truncation", color="#c9d1d9", fontsize=11
+        )
         ax.grid(True, axis="y", alpha=0.3)
     else:
-        ax.text(0.5, 0.5, "No retrieval data", ha="center", va="center",
-                color="#8b949e", transform=ax.transAxes)
+        ax.text(
+            0.5,
+            0.5,
+            "No retrieval data",
+            ha="center",
+            va="center",
+            color="#8b949e",
+            transform=ax.transAxes,
+        )
         ax.set_title("MRL MRR@10", color="#c9d1d9", fontsize=11)
 
     # --- Panels 3 & 4: flight observer (height / curvature) ---
@@ -464,7 +506,7 @@ def make_figure(
         ]
     ):
         ax = axes[1, col_idx]
-        if flight_obs and key in flight_obs and flight_obs[key]:
+        if flight_obs and key in flight_obs and len(flight_obs[key]) > 0:
             vals = np.array(flight_obs[key], dtype=float)
             hops = np.arange(len(vals))
             ax.plot(hops, vals, color=color, lw=1.5, alpha=0.9)
@@ -479,9 +521,13 @@ def make_figure(
             ax.grid(True, alpha=0.3)
         else:
             ax.text(
-                0.5, 0.5,
+                0.5,
+                0.5,
                 "No flight data\n(run without --no-walker)",
-                ha="center", va="center", color="#8b949e", transform=ax.transAxes,
+                ha="center",
+                va="center",
+                color="#8b949e",
+                transform=ax.transAxes,
                 fontsize=9,
             )
         title_map = {
@@ -507,7 +553,9 @@ def parse_args() -> argparse.Namespace:
         help="Path to pepys_clean.txt pipe-delimited diary file",
     )
     p.add_argument(
-        "--n", type=int, default=0,
+        "--n",
+        type=int,
+        default=0,
         help="Max entries to use (0 = all)",
     )
     p.add_argument(
@@ -516,11 +564,15 @@ def parse_args() -> argparse.Namespace:
         help="Path to embedding cache JSON (read if exists, write after embedding)",
     )
     p.add_argument(
-        "--tau", type=float, default=0.90,
+        "--tau",
+        type=float,
+        default=0.90,
         help="PCA variance threshold for intrinsic dim (default: 0.90)",
     )
     p.add_argument(
-        "--k", type=int, default=10,
+        "--k",
+        type=int,
+        default=10,
         help="KNN for ManifoldModel (default: 10)",
     )
     p.add_argument(
@@ -529,24 +581,30 @@ def parse_args() -> argparse.Namespace:
         help="ollama model name (default: nomic-embed-text-4k for long-entry support)",
     )
     p.add_argument(
-        "--max-chars", type=int, default=0,
+        "--max-chars",
+        type=int,
+        default=0,
         help="Truncate each entry to this many characters before embedding "
-             "(0 = no truncation; use ~12000 for nomic-embed-text standard)",
+        "(0 = no truncation; use ~12000 for nomic-embed-text standard)",
     )
     p.add_argument(
-        "--clear-cache", action="store_true",
+        "--clear-cache",
+        action="store_true",
         help="Delete any existing embedding cache before running (start fresh)",
     )
     p.add_argument(
-        "--no-walker", action="store_true",
+        "--no-walker",
+        action="store_true",
         help="Skip ManifoldWalker/ManifoldObserver flight step",
     )
     p.add_argument(
-        "--out-json", default=DEFAULT_OUT_JSON,
+        "--out-json",
+        default=DEFAULT_OUT_JSON,
         help="Path for results JSON output",
     )
     p.add_argument(
-        "--out-png", default=DEFAULT_OUT_PNG,
+        "--out-png",
+        default=DEFAULT_OUT_PNG,
         help="Path for figure PNG output",
     )
     return p.parse_args()
@@ -562,7 +620,9 @@ def main() -> None:  # noqa: C901
     cache_path = Path(args.cache)
 
     if cache_path.exists():
-        console.print(f"\n[bold]Step 1:[/bold] Loading cached embeddings from {cache_path} …")
+        console.print(
+            f"\n[bold]Step 1:[/bold] Loading cached embeddings from {cache_path} …"
+        )
         E, texts, timestamps = load_cache(str(cache_path))
         # Honour --n even when loading from cache
         if args.n and len(texts) > args.n:
@@ -580,27 +640,31 @@ def main() -> None:  # noqa: C901
 
         console.print(f"\n[bold]Step 1:[/bold] Parsing {diary_path} …")
         texts, timestamps = parse_diary(str(diary_path), n=args.n)
-        console.print(f"  Loaded {len(texts)} entries  "
-                      f"({timestamps[0].date()} → {timestamps[-1].date()})")
+        console.print(
+            f"  Loaded {len(texts)} entries  "
+            f"({timestamps[0].date()} → {timestamps[-1].date()})"
+        )
 
         if args.max_chars:
             n_long = sum(1 for t in texts if len(t) > args.max_chars)
             if n_long:
-                console.print(f"  Truncating {n_long} entries to {args.max_chars} chars")
+                console.print(
+                    f"  Truncating {n_long} entries to {args.max_chars} chars"
+                )
             texts = [t[: args.max_chars] if args.max_chars else t for t in texts]
 
         # Resume from partial checkpoint if it exists
         if cache_path.exists():
-            console.print(f"  [yellow]Partial cache found — resuming from {cache_path}[/yellow]")
+            console.print(
+                f"  [yellow]Partial cache found — resuming from {cache_path}[/yellow]"
+            )
             E_partial, texts_done, ts_done = load_cache(str(cache_path))
             n_done = len(texts_done)
             console.print(f"  Resuming from entry {n_done}/{len(texts)}")
             texts_remaining = texts[n_done:]
-            ts_remaining = timestamps[n_done:]
         else:
             E_partial, n_done = None, 0
             texts_remaining = texts
-            ts_remaining = timestamps
 
         console.print(
             f"  Embedding {len(texts_remaining)} entries with {args.model} "
@@ -617,7 +681,9 @@ def main() -> None:  # noqa: C901
             )
         except Exception as exc:
             console.print(f"[red]Embedding failed: {exc}[/red]")
-            console.print("Ensure ollama is running:  ollama serve && ollama pull nomic-embed-text")
+            console.print(
+                "Ensure ollama is running:  ollama serve && ollama pull nomic-embed-text"
+            )
             sys.exit(1)
         elapsed = time.time() - t0
         # Merge with any partial results from a previous interrupted run
@@ -625,15 +691,15 @@ def main() -> None:  # noqa: C901
             E = np.concatenate([E_partial, E_new], axis=0)
         else:
             E = E_new
-        console.print(f"  Embedded {len(texts_remaining)} new entries in {elapsed:.1f}s  "
-                      f"({elapsed / max(len(texts_remaining), 1):.2f}s/entry)")
+        console.print(
+            f"  Embedded {len(texts_remaining)} new entries in {elapsed:.1f}s  "
+            f"({elapsed / max(len(texts_remaining), 1):.2f}s/entry)"
+        )
         save_cache(str(cache_path), E, texts, timestamps)
 
     N, full_dim = E.shape
     console.print(f"  Corpus: {N} entries × {full_dim} dims  (dtype={E.dtype})")
-    console.print(
-        f"  Date range: {min(timestamps).date()} → {max(timestamps).date()}"
-    )
+    console.print(f"  Date range: {min(timestamps).date()} → {max(timestamps).date()}")
 
     # L2-normalise (nomic outputs should already be unit-norm, but be safe)
     norms = np.linalg.norm(E, axis=1, keepdims=True)
@@ -669,7 +735,9 @@ def main() -> None:  # noqa: C901
     # -----------------------------------------------------------------------
     # Step 3: MRL truncation retrieval
     # -----------------------------------------------------------------------
-    console.print("\n[bold]Step 3:[/bold] MRL truncation retrieval (Pepys historical queries) …")
+    console.print(
+        "\n[bold]Step 3:[/bold] MRL truncation retrieval (Pepys historical queries) …"
+    )
     retrieval_pairs = build_retrieval_pairs(timestamps)
 
     if retrieval_pairs:
@@ -684,10 +752,14 @@ def main() -> None:  # noqa: C901
             Q_full = Q_full / np.clip(q_norms, 1e-8, None)
             console.print("  Query embeddings ready.")
         except Exception as exc:
-            console.print(f"[yellow]Query embedding failed ({exc}); skipping retrieval.[/yellow]")
+            console.print(
+                f"[yellow]Query embedding failed ({exc}); skipping retrieval.[/yellow]"
+            )
             Q_full = None
     else:
-        console.print("  [yellow]No retrieval pairs built (corpus too small or dates out of range).[/yellow]")
+        console.print(
+            "  [yellow]No retrieval pairs built (corpus too small or dates out of range).[/yellow]"
+        )
         Q_full = None
 
     retrieval_table = Table(
@@ -719,7 +791,9 @@ def main() -> None:  # noqa: C901
         else:
             mrr = float("nan")
 
-        mrl_results.append({"dim": d, "mrr": mrr, "var_explained": var_expl, "pca_id_90": id_d90})
+        mrl_results.append(
+            {"dim": d, "mrr": mrr, "var_explained": var_expl, "pca_id_90": id_d90}
+        )
         retrieval_table.add_row(str(d), f"{mrr:.3f}", f"{var_expl:.1%}", str(id_d90))
 
     console.print(retrieval_table)
@@ -731,16 +805,20 @@ def main() -> None:  # noqa: C901
     flight_info: dict = {}
 
     if not args.no_walker:
-        console.print("\n[bold]Step 4:[/bold] ManifoldWalker flight (most-distant pair) …")
+        console.print(
+            "\n[bold]Step 4:[/bold] ManifoldWalker flight (most-distant pair) …"
+        )
         try:
             from proteusPy.manifold_model import ManifoldModel
             from proteusPy.manifold_observer import ManifoldObserver
 
             labels = np.array([ts.year for ts in timestamps])
 
-            console.print(f"  Fitting ManifoldModel (k={args.k}, τ={args.tau}) on {N} entries …")
+            console.print(
+                f"  Fitting ManifoldModel (k={args.k}, τ={args.tau}) on {N} entries …"
+            )
             mm = ManifoldModel(
-                n_neighbors=args.k,
+                k_graph=args.k,
                 variance_threshold=args.tau,
                 manifold_weight=0.8,
             )
@@ -761,7 +839,6 @@ def main() -> None:  # noqa: C901
             i_dest = int(sample_idx[j_loc])
 
             ts_orig = timestamps[i_orig]
-            ts_dest = timestamps[j_loc]
             dist_cos = float(1 - sims[i_loc, j_loc])
             console.print(
                 f"  Origin  : entry {i_orig}  ({ts_orig.date()})  "
@@ -773,18 +850,28 @@ def main() -> None:  # noqa: C901
             )
             console.print(f"  Cosine distance: {dist_cos:.4f}")
 
-            mm.set_position(f"n{i_orig}")
+            mm.fly_to(f"n{i_orig}")
             path = mm.fly_toward(E[i_dest], max_steps=200, patience=15)
-            arrived = np.linalg.norm(E[i_dest] - mm._graph.get_embedding(path[-1])) < 0.05
-            console.print(
-                f"  Path length: {len(path)} hops  |  arrived: {arrived}"
+            arrived = (
+                np.linalg.norm(E[i_dest] - mm._graph.get_embedding(path[-1])) < 0.05
             )
+            console.print(f"  Path length: {len(path)} hops  |  arrived: {arrived}")
 
-            obs = ManifoldObserver(mm._graph, mm._geometries)
+            obs = ManifoldObserver(mm)
             flight_obs = obs.observe_path(path)
+            mean_h = (
+                float(np.mean(flight_obs["heights"]))
+                if len(flight_obs["heights"])
+                else 0.0
+            )
+            mean_c = (
+                float(np.mean(flight_obs["curvatures"]))
+                if len(flight_obs["curvatures"])
+                else 0.0
+            )
             console.print(
-                f"  Observer: mean height={flight_obs['mean_height']:.4f}  "
-                f"mean curvature={flight_obs['mean_curvature']:.4f}°"
+                f"  Observer: mean height={mean_h:.4f}  "
+                f"mean curvature={mean_c:.4f}°"
             )
 
             flight_info = {
@@ -795,20 +882,22 @@ def main() -> None:  # noqa: C901
                 "cosine_distance": round(dist_cos, 4),
                 "path_length": len(path),
                 "arrived": arrived,
-                "mean_height": flight_obs["mean_height"],
-                "mean_curvature": flight_obs["mean_curvature"],
+                "mean_height": mean_h,
+                "mean_curvature": mean_c,
             }
 
         except Exception as exc:
             console.print(f"[yellow]ManifoldWalker step failed: {exc}[/yellow]")
             import traceback
+
             traceback.print_exc()
 
     # -----------------------------------------------------------------------
     # Summary table
     # -----------------------------------------------------------------------
     console.rule("[bold]Summary[/bold]")
-    console.print(f"""
+    console.print(
+        f"""
   Corpus              : {N} Pepys diary entries
   Date range          : {min(timestamps).date()} → {max(timestamps).date()}
   Full embedding dim  : {full_dim}
@@ -817,7 +906,8 @@ def main() -> None:  # noqa: C901
   PCA 90%             : {d90} dims
   PCA 95%             : {d95} dims
   PCA 99%             : {d99} dims
-""")
+"""
+    )
 
     # -----------------------------------------------------------------------
     # Save results
@@ -834,8 +924,21 @@ def main() -> None:  # noqa: C901
         "mrl_retrieval": mrl_results,
         "flight": flight_info,
     }
+
+    class _NumpyEncoder(json.JSONEncoder):
+        def default(self, obj):
+            if isinstance(obj, np.integer):
+                return int(obj)
+            if isinstance(obj, np.floating):
+                return float(obj)
+            if isinstance(obj, np.bool_):
+                return bool(obj)
+            if isinstance(obj, np.ndarray):
+                return obj.tolist()
+            return super().default(obj)
+
     with open(args.out_json, "w", encoding="utf-8") as fh:
-        json.dump(results, fh, indent=2)
+        json.dump(results, fh, indent=2, cls=_NumpyEncoder)
     console.print(f"[dim]Results saved → {args.out_json}[/dim]")
 
     # -----------------------------------------------------------------------
