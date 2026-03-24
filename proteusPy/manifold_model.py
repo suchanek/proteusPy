@@ -34,6 +34,9 @@ Part of the program proteusPy, https://github.com/suchanek/proteusPy,
 a Python package for the manipulation and analysis of macromolecules.
 
 Author: Eric G. Suchanek, PhD
+Affiliation: Flux-Frontiers, https://github.com/Flux-Frontiers
+License: BSD
+Last revised: 2026-03-23 -egs-
 """
 
 __pdoc__ = {"__all__": True}
@@ -635,7 +638,7 @@ class ManifoldModel:
 
         return best_id
 
-    def fly_toward(self, target, max_steps: int = 20) -> list[str]:
+    def fly_toward(self, target, max_steps: int = 20, patience: int = 5) -> list[str]:
         """Fly toward a target point, following the graph.
 
         Parameters
@@ -644,6 +647,11 @@ class ManifoldModel:
             Target point in ambient space.
         max_steps : int
             Maximum number of graph hops.
+        patience : int
+            Number of consecutive non-improving hops allowed before stopping.
+            With sparse graphs (small k) a greedy step occasionally moves
+            sideways; patience lets the walker continue past local detours
+            rather than terminating at the first non-improving step.
 
         Returns
         -------
@@ -652,6 +660,7 @@ class ManifoldModel:
         """
         target = np.asarray(target, dtype="d")
         path = []
+        stall = 0
 
         for _ in range(max_steps):
             if self._current_node is None:
@@ -670,12 +679,14 @@ class ManifoldModel:
 
             path.append(next_id)
 
-            # Check if we're getting closer
             new_emb = self._graph.get_embedding(next_id)
             new_dist = np.linalg.norm(target - new_emb)
             if new_dist >= dist:
-                # Not making progress — stop
-                break
+                stall += 1
+                if stall >= patience:
+                    break
+            else:
+                stall = 0
 
         return path
 

@@ -35,6 +35,10 @@ Part of the program proteusPy, https://github.com/suchanek/proteusPy,
 a Python package for the manipulation and analysis of macromolecules.
 
 Author: Eric G. Suchanek, PhD
+Affiliation: Flux-Frontiers, https://github.com/Flux-Frontiers
+License: BSD
+Last revised: 2026-03-23 -egs-
+
 """
 
 from __future__ import annotations
@@ -606,6 +610,151 @@ class ManifoldObserver:
             "max_height": float(np.max(heights)) if heights else 0.0,
             "mean_intrinsic_dim": float(np.mean(dims)) if dims else 0.0,
             "high_curvature_nodes": high_curv_nodes,
+        }
+
+    # ----- Path tracing (pen-down view from above) -----
+
+    def observe_path(
+        self,
+        path: list[str],
+        pen_down: bool = True,
+    ) -> dict:
+        """See a walker's traced path from the observer's vantage above the surface.
+
+        The classical turtle can drop a pen and draw on the plane.  In the
+        manifold the walker traces a sequence of N-dim positions.  The observer,
+        sitting one dimension higher, sees the complete trajectory as a relief
+        curve: each hop is lifted to (N+1)-space, with the extra coordinate
+        encoding height above the local tangent plane.
+
+        This is the "pen-down" view: what Flatland's Sphere sees looking down
+        at the curve the Flatlander drew while walking.
+
+        Parameters
+        ----------
+        path : list of str
+            Ordered list of node IDs visited by the walker (e.g.
+            ``ManifoldModel.flight_path``).
+        pen_down : bool
+            If True (default), compute and return the full lifted trajectory.
+            If False, returns only the per-hop metadata without lifting.
+
+        Returns
+        -------
+        dict with keys:
+
+        ``positions_N`` : np.ndarray, shape (n_hops, N)
+            Walker positions in N-space (original manifold coordinates).
+        ``positions_lifted`` : np.ndarray, shape (n_hops, N+1)
+            Walker positions in (N+1)-space as seen by the observer.
+            The last column is the reconstruction-error height at each hop.
+        ``heights`` : np.ndarray, shape (n_hops,)
+            Observer height coordinate at each hop (= reconstruction error
+            from the local tangent plane).  Zero = on the manifold; positive =
+            off the manifold surface (noise / curvature gap).
+        ``curvatures`` : np.ndarray, shape (n_hops,)
+            Curvature at each hop node (mean principal angle to neighbors).
+        ``intrinsic_dims`` : np.ndarray of int, shape (n_hops,)
+            Local intrinsic dimensionality at each hop.
+        ``class_labels`` : list
+            Class label at each hop node (None if model is unsupervised).
+        ``path`` : list of str
+            Input path, echoed back.
+        ``n_hops`` : int
+            Number of hops.
+        ``boundary_crossings`` : list of int
+            Hop indices where the class label changes.
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from proteusPy.manifold_model import ManifoldModel
+        >>> from proteusPy.manifold_observer import ManifoldObserver
+        >>> rng = np.random.default_rng(0)
+        >>> X = rng.standard_normal((60, 4))
+        >>> y = (X[:, 0] > 0).astype(int)
+        >>> model = ManifoldModel(k_graph=6, k_pca=15)
+        >>> _ = model.fit(X, y)
+        >>> _ = model.fly_to("n0")
+        >>> path = model.fly_toward(X[30], max_steps=10)
+        >>> obs = ManifoldObserver(model)
+        >>> result = obs.observe_path(path)
+        >>> result["n_hops"] == len(path)
+        True
+        >>> result["positions_lifted"].shape[1] == 5  # N+1 = 4+1
+        True
+        """
+        if not path:
+            return {
+                "positions_N": np.empty((0, self._subject.ndim)),
+                "positions_lifted": np.empty((0, self._ndim)),
+                "heights": np.array([]),
+                "curvatures": np.array([]),
+                "intrinsic_dims": np.array([], dtype=int),
+                "class_labels": [],
+                "path": path,
+                "n_hops": 0,
+                "boundary_crossings": [],
+            }
+
+        N = self._subject.ndim
+        n_hops = len(path)
+        pos_N = np.zeros((n_hops, N), dtype="d")
+        pos_lifted = np.zeros((n_hops, self._ndim), dtype="d")
+        heights = np.zeros(n_hops, dtype="d")
+        curvatures = np.zeros(n_hops, dtype="d")
+        intrinsic_dims = np.zeros(n_hops, dtype=int)
+        labels: list = []
+
+        for i, node_id in enumerate(path):
+            # Raw position in N-space
+            emb = self._subject.graph.get_embedding(node_id)
+            pos_N[i] = emb
+
+            # Geometry at this node
+            geom = self._subject.get_geometry(node_id)
+            intrinsic_dims[i] = geom.intrinsic_dim
+
+            # Curvature — use cached value if observe() was called, else compute
+            if node_id in self._observed:
+                curv = self._observed[node_id].curvature
+            else:
+                curv, _ = self._compute_curvature(node_id)
+            curvatures[i] = curv
+
+            # Lift to (N+1)-space
+            if pen_down:
+                lifted = self._lift_point(emb, geom)
+            else:
+                lifted = np.zeros(self._ndim, dtype="d")
+                lifted[:N] = emb
+            pos_lifted[i] = lifted
+            heights[i] = float(lifted[-1])
+
+            # Class label
+            idx = int(node_id[1:])
+            if self._subject._y_train is not None and idx < len(self._subject._y_train):
+                labels.append(self._subject._y_train[idx])
+            else:
+                labels.append(None)
+
+        # Boundary crossings — hops where class changes
+        crossings = []
+        for i in range(1, n_hops):
+            if labels[i] is not None and labels[i - 1] is not None:
+                if labels[i] != labels[i - 1]:
+                    crossings.append(i)
+
+        return {
+            "positions_N": pos_N,
+            "positions_lifted": pos_lifted,
+            "heights": heights,
+            "curvatures": curvatures,
+            "intrinsic_dims": intrinsic_dims,
+            "class_labels": labels,
+            "path": path,
+            "n_hops": n_hops,
+            "boundary_crossings": crossings,
         }
 
     # ----- Dunder -----
