@@ -16,7 +16,7 @@ how much temporal structure the embedding manifold retains.
 Pipeline
 --------
 1. Parse pepys_clean.txt (pipe-delimited: TIMESTAMP | TYPE | CATEGORY | CONTENT).
-2. Subsample if requested; embed via ollama nomic-embed-text (or nomic.ai API).
+2. Subsample if requested; embed via sentence-transformers (nomic-ai/nomic-embed-text-v1).
    Embeddings are cached to JSON so re-runs are instant.
 3. Intrinsic dimensionality:
      - PCA explained-variance elbow (90 / 95 / 99 %)
@@ -45,26 +45,24 @@ Usage
 
 Requirements
 ------------
-  All already in proteusPy env (numpy, scikit-learn, rich, matplotlib, requests, tqdm).
-  Embeddings: ollama running locally with nomic-embed-text pulled, OR NOMIC_API_KEY set.
+  All already in proteusPy env (numpy, scikit-learn, rich, matplotlib, sentence-transformers, tqdm).
+  No external services required — model is loaded directly via HuggingFace.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
-import time
 from datetime import datetime
 from pathlib import Path
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-import requests
 from rich.console import Console
 from rich.table import Table
+from sentence_transformers import SentenceTransformer
 from sklearn.decomposition import PCA
 from sklearn.neighbors import NearestNeighbors
 from tqdm import tqdm
@@ -74,11 +72,7 @@ console = Console()
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-OLLAMA_URL = "http://localhost:11434/api/embeddings"
-OLLAMA_MODEL = "nomic-embed-text-4k"  # 4k-context variant handles long Pepys entries
-USE_API = False
-NOMIC_API_KEY = os.environ.get("NOMIC_API_KEY", "")
-NOMIC_API_URL = "https://api-atlas.nomic.ai/v1/embedding/text"
+DEFAULT_MODEL = "nomic-ai/nomic-embed-text-v1"  # HF model id, loaded via sentence-transformers
 
 MRL_DIMS = [64, 128, 256, 512, 768]
 K_RETRIEVAL = 10
@@ -122,7 +116,7 @@ PEPYS_QUERIES = [
 # ---------------------------------------------------------------------------
 # Diary parser (no diary_kg dependency — parse the pipe-delimited format)
 # ---------------------------------------------------------------------------
-def parse_diary(path: str, n: int = 0) -> tuple[list[str], list[datetime]]:
+def parse_diary(path: str) -> tuple[list[str], list[datetime]]:
     """Parse a pipe-delimited diary file and return (texts, timestamps).
 
     Expected line format::
@@ -134,8 +128,10 @@ def parse_diary(path: str, n: int = 0) -> tuple[list[str], list[datetime]]:
     that topic-level signal is preserved in the embedding space.  Comment
     lines beginning with ``#`` and section headers are silently skipped.
 
+    Always parses the full file; use :func:`temporally_sample` afterwards to
+    subsample while preserving temporal diversity.
+
     :param path: Path to the diary file.
-    :param n: Maximum number of entries to return (0 = all).
     :return: Tuple of (content strings, datetime objects).
     """
     texts: list[str] = []
@@ -162,98 +158,90 @@ def parse_diary(path: str, n: int = 0) -> tuple[list[str], list[datetime]]:
             embed_text = f"{topic_label} | {category} | {content}"
             texts.append(embed_text)
             timestamps.append(ts)
-            if n and len(texts) >= n:
-                break
     return texts, timestamps
+
+
+def temporally_sample(
+    texts: list[str], timestamps: list[datetime], n: int
+) -> tuple[list[str], list[datetime]]:
+    """Return *n* entries sampled evenly across the full time span.
+
+    Entries are assumed to be sorted chronologically (as produced by
+    :func:`parse_diary`).  We pick indices at equal intervals so that the
+    sample covers the whole 1660-1669 arc rather than clustering at the start.
+
+    :param texts: Full list of entry strings.
+    :param timestamps: Corresponding datetime objects (same length, sorted).
+    :param n: Desired sample size.  If >= len(texts) the full corpus is returned.
+    :return: Tuple of (sampled texts, sampled timestamps).
+    """
+    total = len(texts)
+    if n <= 0 or n >= total:
+        return texts, timestamps
+    indices = [round(i * (total - 1) / (n - 1)) for i in range(n)]
+    return [texts[i] for i in indices], [timestamps[i] for i in indices]
 
 
 # ---------------------------------------------------------------------------
 # Embedding helpers
 # ---------------------------------------------------------------------------
-def embed_ollama(
+def embed_local(
     texts: list[str],
-    model: str = OLLAMA_MODEL,
-    max_retries: int = 3,
+    model: str = DEFAULT_MODEL,
+    batch_size: int = 64,
     checkpoint_path: str | None = None,
     checkpoint_texts: list[str] | None = None,
     checkpoint_timestamps: list[datetime] | None = None,
 ) -> np.ndarray:
-    """Embed texts via ollama (one at a time) with retry and live checkpointing.
+    """Embed texts directly via sentence-transformers (no ollama required).
+
+    Loads the model once, then encodes in batches with a progress bar.
+    Writes a checkpoint to *checkpoint_path* every 200 entries so a crash
+    mid-run doesn't lose all work.
 
     :param texts: List of strings to embed.
-    :param model: ollama model name (default: OLLAMA_MODEL).
-    :param max_retries: Retries per entry on 5xx errors before giving up.
-    :param checkpoint_path: If set, write a cache checkpoint after every 50
-        entries so a crash mid-run doesn't lose all work.
-    :param checkpoint_texts: Aligned text list for the checkpoint cache.
-    :param checkpoint_timestamps: Aligned timestamp list for the checkpoint cache.
+    :param model: HuggingFace model id (default: DEFAULT_MODEL).
+    :param batch_size: Encoding batch size (tune to GPU/RAM).
+    :param checkpoint_path: If set, save a partial cache every 200 entries.
+    :param checkpoint_texts: Full aligned text list used when writing checkpoints.
+    :param checkpoint_timestamps: Full aligned timestamp list for checkpoints.
     :return: Float32 array of shape (N, D).
     """
-    vecs = []
-    for i, text in enumerate(tqdm(texts, desc=f"Embedding via {model}")):
-        for attempt in range(max_retries):
-            try:
-                r = requests.post(
-                    OLLAMA_URL,
-                    json={"model": model, "prompt": text},
-                    timeout=120,
-                )
-                r.raise_for_status()
-                vecs.append(r.json()["embedding"])
-                break
-            except Exception as exc:
-                if attempt < max_retries - 1:
-                    time.sleep(2**attempt)  # 1s, 2s backoff
-                else:
-                    raise exc
-        # Checkpoint every 50 entries
+    console.print(f"  Loading embedder: {model} …")
+    embedder = SentenceTransformer(model, trust_remote_code=True)
+
+    vecs: list[np.ndarray] = []
+    checkpoint_interval = 200
+
+    for batch_start in tqdm(
+        range(0, len(texts), batch_size),
+        desc="Embedding",
+        unit="batch",
+    ):
+        batch = texts[batch_start : batch_start + batch_size]
+        # nomic-embed-text expects a task-type prefix for search/retrieval
+        prefixed = [f"search_document: {t}" for t in batch]
+        batch_vecs = embedder.encode(
+            prefixed, convert_to_numpy=True, show_progress_bar=False
+        )
+        vecs.append(batch_vecs.astype(np.float32))
+
+        n_done = batch_start + len(batch)
         if (
             checkpoint_path
             and checkpoint_texts is not None
             and checkpoint_timestamps is not None
-            and (i + 1) % 50 == 0
+            and n_done % checkpoint_interval == 0
         ):
-            partial = np.array(vecs, dtype=np.float32)
+            partial = np.concatenate(vecs, axis=0)
             save_cache(
                 checkpoint_path,
                 partial,
-                checkpoint_texts[: len(vecs)],
-                checkpoint_timestamps[: len(vecs)],
+                checkpoint_texts[: len(partial)],
+                checkpoint_timestamps[: len(partial)],
             )
-    return np.array(vecs, dtype=np.float32)
 
-
-def embed_nomic_api(texts: list[str]) -> np.ndarray:
-    """Embed texts in batches via nomic.ai API."""
-    headers = {
-        "Authorization": f"Bearer {NOMIC_API_KEY}",
-        "Content-Type": "application/json",
-    }
-    batch_size = 32
-    vecs = []
-    for i in tqdm(range(0, len(texts), batch_size), desc="Embedding (API)"):
-        batch = texts[i : i + batch_size]
-        r = requests.post(
-            NOMIC_API_URL,
-            headers=headers,
-            json={"model": "nomic-embed-text-v1", "texts": batch},
-            timeout=60,
-        )
-        r.raise_for_status()
-        vecs.extend(r.json()["embeddings"])
-    return np.array(vecs, dtype=np.float32)
-
-
-def embed(texts: list[str], model: str = OLLAMA_MODEL) -> np.ndarray:
-    """Dispatch to the configured embedding backend.
-
-    :param texts: Texts to embed.
-    :param model: ollama model name (ignored when USE_API=True).
-    :return: Float32 array of shape (N, D).
-    """
-    if USE_API:
-        return embed_nomic_api(texts)
-    return embed_ollama(texts, model=model)
+    return np.concatenate(vecs, axis=0) if vecs else np.empty((0, 0), dtype=np.float32)
 
 
 # ---------------------------------------------------------------------------
@@ -546,22 +534,19 @@ def make_figure(
 # Main
 # ---------------------------------------------------------------------------
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Pepys diary nomic-embed manifold explorer")
-    p.add_argument(
-        "--diary",
-        default=DEFAULT_DIARY,
-        help="Path to pepys_clean.txt pipe-delimited diary file",
+    p = argparse.ArgumentParser(
+        description="Pepys diary manifold explorer — reads from embedding cache built by pepys_embedder.py"
     )
     p.add_argument(
         "--n",
         type=int,
         default=0,
-        help="Max entries to use (0 = all)",
+        help="Temporally-sampled subset size drawn from the full cache (0 = all). Build cache first with pepys_embedder.py.",
     )
     p.add_argument(
         "--cache",
         default=DEFAULT_CACHE,
-        help="Path to embedding cache JSON (read if exists, write after embedding)",
+        help="Path to embedding cache JSON produced by pepys_embedder.py",
     )
     p.add_argument(
         "--tau",
@@ -576,21 +561,9 @@ def parse_args() -> argparse.Namespace:
         help="KNN for ManifoldModel (default: 10)",
     )
     p.add_argument(
-        "--model",
-        default=OLLAMA_MODEL,
-        help="ollama model name (default: nomic-embed-text-4k for long-entry support)",
-    )
-    p.add_argument(
-        "--max-chars",
-        type=int,
-        default=0,
-        help="Truncate each entry to this many characters before embedding "
-        "(0 = no truncation; use ~12000 for nomic-embed-text standard)",
-    )
-    p.add_argument(
         "--clear-cache",
         action="store_true",
-        help="Delete any existing embedding cache before running (start fresh)",
+        help="Delete any existing cache + results before running",
     )
     p.add_argument(
         "--no-walker",
@@ -619,83 +592,44 @@ def main() -> None:  # noqa: C901
     # -----------------------------------------------------------------------
     cache_path = Path(args.cache)
 
-    if cache_path.exists():
+    # --clear-cache: wipe cache and results so the next run starts fresh.
+    if args.clear_cache:
+        for _p in (cache_path, Path(args.out_json), Path(args.out_png)):
+            if _p.exists():
+                _p.unlink()
+                console.print(f"[yellow]Cleared:[/yellow] {_p}")
+
+    # Embedding is handled by pepys_embedder.py — this script is cache-only.
+    if not cache_path.exists():
         console.print(
-            f"\n[bold]Step 1:[/bold] Loading cached embeddings from {cache_path} …"
+            "[red]No embedding cache found.\n"
+            "Build it first with pepys_embedder.py:[/red]\n"
+            f"  python benchmarks/pepys_embedder.py --output {cache_path}"
         )
-        E, texts, timestamps = load_cache(str(cache_path))
-        # Honour --n even when loading from cache
-        if args.n and len(texts) > args.n:
-            E = E[: args.n]
-            texts = texts[: args.n]
-            timestamps = timestamps[: args.n]
-    else:
-        diary_path = Path(args.diary)
-        if not diary_path.exists():
+        sys.exit(1)
+
+    console.print(
+        f"\n[bold]Step 1:[/bold] Loading cached embeddings from {cache_path} …"
+    )
+    E, texts, timestamps = load_cache(str(cache_path))
+
+    if args.n:
+        if args.n > len(texts):
             console.print(
-                f"[red]Diary file not found: {diary_path}\n"
-                "Pass --diary /path/to/pepys_clean.txt[/red]"
+                f"[yellow]Warning:[/yellow] --n {args.n} exceeds cache size "
+                f"({len(texts)} entries) — using all cached entries."
             )
-            sys.exit(1)
-
-        console.print(f"\n[bold]Step 1:[/bold] Parsing {diary_path} …")
-        texts, timestamps = parse_diary(str(diary_path), n=args.n)
-        console.print(
-            f"  Loaded {len(texts)} entries  "
-            f"({timestamps[0].date()} → {timestamps[-1].date()})"
-        )
-
-        if args.max_chars:
-            n_long = sum(1 for t in texts if len(t) > args.max_chars)
-            if n_long:
-                console.print(
-                    f"  Truncating {n_long} entries to {args.max_chars} chars"
-                )
-            texts = [t[: args.max_chars] if args.max_chars else t for t in texts]
-
-        # Resume from partial checkpoint if it exists
-        if cache_path.exists():
+        elif args.n < len(texts):
+            total = len(texts)
+            n = args.n
+            indices = [round(i * (total - 1) / (n - 1)) for i in range(n)]
+            E = E[indices]
+            texts = [texts[i] for i in indices]
+            timestamps = [timestamps[i] for i in indices]
             console.print(
-                f"  [yellow]Partial cache found — resuming from {cache_path}[/yellow]"
+                f"  Temporally sampled {len(texts)} entries  "
+                f"({timestamps[0].date()} → {timestamps[-1].date()})"
             )
-            E_partial, texts_done, ts_done = load_cache(str(cache_path))
-            n_done = len(texts_done)
-            console.print(f"  Resuming from entry {n_done}/{len(texts)}")
-            texts_remaining = texts[n_done:]
-        else:
-            E_partial, n_done = None, 0
-            texts_remaining = texts
-
-        console.print(
-            f"  Embedding {len(texts_remaining)} entries with {args.model} "
-            f"(this may take a while) …"
-        )
-        t0 = time.time()
-        try:
-            E_new = embed_ollama(
-                texts_remaining,
-                model=args.model,
-                checkpoint_path=str(cache_path),
-                checkpoint_texts=texts,
-                checkpoint_timestamps=timestamps,
-            )
-        except Exception as exc:
-            console.print(f"[red]Embedding failed: {exc}[/red]")
-            console.print(
-                "Ensure ollama is running:  ollama serve && ollama pull nomic-embed-text"
-            )
-            sys.exit(1)
-        elapsed = time.time() - t0
-        # Merge with any partial results from a previous interrupted run
-        if E_partial is not None:
-            E = np.concatenate([E_partial, E_new], axis=0)
-        else:
-            E = E_new
-        console.print(
-            f"  Embedded {len(texts_remaining)} new entries in {elapsed:.1f}s  "
-            f"({elapsed / max(len(texts_remaining), 1):.2f}s/entry)"
-        )
-        save_cache(str(cache_path), E, texts, timestamps)
 
     N, full_dim = E.shape
     console.print(f"  Corpus: {N} entries × {full_dim} dims  (dtype={E.dtype})")
@@ -747,7 +681,7 @@ def main() -> None:  # noqa: C901
             f"  {len(query_texts)} queries; avg {np.mean([len(r) for r in rel_lists]):.0f} relevant entries/query"
         )
         try:
-            Q_full = embed(query_texts, model=args.model)
+            Q_full = embed_local(query_texts, model=args.model)
             q_norms = np.linalg.norm(Q_full, axis=1, keepdims=True)
             Q_full = Q_full / np.clip(q_norms, 1e-8, None)
             console.print("  Query embeddings ready.")

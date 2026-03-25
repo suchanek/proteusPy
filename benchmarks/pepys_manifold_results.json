@@ -1,56 +1,56 @@
 {
-  "corpus_size": 200,
+  "corpus_size": 1000,
   "date_range": [
     "1660-01-01T08:00:00",
-    "1660-04-16T08:00:00"
+    "1669-08-02T07:00:00"
   ],
   "full_dim": 768,
-  "twonn_id": -11.34,
-  "participation_ratio": 35.3,
-  "pca_id_90pct": 81,
-  "pca_id_95pct": 111,
-  "pca_id_99pct": 163,
+  "twonn_id": -13.52,
+  "participation_ratio": 36.06,
+  "pca_id_90pct": 107,
+  "pca_id_95pct": 142,
+  "pca_id_99pct": 185,
   "mrl_retrieval": [
     {
       "dim": 64,
-      "mrr": 0.9199999999999999,
-      "var_explained": 1.0000001192092896,
-      "pca_id_90": 37
+      "mrr": 0.791025641025641,
+      "var_explained": 1.0,
+      "pca_id_90": 43
     },
     {
       "dim": 128,
-      "mrr": 0.9111111111111111,
+      "mrr": 0.8102564102564103,
       "var_explained": 1.0,
-      "pca_id_90": 54
+      "pca_id_90": 71
     },
     {
       "dim": 256,
-      "mrr": 0.9111111111111111,
-      "var_explained": 0.9999999403953552,
-      "pca_id_90": 68
+      "mrr": 0.891025641025641,
+      "var_explained": 0.9857942461967468,
+      "pca_id_90": 98
     },
     {
       "dim": 512,
-      "mrr": 0.9,
-      "var_explained": 1.0,
-      "pca_id_90": 78
+      "mrr": 0.8974358974358976,
+      "var_explained": 0.9492780566215515,
+      "pca_id_90": 105
     },
     {
       "dim": 768,
-      "mrr": 0.9,
-      "var_explained": 1.0,
-      "pca_id_90": 81
+      "mrr": 0.8871794871794871,
+      "var_explained": 0.9342991709709167,
+      "pca_id_90": 107
     }
   ],
   "flight": {
-    "origin_idx": 43,
-    "dest_idx": 192,
-    "origin_date": "1660-01-22T12:00:00",
-    "dest_date": "1660-04-13T08:00:00",
-    "cosine_distance": 0.5855,
-    "path_length": 34,
+    "origin_idx": 489,
+    "dest_idx": 854,
+    "origin_date": "1664-07-06T07:00:00",
+    "dest_date": "1667-10-19T08:00:00",
+    "cosine_distance": 0.6474,
+    "path_length": 200,
     "arrived": false,
-    "mean_height": 0.3224701787844647,
-    "mean_curvature": 0.4635955086512415
+    "mean_height": 0.3162331153911181,
+    "mean_curvature": 0.6741753857652018
   }
 }

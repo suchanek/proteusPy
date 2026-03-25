@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`pepys_embedder.py`** — standalone multi-process ingestion pipeline: parses a pipe-delimited diary file, applies temporally diverse subsampling, and embeds via `sentence-transformers` (`nomic-ai/nomic-embed-text-v1`) using `multiprocessing.Pool` (one worker per CPU core, each loading the model independently). Produces a JSON cache compatible with `pepys_manifold_explorer.py`. Replaces the in-explorer `--init` flow.
+- **`nlp_ingestion_workflow.md`** — full pipeline documentation covering all four stages: raw-text parse (`pepys_proper_parse.py`), NLP enrichment (`DiaryTransformer` — spaCy diversity clustering + sentence-transformers segmentation + YAML TopicClassifier), multi-process embedding (`pepys_embedder.py`), and manifold analysis (`pepys_manifold_explorer.py`).
+- **Claude Code memory** — `feedback_nlp_principles.md` records the project's NLP-first principle: prefer `sentence-transformers` / HuggingFace locally, minimise inference API calls.
+
+### Changed
+
+- **`pepys_manifold_explorer.py` — cache-only reader**: removed all embedding/ingestion code (`--init`, `--diary`, `--model`, `--max-chars` args, `embed_local()` call, partial-checkpoint logic). Explorer now requires a pre-built cache from `pepys_embedder.py`; prints the exact command if no cache is found.
+- **`pepys_manifold_explorer.py` — temporal sampling on cache load**: `--n` now applies `temporally_sample()` against the full cached corpus, guaranteeing the subset spans the entire 1660–1669 arc rather than head-slicing.
+- **Renamed** `benchmarks/pepys/COMPLETE_TECHNICAL_ARTICLE.md` → `personal_agent_pipeline_article.md` and `COMPLETE_TECHNICAL_ARTICLE_internal.md` → `personal_agent_pipeline_article_internal.md` to reflect their source (personal_agent pipeline research).
+
 - **Pepys benchmark enriched embeddings** (`pepys_embeddings.json`) — precomputed nomic-embed-text-4k embeddings for the full Pepys diary corpus, cached for reproducible benchmark runs.
 - **Pepys benchmark results** (`pepys_manifold_results.json`) — manifold flight metrics (MRL retrieval, ManifoldWalker path, observer heights/curvatures) from the enriched-corpus run.
 - **5 new Pepys query topics** — Church/religion, Travel/locations, Money/finance, Social gathering, and Emotion/personal feelings added to `PEPYS_QUERIES` for broader semantic coverage of the diary corpus.
