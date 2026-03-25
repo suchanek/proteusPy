@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **WaveRider arXiv manuscript** (`docs/waverider/article/waverider_arxiv.tex`) — relocated from `docs/waverider/` to `docs/waverider/article/`; updated Introduction to justify intrinsic-dimensionality claims with the actual discovery mechanism: local PCA cumulative-variance threshold (τ) applied per data point, with forward references to Algorithm 1 (`\label{alg:walker}`) and §3.2 (`\label{sec:manifoldwalker}`); corrected the noise-fraction figures per dataset (71–83% for UCI Digits, 98.8–99.3% for CIFAR-10; previously misstated as ">99%" for both). Added "Intrinsic dimensionality estimation" paragraph in Related Work covering TwoNN (Facco et al. 2017), participation ratio, and PCA-elbow methods. Added bibliography entries for Facco et al. 2017 (TwoNN estimator) and Pope et al. 2021 (intrinsic dimension of images), cited for corroboration.
+
 - **`pepys_manifold_explorer.py` — TwoNN fix**: corrected sign error in `twonn_id()` — formula now returns `len(mu) / sum(log(mu))` (positive), fixing negative intrinsic-dimensionality estimates.
 - **`pepys_manifold_explorer.py` — NaN-safe MRR plot**: `make_figure()` filters `NaN` values from `mrrs` before calling `max()`, preventing crash when some MRL checkpoints yield no valid retrievals.
 - **`pepys_manifold_explorer.py` — use `DEFAULT_MODEL` for query embedding**: `main()` now passes `DEFAULT_MODEL` instead of `args.model` to `embed_local()`, ensuring query and corpus embeddings always use the same model.

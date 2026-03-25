@@ -135,11 +135,23 @@ distribution shifts.
 
 An alternative is to \emph{discover} the data manifold explicitly and use that
 discovery as the model. Real high-dimensional data---images, protein structures,
-speech signals---rarely uses all of its ambient dimensions. Handwritten digits
-live on a manifold of intrinsic dimension roughly 13 inside 64-dimensional pixel
-space. CIFAR-10 natural images sit on a manifold of intrinsic dimension roughly
-29 inside 3{,}072-dimensional space. More than 99\% of the ambient dimensions
-are noise.
+speech signals---rarely uses all of its ambient dimensions.
+Handwritten digits ($8{\times}8$ pixels) lie on a manifold of intrinsic
+dimension $\approx$13 inside 64-dimensional space (71--83\% of ambient
+dimensions are noise).
+CIFAR-10 natural images lie on a manifold of local intrinsic dimension 23--36
+inside 3{,}072-dimensional space (98.8--99.3\% noise), depending on the
+variance threshold $\tau$ (Section~\ref{sec:manifoldwalker},
+Table~\ref{tab:tau}).
+
+These intrinsic dimensions are not assumed: they are \emph{discovered} by
+WaveRider's local PCA estimator (Algorithm~\ref{alg:walker}, step~3).
+For each data point, the $k$-nearest-neighbour covariance matrix is
+diagonalised; the intrinsic dimension $d$ is the minimum number of principal
+components whose cumulative eigenvalue fraction reaches $\tau$.
+This per-point, data-driven estimate is consistent with independent global
+measurements using the TwoNN estimator~\cite{facco17} and with prior surveys
+of image-dataset intrinsic dimensionality~\cite{pope21}.
 
 If we can find the manifold, we can discard the noise, measure distances
 correctly (along the surface, not through the void), and classify by
@@ -228,6 +240,20 @@ by distance to learned prototypes.  ManifoldModel is in the spirit of
 prototype-based classifiers, but the prototypes are all training points (not a
 learned subset), and distances are measured in manifold space rather than
 Euclidean space.
+
+\paragraph{Intrinsic dimensionality estimation.}
+Several estimators have been proposed for the intrinsic dimensionality of a
+dataset.  The TwoNN estimator~\cite{facco17} derives a maximum-likelihood
+estimate from the ratio of each point's first- and second-nearest-neighbour
+distances under a Poisson process model on the manifold; it requires only three
+nearest neighbours per point and is implemented in
+\texttt{benchmarks/pepys\_manifold\_explorer.py} for global corroboration.
+The participation ratio~\cite{pope21}, $\mathrm{PR} = (\sum\lambda_i)^2 /
+\sum\lambda_i^2$, measures the effective number of active principal components.
+PCA-based elbow methods~\cite{kambhatla97} count components up to a cumulative
+variance threshold.  WaveRider uses the last of these \emph{locally} at every
+graph node (Algorithm~\ref{alg:walker}, step~3), producing a per-point intrinsic
+dimension field rather than a single global estimate.
 
 \paragraph{Extrinsic vs.\ intrinsic geometry.}
 The distinction between intrinsic (Gauss) curvature and extrinsic (mean
@@ -346,12 +372,14 @@ $\texttt{to\_global}(\mathbf{v}) = \bF^\T\mathbf{v}$.
 Turtle3D (Roll, Pitch, Yaw, Turn, Move) is the special case $N=3$.
 
 \subsection{Layer 2: ManifoldWalker --- Gradient Descent on the Manifold}
+\label{sec:manifoldwalker}
 
 ManifoldWalker performs optimisation on an implicit manifold defined by a point
 cloud, using local PCA to estimate the tangent space at each step.
 
 \begin{algorithm}[h]
 \caption{ManifoldWalker single step}
+\label{alg:walker}
 \begin{algorithmic}[1]
 \Require current position $\bp$, loss gradient $\nabla L(\bp)$,
          dataset $\mathcal{X}$, parameters $k,\tau,\eta$
@@ -1259,6 +1287,20 @@ D.~P. Kingma and J.~Ba.
 H.~M. Berman et~al.
 \newblock The {Protein Data Bank}.
 \newblock \emph{Nucleic Acids Research}, 28(1):235--242, 2000.
+
+\bibitem{facco17}
+E.~Facco, M.~d'Errico, A.~Rodriguez, and A.~Laio.
+\newblock Estimating the intrinsic dimension of datasets by a minimal
+  neighborhood information.
+\newblock \emph{Scientific Reports}, 7:12140, 2017.
+\newblock \url{https://doi.org/10.1038/s41598-017-11873-y}.
+
+\bibitem{pope21}
+P.~E. Pope, C.~Zhu, A.~Abdelkader, M.~Goldblum, and T.~Goldstein.
+\newblock The intrinsic dimension of images and its impact on learning.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2021.
+\newblock \url{https://openreview.net/forum?id=XJk19XzGq2J}.
 
 \end{thebibliography}
 
