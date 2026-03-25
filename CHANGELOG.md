@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **`pepys_manifold_explorer.py` — TwoNN fix**: corrected sign error in `twonn_id()` — formula now returns `len(mu) / sum(log(mu))` (positive), fixing negative intrinsic-dimensionality estimates.
+- **`pepys_manifold_explorer.py` — NaN-safe MRR plot**: `make_figure()` filters `NaN` values from `mrrs` before calling `max()`, preventing crash when some MRL checkpoints yield no valid retrievals.
+- **`pepys_manifold_explorer.py` — use `DEFAULT_MODEL` for query embedding**: `main()` now passes `DEFAULT_MODEL` instead of `args.model` to `embed_local()`, ensuring query and corpus embeddings always use the same model.
+- **Removed stale Pepys benchmark artefacts**: deleted `benchmarks/pepys_small_embeddings.json`, `benchmarks/pepys_small_results.json`, and `benchmarks/pepys_small_results.png` (superseded by the full-corpus run); updated `benchmarks/pepys_manifold_results.json` and `.png` with results from the corrected run.
+- **Removed `benchmarks/pepys/tests/`**: deleted the entire test sub-package (`__init__.py`, `conftest.py`, and nine test modules) that targeted the now-removed `DiaryKG`/`DiaryTransformer` in-explorer code paths; no replacement needed as that logic lives in `pepys_embedder.py`.
+
 ### Added
 
 - **`pepys_embedder.py`** — standalone multi-process ingestion pipeline: parses a pipe-delimited diary file, applies temporally diverse subsampling, and embeds via `sentence-transformers` (`nomic-ai/nomic-embed-text-v1`) using `multiprocessing.Pool` (one worker per CPU core, each loading the model independently). Produces a JSON cache compatible with `pepys_manifold_explorer.py`. Replaces the in-explorer `--init` flow.

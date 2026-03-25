@@ -303,7 +303,7 @@ def twonn_id(X: np.ndarray) -> float:
     r2 = distances[:, 2]
     mask = r1 > 0
     mu = r2[mask] / r1[mask]
-    return float(-len(mu) / np.sum(np.log(mu)))
+    return float(len(mu) / np.sum(np.log(mu)))
 
 
 def elbow_pca(eigenvalues: np.ndarray, threshold: float = 0.90) -> int:
@@ -467,7 +467,8 @@ def make_figure(
                 fontsize=8,
                 color="#c9d1d9",
             )
-        ax.set_ylim(0, max(mrrs) * 1.25 if mrrs else 1)
+        valid_mrrs = [v for v in mrrs if not np.isnan(v)]
+        ax.set_ylim(0, max(valid_mrrs) * 1.25 if valid_mrrs else 1)
         ax.set_xlabel("Embedding Dimension (MRL)", fontsize=9)
         ax.set_ylabel("MRR@10", fontsize=9)
         ax.set_title(
@@ -681,7 +682,7 @@ def main() -> None:  # noqa: C901
             f"  {len(query_texts)} queries; avg {np.mean([len(r) for r in rel_lists]):.0f} relevant entries/query"
         )
         try:
-            Q_full = embed_local(query_texts, model=args.model)
+            Q_full = embed_local(query_texts, model=DEFAULT_MODEL)
             q_norms = np.linalg.norm(Q_full, axis=1, keepdims=True)
             Q_full = Q_full / np.clip(q_norms, 1e-8, None)
             console.print("  Query embeddings ready.")

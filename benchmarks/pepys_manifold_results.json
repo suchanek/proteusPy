@@ -1,56 +1,56 @@
 {
-  "corpus_size": 1000,
+  "corpus_size": 6450,
   "date_range": [
     "1660-01-01T08:00:00",
     "1669-08-02T07:00:00"
   ],
   "full_dim": 768,
-  "twonn_id": -13.52,
-  "participation_ratio": 36.06,
-  "pca_id_90pct": 107,
-  "pca_id_95pct": 142,
-  "pca_id_99pct": 185,
+  "twonn_id": 14.85,
+  "participation_ratio": 56.11,
+  "pca_id_90pct": 139,
+  "pca_id_95pct": 166,
+  "pca_id_99pct": 193,
   "mrl_retrieval": [
     {
       "dim": 64,
-      "mrr": 0.791025641025641,
+      "mrr": 0.7923076923076924,
       "var_explained": 1.0,
-      "pca_id_90": 43
+      "pca_id_90": 48
     },
     {
       "dim": 128,
-      "mrr": 0.8102564102564103,
-      "var_explained": 1.0,
-      "pca_id_90": 71
+      "mrr": 0.9326923076923077,
+      "var_explained": 1.0000001192092896,
+      "pca_id_90": 88
     },
     {
       "dim": 256,
-      "mrr": 0.891025641025641,
-      "var_explained": 0.9857942461967468,
-      "pca_id_90": 98
+      "mrr": 0.935897435897436,
+      "var_explained": 0.9646105766296387,
+      "pca_id_90": 132
     },
     {
       "dim": 512,
-      "mrr": 0.8974358974358976,
-      "var_explained": 0.9492780566215515,
-      "pca_id_90": 105
+      "mrr": 0.8942307692307693,
+      "var_explained": 0.870663046836853,
+      "pca_id_90": 139
     },
     {
       "dim": 768,
-      "mrr": 0.8871794871794871,
-      "var_explained": 0.9342991709709167,
-      "pca_id_90": 107
+      "mrr": 0.8956043956043955,
+      "var_explained": 0.828073263168335,
+      "pca_id_90": 139
     }
   ],
   "flight": {
-    "origin_idx": 489,
-    "dest_idx": 854,
-    "origin_date": "1664-07-06T07:00:00",
-    "dest_date": "1667-10-19T08:00:00",
-    "cosine_distance": 0.6474,
-    "path_length": 200,
+    "origin_idx": 3859,
+    "dest_idx": 4239,
+    "origin_date": "1665-07-06T08:00:00",
+    "dest_date": "1666-01-19T08:00:00",
+    "cosine_distance": 0.5581,
+    "path_length": 21,
     "arrived": false,
-    "mean_height": 0.3162331153911181,
-    "mean_curvature": 0.6741753857652018
+    "mean_height": 0.1926680902804546,
+    "mean_curvature": 0.5399916793816317
   }
 }
