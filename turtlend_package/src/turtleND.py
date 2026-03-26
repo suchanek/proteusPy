@@ -14,6 +14,9 @@ This enables navigation through N-dimensional embedding spaces, providing
 a geometric, frame-based alternative to gradient descent.
 
 Author: Eric G. Suchanek, PhD
+Affiliation: Flux-Frontiers, https://github.com/Flux-Frontiers
+License: BSD
+Last revised: 2026-03-23 -egs-
 Based on the Turtle3D implementation.
 """
 
@@ -353,6 +356,119 @@ class TurtleND:
                     if norm > 1e-12:
                         break
             self._frame[k] = v / norm
+
+    # ---------------------------------------------------------------
+    # Dimensional expansion
+    # ---------------------------------------------------------------
+
+    def expand_dim(self, label: str = "") -> int:
+        """Expand the turtle's space by one dimension.
+
+        Grows position from N to N+1 (new coordinate = 0) and extends
+        the orthonormal frame with a new basis vector orthogonal to all
+        existing ones.  Returns the index of the new axis.
+
+        This is the primitive that enables temporal grounding: embed in
+        N dims, then call ``expand_dim()`` to add a time axis that the
+        turtle can navigate.
+
+        :param label: Optional human-readable label for the new axis.
+        :return: Index of the newly added dimension (== old ndim).
+        """
+        old_n = self._ndim
+        new_n = old_n + 1
+
+        # Extend position (new coordinate starts at 0)
+        new_pos = np.zeros(new_n, dtype="d")
+        new_pos[:old_n] = self._position
+
+        # Extend frame: pad each existing row with 0, add new row e_{new_n-1}
+        new_frame = np.zeros((new_n, new_n), dtype="d")
+        new_frame[:old_n, :old_n] = self._frame
+        new_frame[old_n, old_n] = 1.0  # new basis vector = standard basis
+
+        self._ndim = new_n
+        self._position = new_pos
+        self._frame = new_frame
+
+        return old_n
+
+    # ---------------------------------------------------------------
+    # Heading alignment
+    # ---------------------------------------------------------------
+
+    def orient_toward(self, direction) -> float:
+        """Rotate heading to face an arbitrary direction in ambient space.
+
+        Decomposes *direction* into components parallel and perpendicular
+        to the current heading, then applies a single Givens rotation in
+        the plane they span.  The rest of the frame is carried along
+        rigidly (only two basis vectors are touched).
+
+        If direction is (anti-)parallel to heading, no rotation is applied.
+
+        :param direction: Target direction vector (array-like, length ndim).
+        :return: Angle rotated in degrees.
+        """
+        d = np.asarray(direction, dtype="d")
+        norm = np.linalg.norm(d)
+        if norm < 1e-12:
+            return 0.0
+        d = d / norm
+
+        heading = self._frame[0]
+        cos_a = float(np.clip(np.dot(heading, d), -1.0, 1.0))
+
+        # Already aligned (or anti-aligned) — nothing to do
+        if abs(cos_a) > 1.0 - 1e-10:
+            return 0.0
+
+        angle_rad = math.acos(cos_a)
+
+        # Perpendicular component of d relative to heading
+        perp = d - cos_a * heading
+        perp = perp / np.linalg.norm(perp)
+
+        # Find which existing basis vector is closest to perp so we can
+        # rotate in the heading–that-basis plane.  This keeps the Givens
+        # rotation within the frame rather than introducing an arbitrary
+        # direction.
+        best_j = 1
+        best_proj = -np.inf
+        for j in range(1, self._ndim):
+            proj = abs(float(np.dot(self._frame[j], perp)))
+            if proj > best_proj:
+                best_proj = proj
+                best_j = j
+
+        # If perp doesn't align well with any single basis vector, we
+        # do a direct 2-vector rotation in the heading–perp plane.
+        # Temporarily replace basis[best_j] with perp, rotate, then
+        # re-orthonormalize to clean up.
+        saved = self._frame[best_j].copy()
+        self._frame[best_j] = perp
+        self._rotate(angle_rad, 0, best_j)
+        # The rotation moved heading toward perp.  Now re-orthonormalize
+        # to fix any drift from the temporary basis swap.
+        self.orthonormalize()
+
+        return math.degrees(angle_rad)
+
+    def orient_in_time(self, time_axis: int | None = None) -> float:
+        """Convenience: orient heading toward the temporal (last) axis.
+
+        Equivalent to ``orient_toward(e_N)`` where ``e_N`` is the unit
+        vector along axis *time_axis* (default: last dimension, as set
+        by ``expand_dim``).
+
+        :param time_axis: Axis index for time (default: ndim - 1).
+        :return: Angle rotated in degrees.
+        """
+        if time_axis is None:
+            time_axis = self._ndim - 1
+        e_t = np.zeros(self._ndim, dtype="d")
+        e_t[time_axis] = 1.0
+        return self.orient_toward(e_t)
 
     # ---------------------------------------------------------------
     # Utility
