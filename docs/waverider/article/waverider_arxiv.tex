@@ -269,67 +269,17 @@ invisible from the surface.
 %% ── Figure 1: WaveRider stack schematic ──────────────────────────────────────
 \begin{figure}[t]
 \centering
-\begin{tikzpicture}[
-  every node/.style={font=\small},
-  block/.style={
-    rectangle, rounded corners=4pt,
-    minimum width=7.4cm, minimum height=1.0cm,
-    align=center, draw, thick,
-  },
-  lbl/.style={font=\footnotesize\itshape, align=center},
-  arr/.style={-{Stealth[length=6pt]}, thick},
-]
-
-%% ── Layer boxes (bottom → top) ────────────────────────────────────────────
-\node[block, fill=blue!12]   (L1) at (0,0)
-  {\textbf{Layer 1: TurtleND}\\[1pt]
-   Position $\mathbf{p}\in\mathbb{R}^N$, orthonormal frame $\mathbf{F}$,
-   Givens rotations};
-
-\node[block, fill=teal!12]   (L2) at (0,2.0)
-  {\textbf{Layer 2: ManifoldWalker}\\[1pt]
-   KNN $\to$ local PCA $\to$ project gradient onto tangent plane $\to$ step};
-
-\node[block, fill=orange!18] (L3) at (0,4.0)
-  {\textbf{Layer 3: ManifoldModel}\\[1pt]
-   KNN graph + stored PCA geometry $\to$ manifold-weighted nearest-neighbour vote};
-
-\node[block, fill=red!12]    (L4) at (0,6.0)
-  {\textbf{Layer 3a: ManifoldObserver}\\[1pt]
-   Extend $N\!\times\!N$ frame by QR $\to$ $(N\!+\!1)$-dim turtle
-   sees curvature, topology, class boundaries};
-
-%% ── Connecting arrows ─────────────────────────────────────────────────────
-\draw[arr] (L1.north) -- (L2.south);
-\draw[arr] (L2.north) -- (L3.south);
-\draw[arr] (L3.north) -- (L4.south);
-
-%% ── Side annotations ──────────────────────────────────────────────────────
-\node[lbl, left=0.55cm of L1] (aL1) {navigation\\primitive};
-\node[lbl, left=0.55cm of L2] (aL2) {Riemannian-\\approx.\\ optimizer};
-\node[lbl, left=0.55cm of L3] (aL3) {zero-param\\classifier};
-\node[lbl, left=0.55cm of L4] (aL4) {extrinsic\\observer};
-
-%% ── Right-side: "gains" annotations ──────────────────────────────────────
-\node[lbl, right=0.45cm of L1, text=blue!60!black]
-  {orientation \&\\local frame};
-\node[lbl, right=0.45cm of L2, text=teal!60!black]
-  {stays on the\\manifold};
-\node[lbl, right=0.45cm of L3, text=orange!70!black]
-  {geometry\\IS the model};
-\node[lbl, right=0.45cm of L4, text=red!60!black]
-  {gains the\\normal: sees\\the surface};
-
-%% ── Bottom label ──────────────────────────────────────────────────────────
-\node[font=\footnotesize, below=0.35cm of L1]
-  {$N$-dimensional input data (tabular, image PCA, molecular angles, embeddings, \ldots)};
-
-\end{tikzpicture}
-\caption{The WaveRider stack.  Each layer builds on the layer below: TurtleND
-provides the navigation primitive; ManifoldWalker uses it for gradient descent
-constrained to the data manifold; ManifoldModel stores the explored geometry as
-a zero-parameter classifier; ManifoldObserver extends the frame by one QR step
-to gain the manifold normal and an extrinsic view of the surface.}
+\includegraphics[width=\linewidth]{waverider_approach.png}
+\caption{The WaveRider four-layer hierarchy.  Layer~1 (\textbf{TurtleND})
+provides the $N$-dimensional navigation primitive with position and orthonormal
+frame; Layer~2 (\textbf{ManifoldWalker}/ManifoldAdamWalker) performs
+Riemannian-approximate gradient descent via local PCA and manifold-projected
+updates; Layer~3 (\textbf{ManifoldModel}/ManifoldObserver) stores the explored
+geometry as a zero-parameter classifier and extends the frame by one QR step to
+gain an extrinsic view of curvature, topology, and class boundaries; Layer~4
+(\textbf{GraphReasoner}) performs geometry-steered reasoning over the resulting
+knowledge graph.  The inset table (lower right) summarises the role of each
+layer.}
 \label{fig:stack}
 \end{figure}
 %% ─────────────────────────────────────────────────────────────────────────────
@@ -395,6 +345,26 @@ cloud, using local PCA to estimate the tangent space at each step.
 \State $\bp \leftarrow \bp - \eta\cdot\bF\tilde{\bg}$
 \end{algorithmic}
 \end{algorithm}
+
+%% ── Figure 2: WaveRider algorithm architecture ────────────────────────────────
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{waverider_arch.png}
+\caption{WaveRider algorithm architecture.  Phase~1 (\textbf{Gradient Diversity
+Sampling}) draws a diverse batch of gradients $g_1,\ldots,g_s$ from the current
+weights.  Phase~2 (\textbf{Manifold Discovery via PCA}) computes the gradient
+covariance $C = G^\mathsf{T}G/(S-1)$, diagonalises it via SVD, and selects the
+top-$d$ eigenvectors; intrinsic dimension $d \approx 2$--$3$ is discovered
+automatically against the ambient 243-dimensional gradient space.  Phase~3
+(\textbf{Manifold Gate}) projects the full gradient onto the $d$-dimensional
+signal subspace ($\mathbf{g}_\text{proj}$), suppressing 99\% of ambient noise.
+Phase~4 (\textbf{ManifoldAdamWalker}) runs standard Adam momentum and adaptive
+learning-rate updates on the projected gradient, re-orienting the PCA basis
+every $R$ epochs.  Standard Adam tracks all 243 noisy dimensions; WaveRider
+tracks only the 2--3 signal dimensions.}
+\label{fig:arch}
+\end{figure}
+%% ─────────────────────────────────────────────────────────────────────────────
 
 \paragraph{ManifoldAdamWalker.}
 Replaces step~6 with Adam momentum~\cite{adam}:
@@ -1309,7 +1279,7 @@ P.~E. Pope, C.~Zhu, A.~Abdelkader, M.~Goldblum, and T.~Goldstein.
 \section{Implementation Notes}
 % ──────────────────────────────────────────────────────────────────────────────
 
-All code is available in proteusPy v0.99.50 (BSD License):
+All code is available in proteusPy v0.99.50 (Elastic License 2.0):
 
 \begin{table}[h]
 \centering

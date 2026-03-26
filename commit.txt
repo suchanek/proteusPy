@@ -1,15 +1,23 @@
-feat(benchmarks): enrich Pepys embeddings, update ManifoldModel/Observer API call-sites
+docs(waverider): justify intrinsic-dim claims with mechanism refs + corrections
 
-- pepys_manifold_explorer: prepend entry_type|category to diary text before
-  embedding so topic signal from pepys_enriched_full.txt is captured; add 5
-  new query topics (Church, Travel, Money, Social, Emotion); add _NumpyEncoder
-  for reliable JSON serialisation of numpy scalars/arrays
-- Both explorers: rename ManifoldModel(n_neighbors=) → ManifoldModel(k_graph=),
-  set_position() → fly_to(), and ManifoldObserver(graph, geometries) →
-  ManifoldObserver(mm) to track updated API
-- Observer path metrics: average raw heights/curvatures lists instead of
-  accessing removed mean_height/mean_curvature dict keys
-- Add pepys_embeddings.json and pepys_manifold_results.json benchmark artefacts
-- Black-style formatting fixes throughout both scripts
+Relocate waverider_arxiv.tex to docs/waverider/article/ and strengthen the
+paper's scientific rigour:
+
+- Introduction: replace bare numerical claims ("roughly 13", "roughly 29",
+  ">99% noise") with data-backed statements grounded in WaveRider's own local
+  PCA estimator (Algorithm 1, step 3).  Per-dataset noise fractions corrected:
+  71–83% for UCI Digits, 98.8–99.3% for CIFAR-10 (from Table 4 τ-sweep).
+  Forward references added to §3.2 and Algorithm 1 via new \label anchors.
+
+- Algorithm 1 / §3.2: added \label{alg:walker} and \label{sec:manifoldwalker}
+  so the Introduction can cross-reference the intrinsic-dimension step directly.
+
+- Related Work: new "Intrinsic dimensionality estimation" paragraph covering the
+  TwoNN estimator (Facco et al. 2017, implemented in pepys_manifold_explorer.py
+  for global corroboration), participation ratio, and PCA-elbow methods
+  (Kambhatla 1997, the local variant WaveRider uses per node).
+
+- Bibliography: added Facco et al. 2017 (Scientific Reports, TwoNN) and Pope
+  et al. 2021 (ICLR, intrinsic dimension of images) as external corroboration.
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>

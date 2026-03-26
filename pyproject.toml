@@ -177,6 +177,6 @@ include = ["proteusPy"]
 [tool.dockg]
 # Add extra directories to exclude beyond the built-in SKIP_DIRS.
 # SKIP_DIRS already covers: .dockg, .git, .venv, venv, __pycache__, node_modules, etc.
-exclude = ["bundles", "dist","data","lib","old","programs","turtlend_package", "pepys"]
+exclude = ["bundles", "dist","data","lib","old","programs","turtlend_package", "pepys", "waverider_missions"]
 
 

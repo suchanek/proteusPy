@@ -510,7 +510,7 @@ From a plotter drawing Spirographs on a Commodore 64 to a 6-dimensional observer
 
 ## Appendix A: Implementation Notes
 
-All code is available in proteusPy v0.99.50, BSD License:
+All code is available in proteusPy v0.99.50, Elastic License 2.0:
 
 | Module | Class | Lines |
 |--------|-------|-------|

@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1774413155.87833 "waverider_arxiv.tex" "waverider_arxiv.pdf" "waverider_arxiv" 1774413156.6556 0
+["pdflatex"] 1774479722.72298 "waverider_arxiv.tex" "waverider_arxiv.pdf" "waverider_arxiv" 1774479723.48377 0
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc" 1254269338 2375 baa924870cfb487815765f9094cf3728 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc" 1202520719 3486 c7eadf5dcc57b3b2d11736679f6636ba ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc" 1202520719 2405 5dcf2c1b967ee25cc46c58cd52244aed ""
@@ -253,9 +253,11 @@
   "/usr/local/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1771198697 5467155 19efa205003f9ecad95fbbaa6ff24da1 ""
   "/usr/local/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1741450574 3345740 46b66fdb0378f7bf5921b5eabf1762b8 ""
   "/usr/local/texlive/2025/texmf.cnf" 1741450484 577 418a7058ec8e006d8704f60ecd22c938 ""
-  "waverider_arxiv.aux" 1774413156.55502 14545 ffe1bcfddad1856369700f31a3a1968f "pdflatex"
-  "waverider_arxiv.out" 1774413156.55573 7002 c6266822767e997cc396bae1e5e994b4 "pdflatex"
-  "waverider_arxiv.tex" 1774410827.29835 63996 d509b709ba732688c55b7378c7695877 ""
+  "waverider_approach.png" 1774479346.97999 5213015 e698c3d28b21342e1c5a833df93e8478 ""
+  "waverider_arch.png" 1774479346.98577 5172914 1c9ab7dffd23d02eaa064f7ca9b24dc9 ""
+  "waverider_arxiv.aux" 1774479723.39301 17145 f856b2b0105ba478dee4ba76cc432d3d "pdflatex"
+  "waverider_arxiv.out" 1774479723.39394 7002 c6266822767e997cc396bae1e5e994b4 "pdflatex"
+  "waverider_arxiv.tex" 1774479715.24387 62983 a367b85b474e786f59b9bbf43d209945 ""
   (generated)
   "waverider_arxiv.aux"
   "waverider_arxiv.log"
