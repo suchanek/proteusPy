@@ -20,18 +20,13 @@
 |---|---|---|---|---|
 | 1 | 2026.084 | **The Maiden Voyage** | [waverider_trek.md](waverider_trek.md) | TurtleND, ManifoldWalker, ManifoldAdamWalker, ManifoldModel (zero params), ManifoldObserver, PEPYS cache, intrinsic dimensionality |
 | 2 | 2026.091 | **The Rabbit Maneuver** | [waverider_trek_ch2.md](waverider_trek_ch2.md) | DiaryTransformer pipeline, TF-IDF k-means category discovery, TopicClassifier, temporal manifold, Great Fire ridge, Plague valley, MRR checkpoints |
+| 3 | 2026.095 | **The mpnet Manifold** | [waverider_trek_ch3.md](waverider_trek_ch3.md) | all-mpnet-base-v2 vs nomic geometry, full corpus 7282 chunks, TwoNN=13.54, MRL inversion (peak at 64D), dark flight panels, distillation vs dimensionality |
 
 ---
 
 ## Mission Queue
 
 *Approved and ready to write — needs real benchmark data first where noted.*
-
-- [ ] **Mission 3 — The Full Corpus** *(pending: full Pepys embedder run)*
-  The crew returns to the Pepys manifold with the complete 3355-entry corpus fully
-  embedded for the first time.  What new landmarks emerge when the dark spaces
-  are lit?  Does the temporal spine sharpen?  Does the Plague valley deepen?
-  File to be created: `waverider_trek_ch3.md`
 
 - [ ] **Mission 4 — The Disulfide Labyrinth**
   The WaveRider dives into the 5-dimensional torsion-angle manifold of disulfide

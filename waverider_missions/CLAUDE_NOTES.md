@@ -98,6 +98,35 @@ forced.  It is exact.
 
 ---
 
+## Hard-Won Design Doctrine
+
+### NLP beats Inference for Corpus Ingestion
+
+Before the DiaryTransformer pipeline existed, two inference-based approaches were
+attempted for Pepys corpus ingestion and categorization:
+
+1. **`personal_agent` + `hindsight` temporal memory backend** — required a running
+   LLM to categorize and consolidate each memory entry.  Ollama worked locally but
+   was *ridiculously slow* at corpus scale.
+
+2. **OpenAI `gpt-4o-mini`** (their cheapest model) — fast enough, but cost *real
+   dollars* to ingest a few thousand memories.  Not viable at 3,355-entry scale,
+   let alone larger corpora.
+
+**The win:** `DiaryTransformer` — spaCy + sentence-transformers + TF-IDF k-means
++ YAML TopicClassifier.  Zero inference cost.  Fully local.  Fast.  Reproducible.
+
+**The principle:** Statistical NLP beats per-entry LLM inference for structured
+ingestion tasks.  Ground truth comes from real results at scale.  Inference is only
+justified when the task genuinely requires multi-step reasoning that statistics
+cannot provide.  Topic classification and chunking at corpus scale is not that task.
+
+This is not a theoretical preference.  It is a lesson paid for in time and dollars.
+When the stories reference the DiaryTransformer as a hard-won instrument — that is
+literally true.
+
+---
+
 ## Source Material
 
 All technical detail should be grounded in the actual codebase.  Use:
