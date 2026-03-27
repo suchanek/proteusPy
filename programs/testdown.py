@@ -1,5 +1,6 @@
-import requests
 import json
+
+import requests
 
 repo_url = "https://github.com/suchanek/proteusPy"
 file_path = "proteusPy/data/PDB_SS_LOADER.pkl"

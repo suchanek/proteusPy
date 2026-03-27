@@ -21,6 +21,15 @@ forced.  It is exact.
 
 ---
 
+## Canon Personnel
+
+**Admiral Eric G. Suchanek, PhD** — Director, Starfleet Knowledge Division.
+The admiral who commissioned the WaveRider and issued the Tree of Knowledge mission.
+He is also the actual engineer who built the WaveRider stack in real life.
+**Always use the full name: *Admiral Eric G. Suchanek, PhD* — like James T. Kirk, the middle initial and credential are canonical.**
+
+---
+
 ## The Ship and Crew
 
 **U.S.S. WaveRider, NCC-7699** — Starfleet's first manifold exploration vessel.

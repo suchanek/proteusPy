@@ -8,7 +8,6 @@ from datetime import timedelta
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
 from colorama import Fore, Style, init
 from tqdm import tqdm
 

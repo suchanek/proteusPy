@@ -75,7 +75,6 @@ import threading
 import time
 from datetime import timedelta
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -237,14 +236,14 @@ def task(
     start_idx: int,
     end_idx: int,
     result_list: DisulfideList,
-    metrics_list: List[Dict],
+    metrics_list: list[dict],
     pbar: tqdm,
     cutoff: float,
     do_graph: bool,
     save_dir: str,
     prefix: str,
     base: int,
-    classlist: List[str],
+    classlist: list[str],
     dpi: float = 300.0,
 ) -> None:
     """
@@ -369,7 +368,7 @@ def analyze_classes_threaded(
     do_octant: bool = True,
     prefix: str = "ss",
     dpi: float = 300.0,
-) -> Tuple[DisulfideList, pd.DataFrame]:
+) -> tuple[DisulfideList, pd.DataFrame]:
     """
     Analyze the classes of disulfide bonds using multithreading.
 
@@ -438,7 +437,7 @@ def analyze_classes_threaded(
         position=0,
         leave=True,
         ncols=PBAR_COLS + 10,
-        bar_format="{l_bar}%s{bar}{r_bar}%s" % (Fore.GREEN, Style.RESET_ALL),
+        bar_format=f"{{l_bar}}{Fore.GREEN}{{bar}}{{r_bar}}{Style.RESET_ALL}",
     )
 
     for i in range(num_threads):
@@ -451,7 +450,7 @@ def analyze_classes_threaded(
             position=pbar_index,
             leave=False,
             ncols=PBAR_COLS + 10,
-            bar_format="{l_bar}%s{bar}{r_bar}%s" % (Fore.BLUE, Style.RESET_ALL),
+            bar_format=f"{{l_bar}}{Fore.BLUE}{{bar}}{{r_bar}}{Style.RESET_ALL}",
             miniters=100,
         )
         thread = threading.Thread(
@@ -509,7 +508,7 @@ def analyze_classes_threaded(
         with open(metrics_filename, "wb+") as f:
             pickle.dump(metrics_df, f)
 
-    except IOError as e:
+    except OSError as e:
         _logger.error("Failed to write output files: %s", e)
         raise e
 
@@ -617,7 +616,7 @@ def update_repository(
             )
         try:
             shutil.copy(source, dest)
-        except IOError as e:
+        except OSError as e:
             _logger.error("Failed to copy binary consensus: %s", e)
 
         source = Path(source_dir) / BINARY_CLASS_METRICS_FILE
@@ -626,7 +625,7 @@ def update_repository(
             print(f"\nCopying binary metrics df from:\n -> {source} to \n -> {dest}")
         try:
             shutil.copy(source, dest)
-        except IOError as e:
+        except OSError as e:
             _logger.error("Failed to copy binary metrics: %s", e)
 
     if octant:
@@ -638,7 +637,7 @@ def update_repository(
             )
         try:
             shutil.copy(source, dest)
-        except IOError as e:
+        except OSError as e:
             _logger.error("Failed to copy octant consensus: %s", e)
 
         source = Path(source_dir) / OCTANT_CLASS_METRICS_FILE
@@ -647,7 +646,7 @@ def update_repository(
             print(f"\nCopying octant metrics df from:\n -> {source} to \n -> {dest}")
         try:
             shutil.copy(source, dest)
-        except IOError as e:
+        except OSError as e:
             _logger.error("Failed to copy octant metrics: %s", e)
 
 

@@ -9,7 +9,6 @@ from pathlib import Path
 
 import numpy as np
 from colorama import init
-from tqdm import tqdm
 
 import proteusPy as pp
 from proteusPy import CA_CUTOFF, SG_CUTOFF, SS_CONSENSUS_BIN_FILE, SS_CONSENSUS_OCT_FILE

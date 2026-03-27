@@ -1497,7 +1497,7 @@ tqdm = ["tqdm"]
 
 [[package]]
 name = "ftree-kg"
-version = "0.2.0"
+version = "0.3.0"
 description = "KGModule for file tree knowledge graphs"
 optional = true
 python-versions = ">=3.12,<3.14"
@@ -1510,7 +1510,6 @@ develop = true
 click = "^8.1.0"
 code-kg = {git = "https://github.com/Flux-Frontiers/code_kg.git"}
 doc-kg = {git = "https://github.com/Flux-Frontiers/doc_kg.git"}
-kg-rag = {git = "https://github.com/Flux-Frontiers/KGRAG.git"}
 
 [package.source]
 type = "directory"

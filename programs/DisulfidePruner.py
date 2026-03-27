@@ -16,7 +16,6 @@ import time
 
 import pandas as pd
 from Bio.PDB import *
-from pyvista import set_plot_theme
 
 # for using from the repo we
 from tqdm import tqdm
@@ -59,7 +58,7 @@ def remove_duplicate_ss(sslist: DisulfideList) -> DisulfideList:
 # walk the dict, prune the SS list. This takes > 8 minutes on my Macbook Pro
 # for the full dataset.
 
-print(f"Pruning...")
+print("Pruning...")
 
 pbar = tqdm(range(tot), ncols=_PBAR_COLS)
 
@@ -84,7 +83,7 @@ pruned_list = DisulfideList([], "PDB_SS_SINGLE_CHAIN")
 tot = len(pruned_dict)
 pbar = tqdm(range(tot), ncols=_PBAR_COLS)
 
-print(f"Building SS list...")
+print("Building SS list...")
 
 for _, pdbid_tuple in zip(pbar, enumerate(pruned_dict)):
     # print(f'{k} {pdbid_tuple}')
@@ -102,7 +101,7 @@ with open(fname, "wb+") as f:
     pickle.dump(pruned_list, f)
 
 # build the dict from the pruned list
-print(f"Building SS dict...")
+print("Building SS dict...")
 pruned_dict_ind = {"xxx": []}
 
 tot = pruned_list.length
@@ -133,7 +132,7 @@ torsfile = "PDB_pruned_ss_torsions.csv"
 fname = f"{datadir}{torsfile}"
 tot = len(pruned_list)
 
-print(f"Building torsion DF")
+print("Building torsion DF")
 
 tors_df = pd.DataFrame(columns=Torsion_DF_Cols)
 tors_df = pruned_list.build_torsion_df()

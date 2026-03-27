@@ -24,6 +24,53 @@
 
 ---
 
+## Lab Notebook — Experiments & Findings
+
+*Running record of sub-mission experiments that inform the narrative but are not full chapters.*
+
+---
+
+### Experiment T-1 — τ-Reversal Test
+**Stardate:** 2026.086
+**Instrument:** `pepys_temporal_flight.py` · `TurtleND.orient_in_time()`
+**Corpus:** Pepys mpnet embeddings, 6450 entries, 768D → 769D augmented (α=1.0, k=10)
+
+**Method:** Added `temporal_backward` flight mode (`forward=False`) alongside the existing
+`temporal` forward mode.  Added `--negate-time` flag to flip the temporal axis sign.
+Measured Kendall τ for both runs.
+
+**Results:**
+
+| Mode | Mono | Kendall τ | Net span |
+|---|---|---|---|
+| Semantic | 47.3% | +0.049 | +4.0 yr |
+| Temporal → | 55.3% | **+0.457** | −0.2 yr |
+| Temporal ← | 50.7% | −0.306 | +2.6 yr |
+| Mixed 50/50 | 47.3% | −0.165 | +3.2 yr |
+
+τ-reversal symmetry residual: 0.1507 (non-zero due to non-uniform entry density across years).
+
+**Bug fixed:** `orient_in_time` was pointing toward `+e_t` (positive z-score = later dates).
+Empirically, forward-in-time motion in the KNN graph requires the **negative** z-score direction.
+Fixed in `TurtleND.orient_in_time`: `e_t[time_axis] = -1.0`.
+
+**Open problem — Temporal Wandering:**
+Even with the correct axis, temporal forward flight achieves only 55.3% monotonicity and
+net span ≈ 0 yr over 151 hops.  Root cause: the temporal signal is **1 dimension in 769** —
+roughly 3.6% of total step magnitude at α=1.0.  The 768D semantic field drowns it out.
+The KNN graph was built on semantic proximity; its edges carry almost no temporal gradient.
+
+**Resolution path:** ManifoldWalker addresses this correctly — it denoises the field via
+local PCA on the KNN neighbourhood before stepping, isolating the true manifold directions
+from ambient noise.  Temporal flight coherence should be revisited once the walk is
+ManifoldWalker-driven rather than raw KNN greedy.
+
+**Story hook:** Sulu can read the heading. The manifold is pulling him. But the warp field
+can't feel a single wire in a 768-strand cable. The Walker is the instrument that will
+let him hear it.
+
+---
+
 ## Mission Queue
 
 *Approved and ready to write — needs real benchmark data first where noted.*

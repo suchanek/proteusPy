@@ -445,7 +445,6 @@ class TurtleND:
         # do a direct 2-vector rotation in the heading–perp plane.
         # Temporarily replace basis[best_j] with perp, rotate, then
         # re-orthonormalize to clean up.
-        saved = self._frame[best_j].copy()
         self._frame[best_j] = perp
         self._rotate(angle_rad, 0, best_j)
         # The rotation moved heading toward perp.  Now re-orthonormalize

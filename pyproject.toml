@@ -10,7 +10,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "proteusPy"
-version = "0.99.60"
+version = "0.99.61"
 description = "proteusPy - Protein Structure Analysis and Modeling Tools"
 readme = "README.md"
 authors = ["Eric G. Suchanek, PhD <suchanek@mac.com>"]
@@ -144,6 +144,7 @@ build         = "*"
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+exclude = ["notebooks/", "examples/", "old/"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP"]
@@ -159,6 +160,12 @@ ignore = ["E501"]
 "turtlend_package/src/__init__.py" = ["F401"]
 "benchmarks/*.py" = ["E402"]
 "turtlend_package/benchmarks/*.py" = ["E402"]
+"programs/cluster.py" = ["E402", "F403", "F405"]
+"programs/DisulfideCluster.py" = ["E402", "F401", "F403", "F405", "F811"]
+"programs/screenshot.py" = ["F403", "F405"]
+"programs/DisulfidePruner.py" = ["F403", "F405"]
+"programs/dse_calculator.py" = ["F403", "F405"]
+"programs/rosetta.py" = ["F403", "F405"]
 
 [tool.pytest.ini_options]
 addopts = "--ignore=tests/test_DisplaySS.py --ignore=tests/test_disulfide_schematic.py --ignore=turtlend_package --ignore=benchmarks"

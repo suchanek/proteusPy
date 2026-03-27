@@ -29,21 +29,31 @@
     {
       "dim": 256,
       "mrr": 0.7371794871794871,
-      "var_explained": 0.9781606197357178,
-      "pca_id_90": 113
+      "var_explained": 0.9780484437942505,
+      "pca_id_90": 112
     },
     {
       "dim": 512,
       "mrr": 0.6987179487179487,
-      "var_explained": 0.9221285581588745,
+      "var_explained": 0.9221258163452148,
       "pca_id_90": 119
     },
     {
       "dim": 768,
       "mrr": 0.6948717948717948,
-      "var_explained": 0.8993063569068909,
+      "var_explained": 0.8993923664093018,
       "pca_id_90": 121
     }
   ],
-  "flight": {}
+  "flight": {
+    "origin_idx": 1016,
+    "dest_idx": 2298,
+    "origin_date": "1665-01-03T15:00:00",
+    "dest_date": "1669-05-03T21:00:00",
+    "cosine_distance": 0.6285,
+    "path_length": 200,
+    "arrived": false,
+    "mean_height": 0.3782,
+    "mean_curvature": 0.8936
+  }
 }

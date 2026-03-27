@@ -21,10 +21,7 @@ Author: Eric G. Suchanek, PhD
 
 from __future__ import annotations
 
-import sys
 import time
-
-import numpy as np
 
 
 def main():
@@ -36,7 +33,6 @@ def main():
         graph_from_disulfides,
     )
     from proteusPy.DisulfideLoader import Load_PDB_SS
-    from proteusPy.disulfide_tree import snippet_for_node
     from proteusPy.tree_visualizer import png_tree, text_tree
 
     # ------------------------------------------------------------------

@@ -1,0 +1,75 @@
+{
+  "corpus": "/Users/egs/repos/diary_kg/benchmarks/pepys_mpnet_embeddings.json",
+  "N": 6450,
+  "D": 768,
+  "alpha": 1.0,
+  "k": 10,
+  "encoding": "destination_relative",
+  "origin_idx": 2645,
+  "dest_idx": 2835,
+  "origin_date": "1663-10-21T07:00:00",
+  "dest_date": "1664-01-23T12:00:00",
+  "span_days": 94,
+  "path_length": 7,
+  "reached_destination": true,
+  "final_kendall_tau": 0.0476,
+  "monotonicity": 0.3333,
+  "hops": [
+    {
+      "hop": 0,
+      "idx": 2645,
+      "date": "1663-10-21",
+      "text": "weather | General | To begin to keep myself as warm as I can.",
+      "fyear": 1663.803,
+      "running_tau": null
+    },
+    {
+      "hop": 1,
+      "idx": 1052,
+      "date": "1661-07-22",
+      "text": "work | General | Up by three, and going by four on my way to London; but the day proves very cold, so that having put on",
+      "fyear": 1661.5544,
+      "running_tau": null
+    },
+    {
+      "hop": 2,
+      "idx": 2106,
+      "date": "1663-01-22",
+      "text": "work | Work | Up, and it being a brave morning, with a gally to Woolwich, and there both at the Ropeyarde and the other ",
+      "fyear": 1663.0584,
+      "running_tau": -0.3333
+    },
+    {
+      "hop": 3,
+      "idx": 971,
+      "date": "1661-06-01",
+      "text": "work | General | Having taken our leaves of Sir W. Batten and my Lady, who are gone this morning to keep their Whitsunti",
+      "fyear": 1661.4143,
+      "running_tau": -0.6667
+    },
+    {
+      "hop": 4,
+      "idx": 537,
+      "date": "1660-10-09",
+      "text": "work | General | This morning Sir W. Batten with Colonel Birch to Deptford, to pay off two ships. Sir W. Penn and I stay",
+      "fyear": 1660.773,
+      "running_tau": -0.8
+    },
+    {
+      "hop": 5,
+      "idx": 4269,
+      "date": "1666-02-03",
+      "text": "work | General | . Up, and with Sir W. Batten and [Sir] W. Penn to Whitehall, and there to Sir W. Coventry\u2019s chamber, an",
+      "fyear": 1666.0913,
+      "running_tau": -0.2
+    },
+    {
+      "hop": 6,
+      "idx": 2835,
+      "date": "1664-01-23",
+      "text": "work | General | Up, and with Sir W. Batten and Sir W. Penn to Whitehall; but there finding the Duke gone to his lodging",
+      "fyear": 1664.0616,
+      "running_tau": 0.0476
+    }
+  ]
+}

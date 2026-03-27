@@ -21,7 +21,7 @@ def profile_average_conformation(loader):
         profiler = cProfile.Profile()
         profiler.enable()
         test_data = generate_test_data(length, loader)
-        avg = test_data.average_conformation
+        test_data.average_conformation
         profiler.disable()
 
         print(f"Profiling results for list length {length}:")

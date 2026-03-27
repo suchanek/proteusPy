@@ -17,8 +17,6 @@ from datetime import timedelta
 from Bio.PDB import PDBList
 from tqdm import tqdm
 
-import proteusPy
-
 # Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -81,7 +79,7 @@ def fetch_and_save_pdb(pdbid, save_path=".", verbose=True):
 
 def read_ids_from_file(file_path):
     """Reads IDs from a file, prints bad IDs, and returns the good ones as a set."""
-    with open(file_path, "r") as file:
+    with open(file_path) as file:
         ids = file.read().strip().lower().split(",")
 
     # Separate good and bad IDs based on length

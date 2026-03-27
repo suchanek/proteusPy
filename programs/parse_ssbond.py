@@ -13,7 +13,7 @@ def parse_ssbond_records(pdb_filename):
     """
     ssbond_records = []
 
-    with open(pdb_filename, "r") as pdb_file:
+    with open(pdb_filename) as pdb_file:
         for line in pdb_file:
             if line.startswith("SSBOND"):
                 ssbond_record = {

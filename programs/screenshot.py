@@ -3,16 +3,10 @@
 # Last revision: 1/19/23 -egs-
 # Cα Cβ Sγ
 
-import math
 
-import matplotlib
 import matplotlib.pyplot as plt
-import pandas as pd
-import plotly_express as px
-import pyvista as pv
 from pyvista import set_plot_theme
 
-import proteusPy
 from proteusPy import *
 from proteusPy.DisulfideBase import *
 from proteusPy.ProteusGlobals import *

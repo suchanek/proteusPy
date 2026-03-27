@@ -341,7 +341,7 @@ def _parse_pdb_header_list(header):
                 if tail:
                     remark_99_keyval = tail.replace("ASTRAL ", "").split(": ")
                     if (
-                        type(remark_99_keyval) == list
+                        isinstance(remark_99_keyval, list)
                         and len(remark_99_keyval) == 2
                     ):
                         if "astral" not in pdbh_dict:

@@ -44,7 +44,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from proteusPy import Disulfide, DisulfideList, DisulfideLoader, Load_PDB_SS
+from proteusPy import Load_PDB_SS
 
 HOME = Path.home()
 PDB = Path(os.getenv("PDB", HOME / "pdb"))

@@ -2,7 +2,7 @@
 Display and screenshot functionality for disulfide bonds using the proteusPy package.
 
 This module demonstrates the display and screenshot functionalities for disulfide bonds
-using the proteusPy package. It shows various visualization methods for both single 
+using the proteusPy package. It shows various visualization methods for both single
 disulfide bonds and lists of disulfide bonds.
 
 Author: Eric G. Suchanek, PhD

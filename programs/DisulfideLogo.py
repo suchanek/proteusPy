@@ -3,9 +3,6 @@
 # Last revision: 1/2/23 -egs-
 # Cα Cβ Sγ
 
-import pandas as pd
-import pyvista as pv
-from pyvista import set_plot_theme
 
 from proteusPy.DisulfideBase import Disulfide, DisulfideList
 from proteusPy.DisulfideLoader import Load_PDB_SS

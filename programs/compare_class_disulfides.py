@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """
 Script for comparing disulfides from different structural classes.
@@ -18,7 +17,6 @@ Last Modification: 2025-03-15
 import os
 import pickle
 import sys
-from typing import Dict, List, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -32,7 +30,7 @@ from proteusPy.DisulfideClassGenerator import DisulfideClassGenerator
 
 
 def compare_energy_distributions(
-    class_disulfides: Dict[str, DisulfideList], class_names: Dict[str, str]
+    class_disulfides: dict[str, DisulfideList], class_names: dict[str, str]
 ) -> None:
     """
     Compare the energy distributions of disulfides from different classes.
@@ -107,7 +105,7 @@ def compare_energy_distributions(
 
 
 def compare_dihedral_distributions(
-    class_disulfides: Dict[str, DisulfideList], class_names: Dict[str, str]
+    class_disulfides: dict[str, DisulfideList], class_names: dict[str, str]
 ) -> None:
     """
     Compare the dihedral angle distributions of disulfides from different classes.
@@ -193,8 +191,8 @@ def compare_dihedral_distributions(
 
 
 def compare_minimum_energy_disulfides(
-    class_disulfides: Dict[str, DisulfideList], class_names: Dict[str, str]
-) -> Dict[str, Disulfide]:
+    class_disulfides: dict[str, DisulfideList], class_names: dict[str, str]
+) -> dict[str, Disulfide]:
     """
     Compare the minimum energy disulfides from different classes.
 
@@ -271,8 +269,8 @@ def compare_minimum_energy_disulfides(
 
 
 def compare_average_conformations(
-    class_disulfides: Dict[str, DisulfideList], class_names: Dict[str, str]
-) -> Dict[str, Disulfide]:
+    class_disulfides: dict[str, DisulfideList], class_names: dict[str, str]
+) -> dict[str, Disulfide]:
     """
     Compare the average conformations of disulfides from different classes.
 
@@ -431,14 +429,10 @@ def main():
     compare_dihedral_distributions(class_disulfides, class_names)
 
     # Compare the minimum energy disulfides
-    min_energy_disulfides = compare_minimum_energy_disulfides(
-        class_disulfides, class_names
-    )
+    compare_minimum_energy_disulfides(class_disulfides, class_names)
 
     # Compare the average conformations
-    avg_conformation_disulfides = compare_average_conformations(
-        class_disulfides, class_names
-    )
+    compare_average_conformations(class_disulfides, class_names)
 
     # Save all disulfides to a file
     for class_id, disulfide_list in class_disulfides.items():

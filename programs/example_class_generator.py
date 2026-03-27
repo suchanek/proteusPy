@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """
 Example script demonstrating how to use the DisulfideClassGenerator class.
@@ -15,10 +14,7 @@ Author: Eric G. Suchanek, PhD
 Last Modification: 2025-03-15
 """
 
-import os
 import pickle
-import sys
-from pathlib import Path
 
 from proteusPy.DisulfideClassGenerator import DisulfideClassGenerator
 

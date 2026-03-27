@@ -2,8 +2,8 @@
 # pepys_temporal_flight.py
 # Copyright (c) 2026 Eric G. Suchanek, PhD, Flux-Frontiers
 # https://github.com/Flux-Frontiers
-# License: BSD
-# Last revised: 2026-03-26 -egs-
+# License: Elastic 2.0
+# Last revised: 2026-03-26 19:17:39 -egs-
 """
 pepys_temporal_flight.py
 -------------------------
@@ -57,6 +57,10 @@ Requirements
 from __future__ import annotations
 
 import argparse
+
+# Direct import of turtleND to avoid pulling in heavy optional deps (pyvista etc.)
+# via proteusPy.__init__.  We load the module file directly.
+import importlib.util as _ilu  # noqa: E402
 import json
 import math
 import sys
@@ -70,11 +74,9 @@ import numpy as np
 from rich.console import Console
 from rich.table import Table
 
-# Direct import of turtleND to avoid pulling in heavy optional deps (pyvista etc.)
-# via proteusPy.__init__.  We load the module file directly.
-import importlib.util as _ilu  # noqa: E402
-
-_tnd_path = str(Path(__file__).resolve().parent.parent / "proteusPy" / "turtleND.py")
+_tnd_path = str(
+    Path(__file__).resolve().parent.parent.parent / "proteusPy" / "proteusPy" / "turtleND.py"
+)
 _spec = _ilu.spec_from_file_location("turtleND", _tnd_path)
 _tnd_mod = _ilu.module_from_spec(_spec)
 _spec.loader.exec_module(_tnd_mod)
@@ -85,7 +87,7 @@ console = Console()
 # ---------------------------------------------------------------------------
 # Defaults
 # ---------------------------------------------------------------------------
-DEFAULT_CACHE = str(Path(__file__).parent / "pepys_small_embeddings.json")
+DEFAULT_CACHE = str(Path(__file__).parent / "pepys_mpnet_embeddings.json")
 DEFAULT_OUT_JSON = str(Path(__file__).parent / "pepys_temporal_flight_results.json")
 DEFAULT_OUT_PNG = str(Path(__file__).parent / "pepys_temporal_flight_results.png")
 
@@ -101,9 +103,7 @@ def timestamps_to_fractional_years(timestamps: list[datetime]) -> np.ndarray:
     """
     fyears = np.array(
         [
-            ts.year
-            + (ts.timetuple().tm_yday - 1) / 365.25
-            + ts.hour / (365.25 * 24)
+            ts.year + (ts.timetuple().tm_yday - 1) / 365.25 + ts.hour / (365.25 * 24)
             for ts in timestamps
         ],
         dtype=np.float64,
@@ -177,17 +177,20 @@ class TemporalFlyer:
         texts: list[str],
         k: int = 10,
         alpha: float = 1.0,
+        negate_time: bool = False,
     ):
         from sklearn.neighbors import NearestNeighbors
 
         self.texts = texts
         self.timestamps = timestamps
         self.alpha = alpha
+        self.negate_time = negate_time
 
         # Fractional years & augmented embeddings
         self.fyears = timestamps_to_fractional_years(timestamps)
+        fyears_for_aug = -self.fyears if negate_time else self.fyears
         self.E_orig = embeddings.copy()
-        self.E_aug = augment_with_time(embeddings, self.fyears, alpha=alpha)
+        self.E_aug = augment_with_time(embeddings, fyears_for_aug, alpha=alpha)
         self.N, self.D = self.E_aug.shape  # D = original_dim + 1
         self.time_axis = self.D - 1
 
@@ -349,7 +352,12 @@ def temporal_coherence(path: list[int], fyears: np.ndarray) -> dict:
     - kendall_tau: Kendall rank correlation between path order and time
     """
     if len(path) < 2:
-        return {"monotonicity": 1.0, "mean_dt": 0.0, "total_span": 0.0, "kendall_tau": 1.0}
+        return {
+            "monotonicity": 1.0,
+            "mean_dt": 0.0,
+            "total_span": 0.0,
+            "kendall_tau": 1.0,
+        }
 
     times = fyears[path]
     dts = np.diff(times)
@@ -403,7 +411,7 @@ def make_figure(
     out_path: str,
     dpi: int = 150,
 ) -> None:
-    """6-panel figure: 3 flight-path scatters + 3 temporal profiles."""
+    """8-panel figure: 4 flight-path scatters + 4 temporal profiles."""
 
     dark = {
         "figure.facecolor": "#0d1117",
@@ -420,7 +428,8 @@ def make_figure(
 
     from sklearn.decomposition import PCA
 
-    fig, axes = plt.subplots(2, 3, figsize=(18, 10))
+    plot_modes = ["semantic", "temporal", "temporal_backward", "mixed"]
+    fig, axes = plt.subplots(2, 4, figsize=(24, 10))
     fig.suptitle(
         "Pepys Diary · Temporal Flight Experiment",
         fontsize=15,
@@ -432,14 +441,20 @@ def make_figure(
     pca = PCA(n_components=2)
     coords = pca.fit_transform(flyer.E_aug)
 
-    colors = {"semantic": "#58a6ff", "temporal": "#3fb950", "mixed": "#f78166"}
+    colors = {
+        "semantic": "#58a6ff",
+        "temporal": "#3fb950",
+        "temporal_backward": "#f0a500",
+        "mixed": "#f78166",
+    }
     mode_labels = {
         "semantic": "Semantic Flight",
-        "temporal": "Temporal Flight",
+        "temporal": "Temporal Flight (→)",
+        "temporal_backward": "Temporal Backward (←)",
         "mixed": "Mixed Flight (50/50)",
     }
 
-    for col, mode in enumerate(["semantic", "temporal", "mixed"]):
+    for col, mode in enumerate(plot_modes):
         path = paths[mode]
         coh = coherence[mode]
         color = colors[mode]
@@ -448,20 +463,52 @@ def make_figure(
         ax = axes[0, col]
         # Background points coloured by year
         years = np.array([ts.year for ts in flyer.timestamps])
-        ax.scatter(coords[:, 0], coords[:, 1], c=years, cmap="plasma",
-                   s=3, alpha=0.25, linewidths=0)
+        ax.scatter(
+            coords[:, 0],
+            coords[:, 1],
+            c=years,
+            cmap="plasma",
+            s=3,
+            alpha=0.25,
+            linewidths=0,
+        )
 
         # Flight path
         path_coords = coords[path]
-        ax.plot(path_coords[:, 0], path_coords[:, 1], color=color,
-                lw=1.2, alpha=0.8, zorder=3)
-        ax.scatter(path_coords[0, 0], path_coords[0, 1], c="white",
-                   s=60, marker="o", zorder=5, edgecolors=color, linewidths=2)
-        ax.scatter(path_coords[-1, 0], path_coords[-1, 1], c="white",
-                   s=60, marker="*", zorder=5, edgecolors=color, linewidths=2)
+        ax.plot(
+            path_coords[:, 0],
+            path_coords[:, 1],
+            color=color,
+            lw=1.2,
+            alpha=0.8,
+            zorder=3,
+        )
+        ax.scatter(
+            path_coords[0, 0],
+            path_coords[0, 1],
+            c="white",
+            s=60,
+            marker="o",
+            zorder=5,
+            edgecolors=color,
+            linewidths=2,
+        )
+        ax.scatter(
+            path_coords[-1, 0],
+            path_coords[-1, 1],
+            c="white",
+            s=60,
+            marker="*",
+            zorder=5,
+            edgecolors=color,
+            linewidths=2,
+        )
 
-        ax.set_title(f"{mode_labels[mode]}\n({len(path)} hops, τ={coh['kendall_tau']:.2f})",
-                     color="#c9d1d9", fontsize=10)
+        ax.set_title(
+            f"{mode_labels[mode]}\n({len(path)} hops, τ={coh['kendall_tau']:.2f})",
+            color="#c9d1d9",
+            fontsize=10,
+        )
         ax.set_xlabel(f"PC1 ({pca.explained_variance_ratio_[0]:.1%})", fontsize=8)
         ax.set_ylabel(f"PC2 ({pca.explained_variance_ratio_[1]:.1%})", fontsize=8)
         ax.grid(True, alpha=0.3)
@@ -477,7 +524,8 @@ def make_figure(
         ax2.set_title(
             f"Time along path · mono={coh['monotonicity']:.0%}  "
             f"span={coh['total_span_years']:.1f}yr",
-            color="#c9d1d9", fontsize=10,
+            color="#c9d1d9",
+            fontsize=10,
         )
         ax2.grid(True, alpha=0.3)
 
@@ -491,9 +539,7 @@ def make_figure(
 # CLI
 # ---------------------------------------------------------------------------
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(
-        description="Pepys diary temporal flight experiment"
-    )
+    p = argparse.ArgumentParser(description="Pepys diary temporal flight experiment")
     p.add_argument(
         "--cache",
         default=DEFAULT_CACHE,
@@ -533,6 +579,12 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_OUT_PNG,
         help="Path for figure PNG",
     )
+    p.add_argument(
+        "--negate-time",
+        action="store_true",
+        default=False,
+        help="Negate the temporal coordinate before augmenting (reverses the time axis sign)",
+    )
     return p.parse_args()
 
 
@@ -557,8 +609,9 @@ def main() -> None:
     console.print(f"\n[bold]Step 1:[/bold] Loading embeddings from {cache_path} …")
     E, texts, timestamps = load_cache(str(cache_path))
     N, orig_dim = E.shape
-    console.print(f"  {N} entries × {orig_dim} dims, "
-                  f"{min(timestamps).date()} → {max(timestamps).date()}")
+    console.print(
+        f"  {N} entries × {orig_dim} dims, {min(timestamps).date()} → {max(timestamps).date()}"
+    )
 
     # L2-normalise
     norms = np.linalg.norm(E, axis=1, keepdims=True)
@@ -567,40 +620,50 @@ def main() -> None:
     # ------------------------------------------------------------------
     # Step 2: Build temporally-augmented space
     # ------------------------------------------------------------------
-    console.print(f"\n[bold]Step 2:[/bold] Augmenting with temporal axis (α={args.alpha}) …")
+    console.print(
+        f"\n[bold]Step 2:[/bold] Augmenting with temporal axis (α={args.alpha}"
+        f"{', time axis negated' if args.negate_time else ''}) …"
+    )
     fyears = timestamps_to_fractional_years(timestamps)
-    E_aug = augment_with_time(E, fyears, alpha=args.alpha)
-    console.print(f"  Augmented: {E_aug.shape[0]} × {E_aug.shape[1]} dims "
-                  f"(+1 temporal axis at index {E_aug.shape[1] - 1})")
+    fyears_for_aug = -fyears if args.negate_time else fyears
+    E_aug = augment_with_time(E, fyears_for_aug, alpha=args.alpha)
+    console.print(
+        f"  Augmented: {E_aug.shape[0]} × {E_aug.shape[1]} dims "
+        f"(+1 temporal axis at index {E_aug.shape[1] - 1})"
+    )
 
     # Show temporal axis stats
     t_col = E_aug[:, -1]
-    console.print(f"  Temporal axis: min={t_col.min():.3f}, max={t_col.max():.3f}, "
-                  f"std={t_col.std():.3f}")
+    console.print(
+        f"  Temporal axis: min={t_col.min():.3f}, max={t_col.max():.3f}, std={t_col.std():.3f}"
+    )
 
     # ------------------------------------------------------------------
     # Step 3: Build flyer and find distant pair
     # ------------------------------------------------------------------
     console.print(f"\n[bold]Step 3:[/bold] Building KNN graph (k={args.k}) …")
     t0 = time.time()
-    flyer = TemporalFlyer(E, timestamps, texts, k=args.k, alpha=args.alpha)
+    flyer = TemporalFlyer(
+        E, timestamps, texts, k=args.k, alpha=args.alpha,
+        negate_time=args.negate_time,
+    )
     elapsed = time.time() - t0
     console.print(f"  Built in {elapsed:.1f}s")
 
     i_orig, i_dest = find_distant_pair(E)
     console.print(
-        f"  Origin : [{i_orig}] {timestamps[i_orig].date()} — "
-        f'"{texts[i_orig][:60]}…"'
+        f'  Origin : [{i_orig}] {timestamps[i_orig].date()} — "{texts[i_orig][:60]}…"'
     )
     console.print(
-        f"  Dest   : [{i_dest}] {timestamps[i_dest].date()} — "
-        f'"{texts[i_dest][:60]}…"'
+        f'  Dest   : [{i_dest}] {timestamps[i_dest].date()} — "{texts[i_dest][:60]}…"'
     )
 
     # ------------------------------------------------------------------
     # Step 4: Three flight modes
     # ------------------------------------------------------------------
-    console.print(f"\n[bold]Step 4:[/bold] Flying three modes (max {args.max_steps} hops) …")
+    console.print(
+        f"\n[bold]Step 4:[/bold] Flying three modes (max {args.max_steps} hops) …"
+    )
 
     paths = {}
     coherence = {}
@@ -612,7 +675,9 @@ def main() -> None:
 
     # 4b: Temporal flight (forward from origin)
     console.print("  [green]Temporal flight …[/green]")
-    paths["temporal"] = flyer.temporal_flight(i_orig, max_steps=args.max_steps, forward=True)
+    paths["temporal"] = flyer.temporal_flight(
+        i_orig, max_steps=args.max_steps, forward=True
+    )
     coherence["temporal"] = temporal_coherence(paths["temporal"], flyer.fyears)
 
     # 4c: Mixed flight
@@ -622,9 +687,19 @@ def main() -> None:
     )
     coherence["mixed"] = temporal_coherence(paths["mixed"], flyer.fyears)
 
+    # 4d: Temporal backward — reversed tau test
+    console.print("  [yellow]Temporal backward (τ-reversal test) …[/yellow]")
+    paths["temporal_backward"] = flyer.temporal_flight(
+        i_orig, max_steps=args.max_steps, forward=False
+    )
+    coherence["temporal_backward"] = temporal_coherence(
+        paths["temporal_backward"], flyer.fyears
+    )
+
     # ------------------------------------------------------------------
     # Step 5: Results table
     # ------------------------------------------------------------------
+    all_modes = ["semantic", "temporal", "temporal_backward", "mixed"]
     console.print()
     table = Table(title="Temporal Coherence by Flight Mode", show_header=True)
     table.add_column("Mode", style="cyan")
@@ -634,10 +709,10 @@ def main() -> None:
     table.add_column("Mean Δt (yr)", justify="right")
     table.add_column("Span (yr)", justify="right")
 
-    for mode in ["semantic", "temporal", "mixed"]:
+    for mode in all_modes:
         c = coherence[mode]
         table.add_row(
-            mode.capitalize(),
+            mode.replace("_", " ").capitalize(),
             str(len(paths[mode])),
             f"{c['monotonicity']:.1%}",
             f"{c['kendall_tau']:.3f}",
@@ -645,6 +720,16 @@ def main() -> None:
             f"{c['total_span_years']:.1f}",
         )
     console.print(table)
+
+    # τ-reversal symmetry check
+    tau_fwd = coherence["temporal"]["kendall_tau"]
+    tau_bwd = coherence["temporal_backward"]["kendall_tau"]
+    tau_sum = tau_fwd + tau_bwd
+    console.print(
+        f"\n[bold]τ-reversal symmetry:[/bold]  "
+        f"τ(forward)={tau_fwd:+.3f}  τ(backward)={tau_bwd:+.3f}  "
+        f"sum={tau_sum:+.3f}  (ideal: 0.000)"
+    )
 
     # ------------------------------------------------------------------
     # Step 6: TurtleND primitive demo
@@ -658,23 +743,33 @@ def main() -> None:
 
     t.position = flyer.E_aug[i_orig].astype(np.float64)
     ang = t.orient_in_time(time_idx)
-    console.print(f"  orient_in_time() rotated heading {ang:.1f}° toward axis {time_idx}")
+    console.print(
+        f"  orient_in_time() rotated heading {ang:.1f}° toward axis {time_idx}"
+    )
     console.print(f"  heading[time_axis] = {t.heading[time_idx]:.4f}")
 
     # Move forward in time
     t.recording = True
     t.move(0.1)
-    console.print(f"  move(0.1) → temporal coord went from "
-                  f"{flyer.E_aug[i_orig, -1]:.3f} to {t.position[time_idx]:.3f}")
+    console.print(
+        f"  move(0.1) → temporal coord went from "
+        f"{flyer.E_aug[i_orig, -1]:.3f} to {t.position[time_idx]:.3f}"
+    )
 
     # ------------------------------------------------------------------
     # Step 7: Save results
     # ------------------------------------------------------------------
+    tau_symmetry = round(
+        coherence["temporal"]["kendall_tau"]
+        + coherence["temporal_backward"]["kendall_tau"],
+        4,
+    )
     results = {
         "corpus_size": N,
         "original_dim": orig_dim,
         "augmented_dim": int(E_aug.shape[1]),
         "alpha": args.alpha,
+        "negate_time": args.negate_time,
         "time_blend": args.time_blend,
         "k_graph": args.k,
         "max_steps": args.max_steps,
@@ -682,9 +777,10 @@ def main() -> None:
         "dest_idx": i_dest,
         "origin_date": timestamps[i_orig].isoformat(),
         "dest_date": timestamps[i_dest].isoformat(),
+        "tau_reversal_symmetry": tau_symmetry,
         "flights": {},
     }
-    for mode in ["semantic", "temporal", "mixed"]:
+    for mode in ["semantic", "temporal", "temporal_backward", "mixed"]:
         results["flights"][mode] = {
             "path_length": len(paths[mode]),
             "coherence": coherence[mode],
@@ -693,9 +789,9 @@ def main() -> None:
 
     class _NpEncoder(json.JSONEncoder):
         def default(self, obj):
-            if isinstance(obj, (np.integer,)):
+            if isinstance(obj, np.integer):
                 return int(obj)
-            if isinstance(obj, (np.floating,)):
+            if isinstance(obj, np.floating):
                 return float(obj)
             if isinstance(obj, np.ndarray):
                 return obj.tolist()
@@ -710,10 +806,11 @@ def main() -> None:
     # ------------------------------------------------------------------
     console.print("\n[bold]Generating figure …[/bold]")
     try:
-        make_figure(flyer, paths, coherence, args.out_png)
+        make_figure(flyer, paths, coherence, args.out_png)  # now 8-panel (4 modes)
     except Exception as exc:
         console.print(f"[yellow]Figure generation failed: {exc}[/yellow]")
         import traceback
+
         traceback.print_exc()
 
     console.rule("[bold green]Done")

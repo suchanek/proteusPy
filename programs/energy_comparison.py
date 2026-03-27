@@ -124,7 +124,7 @@ for i in range(chi2_vals.shape[0]):
                 chi5,
             ]
             energies_kcal[i, j, k] = ss.TorsionEnergy
-            
+
             # Use DisulfideEnergy for DSE energy
             ss_energy = DisulfideEnergy(
                 chi1,

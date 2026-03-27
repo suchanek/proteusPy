@@ -445,7 +445,6 @@ class TurtleND:
         # do a direct 2-vector rotation in the heading–perp plane.
         # Temporarily replace basis[best_j] with perp, rotate, then
         # re-orthonormalize to clean up.
-        saved = self._frame[best_j].copy()
         self._frame[best_j] = perp
         self._rotate(angle_rad, 0, best_j)
         # The rotation moved heading toward perp.  Now re-orthonormalize
@@ -457,7 +456,12 @@ class TurtleND:
     def orient_in_time(self, time_axis: int | None = None) -> float:
         """Convenience: orient heading toward the temporal (last) axis.
 
-        Equivalent to ``orient_toward(e_N)`` where ``e_N`` is the unit
+        Points toward the *negative* z-score direction of the temporal axis,
+        which corresponds to chronologically forward motion in the KNN graph.
+        The positive z-score direction is the earliest (lowest fractional-year)
+        end of the corpus; forward-in-time means decreasing z-score.
+
+        Equivalent to ``orient_toward(-e_N)`` where ``e_N`` is the unit
         vector along axis *time_axis* (default: last dimension, as set
         by ``expand_dim``).
 
@@ -467,7 +471,7 @@ class TurtleND:
         if time_axis is None:
             time_axis = self._ndim - 1
         e_t = np.zeros(self._ndim, dtype="d")
-        e_t[time_axis] = 1.0
+        e_t[time_axis] = -1.0
         return self.orient_toward(e_t)
 
     # ---------------------------------------------------------------

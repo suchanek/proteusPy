@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """
 Advanced script for analyzing and visualizing disulfides generated for structural classes.
@@ -268,7 +267,7 @@ def main():
         with open(avg_file, "wb") as f:
             pickle.dump(avg_disulfide, f)
         print(f"Saved average conformation disulfide to {avg_file}.")
-        
+
         disulfide_list.display_overlay(light="auto")
     else:
         print(f"Class {class_str} not found. Let's try with '+++++' instead.")

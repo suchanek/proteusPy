@@ -2,7 +2,6 @@ import os
 import sys
 import urllib.request
 
-import numpy as np
 import pandas as pd
 from pyrosetta import *
 from pyrosetta.teaching import *
@@ -23,14 +22,14 @@ def get_disulfide_energy(pose, res1, res2):
     """Calculate disulfide torsional energy using PyRosetta's energy function"""
     # Create a copy of the pose to avoid modifying the original
     working_pose = Pose(pose)
-    
+
     # Set up score function with disulfide term
     scorefxn = get_fa_scorefxn()
     scorefxn.set_weight(rosetta.core.scoring.dslf_fa13, 1.0)
-    
+
     # Score the pose
     scorefxn(working_pose)
-    
+
     # Get total energies
     score_terms = working_pose.energies().total_energies()
     torsional_energy = score_terms[rosetta.core.scoring.dslf_fa13]
@@ -40,7 +39,7 @@ def get_disulfide_energy(pose, res1, res2):
     for res in [res1, res2]:
         angles = [working_pose.chi(i, res) for i in range(1, working_pose.residue(res).nchi() + 1)]
         chi_angles.append(angles)
-    
+
     return torsional_energy, chi_angles[0], chi_angles[1]
 
 
@@ -87,7 +86,7 @@ def calculate_dse(pdbid, pose=None):
 
                     # Calculate disulfide energy and get chi angles
                     total_strain, chi_1, chi_2 = get_disulfide_energy(pose, i, j)
-                    
+
                     # Format chi angles for storage
                     chi_angles_1 = ','.join([f"{angle:.2f}" for angle in chi_1])
                     chi_angles_2 = ','.join([f"{angle:.2f}" for angle in chi_2])
