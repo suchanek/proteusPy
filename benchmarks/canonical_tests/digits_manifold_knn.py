@@ -8,19 +8,38 @@ No neural network. No training. No Adam. Just geometry.
 Question: does understanding the manifold structure of raw pixel space
 give you better classification than treating the space as isotropic?
 
-Method:
-  Standard KNN:  euclidean distance in full 64-dim pixel space
-  Cosine KNN:    cosine distance in full 64-dim pixel space
-  Manifold KNN:  local PCA at each query point discovers the tangent
-                 space of the data manifold, projects neighbors onto it,
-                 measures distance only along on-manifold directions.
-                 Off-manifold dimensions (noise) are ignored.
+Dataset: sklearn digits — 1797 samples of 8×8 pixel images (64-dimensional
+input), 10 classes (digits 0-9).  Evaluation uses 5-fold stratified
+cross-validation (k_vote=7, k_pca=50).
 
-Dataset: sklearn digits — 1797 samples of 8x8 pixel images (64 dims),
-10 classes (digits 0-9).
+Seven methods are compared
+--------------------------
+  Euclidean KNN:                  standard sklearn KNN, Euclidean distance
+  Cosine KNN:                     standard sklearn KNN, cosine distance
+  ManifoldKNN (τ=0.95/0.90/0.85): at each query point, find k_pca nearest
+                                   neighbors, compute local PCA to discover
+                                   the tangent space (d dims), project
+                                   neighbors onto it, and vote in the
+                                   projected subspace.  Off-manifold
+                                   dimensions (noise) are suppressed.
+  EigenWeightedManifoldKNN (τ=0.95/0.90): like ManifoldKNN but weights
+                                   projected distances by 1/sqrt(λ) —
+                                   a Mahalanobis-like metric on the local
+                                   tangent space that emphasises fine-
+                                   structure directions over coarse ones.
+
+Both ManifoldKNN and EigenWeightedManifoldKNN are implemented here without
+depending on proteusPy's ManifoldModel (lightweight, no graph construction).
+
+Results are printed to stdout; no JSON or plot output is produced.
 
 Part of proteusPy, https://github.com/suchanek/proteusPy
 Author: Eric G. Suchanek, PhD
+Affiliation: Flux-Frontiers
+
+Usage
+-----
+    python benchmarks/canonical_tests/digits_manifold_knn.py
 """
 
 import sys

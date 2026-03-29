@@ -301,6 +301,8 @@ class ManifoldModel:
         # Truncated basis: only store the d principal directions we need
         # Vt rows are principal directions in descending singular value order
         basis = Vt[:intrinsic_dim]  # shape (d, ndim) — NOT (ndim, ndim)
+        if not np.isfinite(basis).all():
+            basis = np.nan_to_num(basis, nan=0.0, posinf=0.0, neginf=0.0)
 
         label = self._y_train[idx] if self._y_train is not None else None
 
@@ -339,6 +341,8 @@ class ManifoldModel:
 
                 # Project difference into tangent space
                 diff = tgt_point - src_geom.centroid
+                if not np.isfinite(diff).all():
+                    diff = np.nan_to_num(diff, nan=0.0, posinf=0.0, neginf=0.0)
                 proj = src_geom.basis[:d] @ diff  # project onto d tangent dims
                 manifold_dist = float(np.linalg.norm(proj))
                 euclidean_dist = float(dists_euc[j])

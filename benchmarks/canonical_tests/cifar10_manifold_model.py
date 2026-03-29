@@ -3,33 +3,45 @@
 CIFAR-10 Benchmark: ManifoldModel — The Ultimate Test
 =====================================================
 
-The ManifoldModel on CIFAR-10: can pure geometry — zero learned parameters —
-classify 3,072-dimensional color images?
+Tests ManifoldModel — zero learned parameters, pure geometry — against
+Euclidean KNN on the CIFAR-10 color image dataset.
 
-This is the hardest test of the WaveRider thesis. CIFAR-10 has:
+CIFAR-10 is the hardest test of the WaveRider geometry thesis:
   - 3,072 ambient dimensions (32×32×3 pixels)
   - 10 visually complex classes (animals, vehicles)
-  - High intra-class variability (many poses, backgrounds, lighting)
+  - High intra-class variability (poses, backgrounds, lighting)
   - Significant inter-class overlap (cats vs dogs, trucks vs automobiles)
 
-The ManifoldModel discovers the manifold structure via local PCA, builds a
-knowledge graph with manifold-weighted edges, and classifies via graph-walk
-+ manifold-projected voting. No neural network. No backpropagation. No
-learned weights. Just geometry.
+ManifoldModel discovers the manifold structure via local PCA, builds a
+k-NN graph with manifold-weighted edges, and classifies via graph-walk
++ manifold-projected voting.  No neural network.  No learned weights.
 
-Because CIFAR-10 has 50K training samples in 3072D, we subsample for
-ManifoldModel fitting (full O(n²·d) distance computation would be
-prohibitive at 50K). We compare:
-  - ManifoldModel on subsampled data
-  - Euclidean KNN on the same subsample (apples-to-apples)
-  - Euclidean KNN on full training data (upper bound)
+Because CIFAR-10 has 50K training samples in 3,072D, training data is
+stratified-subsampled (--n-train, default 5,000) to keep O(n²·d) graph
+construction tractable.  Test evaluation uses a separate stratified
+subsample (--n-test, default 2,000).
+
+Three comparisons (apples-to-apples on the same subsamples)
+------------------------------------------------------------
+  ManifoldModel (zero params):
+    fit()     — local PCA (--k-pca=50), k-NN graph (--k-graph=15),
+                manifold-weighted edges (--manifold-weight=0.8)
+    predict() — graph-walk + manifold-projected voting (--k-vote=7)
+                at variance threshold --tau (default 0.90)
+  Euclidean KNN (subsampled):   sklearn KNN on the same n_train samples
+  Euclidean KNN (full train):   sklearn KNN on all 50K training images
+                                (upper-bound reference)
+
+Results (including per-class accuracy and geometry statistics) are saved to
+``benchmarks/canonical_tests/cifar10_manifold_model_results.json``.
 
 Part of proteusPy, https://github.com/suchanek/proteusPy
 Author: Eric G. Suchanek, PhD
+Affiliation: Flux-Frontiers
 
 Usage
 -----
-    python benchmarks/cifar10_manifold_model.py [--n-train 5000] [--tau 0.90]
+    python benchmarks/canonical_tests/cifar10_manifold_model.py [--n-train 5000] [--tau 0.90]
 """
 
 import argparse
@@ -826,7 +838,7 @@ def main():
             save_r["geometry"] = r["geometry"]
         save_data["results"][name] = save_r
 
-    results_path = "benchmarks/cifar10_manifold_model_results.json"
+    results_path = Path(__file__).resolve().parent / "cifar10_manifold_model_results.json"
     with open(results_path, "w") as f:
         json.dump(save_data, f, indent=2)
     print(f"\nResults saved to {results_path}")
@@ -836,11 +848,10 @@ def main():
     tb.close()
 
     if args.plot or args.plot_file:
-        plot_results(
-            results,
-            dataset_label=dataset_label,
-            save_path=args.plot_file,
+        plot_path = args.plot_file or str(
+            Path(__file__).resolve().parent / "cifar10_manifold_model_results.png"
         )
+        plot_results(results, dataset_label=dataset_label, save_path=plot_path)
 
 
 if __name__ == "__main__":

@@ -259,8 +259,14 @@ class ManifoldObserver:
 
             # Principal angles between the two tangent subspaces via SVD
             # of the cross-Gramian B_src @ B_tgt^T
+            # Use errstate to silence Apple Accelerate FPU exceptions on subnormal
+            # float32 patterns; sanitise result for degenerate tangent bases.
             d_min = min(basis_src.shape[0], basis_tgt.shape[0])
-            cross = basis_src @ basis_tgt.T  # (d_src, d_tgt)
+            b_src64 = np.nan_to_num(basis_src.astype(np.float64), nan=0.0, posinf=0.0, neginf=0.0)
+            b_tgt64 = np.nan_to_num(basis_tgt.astype(np.float64), nan=0.0, posinf=0.0, neginf=0.0)
+            with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
+                cross = b_src64 @ b_tgt64.T  # (d_src, d_tgt)
+            cross = np.nan_to_num(cross, nan=0.0, posinf=0.0, neginf=0.0)
             svs = np.linalg.svd(cross, compute_uv=False)
             # Singular values are cosines of principal angles
             svs = np.clip(svs[:d_min], -1.0, 1.0)
@@ -364,10 +370,18 @@ class ManifoldObserver:
         geom = self._subject.get_geometry(nearest_id)
 
         # Compute height (reconstruction error from tangent plane)
-        diff = query - geom.centroid
+        diff = np.nan_to_num(
+            (query - geom.centroid).astype(np.float64), nan=0.0, posinf=0.0, neginf=0.0
+        )
         d = geom.intrinsic_dim
-        tangent_proj = geom.basis[:d] @ diff  # (d,)
-        reconstructed = geom.basis[:d].T @ tangent_proj
+        basis_d = np.nan_to_num(
+            geom.basis[:d].astype(np.float64), nan=0.0, posinf=0.0, neginf=0.0
+        )
+        with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
+            tangent_proj = basis_d @ diff  # (d,)
+            reconstructed = basis_d.T @ tangent_proj
+        tangent_proj = np.nan_to_num(tangent_proj, nan=0.0, posinf=0.0, neginf=0.0)
+        reconstructed = np.nan_to_num(reconstructed, nan=0.0, posinf=0.0, neginf=0.0)
         residual = diff - reconstructed
         height = float(np.linalg.norm(residual))
 

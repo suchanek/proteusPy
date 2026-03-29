@@ -3,16 +3,42 @@
 Digits Benchmark: ManifoldModel vs Standard KNN
 ================================================
 
-Tests the new ManifoldModel architecture — where the manifold IS the model —
-against standard Euclidean KNN on the sklearn digits dataset.
+Tests ManifoldModel — where the manifold IS the classifier (zero learned
+parameters) — against standard Euclidean KNN on the sklearn digits dataset.
 
-The ManifoldModel:
-  1. Explores the data manifold (fit) — discovers local geometry, builds graph
-  2. Navigates the graph (predict) — classifies via manifold-aware graph walk
-  3. Can fly the embedded space — interactive turtle navigation
+Dataset: sklearn digits — 1797 samples of 8×8 pixel images (64-dimensional
+input), 10 classes (digits 0-9).
+
+Benchmark (5-fold stratified cross-validation)
+-----------------------------------------------
+  Euclidean KNN (k=7):            sklearn KNN, Euclidean distance
+  ManifoldModel (τ=0.95/0.90/0.85/0.80):
+    fit()     — discovers local geometry via local PCA (k_pca=50),
+                builds a k-NN graph (k_graph=15) with manifold-weighted edges
+    predict() — classifies via graph-walk + manifold-projected voting (k_vote=7)
+
+Per-fold intrinsic dimensionality is recorded from ManifoldModel.intrinsic_dim
+and summarised at the end.
+
+Fly Mode Demo
+-------------
+After the cross-validation sweep a final ManifoldModel is fit on the full
+dataset (τ=0.90).  The script then demonstrates turtle navigation:
+  fly_to(start)    — positions the turtle at the first digit-0 sample
+  get_geometry()   — reports local intrinsic dimensionality at that node
+  fly_toward(target, max_steps=15) — walks 15 steps toward the first digit-9
+                     sample, printing node, digit label, intrinsic dim, and
+                     distance to target at each step
+
+Results are printed to stdout; no JSON or plot output is produced.
 
 Part of proteusPy, https://github.com/suchanek/proteusPy
 Author: Eric G. Suchanek, PhD
+Affiliation: Flux-Frontiers
+
+Usage
+-----
+    python benchmarks/canonical_tests/digits_manifold_model.py
 """
 
 import importlib.util

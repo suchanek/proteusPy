@@ -6,19 +6,41 @@ Iris Benchmark: Standalone ManifoldAdamWalker vs Adam
 Can manifold-aware optimization with built-in Adam dynamics beat
 canonical Adam on its home turf?
 
-The ManifoldAdamWalker runs Adam's momentum and adaptive LR entirely
-within the PCA-discovered manifold subspace.  Off-manifold gradient
-components are suppressed BEFORE the Adam update, so:
-  - Momentum never accumulates noise
-  - The adaptive denominator only tracks signal variance
-  - Step sizes adapt to manifold curvature, not ambient noise
+Trains an identical MLP (4→16→8→3 softmax) on Iris (150 samples, 4 features,
+3 classes, 80/20 stratified split) using two optimizers over --trials
+independent runs (default 10).  Supports Apple Metal GPU via tensorflow-metal.
+
+The active-subspace approach
+-----------------------------
+At each optimization step, --n-samples gradients are collected from different
+mini-batches and treated as points in the P-dimensional weight space.  Local
+PCA (k=--k, τ=--variance-threshold) discovers the active subspace — directions
+where the loss actually varies.  A trajectory buffer of recent weight snapshots
+provides a second source of geometry.
+
+Two methods
+-----------
+  Adam (canonical):
+    Standard TensorFlow/Keras Adam on the full gradient.
+
+  StandaloneManifoldAdam (ManifoldAdamWalker):
+    Projects each gradient onto the active subspace, suppressing off-subspace
+    components, then runs Adam momentum (β₁=--beta1, β₂=--beta2) and adaptive
+    LR entirely within that subspace.  Effects:
+      - Momentum never accumulates mini-batch noise
+      - Adaptive denominator tracks only signal variance
+      - Step sizes adapt to manifold curvature
+
+Results are saved alongside the script as ``iris_maw_results.json`` and an
+optional matplotlib figure is written as ``iris_maw_results.png``.
 
 Part of proteusPy, https://github.com/suchanek/proteusPy
 Author: Eric G. Suchanek, PhD
+Affiliation: Flux-Frontiers
 
 Usage
 -----
-    python benchmarks/iris_manifold_adam_walker.py [--epochs 200] [--trials 10]
+    python benchmarks/canonical_tests/iris_manifold_adam_walker.py [--epochs 200] [--trials 10]
 """
 
 import argparse

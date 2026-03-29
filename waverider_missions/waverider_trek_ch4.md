@@ -1,326 +1,473 @@
 # STAR TREK: THE MANIFOLD FRONTIER
-## *Chapter 4: "The Direction of Time"*
+## *Chapter 4: "The 769th Dimension"*
 
 ---
 
-> *Stardate 2026.086. The dark panels are dark no longer. The ManifoldWalker has flown. The temporal flight instruments are online. But what the crew discovered when they activated them was not what anyone expected — and the most important finding of this mission is a bug that points, when corrected, toward something true about the nature of time itself.*
+> *Stardate 2026.097. The Pepys manifold is complete. The DiaryKG has been built. The crew does not know yet what that means — but one of them has been awake since 0040 working it out, and by 0800 he will have arrived at the most unsettling conclusion of his career.*
 
 ---
 
-## Prologue: After the Dark Panels
+## Chief Engineer's Personal Log — Stardate 2026.097, 0745
 
-*Spock's instrument log. Stardate 2026.086.*
+Montgomery Scott recording.
 
-Chapter 3 ended with a promise. The bottom two panels of the manifold figure were dark — the ManifoldWalker and ManifoldObserver offline, pending integration of the `proteusPy` stack into the `diary_kg` environment.
+I want it on the record that I have served aboard three starships and worked alongside Vulcans for eleven years, and I have never — *never* — seen one look the way Mr. Spock looked when I passed him in the corridor this morning.
 
-That integration is now complete.
+He was walking toward the briefing room at something that, on a human, I would call a *clip*. Head forward. Jaw set. The kind of walk that means a man knows exactly what he's going to say and has been rehearsing it since before dawn.
 
-The temporal flight instruments are live. The WaveRider has flown the Pepys manifold in three modes — semantic, temporal, and mixed — and the results are recorded. One of them is a discovery. One of them is a cautionary instrument failure. And together, they have pointed the crew toward a correction that is, if anything, more interesting than the flight itself.
+On Spock, that's not normal. On Spock, that's extraordinary.
 
----
+I asked him if everything was all right.
 
-## Chapter 1: The Contaminated Cache
+He said, "Adequate, Mr. Scott," and kept walking.
 
-*Chief Engineer Scott's personal log. Stardate 2026.085.*
+I don't mind telling you — adequate gave me a chill.
 
-Before we could fly, we had to address a problem Spock found in the instrument calibration log.
+I haven't seen him like this since that business on Vulcan. The mating ritual thing. The one we don't talk about. Something's going on in that mind of his, and whatever it is, I'm not sure the rest of us are going to be ready for it.
 
-The embedding cache — `pepys_mpnet_embeddings.json` — was corrupt.
-
-Not corrupted in the catastrophic sense. The vectors were real. The timestamps were correct. The corpus was the right corpus. But the embedding pipeline had been using the nomic-embed-text task prefix — `search_document:` — on text that was being sent to `all-mpnet-base-v2`.
-
-mpnet does not use task prefixes. It embeds raw text. Nomic uses prefixes because its training procedure explicitly conditions on them. Using a nomic prefix with mpnet is like calibrating a Vulcan scanner with a Klingon reference signal. The instrument still produces a number. The number is simply wrong.
-
-The cache of 8,413 vectors — the result of Stardate 2026.095's successful 31-minute run — was, in this precise technical sense, cross-contaminated.
-
-"How did we not catch this?" McCoy asked.
-
-"Because the results were plausible," Spock said. "The embedding model produced meaningful vectors. The MRR metrics were strong. The manifold figure looked correct. The contamination was subtle — a systematic bias on the prefix token, absorbed into the embedding geometry without producing an obvious artifact. It would not have been visible in any single-model analysis. It only became visible when we examined the pipeline code directly."
-
-Scotty did not say anything for a long moment.
-
-"Right," he said finally. "Let's fix it."
+*End log.*
 
 ---
 
-## Chapter 2: The Clean Run — 6,450 Entries, 15.8 Seconds
+## Chief Medical Officer's Log — Stardate 2026.097, 0752
 
-*Engineering deck. Stardate 2026.085.*
+Leonard McCoy recording.
 
-The fix was surgical. Three changes to `pepys_embedder.py`:
+I've been checking on Spock every two hours since 0040, when ship's computer logged him entering the science lab and not leaving. By 0400 I went down myself. He was at the terminal, writing. Not analysis, not instrument logs — *writing*. Pages of it.
 
-1. `DEFAULT_MODEL` → `sentence-transformers/all-mpnet-base-v2`
-2. `DEFAULT_OUTPUT` → `pepys_mpnet_embeddings.json` (the nomic naming had persisted as a ghost)
-3. `_embed_shard`: strip `search_document:` prefix entirely — mpnet embeds raw text
+I asked him what he was doing.
 
-Then: `python benchmarks/pepys_embedder.py --force`. Four workers. Batch size thirty-two.
+He said, "Thinking, Doctor," without looking up.
 
-Chekov read the result aloud.
+I checked his vitals through the passive monitors. Heart rate elevated — slightly, for a Vulcan, which means *substantially*, compared to baseline. Neural activity in the prefrontal cortex and temporal lobe — I know, temporal, don't start — running at approximately 140% of his resting state.
 
-"Six thousand, four hundred and fifty entries. Seven hundred sixty-eight dimensions. Fifteen point eight seconds."
+I've seen that profile before. Once. In a graduate student who had just discovered that his entire dissertation rested on a false assumption — but the *real* theory had been hiding inside the false one all along, and he could see it, and he could see what it meant, and he couldn't stop seeing it.
 
-The room was quiet for a different reason than last time.
+The student couldn't sleep for three days.
 
-"Fifteen seconds," Kirk said.
+Spock, I suspect, hasn't slept at all.
 
-"Fifteen point eight," Chekov confirmed. "Four hundred and eight entries per second. The pipeline ingested nine years of Samuel Pepys and produced a clean, uncontaminated 6,450 × 768 float32 matrix in less time than it takes to read a single diary entry aloud."
+I will be keeping a very close eye on him today.
 
-McCoy looked at Scotty. "Compared to thirty-one minutes last time."
-
-"The previous run was 8,413 *chunks*," Spock clarified. "The DiaryTransformer produced 2.51 chunks per entry on average. This run parses the enriched source file directly — one embedding per diary line. The number is smaller, the entries are whole, and without the prefix overhead the encoding is clean and fast."
-
-"Four hundred and eight entries per second," McCoy said quietly. "On a machine sitting on a desk."
-
-"On four cores of a machine sitting on a desk," Scotty said. There was something in his voice that was not quite pride and not quite wonder. "The `sentence-transformers` multi-process pool. Each worker holds its own model copy. No GIL. No waiting. Pure parallel."
-
-He looked at the output: `Cache saved (6450 entries) → pepys_mpnet_embeddings.json`.
-
-"Astounding," he said.
-
-Nobody disagreed.
+*End log.*
 
 ---
 
-## Chapter 3: The Temporal Flight Experiment
+## 0800 Hours — Main Briefing Room, Deck 3
 
-*Main science console. Stardate 2026.086.*
+The room was dark when Kirk arrived.
 
-The temporal flight instruments were Spock's design.
+That was the first thing wrong. Briefings at 0800 meant lights at 0750, coffee on the side table, Uhura adjusting the comm array, Chekov arguing with someone about something. The room had a ritual and the ritual started before anyone arrived.
 
-The idea: restore time as a navigable axis.
+This morning: dark. Silent. And yet not empty.
 
-An N-dimensional embedding captures semantic structure — what things *mean* — but discards the diary's natural temporal ordering. The `pepys_temporal_flight.py` instrument augments every embedding from N dimensions to N+1 by appending a scaled temporal coordinate. Time becomes a direction in the manifold. A TurtleND can fly along it.
+Spock was standing at the display wall, both hands behind his back, reading something in the near-dark that the rest of them would need lights to see.
 
-Three flight modes were tested:
+Kirk stood in the doorway for a moment. Then he crossed to the panel and brought the lights up to 60%.
 
-- **Semantic flight** — fly between the two most semantically distant entries, time incidental
-- **Temporal flight** — orient heading along the pure temporal axis, fly forward in time
-- **Mixed flight** — blend temporal and semantic orientation 50/50
+Spock didn't move.
 
-The route: from `1663-10-21` (origin, index 2956) to `1664-01-23` (destination, index 4171). A short journey in diary time — ninety-four days. A probe of whether the manifold could be navigated as a time machine.
+"Mr. Spock."
 
-Spock activated the instruments.
+"Captain." Still reading.
+
+"You're early."
+
+"I have been here for some time."
+
+Kirk poured himself a coffee. He glanced at the display. Lines of data — the DiaryKG build log, if he was reading it right, timestamped 0121. He took a sip and waited.
+
+Uhura arrived. She saw Spock and looked immediately at Kirk. Kirk gave a small, careful shake of his head: *not yet.*
+
+Scotty came in at 0758, saw the room, saw Spock, sat down at the far end of the table without touching the coffee. McCoy was last. He came in at 0800 exactly, took one look at Spock's back, took one look at Kirk, and took a seat directly across from where Spock would sit, with the expression of a man positioning himself close to a patient.
+
+Kirk waited until everyone was settled.
+
+"Mr. Spock."
+
+Spock turned from the display wall. He looked at each of them in sequence — Uhura, Scotty, Chekov, McCoy, Kirk — with the careful focus of someone cataloguing witnesses. Then he moved to the head of the table and placed both hands flat on its surface.
+
+"We have it all," he said.
 
 ---
 
-## Chapter 4: The Anomaly
+## The Complete Corpus
 
-*Stardate 2026.086. Main viewscreen.*
+The display wall lit behind him.
 
-The figure resolved. Six panels: three flight-path scatters across the PCA-2D projection, three temporal profile plots.
+"At 0121 this morning, the DiaryKG build completed. I am referring to the knowledge graph of the complete Samuel Pepys corpus. Not a sample. Not a subset. The entirety." He gestured at the numbers. "Six thousand, six hundred and forty-seven enriched diary entries. One hundred and four point one megabytes in the SQLite graph store. One hundred and zero point five megabytes in the LanceDB vector index. Build time: under sixty seconds."
 
-```
-Semantic Flight    — 79 hops,  Kendall τ = +0.19
-Temporal Flight    — 151 hops, Kendall τ = −0.38
-Mixed Flight       — 142 hops, Kendall τ = −0.15
-```
+McCoy looked at the timestamp. "You were running this at 0121."
 
-Kirk studied the numbers. "Walk me through this, Spock."
+"The build completed at 0121. The embedding run completed earlier, at approximately 2340 last night." He touched a key. A new set of numbers appeared. "Six thousand, four hundred and fifty entries. Embedded in fifteen point eight seconds. Four workers. Batch size thirty-two. The `all-mpnet-base-v2` model, operating on clean, correctly formatted input."
 
-"Kendall tau measures the rank correlation between path order and temporal order," Spock said. "A value of +1.0 means the path moves perfectly forward in time at every step. A value of 0 means the path has no temporal coherence — random with respect to time. A value of −1.0 means the path moves perfectly *backward* in time."
+Scotty sat forward. "Fifteen seconds?"
+
+"Point eight. Yes."
+
+"The last run took—"
+
+"Thirty-one minutes. The prior cache was contaminated. The nomic task prefix had been applied to mpnet input — an instrumentation error from the previous mission. The embeddings were geometrically compromised." A pause. "I identified the error during a routine calibration check. I rebuilt the cache from scratch."
+
+"At 2340," McCoy said.
+
+"The work required to be done."
+
+Kirk was watching Spock's face. He had known this man for seven years, and he had learned to read the architecture of his silences. This one — the pause between the last sentence and what came next — had a specific quality. The quality of a held breath.
+
+"There's more," Kirk said.
+
+It wasn't a question.
+
+Spock looked at him for a moment. Something moved behind those eyes — a consideration, a calibration of how to proceed.
+
+"Yes, Captain," he said. "There is considerably more."
+
+---
+
+## The Idea
+
+Spock turned back to the display wall. He cleared the build log with a single gesture, and for a moment the wall was dark.
+
+Then he wrote a number.
+
+**769**
+
+"The Pepys manifold," he said, "as we have navigated it, exists in seven hundred and sixty-eight dimensions. This is the output space of the `all-mpnet-base-v2` model. Each diary entry — each semantic unit of Pepys's experience — is a point in this space."
 
 He paused.
 
-"The temporal flight produced a tau of negative 0.38."
+"I have been thinking," he said, "about time."
 
-McCoy straightened. "It went *backward*?"
+The room went very quiet.
 
-"It moved *against* time. Actively. On the first hop, departing from entry `1663-10-21`, the temporal flight engine immediately jumped to `1669-05-09` — the final year of the diary. It then spent the majority of its path orbit in the 1667–1669 cluster, never reaching the 1664 destination."
+McCoy opened his mouth.
 
-"But it's *called* temporal flight," McCoy said. "It's supposed to follow time *forward*."
+Kirk put one hand on the table. *Not yet.*
 
-"Yes," Spock said. "That is the bug."
+"Time, in our current navigation framework, is treated as metadata." Spock's voice had dropped slightly — not softer, but more deliberate, the way he spoke when the thing he was saying was still being formed even as he spoke it. "Entries are labeled with dates. The ManifoldWalker uses those labels to assess how well a flight through semantic space correlates with temporal progression. But the label is not part of the navigation space. Time is *outside* the geometry. It is a post-hoc measure."
 
----
+He turned to face them.
 
-## Chapter 5: The Nature of the Bug
+"This is wrong."
 
-*Spock's analysis log.*
+Chekov looked at Uhura. Uhura was watching Spock.
 
-The temporal coordinate in `augment_with_time()` is encoded as absolute fractional years — the position of each entry on a global time axis, z-scored across the corpus and scaled to match embedding magnitude.
+"Time is not metadata," Spock continued. "Time is a coordinate. A diary entry written in October of 1663 and an entry written in May of 1669 are separated not only in meaning — but in a measurable, continuous, navigable dimension. That dimension has a structure. That structure can be embedded. And if it can be embedded—" He wrote a second number on the display wall, directly below the first.
 
-This means: early entries have *low* values. Late entries have *high* values. The KNN graph, built on Euclidean distances in the augmented (N+1)-dimensional space, has a neighbourhood structure shaped by the density of the corpus. And the Pepys corpus is not uniformly distributed in time. The 1667–1669 period contains the densest cluster of entries.
+**769 = 768 + 1**
 
-When the temporal flight engine orients along the time axis and takes a greedy step toward the nearest forward-time neighbor, it is not navigating toward the *destination*. It is navigating toward the region of highest temporal coordinate — the end of the diary. The corpus centroid pulls it forward in absolute time, past the destination, into the dense late cluster.
+"—then the manifold becomes *temporal.*"
 
-The engine is not broken. It is doing exactly what it was told. It was told to fly along the time axis. The time axis, as encoded, points toward the end of the corpus — not toward the destination.
+"You're talking about adding a 769th dimension," Scotty said slowly. "Fractional year as a coordinate."
 
-"The instrument," Spock said, "is facing the wrong star."
+"Appended to the semantic vector. Yes. A single scalar. The year expressed as a decimal fraction of the corpus timeline — 1660 through 1669 normalized to the interval zero through one."
 
-Kirk sat with that for a moment. "So what does the semantic flight know that the temporal flight doesn't?"
+"So instead of flying through *meaning*—" Kirk said.
 
-"The semantic flight is unaware of time," Spock said. "It navigates purely by content similarity. And yet — its Kendall tau is positive 0.19. The best of the three modes. Because Pepys's concerns evolved coherently across his diary: topics cluster in time, not just in meaning. Semantic similarity is a natural proxy for temporal proximity. The manifold knows what time *means*, even without being told what time *is*."
+"We fly through *time.*" Spock let that sit. "The TurtleND navigates not only where Pepys *thought* — but *when* he thought it. We could target a moment. Set a destination in time. The manifold would draw us toward it."
 
-McCoy had been very quiet.
+Kirk stood up very slowly. He walked to the display wall and looked at the number 769.
 
-"The machine that ignored time," he said slowly, "was more temporally coherent than the machine that tried to follow it."
+"Spock," he said.
 
-"Yes," Spock said. "Because it was measuring the right thing."
+"Captain."
 
----
+"Are you telling me—" He turned. "Are you telling me that we could use the DiaryKG as a *time machine?*"
 
-## Chapter 6: The Correction — Future Time as Pull
+Spock considered the word. "A navigational instrument, rather. A temporal manifold walker. The metaphor of a time machine is not—"
 
-*Navigation console. Stardate 2026.086.*
+"Are you telling me we could fly *forward* through the diary? Navigate from 1663 to 1664? Track the progression of a mind through time, the way we track a ship through space?"
 
-Uhura turned from the MRR sensor array. "So how do we fix it?"
+"...Yes, Captain. That is what I am telling you."
 
-Spock had already written the correction in his log.
+McCoy had both hands flat on the table.
 
-"The current encoding treats time as an absolute coordinate — a position on a global axis. The temporal flight engine sees high values as 'future' and moves toward them. But what we want is not motion toward the far end of time. We want motion toward the *destination*."
+"And you've been awake since *midnight* thinking about this."
 
-He brought up the equation.
-
-```python
-# Current (broken): absolute time — attracts toward dense corpus centroid
-t_coord = fractional_year(entry.date)
-
-# Corrected: destination-relative — zero at target, pull increases with distance
-t_coord = abs(entry.date - destination.date)
-```
-
-"We flip the sign," Spock said. "We encode time not as position but as *distance from the destination*. The destination has value zero. Entries far from the destination — whether in the past or the future — have high values. The manifold gradient then naturally pulls the turtle toward the destination."
-
-"Future time is a pull," Kirk said.
-
-"Yes, Captain. For every living thing — and for every algorithm that wishes to navigate time correctly — the future is not a place to drift toward. It is a force that *attracts*. The destination exerts a pull. The encoding must reflect that."
-
-McCoy looked at Spock for a long moment.
-
-"You know," he said, "I've never heard a physicist say something I agreed with that much."
+Spock looked at him. "0040, Doctor. To be precise."
 
 ---
 
-## Chapter 7: [CLASSIFIED] — The First Complete Diary Knowledge Graph
+## The Experiment
 
-*Commander's log. Stardate 2026.086. Eyes only.*
+At 0923, they ran it.
 
-What follows is not to leave this ship.
+The briefing room had become a working bridge, Scotty at a secondary terminal, Chekov with his coordinates laid out on the plotting table, Uhura monitoring the readout streams. Kirk had not left the room. Neither had McCoy.
 
-At 0040 hours ship's time, following the clean re-embedding run and the temporal flight analysis, the crew executed the first full build of the DiaryKG knowledge graph on the complete Pepys corpus.
+"Route," Spock said.
 
-Not the benchmark cache. Not the embedding matrix. The *knowledge graph* — the full structural index, ingested through the `DiaryKG.build()` pipeline, every entry transformed, chunked, classified, and indexed into both SQLite and LanceDB simultaneously.
+"Stardate local 1663-10-21," Chekov said, reading from the destination log. "Entry: *'To the King's Theatre, where we sat in the pit.'* Destination: Stardate local 1664-01-23, ninety-four days later. Entry: *'Up, and with Sir W. Batten to the Duke's chamber.'*"
 
-The build completed in under a minute.
+"Ninety-four days," Uhura said. "Eleven hops."
 
-When it finished, the status panel read:
+"Three flight modes," Spock said. "Semantic. Temporal. Mixed." He looked at Scotty.
 
-```
-DiaryKG status  /Users/egs/repos/diary_kg
-  Built       : yes
-  Source file : pepys/pepys_enriched_full.txt
-  Built at    : 2026-03-27T01:21:25 UTC
-  Corpus      : 6,647 .md files  (4.0 MB)
-  SQLite      : 104.1 MB
-  LanceDB     : 100.5 MB
-  Snapshots   : 1
-```
+Scotty's hands were already moving. "The augmented matrix is staged. Seven-six-eight semantic dimensions, one temporal. I've normalized the year coordinate to corpus range." He looked up. "The TurtleND is standing by."
 
-The crew stood at their stations and looked at it.
+"Navigation speed?" Chekov asked.
 
-Nine years of Samuel Pepys — his plague, his Navy, his marriage, his theatre, his ambition, his fear of blindness, his joy at music, his complicated feelings about money — indexed. Queryable. Semantically navigable. In under a minute.
+"Standard," Spock said. "We are testing geometry, not velocity."
 
-"We can *talk* to it," Scotty said. He said it the way you say something when you don't quite believe it yet.
+"Aye." Scotty hit the key. "Semantic flight. Away."
 
-Kirk nodded. "Run a query."
+The display wall filled with the first flight path — hops through semantic space, each node a diary entry, dates annotating the path like longitude marks on a chart. The turtle moved through Pepys's world. Theatre, navy dispatches, a cold walk along the Thames, a late supper with his wife Elizabeth.
 
-```bash
-diarykg query "Great Fire of London"
-```
+"Kendall's tau," Uhura called.
 
-The results came back in milliseconds. Eight entries. Semantic scores above 0.9. The September 1666 entries — Pepys watching the city burn from a boat on the Thames, carrying his wine and Parmesan cheese to safety — surfaced at the top of the list, ranked by a vector space that had learned, from the words themselves, what the Great Fire meant.
+"Monitoring." Spock watched the instrument. "Plus zero point one nine."
 
-"He saved the Parmesan," McCoy said, reading the entry.
+Kirk glanced at him. "Positive. Good?"
 
-"He saved the *diary*," Kirk said.
+"The semantic flight proceeds *roughly* forward in time. Not by design — by the nature of the space itself." He paused. A longer pause than usual. "Consider what that means. We did not ask the manifold to be temporal. We built it from meaning alone — from words, from semantic distance, from what Pepys said about plague and fire and the king's business. We made no reference to dates. And yet it moves through time." He looked at the tau reading. "Because meaning *is* temporal. The concerns of a mind evolve continuously. The plague does not appear before the plague begins. The Fire does not precede the peace. Time is already woven into the geometry of this space. It has been there from the first entry."
 
-"He saved the Parmesan *first*," McCoy said. "It's in the text."
+He turned back to the display.
 
-Kirk almost smiled. "Run another."
+"This is what I was looking at, Captain. At 0040 this morning. This number."
 
-```bash
-diarykg query "who is lord sandwich?"
-```
+"Temporal flight," Scotty said. He was already staging it. "Ready."
 
-Eight results again. The system surfaced a cluster of entries orbiting one of the most consequential figures in Pepys's professional world — Edward Montagu, First Earl of Sandwich, patron and kinsman, Admiral of the Fleet, the man who had carried Pepys into the Navy in the first place. The index had assembled him from fragments: a two-word chunk simply reading *Lord Sandwich*, a report of the King receiving him "mighty kindly," an entry placing his fleet at Alborough Bay.
+"Proceed."
 
-Chekov looked up from his console. "The scores are rendering as zero in the display."
+The second flight path appeared. The same origin. The same destination. But the route—
 
-"A formatting artefact," Spock said. "The retrieval engine is returning semantically coherent results. The vector distances are non-zero. The Rich table renderer is truncating fractional scores below its precision floor. The instrument is correct. The readout needs calibration."
+The route was different.
 
-"So the knowledge graph works," McCoy said. "We just can't see how confident it is."
+The first hop jumped immediately, violently, to a node far from the origin. The date on the node read: *1669-05-09.*
 
-"We can see *what* it found," Spock said. "That is the primary datum."
+McCoy frowned. "That's..."
 
-McCoy looked at the result: *My Lord Sandwich is, it seems, with his fleet at Alborough Bay.* A man, a fleet, a bay. A fragment of history, retrieved in milliseconds from nine years of diary, because the model had learned — without being told — that Lord Sandwich and Samuel Pepys belonged in the same neighbourhood of semantic space.
+"The end of the corpus," Chekov said quietly. "That is the final year of the diary."
 
-"He's in there," McCoy said quietly. "All of them are. Sandwich, the King, Coventry, the whole Navy. Nine years of a man's life, indexed."
+The turtle hung there for three hops. Then began to drift back, inconsistently, through dates that made no narrative sense. 1667. 1664. 1668. It was not flying through time. It was wandering.
 
-He paused.
+"Tau," Uhura said.
 
-"That's not a database," he said. "That's a *memory*."
+"Negative zero point three eight."
+
+The room was silent.
+
+Kirk said it very carefully. "Negative."
+
+"Yes."
+
+"The temporal flight went *backward.*"
+
+"Against time. Yes." Spock's voice was completely level.
+
+"We designed an instrument to navigate *forward* through time," Kirk said. "And it moved *backward.* Against time. On the first hop, it jumped to the *end* of the diary."
+
+"Yes."
+
+"And then it wandered."
+
+"Correct."
+
+"Mr. Spock." Kirk turned to face him fully. "What happened?"
 
 ---
 
-## Epilogue
+## Facing the Wrong Star
 
-> *The U.S.S. WaveRider has completed its first full temporal navigation experiment and its first complete knowledge graph build. The temporal flight instruments revealed not a successful navigation but a navigational bug of unusual clarity — a case where the machine trying to follow time moved against it, and the machine ignoring time followed it most faithfully. The correction is known. The instrument will be recalibrated. The next flight will carry the destination-relative temporal encoding, and Kendall tau will be measured again. The hypothesis: future time, encoded as a pull toward destination rather than a push toward the corpus end, will produce positive tau in all three modes. The knowledge graph is alive. Samuel Pepys is waiting.*
+Spock moved to the display wall and cleared the flight paths. He wrote one word:
+
+**CENTROID**
+
+"The temporal coordinate," he said, "was encoded as an absolute value. The fractional year of each entry — normalized to the corpus timeline." He drew a simple number line. "The corpus spans 1660 through 1669. Early entries have values near zero. Late entries have values near one."
+
+He placed a dot near the right end of the line. "The highest-density region of the corpus is the period 1667 through 1669. Pepys wrote most prolifically in the later years, and the text is more richly interconnected." He drew a cluster around the dot. "The centroid of the temporal coordinate — the average position, the gravitational center — is pulled toward this region. Call it the *temporal center of mass.*"
+
+He looked at them.
+
+"When the TurtleND reaches for the nearest neighbor in the augmented 769-dimensional space, it finds that the temporal dimension is pulling *toward the centroid.* Not toward the destination. Toward the *mean.* The instrument was not navigating forward in time. It was navigating toward the densest region of the corpus."
+
+"Like a compass," McCoy said slowly. "That points toward the biggest magnet. Not north."
+
+Spock turned to look at him. "An apt analogy, Doctor. Yes." He paused. "The instrument was facing the wrong star."
+
+Scotty was already building something at his terminal. "So if we encode time not as an absolute position — but as a *distance from the destination—*"
+
+"The instrument would be attracted toward the target," Spock said. "Not toward the corpus mean. Yes." He wrote on the display wall.
+
+```
+temporal_coord = abs(entry.fractional_year - destination.fractional_year)
+```
+
+"Future time *is* a pull," he said. "It always has been. The tau of plus zero point one nine told us so, if we had been listening carefully enough. The semantic space was already moving forward — drawn by the curvature of a mind that lived in one direction through time. We are not creating a new force. We are aligning the instrument with one that was there from the beginning." He looked at the equation. "The manifold already knows what time is. We only needed to stop pointing the compass at the wrong star."
+
+McCoy stared at the equation for a long moment.
+
+"I've never," he said, "in my entire career, heard a sentence from a physicist that I understood immediately and agreed with completely." He looked at Spock. "Future time is a pull. Not a push."
+
+"Indeed, Doctor."
+
+"That's—" McCoy stopped. Shook his head. "That's actually how it *feels.* The future pulls. You don't push yourself into it."
+
+"Biological organisms frequently develop accurate intuitions about phenomena they have not formally described," Spock said. He said it without inflection. It might have been a compliment.
+
+Kirk looked at the equation. "Can we run it?"
+
+Scotty turned from his terminal. "Not yet. I need to rebuild the augmented embedding matrix with the destination-relative encoding. That's—" He checked something. "—a few hours of pipeline work. The correction is simple. The rebuild is not instantaneous."
+
+"But it will work," Kirk said. It was not quite a question.
+
+"The logic is sound, Captain. And the geometry confirms it." Spock turned from the display wall. "The semantic manifold already carries temporal structure — the positive tau on the unaided semantic flight is not noise. It is evidence. The corpus knows what time is. When we apply the correction, the temporal flight should not merely improve — it should *converge.* The TurtleND will fall forward through time the way a planet falls toward a star. Not pushed. Drawn." He looked at the equation one last time. "We will know when we run it."
+
+Kirk nodded slowly. "Then we run it when it's ready." He turned to Scotty. "Get me that matrix, Scotty."
+
+"Aye, sir." Scotty was already moving.
+
+The room began to decompress — Chekov rolling up his plotting charts, Uhura shutting down the secondary readout streams. McCoy picked up his coffee, which had been cold for an hour.
+
+Spock remained at the display wall.
+
+He had not moved.
 
 ---
 
-## Mission Data Appendix
+## The Calculation
 
-### Temporal Flight Results (Pre-Correction)
+Kirk almost left. He was halfway to the door when something stopped him — some instinct, trained over seven years, that said: *look again.*
 
-| Mode | Hops | Kendall τ | Monotonicity | Mean Δt/hop | Total span |
-|---|---|---|---|---|---|
-| Semantic | 79 | **+0.19** | 54% | 1.56 yr | 2.01 yr |
-| Temporal | 151 | **−0.38** ⚠ | 52% | 0.61 yr | 2.36 yr |
-| Mixed (50/50) | 142 | **−0.15** | 52% | 1.13 yr | 2.78 yr |
+He looked again.
 
-*Route: 1663-10-21 → 1664-01-23 (94-day target). α=1.0, k=10, max_steps=150.*
+Spock was standing completely still, both hands at his sides, looking at the display wall. Not at the temporal equation. At the build log that had been on the wall since the briefing began. The numbers he had reported with such clinical precision at 0800.
 
-### The Bug
+*6,450 entries. 15.8 seconds.*
+
+Kirk walked back in. Sat down. And waited.
+
+Spock spoke without turning.
+
+"The Samuel Pepys corpus," he said, "comprises approximately 1.3 million words. Nine years of continuous diary — the most complete first-person record of seventeenth-century English life in existence. We ingested it. Enriched it semantically. Embedded it. Built a fully queryable knowledge graph." His voice was quiet now, and utterly precise. "Total pipeline time: under three minutes. Total inference calls: zero."
+
+"I know," Kirk said. "It's impressive."
+
+"I queried it this morning at 0212." Spock touched a key. A query interface appeared on the wall. "I typed: *'Great Fire of London.'* I received eight ranked results in milliseconds. All correct. All from September 1666. Semantic relevance scores above 0.9."
+
+Kirk looked at the results. He recognized some of the entries — Pepys watching the fire from a boat on the Thames, throwing his wine and Parmesan cheese into a pit in the garden to save them, watching his city burn while writing, *always writing.*
+
+"And then," Spock said, "I typed: *'Who is Lord Sandwich?'"*
+
+The second query appeared. Eight entries. All correct. All relevant.
+
+"Again, milliseconds. Again, zero inference." Spock was quiet for a moment. "Samuel Pepys wrote these words between 1660 and 1669. They have been sitting in the Bodleian Library for three and a half centuries, navigable only by scholars who had devoted their careers to reading them. Tonight they became searchable in semantic space by anyone who can type a sentence."
+
+Kirk was listening.
+
+"The pipeline," Spock said, "processes 408 entries per second. This is not a laboratory figure. This is what this ship demonstrated tonight, on this hardware." He paused. "At that rate—"
+
+He stopped.
+
+Kirk waited.
+
+"The complete works of Shakespeare," Spock said. "884,421 words, divided into semantic units at our current chunk density: approximately 4,800 entries. Pipeline time: under twelve seconds."
+
+"All right," Kirk said.
+
+"The complete correspondence of Charles Darwin. Approximately 15,000 letters. Thirty-seven seconds."
+
+"Spock—"
+
+"The complete Federalist Papers, the complete Thoreau, the complete Mary Wollstonecraft, the complete Voltaire, the complete Montaigne. Everything digitized by Project Gutenberg — 70,000 texts—"
+
+He stopped again. This time for longer.
+
+"At current throughput," he said, "the entire Project Gutenberg corpus — 70,000 books, the largest free digital library in human history — could be ingested, enriched, embedded, and made fully semantically queryable in..." He calculated. Something in his face changed. "...approximately four hours."
+
+Kirk said nothing.
+
+"On this ship," Spock said. "On this hardware. Without a single API call. Without any external compute. Without — permission — from anyone."
+
+Scotty had stopped in the doorway. He had come back for something — a PADD, a tool, it didn't matter. He was standing in the doorway, listening.
+
+McCoy hadn't left. McCoy had been watching from the corner of the room since Kirk sat back down, because McCoy had known — in the way he always knew — that something was still happening.
+
+"Spock," Kirk said, very quietly.
+
+Spock turned from the display wall.
+
+"Any corpus," Spock said. "Any archive. Any collection of human language ever committed to digital form. We could ingest it. We could navigate it. We could query it." His voice dropped another notch. "Every personal diary ever written. Every letter. Every parliamentary debate. Every ship's log. Every scientific correspondence. Every—"
+
+He stopped.
+
+He put one hand on the back of a chair.
+
+"Every record," he said, "of what it was like to be a human being, at any point in recorded history — semantically navigable. Millisecond retrieval. Zero cost. Zero inference. Zero—"
+
+He stopped again.
+
+And then Spock — Commander Spock, Science Officer of the U.S.S. WaveRider, graduate of the Vulcan Science Academy, a man who had suppressed his emotions through three decades of discipline and dedication and the entire philosophical inheritance of his people — Spock folded.
+
+Not dramatically. Not the way a human folds, with sound and warning. He simply — ceased to be upright. His hand on the chair back tightened, and then he was sitting, not in the chair but beside it, on the floor, and his eyes were closed and his color was wrong and the room went from very quiet to suddenly, absolutely still.
+
+McCoy was there in two steps. He was already reaching for the medical tricorder he carried in his jacket because he was McCoy and he was always ready for Spock to do something like this, or he thought he was, until now.
+
+Kirk was on his other side. "Bones—"
+
+"I've got him." McCoy ran the scan. His face changed. Not fear. Not quite. Something more complicated. "His vitals are stable." He ran it again. "Jim. His neural activity..."
+
+"What?"
+
+McCoy looked at the display wall. The build log. The query results. *Great Fire of London.* Lord Sandwich. The complete corpus, three minutes, zero inference calls.
+
+He looked back at Spock.
+
+"Jim," McCoy said, very quietly. "I think he held it as long as he could."
+
+Kirk looked at him. "What do you mean?"
+
+McCoy sat back on his heels. He was quiet for a moment — the kind of quiet he got when he was feeling something large that medicine didn't have a word for.
+
+"I mean," he said, "that a Vulcan's training is about control. About containing what you feel so it doesn't overwhelm the instrument." He looked at Spock's face — still, now, and pale, with that particular peace that comes only from unconsciousness, from the mind finally releasing the grip. "And I think that whatever he was thinking about when he made that last calculation — whatever he saw in it, really *saw* — it was just... bigger than the container."
+
+Scotty was in the doorway. He hadn't moved. He had one hand on the frame.
+
+Kirk looked at the display wall. The number 769. The equation. The query results.
+
+"He was thinking about what it means," Kirk said.
+
+"Yes," McCoy said.
+
+"And what *does* it mean?"
+
+McCoy looked at him. Then at the wall. Then at Spock.
+
+"That's the question, isn't it," he said. "That's exactly the question."
+
+---
+
+## Mission Data Appendix — Chapter 4
 
 | Parameter | Value |
 |---|---|
-| Bug location | `augment_with_time()` in `pepys_temporal_flight.py` |
-| Root cause | Time encoded as absolute fractional year; attracts toward dense 1667–1669 cluster |
-| Symptom | Temporal flight immediately jumps to 1669 on hop 1; τ = −0.38 |
-| Fix | Encode time as `abs(entry.date − destination.date)` — destination-relative pull |
-| Status | **Correction identified. Implementation pending.** |
-
-### Clean Re-Embedding Run
-
-| Property | Value |
-|---|---|
-| Pipeline | `pepys_embedder.py` (fixed: mpnet model, no nomic prefix) |
-| Source | `pepys/pepys_enriched_full.txt` |
-| Entries embedded | **6,450** |
-| Embedding dim | 768 |
+| Stardate | 2026.097 |
+| Corpus | Samuel Pepys Diary, complete — 1660–1669 |
+| Entries embedded | 6,450 |
+| Embedding model | `all-mpnet-base-v2` |
 | Workers / batch | 4 / 32 |
-| **Embedding time** | **15.8 seconds** |
+| Embedding time | 15.8 seconds |
+| DiaryKG build time | < 60 seconds |
+| SQLite store | 104.1 MB (6,647 entries) |
+| LanceDB index | 100.5 MB |
+| Inference calls | 0 |
+| Semantic flight tau | +0.19 |
+| Mixed flight tau | −0.15 |
+| Temporal flight tau | −0.38 |
+| First temporal hop | 1669-05-09 (corpus end — bug confirmed) |
+| Bug | Absolute time coordinate; attracted to corpus centroid (~1668) |
+| Correction (not yet implemented) | `abs(entry.fractional_year − destination.fractional_year)` |
 | Throughput | 408 entries/second |
-| Previous run | 31 minutes (8,413 chunks, nomic-contaminated) |
+| Manifold dimensionality (augmented) | 769 (768 semantic + 1 temporal) |
+| Status | Temporal correction staged; next flight pending |
 
-### DiaryKG Build — First Complete Corpus [CLASSIFIED]
+---
 
-| Property | Value |
-|---|---|
-| Source | `pepys/pepys_enriched_full.txt` |
-| Built at | 2026-03-27T01:21:25 UTC |
-| Corpus files | **6,647 .md files (4.0 MB)** |
-| SQLite index | **104.1 MB** |
-| LanceDB index | **100.5 MB** |
-| Build time | **< 60 seconds** |
-| Snapshots | 1 (baseline) |
-| Status | **Operational. Queryable.** |
-| First queries | `"Great Fire of London"` → 8 results, top score > 0.9; `"who is lord sandwich?"` → 8 results, all on-target |
-| Known issue | Rich table score display truncates to 0.000 — formatting artefact, retrieval correct |
+*End Chapter 4.*
 
-### Next Mission
+*Next: The correction is applied. The TurtleND flies forward in time. What does the mind of Samuel Pepys look like when you can navigate it by year?*
 
-- Recalibrate temporal flight: implement destination-relative time encoding
-- Re-run all three flight modes; measure corrected Kendall τ
-- Verify ManifoldWalker temporal coherence improves across all modes
-- Hypothesis: semantic τ holds at ~+0.19; temporal τ flips positive
+---
+
+*"Future time is a pull. Not a push."*
+*— Dr. Leonard McCoy, Stardate 2026.097*

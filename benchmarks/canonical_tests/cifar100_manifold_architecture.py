@@ -1,29 +1,49 @@
 #!/usr/bin/env python3
 """
-CIFAR-10 Benchmark: Manifold-Informed Architecture vs Standard Architecture
-===========================================================================
+CIFAR-100 Benchmark: Manifold-Informed Architecture vs Standard Architecture
+=============================================================================
 
-Extends the MNIST manifold-architecture experiment to CIFAR-10:
-3,072-dimensional color images (32x32x3), 60K training samples, 10 classes.
+The hardest step in the manifold series: 3,072-dimensional color images
+(32×32×3), 50K training / 10K test samples, 100 fine-grained classes.
 
-The hypothesis remains: if CIFAR-10 images live on a d-dimensional manifold
-inside 3,072-dimensional pixel space, then an MLP with a bottleneck matching d
-should outperform (or match) a standard architecture while using fewer
-parameters on the noise dimensions.
+Same ambient space as CIFAR-10 but 10× more classes crammed onto the same
+manifold.  The hypothesis is under maximum stress: does a manifold-informed
+bottleneck still hold when 100 classes must be separated in ~35D?
 
-Phase 1: Discover intrinsic dimensionality via local PCA
-Phase 2: Build architectures:
-  - Standard:  3072 → 256 → 128 → 10  (common default for CIFAR MLP)
-  - Manifold:  3072 → 2d → d → 10     (bottleneck = intrinsic dim)
-  - Wide Manifold: 3072 → 4d → 2d → d → 10  (progressive compression)
-Phase 3: Train both with Adam, compare accuracy
+Three phases
+------------
+Phase 1 — Manifold Discovery
+    Local PCA over --discovery-samples random training points (k=--k-pca
+    neighbors each).  Intrinsic dimensionality d is set to the maximum
+    per-class intrinsic dim at τ=--tau (default 0.90), accommodating the
+    hardest class.
+
+Phase 2 — Architecture Comparison
+    Five architectures are built and summarised:
+
+    - Standard (512→256):           input → 512 → 256 → 100
+    - Manifold (2d→d):              input → 2d  → d   → 100
+    - Wide Manifold (4d→2d→d):      input → 4d  → 2d  → d → 100
+    - PCA→dD + MLP (2d→d):          PCA-projected input → 2d → d → 100
+    - Intrinsic Dim (PCA→dD→output): PCA-projected input → d  → 100
+
+    The PCA models receive input already compressed to d dimensions by
+    global sklearn PCA; the remaining models operate in raw pixel space.
+
+Phase 3 — Training and Evaluation
+    All architectures are trained with Adam for --epochs epochs across
+    --trials independent random seeds.  Aggregate results (accuracy, loss,
+    parameter counts, convergence epochs, parameter efficiency) are printed
+    and saved to ``cifar100_architecture_results.json`` alongside a four-panel
+    matplotlib figure (``cifar100_architecture_results.png``).
 
 Part of proteusPy, https://github.com/suchanek/proteusPy
 Author: Eric G. Suchanek, PhD
+Affiliation: Flux-Frontiers
 
 Usage
 -----
-    python benchmarks/cifar10_manifold_architecture.py [--epochs 50] [--trials 5]
+    python benchmarks/canonical_tests/cifar100_manifold_architecture.py [--epochs 50] [--trials 3]
 """
 
 import argparse
@@ -51,8 +71,6 @@ for gpu in gpus:
     except RuntimeError:
         pass
 
-# On macOS with tensorflow-metal, Metal GPUs appear as GPU-type devices.
-# "METAL" does NOT appear in device names — correct detection: darwin + GPU present.
 metal = sys.platform == "darwin" and len(gpus) > 0
 DEVICE_INFO = {
     "tensorflow_version": tf.__version__,
@@ -92,11 +110,7 @@ _mw_spec.loader.exec_module(_mw_mod)
 
 
 def discover_dimensionality(X, n_samples=500, k=50, variance_thresholds=(0.95, 0.90, 0.85)):
-    """Discover intrinsic dimensionality of the data manifold via local PCA.
-
-    For high-dimensional data like CIFAR-10 (3072D), we use the covariance
-    of the k-nearest neighbors rather than the full covariance matrix.
-    """
+    """Discover intrinsic dimensionality of the data manifold via local PCA."""
     n_points, ndim = X.shape
     sample_idx = np.random.choice(n_points, size=min(n_samples, n_points), replace=False)
 
@@ -107,15 +121,11 @@ def discover_dimensionality(X, n_samples=500, k=50, variance_thresholds=(0.95, 0
             print(f"  Local PCA: {i + 1}/{len(sample_idx)}", flush=True)
 
         point = X[idx]
-        # k nearest neighbors
         dists = np.linalg.norm(X - point, axis=1)
         knn_idx = np.argpartition(dists, k)[:k]
         neighbors = X[knn_idx]
 
-        # Local PCA via SVD (more efficient for k << ndim)
         centered = neighbors - neighbors.mean(axis=0)
-        # Use SVD on the data matrix instead of eigendecomposition on the
-        # covariance matrix — this is O(k^2 * ndim) instead of O(ndim^3)
         _, s, _ = np.linalg.svd(centered, full_matrices=False)
         eigenvalues = (s ** 2) / (len(neighbors) - 1)
 
@@ -139,8 +149,12 @@ def discover_dimensionality(X, n_samples=500, k=50, variance_thresholds=(0.95, 0
     return report
 
 
-def discover_per_class_dimensionality(X, y, k=50, tau=0.90, n_samples_per_class=50):
-    """Discover intrinsic dimensionality per class."""
+def discover_per_class_dimensionality(X, y, k=50, tau=0.90, n_samples_per_class=10):
+    """Discover intrinsic dimensionality per class.
+
+    Default n_samples_per_class=10 keeps discovery fast for 100 classes
+    (1,000 total SVDs vs 5,000 for n_samples_per_class=50).
+    """
     classes = sorted(set(y))
     class_dims = {}
 
@@ -178,12 +192,25 @@ def discover_per_class_dimensionality(X, y, k=50, tau=0.90, n_samples_per_class=
 
 
 # ---------------------------------------------------------------------------
-# CIFAR-10 class names
+# CIFAR-100 class names (fine labels)
 # ---------------------------------------------------------------------------
 
-CIFAR10_CLASSES = [
-    "airplane", "automobile", "bird", "cat", "deer",
-    "dog", "frog", "horse", "ship", "truck",
+CIFAR100_CLASSES = [
+    "apple", "aquarium_fish", "baby", "bear", "beaver", "bed", "bee", "beetle",
+    "bicycle", "bottle", "bowl", "boy", "bridge", "bus", "butterfly", "camel",
+    "can", "castle", "caterpillar", "cattle", "chair", "chimpanzee", "clock",
+    "cloud", "cockroach", "couch", "crab", "crocodile", "cup", "dinosaur",
+    "dolphin", "elephant", "flatfish", "forest", "fox", "girl", "hamster",
+    "house", "kangaroo", "keyboard", "lamp", "lawn_mower", "leopard", "lion",
+    "lizard", "lobster", "man", "maple_tree", "motorcycle", "mountain", "mouse",
+    "mushroom", "oak_tree", "orange", "orchid", "otter", "palm_tree", "pear",
+    "pickup_truck", "pine_tree", "plain", "plate", "poppy", "porcupine",
+    "possum", "rabbit", "raccoon", "ray", "road", "rocket", "rose", "sea",
+    "seal", "shark", "shrew", "skunk", "skyscraper", "snail", "snake",
+    "spider", "squirrel", "streetcar", "sunflower", "sweet_pepper", "table",
+    "tank", "telephone", "television", "tiger", "tractor", "train", "trout",
+    "tulip", "turtle", "wardrobe", "whale", "willow_tree", "wolf", "woman",
+    "worm",
 ]
 
 
@@ -193,15 +220,14 @@ CIFAR10_CLASSES = [
 
 
 def build_standard_model(input_dim, n_classes, lr=0.001):
-    """Standard MLP for CIFAR-10: 3072 → 256 → 128 → 10.
+    """Standard MLP for CIFAR-100: 3072 → 512 → 256 → 100.
 
-    Scaled up from MNIST's 128→64 since CIFAR-10 is 4× the dimensionality
-    and significantly more complex (color, texture, shape).
+    Larger than the CIFAR-10 standard (256→128) to handle 100 classes.
     """
     model = keras.Sequential([
         keras.layers.Input(shape=(input_dim,)),
+        keras.layers.Dense(512, activation="relu"),
         keras.layers.Dense(256, activation="relu"),
-        keras.layers.Dense(128, activation="relu"),
         keras.layers.Dense(n_classes, activation="softmax"),
     ])
     model.compile(
@@ -213,10 +239,7 @@ def build_standard_model(input_dim, n_classes, lr=0.001):
 
 
 def build_manifold_model(input_dim, n_classes, intrinsic_dim, lr=0.001):
-    """Manifold-informed architecture: input → 2d → d → output.
-
-    The bottleneck width matches the discovered intrinsic dimensionality.
-    """
+    """Manifold-informed architecture: input → 2d → d → output."""
     d = max(intrinsic_dim, n_classes)
     model = keras.Sequential([
         keras.layers.Input(shape=(input_dim,)),
@@ -233,11 +256,7 @@ def build_manifold_model(input_dim, n_classes, intrinsic_dim, lr=0.001):
 
 
 def build_wide_manifold_model(input_dim, n_classes, intrinsic_dim, lr=0.001):
-    """Wider manifold-informed: input → 4d → 2d → d → output.
-
-    Three hidden layers with progressive compression toward the
-    manifold bottleneck. More capacity for learning the projection.
-    """
+    """Wider manifold-informed: input → 4d → 2d → d → output."""
     d = max(intrinsic_dim, n_classes)
     model = keras.Sequential([
         keras.layers.Input(shape=(input_dim,)),
@@ -255,15 +274,32 @@ def build_wide_manifold_model(input_dim, n_classes, intrinsic_dim, lr=0.001):
 
 
 def build_pca_model(n_classes, intrinsic_dim, lr=0.001):
-    """PCA pre-projected model: d → 2d → d → output.
-
-    Input is already PCA-projected to intrinsic_dim dimensions.
-    """
+    """PCA pre-projected model: d → 2d → d → output."""
     d = max(intrinsic_dim, n_classes)
     model = keras.Sequential([
         keras.layers.Input(shape=(intrinsic_dim,)),
         keras.layers.Dense(2 * d, activation="relu"),
         keras.layers.Dense(d, activation="relu"),
+        keras.layers.Dense(n_classes, activation="softmax"),
+    ])
+    model.compile(
+        optimizer=keras.optimizers.Adam(learning_rate=lr),
+        loss="sparse_categorical_crossentropy",
+        metrics=["accuracy"],
+    )
+    return model
+
+
+def build_pca_intrinsic_dim_model(n_classes, intrinsic_dim, lr=0.001):
+    """PCA pre-projected model: d → d → output.
+
+    Input is already PCA-projected to intrinsic_dim dimensions.
+    The network only needs to learn nonlinear classification in the
+    manifold subspace, not the projection itself.
+    """
+    model = keras.Sequential([
+        keras.layers.Input(shape=(intrinsic_dim,)),
+        keras.layers.Dense(intrinsic_dim, activation="relu"),
         keras.layers.Dense(n_classes, activation="softmax"),
     ])
     model.compile(
@@ -300,11 +336,11 @@ def run_trial(build_fn, X_train, y_train, X_test, y_test, epochs, batch_size, tr
 
     test_loss, test_acc = model.evaluate(X_test, y_test, verbose=0)
 
-    # Convergence epoch (first epoch hitting 40% train accuracy — lower
-    # threshold than MNIST since CIFAR-10 MLPs top out around 55%)
+    # Convergence epoch (first epoch hitting 15% train accuracy —
+    # CIFAR-100 MLPs top out around 25-35%)
     conv_epoch = None
     for i, acc in enumerate(history.history["accuracy"]):
-        if acc >= 0.40:
+        if acc >= 0.15:
             conv_epoch = i
             break
 
@@ -327,7 +363,7 @@ def run_trial(build_fn, X_train, y_train, X_test, y_test, epochs, batch_size, tr
 # ---------------------------------------------------------------------------
 
 
-def plot_results(all_results, intrinsic_dim, save_path):
+def plot_results(all_results, intrinsic_dim, save_path, elapsed=None):
     try:
         import matplotlib
         matplotlib.use("Agg")
@@ -336,17 +372,19 @@ def plot_results(all_results, intrinsic_dim, save_path):
         print("matplotlib not available — skipping plots")
         return
 
-    colors = {
-        "Standard (256→128)": "steelblue",
-        f"Manifold (2d→d, d={intrinsic_dim})": "firebrick",
-        f"Wide Manifold (4d→2d→d, d={intrinsic_dim})": "forestgreen",
-    }
+    palette = [
+        "steelblue", "firebrick", "forestgreen", "darkorange",
+        "mediumpurple", "saddlebrown",
+    ]
+    names = list(all_results.keys())
+    colors = {n: palette[i % len(palette)] for i, n in enumerate(names)}
 
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+    elapsed_str = f"  |  run time: {elapsed:.0f}s" if elapsed is not None else ""
     fig.suptitle(
-        f"CIFAR-10: Manifold-Informed Architecture (d={intrinsic_dim}) vs Standard\n"
-        f"3,072D color images → manifold discovery → architecture",
-        fontsize=14, fontweight="bold",
+        f"CIFAR-100: Manifold-Informed Architecture (d={intrinsic_dim}) vs Standard\n"
+        f"3,072D color images → manifold discovery → architecture  |  100 fine-grained classes{elapsed_str}",
+        fontsize=13, fontweight="bold",
     )
 
     # Validation accuracy curves
@@ -354,14 +392,14 @@ def plot_results(all_results, intrinsic_dim, save_path):
     for name, results in all_results.items():
         accs = np.array([r["val_acc"] for r in results])
         epochs = np.arange(1, accs.shape[1] + 1)
-        color = colors.get(name, "gray")
+        color = colors[name]
         ax.plot(epochs, accs.mean(0), "-", label=name, linewidth=2, color=color)
         ax.fill_between(epochs, accs.mean(0) - accs.std(0),
                         accs.mean(0) + accs.std(0), alpha=0.15, color=color)
     ax.set_xlabel("Epoch")
     ax.set_ylabel("Validation Accuracy")
     ax.set_title("Validation Accuracy")
-    ax.legend(fontsize=8)
+    ax.legend(fontsize=7)
     ax.grid(True, alpha=0.3)
 
     # Training loss curves
@@ -369,33 +407,31 @@ def plot_results(all_results, intrinsic_dim, save_path):
     for name, results in all_results.items():
         losses = np.array([r["train_loss"] for r in results])
         epochs = np.arange(1, losses.shape[1] + 1)
-        color = colors.get(name, "gray")
+        color = colors[name]
         ax.plot(epochs, losses.mean(0), "-", label=name, linewidth=2, color=color)
         ax.fill_between(epochs, losses.mean(0) - losses.std(0),
                         losses.mean(0) + losses.std(0), alpha=0.15, color=color)
     ax.set_xlabel("Epoch")
     ax.set_ylabel("Training Loss")
     ax.set_title("Training Loss")
-    ax.legend(fontsize=8)
+    ax.legend(fontsize=7)
     ax.set_yscale("log")
     ax.grid(True, alpha=0.3)
 
     # Final test accuracy comparison
     ax = axes[1, 0]
-    names = list(all_results.keys())
     means = [np.mean([r["test_acc"] for r in all_results[n]]) for n in names]
     stds = [np.std([r["test_acc"] for r in all_results[n]]) for n in names]
-    bar_colors = [colors.get(n, "gray") for n in names]
+    bar_colors = [colors[n] for n in names]
     short_names = [n.split("(")[0].strip() for n in names]
     bars = ax.bar(short_names, means, yerr=stds, color=bar_colors, alpha=0.8, capsize=5)
     for bar, m in zip(bars, means):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.002,
-                f"{m:.4f}", ha="center", va="bottom", fontweight="bold", fontsize=9)
+                f"{m:.4f}", ha="center", va="bottom", fontweight="bold", fontsize=8)
     ax.set_ylabel("Test Accuracy")
     ax.set_title("Final Test Accuracy")
     ax.grid(True, alpha=0.3, axis="y")
-    # CIFAR-10 MLP accuracy typically 40-55%
-    ax.set_ylim(0.3, 0.65)
+    ax.set_ylim(0.15, 0.45)
 
     # Parameter efficiency
     ax = axes[1, 1]
@@ -403,9 +439,10 @@ def plot_results(all_results, intrinsic_dim, save_path):
     bars = ax.bar(short_names, param_counts, color=bar_colors, alpha=0.8)
     for bar, p, m in zip(bars, param_counts, means):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 50,
-                f"{p:,}\nacc={m:.4f}", ha="center", va="bottom", fontsize=8)
+                f"{p:,}\nacc={m:.4f}", ha="center", va="bottom", fontsize=7)
     ax.set_ylabel("Parameters")
     ax.set_title("Parameter Count (lower is better at same accuracy)")
+    ax.set_yscale("log")
     ax.grid(True, alpha=0.3, axis="y")
 
     plt.tight_layout()
@@ -419,90 +456,12 @@ def plot_results(all_results, intrinsic_dim, save_path):
 # ---------------------------------------------------------------------------
 
 
-def _generate_synthetic_cifar10(
-    n_train=50000, n_test=10000, ambient_dim=3072, intrinsic_dim=35,
-    n_classes=10, seed=42,
-):
-    """Generate synthetic data mimicking CIFAR-10's manifold structure.
-
-    Each class lives on a ~intrinsic_dim-dimensional manifold embedded
-    in ambient_dim-dimensional space via a random linear projection plus
-    nonlinear warping. Classes share some subspace overlap to make
-    classification non-trivial (targeting ~55% MLP accuracy, similar to
-    CIFAR-10 with a flat MLP).
-    """
-    rng = np.random.RandomState(seed)
-
-    # Shared random projection matrix: all classes embed through this,
-    # but each class uses a different subspace + offset
-    rng.randn(ambient_dim, ambient_dim).astype("float32") * 0.01
-
-    X_all, y_all = [], []
-    n_total = n_train + n_test
-    per_class = n_total // n_classes
-
-    # Class centers are close together (not well-separated)
-    centers = rng.randn(n_classes, ambient_dim).astype("float32") * 0.5
-
-    for c in range(n_classes):
-        # Each class gets its own subspace basis, but with partial overlap:
-        # 50% of basis vectors are shared across neighboring classes
-        raw_basis = rng.randn(intrinsic_dim, ambient_dim).astype("float32")
-
-        # Mix in basis vectors from neighboring classes for overlap
-        (c + 1) % n_classes
-        neighbor_basis = rng.randn(intrinsic_dim, ambient_dim).astype("float32")
-        rng_state = rng.get_state()  # save state
-        n_shared = intrinsic_dim // 3
-        raw_basis[:n_shared] = 0.6 * raw_basis[:n_shared] + 0.4 * neighbor_basis[:n_shared]
-        rng.set_state(rng_state)  # restore state
-
-        # Orthonormalize
-        Q, _ = np.linalg.qr(raw_basis.T)
-        basis = Q.T[:intrinsic_dim]  # (intrinsic_dim, ambient_dim)
-
-        # Latent coordinates — class-specific spread and structure
-        spread = 1.5 + rng.rand() * 1.0
-        z = rng.randn(per_class, intrinsic_dim).astype("float32") * spread
-
-        # Multi-scale nonlinear warping for realistic manifold curvature
-        z_warped = (
-            z
-            + 0.5 * np.sin(z * 1.2)
-            + 0.2 * np.cos(z * 2.5 + c)
-            + 0.1 * np.sin(z[:, :1] * z[:, 1:2])  # cross-dimension interaction (broadcast)
-        )
-
-        # Project to ambient space through class-specific basis
-        X_c = z_warped @ basis + centers[c]
-
-        # Substantial ambient noise (makes classification harder)
-        X_c += rng.randn(per_class, ambient_dim).astype("float32") * 0.8
-
-        X_all.append(X_c)
-        y_all.append(np.full(per_class, c, dtype=np.int64))
-
-    X_all = np.concatenate(X_all)
-    y_all = np.concatenate(y_all)
-
-    # Shuffle
-    perm = rng.permutation(len(X_all))
-    X_all, y_all = X_all[perm], y_all[perm]
-
-    return (
-        X_all[:n_train],
-        y_all[:n_train],
-        X_all[n_train:n_train + n_test],
-        y_all[n_train:n_train + n_test],
-    )
-
-
 def main():
     parser = argparse.ArgumentParser(
-        description="CIFAR-10: Manifold-Informed Architecture vs Standard"
+        description="CIFAR-100: Manifold-Informed Architecture vs Standard"
     )
     parser.add_argument("--epochs", type=int, default=50)
-    parser.add_argument("--trials", type=int, default=5)
+    parser.add_argument("--trials", type=int, default=3)
     parser.add_argument("--lr", type=float, default=0.001)
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--tau", type=float, default=0.90,
@@ -511,29 +470,23 @@ def main():
                         help="Points to sample for dimensionality discovery")
     parser.add_argument("--k-pca", type=int, default=50,
                         help="Neighborhood size for local PCA")
+    parser.add_argument("--samples-per-class", type=int, default=10,
+                        help="Samples per class for per-class dimensionality (default 10 for speed)")
     parser.add_argument("--plot", action="store_true", default=True)
     args = parser.parse_args()
+    t_start = time.perf_counter()
 
     # -----------------------------------------------------------------------
     # Load data
     # -----------------------------------------------------------------------
 
-    try:
-        print("\nLoading CIFAR-10...")
-        (X_train, y_train), (X_test, y_test) = keras.datasets.cifar10.load_data()
-        # Flatten: (N, 32, 32, 3) → (N, 3072)
-        X_train = X_train.reshape(-1, 3072).astype("float32")
-        X_test = X_test.reshape(-1, 3072).astype("float32")
-        y_train = y_train.ravel()
-        y_test = y_test.ravel()
-        dataset_label = "CIFAR-10"
-        is_synthetic = False
-    except Exception as e:
-        print(f"\nCIFAR-10 download unavailable ({e.__class__.__name__})")
-        print("Generating synthetic CIFAR-10-like data (3072D, 10 classes, manifold structure)...")
-        X_train, y_train, X_test, y_test = _generate_synthetic_cifar10()
-        dataset_label = "Synthetic CIFAR-10-like"
-        is_synthetic = True
+    print("\nLoading CIFAR-100...")
+    (X_train, y_train), (X_test, y_test) = keras.datasets.cifar100.load_data(label_mode="fine")
+    # Flatten: (N, 32, 32, 3) → (N, 3072)
+    X_train = X_train.reshape(-1, 3072).astype("float32")
+    X_test = X_test.reshape(-1, 3072).astype("float32")
+    y_train = y_train.ravel()
+    y_test = y_test.ravel()
 
     # Normalize
     scaler = StandardScaler()
@@ -543,12 +496,7 @@ def main():
     input_dim = X_train.shape[1]
     n_classes = len(set(y_train))
     print(f"  Train: {X_train.shape}, Test: {X_test.shape}")
-    if is_synthetic:
-        print(f"  Classes: {n_classes}, Input dim: {input_dim}")
-        print(f"  (Synthetic data with ~35D intrinsic manifold embedded in {input_dim}D)")
-    else:
-        print(f"  Classes: {n_classes} ({', '.join(CIFAR10_CLASSES)})")
-        print(f"  Input dim: {input_dim} (32×32×3 color images)")
+    print(f"  Classes: {n_classes}  |  Input dim: {input_dim} (32×32×3 color images)")
 
     # -----------------------------------------------------------------------
     # Phase 1: Discover intrinsic dimensionality
@@ -575,20 +523,22 @@ def main():
         noise_pct = 100 * (1 - r["mean"] / input_dim)
         print(f"{tau:>6.2f} {r['mean']:>8.1f} {r['std']:>6.1f} {r['min']:>5} {r['max']:>5} {noise_pct:>7.1f}%")
 
-    # Use the specified tau for architecture
-    intrinsic_dim = int(round(dim_report[args.tau]["mean"]))
-    print(f"\n>> Using intrinsic dim d = {intrinsic_dim} (τ={args.tau}) for architecture")
-    print(f"   This is {intrinsic_dim}/{input_dim} = {intrinsic_dim / input_dim * 100:.1f}% of ambient dimensions")
-
     # Per-class dimensionality
-    print(f"\nPer-class intrinsic dimensionality (τ={args.tau}):")
+    print(f"\nPer-class intrinsic dimensionality (τ={args.tau}, {args.samples_per_class} samples/class):")
     class_dims = discover_per_class_dimensionality(
-        X_train, y_train, k=args.k_pca, tau=args.tau, n_samples_per_class=50
+        X_train, y_train, k=args.k_pca, tau=args.tau,
+        n_samples_per_class=args.samples_per_class,
     )
     for c in sorted(class_dims.keys()):
         cd = class_dims[c]
-        label = CIFAR10_CLASSES[c] if c < len(CIFAR10_CLASSES) else str(c)
-        print(f"  {label:>12}: d = {cd['mean']:.1f} ± {cd['std']:.1f}  [{cd['min']}, {cd['max']}]")
+        label = CIFAR100_CLASSES[c] if c < len(CIFAR100_CLASSES) else str(c)
+        print(f"  {label:>20}: d = {cd['mean']:.1f} ± {cd['std']:.1f}  [{cd['min']}, {cd['max']}]")
+
+    # Use max of per-class maxima as the bottleneck — accommodates the hardest sample
+    global_dim = int(round(dim_report[args.tau]["mean"]))
+    intrinsic_dim = max(cd["max"] for cd in class_dims.values())
+    print(f"\n>> Global intrinsic dim (mean): {global_dim}  |  Max per-class max: {intrinsic_dim}")
+    print(f"   Using d = {intrinsic_dim} (τ={args.tau})  =  {intrinsic_dim / input_dim * 100:.1f}% of ambient dimensions")
 
     # -----------------------------------------------------------------------
     # Phase 2: Build architectures
@@ -600,14 +550,41 @@ def main():
 
     d = intrinsic_dim
 
+    # PCA projection (needed for intrinsic-dim and PCA models)
+    from sklearn.decomposition import PCA as skPCA
+
+    pca = skPCA(n_components=d)
+    X_train_pca = pca.fit_transform(X_train).astype("float32")
+    X_test_pca = pca.transform(X_test).astype("float32")
+    var_explained = pca.explained_variance_ratio_.sum()
+    print(f"  PCA to {d}D captures {var_explained * 100:.1f}% of global variance")
+
+    # Each entry: (build_fn, X_tr, X_te) — raw or PCA-projected as appropriate
     architectures = {
-        "Standard (256→128)": lambda: build_standard_model(input_dim, n_classes, lr=args.lr),
-        f"Manifold (2d→d, d={d})": lambda: build_manifold_model(input_dim, n_classes, d, lr=args.lr),
-        f"Wide Manifold (4d→2d→d, d={d})": lambda: build_wide_manifold_model(input_dim, n_classes, d, lr=args.lr),
+        "Standard (512→256)": (
+            lambda: build_standard_model(input_dim, n_classes, lr=args.lr),
+            X_train, X_test,
+        ),
+        f"Wide Manifold (4d→2d→d, d={d})": (
+            lambda: build_wide_manifold_model(input_dim, n_classes, d, lr=args.lr),
+            X_train, X_test,
+        ),
+        f"Manifold (2d→d, d={d})": (
+            lambda: build_manifold_model(input_dim, n_classes, d, lr=args.lr),
+            X_train, X_test,
+        ),
+        f"PCA→{d}D + MLP (2d→d)": (
+            lambda: build_pca_model(n_classes, d, lr=args.lr),
+            X_train_pca, X_test_pca,
+        ),
+        f"Intrinsic Dim (PCA→{d}D→output)": (
+            lambda: build_pca_intrinsic_dim_model(n_classes, d, lr=args.lr),
+            X_train_pca, X_test_pca,
+        ),
     }
 
     # Show architecture details
-    for name, build_fn in architectures.items():
+    for name, (build_fn, _, _) in architectures.items():
         model = build_fn()
         n_params = count_params(model)
         print(f"\n{name}:")
@@ -626,7 +603,7 @@ def main():
 
     all_results = {}
 
-    for name, build_fn in architectures.items():
+    for name, (build_fn, X_tr, X_te) in architectures.items():
         print(f"\n{name}")
         trial_results = []
 
@@ -635,7 +612,7 @@ def main():
             tf.random.set_seed(trial * 42)
 
             result = run_trial(
-                build_fn, X_train, y_train, X_test, y_test,
+                build_fn, X_tr, y_train, X_te, y_test,
                 epochs=args.epochs, batch_size=args.batch_size, trial=trial,
             )
 
@@ -650,59 +627,14 @@ def main():
         all_results[name] = trial_results
 
     # -----------------------------------------------------------------------
-    # Phase 3b: PCA pre-projection experiment
-    # -----------------------------------------------------------------------
-
-    print("\n" + "=" * 70)
-    print("PHASE 3b: PCA PRE-PROJECTION (manifold discovery → dimensionality reduction → train)")
-    print("=" * 70)
-
-    from sklearn.decomposition import PCA as skPCA
-
-    pca = skPCA(n_components=d)
-    X_train_pca = pca.fit_transform(X_train).astype("float32")
-    X_test_pca = pca.transform(X_test).astype("float32")
-    var_explained = pca.explained_variance_ratio_.sum()
-    print(f"  PCA to {d}D captures {var_explained * 100:.1f}% of global variance")
-
-    pca_name = f"PCA→{d}D + MLP (2d→d)"
-    def pca_build_fn():
-        return build_pca_model(n_classes, d, lr=args.lr)
-
-    model = pca_build_fn()
-    pca_params = count_params(model)
-    print(f"  {pca_name}: {pca_params:,} parameters")
-    print()
-
-    pca_results = []
-    for trial in range(args.trials):
-        np.random.seed(trial * 42)
-        tf.random.set_seed(trial * 42)
-
-        result = run_trial(
-            pca_build_fn, X_train_pca, y_train, X_test_pca, y_test,
-            epochs=args.epochs, batch_size=args.batch_size, trial=trial,
-        )
-
-        conv_str = f"conv@{result['convergence_epoch']}" if result["convergence_epoch"] is not None else "no conv"
-        print(f"  Trial {trial + 1}/{args.trials}: "
-              f"acc={result['test_acc']:.4f}  "
-              f"loss={result['test_loss']:.4f}  "
-              f"{conv_str}  "
-              f"time={result['wall_time']:.1f}s")
-        pca_results.append(result)
-
-    all_results[pca_name] = pca_results
-
-    # -----------------------------------------------------------------------
     # Summary
     # -----------------------------------------------------------------------
 
     print("\n" + "=" * 70)
     print("RESULTS SUMMARY")
     print("=" * 70)
-    print(f"Dataset: {dataset_label} ({input_dim}D, {n_classes} classes)")
-    print(f"Intrinsic dimensionality: d = {intrinsic_dim} (τ={args.tau})")
+    print(f"Dataset: CIFAR-100 ({input_dim}D, {n_classes} fine-grained classes)")
+    print(f"Intrinsic dimensionality: d = {intrinsic_dim} (global mean: {global_dim}, τ={args.tau})")
     print(f"Noise dimensions: {100 * (1 - intrinsic_dim / input_dim):.1f}%")
     print(f"Epochs: {args.epochs}, Trials: {args.trials}")
     print(f"Device: {DEVICE_INFO['device_used']}")
@@ -733,7 +665,7 @@ def main():
         print(row)
 
     # Convergence
-    row = f"{'Epochs to 40%':<25}"
+    row = f"{'Epochs to 15%':<25}"
     for name, results in all_results.items():
         convs = [r["convergence_epoch"] for r in results if r["convergence_epoch"] is not None]
         if convs:
@@ -755,7 +687,7 @@ def main():
     print("-" * 70)
     best_name = max(all_results, key=lambda n: np.mean([r["test_acc"] for r in all_results[n]]))
     best_acc = np.mean([r["test_acc"] for r in all_results[best_name]])
-    std_name = "Standard (256→128)"
+    std_name = "Standard (512→256)"
     std_acc = np.mean([r["test_acc"] for r in all_results[std_name]])
 
     if best_name != std_name:
@@ -763,7 +695,6 @@ def main():
         print(f">> MANIFOLD-INFORMED WINS: {best_name}")
         print(f"   {best_acc:.4f} vs {std_acc:.4f} (standard)")
         print(f"   Delta: +{delta:.4f} ({delta * 100:.2f}%)")
-
         best_params = all_results[best_name][0]["n_params"]
         std_params = all_results[std_name][0]["n_params"]
         if best_params < std_params:
@@ -783,10 +714,11 @@ def main():
 
     save_data = {
         "device": DEVICE_INFO,
-        "dataset": "cifar10" if not is_synthetic else "synthetic_cifar10",
+        "dataset": "cifar100",
         "input_dim": input_dim,
         "n_classes": n_classes,
-        "class_names": CIFAR10_CLASSES,
+        "class_names": CIFAR100_CLASSES,
+        "global_dim": global_dim,
         "intrinsic_dim": intrinsic_dim,
         "tau": args.tau,
         "epochs": args.epochs,
@@ -797,7 +729,7 @@ def main():
         "per_class_dims": {
             str(k): {
                 **v,
-                "class_name": CIFAR10_CLASSES[k] if k < len(CIFAR10_CLASSES) else str(k),
+                "class_name": CIFAR100_CLASSES[k] if k < len(CIFAR100_CLASSES) else str(k),
             }
             for k, v in class_dims.items()
         },
@@ -806,14 +738,14 @@ def main():
         },
     }
 
-    results_path = "benchmarks/cifar10_architecture_results.json"
+    results_path = Path(__file__).resolve().parent / "cifar100_architecture_results.json"
     with open(results_path, "w") as f:
         json.dump(save_data, f, indent=2)
     print(f"\nResults saved to {results_path}")
 
     if args.plot:
-        plot_path = "benchmarks/cifar10_architecture_results.png"
-        plot_results(all_results, intrinsic_dim, plot_path)
+        plot_path = str(Path(__file__).resolve().parent / "cifar100_architecture_results.png")
+        plot_results(all_results, intrinsic_dim, plot_path, elapsed=time.perf_counter() - t_start)
 
 
 if __name__ == "__main__":

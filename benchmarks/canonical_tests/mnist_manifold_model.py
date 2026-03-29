@@ -3,8 +3,8 @@
 MNIST Benchmark: ManifoldModel — The Ultimate Test on Real Data
 ===============================================================
 
-The ManifoldModel on MNIST: can pure geometry — zero learned parameters —
-classify 784-dimensional handwritten digit images?
+Tests ManifoldModel — zero learned parameters, pure geometry — against
+Euclidean KNN on the MNIST handwritten-digit dataset.
 
 MNIST provides the ideal proving ground:
   - 784 ambient dimensions (28×28 pixels)
@@ -12,17 +12,32 @@ MNIST provides the ideal proving ground:
   - 60,000 training / 10,000 test images
   - 10 digit classes with varying geometric complexity
 
-We compare:
-  - ManifoldModel (zero params, pure geometry)
-  - Euclidean KNN (zero params, brute-force distance)
-  - Both on the same subsample (apples-to-apples)
+Because ManifoldModel's O(n²·d) graph construction is prohibitive at full
+scale, training data is stratified-subsampled (--n-train, default 5,000).
+Test evaluation uses a separate stratified subsample (--n-test, default 2,000).
+
+Three comparisons (apples-to-apples on the same subsamples)
+------------------------------------------------------------
+  ManifoldModel (zero params):
+    fit()     — discovers local geometry via local PCA (--k-pca=50),
+                builds a k-NN graph (--k-graph=15) with manifold-weighted
+                edges (--manifold-weight=0.8)
+    predict() — classifies via graph-walk + manifold-projected voting
+                (--k-vote=7), at variance threshold --tau (default 0.90)
+  Euclidean KNN (subsampled):   sklearn KNN on the same n_train samples
+  Euclidean KNN (full train):   sklearn KNN on all 60K training images
+                                (upper-bound reference)
+
+Results (including per-class accuracy and geometry statistics) are saved to
+``benchmarks/mnist_manifold_model_results.json``.
 
 Part of proteusPy, https://github.com/suchanek/proteusPy
 Author: Eric G. Suchanek, PhD
+Affiliation: Flux-Frontiers
 
 Usage
 -----
-    python benchmarks/mnist_manifold_model.py [--n-train 5000] [--tau 0.90]
+    python benchmarks/canonical_tests/mnist_manifold_model.py [--n-train 5000] [--tau 0.90]
 """
 
 import argparse

@@ -4,26 +4,47 @@ CIFAR-10 Benchmark: Manifold-Informed Architecture vs Standard Architecture
 ===========================================================================
 
 Extends the MNIST manifold-architecture experiment to CIFAR-10:
-3,072-dimensional color images (32x32x3), 60K training samples, 10 classes.
+3,072-dimensional color images (32×32×3), 50K training / 10K test samples,
+10 classes.
 
-The hypothesis remains: if CIFAR-10 images live on a d-dimensional manifold
-inside 3,072-dimensional pixel space, then an MLP with a bottleneck matching d
-should outperform (or match) a standard architecture while using fewer
-parameters on the noise dimensions.
+The hypothesis: if CIFAR-10 images live on a d-dimensional manifold inside
+3,072-dimensional pixel space, then an MLP whose bottleneck matches d should
+achieve comparable accuracy to a standard over-parameterised architecture
+while using fewer parameters on the noise dimensions.
 
-Phase 1: Discover intrinsic dimensionality via local PCA
-Phase 2: Build architectures:
-  - Standard:  3072 → 256 → 128 → 10  (common default for CIFAR MLP)
-  - Manifold:  3072 → 2d → d → 10     (bottleneck = intrinsic dim)
-  - Wide Manifold: 3072 → 4d → 2d → d → 10  (progressive compression)
-Phase 3: Train both with Adam, compare accuracy
+Three phases
+------------
+Phase 1 — Manifold Discovery
+    Local PCA over --discovery-samples random training points (k=--k-pca
+    neighbors each).  Intrinsic dimensionality d is set to the maximum
+    per-class intrinsic dim at τ=--tau (default 0.90), accommodating the
+    hardest class.
+
+Phase 2 — Architecture Comparison
+    Five architectures are built and summarised:
+
+    - Standard (256→128):           input → 256 → 128 → 10
+    - Manifold (2d→d):              input → 2d  → d   → 10
+    - Wide Manifold (4d→2d→d):      input → 4d  → 2d  → d → 10
+    - PCA→dD + MLP (2d→d):          PCA-projected input → 2d → d → 10
+    - Intrinsic Dim (PCA→dD→output): PCA-projected input → d  → 10
+
+    The PCA models receive input already compressed to d dimensions by
+    global sklearn PCA; the remaining models operate in raw pixel space.
+
+Phase 3 — Training and Evaluation
+    All architectures are trained with Adam for --epochs epochs across
+    --trials independent random seeds.  Aggregate results are printed and
+    saved to ``cifar10_architecture_results.json`` alongside a four-panel
+    matplotlib figure (``cifar10_architecture_results.png``).
 
 Part of proteusPy, https://github.com/suchanek/proteusPy
 Author: Eric G. Suchanek, PhD
+Affiliation: Flux-Frontiers
 
 Usage
 -----
-    python benchmarks/cifar10_manifold_architecture.py [--epochs 50] [--trials 5]
+    python benchmarks/canonical_tests/cifar10_manifold_architecture.py [--epochs 50] [--trials 5]
 """
 
 import argparse
@@ -274,6 +295,26 @@ def build_pca_model(n_classes, intrinsic_dim, lr=0.001):
     return model
 
 
+def build_pca_intrinsic_dim_model(n_classes, intrinsic_dim, lr=0.001):
+    """PCA pre-projected model: d → d → output.
+
+    Input is already PCA-projected to intrinsic_dim dimensions.
+    The network only needs to learn the nonlinear classification
+    in the manifold subspace, not the projection itself.
+    """
+    model = keras.Sequential([
+        keras.layers.Input(shape=(intrinsic_dim,)),
+        keras.layers.Dense(intrinsic_dim, activation="relu"),
+        keras.layers.Dense(n_classes, activation="softmax"),
+    ])
+    model.compile(
+        optimizer=keras.optimizers.Adam(learning_rate=lr),
+        loss="sparse_categorical_crossentropy",
+        metrics=["accuracy"],
+    )
+    return model
+
+
 def count_params(model):
     return sum(int(np.prod(w.shape)) for w in model.trainable_weights)
 
@@ -327,7 +368,7 @@ def run_trial(build_fn, X_train, y_train, X_test, y_test, epochs, batch_size, tr
 # ---------------------------------------------------------------------------
 
 
-def plot_results(all_results, intrinsic_dim, save_path):
+def plot_results(all_results, intrinsic_dim, save_path, elapsed=None):
     try:
         import matplotlib
         matplotlib.use("Agg")
@@ -343,9 +384,10 @@ def plot_results(all_results, intrinsic_dim, save_path):
     }
 
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+    elapsed_str = f"  |  run time: {elapsed:.0f}s" if elapsed is not None else ""
     fig.suptitle(
         f"CIFAR-10: Manifold-Informed Architecture (d={intrinsic_dim}) vs Standard\n"
-        f"3,072D color images → manifold discovery → architecture",
+        f"3,072D color images → manifold discovery → architecture{elapsed_str}",
         fontsize=14, fontweight="bold",
     )
 
@@ -406,6 +448,7 @@ def plot_results(all_results, intrinsic_dim, save_path):
                 f"{p:,}\nacc={m:.4f}", ha="center", va="bottom", fontsize=8)
     ax.set_ylabel("Parameters")
     ax.set_title("Parameter Count (lower is better at same accuracy)")
+    ax.set_yscale("log")
     ax.grid(True, alpha=0.3, axis="y")
 
     plt.tight_layout()
@@ -513,6 +556,7 @@ def main():
                         help="Neighborhood size for local PCA")
     parser.add_argument("--plot", action="store_true", default=True)
     args = parser.parse_args()
+    t_start = time.perf_counter()
 
     # -----------------------------------------------------------------------
     # Load data
@@ -575,11 +619,6 @@ def main():
         noise_pct = 100 * (1 - r["mean"] / input_dim)
         print(f"{tau:>6.2f} {r['mean']:>8.1f} {r['std']:>6.1f} {r['min']:>5} {r['max']:>5} {noise_pct:>7.1f}%")
 
-    # Use the specified tau for architecture
-    intrinsic_dim = int(round(dim_report[args.tau]["mean"]))
-    print(f"\n>> Using intrinsic dim d = {intrinsic_dim} (τ={args.tau}) for architecture")
-    print(f"   This is {intrinsic_dim}/{input_dim} = {intrinsic_dim / input_dim * 100:.1f}% of ambient dimensions")
-
     # Per-class dimensionality
     print(f"\nPer-class intrinsic dimensionality (τ={args.tau}):")
     class_dims = discover_per_class_dimensionality(
@@ -589,6 +628,12 @@ def main():
         cd = class_dims[c]
         label = CIFAR10_CLASSES[c] if c < len(CIFAR10_CLASSES) else str(c)
         print(f"  {label:>12}: d = {cd['mean']:.1f} ± {cd['std']:.1f}  [{cd['min']}, {cd['max']}]")
+
+    # Use max of per-class maxima as the bottleneck — accommodates the hardest sample
+    global_dim = int(round(dim_report[args.tau]["mean"]))
+    intrinsic_dim = max(cd["max"] for cd in class_dims.values())
+    print(f"\n>> Global intrinsic dim (mean): {global_dim}  |  Max per-class max: {intrinsic_dim}")
+    print(f"   Using d = {intrinsic_dim} (τ={args.tau})  =  {intrinsic_dim / input_dim * 100:.1f}% of ambient dimensions")
 
     # -----------------------------------------------------------------------
     # Phase 2: Build architectures
@@ -600,14 +645,41 @@ def main():
 
     d = intrinsic_dim
 
+    # PCA projection (needed for intrinsic-dim and PCA models)
+    from sklearn.decomposition import PCA as skPCA
+
+    pca = skPCA(n_components=d)
+    X_train_pca = pca.fit_transform(X_train).astype("float32")
+    X_test_pca = pca.transform(X_test).astype("float32")
+    var_explained = pca.explained_variance_ratio_.sum()
+    print(f"  PCA to {d}D captures {var_explained * 100:.1f}% of global variance")
+
+    # Each entry: (build_fn, X_tr, X_te) — raw or PCA-projected as appropriate
     architectures = {
-        "Standard (256→128)": lambda: build_standard_model(input_dim, n_classes, lr=args.lr),
-        f"Manifold (2d→d, d={d})": lambda: build_manifold_model(input_dim, n_classes, d, lr=args.lr),
-        f"Wide Manifold (4d→2d→d, d={d})": lambda: build_wide_manifold_model(input_dim, n_classes, d, lr=args.lr),
+        "Standard (256→128)": (
+            lambda: build_standard_model(input_dim, n_classes, lr=args.lr),
+            X_train, X_test,
+        ),
+        f"Wide Manifold (4d→2d→d, d={d})": (
+            lambda: build_wide_manifold_model(input_dim, n_classes, d, lr=args.lr),
+            X_train, X_test,
+        ),
+        f"Manifold (2d→d, d={d})": (
+            lambda: build_manifold_model(input_dim, n_classes, d, lr=args.lr),
+            X_train, X_test,
+        ),
+        f"PCA→{d}D + MLP (2d→d)": (
+            lambda: build_pca_model(n_classes, d, lr=args.lr),
+            X_train_pca, X_test_pca,
+        ),
+        f"Intrinsic Dim (PCA→{d}D→output)": (
+            lambda: build_pca_intrinsic_dim_model(n_classes, d, lr=args.lr),
+            X_train_pca, X_test_pca,
+        ),
     }
 
     # Show architecture details
-    for name, build_fn in architectures.items():
+    for name, (build_fn, _, _) in architectures.items():
         model = build_fn()
         n_params = count_params(model)
         print(f"\n{name}:")
@@ -626,7 +698,7 @@ def main():
 
     all_results = {}
 
-    for name, build_fn in architectures.items():
+    for name, (build_fn, X_tr, X_te) in architectures.items():
         print(f"\n{name}")
         trial_results = []
 
@@ -635,7 +707,7 @@ def main():
             tf.random.set_seed(trial * 42)
 
             result = run_trial(
-                build_fn, X_train, y_train, X_test, y_test,
+                build_fn, X_tr, y_train, X_te, y_test,
                 epochs=args.epochs, batch_size=args.batch_size, trial=trial,
             )
 
@@ -648,51 +720,6 @@ def main():
             trial_results.append(result)
 
         all_results[name] = trial_results
-
-    # -----------------------------------------------------------------------
-    # Phase 3b: PCA pre-projection experiment
-    # -----------------------------------------------------------------------
-
-    print("\n" + "=" * 70)
-    print("PHASE 3b: PCA PRE-PROJECTION (manifold discovery → dimensionality reduction → train)")
-    print("=" * 70)
-
-    from sklearn.decomposition import PCA as skPCA
-
-    pca = skPCA(n_components=d)
-    X_train_pca = pca.fit_transform(X_train).astype("float32")
-    X_test_pca = pca.transform(X_test).astype("float32")
-    var_explained = pca.explained_variance_ratio_.sum()
-    print(f"  PCA to {d}D captures {var_explained * 100:.1f}% of global variance")
-
-    pca_name = f"PCA→{d}D + MLP (2d→d)"
-    def pca_build_fn():
-        return build_pca_model(n_classes, d, lr=args.lr)
-
-    model = pca_build_fn()
-    pca_params = count_params(model)
-    print(f"  {pca_name}: {pca_params:,} parameters")
-    print()
-
-    pca_results = []
-    for trial in range(args.trials):
-        np.random.seed(trial * 42)
-        tf.random.set_seed(trial * 42)
-
-        result = run_trial(
-            pca_build_fn, X_train_pca, y_train, X_test_pca, y_test,
-            epochs=args.epochs, batch_size=args.batch_size, trial=trial,
-        )
-
-        conv_str = f"conv@{result['convergence_epoch']}" if result["convergence_epoch"] is not None else "no conv"
-        print(f"  Trial {trial + 1}/{args.trials}: "
-              f"acc={result['test_acc']:.4f}  "
-              f"loss={result['test_loss']:.4f}  "
-              f"{conv_str}  "
-              f"time={result['wall_time']:.1f}s")
-        pca_results.append(result)
-
-    all_results[pca_name] = pca_results
 
     # -----------------------------------------------------------------------
     # Summary
@@ -806,14 +833,14 @@ def main():
         },
     }
 
-    results_path = "benchmarks/cifar10_architecture_results.json"
+    results_path = Path(__file__).resolve().parent / "cifar10_architecture_results.json"
     with open(results_path, "w") as f:
         json.dump(save_data, f, indent=2)
     print(f"\nResults saved to {results_path}")
 
     if args.plot:
-        plot_path = "benchmarks/cifar10_architecture_results.png"
-        plot_results(all_results, intrinsic_dim, plot_path)
+        plot_path = str(Path(__file__).resolve().parent / "cifar10_architecture_results.png")
+        plot_results(all_results, intrinsic_dim, plot_path, elapsed=time.perf_counter() - t_start)
 
 
 if __name__ == "__main__":

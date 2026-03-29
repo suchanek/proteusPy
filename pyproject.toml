@@ -85,7 +85,8 @@ markdown         = { version = ">=3.6", optional = true }
 trame-vtk        = { version = ">=2.0.0", optional = true }
 doc-kg           = { git = "https://github.com/Flux-Frontiers/doc_kg.git", optional = true }
 code-kg          = { git = "https://github.com/Flux-Frontiers/code_kg.git", optional = true }
-ftree-kg         = { path = "../FTreeKG", develop = true, optional = true }
+ftree-kg          = { git = "https://github.com/Flux-Frontiers/ftree_kg.git", optional = true }
+#ftree-kg         = { path = "../ftreekg", develop = true, optional = true }
 
 [tool.poetry.group.ml.dependencies]
 tensorflow       = "2.16.2"

@@ -1,0 +1,83 @@
+{
+  "corpus": "/Users/egs/repos/diary_kg/benchmarks/pepys_mpnet_embeddings.json",
+  "N": 7282,
+  "D": 768,
+  "alpha": 1.0,
+  "k": 10,
+  "encoding": "destination_relative_signed",
+  "origin_idx": 2884,
+  "dest_idx": 3109,
+  "origin_date": "1663-10-21T07:00:00",
+  "dest_date": "1664-01-23T12:00:00",
+  "span_days": 94,
+  "path_length": 8,
+  "reached_destination": true,
+  "final_kendall_tau": 0.2143,
+  "monotonicity": 0.5714,
+  "hops": [
+    {
+      "hop": 0,
+      "idx": 2884,
+      "date": "1663-10-21",
+      "text": "pepys weather | General | To begin to keep myself as warm as I can.",
+      "fyear": 1663.803,
+      "running_tau": null
+    },
+    {
+      "hop": 1,
+      "idx": 4822,
+      "date": "1666-02-28",
+      "text": "pepys weather | Office | The weather for three or four days being come to be exceeding cold again as any time this year.",
+      "fyear": 1666.159,
+      "running_tau": null
+    },
+    {
+      "hop": 2,
+      "idx": 5599,
+      "date": "1666-12-29",
+      "text": "pepys weather | Office | Up, called up with news from Sir W. Batten that Hogg3149 hath brought in two prizes more: and s",
+      "fyear": 1666.9925,
+      "running_tau": 1.0
+    },
+    {
+      "hop": 3,
+      "idx": 5448,
+      "date": "1666-10-28",
+      "text": "pepys weather | Emotion | He commends Smith, and cries out of Holmes for an idle, proud, conceited, though stout fellow.",
+      "fyear": 1666.8227,
+      "running_tau": 0.6667
+    },
+    {
+      "hop": 4,
+      "idx": 5992,
+      "date": "1667-06-10",
+      "text": "pepys naval | Emotion | Here I was with much ado fain to press two watermen to make me a galley, and so to Woolwich to g",
+      "fyear": 1667.439,
+      "running_tau": 0.8
+    },
+    {
+      "hop": 5,
+      "idx": 5203,
+      "date": "1666-07-27",
+      "text": "pepys court | Social | But says that two or three of our great ships were in danger of being fired by our own fire-ships",
+      "fyear": 1666.5676,
+      "running_tau": 0.4667
+    },
+    {
+      "hop": 6,
+      "idx": 5609,
+      "date": "1667-01-02",
+      "text": "pepys court | Office | Up, and with Sir J. Minnes by coach to Whitehall, and there attended the King and the Duke of Yor",
+      "fyear": 1667.0041,
+      "running_tau": 0.5238
+    },
+    {
+      "hop": 7,
+      "idx": 3109,
+      "date": "1664-01-23",
+      "text": "pepys court | General | Up, and with Sir W. Batten and Sir W. Penn to Whitehall; but there finding the Duke gone to his ",
+      "fyear": 1664.0616,
+      "running_tau": 0.2143
+    }
+  ]
+}

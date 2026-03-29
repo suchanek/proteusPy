@@ -1,27 +1,63 @@
 #!/usr/bin/env python3
 """
-MNIST Benchmark: Manifold-Informed Architecture vs Standard Architecture
-========================================================================
+Manifold-Informed Architecture Benchmark: MNIST and sklearn Digits
+===================================================================
 
-The hypothesis: if the data lives on a d-dimensional manifold inside
-784-dimensional pixel space, then an MLP with a bottleneck matching d
-should outperform a standard architecture that wastes capacity on
-noise dimensions.
+Tests the hypothesis that MLP architectures whose bottleneck width
+is set to the data's intrinsic dimensionality (d) outperform standard
+fixed-width architectures — achieving comparable or higher accuracy
+with fewer parameters.
 
-Phase 1: Discover intrinsic dimensionality via local PCA
-Phase 2: Build two architectures:
-  - Standard:  784 → 128 → 64 → 10  (arbitrary, common default)
-  - Manifold:  784 → 2d → d → 10    (bottleneck = intrinsic dim)
-Phase 3: Train both with Adam, compare accuracy
+Supports two datasets via ``--dataset {mnist,digits}``:
+  - MNIST:  70 000 28×28 grayscale digit images (784-dimensional input)
+  - Digits: sklearn's 8×8 toy digit dataset (64-dimensional input)
 
-The manifold tells us the architecture. Adam does the rest.
+Three phases
+------------
+Phase 1 — Manifold Discovery
+    Estimates intrinsic dimensionality via local PCA: for each of
+    ``--discovery-samples`` randomly drawn points, the k-nearest
+    neighbors (``--k-pca``) are gathered and a local covariance matrix
+    is built. The number of eigenvalues needed to explain fraction τ
+    (``--tau``) of local variance gives the local intrinsic dimension.
+    Both global statistics and per-class statistics are reported.
+    The bottleneck d is set to the maximum per-class intrinsic dim,
+    ensuring the hardest digit manifold is fully accommodated.
+
+Phase 2 — Architecture Comparison
+    Five architectures are built and summarised:
+
+    - Standard (128→64):            input → 128 → 64 → n_classes
+    - Manifold (2d→d):              input → 2d  → d  → n_classes
+    - Wide Manifold (4d→2d→d):      input → 4d  → 2d → d → n_classes
+    - PCA→dD + MLP (2d→d):          PCA-projected input → 2d → d → n_classes
+    - Intrinsic Dim (PCA→dD→output): PCA-projected input → d → n_classes
+
+    The PCA models receive input already compressed to d dimensions by
+    global sklearn PCA; the remaining models operate in raw pixel space.
+
+Phase 3 — Training and Evaluation
+    All architectures are trained with Adam for ``--epochs`` epochs
+    across ``--trials`` independent random seeds.  Per-trial metrics
+    include test accuracy, test loss, wall time, and the epoch at which
+    95 % training accuracy was first reached.  Aggregate results are
+    printed in a comparative table and saved to JSON alongside a
+    four-panel matplotlib figure (validation accuracy curves, training
+    loss curves, final test accuracy bar chart, parameter count chart).
+
+Results are written next to the script as
+``{mnist,digits}_architecture_results.{json,png}``.
 
 Part of proteusPy, https://github.com/suchanek/proteusPy
 Author: Eric G. Suchanek, PhD
+Affiliation: Flux-Frontiers
+Last Revision: 2026-03-28
 
 Usage
 -----
-    python benchmarks/mnist_manifold_architecture.py [--epochs 30] [--trials 5]
+    python benchmarks/canonical_tests/mnist_manifold_architecture.py
+    python benchmarks/canonical_tests/mnist_manifold_architecture.py --dataset digits
+    python benchmarks/canonical_tests/mnist_manifold_architecture.py --epochs 30 --trials 5 --tau 0.90
 """
 
 import argparse
@@ -29,6 +65,7 @@ import json
 import os
 import sys
 import time
+from pathlib import Path
 
 import numpy as np
 from sklearn.preprocessing import StandardScaler
@@ -74,14 +111,18 @@ from tensorflow import keras  # noqa: E402
 # ---------------------------------------------------------------------------
 
 
-def discover_dimensionality(X, n_samples=500, k=50, variance_thresholds=(0.95, 0.90, 0.85)):
+def discover_dimensionality(
+    X, n_samples=500, k=50, variance_thresholds=(0.95, 0.90, 0.85)
+):
     """Discover intrinsic dimensionality of the data manifold via local PCA.
 
     Samples n_samples random points, computes local PCA at each,
     and returns statistics on intrinsic dimensionality.
     """
     n_points, ndim = X.shape
-    sample_idx = np.random.choice(n_points, size=min(n_samples, n_points), replace=False)
+    sample_idx = np.random.choice(
+        n_points, size=min(n_samples, n_points), replace=False
+    )
 
     results = {tau: [] for tau in variance_thresholds}
 
@@ -164,12 +205,14 @@ def discover_per_class_dimensionality(X, y, k=50, tau=0.90, n_samples_per_class=
 
 def build_standard_model(input_dim, n_classes, lr=0.001):
     """Standard architecture: 784 → 128 → 64 → 10. Common default."""
-    model = keras.Sequential([
-        keras.layers.Input(shape=(input_dim,)),
-        keras.layers.Dense(128, activation="relu"),
-        keras.layers.Dense(64, activation="relu"),
-        keras.layers.Dense(n_classes, activation="softmax"),
-    ])
+    model = keras.Sequential(
+        [
+            keras.layers.Input(shape=(input_dim,)),
+            keras.layers.Dense(128, activation="relu"),
+            keras.layers.Dense(64, activation="relu"),
+            keras.layers.Dense(n_classes, activation="softmax"),
+        ]
+    )
     model.compile(
         optimizer=keras.optimizers.Adam(learning_rate=lr),
         loss="sparse_categorical_crossentropy",
@@ -186,12 +229,38 @@ def build_manifold_model(input_dim, n_classes, intrinsic_dim, lr=0.001):
     projection down to the manifold.
     """
     d = max(intrinsic_dim, n_classes)  # at least as wide as output
-    model = keras.Sequential([
-        keras.layers.Input(shape=(input_dim,)),
-        keras.layers.Dense(2 * d, activation="relu"),
-        keras.layers.Dense(d, activation="relu"),
-        keras.layers.Dense(n_classes, activation="softmax"),
-    ])
+    model = keras.Sequential(
+        [
+            keras.layers.Input(shape=(input_dim,)),
+            keras.layers.Dense(2 * d, activation="relu"),
+            keras.layers.Dense(d, activation="relu"),
+            keras.layers.Dense(n_classes, activation="softmax"),
+        ]
+    )
+    model.compile(
+        optimizer=keras.optimizers.Adam(learning_rate=lr),
+        loss="sparse_categorical_crossentropy",
+        metrics=["accuracy"],
+    )
+    return model
+
+
+def build_manifold_observer_model(input_dim, n_classes, intrinsic_dim, lr=0.001):
+    """Manifold-informed architecture: input → d + 1 → d + 1 → output.
+
+    The bottleneck width matches the discovered intrinsic dimensionality.
+    The layer before it is 2d to give the network room to learn the
+    projection down to the manifold.
+    """
+    d = max(intrinsic_dim, n_classes)  # at least as wide as output
+    model = keras.Sequential(
+        [
+            keras.layers.Input(shape=(input_dim,)),
+            keras.layers.Dense(intrinsic_dim + 1, activation="relu"),
+            keras.layers.Dense(intrinsic_dim + 1, activation="relu"),
+            keras.layers.Dense(n_classes, activation="softmax"),
+        ]
+    )
     model.compile(
         optimizer=keras.optimizers.Adam(learning_rate=lr),
         loss="sparse_categorical_crossentropy",
@@ -207,13 +276,15 @@ def build_wide_manifold_model(input_dim, n_classes, intrinsic_dim, lr=0.001):
     manifold bottleneck. More capacity for learning the projection.
     """
     d = max(intrinsic_dim, n_classes)
-    model = keras.Sequential([
-        keras.layers.Input(shape=(input_dim,)),
-        keras.layers.Dense(4 * d, activation="relu"),
-        keras.layers.Dense(2 * d, activation="relu"),
-        keras.layers.Dense(d, activation="relu"),
-        keras.layers.Dense(n_classes, activation="softmax"),
-    ])
+    model = keras.Sequential(
+        [
+            keras.layers.Input(shape=(input_dim,)),
+            keras.layers.Dense(4 * d, activation="relu"),
+            keras.layers.Dense(2 * d, activation="relu"),
+            keras.layers.Dense(d, activation="relu"),
+            keras.layers.Dense(n_classes, activation="softmax"),
+        ]
+    )
     model.compile(
         optimizer=keras.optimizers.Adam(learning_rate=lr),
         loss="sparse_categorical_crossentropy",
@@ -230,12 +301,37 @@ def build_pca_model(n_classes, intrinsic_dim, lr=0.001):
     in the manifold subspace, not the projection itself.
     """
     d = max(intrinsic_dim, n_classes)
-    model = keras.Sequential([
-        keras.layers.Input(shape=(intrinsic_dim,)),
-        keras.layers.Dense(2 * d, activation="relu"),
-        keras.layers.Dense(d, activation="relu"),
-        keras.layers.Dense(n_classes, activation="softmax"),
-    ])
+    model = keras.Sequential(
+        [
+            keras.layers.Input(shape=(intrinsic_dim,)),
+            keras.layers.Dense(2 * d, activation="relu"),
+            keras.layers.Dense(d, activation="relu"),
+            keras.layers.Dense(n_classes, activation="softmax"),
+        ]
+    )
+    model.compile(
+        optimizer=keras.optimizers.Adam(learning_rate=lr),
+        loss="sparse_categorical_crossentropy",
+        metrics=["accuracy"],
+    )
+    return model
+
+
+def build_pca_intrinsic_dim_model(n_classes, intrinsic_dim, lr=0.001):
+    """PCA pre-projected model: d → 2d → d → output.
+
+    Input is already PCA-projected to intrinsic_dim dimensions.
+    The network only needs to learn the nonlinear classification
+    in the manifold subspace, not the projection itself.
+    """
+    d = max(intrinsic_dim, n_classes)
+    model = keras.Sequential(
+        [
+            keras.layers.Input(shape=(intrinsic_dim,)),
+            keras.layers.Dense(intrinsic_dim, activation="relu"),
+            keras.layers.Dense(n_classes, activation="softmax"),
+        ]
+    )
     model.compile(
         optimizer=keras.optimizers.Adam(learning_rate=lr),
         loss="sparse_categorical_crossentropy",
@@ -261,7 +357,8 @@ def run_trial(build_fn, X_train, y_train, X_test, y_test, epochs, batch_size, tr
 
     t0 = time.perf_counter()
     history = model.fit(
-        X_train, y_train,
+        X_train,
+        y_train,
         epochs=epochs,
         batch_size=batch_size,
         validation_data=(X_test, y_test),
@@ -297,9 +394,10 @@ def run_trial(build_fn, X_train, y_train, X_test, y_test, epochs, batch_size, tr
 # ---------------------------------------------------------------------------
 
 
-def plot_results(all_results, intrinsic_dim, save_path):
+def plot_results(all_results, intrinsic_dim, save_path, elapsed=None):
     try:
         import matplotlib
+
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
     except ImportError:
@@ -313,9 +411,11 @@ def plot_results(all_results, intrinsic_dim, save_path):
     }
 
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+    elapsed_str = f"  |  run time: {elapsed:.0f}s" if elapsed is not None else ""
     fig.suptitle(
-        f"MNIST: Manifold-Informed Architecture (d={intrinsic_dim}) vs Standard",
-        fontsize=14, fontweight="bold",
+        f"MNIST: Manifold-Informed Architecture (d={intrinsic_dim}) vs Standard{elapsed_str}",
+        fontsize=14,
+        fontweight="bold",
     )
 
     # Validation accuracy curves
@@ -325,8 +425,13 @@ def plot_results(all_results, intrinsic_dim, save_path):
         epochs = np.arange(1, accs.shape[1] + 1)
         color = colors.get(name, "gray")
         ax.plot(epochs, accs.mean(0), "-", label=name, linewidth=2, color=color)
-        ax.fill_between(epochs, accs.mean(0) - accs.std(0),
-                        accs.mean(0) + accs.std(0), alpha=0.15, color=color)
+        ax.fill_between(
+            epochs,
+            accs.mean(0) - accs.std(0),
+            accs.mean(0) + accs.std(0),
+            alpha=0.15,
+            color=color,
+        )
     ax.set_xlabel("Epoch")
     ax.set_ylabel("Validation Accuracy")
     ax.set_title("Validation Accuracy")
@@ -340,8 +445,13 @@ def plot_results(all_results, intrinsic_dim, save_path):
         epochs = np.arange(1, losses.shape[1] + 1)
         color = colors.get(name, "gray")
         ax.plot(epochs, losses.mean(0), "-", label=name, linewidth=2, color=color)
-        ax.fill_between(epochs, losses.mean(0) - losses.std(0),
-                        losses.mean(0) + losses.std(0), alpha=0.15, color=color)
+        ax.fill_between(
+            epochs,
+            losses.mean(0) - losses.std(0),
+            losses.mean(0) + losses.std(0),
+            alpha=0.15,
+            color=color,
+        )
     ax.set_xlabel("Epoch")
     ax.set_ylabel("Training Loss")
     ax.set_title("Training Loss")
@@ -358,8 +468,15 @@ def plot_results(all_results, intrinsic_dim, save_path):
     short_names = [n.split("(")[0].strip() for n in names]
     bars = ax.bar(short_names, means, yerr=stds, color=bar_colors, alpha=0.8, capsize=5)
     for bar, m in zip(bars, means):
-        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.002,
-                f"{m:.4f}", ha="center", va="bottom", fontweight="bold", fontsize=9)
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 0.002,
+            f"{m:.4f}",
+            ha="center",
+            va="bottom",
+            fontweight="bold",
+            fontsize=9,
+        )
     ax.set_ylabel("Test Accuracy")
     ax.set_title("Final Test Accuracy")
     ax.grid(True, alpha=0.3, axis="y")
@@ -371,10 +488,17 @@ def plot_results(all_results, intrinsic_dim, save_path):
     [m / p * 1000 for m, p in zip(means, param_counts)]
     bars = ax.bar(short_names, param_counts, color=bar_colors, alpha=0.8)
     for bar, p, m in zip(bars, param_counts, means):
-        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 50,
-                f"{p:,}\nacc={m:.4f}", ha="center", va="bottom", fontsize=8)
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            bar.get_height() + 50,
+            f"{p:,}\nacc={m:.4f}",
+            ha="center",
+            va="bottom",
+            fontsize=8,
+        )
     ax.set_ylabel("Parameters")
     ax.set_title("Parameter Count (lower is better at same accuracy)")
+    ax.set_yscale("log")
     ax.grid(True, alpha=0.3, axis="y")
 
     plt.tight_layout()
@@ -396,15 +520,22 @@ def main():
     parser.add_argument("--trials", type=int, default=5)
     parser.add_argument("--lr", type=float, default=0.001)
     parser.add_argument("--batch-size", type=int, default=128)
-    parser.add_argument("--tau", type=float, default=0.90,
-                        help="Variance threshold for intrinsic dim")
-    parser.add_argument("--discovery-samples", type=int, default=500,
-                        help="Points to sample for dimensionality discovery")
-    parser.add_argument("--k-pca", type=int, default=50,
-                        help="Neighborhood size for local PCA")
+    parser.add_argument(
+        "--tau", type=float, default=0.90, help="Variance threshold for intrinsic dim"
+    )
+    parser.add_argument(
+        "--discovery-samples",
+        type=int,
+        default=500,
+        help="Points to sample for dimensionality discovery",
+    )
+    parser.add_argument(
+        "--k-pca", type=int, default=50, help="Neighborhood size for local PCA"
+    )
     parser.add_argument("--dataset", choices=["mnist", "digits"], default="mnist")
     parser.add_argument("--plot", action="store_true", default=True)
     args = parser.parse_args()
+    t_start = time.perf_counter()
 
     # -----------------------------------------------------------------------
     # Load data
@@ -422,9 +553,11 @@ def main():
     else:
         print("\nLoading sklearn digits...")
         from sklearn.datasets import load_digits
+
         data = load_digits()
         X, y = data.data.astype("float32"), data.target
         from sklearn.model_selection import train_test_split
+
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=42, stratify=y
         )
@@ -448,7 +581,9 @@ def main():
     print(f"\nSampling {args.discovery_samples} points, k={args.k_pca} neighbors...")
     t0 = time.perf_counter()
     dim_report = discover_dimensionality(
-        X_train, n_samples=args.discovery_samples, k=args.k_pca,
+        X_train,
+        n_samples=args.discovery_samples,
+        k=args.k_pca,
         variance_thresholds=(0.95, 0.90, 0.85, 0.80),
     )
     discovery_time = time.perf_counter() - t0
@@ -459,11 +594,9 @@ def main():
     for tau in sorted(dim_report.keys(), reverse=True):
         r = dim_report[tau]
         noise_pct = 100 * (1 - r["mean"] / input_dim)
-        print(f"{tau:>6.2f} {r['mean']:>8.1f} {r['std']:>6.1f} {r['min']:>5} {r['max']:>5} {noise_pct:>7.1f}%")
-
-    # Use the specified tau for architecture
-    intrinsic_dim = int(round(dim_report[args.tau]["mean"]))
-    print(f"\n>> Using intrinsic dim d = {intrinsic_dim} (τ={args.tau}) for architecture")
+        print(
+            f"{tau:>6.2f} {r['mean']:>8.1f} {r['std']:>6.1f} {r['min']:>5} {r['max']:>5} {noise_pct:>7.1f}%"
+        )
 
     # Per-class dimensionality
     print(f"\nPer-class intrinsic dimensionality (τ={args.tau}):")
@@ -472,7 +605,17 @@ def main():
     )
     for c in sorted(class_dims.keys()):
         cd = class_dims[c]
-        print(f"  Digit {c}: d = {cd['mean']:.1f} ± {cd['std']:.1f}  [{cd['min']}, {cd['max']}]")
+        print(
+            f"  Digit {c}: d = {cd['mean']:.1f} ± {cd['std']:.1f}  [{cd['min']}, {cd['max']}]"
+        )
+
+    # Use max of per-class maxima as the bottleneck — accommodates the hardest sample
+    global_dim = int(round(dim_report[args.tau]["mean"]))
+    intrinsic_dim = max(cd["max"] for cd in class_dims.values())
+    print(
+        f"\n>> Global intrinsic dim (mean): {global_dim}  |  Max per-class max: {intrinsic_dim}"
+        f"  →  using d = {intrinsic_dim} (τ={args.tau})"
+    )
 
     # -----------------------------------------------------------------------
     # Phase 2: Build architectures
@@ -484,14 +627,41 @@ def main():
 
     d = intrinsic_dim
 
+    # PCA projection (needed for intrinsic-dim and PCA models)
+    from sklearn.decomposition import PCA as skPCA
+
+    pca = skPCA(n_components=d)
+    X_train_pca = pca.fit_transform(X_train).astype("float32")
+    X_test_pca = pca.transform(X_test).astype("float32")
+    var_explained = pca.explained_variance_ratio_.sum()
+    print(f"  PCA to {d}D captures {var_explained * 100:.1f}% of global variance")
+
+    # Each entry: (build_fn, X_tr, X_te) — raw or PCA-projected as appropriate
     architectures = {
-        "Standard (128→64)": lambda: build_standard_model(input_dim, n_classes, lr=args.lr),
-        f"Manifold (2d→d, d={d})": lambda: build_manifold_model(input_dim, n_classes, d, lr=args.lr),
-        f"Wide Manifold (4d→2d→d, d={d})": lambda: build_wide_manifold_model(input_dim, n_classes, d, lr=args.lr),
+        "Standard (128→64)": (
+            lambda: build_standard_model(input_dim, n_classes, lr=args.lr),
+            X_train, X_test,
+        ),
+        f"Wide Manifold (4d→2d→d, d={d})": (
+            lambda: build_wide_manifold_model(input_dim, n_classes, d, lr=args.lr),
+            X_train, X_test,
+        ),
+        f"Manifold (2d→d, d={d})": (
+            lambda: build_manifold_model(input_dim, n_classes, d, lr=args.lr),
+            X_train, X_test,
+        ),
+        f"PCA→{d}D + MLP (2d→d)": (
+            lambda: build_pca_model(n_classes, d, lr=args.lr),
+            X_train_pca, X_test_pca,
+        ),
+        f"Intrinsic Dim (PCA→{d}D→output)": (
+            lambda: build_pca_intrinsic_dim_model(n_classes, d, lr=args.lr),
+            X_train_pca, X_test_pca,
+        ),
     }
 
     # Show architecture details
-    for name, build_fn in architectures.items():
+    for name, (build_fn, _, _) in architectures.items():
         model = build_fn()
         n_params = count_params(model)
         [int(np.prod(w.shape)) for w in model.trainable_weights]
@@ -511,7 +681,7 @@ def main():
 
     all_results = {}
 
-    for name, build_fn in architectures.items():
+    for name, (build_fn, X_tr, X_te) in architectures.items():
         print(f"\n{name}")
         trial_results = []
 
@@ -520,64 +690,31 @@ def main():
             tf.random.set_seed(trial * 42)
 
             result = run_trial(
-                build_fn, X_train, y_train, X_test, y_test,
-                epochs=args.epochs, batch_size=args.batch_size, trial=trial,
+                build_fn,
+                X_tr,
+                y_train,
+                X_te,
+                y_test,
+                epochs=args.epochs,
+                batch_size=args.batch_size,
+                trial=trial,
             )
 
-            conv_str = f"conv@{result['convergence_epoch']}" if result["convergence_epoch"] is not None else "no conv"
-            print(f"  Trial {trial + 1}/{args.trials}: "
-                  f"acc={result['test_acc']:.4f}  "
-                  f"loss={result['test_loss']:.4f}  "
-                  f"{conv_str}  "
-                  f"time={result['wall_time']:.1f}s")
+            conv_str = (
+                f"conv@{result['convergence_epoch']}"
+                if result["convergence_epoch"] is not None
+                else "no conv"
+            )
+            print(
+                f"  Trial {trial + 1}/{args.trials}: "
+                f"acc={result['test_acc']:.4f}  "
+                f"loss={result['test_loss']:.4f}  "
+                f"{conv_str}  "
+                f"time={result['wall_time']:.1f}s"
+            )
             trial_results.append(result)
 
         all_results[name] = trial_results
-
-    # -----------------------------------------------------------------------
-    # Phase 3b: PCA pre-projection experiment
-    # -----------------------------------------------------------------------
-
-    print("\n" + "=" * 70)
-    print("PHASE 3b: PCA PRE-PROJECTION (manifold discovery → dimensionality reduction → train)")
-    print("=" * 70)
-
-    from sklearn.decomposition import PCA as skPCA
-
-    pca = skPCA(n_components=d)
-    X_train_pca = pca.fit_transform(X_train).astype("float32")
-    X_test_pca = pca.transform(X_test).astype("float32")
-    var_explained = pca.explained_variance_ratio_.sum()
-    print(f"  PCA to {d}D captures {var_explained * 100:.1f}% of global variance")
-
-    pca_name = f"PCA→{d}D + MLP (2d→d)"
-    def pca_build_fn():
-        return build_pca_model(n_classes, d, lr=args.lr)
-
-    model = pca_build_fn()
-    pca_params = count_params(model)
-    print(f"  {pca_name}: {pca_params:,} parameters")
-    print()
-
-    pca_results = []
-    for trial in range(args.trials):
-        np.random.seed(trial * 42)
-        tf.random.set_seed(trial * 42)
-
-        result = run_trial(
-            pca_build_fn, X_train_pca, y_train, X_test_pca, y_test,
-            epochs=args.epochs, batch_size=args.batch_size, trial=trial,
-        )
-
-        conv_str = f"conv@{result['convergence_epoch']}" if result["convergence_epoch"] is not None else "no conv"
-        print(f"  Trial {trial + 1}/{args.trials}: "
-              f"acc={result['test_acc']:.4f}  "
-              f"loss={result['test_loss']:.4f}  "
-              f"{conv_str}  "
-              f"time={result['wall_time']:.1f}s")
-        pca_results.append(result)
-
-    all_results[pca_name] = pca_results
 
     # -----------------------------------------------------------------------
     # Summary
@@ -586,8 +723,10 @@ def main():
     print("\n" + "=" * 70)
     print("RESULTS SUMMARY")
     print("=" * 70)
-    print(f"Dataset: {'MNIST' if args.dataset == 'mnist' else 'Digits'} "
-          f"({input_dim}D, {n_classes} classes)")
+    print(
+        f"Dataset: {'MNIST' if args.dataset == 'mnist' else 'Digits'} "
+        f"({input_dim}D, {n_classes} classes)"
+    )
     print(f"Intrinsic dimensionality: d = {intrinsic_dim} (τ={args.tau})")
     print(f"Noise dimensions: {100 * (1 - intrinsic_dim / input_dim):.1f}%")
     print(f"Epochs: {args.epochs}, Trials: {args.trials}")
@@ -621,7 +760,11 @@ def main():
     # Convergence
     row = f"{'Epochs to 95%':<25}"
     for name, results in all_results.items():
-        convs = [r["convergence_epoch"] for r in results if r["convergence_epoch"] is not None]
+        convs = [
+            r["convergence_epoch"]
+            for r in results
+            if r["convergence_epoch"] is not None
+        ]
         if convs:
             row += f"  {np.mean(convs):.1f} ± {np.std(convs):.1f} ({len(convs)}/{len(results)})  "
         else:
@@ -639,7 +782,9 @@ def main():
 
     # Winner
     print("-" * 70)
-    best_name = max(all_results, key=lambda n: np.mean([r["test_acc"] for r in all_results[n]]))
+    best_name = max(
+        all_results, key=lambda n: np.mean([r["test_acc"] for r in all_results[n]])
+    )
     best_acc = np.mean([r["test_acc"] for r in all_results[best_name]])
     std_name = "Standard (128→64)"
     std_acc = np.mean([r["test_acc"] for r in all_results[std_name]])
@@ -654,10 +799,14 @@ def main():
         std_params = all_results[std_name][0]["n_params"]
         if best_params < std_params:
             reduction = 100 * (1 - best_params / std_params)
-            print(f"   With {reduction:.0f}% FEWER parameters ({best_params:,} vs {std_params:,})")
+            print(
+                f"   With {reduction:.0f}% FEWER parameters ({best_params:,} vs {std_params:,})"
+            )
         elif best_params > std_params:
             increase = 100 * (best_params / std_params - 1)
-            print(f"   With {increase:.0f}% more parameters ({best_params:,} vs {std_params:,})")
+            print(
+                f"   With {increase:.0f}% more parameters ({best_params:,} vs {std_params:,})"
+            )
     else:
         print(f">> Standard architecture wins: {std_acc:.4f}")
 
@@ -676,25 +825,19 @@ def main():
         "tau": args.tau,
         "epochs": args.epochs,
         "trials": args.trials,
-        "dimensionality_report": {
-            str(k): v for k, v in dim_report.items()
-        },
-        "per_class_dims": {
-            str(k): v for k, v in class_dims.items()
-        },
-        "results": {
-            name: results for name, results in all_results.items()
-        },
+        "dimensionality_report": {str(k): v for k, v in dim_report.items()},
+        "per_class_dims": {str(k): v for k, v in class_dims.items()},
+        "results": {name: results for name, results in all_results.items()},
     }
 
-    results_path = f"benchmarks/{'mnist' if args.dataset == 'mnist' else 'digits'}_architecture_results.json"
+    results_path = Path(__file__).resolve().parent / f"{'mnist' if args.dataset == 'mnist' else 'digits'}_architecture_results.json"
     with open(results_path, "w") as f:
         json.dump(save_data, f, indent=2)
     print(f"\nResults saved to {results_path}")
 
     if args.plot:
-        plot_path = f"benchmarks/{'mnist' if args.dataset == 'mnist' else 'digits'}_architecture_results.png"
-        plot_results(all_results, intrinsic_dim, plot_path)
+        plot_path = str(Path(__file__).resolve().parent / f"{'mnist' if args.dataset == 'mnist' else 'digits'}_architecture_results.png")
+        plot_results(all_results, intrinsic_dim, plot_path, elapsed=time.perf_counter() - t_start)
 
 
 if __name__ == "__main__":

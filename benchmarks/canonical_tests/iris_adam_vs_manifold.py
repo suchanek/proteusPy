@@ -1,20 +1,50 @@
 #!/usr/bin/env python3
 """
-Iris Benchmark: Adam vs ManifoldWalker Optimizer
-=================================================
+Iris Benchmark: Adam vs ManifoldWalker vs ManifoldAdam in Weight Space
+======================================================================
 
-Full-stack TensorFlow benchmark comparing canonical Adam optimization against
-ManifoldWalker-based manifold-aware gradient descent on the Iris classification
-task.
+Compares three optimizers on an identical MLP (4→16→8→3 softmax, ~200 params)
+trained on the Iris classification task (150 samples, 4 features, 3 classes,
+80/20 stratified split).  Supports Apple Metal GPU via tensorflow-metal.
 
-Supports Apple Metal GPU acceleration when tensorflow-metal is installed.
+The key insight
+---------------
+A neural network's loss landscape lives in R^P (P = parameter count), but its
+effective dimensionality is much lower — most gradient directions are dominated
+by mini-batch sampling noise.  By collecting gradients from N different
+mini-batches and treating each as a point in weight space, local PCA reveals
+the "active subspace": the directions where the loss actually varies.
 
-Part of the program proteusPy, https://github.com/suchanek/proteusPy
+Three methods (--trials independent runs, default 10)
+------------------------------------------------------
+  Adam (canonical):
+    Standard TensorFlow/Keras Adam on the full gradient.
+
+  ManifoldWalker (raw):
+    At each step, samples --n-samples gradients from different mini-batches,
+    runs local PCA to discover the active subspace (τ=--variance-threshold),
+    projects the full gradient onto that subspace, and takes a steepest-descent
+    step.  Neighborhood is resampled every --resample-interval epochs.
+    --steps-per-epoch ManifoldWalker steps are taken per epoch.
+    A trajectory buffer of recent weight snapshots provides a second source of
+    geometry (the optimization path itself).
+
+  ManifoldAdam (hybrid):
+    Same active-subspace projection as ManifoldWalker, but replaces the vanilla
+    step with Adam momentum + adaptive learning rate running entirely within the
+    discovered subspace.  Off-subspace gradient components are suppressed before
+    the Adam update accumulates any momentum.
+
+Results are saved to ``benchmarks/canonical_tests/iris_benchmark_results.json``
+and an optional four-panel matplotlib figure is written alongside it.
+
+Part of proteusPy, https://github.com/suchanek/proteusPy
 Author: Eric G. Suchanek, PhD
+Affiliation: Flux-Frontiers
 
 Usage
 -----
-    python benchmarks/iris_adam_vs_manifold.py [--epochs 200] [--trials 10] [--plot]
+    python benchmarks/canonical_tests/iris_adam_vs_manifold.py [--epochs 200] [--trials 10] [--plot]
 """
 
 import argparse

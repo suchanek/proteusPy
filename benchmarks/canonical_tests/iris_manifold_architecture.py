@@ -1,27 +1,31 @@
 #!/usr/bin/env python3
 """
-MNIST Benchmark: Manifold-Informed Architecture vs Standard Architecture
-========================================================================
+Iris Benchmark: Manifold-Informed Architecture vs Standard Architecture
+=======================================================================
 
-The hypothesis: if the data lives on a d-dimensional manifold inside
-784-dimensional pixel space, then an MLP with a bottleneck matching d
-should outperform a standard architecture that wastes capacity on
-noise dimensions.
+The entry point to the manifold series: 4-dimensional flower measurements,
+150 samples, 3 classes.  The iris dataset famously lives on a ~2-dimensional
+manifold inside 4D space — the compression story is 4→2 (50% noise reduction).
+
+Small scale makes this fast and interpretable.  The hypothesis: a bottleneck
+matching the intrinsic dimension should match or exceed a standard architecture
+with fewer parameters.
 
 Phase 1: Discover intrinsic dimensionality via local PCA
-Phase 2: Build two architectures:
-  - Standard:  784 → 128 → 64 → 10  (arbitrary, common default)
-  - Manifold:  784 → 2d → d → 10    (bottleneck = intrinsic dim)
-Phase 3: Train both with Adam, compare accuracy
-
-The manifold tells us the architecture. Adam does the rest.
+Phase 2: Build architectures:
+  - Standard:        4 → 16 → 8 → 3
+  - Wide Manifold:   4 → 4d → 2d → d → 3   (bottleneck = max per-class dim)
+  - Manifold:        4 → 2d → d → 3
+  - PCA→dD + MLP:    d → 2d → d → 3         (PCA-projected input)
+  - Intrinsic Dim:   PCA→dD → d → 3          (raw manifold subspace)
+Phase 3: Train all with Adam, compare accuracy & parameter efficiency
 
 Part of proteusPy, https://github.com/suchanek/proteusPy
 Author: Eric G. Suchanek, PhD
 
 Usage
 -----
-    python benchmarks/mnist_manifold_architecture.py [--epochs 30] [--trials 5]
+    python benchmarks/canonical_tests/iris_manifold_architecture.py [--epochs 300] [--trials 10]
 """
 
 import argparse
@@ -29,8 +33,11 @@ import json
 import os
 import sys
 import time
+from pathlib import Path
 
 import numpy as np
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 # ---------------------------------------------------------------------------
@@ -48,55 +55,40 @@ for gpu in gpus:
     except RuntimeError:
         pass
 
-# On macOS with tensorflow-metal, Metal GPUs appear as GPU type devices.
-# Confirm by checking for the metal plugin in registered devices.
-_all_devices = tf.config.list_physical_devices()
 metal = sys.platform == "darwin" and len(gpus) > 0
-
 DEVICE_INFO = {
     "tensorflow_version": tf.__version__,
     "device_used": "Metal GPU" if metal else ("GPU" if gpus else "CPU"),
-    "physical_devices": [d.name for d in _all_devices],
 }
 print(f"TensorFlow {tf.__version__} | Device: {DEVICE_INFO['device_used']}")
-print(f"Physical devices: {[d.name for d in _all_devices]}")
-
-# Explicit device strategy: route to Metal GPU when available, else CPU.
-if gpus:
-    STRATEGY = tf.distribute.OneDeviceStrategy("/GPU:0")
-else:
-    STRATEGY = tf.distribute.OneDeviceStrategy("/CPU:0")
 
 from tensorflow import keras  # noqa: E402
+
+IRIS_CLASSES = ["setosa", "versicolor", "virginica"]
+
 
 # ---------------------------------------------------------------------------
 # Phase 1: Manifold Discovery
 # ---------------------------------------------------------------------------
 
 
-def discover_dimensionality(X, n_samples=500, k=50, variance_thresholds=(0.95, 0.90, 0.85)):
-    """Discover intrinsic dimensionality of the data manifold via local PCA.
-
-    Samples n_samples random points, computes local PCA at each,
-    and returns statistics on intrinsic dimensionality.
-    """
-    n_points, ndim = X.shape
+def discover_dimensionality(X, n_samples=100, k=10, variance_thresholds=(0.95, 0.90, 0.85)):
+    """Discover intrinsic dimensionality via local PCA."""
+    n_points = X.shape[0]
     sample_idx = np.random.choice(n_points, size=min(n_samples, n_points), replace=False)
 
     results = {tau: [] for tau in variance_thresholds}
 
     for idx in sample_idx:
         point = X[idx]
-        # k nearest neighbors
         dists = np.linalg.norm(X - point, axis=1)
-        knn_idx = np.argpartition(dists, k)[:k]
+        k_use = min(k, n_points - 1)
+        knn_idx = np.argpartition(dists, k_use)[:k_use]
         neighbors = X[knn_idx]
 
-        # Local PCA
         centered = neighbors - neighbors.mean(axis=0)
-        cov = (centered.T @ centered) / (len(neighbors) - 1)
-        eigenvalues = np.linalg.eigvalsh(cov)[::-1]
-        eigenvalues = np.maximum(eigenvalues, 0.0)
+        _, s, _ = np.linalg.svd(centered, full_matrices=False)
+        eigenvalues = (s ** 2) / max(len(neighbors) - 1, 1)
 
         total = eigenvalues.sum()
         if total > 0:
@@ -109,16 +101,16 @@ def discover_dimensionality(X, n_samples=500, k=50, variance_thresholds=(0.95, 0
     for tau in variance_thresholds:
         dims = results[tau]
         report[tau] = {
-            "mean": np.mean(dims),
-            "std": np.std(dims),
-            "median": np.median(dims),
+            "mean": float(np.mean(dims)),
+            "std": float(np.std(dims)),
+            "median": float(np.median(dims)),
             "min": int(np.min(dims)),
             "max": int(np.max(dims)),
         }
     return report
 
 
-def discover_per_class_dimensionality(X, y, k=50, tau=0.90, n_samples_per_class=50):
+def discover_per_class_dimensionality(X, y, k=10, tau=0.90, n_samples_per_class=10):
     """Discover intrinsic dimensionality per class."""
     classes = sorted(set(y))
     class_dims = {}
@@ -137,9 +129,8 @@ def discover_per_class_dimensionality(X, y, k=50, tau=0.90, n_samples_per_class=
             neighbors = X_c[knn_idx]
 
             centered = neighbors - neighbors.mean(axis=0)
-            cov = (centered.T @ centered) / (len(neighbors) - 1)
-            eigenvalues = np.linalg.eigvalsh(cov)[::-1]
-            eigenvalues = np.maximum(eigenvalues, 0.0)
+            _, s, _ = np.linalg.svd(centered, full_matrices=False)
+            eigenvalues = (s ** 2) / max(len(neighbors) - 1, 1)
 
             total = eigenvalues.sum()
             if total > 0:
@@ -148,8 +139,8 @@ def discover_per_class_dimensionality(X, y, k=50, tau=0.90, n_samples_per_class=
                 dims.append(d)
 
         class_dims[c] = {
-            "mean": np.mean(dims),
-            "std": np.std(dims),
+            "mean": float(np.mean(dims)),
+            "std": float(np.std(dims)),
             "min": int(np.min(dims)),
             "max": int(np.max(dims)),
         }
@@ -163,11 +154,11 @@ def discover_per_class_dimensionality(X, y, k=50, tau=0.90, n_samples_per_class=
 
 
 def build_standard_model(input_dim, n_classes, lr=0.001):
-    """Standard architecture: 784 → 128 → 64 → 10. Common default."""
+    """Standard MLP for Iris: 4 → 16 → 8 → 3."""
     model = keras.Sequential([
         keras.layers.Input(shape=(input_dim,)),
-        keras.layers.Dense(128, activation="relu"),
-        keras.layers.Dense(64, activation="relu"),
+        keras.layers.Dense(16, activation="relu"),
+        keras.layers.Dense(8, activation="relu"),
         keras.layers.Dense(n_classes, activation="softmax"),
     ])
     model.compile(
@@ -179,13 +170,8 @@ def build_standard_model(input_dim, n_classes, lr=0.001):
 
 
 def build_manifold_model(input_dim, n_classes, intrinsic_dim, lr=0.001):
-    """Manifold-informed architecture: input → 2d → d → output.
-
-    The bottleneck width matches the discovered intrinsic dimensionality.
-    The layer before it is 2d to give the network room to learn the
-    projection down to the manifold.
-    """
-    d = max(intrinsic_dim, n_classes)  # at least as wide as output
+    """Manifold-informed: input → 2d → d → output."""
+    d = max(intrinsic_dim, n_classes)
     model = keras.Sequential([
         keras.layers.Input(shape=(input_dim,)),
         keras.layers.Dense(2 * d, activation="relu"),
@@ -201,11 +187,7 @@ def build_manifold_model(input_dim, n_classes, intrinsic_dim, lr=0.001):
 
 
 def build_wide_manifold_model(input_dim, n_classes, intrinsic_dim, lr=0.001):
-    """Wider manifold-informed: input → 4d → 2d → d → output.
-
-    Three hidden layers with progressive compression toward the
-    manifold bottleneck. More capacity for learning the projection.
-    """
+    """Wider manifold-informed: input → 4d → 2d → d → output."""
     d = max(intrinsic_dim, n_classes)
     model = keras.Sequential([
         keras.layers.Input(shape=(input_dim,)),
@@ -223,17 +205,27 @@ def build_wide_manifold_model(input_dim, n_classes, intrinsic_dim, lr=0.001):
 
 
 def build_pca_model(n_classes, intrinsic_dim, lr=0.001):
-    """PCA pre-projected model: d → 2d → d → output.
-
-    Input is already PCA-projected to intrinsic_dim dimensions.
-    The network only needs to learn the nonlinear classification
-    in the manifold subspace, not the projection itself.
-    """
+    """PCA pre-projected: d → 2d → d → output."""
     d = max(intrinsic_dim, n_classes)
     model = keras.Sequential([
         keras.layers.Input(shape=(intrinsic_dim,)),
         keras.layers.Dense(2 * d, activation="relu"),
         keras.layers.Dense(d, activation="relu"),
+        keras.layers.Dense(n_classes, activation="softmax"),
+    ])
+    model.compile(
+        optimizer=keras.optimizers.Adam(learning_rate=lr),
+        loss="sparse_categorical_crossentropy",
+        metrics=["accuracy"],
+    )
+    return model
+
+
+def build_pca_intrinsic_dim_model(n_classes, intrinsic_dim, lr=0.001):
+    """PCA pre-projected: d → d → output."""
+    model = keras.Sequential([
+        keras.layers.Input(shape=(intrinsic_dim,)),
+        keras.layers.Dense(intrinsic_dim, activation="relu"),
         keras.layers.Dense(n_classes, activation="softmax"),
     ])
     model.compile(
@@ -255,8 +247,7 @@ def count_params(model):
 
 def run_trial(build_fn, X_train, y_train, X_test, y_test, epochs, batch_size, trial):
     """Train a model and return metrics."""
-    with STRATEGY.scope():
-        model = build_fn()
+    model = build_fn()
     n_params = count_params(model)
 
     t0 = time.perf_counter()
@@ -271,10 +262,10 @@ def run_trial(build_fn, X_train, y_train, X_test, y_test, epochs, batch_size, tr
 
     test_loss, test_acc = model.evaluate(X_test, y_test, verbose=0)
 
-    # Convergence epoch (first epoch hitting 95% train accuracy)
+    # Convergence: first epoch hitting 90% train accuracy
     conv_epoch = None
     for i, acc in enumerate(history.history["accuracy"]):
-        if acc >= 0.95:
+        if acc >= 0.90:
             conv_epoch = i
             break
 
@@ -306,16 +297,17 @@ def plot_results(all_results, intrinsic_dim, save_path):
         print("matplotlib not available — skipping plots")
         return
 
-    colors = {
-        "Standard (128→64)": "steelblue",
-        f"Manifold (2d→d, d={intrinsic_dim})": "firebrick",
-        f"Wide Manifold (4d→2d→d, d={intrinsic_dim})": "forestgreen",
-    }
+    palette = [
+        "steelblue", "forestgreen", "firebrick", "darkorange", "mediumpurple",
+    ]
+    names = list(all_results.keys())
+    colors = {n: palette[i % len(palette)] for i, n in enumerate(names)}
 
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
     fig.suptitle(
-        f"MNIST: Manifold-Informed Architecture (d={intrinsic_dim}) vs Standard",
-        fontsize=14, fontweight="bold",
+        f"Iris: Manifold-Informed Architecture (d={intrinsic_dim}) vs Standard\n"
+        f"4D flower measurements → manifold discovery → architecture  |  3 classes",
+        fontsize=13, fontweight="bold",
     )
 
     # Validation accuracy curves
@@ -323,7 +315,7 @@ def plot_results(all_results, intrinsic_dim, save_path):
     for name, results in all_results.items():
         accs = np.array([r["val_acc"] for r in results])
         epochs = np.arange(1, accs.shape[1] + 1)
-        color = colors.get(name, "gray")
+        color = colors[name]
         ax.plot(epochs, accs.mean(0), "-", label=name, linewidth=2, color=color)
         ax.fill_between(epochs, accs.mean(0) - accs.std(0),
                         accs.mean(0) + accs.std(0), alpha=0.15, color=color)
@@ -338,7 +330,7 @@ def plot_results(all_results, intrinsic_dim, save_path):
     for name, results in all_results.items():
         losses = np.array([r["train_loss"] for r in results])
         epochs = np.arange(1, losses.shape[1] + 1)
-        color = colors.get(name, "gray")
+        color = colors[name]
         ax.plot(epochs, losses.mean(0), "-", label=name, linewidth=2, color=color)
         ax.fill_between(epochs, losses.mean(0) - losses.std(0),
                         losses.mean(0) + losses.std(0), alpha=0.15, color=color)
@@ -349,12 +341,11 @@ def plot_results(all_results, intrinsic_dim, save_path):
     ax.set_yscale("log")
     ax.grid(True, alpha=0.3)
 
-    # Final test accuracy comparison
+    # Final test accuracy
     ax = axes[1, 0]
-    names = list(all_results.keys())
     means = [np.mean([r["test_acc"] for r in all_results[n]]) for n in names]
     stds = [np.std([r["test_acc"] for r in all_results[n]]) for n in names]
-    bar_colors = [colors.get(n, "gray") for n in names]
+    bar_colors = [colors[n] for n in names]
     short_names = [n.split("(")[0].strip() for n in names]
     bars = ax.bar(short_names, means, yerr=stds, color=bar_colors, alpha=0.8, capsize=5)
     for bar, m in zip(bars, means):
@@ -363,18 +354,18 @@ def plot_results(all_results, intrinsic_dim, save_path):
     ax.set_ylabel("Test Accuracy")
     ax.set_title("Final Test Accuracy")
     ax.grid(True, alpha=0.3, axis="y")
-    ax.set_ylim(0.9, 1.0)
+    ax.set_ylim(0.7, 1.05)
 
-    # Parameter efficiency
+    # Parameter count (log scale)
     ax = axes[1, 1]
     param_counts = [all_results[n][0]["n_params"] for n in names]
-    [m / p * 1000 for m, p in zip(means, param_counts)]
     bars = ax.bar(short_names, param_counts, color=bar_colors, alpha=0.8)
     for bar, p, m in zip(bars, param_counts, means):
-        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 50,
+        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() * 1.05,
                 f"{p:,}\nacc={m:.4f}", ha="center", va="bottom", fontsize=8)
     ax.set_ylabel("Parameters")
     ax.set_title("Parameter Count (lower is better at same accuracy)")
+    ax.set_yscale("log")
     ax.grid(True, alpha=0.3, axis="y")
 
     plt.tight_layout()
@@ -390,19 +381,15 @@ def plot_results(all_results, intrinsic_dim, save_path):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="MNIST: Manifold-Informed Architecture vs Standard"
+        description="Iris: Manifold-Informed Architecture vs Standard"
     )
-    parser.add_argument("--epochs", type=int, default=30)
-    parser.add_argument("--trials", type=int, default=5)
+    parser.add_argument("--epochs", type=int, default=300)
+    parser.add_argument("--trials", type=int, default=10)
     parser.add_argument("--lr", type=float, default=0.001)
-    parser.add_argument("--batch-size", type=int, default=128)
-    parser.add_argument("--tau", type=float, default=0.90,
-                        help="Variance threshold for intrinsic dim")
-    parser.add_argument("--discovery-samples", type=int, default=500,
-                        help="Points to sample for dimensionality discovery")
-    parser.add_argument("--k-pca", type=int, default=50,
-                        help="Neighborhood size for local PCA")
-    parser.add_argument("--dataset", choices=["mnist", "digits"], default="mnist")
+    parser.add_argument("--batch-size", type=int, default=32)
+    parser.add_argument("--tau", type=float, default=0.90)
+    parser.add_argument("--test-size", type=float, default=0.2)
+    parser.add_argument("--k-pca", type=int, default=10)
     parser.add_argument("--plot", action="store_true", default=True)
     args = parser.parse_args()
 
@@ -410,32 +397,24 @@ def main():
     # Load data
     # -----------------------------------------------------------------------
 
-    if args.dataset == "mnist":
-        print("\nLoading MNIST...")
-        (X_train, y_train), (X_test, y_test) = keras.datasets.mnist.load_data()
-        X_train = X_train.reshape(-1, 784).astype("float32")
-        X_test = X_test.reshape(-1, 784).astype("float32")
-        # Normalize
-        scaler = StandardScaler()
-        X_train = scaler.fit_transform(X_train)
-        X_test = scaler.transform(X_test)
-    else:
-        print("\nLoading sklearn digits...")
-        from sklearn.datasets import load_digits
-        data = load_digits()
-        X, y = data.data.astype("float32"), data.target
-        from sklearn.model_selection import train_test_split
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=42, stratify=y
-        )
-        scaler = StandardScaler()
-        X_train = scaler.fit_transform(X_train)
-        X_test = scaler.transform(X_test)
+    print("\nLoading Iris...")
+    iris = load_iris()
+    X_all = iris.data.astype("float32")
+    y_all = iris.target
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X_all, y_all, test_size=args.test_size, random_state=42, stratify=y_all
+    )
+
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train).astype("float32")
+    X_test = scaler.transform(X_test).astype("float32")
 
     input_dim = X_train.shape[1]
     n_classes = len(set(y_train))
     print(f"  Train: {X_train.shape}, Test: {X_test.shape}")
-    print(f"  Classes: {n_classes}, Input dim: {input_dim}")
+    print(f"  Classes: {n_classes} ({', '.join(IRIS_CLASSES)})")
+    print(f"  Input dim: {input_dim} (sepal/petal length+width)")
 
     # -----------------------------------------------------------------------
     # Phase 1: Discover intrinsic dimensionality
@@ -445,34 +424,36 @@ def main():
     print("PHASE 1: MANIFOLD DISCOVERY")
     print("=" * 70)
 
-    print(f"\nSampling {args.discovery_samples} points, k={args.k_pca} neighbors...")
-    t0 = time.perf_counter()
+    print(f"\nSampling all {len(X_train)} points, k={args.k_pca} neighbors...")
     dim_report = discover_dimensionality(
-        X_train, n_samples=args.discovery_samples, k=args.k_pca,
+        X_train, n_samples=len(X_train), k=args.k_pca,
         variance_thresholds=(0.95, 0.90, 0.85, 0.80),
     )
-    discovery_time = time.perf_counter() - t0
-    print(f"Discovery time: {discovery_time:.1f}s\n")
 
-    print(f"{'τ':>6} {'Mean d':>8} {'Std':>6} {'Min':>5} {'Max':>5} {'Noise %':>8}")
+    print(f"\n{'τ':>6} {'Mean d':>8} {'Std':>6} {'Min':>5} {'Max':>5} {'Noise %':>8}")
     print("-" * 45)
     for tau in sorted(dim_report.keys(), reverse=True):
         r = dim_report[tau]
         noise_pct = 100 * (1 - r["mean"] / input_dim)
         print(f"{tau:>6.2f} {r['mean']:>8.1f} {r['std']:>6.1f} {r['min']:>5} {r['max']:>5} {noise_pct:>7.1f}%")
 
-    # Use the specified tau for architecture
-    intrinsic_dim = int(round(dim_report[args.tau]["mean"]))
-    print(f"\n>> Using intrinsic dim d = {intrinsic_dim} (τ={args.tau}) for architecture")
-
     # Per-class dimensionality
     print(f"\nPer-class intrinsic dimensionality (τ={args.tau}):")
     class_dims = discover_per_class_dimensionality(
-        X_train, y_train, k=args.k_pca, tau=args.tau, n_samples_per_class=50
+        X_train, y_train, k=args.k_pca, tau=args.tau, n_samples_per_class=10,
     )
     for c in sorted(class_dims.keys()):
         cd = class_dims[c]
-        print(f"  Digit {c}: d = {cd['mean']:.1f} ± {cd['std']:.1f}  [{cd['min']}, {cd['max']}]")
+        label = IRIS_CLASSES[c] if c < len(IRIS_CLASSES) else str(c)
+        print(f"  {label:>12}: d = {cd['mean']:.1f} ± {cd['std']:.1f}  [{cd['min']}, {cd['max']}]")
+
+    # Use max of per-class maxima as the bottleneck
+    global_dim = int(round(dim_report[args.tau]["mean"]))
+    intrinsic_dim = max(cd["max"] for cd in class_dims.values())
+    # Clamp to ambient dim
+    intrinsic_dim = min(intrinsic_dim, input_dim)
+    print(f"\n>> Global intrinsic dim (mean): {global_dim}  |  Max per-class max: {intrinsic_dim}")
+    print(f"   Using d = {intrinsic_dim} (τ={args.tau})  =  {intrinsic_dim / input_dim * 100:.0f}% of ambient dimensions")
 
     # -----------------------------------------------------------------------
     # Phase 2: Build architectures
@@ -484,17 +465,40 @@ def main():
 
     d = intrinsic_dim
 
+    from sklearn.decomposition import PCA as skPCA
+
+    pca = skPCA(n_components=d)
+    X_train_pca = pca.fit_transform(X_train).astype("float32")
+    X_test_pca = pca.transform(X_test).astype("float32")
+    var_explained = pca.explained_variance_ratio_.sum()
+    print(f"  PCA to {d}D captures {var_explained * 100:.1f}% of global variance")
+
     architectures = {
-        "Standard (128→64)": lambda: build_standard_model(input_dim, n_classes, lr=args.lr),
-        f"Manifold (2d→d, d={d})": lambda: build_manifold_model(input_dim, n_classes, d, lr=args.lr),
-        f"Wide Manifold (4d→2d→d, d={d})": lambda: build_wide_manifold_model(input_dim, n_classes, d, lr=args.lr),
+        "Standard (16→8)": (
+            lambda: build_standard_model(input_dim, n_classes, lr=args.lr),
+            X_train, X_test,
+        ),
+        f"Wide Manifold (4d→2d→d, d={d})": (
+            lambda: build_wide_manifold_model(input_dim, n_classes, d, lr=args.lr),
+            X_train, X_test,
+        ),
+        f"Manifold (2d→d, d={d})": (
+            lambda: build_manifold_model(input_dim, n_classes, d, lr=args.lr),
+            X_train, X_test,
+        ),
+        f"PCA→{d}D + MLP (2d→d)": (
+            lambda: build_pca_model(n_classes, d, lr=args.lr),
+            X_train_pca, X_test_pca,
+        ),
+        f"Intrinsic Dim (PCA→{d}D→output)": (
+            lambda: build_pca_intrinsic_dim_model(n_classes, d, lr=args.lr),
+            X_train_pca, X_test_pca,
+        ),
     }
 
-    # Show architecture details
-    for name, build_fn in architectures.items():
+    for name, (build_fn, _, _) in architectures.items():
         model = build_fn()
         n_params = count_params(model)
-        [int(np.prod(w.shape)) for w in model.trainable_weights]
         print(f"\n{name}:")
         print(f"  Parameters: {n_params:,}")
         for layer in model.layers:
@@ -511,7 +515,7 @@ def main():
 
     all_results = {}
 
-    for name, build_fn in architectures.items():
+    for name, (build_fn, X_tr, X_te) in architectures.items():
         print(f"\n{name}")
         trial_results = []
 
@@ -520,7 +524,7 @@ def main():
             tf.random.set_seed(trial * 42)
 
             result = run_trial(
-                build_fn, X_train, y_train, X_test, y_test,
+                build_fn, X_tr, y_train, X_te, y_test,
                 epochs=args.epochs, batch_size=args.batch_size, trial=trial,
             )
 
@@ -529,55 +533,10 @@ def main():
                   f"acc={result['test_acc']:.4f}  "
                   f"loss={result['test_loss']:.4f}  "
                   f"{conv_str}  "
-                  f"time={result['wall_time']:.1f}s")
+                  f"time={result['wall_time']:.2f}s")
             trial_results.append(result)
 
         all_results[name] = trial_results
-
-    # -----------------------------------------------------------------------
-    # Phase 3b: PCA pre-projection experiment
-    # -----------------------------------------------------------------------
-
-    print("\n" + "=" * 70)
-    print("PHASE 3b: PCA PRE-PROJECTION (manifold discovery → dimensionality reduction → train)")
-    print("=" * 70)
-
-    from sklearn.decomposition import PCA as skPCA
-
-    pca = skPCA(n_components=d)
-    X_train_pca = pca.fit_transform(X_train).astype("float32")
-    X_test_pca = pca.transform(X_test).astype("float32")
-    var_explained = pca.explained_variance_ratio_.sum()
-    print(f"  PCA to {d}D captures {var_explained * 100:.1f}% of global variance")
-
-    pca_name = f"PCA→{d}D + MLP (2d→d)"
-    def pca_build_fn():
-        return build_pca_model(n_classes, d, lr=args.lr)
-
-    model = pca_build_fn()
-    pca_params = count_params(model)
-    print(f"  {pca_name}: {pca_params:,} parameters")
-    print()
-
-    pca_results = []
-    for trial in range(args.trials):
-        np.random.seed(trial * 42)
-        tf.random.set_seed(trial * 42)
-
-        result = run_trial(
-            pca_build_fn, X_train_pca, y_train, X_test_pca, y_test,
-            epochs=args.epochs, batch_size=args.batch_size, trial=trial,
-        )
-
-        conv_str = f"conv@{result['convergence_epoch']}" if result["convergence_epoch"] is not None else "no conv"
-        print(f"  Trial {trial + 1}/{args.trials}: "
-              f"acc={result['test_acc']:.4f}  "
-              f"loss={result['test_loss']:.4f}  "
-              f"{conv_str}  "
-              f"time={result['wall_time']:.1f}s")
-        pca_results.append(result)
-
-    all_results[pca_name] = pca_results
 
     # -----------------------------------------------------------------------
     # Summary
@@ -586,10 +545,9 @@ def main():
     print("\n" + "=" * 70)
     print("RESULTS SUMMARY")
     print("=" * 70)
-    print(f"Dataset: {'MNIST' if args.dataset == 'mnist' else 'Digits'} "
-          f"({input_dim}D, {n_classes} classes)")
-    print(f"Intrinsic dimensionality: d = {intrinsic_dim} (τ={args.tau})")
-    print(f"Noise dimensions: {100 * (1 - intrinsic_dim / input_dim):.1f}%")
+    print(f"Dataset: Iris ({input_dim}D, {n_classes} classes, {len(X_train)} train / {len(X_test)} test)")
+    print(f"Intrinsic dimensionality: d = {intrinsic_dim} (global mean: {global_dim}, τ={args.tau})")
+    print(f"Noise dimensions: {100 * (1 - intrinsic_dim / input_dim):.0f}%")
     print(f"Epochs: {args.epochs}, Trials: {args.trials}")
     print(f"Device: {DEVICE_INFO['device_used']}")
     print("-" * 70)
@@ -606,7 +564,7 @@ def main():
         ("Test Accuracy", "test_acc", ".4f"),
         ("Test Loss", "test_loss", ".4f"),
         ("Parameters", "n_params", ",d"),
-        ("Wall Time (s)", "wall_time", ".1f"),
+        ("Wall Time (s)", "wall_time", ".2f"),
     ]:
         row = f"{label:<25}"
         for name, results in all_results.items():
@@ -619,7 +577,7 @@ def main():
         print(row)
 
     # Convergence
-    row = f"{'Epochs to 95%':<25}"
+    row = f"{'Epochs to 90%':<25}"
     for name, results in all_results.items():
         convs = [r["convergence_epoch"] for r in results if r["convergence_epoch"] is not None]
         if convs:
@@ -634,30 +592,25 @@ def main():
     for name, results in all_results.items():
         mean_acc = np.mean([r["test_acc"] for r in results])
         n_params = results[0]["n_params"]
-        eff = mean_acc / n_params * 1000
+        eff = mean_acc / max(n_params, 1) * 1000
         print(f"  {name}: {eff:.4f} acc/Kparam  ({mean_acc:.4f} / {n_params:,})")
 
     # Winner
     print("-" * 70)
     best_name = max(all_results, key=lambda n: np.mean([r["test_acc"] for r in all_results[n]]))
     best_acc = np.mean([r["test_acc"] for r in all_results[best_name]])
-    std_name = "Standard (128→64)"
+    std_name = "Standard (16→8)"
     std_acc = np.mean([r["test_acc"] for r in all_results[std_name]])
 
     if best_name != std_name:
         delta = best_acc - std_acc
         print(f">> MANIFOLD-INFORMED WINS: {best_name}")
-        print(f"   {best_acc:.4f} vs {std_acc:.4f} (standard)")
-        print(f"   Delta: +{delta:.4f} ({delta * 100:.2f}%)")
-
+        print(f"   {best_acc:.4f} vs {std_acc:.4f} (standard)  Δ={delta:+.4f}")
         best_params = all_results[best_name][0]["n_params"]
         std_params = all_results[std_name][0]["n_params"]
         if best_params < std_params:
             reduction = 100 * (1 - best_params / std_params)
             print(f"   With {reduction:.0f}% FEWER parameters ({best_params:,} vs {std_params:,})")
-        elif best_params > std_params:
-            increase = 100 * (best_params / std_params - 1)
-            print(f"   With {increase:.0f}% more parameters ({best_params:,} vs {std_params:,})")
     else:
         print(f">> Standard architecture wins: {std_acc:.4f}")
 
@@ -669,31 +622,32 @@ def main():
 
     save_data = {
         "device": DEVICE_INFO,
-        "dataset": args.dataset,
+        "dataset": "iris",
         "input_dim": input_dim,
         "n_classes": n_classes,
+        "class_names": IRIS_CLASSES,
+        "global_dim": global_dim,
         "intrinsic_dim": intrinsic_dim,
         "tau": args.tau,
         "epochs": args.epochs,
         "trials": args.trials,
-        "dimensionality_report": {
-            str(k): v for k, v in dim_report.items()
-        },
+        "n_train": len(X_train),
+        "n_test": len(X_test),
+        "dimensionality_report": {str(k): v for k, v in dim_report.items()},
         "per_class_dims": {
-            str(k): v for k, v in class_dims.items()
+            str(k): {**v, "class_name": IRIS_CLASSES[k] if k < len(IRIS_CLASSES) else str(k)}
+            for k, v in class_dims.items()
         },
-        "results": {
-            name: results for name, results in all_results.items()
-        },
+        "results": {name: results for name, results in all_results.items()},
     }
 
-    results_path = f"benchmarks/{'mnist' if args.dataset == 'mnist' else 'digits'}_architecture_results.json"
+    results_path = Path(__file__).resolve().parent / "iris_architecture_results.json"
     with open(results_path, "w") as f:
         json.dump(save_data, f, indent=2)
     print(f"\nResults saved to {results_path}")
 
     if args.plot:
-        plot_path = f"benchmarks/{'mnist' if args.dataset == 'mnist' else 'digits'}_architecture_results.png"
+        plot_path = str(Path(__file__).resolve().parent / "iris_architecture_results.png")
         plot_results(all_results, intrinsic_dim, plot_path)
 
 
