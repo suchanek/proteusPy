@@ -80,28 +80,7 @@ print(f"TensorFlow {tf.__version__} | Device: {DEVICE_INFO['device_used']}")
 
 from tensorflow import keras  # noqa: E402
 
-# ---------------------------------------------------------------------------
-# Import ManifoldWalker for PCA
-# ---------------------------------------------------------------------------
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
-import importlib.util
-
-_tnd_spec = importlib.util.spec_from_file_location(
-    "proteusPy.turtleND",
-    Path(__file__).resolve().parent.parent / "proteusPy" / "turtleND.py",
-)
-_tnd_mod = importlib.util.module_from_spec(_tnd_spec)
-sys.modules["proteusPy.turtleND"] = _tnd_mod
-_tnd_spec.loader.exec_module(_tnd_mod)
-
-_mw_spec = importlib.util.spec_from_file_location(
-    "manifold_walker",
-    Path(__file__).resolve().parent.parent / "proteusPy" / "manifold_walker.py",
-)
-_mw_mod = importlib.util.module_from_spec(_mw_spec)
-_mw_spec.loader.exec_module(_mw_mod)
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 
 # ---------------------------------------------------------------------------
@@ -537,8 +516,12 @@ def main():
     # Use max of per-class maxima as the bottleneck — accommodates the hardest sample
     global_dim = int(round(dim_report[args.tau]["mean"]))
     intrinsic_dim = max(cd["max"] for cd in class_dims.values())
+    # We know there are 100 classes — need at least n_classes dims to separate them.
+    # Clamp d to n_classes so PCA projection and network widths are consistent.
+    d = max(intrinsic_dim, n_classes)
     print(f"\n>> Global intrinsic dim (mean): {global_dim}  |  Max per-class max: {intrinsic_dim}")
-    print(f"   Using d = {intrinsic_dim} (τ={args.tau})  =  {intrinsic_dim / input_dim * 100:.1f}% of ambient dimensions")
+    print(f"   Using d = {d} (max of local-PCA={intrinsic_dim}, n_classes={n_classes})")
+    print(f"   d = {d / input_dim * 100:.1f}% of ambient dimensions")
 
     # -----------------------------------------------------------------------
     # Phase 2: Build architectures
@@ -547,8 +530,6 @@ def main():
     print("\n" + "=" * 70)
     print("PHASE 2: ARCHITECTURE COMPARISON")
     print("=" * 70)
-
-    d = intrinsic_dim
 
     # PCA projection (needed for intrinsic-dim and PCA models)
     from sklearn.decomposition import PCA as skPCA
@@ -634,8 +615,8 @@ def main():
     print("RESULTS SUMMARY")
     print("=" * 70)
     print(f"Dataset: CIFAR-100 ({input_dim}D, {n_classes} fine-grained classes)")
-    print(f"Intrinsic dimensionality: d = {intrinsic_dim} (global mean: {global_dim}, τ={args.tau})")
-    print(f"Noise dimensions: {100 * (1 - intrinsic_dim / input_dim):.1f}%")
+    print(f"Intrinsic dimensionality: d = {d} (local-PCA max: {intrinsic_dim}, global mean: {global_dim}, τ={args.tau})")
+    print(f"Noise dimensions: {100 * (1 - d / input_dim):.1f}%")
     print(f"Epochs: {args.epochs}, Trials: {args.trials}")
     print(f"Device: {DEVICE_INFO['device_used']}")
     print("-" * 70)
@@ -745,7 +726,7 @@ def main():
 
     if args.plot:
         plot_path = str(Path(__file__).resolve().parent / "cifar100_architecture_results.png")
-        plot_results(all_results, intrinsic_dim, plot_path, elapsed=time.perf_counter() - t_start)
+        plot_results(all_results, d, plot_path, elapsed=time.perf_counter() - t_start)
 
 
 if __name__ == "__main__":

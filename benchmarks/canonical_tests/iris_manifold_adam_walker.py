@@ -83,25 +83,9 @@ from tensorflow import keras  # noqa: E402
 # Import ManifoldAdamWalker directly (avoid heavy proteusPy deps)
 # ---------------------------------------------------------------------------
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-import importlib.util
-
-_tnd_spec = importlib.util.spec_from_file_location(
-    "proteusPy.turtleND",
-    Path(__file__).resolve().parent.parent / "proteusPy" / "turtleND.py",
-)
-_tnd_mod = importlib.util.module_from_spec(_tnd_spec)
-sys.modules["proteusPy.turtleND"] = _tnd_mod
-_tnd_spec.loader.exec_module(_tnd_mod)
-
-_mw_spec = importlib.util.spec_from_file_location(
-    "manifold_walker",
-    Path(__file__).resolve().parent.parent / "proteusPy" / "manifold_walker.py",
-)
-_mw_mod = importlib.util.module_from_spec(_mw_spec)
-_mw_spec.loader.exec_module(_mw_mod)
-ManifoldAdamWalker = _mw_mod.ManifoldAdamWalker
+from proteusPy.manifold_walker import ManifoldAdamWalker  # noqa: E402
 
 
 # ---------------------------------------------------------------------------

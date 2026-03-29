@@ -41,7 +41,6 @@ Usage
     python benchmarks/canonical_tests/digits_manifold_model.py
 """
 
-import importlib.util
 import sys
 import time
 from pathlib import Path
@@ -52,34 +51,9 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
 
-# Bootstrap imports without heavy proteusPy dependencies
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-_tnd_spec = importlib.util.spec_from_file_location(
-    "proteusPy.turtleND",
-    Path(__file__).resolve().parent.parent / "proteusPy" / "turtleND.py",
-)
-_tnd_mod = importlib.util.module_from_spec(_tnd_spec)
-sys.modules["proteusPy.turtleND"] = _tnd_mod
-_tnd_spec.loader.exec_module(_tnd_mod)
-
-_gr_spec = importlib.util.spec_from_file_location(
-    "proteusPy.graph_reasoner",
-    Path(__file__).resolve().parent.parent / "proteusPy" / "graph_reasoner.py",
-)
-_gr_mod = importlib.util.module_from_spec(_gr_spec)
-sys.modules["proteusPy.graph_reasoner"] = _gr_mod
-_gr_spec.loader.exec_module(_gr_mod)
-
-_mm_spec = importlib.util.spec_from_file_location(
-    "proteusPy.manifold_model",
-    Path(__file__).resolve().parent.parent / "proteusPy" / "manifold_model.py",
-)
-_mm_mod = importlib.util.module_from_spec(_mm_spec)
-sys.modules["proteusPy.manifold_model"] = _mm_mod
-_mm_spec.loader.exec_module(_mm_mod)
-
-ManifoldModel = _mm_mod.ManifoldModel
+from proteusPy.manifold_model import ManifoldModel  # noqa: E402
 
 
 def main():

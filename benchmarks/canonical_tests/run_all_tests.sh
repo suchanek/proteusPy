@@ -70,13 +70,13 @@ run digits_manifold_knn \
 # MNIST
 # ---------------------------------------------------------------------------
 
-run mnist_manifold_model \
-    mnist_manifold_model.py
+#run mnist_manifold_model \
+#    mnist_manifold_model.py
 
-run mnist_manifold_architecture \
-    mnist_manifold_architecture.py \
-    ${EPOCHS:+--epochs "$EPOCHS"} \
-    ${TRIALS:+--trials "$TRIALS"}
+#run mnist_manifold_architecture \
+#    mnist_manifold_architecture.py \
+#    ${EPOCHS:+--epochs "$EPOCHS"} \
+#    ${TRIALS:+--trials "$TRIALS"}
 
 # ---------------------------------------------------------------------------
 # CIFAR-10

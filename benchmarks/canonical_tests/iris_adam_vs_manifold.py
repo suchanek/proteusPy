@@ -101,28 +101,9 @@ tf, DEVICE_INFO = _setup_tensorflow()
 # Now safe to import tf-dependent modules
 from tensorflow import keras  # noqa: E402
 
-# Import ManifoldWalker directly to avoid heavy proteusPy deps (pyvista, etc.)
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-import importlib.util
-
-_mw_spec = importlib.util.spec_from_file_location(
-    "manifold_walker",
-    Path(__file__).resolve().parent.parent / "proteusPy" / "manifold_walker.py",
-)
-_mw_mod = importlib.util.module_from_spec(_mw_spec)
-
-# Also need turtleND available as proteusPy.turtleND for the import inside manifold_walker
-_tnd_spec = importlib.util.spec_from_file_location(
-    "proteusPy.turtleND",
-    Path(__file__).resolve().parent.parent / "proteusPy" / "turtleND.py",
-)
-_tnd_mod = importlib.util.module_from_spec(_tnd_spec)
-sys.modules["proteusPy.turtleND"] = _tnd_mod
-_tnd_spec.loader.exec_module(_tnd_mod)
-
-_mw_spec.loader.exec_module(_mw_mod)
-ManifoldWalker = _mw_mod.ManifoldWalker  # noqa: E402
+from proteusPy.manifold_walker import ManifoldWalker  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Data loading
