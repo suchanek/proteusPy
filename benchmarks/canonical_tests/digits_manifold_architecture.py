@@ -397,7 +397,6 @@ def build_pca_intrinsic_dim_model(n_classes, intrinsic_dim, lr=0.001):
     :param lr: Adam learning rate.
     :returns: Compiled Keras model.
     """
-    d = max(intrinsic_dim, n_classes)
     model = keras.Sequential(
         [
             keras.layers.Input(shape=(intrinsic_dim,)),
@@ -542,7 +541,6 @@ def plot_results(all_results, intrinsic_dim, save_path, elapsed=None):
 
     # Separate Keras vs sklearn results
     keras_names = [n for n in names if any(r.get("train_acc") for r in all_results[n])]
-    sklearn_names = [n for n in names if n not in keras_names]
 
     fig, axes = plt.subplots(2, 2, figsize=(15, 10))
     elapsed_str = f"  |  run time: {elapsed:.0f}s" if elapsed is not None else ""

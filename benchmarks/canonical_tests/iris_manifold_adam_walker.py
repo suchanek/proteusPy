@@ -87,7 +87,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 from proteusPy.manifold_walker import ManifoldAdamWalker  # noqa: E402
 
-
 # ---------------------------------------------------------------------------
 # Data
 # ---------------------------------------------------------------------------

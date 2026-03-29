@@ -252,7 +252,6 @@ def build_manifold_observer_model(input_dim, n_classes, intrinsic_dim, lr=0.001)
     The layer before it is 2d to give the network room to learn the
     projection down to the manifold.
     """
-    d = max(intrinsic_dim, n_classes)  # at least as wide as output
     model = keras.Sequential(
         [
             keras.layers.Input(shape=(input_dim,)),
@@ -324,7 +323,6 @@ def build_pca_intrinsic_dim_model(n_classes, intrinsic_dim, lr=0.001):
     The network only needs to learn the nonlinear classification
     in the manifold subspace, not the projection itself.
     """
-    d = max(intrinsic_dim, n_classes)
     model = keras.Sequential(
         [
             keras.layers.Input(shape=(intrinsic_dim,)),

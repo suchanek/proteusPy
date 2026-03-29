@@ -321,7 +321,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 from proteusPy.manifold_model import ManifoldModel  # noqa: E402
 
-
 # ---------------------------------------------------------------------------
 # CIFAR-10 class names
 # ---------------------------------------------------------------------------

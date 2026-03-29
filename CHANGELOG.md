@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`benchmarks/canonical_tests/report_generator.py`** — automated PDF + Markdown report generator for canonical benchmark runs. Reads a JSON results file, aggregates per-architecture statistics (mean/std accuracy, loss, wall time, parameter count, efficiency), embeds the result figure, and emits provenance-rich reports covering manifold discovery tables, per-class intrinsic dimensionality, architecture comparison, and key findings. Supports MNIST, CIFAR-10, CIFAR-100, Digits, and Iris via `--all` batch mode.
+- **Canonical benchmark reports** — generated PDF and Markdown reports for all four datasets: MNIST (`mnist_report.md/.pdf`), CIFAR-10 (`cifar10_report.md/.pdf`), CIFAR-100 (`cifar100_report.md/.pdf`), and Digits (`digits_report.md/.pdf`), each including experimental setup, manifold discovery statistics, per-class intrinsic dimensionality, architecture comparison table, and key findings.
+
+### Fixed
+
+- **`digits_manifold_architecture.py` / `mnist_manifold_architecture.py`** — removed dead `d = max(intrinsic_dim, n_classes)` assignments in `build_pca_intrinsic_dim_model()` (and `build_manifold_observer_model()` in MNIST); the computed value was never used downstream, so the lines were pure dead code.
+- **`digits_manifold_architecture.py`** — removed unused `sklearn_names` variable from `plot_results()`.
+
 ### Changed
 
 - **WaveRider arXiv manuscript** (`docs/waverider/article/waverider_arxiv.tex`) — relocated from `docs/waverider/` to `docs/waverider/article/`; updated Introduction to justify intrinsic-dimensionality claims with the actual discovery mechanism: local PCA cumulative-variance threshold (τ) applied per data point, with forward references to Algorithm 1 (`\label{alg:walker}`) and §3.2 (`\label{sec:manifoldwalker}`); corrected the noise-fraction figures per dataset (71–83% for UCI Digits, 98.8–99.3% for CIFAR-10; previously misstated as ">99%" for both). Added "Intrinsic dimensionality estimation" paragraph in Related Work covering TwoNN (Facco et al. 2017), participation ratio, and PCA-elbow methods. Added bibliography entries for Facco et al. 2017 (TwoNN estimator) and Pope et al. 2021 (intrinsic dimension of images), cited for corroboration.

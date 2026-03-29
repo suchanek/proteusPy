@@ -1,6 +1,6 @@
 {
   "format": "1.0",
-  "last_update": "2026-03-27T22:58:17.479981+00:00",
+  "last_update": "2026-03-29T04:39:28.604692+00:00",
   "snapshots": [
     {
       "key": "9d642891f86da793c3505e331c3b506d2abcb2c6",
@@ -1574,6 +1574,162 @@
           "nodes": -12740,
           "edges": -19068,
           "coverage_delta": 0.0039999999999998925,
+          "critical_issues_delta": -1
+        }
+      }
+    },
+    {
+      "key": "98d2b13cc6bfe97182cd28ba32654b8496701cb4",
+      "branch": "dev.jrml",
+      "timestamp": "2026-03-29T04:39:06.005635+00:00",
+      "version": "0.99.61",
+      "file": "98d2b13cc6bfe97182cd28ba32654b8496701cb4.json",
+      "metrics": {
+        "total_nodes": 9884,
+        "total_edges": 9454,
+        "meaningful_nodes": 703,
+        "docstring_coverage": 0.882,
+        "node_counts": {
+          "class": 39,
+          "function": 135,
+          "method": 492,
+          "module": 37,
+          "symbol": 9181
+        },
+        "edge_counts": {
+          "ATTR_ACCESS": 3382,
+          "CALLS": 2774,
+          "CONTAINS": 666,
+          "IMPORTS": 473,
+          "INHERITS": 18,
+          "RESOLVES_TO": 2141
+        },
+        "critical_issues": 0,
+        "complexity_median": 6,
+        "module_node_counts": {
+          "proteusPy/DisulfideBase.py": 1301,
+          "proteusPy/DisulfideClassGenerator.py": 334,
+          "proteusPy/DisulfideClassManager.py": 231,
+          "proteusPy/DisulfideClasses.py": 15,
+          "proteusPy/DisulfideEnergy.py": 252,
+          "proteusPy/DisulfideExceptions.py": 6,
+          "proteusPy/DisulfideExtractor_mp.py": 196,
+          "proteusPy/DisulfideIO.py": 151,
+          "proteusPy/DisulfideLoader.py": 458,
+          "proteusPy/DisulfideStats.py": 221,
+          "proteusPy/DisulfideVisualization.py": 970,
+          "proteusPy/Plotting.py": 53,
+          "proteusPy/ProteusGlobals.py": 67,
+          "proteusPy/ProteusPyWarning.py": 2,
+          "proteusPy/Residue.py": 57,
+          "proteusPy/__init__.py": 21,
+          "proteusPy/_version.py": 2,
+          "proteusPy/angle_annotation.py": 148,
+          "proteusPy/atoms.py": 26,
+          "proteusPy/bootstrapper.py": 24,
+          "proteusPy/display_class_disulfides.py": 19,
+          "proteusPy/disulfide_schematic.py": 116,
+          "proteusPy/disulfide_tree.py": 212,
+          "proteusPy/graph_reasoner.py": 484,
+          "proteusPy/hexbin_plot.py": 62,
+          "proteusPy/logger_config.py": 133,
+          "proteusPy/manifold_model.py": 391,
+          "proteusPy/manifold_observer.py": 295,
+          "proteusPy/manifold_walker.py": 214,
+          "proteusPy/qt5viewer.py": 380,
+          "proteusPy/render_disulfide_schematic.py": 112,
+          "proteusPy/ssparser.py": 201,
+          "proteusPy/tree_visualizer.py": 255,
+          "proteusPy/turtle3D.py": 306,
+          "proteusPy/turtleND.py": 238,
+          "proteusPy/utility.py": 490,
+          "proteusPy/vector3D.py": 186
+        }
+      },
+      "deltas": {
+        "vs_previous": null,
+        "vs_baseline": {
+          "nodes": -12691,
+          "edges": -19025,
+          "coverage_delta": 0.0050000000000000044,
+          "critical_issues_delta": -1
+        }
+      }
+    },
+    {
+      "key": "5c0a419117d2fcc1bacc628dee8032fc7259d9eb",
+      "branch": "dev.jrml",
+      "timestamp": "2026-03-29T04:39:28.603711+00:00",
+      "version": "0.99.61",
+      "file": "5c0a419117d2fcc1bacc628dee8032fc7259d9eb.json",
+      "metrics": {
+        "total_nodes": 9884,
+        "total_edges": 9454,
+        "meaningful_nodes": 703,
+        "docstring_coverage": 0.882,
+        "node_counts": {
+          "class": 39,
+          "function": 135,
+          "method": 492,
+          "module": 37,
+          "symbol": 9181
+        },
+        "edge_counts": {
+          "ATTR_ACCESS": 3382,
+          "CALLS": 2774,
+          "CONTAINS": 666,
+          "IMPORTS": 473,
+          "INHERITS": 18,
+          "RESOLVES_TO": 2141
+        },
+        "critical_issues": 0,
+        "complexity_median": 6,
+        "module_node_counts": {
+          "proteusPy/DisulfideBase.py": 1301,
+          "proteusPy/DisulfideClassGenerator.py": 334,
+          "proteusPy/DisulfideClassManager.py": 231,
+          "proteusPy/DisulfideClasses.py": 15,
+          "proteusPy/DisulfideEnergy.py": 252,
+          "proteusPy/DisulfideExceptions.py": 6,
+          "proteusPy/DisulfideExtractor_mp.py": 196,
+          "proteusPy/DisulfideIO.py": 151,
+          "proteusPy/DisulfideLoader.py": 458,
+          "proteusPy/DisulfideStats.py": 221,
+          "proteusPy/DisulfideVisualization.py": 970,
+          "proteusPy/Plotting.py": 53,
+          "proteusPy/ProteusGlobals.py": 67,
+          "proteusPy/ProteusPyWarning.py": 2,
+          "proteusPy/Residue.py": 57,
+          "proteusPy/__init__.py": 21,
+          "proteusPy/_version.py": 2,
+          "proteusPy/angle_annotation.py": 148,
+          "proteusPy/atoms.py": 26,
+          "proteusPy/bootstrapper.py": 24,
+          "proteusPy/display_class_disulfides.py": 19,
+          "proteusPy/disulfide_schematic.py": 116,
+          "proteusPy/disulfide_tree.py": 212,
+          "proteusPy/graph_reasoner.py": 484,
+          "proteusPy/hexbin_plot.py": 62,
+          "proteusPy/logger_config.py": 133,
+          "proteusPy/manifold_model.py": 391,
+          "proteusPy/manifold_observer.py": 295,
+          "proteusPy/manifold_walker.py": 214,
+          "proteusPy/qt5viewer.py": 380,
+          "proteusPy/render_disulfide_schematic.py": 112,
+          "proteusPy/ssparser.py": 201,
+          "proteusPy/tree_visualizer.py": 255,
+          "proteusPy/turtle3D.py": 306,
+          "proteusPy/turtleND.py": 238,
+          "proteusPy/utility.py": 490,
+          "proteusPy/vector3D.py": 186
+        }
+      },
+      "deltas": {
+        "vs_previous": null,
+        "vs_baseline": {
+          "nodes": -12691,
+          "edges": -19025,
+          "coverage_delta": 0.0050000000000000044,
           "critical_issues_delta": -1
         }
       }
