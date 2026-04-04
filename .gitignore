@@ -3,15 +3,13 @@
 **/.DS_Store
 **/.pytest_cache
 schematic_outputs/
+class_analysis_outputs/
 .venv
 .vscode
 .eggs
 build/
 dist/
 data/*.png
-data/Nclasses/*
-data/classes/*
-data/Oclasses/*
 programs/chatbot.py
 proteusPy.egg-info/*
 proteusPy/proteusPy.egg-info/*

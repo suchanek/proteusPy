@@ -27,7 +27,7 @@ from proteusPy import Disulfide, DisulfideList
 from proteusPy.DisulfideClassGenerator import DisulfideClassGenerator
 
 # Add a global save directory constant and create it
-SAVE_DIR = Path("schematic_outputs")
+SAVE_DIR = Path("class_analysis_outputs")
 SAVE_DIR.mkdir(exist_ok=True)
 
 
