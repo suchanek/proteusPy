@@ -1,12 +1,17 @@
 # Makefile for proteusPy and associated programs
 # Author: Eric G. Suchanek, PhD
-# Last revision: 2025-01-26 17:06:12 -egs-
+# Last revision: 2025-04-27 21:21:28 -egs-
 
-VERS := $(shell python -c "exec(open('proteusPy/_version.py').read()); print(__version__)")
+VERS = $(shell python -c "exec(open('proteusPy/_version.py').read()); print(__version__)")
 CONDA ?= conda
 MESS = $(VERS)
 DEVNAME = ppydev
-OS_NAME := $(shell uname -s)
+PKGNAME = proteusPy
+CONDA_PREFIX := $(shell conda info --base)
+CURRENT_ENV := $(shell echo $(CONDA_DEFAULT_ENV))
+
+OS_NAME := $(shell uname -s 2>/dev/null || echo Windows_NT)
+
 # Repository location (can be overridden)
 REPO_DIR ?= $(shell pwd)
 
@@ -21,9 +26,9 @@ else
 endif
 
 .PHONY: all vers newvers nuke pkg dev clean devclean install \
-	install_dev jup jup_dev format bld sdist docs upload tag push-tag commit \
+	install_dev jup jup_dev format sdist docs upload tag push-tag commit \
 	tests docker docker_hub docker_github docker_all docker_run docker_purge \
-	update_pyproject_version
+	update_pyproject_version info conda_env bootstrap bld wheels
 
 all: docs bld docker_all
 
@@ -32,9 +37,10 @@ vers:
 	@echo "Operating system = $(OS_NAME)"
 
 newvers:
-	@echo "Current version number is: $(VERS)"	
+	@echo "Current version number is: $(VERS)"
 	@python -c "vers=input('Enter new version number: '); open('proteusPy/_version.py', 'w').write(f'__version__ = \"{vers}\"\\n')"
-	@echo "Version number updated."
+	$(eval VERS := $(shell python -c "exec(open('proteusPy/_version.py').read()); print(__version__)"))
+	@echo "New version number is: $(VERS)"
 	@echo "Updating version in pyproject.toml to $(VERS)"
 	@sed -i '' 's/version = ".*"/version = "$(VERS)"/' pyproject.toml
 	@echo "pyproject.toml version updated to $(VERS)"
@@ -56,48 +62,53 @@ ifeq ($(OS_NAME), Linux)
 endif
 	@echo "Step 1 done. Activate the environment with 'conda activate proteusPy' and run 'make install'"
 
-dev:
-	@echo "Building development environment $(DEVNAME)..."
-	$(CONDA) create --name $(DEVNAME) -y python=3.12
-	$(CONDA) run -n $(DEVNAME) pip install build 
+install:
+	@echo "Installing proteusPy..."
+	$(CONDA) create --name $(PKGNAME) -y python=3.12
+	$(CONDA) run -n $(PKGNAME) pip uninstall -y proteusPy
 
 ifeq ($(OS_NAME), Linux)
 	@echo "Linux detected, installing VTK..."
-	$(CONDA) install -n $(DEVNAME) vtk -y
+	$(CONDA) install -n $(PKGNAME) vtk -y
+	$(CONDA) run -v -n $(PKGNAME) pip install dist/*.whl
+else
+	$(CONDA) run -v -n $(PKGNAME) pip install dist/proteuspy-$(VERS)-py3-none-any.whl
 endif
-	@echo "Step 1 done. Activate the environment with 'conda activate $(DEVNAME)' and run 'make install_dev'"
+	$(CONDA) run -n $(PKGNAME) python -m ipykernel install --user --name $(PKGNAME) --display-name "$(PKGNAME) ($(VERS))"
+
+	@echo "proteusPy installation finished!"
+	@echo "Remember to activate the environment with 'conda activate $(PKG_NAME) and run 'make bootstrap to download and build the Disulfide Databases.'"
+
+bootstrap:
+	@if [ "$(CURRENT_ENV)" != "$(PKGNAME)" ] && [ "$(CURRENT_ENV)" != "$(DEVNAME)" ]; then \
+		echo "Error: Please activate either the $(PKGNAME) or $(DEVNAME) environment before running this target."; \
+		exit 1; \
+	fi
+	@echo "Downloading and building the Disulfide Databases into $(CURRENT_ENV). This will take some time..."
+	proteusPy.bootstrapper -v
+
+dev:
+	@echo "Building development environment $(DEVNAME)..."
+	$(CONDA) create --name $(DEVNAME) -y python=3.12
+	$(CONDA) run -n $(DEVNAME) pip install build pytest twine pdoc black
+	-$(CONDA) run -n $(DEVNAME) pip uninstall -y proteusPy
+
+ifeq ($(OS_NAME), Linux)
+	@echo "Linux detected, installing VTK..."
+	$(CONDA) install -n $(DEVNAME) vtk -y -q
+	$(CONDA) run -v -n $(DEVNAME) pip install dist/*.whl
+else
+	$(CONDA) run -v -n $(DEVNAME) pip install dist/proteuspy-$(VERS)-py3-none-any.whl[all]
+endif
+	$(CONDA) run -n $(DEVNAME) python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
+	@echo "Development environment installation finished. Remember to activate the environment with 'conda activate $(DEVNAME)'"
+	@echo "and run 'make bootstrap to download and build the Disulfide Databases.'"
 
 clean devclean:
-	@echo "Removing $(if $(filter $@,clean),proteusPy,$(DEVNAME)) environment..."
-	-@jupyter kernelspec uninstall $(if $(filter $@,clean),proteusPy,$(DEVNAME)) -y
-	-@$(CONDA) env remove --name $(if $(filter $@,clean),proteusPy,$(DEVNAME)) -y
+	@echo "Removing $(if $(filter $@,clean),$(PKGNAME),$(DEVNAME)) environment..."
+	-@jupyter kernelspec uninstall $(if $(filter $@,clean),$(PKGNAME),$(DEVNAME)) -y
+	-@$(CONDA) env remove --name $(if $(filter $@,clean),$(PKGNAME),$(DEVNAME)) -y
 
-install:
-	@echo "Starting installation step 2/2 for $(VERS)..."
-ifeq ($(OS_NAME), Linux)
-	pip install dist/*.whl
-else
-	pip install dist/proteuspy-$(VERS)-py3-none-any.whl[all]
-endif
-
-	python -m ipykernel install --user --name proteusPy --display-name "proteusPy ($(VERS))"
-	@echo "Downloading and building the Disulfide Databases..."
-	# proteusPy.bootstrapper -v
-	@echo "Installation finished!"
-
-install_dev: bld
-	@echo "Starting installation step 2/2 for $(VERS)..."
-	pip uninstall -y proteusPy
-ifeq ($(OS_NAME), Linux)
-	pip install dist/*.whl
-else
-	pip install dist/proteuspy-$(VERS)-py3-none-any.whl[all]
-endif
-
-	python -m ipykernel install --user --name $(DEVNAME) --display-name "$(DEVNAME) ($(VERS))"
-	@echo "Downloading and building the Disulfide Databases..."
-	proteusPy.bootstrapper -v
-	@echo "Development environment installation finished!"
 
 define jupyter-setup
 	jupyter contrib nbextension install --sys-prefix
@@ -114,7 +125,6 @@ jup_dev:
 format:
 	black proteusPy
 
-.PHONY: bld
 bld: wheels
 	@echo "Build complete."
 
@@ -182,5 +192,10 @@ docker_run:
 
 docker_purge:
 	docker system prune -a
+
+info:
+	@echo "Available targets in this Makefile:"
+	@grep -E '^[a-zA-Z0-9_-]+:' makefile | sed 's/:.*//' | sort | uniq
+
 
 # End of file
