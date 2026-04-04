@@ -189,7 +189,7 @@ def test_average_resolution_with_no_data(disulfide_list):
     assert disulfide_list.average_resolution == -1.0
 
 
-def test_average_energy_with_multiple_disulfides(disulfide_list):
+def test_avg_enrgy_with_multi_disulfides(disulfide_list):
     """Test average energy calculation"""
     ss1 = Disulfide("test1")
     ss1.energy = 10.0
@@ -215,21 +215,21 @@ def test_filter_by_sg_distance(pdb_5rsa):
     assert all(ss.sg_distance < 3.0 for ss in filtered)
 
 
-def test_filter_by_distance_with_invalid_type(pdb_5rsa):
+def test_filter_by_distance_with_inv_type(pdb_5rsa):
     """Test filtering with invalid distance type raises ValueError"""
     with pytest.raises(ValueError):
         pdb_5rsa.filter_by_distance(distance=0, distance_type="invalid")
 
 
 # Neighbor Finding Tests
-def test_nearest_neighbors_with_valid_angles(pdb_5rsa):
+def test_nearest_nbors_with_valid_angles(pdb_5rsa):
     """Test finding nearest neighbors with valid angles"""
     angles = [-60.0, -60.0, -90.0, -60.0, -60.0]
     neighbors = pdb_5rsa.nearest_neighbors(10.0, angles)
     assert isinstance(neighbors, DisulfideList)
 
 
-def test_nearest_neighbors_with_invalid_angles(pdb_5rsa):
+def test_nearest_nbors_with_invld_angles(pdb_5rsa):
     """Test nearest neighbors with invalid angles raises ValueError"""
     with pytest.raises(ValueError):
         pdb_5rsa.nearest_neighbors(10.0, [-60.0])  # Not enough angles

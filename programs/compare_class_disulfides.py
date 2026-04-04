@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """
 Script for comparing disulfides from different structural classes.
@@ -11,33 +12,38 @@ This script demonstrates how to:
 5. Visualize the minimum energy disulfides for comparison
 
 Author: Eric G. Suchanek, PhD
-Last Modification: 2025-03-15
+Last Modification: 2025-04-27 23:50:53 -egs-
 """
 
-import os
 import pickle
-import sys
+from pathlib import Path
+from typing import Dict
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-
-# Add the parent directory to the Python path to import proteusPy modules
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from proteusPy import Disulfide, DisulfideList
 from proteusPy.DisulfideClassGenerator import DisulfideClassGenerator
 
+# Add a global save directory constant and create it
+SAVE_DIR = Path("class_analysis_outputs")
+SAVE_DIR.mkdir(exist_ok=True)
+
 
 def compare_energy_distributions(
-    class_disulfides: dict[str, DisulfideList], class_names: dict[str, str]
+    class_disulfides: Dict[str, DisulfideList],
+    class_names: Dict[str, str],
+    save_dir: Path = SAVE_DIR,
 ) -> None:
     """
     Compare the energy distributions of disulfides from different classes.
 
-    Parameters:
-        class_disulfides (Dict[str, DisulfideList]): Dictionary mapping class IDs to DisulfideLists.
-        class_names (Dict[str, str]): Dictionary mapping class IDs to class names.
+    :param class_disulfides: Dictionary mapping class IDs to DisulfideLists.
+    :type class_disulfides: Dict[str, DisulfideList]
+    :param class_names: Dictionary mapping class IDs to class names.
+    :type class_names: Dict[str, str]
+    :param save_dir: Directory to save the output plots. Defaults to SAVE_DIR.
+    :type save_dir: Path
     """
     plt.figure(figsize=(12, 8))
 
@@ -71,7 +77,7 @@ def compare_energy_distributions(
             bins=20,
             alpha=0.3,
             color=color,
-            label=f"Class {class_id} ({class_names[class_id]})",
+            label=f"Class{class_names[class_id]}",
         )
 
         # Plot vertical lines for mean and min energy
@@ -97,15 +103,18 @@ def compare_energy_distributions(
     plt.grid(True, alpha=0.3)
 
     # Save the plot
-    plt.savefig("class_energy_comparison.png", dpi=300, bbox_inches="tight")
-    print("Saved energy distribution comparison plot to class_energy_comparison.png")
+    outpath = save_dir / "class_energy_comparison.png"
+    plt.savefig(outpath, dpi=300, bbox_inches="tight")
+    print(f"Saved energy distribution comparison plot to {outpath}")
 
     # Show the plot (comment out if running in a non-interactive environment)
     # plt.show()
 
 
 def compare_dihedral_distributions(
-    class_disulfides: dict[str, DisulfideList], class_names: dict[str, str]
+    class_disulfides: Dict[str, DisulfideList],
+    class_names: Dict[str, str],
+    save_dir: Path = SAVE_DIR,
 ) -> None:
     """
     Compare the dihedral angle distributions of disulfides from different classes.
@@ -148,7 +157,7 @@ def compare_dihedral_distributions(
             bins=20,
             alpha=0.3,
             color=color,
-            label=f"Class {class_id} ({class_names[class_id]})",
+            label=f"Class: {class_names[class_id]}",
         )
         axs[1].hist(chi2_values, bins=20, alpha=0.3, color=color)
         axs[2].hist(chi3_values, bins=20, alpha=0.3, color=color)
@@ -181,18 +190,19 @@ def compare_dihedral_distributions(
     plt.tight_layout(rect=[0.05, 0, 1, 0.97])
 
     # Save the plot
-    plt.savefig("class_dihedral_comparison.png", dpi=300, bbox_inches="tight")
-    print(
-        "Saved dihedral distribution comparison plot to class_dihedral_comparison.png"
-    )
+    outpath = save_dir / "class_dihedral_comparison.png"
+    plt.savefig(outpath, dpi=300, bbox_inches="tight")
+    print(f"Saved dihedral distribution comparison plot to {outpath}")
 
     # Show the plot (comment out if running in a non-interactive environment)
     # plt.show()
 
 
 def compare_minimum_energy_disulfides(
-    class_disulfides: dict[str, DisulfideList], class_names: dict[str, str]
-) -> dict[str, Disulfide]:
+    class_disulfides: Dict[str, DisulfideList],
+    class_names: Dict[str, str],
+    save_dir: Path = SAVE_DIR,
+) -> Dict[str, Disulfide]:
     """
     Compare the minimum energy disulfides from different classes.
 
@@ -207,9 +217,7 @@ def compare_minimum_energy_disulfides(
 
     print("\nMinimum Energy Disulfides Comparison:")
     print("-" * 50)
-    print(
-        f"{'Class ID':<10} {'Class Name':<15} {'Energy (kcal/mol)':<20} {'Cα Distance (Å)':<15}"
-    )
+    print(f"{'Class Name':<15} {'Energy (kcal/mol)':<20} {'Cα Distance (Å)':<15}")
     print("-" * 50)
 
     for class_id, disulfide_list in class_disulfides.items():
@@ -217,13 +225,13 @@ def compare_minimum_energy_disulfides(
         min_energy_disulfide = min(disulfide_list, key=lambda ss: ss.energy)
         min_energy_disulfides[class_id] = min_energy_disulfide
 
-        # Print information about the minimum energy disulfide
+        # Format the output to align against the decimal point
         print(
-            f"{class_id:<10} {class_names[class_id]:<15} {min_energy_disulfide.energy:<20.2f} {min_energy_disulfide.ca_distance:<15.2f}"
+            f"{class_names[class_id]:<15} {min_energy_disulfide.energy:>20.2f} {min_energy_disulfide.ca_distance:>15.2f}"
         )
 
         # Save the minimum energy disulfide to a file
-        min_energy_file = f"class_{class_id}_min_energy_disulfide.pkl"
+        min_energy_file = save_dir / f"cls_{class_id}_min_energy_disulfide.pkl"
         with open(min_energy_file, "wb") as f:
             pickle.dump(min_energy_disulfide, f)
 
@@ -237,8 +245,9 @@ def compare_minimum_energy_disulfides(
 
     # Define colors based on energy values (lower energy = greener, higher energy = redder)
     norm = plt.Normalize(min(energies), max(energies))
-    colors = plt.cm.RdYlGn_r(norm(energies))
-
+    cmap = plt.colormaps["viridis"]  # Replace "RdYlGn" with "viridis"
+    colors = cmap(norm(energies))
+    cmap = plt.colormaps["viridis"]  # Replace "RdYlGn" with "viridis"
     bars = plt.bar(class_ids, energies, color=colors)
 
     plt.title("Minimum Energy Comparison Between Classes")
@@ -247,10 +256,10 @@ def compare_minimum_energy_disulfides(
     plt.grid(True, alpha=0.3, axis="y")
 
     # Add class names as annotations
-    for i, bar in enumerate(bars):
+    for i, _bar in enumerate(bars):
         plt.text(
-            bar.get_x() + bar.get_width() / 2,
-            bar.get_height() + 0.1,
+            _bar.get_x() + _bar.get_width() / 2,
+            _bar.get_height() + 0.1,
             class_names[class_ids[i]],
             ha="center",
             va="bottom",
@@ -258,9 +267,9 @@ def compare_minimum_energy_disulfides(
         )
 
     # Save the plot
-    plt.tight_layout()
-    plt.savefig("class_min_energy_comparison.png", dpi=300, bbox_inches="tight")
-    print("Saved minimum energy comparison plot to class_min_energy_comparison.png")
+    outpath = save_dir / "cls_min_energy_comparison.png"
+    plt.savefig(outpath, dpi=300, bbox_inches="tight")
+    print(f"Saved minimum energy comparison plot to {outpath}")
 
     # Show the plot (comment out if running in a non-interactive environment)
     # plt.show()
@@ -269,14 +278,17 @@ def compare_minimum_energy_disulfides(
 
 
 def compare_average_conformations(
-    class_disulfides: dict[str, DisulfideList], class_names: dict[str, str]
-) -> dict[str, Disulfide]:
+    class_disulfides: Dict[str, DisulfideList],
+    class_names: Dict[str, str],
+    save_dir: str = SAVE_DIR,
+) -> Dict[str, Disulfide]:
     """
     Compare the average conformations of disulfides from different classes.
 
     Parameters:
         class_disulfides (Dict[str, DisulfideList]): Dictionary mapping class IDs to DisulfideLists.
         class_names (Dict[str, str]): Dictionary mapping class IDs to class names.
+        save_dir (str): Directory to save the output plots and files. Defaults to SAVE_DIR.
 
     Returns:
         Dict[str, Disulfide]: Dictionary mapping class IDs to average conformation disulfides.
@@ -286,7 +298,7 @@ def compare_average_conformations(
     print("\nAverage Conformation Comparison:")
     print("-" * 80)
     print(
-        f"{'Class ID':<10} {'Class Name':<15} {'Chi1':<10} {'Chi2':<10} {'Chi3':<10} {'Chi4':<10} {'Chi5':<10}"
+        f"{'Class Name':<15} {'Chi1':>10} {'Chi2':>10} {'Chi3':>10} {'Chi4':>10} {'Chi5':>10}"
     )
     print("-" * 80)
 
@@ -296,17 +308,19 @@ def compare_average_conformations(
 
         # Create a disulfide with the average conformation
         avg_disulfide = Disulfide(
-            name=f"{class_id}_{class_names[class_id]}_avg", torsions=avg_conformation
+            name=f"{class_names[class_id]}_avg", torsions=avg_conformation
         )
         avg_conformation_disulfides[class_id] = avg_disulfide
 
         # Print information about the average conformation
         print(
-            f"{class_id:<10} {class_names[class_id]:<15} {avg_conformation[0]:<10.2f} {avg_conformation[1]:<10.2f} {avg_conformation[2]:<10.2f} {avg_conformation[3]:<10.2f} {avg_conformation[4]:<10.2f}"
+            f"{class_names[class_id]:<15} {avg_conformation[0]:>10.2f} {avg_conformation[1]:>10.2f} {avg_conformation[2]:>10.2f} {avg_conformation[3]:>10.2f} {avg_conformation[4]:>10.2f}"
         )
 
         # Save the average conformation disulfide to a file
-        avg_file = f"class_{class_id}_avg_conformation_disulfide.pkl"
+        avg_file = (
+            save_dir / f"cls_{class_names[class_id]}_avg_conformation_disulfide.pkl"
+        )
         with open(avg_file, "wb") as f:
             pickle.dump(avg_disulfide, f)
 
@@ -320,28 +334,19 @@ def compare_average_conformations(
     angles = np.linspace(0, 2 * np.pi, 5, endpoint=False).tolist()
     angles += angles[:1]  # Close the loop
 
-    # Define a list of colors and markers for different classes
-    colors = [
-        "blue",
-        "red",
-        "green",
-        "orange",
-        "purple",
-        "brown",
-        "pink",
-        "gray",
-        "olive",
-        "cyan",
-    ]
+    # Generate dynamic colors using viridis colormap
+    colors = plt.get_cmap("viridis")(
+        np.linspace(0, 1, len(avg_conformation_disulfides))
+    )
     markers = ["o", "s", "^", "D", "v", ">", "<", "p", "*", "h"]
 
     # Plot each class
     for i, (class_id, avg_disulfide) in enumerate(avg_conformation_disulfides.items()):
-        # Normalize the dihedral angles to the range [0, 1]
-        values = [angle / 360 + 0.5 for angle in avg_disulfide.dihedrals]
+        # Normalize the dihedral angles to the range [0, 1] where -180 maps to 0 and 180 maps to 1
+        values = [(angle + 180) / 360 for angle in avg_disulfide.dihedrals]
         values += values[:1]  # Close the loop
 
-        color = colors[i % len(colors)]
+        color = colors[i]
         marker = markers[i % len(markers)]
 
         ax.plot(
@@ -350,7 +355,7 @@ def compare_average_conformations(
             color=color,
             linewidth=2,
             marker=marker,
-            label=f"{class_id} ({class_names[class_id]})",
+            label=f"{class_names[class_id]}",
         )
         ax.fill(angles, values, color=color, alpha=0.1)
 
@@ -358,17 +363,23 @@ def compare_average_conformations(
     ax.set_xticks(angles[:-1])
     ax.set_xticklabels(["Chi1", "Chi2", "Chi3", "Chi4", "Chi5"])
 
+    # Customize radial ticks to show actual dihedral angles
+    ax.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
+    ax.set_yticklabels(["-180°", "-90°", "0°", "90°", "180°"])
+
     # Add legend
     plt.legend(loc="upper right", bbox_to_anchor=(0.1, 0.1))
 
-    plt.title("Average Conformation Comparison Between Classes")
+    # Add title and note about normalization
+    plt.title(
+        "Average Conformation Comparison Between Classes\n(Normalized: -180° to 180° mapped to 0 to 1)",
+        pad=20,
+    )
 
     # Save the plot
-    plt.tight_layout()
-    plt.savefig("class_avg_conformation_comparison.png", dpi=300, bbox_inches="tight")
-    print(
-        "Saved average conformation comparison plot to class_avg_conformation_comparison.png"
-    )
+    outpath = save_dir / "class_avg_conformation_comparison.png"
+    plt.savefig(outpath, dpi=300, bbox_inches="tight")
+    print(f"Saved average conformation comparison plot to {outpath}")
 
     # Show the plot (comment out if running in a non-interactive environment)
     # plt.show()
@@ -376,36 +387,33 @@ def compare_average_conformations(
     return avg_conformation_disulfides
 
 
-def main():
+def main(selected_classes=None):
     """
     Main function demonstrating how to compare disulfides from different classes.
-    """
-    # Path to the CSV file
-    csv_file = "binary_class_metrics_0.00.csv"
 
-    # Select classes to compare
-    selected_classes = [
-        "22222",  # "+++++" (RH Spiral)
-        "00000",  # "-----" (LH Spiral)
-        "02000",  # "-+---" (RH Staple)
-        "02020",  # "-+-+-" (LH Staple)
-        "20220",  # "+-++-" (RH Hook)
-    ]
+    :param selected_classes: List of class IDs to analyze. If None, defaults to predefined classes.
+    :type selected_classes: list[str] or None
+    """
+
+    # Use provided classes or default to predefined classes
+    if selected_classes is None:
+        selected_classes = [
+            "+++++",  # "+++++" (RH Spiral)
+            "-----",  # "-----" (LH Spiral)
+            "-+---",  # "-+---" (RH Staple)
+            "-+-+-",  # "-+-+-" (LH Staple)
+            "+-++-",  # "+-++-" (RH Hook)
+        ]
 
     print(f"Generating disulfides for selected classes: {selected_classes}...")
 
     # Create a generator instance and generate disulfides for the selected classes
-    generator = DisulfideClassGenerator(csv_file, base=2)
-    class_disulfides = generator.generate_for_selected_classes(
-        selected_classes, use_class_str=False
-    )
+    generator = DisulfideClassGenerator()
+    class_disulfides = generator.generate_for_selected_classes(selected_classes)
 
-    # Get class names from the CSV file
-    df = pd.read_csv(csv_file)
     class_names = {}
     for class_id in selected_classes:
-        row = df[df["class"] == class_id].iloc[0]
-        class_names[class_id] = row["class_str"]
+        class_names[class_id] = class_id
 
     # Print information about the generated disulfides
     print("\nGenerated Disulfides:")
@@ -417,7 +425,7 @@ def main():
 
     for class_id, disulfide_list in class_disulfides.items():
         print(
-            f"{class_id:<10} {class_names[class_id]:<15} {len(disulfide_list):<10} {disulfide_list.average_energy:<15.2f} {disulfide_list.average_ca_distance:<15.2f}"
+            f"{class_names[class_id]:<15} {len(disulfide_list):<10} {disulfide_list.average_energy:<15.2f} {disulfide_list.average_ca_distance:<15.2f}"
         )
 
     print("-" * 50)
@@ -436,7 +444,7 @@ def main():
 
     # Save all disulfides to a file
     for class_id, disulfide_list in class_disulfides.items():
-        output_file = f"class_{class_id}_disulfides.pkl"
+        output_file = SAVE_DIR / f"cls_{class_id}_disulfides.pkl"
         with open(output_file, "wb") as f:
             pickle.dump(disulfide_list, f)
         print(f"Saved disulfides for class {class_id} to {output_file}.")
@@ -445,4 +453,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+
+    # Parse command-line arguments for selected classes
+    selected_classes = sys.argv[1:] if len(sys.argv) > 1 else None
+    main(selected_classes)
