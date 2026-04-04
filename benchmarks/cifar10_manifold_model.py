@@ -6,7 +6,7 @@ CIFAR-10 Benchmark: ManifoldModel — The Ultimate Test
 The ManifoldModel on CIFAR-10: can pure geometry — zero learned parameters —
 classify 3,072-dimensional color images?
 
-This is the hardest test of the WaveRider thesis. CIFAR-10 has:
+This is the hardest test of the WaveRider thesis (see https://github.com/flux-frontiers/WaveRider). CIFAR-10 has:
   - 3,072 ambient dimensions (32×32×3 pixels)
   - 10 visually complex classes (animals, vehicles)
   - High intra-class variability (many poses, backgrounds, lighting)

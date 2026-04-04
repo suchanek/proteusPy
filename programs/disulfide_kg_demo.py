@@ -3,7 +3,7 @@
 Disulfide Knowledge Graph Demo
 ==============================
 
-Demonstrates the full WaveRider KG stack applied to disulfide bonds:
+Demonstrates the full WaveRider KG stack (https://github.com/flux-frontiers/WaveRider) applied to disulfide bonds:
 
 1. Load disulfides and build the hierarchical classification tree
 2. Print the tree structure (text visualizer)
