@@ -6,20 +6,11 @@
 
 <!-- markdownlint-disable MD014 -->
 
-# What's New in v0.99.50 — WaveRider Geometric ML Stack
+# WaveRider Geometric ML Stack
 
-**proteusPy now ships the complete WaveRider stack** — a four-layer framework for manifold-aware machine learning with zero learned parameters. The core thesis: *the manifold IS the model*.
+The **WaveRider** geometric ML stack — TurtleND, ManifoldWalker, ManifoldModel, ManifoldObserver, and the knowledge-graph reasoner — now lives in its own repository: **[flux-frontiers/WaveRider](https://github.com/flux-frontiers/WaveRider)**.
 
-| Layer | Module | What it does |
-|-------|--------|-------------|
-| 1 | `TurtleND` | N-dimensional navigation primitive: position + orthonormal frame, Givens rotations, QR orthonormalization |
-| 2 | `ManifoldWalker` / `ManifoldAdamWalker` | Riemannian-approximate gradient descent: KNN → local PCA → project gradient onto tangent plane → step |
-| 3 | `ManifoldModel` | Zero-parameter geometric classifier: manifold-weighted knowledge graph + tangent-space voting. No learned weights |
-| 3a | `ManifoldObserver` | (N+1)-dimensional observer: extends the walker's frame by one orthonormal dimension to gain the manifold normal — hovering above the surface to see curvature, topology, and class boundaries directly |
-
-The insight behind the ManifoldObserver: a TurtleND walking an N-dimensional manifold is a *Flatland creature* — it can only discover structure by searching. By appending one orthonormal dimension via QR, the observer gains a vantage point above the surface. What the ManifoldModel discovers by walking, the ManifoldObserver sees at a glance.
-
-See [`docs/waverider/waverider_stack_summary.md`](docs/waverider/waverider_stack_summary.md) for the full algorithmic reference and [`docs/manifold_observer/manifold_observer.md`](docs/manifold_observer/manifold_observer.md) for the mathematical treatment.
+See that repo for documentation, benchmarks, and experimental results.
 
 ---
 

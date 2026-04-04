@@ -10,7 +10,7 @@ multi-hop chaining with backtracking and beam search.
 
 Unlike gradient-based optimizers (ManifoldWalker) that operate on continuous
 manifolds, the GraphReasoner traverses discrete nodes connected by typed,
-weighted semantic edges. Unlike compressed-space navigators (WaveRider),
+weighted semantic edges. Unlike compressed-space navigators ([WaveRider](https://github.com/flux-frontiers/WaveRider)),
 it operates on ground-truth knowledge structures where every connection is
 empirically grounded.
 
@@ -342,4 +342,4 @@ This is fundamentally different from:
 - **LLM reasoning** — which hallucinates connections
 - **Standard graph traversal** — which ignores semantic direction
 - **ManifoldWalker** — which optimizes a scalar on continuous space
-- **WaveRider** — which navigates compressed model representations
+- **[WaveRider](https://github.com/flux-frontiers/WaveRider)** — which navigates compressed model representations

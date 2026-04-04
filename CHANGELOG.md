@@ -9,7 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- **`waverider_missions/`** — WaveRider narrative content moved to [flux-frontiers/WaveRider](https://github.com/flux-frontiers/WaveRider).
+- **`turtlend_package/`** — standalone TurtleND package, benchmarks, and tests moved to [flux-frontiers/WaveRider](https://github.com/flux-frontiers/WaveRider).
+
 ### Changed
+
+- **WaveRider references** updated throughout README, docs, and benchmarks to point to the new [flux-frontiers/WaveRider](https://github.com/flux-frontiers/WaveRider) repository.
 
 - **WaveRider arXiv manuscript** (`docs/waverider/article/waverider_arxiv.tex`) — relocated from `docs/waverider/` to `docs/waverider/article/`; updated Introduction to justify intrinsic-dimensionality claims with the actual discovery mechanism: local PCA cumulative-variance threshold (τ) applied per data point, with forward references to Algorithm 1 (`\label{alg:walker}`) and §3.2 (`\label{sec:manifoldwalker}`); corrected the noise-fraction figures per dataset (71–83% for UCI Digits, 98.8–99.3% for CIFAR-10; previously misstated as ">99%" for both). Added "Intrinsic dimensionality estimation" paragraph in Related Work covering TwoNN (Facco et al. 2017), participation ratio, and PCA-elbow methods. Added bibliography entries for Facco et al. 2017 (TwoNN estimator) and Pope et al. 2021 (intrinsic dimension of images), cited for corroboration.
 

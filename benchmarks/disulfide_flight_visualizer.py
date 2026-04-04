@@ -341,7 +341,7 @@ def make_figure(json_path: str, png_path: str, dpi: int = 150) -> None:
 
     fig.text(
         0.5, 0.004,
-        "proteusPy · WaveRider · ManifoldObserver  |  "
+        "proteusPy · WaveRider (flux-frontiers/WaveRider) · ManifoldObserver  |  "
         "© 2026 Eric G. Suchanek, PhD · Flux-Frontiers · BSD",
         ha="center", fontsize=7, color="#484f58",
     )
