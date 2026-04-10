@@ -45,12 +45,8 @@ def main():
         default="ss_overlay.png",
         help="Filename to save for the movie or screenshot",
     )
-    parser.add_argument(
-        "--width", type=int, default=1024, help="Width of the display window"
-    )
-    parser.add_argument(
-        "--height", type=int, default=1024, help="Height of the display window"
-    )
+    parser.add_argument("--width", type=int, default=1024, help="Width of the display window")
+    parser.add_argument("--height", type=int, default=1024, help="Height of the display window")
 
     args = parser.parse_args()
 

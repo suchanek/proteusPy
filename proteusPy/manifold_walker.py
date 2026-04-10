@@ -175,9 +175,9 @@ class ManifoldWalker:
         for i in range(self._ndim):
             perturb = np.zeros(self._ndim, dtype="d")
             perturb[i] = self._epsilon
-            grad[i] = (
-                self._objective(point + perturb) - self._objective(point - perturb)
-            ) / (2 * self._epsilon)
+            grad[i] = (self._objective(point + perturb) - self._objective(point - perturb)) / (
+                2 * self._epsilon
+            )
         return grad
 
     def orient(self) -> int:
@@ -192,9 +192,7 @@ class ManifoldWalker:
         intrinsic_dim : int
             The estimated local intrinsic dimensionality.
         """
-        eigenvalues, eigenvectors, intrinsic_dim = self._local_pca(
-            self._turtle._position
-        )
+        eigenvalues, eigenvectors, intrinsic_dim = self._local_pca(self._turtle._position)
         self._eigenvalues = eigenvalues
         self._intrinsic_dim = intrinsic_dim
 
@@ -245,9 +243,7 @@ class ManifoldWalker:
         # Directions with more variance get proportionally more trust
         if self._eigenvalues is not None and self._eigenvalues[0] > 0:
             weights = np.zeros(self._ndim, dtype="d")
-            weights[:intrinsic_dim] = (
-                self._eigenvalues[:intrinsic_dim] / self._eigenvalues[0]
-            )
+            weights[:intrinsic_dim] = self._eigenvalues[:intrinsic_dim] / self._eigenvalues[0]
             local_grad *= weights
 
         # 6. Convert back to global and step (negative = descent)
@@ -295,8 +291,7 @@ class ManifoldWalker:
 
             if verbose and i % 10 == 0:
                 print(
-                    f"Step {i:4d}: obj={val:.6e}  "
-                    f"intrinsic_dim={self._intrinsic_dim}/{self._ndim}"
+                    f"Step {i:4d}: obj={val:.6e}  intrinsic_dim={self._intrinsic_dim}/{self._ndim}"
                 )
 
             if abs(val - prev_val) < tol:
@@ -451,10 +446,10 @@ class ManifoldAdamWalker(ManifoldWalker):
         # 5. Adam update on the projected gradient
         self._t += 1
         self._m = self._beta1 * self._m + (1 - self._beta1) * projected_grad
-        self._v = self._beta2 * self._v + (1 - self._beta2) * (projected_grad ** 2)
+        self._v = self._beta2 * self._v + (1 - self._beta2) * (projected_grad**2)
 
-        m_hat = self._m / (1 - self._beta1 ** self._t)
-        v_hat = self._v / (1 - self._beta2 ** self._t)
+        m_hat = self._m / (1 - self._beta1**self._t)
+        v_hat = self._v / (1 - self._beta2**self._t)
 
         adam_step = m_hat / (np.sqrt(v_hat) + self._adam_eps)
 
@@ -467,11 +462,7 @@ class ManifoldAdamWalker(ManifoldWalker):
         return obj_val
 
     def __repr__(self):
-        id_str = (
-            f"intrinsic_dim={self._intrinsic_dim}"
-            if self._intrinsic_dim
-            else "not oriented"
-        )
+        id_str = f"intrinsic_dim={self._intrinsic_dim}" if self._intrinsic_dim else "not oriented"
         return (
             f"<ManifoldAdamWalker: {self._ndim}D, {self._n_points} embeddings, "
             f"k={self._k}, lr={self._lr}, {id_str}, "

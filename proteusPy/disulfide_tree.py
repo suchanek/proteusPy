@@ -215,9 +215,7 @@ def snippet_for_node(node_data: TreeNodeData) -> dict:
     desc_parts = [f"{level.capitalize()} class {cid}{suffix}"]
     if node_data.class_name:
         desc_parts[0] += f" ({node_data.class_name})"
-    desc_parts.append(
-        f"{node_data.occupancy} members ({node_data.occupancy_pct:.2f}%)"
-    )
+    desc_parts.append(f"{node_data.occupancy} members ({node_data.occupancy_pct:.2f}%)")
     if node_data.functional_annotation:
         desc_parts.append(f"Function: {node_data.functional_annotation}")
     if node_data.consensus_torsions:
@@ -344,12 +342,8 @@ class DisulfideTree:
             return
 
         # Step 1: classify every disulfide at all 4 levels
-        members: dict[str, dict[str, list]] = {
-            level: {} for level in LEVELS
-        }
-        member_angles: dict[str, list[np.ndarray]] = {
-            level: {} for level in LEVELS
-        }
+        members: dict[str, dict[str, list]] = {level: {} for level in LEVELS}
+        member_angles: dict[str, list[np.ndarray]] = {level: {} for level in LEVELS}
 
         for ss in sslist:
             torsions = np.array(ss.torsion_array, dtype="d")
@@ -384,9 +378,7 @@ class DisulfideTree:
                 self._graph.add_node(node_key, centroid, node=data)
 
         # Step 3: add root node
-        all_angles = np.array(
-            [np.array(ss.torsion_array, dtype="d") for ss in sslist]
-        )
+        all_angles = np.array([np.array(ss.torsion_array, dtype="d") for ss in sslist])
         root_centroid = _circular_mean_deg(all_angles)
         root_data = TreeNodeData(
             class_id="root",
@@ -402,9 +394,7 @@ class DisulfideTree:
         for cid in members["binary"]:
             node_key = f"{cid}b"
             weight = self._node_data[node_key].occupancy_pct / 100.0
-            self._graph.add_edge(
-                SemanticEdge("root", node_key, weight, "hierarchy")
-            )
+            self._graph.add_edge(SemanticEdge("root", node_key, weight, "hierarchy"))
 
         # binary → quadrant → sextant → octant
         level_pairs = [
@@ -421,9 +411,7 @@ class DisulfideTree:
                 parent_key = f"{pid}{parent_suffix}"
                 if parent_key in self._graph:
                     weight = self._node_data[child_key].occupancy_pct / 100.0
-                    self._graph.add_edge(
-                        SemanticEdge(parent_key, child_key, weight, "hierarchy")
-                    )
+                    self._graph.add_edge(SemanticEdge(parent_key, child_key, weight, "hierarchy"))
 
         # Step 5: add leaf edges (octant → individual disulfides)
         for cid, ss_list in members["octant"].items():
@@ -433,9 +421,7 @@ class DisulfideTree:
                 if member_key not in self._graph:
                     emb = np.array(ss.torsion_array, dtype="d")
                     self._graph.add_node(member_key, emb, node=ss)
-                self._graph.add_edge(
-                    SemanticEdge(oct_key, member_key, 1.0, "membership")
-                )
+                self._graph.add_edge(SemanticEdge(oct_key, member_key, 1.0, "membership"))
 
     def snippet(self, node_key: str) -> dict:
         """Return a KGRAG snippet for the given node.

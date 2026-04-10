@@ -139,9 +139,7 @@ from proteusPy.manifold_model import ManifoldModel  # noqa: E402
 # ---------------------------------------------------------------------------
 
 
-def discover_dimensionality(
-    X, n_samples=500, k=50, variance_thresholds=(0.95, 0.90, 0.85)
-):
+def discover_dimensionality(X, n_samples=500, k=50, variance_thresholds=(0.95, 0.90, 0.85)):
     """Discover intrinsic dimensionality of the data manifold via local PCA.
 
     Samples n_samples random points, computes local PCA at each,
@@ -154,9 +152,7 @@ def discover_dimensionality(
     :returns: Dict mapping each τ to a statistics dict.
     """
     n_points, ndim = X.shape
-    sample_idx = np.random.choice(
-        n_points, size=min(n_samples, n_points), replace=False
-    )
+    sample_idx = np.random.choice(n_points, size=min(n_samples, n_points), replace=False)
 
     results = {tau: [] for tau in variance_thresholds}
 
@@ -167,9 +163,9 @@ def discover_dimensionality(
         knn_idx = np.argpartition(dists, k)[:k]
         neighbors = X[knn_idx]
 
-        # Local PCA
-        centered = neighbors - neighbors.mean(axis=0)
-        cov = (centered.T @ centered) / (len(neighbors) - 1)
+        # Local PCA — cast to float64 to avoid Apple BLAS float32 overflow
+        centered = (neighbors - neighbors.mean(axis=0)).astype(np.float64)
+        cov = np.einsum("ij,ik->jk", centered, centered) / (len(neighbors) - 1)
         eigenvalues = np.linalg.eigvalsh(cov)[::-1]
         eigenvalues = np.maximum(eigenvalues, 0.0)
 
@@ -219,8 +215,9 @@ def discover_per_class_dimensionality(X, y, k=50, tau=0.90, n_samples_per_class=
             knn_idx = np.argpartition(dists, k_use)[:k_use]
             neighbors = X_c[knn_idx]
 
-            centered = neighbors - neighbors.mean(axis=0)
-            cov = (centered.T @ centered) / (len(neighbors) - 1)
+            # cast to float64 to avoid Apple BLAS float32 overflow
+            centered = (neighbors - neighbors.mean(axis=0)).astype(np.float64)
+            cov = np.einsum("ij,ik->jk", centered, centered) / (len(neighbors) - 1)
             eigenvalues = np.linalg.eigvalsh(cov)[::-1]
             eigenvalues = np.maximum(eigenvalues, 0.0)
 
@@ -613,9 +610,7 @@ def plot_results(all_results, intrinsic_dim, save_path, elapsed=None):
     stds = [np.std([r["test_acc"] for r in all_results[n]]) for n in names]
     bar_colors = [color_map[n] for n in names]
     short_names = [n.split("(")[0].strip() for n in names]
-    bars = ax.bar(
-        short_names, means, yerr=stds, color=bar_colors, alpha=0.8, capsize=5
-    )
+    bars = ax.bar(short_names, means, yerr=stds, color=bar_colors, alpha=0.8, capsize=5)
     for bar, m in zip(bars, means):
         ax.text(
             bar.get_x() + bar.get_width() / 2,
@@ -685,9 +680,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Digits: Manifold-Informed Architecture — Comprehensive Comparison"
     )
-    parser.add_argument(
-        "--epochs", type=int, default=50, help="Training epochs for Keras models"
-    )
+    parser.add_argument("--epochs", type=int, default=50, help="Training epochs for Keras models")
     parser.add_argument(
         "--trials",
         type=int,
@@ -713,18 +706,14 @@ def main():
         default=200,
         help="Points to sample for dimensionality discovery (out of 1797)",
     )
-    parser.add_argument(
-        "--k-pca", type=int, default=30, help="Neighborhood size for local PCA"
-    )
+    parser.add_argument("--k-pca", type=int, default=30, help="Neighborhood size for local PCA")
     parser.add_argument(
         "--k-graph",
         type=int,
         default=15,
         help="Neighborhood size for ManifoldModel graph construction",
     )
-    parser.add_argument(
-        "--k-vote", type=int, default=7, help="Voting neighbors for ManifoldModel"
-    )
+    parser.add_argument("--k-vote", type=int, default=7, help="Voting neighbors for ManifoldModel")
     parser.add_argument("--plot", action="store_true", default=True)
     args = parser.parse_args()
     t_start = time.perf_counter()
@@ -738,7 +727,8 @@ def main():
     X, y = data.data.astype("float32"), data.target
 
     scaler = StandardScaler()
-    X = scaler.fit_transform(X).astype("float32")
+    # nan_to_num: constant pixels (std=0) produce NaN after scaling → zero them
+    X = np.nan_to_num(scaler.fit_transform(X)).astype("float32")
 
     input_dim = X.shape[1]
     n_classes = len(set(y))
@@ -754,9 +744,7 @@ def main():
     print("PHASE 1: MANIFOLD DISCOVERY")
     print("=" * 70)
 
-    print(
-        f"\nSampling {args.discovery_samples} points, k={args.k_pca} neighbors..."
-    )
+    print(f"\nSampling {args.discovery_samples} points, k={args.k_pca} neighbors...")
     t0 = time.perf_counter()
     dim_report = discover_dimensionality(
         X,
@@ -784,10 +772,7 @@ def main():
     )
     for c in sorted(class_dims.keys()):
         cd = class_dims[c]
-        print(
-            f"  Digit {c}: d = {cd['mean']:.1f} ± {cd['std']:.1f}"
-            f"  [{cd['min']}, {cd['max']}]"
-        )
+        print(f"  Digit {c}: d = {cd['mean']:.1f} ± {cd['std']:.1f}  [{cd['min']}, {cd['max']}]")
 
     # Bottleneck = max of per-class maxima — accommodates the hardest manifold
     global_dim = int(round(dim_report[args.tau]["mean"]))
@@ -910,8 +895,9 @@ def main():
             # PCA is fit on the training fold only (no data leakage)
             if needs_pca:
                 pca_fold = skPCA(n_components=d)
-                X_tr_use = pca_fold.fit_transform(X_tr).astype("float32")
-                X_te_use = pca_fold.transform(X_te).astype("float32")
+                # cast to float64 for PCA matmul to avoid Apple BLAS float32 overflow
+                X_tr_use = pca_fold.fit_transform(X_tr.astype(np.float64)).astype("float32")
+                X_te_use = pca_fold.transform(X_te.astype(np.float64)).astype("float32")
             else:
                 X_tr_use, X_te_use = X_tr, X_te
 
@@ -979,13 +965,9 @@ def main():
     print("-" * 70)
 
     # Determine best mean accuracy for marker
-    best_acc = max(
-        np.mean([r["test_acc"] for r in all_results[n]]) for n in all_results
-    )
+    best_acc = max(np.mean([r["test_acc"] for r in all_results[n]]) for n in all_results)
 
-    print(
-        f"\n{'Architecture':<40} {'Mean Acc':>10} {'Std':>8} {'Params':>10} {'Time (s)':>10}"
-    )
+    print(f"\n{'Architecture':<40} {'Mean Acc':>10} {'Std':>8} {'Params':>10} {'Time (s)':>10}")
     print("-" * 80)
 
     for name in all_results:
@@ -1028,10 +1010,7 @@ def main():
         if n_params > 0:
             mean_acc = np.mean([r["test_acc"] for r in results])
             eff = mean_acc / n_params * 1000
-            print(
-                f"  {name}: {eff:.4f} acc/Kparam"
-                f"  ({mean_acc:.4f} / {n_params:,})"
-            )
+            print(f"  {name}: {eff:.4f} acc/Kparam  ({mean_acc:.4f} / {n_params:,})")
 
     # Winner callout
     print("-" * 70)
@@ -1055,14 +1034,12 @@ def main():
         elif n_params_best < n_params_std:
             reduction = 100 * (1 - n_params_best / n_params_std)
             print(
-                f"   With {reduction:.0f}% FEWER parameters"
-                f" ({n_params_best:,} vs {n_params_std:,})"
+                f"   With {reduction:.0f}% FEWER parameters ({n_params_best:,} vs {n_params_std:,})"
             )
         elif n_params_best > n_params_std:
             increase = 100 * (n_params_best / n_params_std - 1)
             print(
-                f"   With {increase:.0f}% more parameters"
-                f" ({n_params_best:,} vs {n_params_std:,})"
+                f"   With {increase:.0f}% more parameters ({n_params_best:,} vs {n_params_std:,})"
             )
     else:
         print(f">> Standard architecture wins: {std_mean:.4f}")
@@ -1096,9 +1073,7 @@ def main():
         "results": {name: results for name, results in all_results.items()},
     }
 
-    results_path = (
-        Path(__file__).resolve().parent / "digits_manifold_architecture_results.json"
-    )
+    results_path = Path(__file__).resolve().parent / "digits_manifold_architecture_results.json"
     with open(results_path, "w") as f:
         json.dump(save_data, f, indent=2, default=str)
     print(f"\nResults saved to {results_path}")
@@ -1109,8 +1084,7 @@ def main():
 
     if args.plot:
         plot_path = str(
-            Path(__file__).resolve().parent
-            / "digits_manifold_architecture_results.png"
+            Path(__file__).resolve().parent / "digits_manifold_architecture_results.png"
         )
         plot_results(all_results, intrinsic_dim, plot_path, elapsed=elapsed)
 

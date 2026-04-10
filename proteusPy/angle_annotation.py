@@ -78,7 +78,7 @@ class AngleAnnotation(Arc):
         text="",
         textposition="inside",
         text_kw=None,
-        **kwargs
+        **kwargs,
     ):
         """
         Parameters
@@ -128,13 +128,7 @@ class AngleAnnotation(Arc):
         self.textposition = textposition
 
         super().__init__(
-            self._xydata,
-            size,
-            size,
-            angle=0.0,
-            theta1=self.theta1,
-            theta2=self.theta2,
-            **kwargs
+            self._xydata, size, size, angle=0.0, theta1=self.theta1, theta2=self.theta2, **kwargs
         )
 
         self.set_transform(IdentityTransform())

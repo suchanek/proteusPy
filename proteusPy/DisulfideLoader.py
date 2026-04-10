@@ -177,9 +177,7 @@ class DisulfideLoader:
                     self.sg_cutoff = sg_cutoff
 
                     if self.verbose:
-                        _logger.info(
-                            f"Using percentile cutoffs: {ca_cutoff:.2f}, {sg_cutoff:.2f}"
-                        )
+                        _logger.info(f"Using percentile cutoffs: {ca_cutoff:.2f}, {sg_cutoff:.2f}")
 
                 old_length = len(sslist)
                 filt = sslist.filter_by_distance(
@@ -269,7 +267,7 @@ class DisulfideLoader:
         if isinstance(item, slice):
             indices = range(*item.indices(len(self.SSList)))
             ind_list = list(indices)
-            name = f"pdb_slice[{ind_list[0]}:{ind_list[-1]+1}]"
+            name = f"pdb_slice[{ind_list[0]}:{ind_list[-1] + 1}]"
             resolution = self.SSList[0].resolution
             sublist = [self.SSList[i] for i in indices]
             return DisulfideList(sublist, name, resolution)
@@ -330,9 +328,7 @@ class DisulfideLoader:
         """
         sslist = self.SSList
         valid_resolutions = [
-            ss.resolution
-            for ss in sslist
-            if ss.resolution is not None and ss.resolution != -1.0
+            ss.resolution for ss in sslist if ss.resolution is not None and ss.resolution != -1.0
         ]
 
         if not valid_resolutions:
@@ -453,9 +449,7 @@ class DisulfideLoader:
         tot_ss = len(ss_ids)
         class_disulfides = DisulfideList([], cls, quiet=True)
 
-        _pbar = (
-            tqdm(range(tot_ss), total=tot_ss, leave=True) if verbose else range(tot_ss)
-        )
+        _pbar = tqdm(range(tot_ss), total=tot_ss, leave=True) if verbose else range(tot_ss)
 
         for idx in _pbar:
             ssid = ss_ids[idx]
@@ -526,9 +520,7 @@ class DisulfideLoader:
 
         return
 
-    def display_overlay(
-        self, pdbid: str = "", verbose: bool = False, spin: bool = False
-    ) -> None:
+    def display_overlay(self, pdbid: str = "", verbose: bool = False, spin: bool = False) -> None:
         """
         Display all disulfides for a given PDB ID overlaid in stick mode against
         a common coordinate frame. This allows us to see all of the disulfides
@@ -770,9 +762,7 @@ class DisulfideLoader:
 
         DisulfideVisualization.plot_count_vs_classid(self.tclass, cls, theme, base, log)
 
-    def _enumerate_class_fromlist(
-        self, sslist: list[str], base: int = 8
-    ) -> pd.DataFrame:
+    def _enumerate_class_fromlist(self, sslist: list[str], base: int = 8) -> pd.DataFrame:
         """
         Enumerate the classes from a list of class IDs and return a DataFrame with class IDs and their corresponding counts.
         Results are cached for improved performance on repeated calls.
@@ -894,9 +884,7 @@ class DisulfideLoader:
             log=log,
         )
 
-    def plot_deviation_scatterplots(
-        self, verbose: bool = False, theme: str = "auto"
-    ) -> None:
+    def plot_deviation_scatterplots(self, verbose: bool = False, theme: str = "auto") -> None:
         """
         Plot scatter plots for Bondlength_Deviation, Angle_Deviation Ca_Distance
         and SG_Distance.
@@ -909,9 +897,7 @@ class DisulfideLoader:
         """
         self.SSList.plot_deviation_scatterplots(verbose=verbose, theme=theme)
 
-    def plot_deviation_histograms(
-        self, theme: str = "auto", verbose: bool = True
-    ) -> None:
+    def plot_deviation_histograms(self, theme: str = "auto", verbose: bool = True) -> None:
         """
         Plot histograms for Bondlength_Deviation, Angle_Deviation, and Ca_Distance.
         """
@@ -1146,7 +1132,6 @@ def Load_PDB_SS(
     _fname_sub = Path(loadpath) / LOADER_SUBSET_FNAME
     _fname_all = Path(loadpath) / LOADER_FNAME
     _fpath = _fname_sub if subset else _fname_all
-
 
     if not _fpath.exists() or force is True:
         if verbose:

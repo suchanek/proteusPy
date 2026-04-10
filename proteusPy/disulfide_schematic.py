@@ -283,25 +283,15 @@ def create_disulfide_schematic(
     # Add dihedral angle labels if requested
     if show_angles:
         # Chi1
-        ax.text(
-            1.2, -0.5, f"χ₁: {disulfide.chi1:.1f}°", fontsize=font_size - 1, ha="left"
-        )
+        ax.text(1.2, -0.5, f"χ₁: {disulfide.chi1:.1f}°", fontsize=font_size - 1, ha="left")
         # Chi2
-        ax.text(
-            1.2, -1.5, f"χ₂: {disulfide.chi2:.1f}°", fontsize=font_size - 1, ha="left"
-        )
+        ax.text(1.2, -1.5, f"χ₂: {disulfide.chi2:.1f}°", fontsize=font_size - 1, ha="left")
         # Chi3
-        ax.text(
-            2.5, -2.2, f"χ₃: {disulfide.chi3:.1f}°", fontsize=font_size - 1, ha="center"
-        )
+        ax.text(2.5, -2.2, f"χ₃: {disulfide.chi3:.1f}°", fontsize=font_size - 1, ha="center")
         # Chi4
-        ax.text(
-            3.8, -1.5, f"χ₂′: {disulfide.chi4:.1f}°", fontsize=font_size - 1, ha="right"
-        )
+        ax.text(3.8, -1.5, f"χ₂′: {disulfide.chi4:.1f}°", fontsize=font_size - 1, ha="right")
         # Chi5
-        ax.text(
-            3.8, -0.5, f"χ₁′: {disulfide.chi5:.1f}°", fontsize=font_size - 1, ha="right"
-        )
+        ax.text(3.8, -0.5, f"χ₁′: {disulfide.chi5:.1f}°", fontsize=font_size - 1, ha="right")
 
     # Add title if requested
     if show_title and disulfide:
@@ -348,9 +338,7 @@ def create_disulfide_schematic(
         # Calculate control points for the curved line
         # We'll use a quadratic Bezier curve that dips below the straight line
         mid_x = (ca_prox_pos[0] + ca_dist_pos[0]) / 2
-        mid_y = (
-            ca_prox_pos[1] + ca_dist_pos[1]
-        ) / 2 - 0.5  # Offset below the straight line
+        mid_y = (ca_prox_pos[1] + ca_dist_pos[1]) / 2 - 0.5  # Offset below the straight line
 
         # Create the curved path
 

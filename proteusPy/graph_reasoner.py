@@ -191,9 +191,7 @@ class KnowledgeGraph:
         """
         emb = np.asarray(embedding, dtype="d")
         if emb.shape != (self.ndim,):
-            raise ValueError(
-                f"Embedding must have shape ({self.ndim},), got {emb.shape}"
-            )
+            raise ValueError(f"Embedding must have shape ({self.ndim},), got {emb.shape}")
         self._nodes[node_id] = node
         self._embeddings[node_id] = emb.copy()
         self._dirty = True
@@ -318,9 +316,7 @@ class RadiusDiscoverer(EdgeDiscoverer):
         If True, use angular wrapping at +/-180 degrees.
     """
 
-    def __init__(
-        self, threshold: float, edge_type: str = "semantic", angular: bool = False
-    ):
+    def __init__(self, threshold: float, edge_type: str = "semantic", angular: bool = False):
         self.threshold = threshold
         self.edge_type = edge_type
         self.angular = angular
@@ -531,11 +527,7 @@ class GradientSteering(SteeringStrategy):
     def score_candidate(self, current, candidate, heading, edge, path):
         current_val = self.field_fn(current)
         candidate_val = self.field_fn(candidate)
-        improvement = (
-            current_val - candidate_val
-            if self.minimize
-            else candidate_val - current_val
-        )
+        improvement = current_val - candidate_val if self.minimize else candidate_val - current_val
 
         direction = candidate - current
         norm = np.linalg.norm(direction)
@@ -561,9 +553,7 @@ class ExplorationSteering(SteeringStrategy):
         alignment = float(np.dot(direction / norm, heading))
 
         if path.embeddings:
-            min_dist = min(
-                float(np.linalg.norm(candidate - e)) for e in path.embeddings
-            )
+            min_dist = min(float(np.linalg.norm(candidate - e)) for e in path.embeddings)
         else:
             min_dist = norm
 
@@ -842,9 +832,7 @@ class GraphReasoner:
         )
 
         # Each beam: (cumulative_score, path, visited_set)
-        beams: list[tuple[float, ReasoningPath, set[str]]] = [
-            (0.0, initial_path, {start_id})
-        ]
+        beams: list[tuple[float, ReasoningPath, set[str]]] = [(0.0, initial_path, {start_id})]
 
         for _ in range(max_hops):
             candidates: list[tuple[float, ReasoningPath, set[str]]] = []
@@ -858,9 +846,7 @@ class GraphReasoner:
                     direction = path.embeddings[-1] - path.embeddings[-2]
                     norm = np.linalg.norm(direction)
                     heading = (
-                        direction / norm
-                        if norm > 1e-10
-                        else np.eye(1, self.graph.ndim, 0).ravel()
+                        direction / norm if norm > 1e-10 else np.eye(1, self.graph.ndim, 0).ravel()
                     )
                 else:
                     heading = np.eye(1, self.graph.ndim, 0).ravel()
@@ -888,9 +874,7 @@ class GraphReasoner:
                         embeddings=path.embeddings + [target_emb.copy()],
                         scores=path.scores + [score],
                     )
-                    candidates.append(
-                        (cum_score + score, new_path, visited | {edge.target_id})
-                    )
+                    candidates.append((cum_score + score, new_path, visited | {edge.target_id}))
 
             if not candidates:
                 break

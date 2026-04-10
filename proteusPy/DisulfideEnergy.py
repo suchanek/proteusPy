@@ -112,9 +112,7 @@ class DisulfideEnergy:
         """
         if len(dihedrals) != 5:
             raise ValueError("Expected a list of 5 dihedral angles")
-        self.set_dihedrals(
-            dihedrals[0], dihedrals[1], dihedrals[2], dihedrals[3], dihedrals[4]
-        )
+        self.set_dihedrals(dihedrals[0], dihedrals[1], dihedrals[2], dihedrals[3], dihedrals[4])
 
     @property
     def dihedrals(self):
@@ -151,10 +149,7 @@ class DisulfideEnergy:
         # Standard energy components (kcal/mol)
         std_components = {
             "chi1_chi5": 2.0
-            * (
-                np.cos(self._torad(3.0 * self._chi1))
-                + np.cos(self._torad(3.0 * self._chi5))
-            ),
+            * (np.cos(self._torad(3.0 * self._chi1)) + np.cos(self._torad(3.0 * self._chi5))),
             "chi2_chi4": np.cos(self._torad(3.0 * self._chi2))
             + np.cos(self._torad(3.0 * self._chi4)),
             "chi3": 3.5 * np.cos(self._torad(2.0 * self._chi3))
@@ -438,9 +433,7 @@ class DisulfideEnergy:
                 linewidth=linewidth,
             )
 
-        ax1.set_title(
-            f"Standard Energy Components - chi{angle_to_vary} varied (kcal/mol)"
-        )
+        ax1.set_title(f"Standard Energy Components - chi{angle_to_vary} varied (kcal/mol)")
         ax1.set_ylabel("Energy (kcal/mol)")
         ax1.legend()
         ax1.grid(True, alpha=0.3)
@@ -622,9 +615,7 @@ class DisulfideEnergy:
         chi_indices : tuple
             Indices of the two chi angles to vary (1-based, like chi1, chi2, etc.)
         """
-        print(
-            f"Creating surface plot for chi{chi_indices[0]} and chi{chi_indices[1]}..."
-        )
+        print(f"Creating surface plot for chi{chi_indices[0]} and chi{chi_indices[1]}...")
 
         # Set default values for all chi angles
         default_chi = [-60, -60, -85, -60, -60]  # Spiral conformation
@@ -661,9 +652,7 @@ class DisulfideEnergy:
             x, y, z_standard, cmap="viridis", linewidth=0, antialiased=True, alpha=0.8
         )
 
-        ax1.set_title(
-            f"Standard Energy (kcal/mol) - chi{chi_indices[0]} vs chi{chi_indices[1]}"
-        )
+        ax1.set_title(f"Standard Energy (kcal/mol) - chi{chi_indices[0]} vs chi{chi_indices[1]}")
         ax1.set_xlabel(f"Chi{chi_indices[0]} (degrees)")
         ax1.set_ylabel(f"Chi{chi_indices[1]} (degrees)")
         ax1.set_zlabel("Energy (kcal/mol)")
@@ -675,9 +664,7 @@ class DisulfideEnergy:
             x, y, z_dse, cmap="plasma", linewidth=0, antialiased=True, alpha=0.8
         )
 
-        ax2.set_title(
-            f"DSE Energy (kcal/mol) - chi{chi_indices[0]} vs chi{chi_indices[1]}"
-        )
+        ax2.set_title(f"DSE Energy (kcal/mol) - chi{chi_indices[0]} vs chi{chi_indices[1]}")
         ax2.set_xlabel(f"Chi{chi_indices[0]} (degrees)")
         ax2.set_ylabel(f"Chi{chi_indices[1]} (degrees)")
         ax2.set_zlabel("Energy (kcal/mol)")

@@ -96,8 +96,8 @@ class ManifoldKNN:
 
     def _local_pca(self, point, neighbors):
         """PCA on a neighborhood, return projection matrix and intrinsic dim."""
-        centered = neighbors - neighbors.mean(axis=0)
-        cov = (centered.T @ centered) / (len(neighbors) - 1)
+        centered = (neighbors - neighbors.mean(axis=0)).astype(np.float64)
+        cov = np.einsum("ij,ik->jk", centered, centered) / (len(neighbors) - 1)
         eigenvalues, eigenvectors = np.linalg.eigh(cov)
 
         # Descending order
@@ -239,11 +239,21 @@ def main():
     methods = {
         "Euclidean KNN": lambda: KNeighborsClassifier(n_neighbors=k_vote, metric="euclidean"),
         "Cosine KNN": lambda: KNeighborsClassifier(n_neighbors=k_vote, metric="cosine"),
-        "Manifold KNN (tau=0.95)": lambda: ManifoldKNN(k_vote=k_vote, k_pca=k_pca, variance_threshold=0.95),
-        "Manifold KNN (tau=0.90)": lambda: ManifoldKNN(k_vote=k_vote, k_pca=k_pca, variance_threshold=0.90),
-        "Manifold KNN (tau=0.85)": lambda: ManifoldKNN(k_vote=k_vote, k_pca=k_pca, variance_threshold=0.85),
-        "EigenWeighted Manifold (tau=0.95)": lambda: EigenWeightedManifoldKNN(k_vote=k_vote, k_pca=k_pca, variance_threshold=0.95),
-        "EigenWeighted Manifold (tau=0.90)": lambda: EigenWeightedManifoldKNN(k_vote=k_vote, k_pca=k_pca, variance_threshold=0.90),
+        "Manifold KNN (tau=0.95)": lambda: ManifoldKNN(
+            k_vote=k_vote, k_pca=k_pca, variance_threshold=0.95
+        ),
+        "Manifold KNN (tau=0.90)": lambda: ManifoldKNN(
+            k_vote=k_vote, k_pca=k_pca, variance_threshold=0.90
+        ),
+        "Manifold KNN (tau=0.85)": lambda: ManifoldKNN(
+            k_vote=k_vote, k_pca=k_pca, variance_threshold=0.85
+        ),
+        "EigenWeighted Manifold (tau=0.95)": lambda: EigenWeightedManifoldKNN(
+            k_vote=k_vote, k_pca=k_pca, variance_threshold=0.95
+        ),
+        "EigenWeighted Manifold (tau=0.90)": lambda: EigenWeightedManifoldKNN(
+            k_vote=k_vote, k_pca=k_pca, variance_threshold=0.90
+        ),
     }
 
     results = {}
@@ -318,7 +328,7 @@ def main():
         delta = best_manifold_acc - euclidean_acc
         print(f"MANIFOLD WINS: {best_manifold_name}")
         print(f"  {best_manifold_acc:.4f} vs {euclidean_acc:.4f} (euclidean)")
-        print(f"  Improvement: +{delta:.4f} ({delta*100:.2f}%)")
+        print(f"  Improvement: +{delta:.4f} ({delta * 100:.2f}%)")
     else:
         print(f"Euclidean KNN wins: {euclidean_acc:.4f} vs {best_manifold_acc:.4f}")
 

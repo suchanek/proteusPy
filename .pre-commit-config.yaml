@@ -1,0 +1,29 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+        exclude: '^(proteusPy|docs|benchmarks)/.*\.(png|jpg|jpeg|gif|pdf)$|^\.(codekg|dockg|ftreekg)/'
+      - id: debug-statements
+
+  - repo: local
+    hooks:
+      - id: poetry-check
+        name: poetry check
+        entry: poetry check --lock
+        language: system
+        pass_filenames: false
+        always_run: true
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.10
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format

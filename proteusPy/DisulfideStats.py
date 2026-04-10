@@ -318,14 +318,10 @@ class DisulfideStats:
                 )
 
         # Convert idealized angles to a list
-        idealized_angles_list = [
-            idealized_angles[triplet] for triplet in angle_triplets
-        ]
+        idealized_angles_list = [idealized_angles[triplet] for triplet in angle_triplets]
 
         # Calculate RMS difference
-        rms_diff = rms_difference(
-            np.array(calculated_angles), np.array(idealized_angles_list)
-        )
+        rms_diff = rms_difference(np.array(calculated_angles), np.array(idealized_angles_list))
 
         if verbose:
             _logger.info("RMS bond angle deviation: %.2f", rms_diff)
@@ -411,14 +407,10 @@ class DisulfideStats:
         idealized_distance_list = [idealized_bonds[pair] for pair in distance_pairs]
 
         # Calculate RMS difference
-        rms_diff = rms_difference(
-            np.array(calculated_distances), np.array(idealized_distance_list)
-        )
+        rms_diff = rms_difference(np.array(calculated_distances), np.array(idealized_distance_list))
 
         if verbose:
-            _logger.info(
-                "RMS distance deviation from ideality for SS atoms: %.2f", rms_diff
-            )
+            _logger.info("RMS distance deviation from ideality for SS atoms: %.2f", rms_diff)
 
             # Reset logger level
             _logger.setLevel(logging.WARNING)
@@ -463,9 +455,7 @@ class DisulfideStats:
         return cutoff
 
     @staticmethod
-    def calculate_cutoff_from_percentile(
-        sslist, percentile: float, verbose: bool = False
-    ) -> dict:
+    def calculate_cutoff_from_percentile(sslist, percentile: float, verbose: bool = False) -> dict:
         """
         Calculate the cutoff values for the standard deviation and percentile methods.
 
@@ -485,12 +475,8 @@ class DisulfideStats:
         angle_cutoff_std = DisulfideStats.calculate_std_cutoff(
             dev_df, "Angle_Deviation", num_std=std
         )
-        ca_cutoff_std = DisulfideStats.calculate_std_cutoff(
-            dev_df, "Ca_Distance", num_std=std
-        )
-        sg_cutoff_std = DisulfideStats.calculate_std_cutoff(
-            dev_df, "Sg_Distance", num_std=std
-        )
+        ca_cutoff_std = DisulfideStats.calculate_std_cutoff(dev_df, "Ca_Distance", num_std=std)
+        sg_cutoff_std = DisulfideStats.calculate_std_cutoff(dev_df, "Sg_Distance", num_std=std)
 
         # Percentile Method
         distance_cutoff_percentile = DisulfideStats.calculate_percentile_cutoff(

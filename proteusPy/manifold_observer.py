@@ -374,9 +374,7 @@ class ManifoldObserver:
             (query - geom.centroid).astype(np.float64), nan=0.0, posinf=0.0, neginf=0.0
         )
         d = geom.intrinsic_dim
-        basis_d = np.nan_to_num(
-            geom.basis[:d].astype(np.float64), nan=0.0, posinf=0.0, neginf=0.0
-        )
+        basis_d = np.nan_to_num(geom.basis[:d].astype(np.float64), nan=0.0, posinf=0.0, neginf=0.0)
         with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
             tangent_proj = basis_d @ diff  # (d,)
             reconstructed = basis_d.T @ tangent_proj
@@ -609,9 +607,7 @@ class ManifoldObserver:
         std_curv = float(np.std(curvatures))
         threshold = mean_curv + 2.0 * std_curv
 
-        high_curv_nodes = [
-            o.node_id for o in self._observed.values() if o.curvature > threshold
-        ]
+        high_curv_nodes = [o.node_id for o in self._observed.values() if o.curvature > threshold]
 
         return {
             "n_nodes": len(self._observed),

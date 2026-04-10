@@ -74,7 +74,7 @@ def plot_class_chart(classes: int) -> None:
     # Showcase different text positions.
     ax1.margins(y=0.4)
     ax1.set_title("textposition")
-    _text = f"${360/classes}°$"
+    _text = f"${360 / classes}°$"
     kw = dict(size=75, unit="points", text=_text)
 
     plot_angle(ax1, (0, 0), 360 / classes, textposition="outside", **kw)
@@ -100,7 +100,7 @@ def plot_class_chart(classes: int) -> None:
     ax1.set_prop_cycle("color", [color_palette(i) for i in range(classes)])
 
     # Create the legend
-    legend_labels = [f"Class {i+1}" for i in range(classes)]
+    legend_labels = [f"Class {i + 1}" for i in range(classes)]
     legend = ax1.legend(
         wedges,
         legend_labels,

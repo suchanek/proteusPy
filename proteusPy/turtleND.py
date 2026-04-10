@@ -136,9 +136,7 @@ class TurtleND:
         :param source: Source turtle (must have the same ndim)
         """
         if source._ndim != self._ndim:
-            raise ValueError(
-                f"Cannot copy from {source._ndim}D turtle to {self._ndim}D turtle"
-            )
+            raise ValueError(f"Cannot copy from {source._ndim}D turtle to {self._ndim}D turtle")
         self._position = source._position.copy()
         self._frame = source._frame.copy()
 
@@ -504,9 +502,7 @@ class TurtleND:
         self._tape = []
 
     def __repr__(self):
-        basis_strs = "\n".join(
-            f"  basis[{i}]: {self._frame[i]}" for i in range(self._ndim)
-        )
+        basis_strs = "\n".join(f"  basis[{i}]: {self._frame[i]}" for i in range(self._ndim))
         return (
             f"<TurtleND: {self._name} ({self._ndim}D)\n"
             f" Position: {self._position}\n"

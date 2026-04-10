@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/Users/egs/repos/proteusPy/.venv/bin/dockg --help)",
+      "Bash(chmod +x /Users/egs/repos/proteusPy/.git/hooks/pre-commit)",
+      "Bash(/Users/egs/repos/proteusPy/.venv/bin/pip show:*)",
+      "Bash(curl -s https://pypi.org/pypi/tensorflow-metal/json)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); versions=list\\(d[''''releases''''].keys\\(\\)\\); print\\(''''All versions:'''', sorted\\(versions\\)\\); latest=d[''''info''''][''''version'''']; print\\(''''Latest:'''', latest\\); print\\(''''Requires:'''', d[''''info''''][''''requires_dist'''']\\)\")",
+      "Bash(curl -s https://pypi.org/pypi/tensorflow-metal/1.2.0/json)",
+      "Bash(curl -sL https://files.pythonhosted.org/packages/39/da/463240cc8ff13a57119db62a676e2edca86fb93905a13527872dadf1926e/tensorflow_metal-1.2.0-cp310-cp310-macosx_12_0_arm64.whl.metadata)",
+      "Bash(python3 -c \"import sys; print\\(sys.stdin.read\\(\\)\\)\")",
+      "Bash(curl -sL https://files.pythonhosted.org/packages/39/da/463240cc8ff13a57119db62a676e2edca86fb93905a13527872dadf1926e/tensorflow_metal-1.2.0-cp310-cp310-macosx_12_0_arm64.whl -o /tmp/tm.whl)",
+      "Bash(python3 -c \"import zipfile; z=zipfile.ZipFile\\(''''/tmp/tm.whl''''\\); names=[n for n in z.namelist\\(\\) if ''''METADATA'''' in n]; print\\(z.read\\(names[0]\\).decode\\(\\)\\)\")",
+      "WebFetch(domain:github.com)",
+      "Bash(pip index:*)",
+      "Bash(pip install:*)",
+      "Bash(python -c \"import ast; ast.parse\\(open\\(''benchmarks/canonical_tests/mnist_manifold_architecture.py''\\).read\\(\\)\\); print\\(''Syntax OK''\\)\")",
+      "Bash(poetry install:*)",
+      "Bash(poetry env:*)"
+    ]
+  }
+}

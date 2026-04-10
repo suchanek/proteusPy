@@ -31,7 +31,7 @@ The turtle built molecules.
 
 Not by accident, not by approximation, but by the precise grammar of structural chemistry. It would orient itself at an atom — nitrogen, carbon, sulfur — and then walk along bond vectors, rotating through dihedral angles, placing each atom exactly where physics demanded. The turtle's coordinate frame *was* the local chemistry. Its heading was the bond direction. Its roll was the torsion. Each rotation encoded a real physical constraint.
 
-And so the turtle built disulfide bonds — the crosslinks that stitch proteins into their folded shapes, the molecular staples that hold the machinery of life in place. From a database of over 36,000 disulfide bonds extracted from the Protein Data Bank, each one built by the turtle walking along five dihedral angles: chi1, chi2, chi3, chi4, chi5. Five numbers. Five turns of the turtle. One bridge between two cysteines.
+And so the turtle built disulfide bonds — the crosslinks that stitch proteins into their folded shapes, the molecular staples that hold the machinery of life in place. From a database of over 175,000 disulfide bonds extracted from the Protein Data Bank, each one built by the turtle walking along five dihedral angles: chi1, chi2, chi3, chi4, chi5. Five numbers. Five turns of the turtle. One bridge between two cysteines.
 
 The turtle had gone from drawing pictures to building the architecture of life.
 
@@ -45,7 +45,7 @@ What if the turtle didn't need three dimensions? What if it could carry an ortho
 
 The N-dimensional turtle was born. It moved along its heading in R^n. It rotated in planes. It maintained its orthonormal frame through modified Gram-Schmidt. And suddenly, the five-dimensional torsion space of disulfide bonds wasn't a table of numbers — it was a *space the turtle could walk through*.
 
-Each disulfide bond was a point. Each cluster of similar bonds was a neighborhood. The turtle could stand at one disulfide and look around.
+Each disulfide bond was a point. Each cluster of similar bonds was a neighborhood. The turtle could stand at one disulfide and look around — and proteusPy could render that neighborhood directly: the structural families of disulfide bonds, visualized in their natural embedding space. What had once been a table of dihedral angles became a geometry you could see. The characterization of those families, the first real fruit of this embedding view, was on its way to publication.
 
 But looking around in five dimensions is not like looking around in three. You can't just spin your head. You need to know which directions *matter* — which directions carry real variation in the data, and which are just noise. A 64-dimensional space of pixel values, for instance, might really be a 13-dimensional manifold twisted through that high-dimensional void. Most of the dimensions are empty. The data lives on a thin, curved sheet.
 
@@ -88,7 +88,7 @@ To classify a new point, the turtle would:
 4. Walk the graph to gather more candidates — use the manifold's topology, not just proximity
 5. Vote — the nearest neighbors in manifold space choose the label
 
-It worked. On the sklearn digits dataset — 1,797 handwritten digits in 64 dimensions — the ManifoldModel scored 97.55% accuracy against Euclidean KNN's 97.33%. Not by training. Not by learning. By *discovering geometry*.
+It worked. On the sklearn digits dataset — 1,797 handwritten digits in 64 dimensions — the ManifoldModel scored 97.72% accuracy against Euclidean KNN's 97.33%. Not by training. Not by learning. By *discovering geometry*.
 
 The model reported that 71% to 86% of the ambient dimensions were noise. The digits lived on a 9-to-18-dimensional manifold curled through 64-dimensional pixel space. The turtle found that manifold, mapped it, and used the map to classify.
 

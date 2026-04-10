@@ -11,6 +11,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`docs/suchanek_disulfide_chapter_2026.pdf`** — completed Springer book chapter on disulfide bond geometry and the proteusPy analysis methodology. The chapter is now finished and the final PDF is included in the repository.
+- **ManifoldModel baseline in MNIST benchmark** (`mnist_manifold_architecture.py`) — `ManifoldModel` (zero-parameter, pure-geometry classifier) is now included as a named architecture entry alongside the neural models. Uses `run_trial_sklearn()` path; reports intrinsic dimensionality and noise-suppression percentage. `ManifoldModel` is skipped in the parameter-efficiency table (0 params) but participates in the winner comparison with the label "Uses ZERO learned parameters — pure manifold geometry".
+- **`.claude/settings.json`** — Claude Code project settings file.
+- **`.pre-commit-config.yaml`** — pre-commit configuration adapted from `pycode_kg`: standard file hygiene (`pre-commit-hooks` v5.0.0), `poetry check --lock`, and `ruff` + `ruff-format`. Resolves the missing-config error that blocked commits when the codekg pre-commit hook invoked `pre-commit run`.
+
+### Fixed
+
+- **Apple BLAS float32 overflow in local PCA** (`digits_manifold_architecture.py`, `digits_manifold_knn.py`, `mnist_manifold_architecture.py`) — covariance matrix computation now casts centered neighbors to `float64` and uses `np.einsum("ij,ik->jk", …)` instead of `centered.T @ centered`. Prevents silent numerical overflow on Apple Silicon where Apple BLAS accumulates float32 products into a float32 accumulator, producing `inf` / `NaN` eigenvalues.
+- **`np.nan_to_num` after `StandardScaler`** (`digits_manifold_architecture.py`, `mnist_manifold_architecture.py`) — constant-valued pixels (std = 0) produce `NaN` after division by zero in `StandardScaler.fit_transform()`; clamped to zero before casting to `float32`.
+- **Numerically stable loss + gradient clipping in MNIST neural models** (`mnist_manifold_architecture.py`) — all Keras models now use `from_logits=True` (fused log-softmax, avoids log(≈0) on Metal GPU) and `clipnorm=1.0` via a shared `_compile()` helper. Previously separate `model.compile()` calls with `"sparse_categorical_crossentropy"` (implying pre-normalised softmax) could overflow on Apple Metal float32.
+- **PCA float64 promotion for cross-validation folds** (`digits_manifold_architecture.py`) — `pca_fold.fit_transform` and `pca_fold.transform` now receive `X.astype(np.float64)` to prevent the same Apple BLAS overflow inside scikit-learn's PCA matmul.
+
+### Changed
+
+- **`tensorflow` upgraded to 2.18.0; `tensorflow-metal` upgraded to 1.2.0** (`pyproject.toml`) — `tensorflow` moves from 2.16.2; `tensorflow-metal` moves from 1.1.0 (previously optional extra) into the `ml` dependency group as a required peer of TensorFlow 2.18 on Apple Silicon.
+- **`ftree-kg` switched to local develop path** (`pyproject.toml`) — dependency now resolves from `../ftreekg` with `develop = true` instead of the upstream git remote, enabling in-place edits during active development.
+- **Removed `metal` extras entry** (`pyproject.toml`) — `tensorflow-metal` is now a direct `ml` group dependency; the separate `[extras.metal]` group and its entry in `[extras.all]` have been removed.
+
+### Removed
+
+- **`turtlend_package/`** — entire in-tree package (source, tests, and docs) removed. The `TurtleND`, `Turtle3D`, `ManifoldWalker`, and `ManifoldModel` implementations have been extracted to their own repository; the in-tree copies are no longer needed.
+- **`waverider_missions/`** — mission logs, story arc, glossary, chapter drafts (ch1–ch5, interlude), and supporting notes removed from this repository. Content migrated to the dedicated WaveRider repo.
+- **`docs/waverider/article/`** — LaTeX source, compiled PDF, auxiliary files, and figures for the WaveRider arXiv manuscript removed (now maintained in the WaveRider repo).
+- **`docs/manifold_observer/manifold_observer.md`**, **`docs/manifold_walker_spec/`** — specification documents removed (superseded by the extracted package documentation).
+
+### Added
+
 - **`benchmarks/canonical_tests/report_generator.py`** — automated PDF + Markdown report generator for canonical benchmark runs. Reads a JSON results file, aggregates per-architecture statistics (mean/std accuracy, loss, wall time, parameter count, efficiency), embeds the result figure, and emits provenance-rich reports covering manifold discovery tables, per-class intrinsic dimensionality, architecture comparison, and key findings. Supports MNIST, CIFAR-10, CIFAR-100, Digits, and Iris via `--all` batch mode.
 - **Canonical benchmark reports** — generated PDF and Markdown reports for all four datasets: MNIST (`mnist_report.md/.pdf`), CIFAR-10 (`cifar10_report.md/.pdf`), CIFAR-100 (`cifar100_report.md/.pdf`), and Digits (`digits_report.md/.pdf`), each including experimental setup, manifold discovery statistics, per-class intrinsic dimensionality, architecture comparison table, and key findings.
 

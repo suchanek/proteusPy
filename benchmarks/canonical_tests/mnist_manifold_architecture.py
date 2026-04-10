@@ -68,6 +68,7 @@ import time
 from pathlib import Path
 
 import numpy as np
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
 
 # ---------------------------------------------------------------------------
@@ -107,22 +108,26 @@ else:
 from tensorflow import keras  # noqa: E402
 
 # ---------------------------------------------------------------------------
+# proteusPy path injection
+# ---------------------------------------------------------------------------
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+
+from proteusPy.manifold_model import ManifoldModel  # noqa: E402
+
+# ---------------------------------------------------------------------------
 # Phase 1: Manifold Discovery
 # ---------------------------------------------------------------------------
 
 
-def discover_dimensionality(
-    X, n_samples=500, k=50, variance_thresholds=(0.95, 0.90, 0.85)
-):
+def discover_dimensionality(X, n_samples=500, k=50, variance_thresholds=(0.95, 0.90, 0.85)):
     """Discover intrinsic dimensionality of the data manifold via local PCA.
 
     Samples n_samples random points, computes local PCA at each,
     and returns statistics on intrinsic dimensionality.
     """
-    n_points, ndim = X.shape
-    sample_idx = np.random.choice(
-        n_points, size=min(n_samples, n_points), replace=False
-    )
+    n_points, _ = X.shape
+    sample_idx = np.random.choice(n_points, size=min(n_samples, n_points), replace=False)
 
     results = {tau: [] for tau in variance_thresholds}
 
@@ -133,9 +138,9 @@ def discover_dimensionality(
         knn_idx = np.argpartition(dists, k)[:k]
         neighbors = X[knn_idx]
 
-        # Local PCA
-        centered = neighbors - neighbors.mean(axis=0)
-        cov = (centered.T @ centered) / (len(neighbors) - 1)
+        # Local PCA — cast to float64 to avoid Apple BLAS float32 overflow
+        centered = (neighbors - neighbors.mean(axis=0)).astype(np.float64)
+        cov = np.einsum("ij,ik->jk", centered, centered) / (len(neighbors) - 1)
         eigenvalues = np.linalg.eigvalsh(cov)[::-1]
         eigenvalues = np.maximum(eigenvalues, 0.0)
 
@@ -177,8 +182,9 @@ def discover_per_class_dimensionality(X, y, k=50, tau=0.90, n_samples_per_class=
             knn_idx = np.argpartition(dists, k_use)[:k_use]
             neighbors = X_c[knn_idx]
 
-            centered = neighbors - neighbors.mean(axis=0)
-            cov = (centered.T @ centered) / (len(neighbors) - 1)
+            # cast to float64 to avoid Apple BLAS float32 overflow
+            centered = (neighbors - neighbors.mean(axis=0)).astype(np.float64)
+            cov = np.einsum("ij,ik->jk", centered, centered) / (len(neighbors) - 1)
             eigenvalues = np.linalg.eigvalsh(cov)[::-1]
             eigenvalues = np.maximum(eigenvalues, 0.0)
 
@@ -203,6 +209,21 @@ def discover_per_class_dimensionality(X, y, k=50, tau=0.90, n_samples_per_class=
 # ---------------------------------------------------------------------------
 
 
+def _compile(model, lr):
+    """Compile with logit-based cross-entropy and gradient clipping.
+
+    Using from_logits=True fuses log-softmax into the loss — numerically
+    stable on Metal GPU where the separate softmax→log path overflows float32.
+    clipnorm=1.0 prevents gradient explosion from any remaining overflow.
+    """
+    model.compile(
+        optimizer=keras.optimizers.Adam(learning_rate=lr, clipnorm=1.0),
+        loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        metrics=["accuracy"],
+    )
+    return model
+
+
 def build_standard_model(input_dim, n_classes, lr=0.001):
     """Standard architecture: 784 → 128 → 64 → 10. Common default."""
     model = keras.Sequential(
@@ -210,15 +231,10 @@ def build_standard_model(input_dim, n_classes, lr=0.001):
             keras.layers.Input(shape=(input_dim,)),
             keras.layers.Dense(128, activation="relu"),
             keras.layers.Dense(64, activation="relu"),
-            keras.layers.Dense(n_classes, activation="softmax"),
+            keras.layers.Dense(n_classes),  # logits — from_logits=True in loss
         ]
     )
-    model.compile(
-        optimizer=keras.optimizers.Adam(learning_rate=lr),
-        loss="sparse_categorical_crossentropy",
-        metrics=["accuracy"],
-    )
-    return model
+    return _compile(model, lr)
 
 
 def build_manifold_model(input_dim, n_classes, intrinsic_dim, lr=0.001):
@@ -234,15 +250,10 @@ def build_manifold_model(input_dim, n_classes, intrinsic_dim, lr=0.001):
             keras.layers.Input(shape=(input_dim,)),
             keras.layers.Dense(2 * d, activation="relu"),
             keras.layers.Dense(d, activation="relu"),
-            keras.layers.Dense(n_classes, activation="softmax"),
+            keras.layers.Dense(n_classes),  # logits
         ]
     )
-    model.compile(
-        optimizer=keras.optimizers.Adam(learning_rate=lr),
-        loss="sparse_categorical_crossentropy",
-        metrics=["accuracy"],
-    )
-    return model
+    return _compile(model, lr)
 
 
 def build_manifold_observer_model(input_dim, n_classes, intrinsic_dim, lr=0.001):
@@ -257,15 +268,10 @@ def build_manifold_observer_model(input_dim, n_classes, intrinsic_dim, lr=0.001)
             keras.layers.Input(shape=(input_dim,)),
             keras.layers.Dense(intrinsic_dim + 1, activation="relu"),
             keras.layers.Dense(intrinsic_dim + 1, activation="relu"),
-            keras.layers.Dense(n_classes, activation="softmax"),
+            keras.layers.Dense(n_classes),  # logits
         ]
     )
-    model.compile(
-        optimizer=keras.optimizers.Adam(learning_rate=lr),
-        loss="sparse_categorical_crossentropy",
-        metrics=["accuracy"],
-    )
-    return model
+    return _compile(model, lr)
 
 
 def build_wide_manifold_model(input_dim, n_classes, intrinsic_dim, lr=0.001):
@@ -281,15 +287,10 @@ def build_wide_manifold_model(input_dim, n_classes, intrinsic_dim, lr=0.001):
             keras.layers.Dense(4 * d, activation="relu"),
             keras.layers.Dense(2 * d, activation="relu"),
             keras.layers.Dense(d, activation="relu"),
-            keras.layers.Dense(n_classes, activation="softmax"),
+            keras.layers.Dense(n_classes),  # logits
         ]
     )
-    model.compile(
-        optimizer=keras.optimizers.Adam(learning_rate=lr),
-        loss="sparse_categorical_crossentropy",
-        metrics=["accuracy"],
-    )
-    return model
+    return _compile(model, lr)
 
 
 def build_pca_model(n_classes, intrinsic_dim, lr=0.001):
@@ -305,19 +306,14 @@ def build_pca_model(n_classes, intrinsic_dim, lr=0.001):
             keras.layers.Input(shape=(intrinsic_dim,)),
             keras.layers.Dense(2 * d, activation="relu"),
             keras.layers.Dense(d, activation="relu"),
-            keras.layers.Dense(n_classes, activation="softmax"),
+            keras.layers.Dense(n_classes),  # logits
         ]
     )
-    model.compile(
-        optimizer=keras.optimizers.Adam(learning_rate=lr),
-        loss="sparse_categorical_crossentropy",
-        metrics=["accuracy"],
-    )
-    return model
+    return _compile(model, lr)
 
 
 def build_pca_intrinsic_dim_model(n_classes, intrinsic_dim, lr=0.001):
-    """PCA pre-projected model: d → 2d → d → output.
+    """PCA pre-projected model: d → output.
 
     Input is already PCA-projected to intrinsic_dim dimensions.
     The network only needs to learn the nonlinear classification
@@ -327,15 +323,10 @@ def build_pca_intrinsic_dim_model(n_classes, intrinsic_dim, lr=0.001):
         [
             keras.layers.Input(shape=(intrinsic_dim,)),
             keras.layers.Dense(intrinsic_dim, activation="relu"),
-            keras.layers.Dense(n_classes, activation="softmax"),
+            keras.layers.Dense(n_classes),  # logits
         ]
     )
-    model.compile(
-        optimizer=keras.optimizers.Adam(learning_rate=lr),
-        loss="sparse_categorical_crossentropy",
-        metrics=["accuracy"],
-    )
-    return model
+    return _compile(model, lr)
 
 
 def count_params(model):
@@ -384,6 +375,34 @@ def run_trial(build_fn, X_train, y_train, X_test, y_test, epochs, batch_size, tr
         "val_acc": [float(a) for a in history.history["val_accuracy"]],
         "train_loss": [float(v) for v in history.history["loss"]],
         "val_loss": [float(v) for v in history.history["val_loss"]],
+    }
+
+
+def run_trial_sklearn(build_fn, X_train, y_train, X_test, y_test, trial):
+    """Train a sklearn/ManifoldModel classifier and return metrics."""
+    clf = build_fn()
+    t0 = time.perf_counter()
+    clf.fit(X_train, y_train)
+    fit_time = time.perf_counter() - t0
+
+    t1 = time.perf_counter()
+    acc = float(clf.score(X_test, y_test))
+    pred_time = time.perf_counter() - t1
+
+    geometry = None
+    if hasattr(clf, "geometry_summary"):
+        geometry = clf.geometry_summary()
+
+    return {
+        "trial": trial,
+        "n_params": 0,
+        "test_loss": None,
+        "test_acc": acc,
+        "wall_time": fit_time + pred_time,
+        "fit_time": fit_time,
+        "pred_time": pred_time,
+        "convergence_epoch": None,
+        "geometry": geometry,
     }
 
 
@@ -483,16 +502,17 @@ def plot_results(all_results, intrinsic_dim, save_path, elapsed=None):
     # Parameter efficiency
     ax = axes[1, 1]
     param_counts = [all_results[n][0]["n_params"] for n in names]
-    [m / p * 1000 for m, p in zip(means, param_counts)]
+    efficiencies = [m / p * 1000 if p > 0 else 0 for m, p in zip(means, param_counts)]
     bars = ax.bar(short_names, param_counts, color=bar_colors, alpha=0.8)
-    for bar, p, m in zip(bars, param_counts, means):
+    for bar, p, m, eff in zip(bars, param_counts, means, efficiencies):
+        label = f"geometric\nacc={m:.4f}" if p == 0 else f"{p:,}\n{eff:.2f}acc/Kp"
         ax.text(
             bar.get_x() + bar.get_width() / 2,
-            bar.get_height() + 50,
-            f"{p:,}\nacc={m:.4f}",
+            max(bar.get_height() * 1.3, 2),
+            label,
             ha="center",
             va="bottom",
-            fontsize=8,
+            fontsize=7,
         )
     ax.set_ylabel("Parameters")
     ax.set_title("Parameter Count (lower is better at same accuracy)")
@@ -527,8 +547,20 @@ def main():
         default=500,
         help="Points to sample for dimensionality discovery",
     )
+    parser.add_argument("--k-pca", type=int, default=50, help="Neighborhood size for local PCA")
     parser.add_argument(
-        "--k-pca", type=int, default=50, help="Neighborhood size for local PCA"
+        "--k-graph",
+        type=int,
+        default=15,
+        help="Neighborhood size for ManifoldModel graph construction",
+    )
+    parser.add_argument("--k-vote", type=int, default=7, help="Voting neighbors for ManifoldModel")
+    parser.add_argument(
+        "--manifold-samples",
+        type=int,
+        default=5000,
+        help="Max training samples for sklearn methods (ManifoldModel/KNN). "
+        "ManifoldModel is O(n²) — keep this well below full MNIST.",
     )
     parser.add_argument("--dataset", choices=["mnist", "digits"], default="mnist")
     parser.add_argument("--plot", action="store_true", default=True)
@@ -546,8 +578,9 @@ def main():
         X_test = X_test.reshape(-1, 784).astype("float32")
         # Normalize
         scaler = StandardScaler()
-        X_train = scaler.fit_transform(X_train)
-        X_test = scaler.transform(X_test)
+        # nan_to_num: constant pixels (std=0) produce NaN after scaling → zero them
+        X_train = np.nan_to_num(scaler.fit_transform(X_train)).astype("float32")
+        X_test = np.nan_to_num(scaler.transform(X_test)).astype("float32")
     else:
         print("\nLoading sklearn digits...")
         from sklearn.datasets import load_digits
@@ -560,8 +593,8 @@ def main():
             X, y, test_size=0.2, random_state=42, stratify=y
         )
         scaler = StandardScaler()
-        X_train = scaler.fit_transform(X_train)
-        X_test = scaler.transform(X_test)
+        X_train = np.nan_to_num(scaler.fit_transform(X_train)).astype("float32")
+        X_test = np.nan_to_num(scaler.transform(X_test)).astype("float32")
 
     input_dim = X_train.shape[1]
     n_classes = len(set(y_train))
@@ -603,9 +636,7 @@ def main():
     )
     for c in sorted(class_dims.keys()):
         cd = class_dims[c]
-        print(
-            f"  Digit {c}: d = {cd['mean']:.1f} ± {cd['std']:.1f}  [{cd['min']}, {cd['max']}]"
-        )
+        print(f"  Digit {c}: d = {cd['mean']:.1f} ± {cd['std']:.1f}  [{cd['min']}, {cd['max']}]")
 
     # Use max of per-class maxima as the bottleneck — accommodates the hardest sample
     global_dim = int(round(dim_report[args.tau]["mean"]))
@@ -628,41 +659,94 @@ def main():
     # PCA projection (needed for intrinsic-dim and PCA models)
     from sklearn.decomposition import PCA as skPCA
 
-    pca = skPCA(n_components=d)
-    X_train_pca = pca.fit_transform(X_train).astype("float32")
-    X_test_pca = pca.transform(X_test).astype("float32")
+    # svd_solver='full' uses LAPACK GESDD and avoids the covariance_eigh path
+    # that triggers spurious Apple BLAS float warnings on macOS.
+    pca = skPCA(n_components=d, svd_solver="full")
+    # cast to float64 for PCA matmul to avoid Apple BLAS float32 overflow
+    X_train_pca = pca.fit_transform(X_train.astype(np.float64)).astype("float32")
+    X_test_pca = pca.transform(X_test.astype(np.float64)).astype("float32")
     var_explained = pca.explained_variance_ratio_.sum()
     print(f"  PCA to {d}D captures {var_explained * 100:.1f}% of global variance")
 
-    # Each entry: (build_fn, X_tr, X_te) — raw or PCA-projected as appropriate
+    # Stratified subsample for O(n²) sklearn methods (ManifoldModel, KNN).
+    n_sk = min(args.manifold_samples, len(X_train))
+    if n_sk < len(X_train):
+        from sklearn.model_selection import StratifiedShuffleSplit
+
+        sss = StratifiedShuffleSplit(n_splits=1, train_size=n_sk, random_state=42)
+        sk_idx, _ = next(sss.split(X_train, y_train))
+        X_sk, y_sk = X_train[sk_idx], y_train[sk_idx]
+        print(f"  sklearn methods: stratified subsample {n_sk:,} / {len(X_train):,} train samples")
+    else:
+        X_sk, y_sk = X_train, y_train
+
+    # Each entry: (build_fn, X_tr, y_tr, X_te, is_sklearn)
     architectures = {
+        f"Euclidean KNN (k={args.k_vote})": (
+            lambda: KNeighborsClassifier(n_neighbors=args.k_vote, metric="euclidean"),
+            X_sk,
+            y_sk,
+            X_test,
+            True,
+        ),
+        f"ManifoldModel (τ={args.tau})": (
+            lambda: ManifoldModel(
+                k_graph=args.k_graph,
+                k_pca=args.k_pca,
+                k_vote=args.k_vote,
+                variance_threshold=args.tau,
+            ),
+            X_sk,
+            y_sk,
+            X_test,
+            True,
+        ),
         "Standard (128→64)": (
             lambda: build_standard_model(input_dim, n_classes, lr=args.lr),
-            X_train, X_test,
+            X_train,
+            y_train,
+            X_test,
+            False,
         ),
         f"Wide Manifold (4d→2d→d, d={d})": (
             lambda: build_wide_manifold_model(input_dim, n_classes, d, lr=args.lr),
-            X_train, X_test,
+            X_train,
+            y_train,
+            X_test,
+            False,
         ),
         f"Manifold (2d→d, d={d})": (
             lambda: build_manifold_model(input_dim, n_classes, d, lr=args.lr),
-            X_train, X_test,
+            X_train,
+            y_train,
+            X_test,
+            False,
         ),
         f"PCA→{d}D + MLP (2d→d)": (
             lambda: build_pca_model(n_classes, d, lr=args.lr),
-            X_train_pca, X_test_pca,
+            X_train_pca,
+            y_train,
+            X_test_pca,
+            False,
         ),
         f"Intrinsic Dim (PCA→{d}D→output)": (
             lambda: build_pca_intrinsic_dim_model(n_classes, d, lr=args.lr),
-            X_train_pca, X_test_pca,
+            X_train_pca,
+            y_train,
+            X_test_pca,
+            False,
         ),
     }
 
     # Show architecture details
-    for name, (build_fn, _, _) in architectures.items():
+    for name, entry in architectures.items():
+        build_fn, is_sklearn = entry[0], entry[4]
+        if is_sklearn:
+            print(f"\n{name}:")
+            print("  Parameters: 0 (non-parametric)")
+            continue
         model = build_fn()
         n_params = count_params(model)
-        [int(np.prod(w.shape)) for w in model.trainable_weights]
         print(f"\n{name}:")
         print(f"  Parameters: {n_params:,}")
         for layer in model.layers:
@@ -679,38 +763,47 @@ def main():
 
     all_results = {}
 
-    for name, (build_fn, X_tr, X_te) in architectures.items():
+    for name, entry in architectures.items():
+        build_fn, X_tr, y_tr, X_te, is_sklearn = entry
         print(f"\n{name}")
         trial_results = []
 
-        for trial in range(args.trials):
-            np.random.seed(trial * 42)
-            tf.random.set_seed(trial * 42)
-
-            result = run_trial(
-                build_fn,
-                X_tr,
-                y_train,
-                X_te,
-                y_test,
-                epochs=args.epochs,
-                batch_size=args.batch_size,
-                trial=trial,
-            )
-
-            conv_str = (
-                f"conv@{result['convergence_epoch']}"
-                if result["convergence_epoch"] is not None
-                else "no conv"
-            )
-            print(
-                f"  Trial {trial + 1}/{args.trials}: "
-                f"acc={result['test_acc']:.4f}  "
-                f"loss={result['test_loss']:.4f}  "
-                f"{conv_str}  "
-                f"time={result['wall_time']:.1f}s"
-            )
+        if is_sklearn:
+            result = run_trial_sklearn(build_fn, X_tr, y_tr, X_te, y_test, trial=0)
+            extra = ""
+            if result.get("geometry"):
+                extra = f"  id={result['geometry']['mean_intrinsic_dim']:.1f}"
+            print(f"  acc={result['test_acc']:.4f}  time={result['wall_time']:.1f}s{extra}")
             trial_results.append(result)
+        else:
+            for trial in range(args.trials):
+                np.random.seed(trial * 42)
+                tf.random.set_seed(trial * 42)
+
+                result = run_trial(
+                    build_fn,
+                    X_tr,
+                    y_tr,
+                    X_te,
+                    y_test,
+                    epochs=args.epochs,
+                    batch_size=args.batch_size,
+                    trial=trial,
+                )
+
+                conv_str = (
+                    f"conv@{result['convergence_epoch']}"
+                    if result["convergence_epoch"] is not None
+                    else "no conv"
+                )
+                print(
+                    f"  Trial {trial + 1}/{args.trials}: "
+                    f"acc={result['test_acc']:.4f}  "
+                    f"loss={result['test_loss']:.4f}  "
+                    f"{conv_str}  "
+                    f"time={result['wall_time']:.1f}s"
+                )
+                trial_results.append(result)
 
         all_results[name] = trial_results
 
@@ -758,53 +851,62 @@ def main():
     # Convergence
     row = f"{'Epochs to 95%':<25}"
     for name, results in all_results.items():
-        convs = [
-            r["convergence_epoch"]
-            for r in results
-            if r["convergence_epoch"] is not None
-        ]
+        convs = [r["convergence_epoch"] for r in results if r["convergence_epoch"] is not None]
         if convs:
             row += f"  {np.mean(convs):.1f} ± {np.std(convs):.1f} ({len(convs)}/{len(results)})  "
         else:
             row += f"{'N/A':>{col_w}}"
     print(row)
 
+    # ManifoldModel geometry footnote
+    print("-" * 70)
+    print("MANIFOLD GEOMETRY (ManifoldModel):")
+    for name, results in all_results.items():
+        if name.startswith("ManifoldModel"):
+            geoms = [r["geometry"] for r in results if r.get("geometry")]
+            if geoms:
+                mean_ids = [g["mean_intrinsic_dim"] for g in geoms if g]
+                ambient = geoms[0].get("ambient_dim", input_dim)
+                noise_pct = 100 * (1 - np.mean(mean_ids) / ambient)
+                print(
+                    f"  {name}: mean intrinsic dim = {np.mean(mean_ids):.1f}"
+                    f" / {ambient}  ({noise_pct:.0f}% noise suppressed)"
+                )
+
     # Parameter efficiency
     print("-" * 70)
     print("PARAMETER EFFICIENCY (accuracy per 1K parameters):")
     for name, results in all_results.items():
-        mean_acc = np.mean([r["test_acc"] for r in results])
         n_params = results[0]["n_params"]
+        if n_params == 0:
+            continue
+        mean_acc = np.mean([r["test_acc"] for r in results])
         eff = mean_acc / n_params * 1000
         print(f"  {name}: {eff:.4f} acc/Kparam  ({mean_acc:.4f} / {n_params:,})")
 
     # Winner
     print("-" * 70)
-    best_name = max(
-        all_results, key=lambda n: np.mean([r["test_acc"] for r in all_results[n]])
-    )
+    best_name = max(all_results, key=lambda n: np.mean([r["test_acc"] for r in all_results[n]]))
     best_acc = np.mean([r["test_acc"] for r in all_results[best_name]])
     std_name = "Standard (128→64)"
     std_acc = np.mean([r["test_acc"] for r in all_results[std_name]])
 
     if best_name != std_name:
         delta = best_acc - std_acc
-        print(f">> MANIFOLD-INFORMED WINS: {best_name}")
+        print(f">> WINNER: {best_name}")
         print(f"   {best_acc:.4f} vs {std_acc:.4f} (standard)")
-        print(f"   Delta: +{delta:.4f} ({delta * 100:.2f}%)")
+        print(f"   Delta: +{delta:.4f} ({delta * 100:.2f} pp)")
 
         best_params = all_results[best_name][0]["n_params"]
         std_params = all_results[std_name][0]["n_params"]
-        if best_params < std_params:
+        if best_params == 0:
+            print("   Uses ZERO learned parameters — pure manifold geometry")
+        elif best_params < std_params:
             reduction = 100 * (1 - best_params / std_params)
-            print(
-                f"   With {reduction:.0f}% FEWER parameters ({best_params:,} vs {std_params:,})"
-            )
+            print(f"   With {reduction:.0f}% FEWER parameters ({best_params:,} vs {std_params:,})")
         elif best_params > std_params:
             increase = 100 * (best_params / std_params - 1)
-            print(
-                f"   With {increase:.0f}% more parameters ({best_params:,} vs {std_params:,})"
-            )
+            print(f"   With {increase:.0f}% more parameters ({best_params:,} vs {std_params:,})")
     else:
         print(f">> Standard architecture wins: {std_acc:.4f}")
 
@@ -820,21 +922,33 @@ def main():
         "input_dim": input_dim,
         "n_classes": n_classes,
         "intrinsic_dim": intrinsic_dim,
+        "global_intrinsic_dim_mean": global_dim,
         "tau": args.tau,
         "epochs": args.epochs,
         "trials": args.trials,
+        "batch_size": args.batch_size,
+        "lr": args.lr,
+        "k_pca": args.k_pca,
+        "k_graph": args.k_graph,
+        "k_vote": args.k_vote,
         "dimensionality_report": {str(k): v for k, v in dim_report.items()},
         "per_class_dims": {str(k): v for k, v in class_dims.items()},
         "results": {name: results for name, results in all_results.items()},
     }
 
-    results_path = Path(__file__).resolve().parent / f"{'mnist' if args.dataset == 'mnist' else 'digits'}_architecture_results.json"
+    results_path = (
+        Path(__file__).resolve().parent
+        / f"{'mnist' if args.dataset == 'mnist' else 'digits'}_architecture_results.json"
+    )
     with open(results_path, "w") as f:
         json.dump(save_data, f, indent=2)
     print(f"\nResults saved to {results_path}")
 
     if args.plot:
-        plot_path = str(Path(__file__).resolve().parent / f"{'mnist' if args.dataset == 'mnist' else 'digits'}_architecture_results.png")
+        plot_path = str(
+            Path(__file__).resolve().parent
+            / f"{'mnist' if args.dataset == 'mnist' else 'digits'}_architecture_results.png"
+        )
         plot_results(all_results, intrinsic_dim, plot_path, elapsed=time.perf_counter() - t_start)
 
 

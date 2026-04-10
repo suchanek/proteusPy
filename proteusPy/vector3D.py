@@ -102,9 +102,7 @@ class Vector3D:
         """
         if y is None and z is None:
             if len(x) != 3:
-                raise ValueError(
-                    "Vector3D: Input must be a list/tuple/array of 3 elements"
-                )
+                raise ValueError("Vector3D: Input must be a list/tuple/array of 3 elements")
             self._coords = np.array(x, dtype=float)
         else:
             self._coords = np.array((x, y, z), dtype=float)
@@ -325,9 +323,7 @@ def distance3d(p1: Vector3D, p2: Vector3D) -> float:
     return d
 
 
-def rms_difference(
-    calculated_angles: np.ndarray, idealized_angles: np.ndarray
-) -> float:
+def rms_difference(calculated_angles: np.ndarray, idealized_angles: np.ndarray) -> float:
     """
     Calculate the Root Mean Square (RMS) difference between disulfide bond
     angles and idealized angles for disulfide bonds and their respective
