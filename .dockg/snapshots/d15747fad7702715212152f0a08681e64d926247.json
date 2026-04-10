@@ -1,0 +1,122 @@
+{
+  "key": "d15747fad7702715212152f0a08681e64d926247",
+  "branch": "master",
+  "timestamp": "2026-04-10T20:12:25.831330+00:00",
+  "version": "0.7.0",
+  "metrics": {
+    "db_path": "/Users/egs/repos/proteusPy/.dockg/graph.sqlite",
+    "total_nodes": 2145,
+    "total_edges": 11671,
+    "node_counts": {
+      "chunk": 340,
+      "document": 20,
+      "entity": 642,
+      "keyword": 677,
+      "section": 163,
+      "topic": 303
+    },
+    "edge_counts": {
+      "CONTAINS": 503,
+      "CO_OCCURS_WITH": 7960,
+      "HAS_KEYWORD": 1331,
+      "HAS_TOPIC": 340,
+      "MENTIONS_ENTITY": 1331,
+      "NEXT": 118,
+      "SIMILAR_TO": 88
+    },
+    "meaningful_nodes": 2125,
+    "coverage_score": 0.9725490196078432,
+    "issues_count": 0,
+    "complexity_median": 15.0
+  },
+  "hotspots": [
+    {
+      "id": "chunk:docs/disulfide_schematic_README.md:0007",
+      "file_path": "docs/disulfide_schematic_README.md",
+      "label": "`create_disulfide_schematic`",
+      "references": 0,
+      "semantic_links": 15,
+      "total_links": 16
+    },
+    {
+      "id": "chunk:docs/graph_reasoner_spec/summary.md:0004",
+      "file_path": "docs/graph_reasoner_spec/summary.md",
+      "label": "The Architecture",
+      "references": 0,
+      "semantic_links": 15,
+      "total_links": 16
+    },
+    {
+      "id": "chunk:analysis/proteusPy_analysis_20260323.md:0010",
+      "file_path": "analysis/proteusPy_analysis_20260323.md",
+      "label": "Module Architecture",
+      "references": 0,
+      "semantic_links": 15,
+      "total_links": 15
+    },
+    {
+      "id": "chunk:benchmarks/disulfide_flight_results_report.md:0005",
+      "file_path": "benchmarks/disulfide_flight_results_report.md",
+      "label": "Flight Summary",
+      "references": 0,
+      "semantic_links": 15,
+      "total_links": 15
+    },
+    {
+      "id": "chunk:docs/disulfide_schematic_README.md:0001",
+      "file_path": "docs/disulfide_schematic_README.md",
+      "label": "Features",
+      "references": 0,
+      "semantic_links": 15,
+      "total_links": 15
+    },
+    {
+      "id": "chunk:docs/graph_reasoner_spec/graph_reasoner_spec.md:0022",
+      "file_path": "docs/graph_reasoner_spec/graph_reasoner_spec.md",
+      "label": "Per-Step Complexity",
+      "references": 0,
+      "semantic_links": 14,
+      "total_links": 15
+    },
+    {
+      "id": "chunk:docs/graph_reasoner_spec/summary.md:0009",
+      "file_path": "docs/graph_reasoner_spec/summary.md",
+      "label": "Steering Strategies",
+      "references": 0,
+      "semantic_links": 14,
+      "total_links": 15
+    },
+    {
+      "id": "chunk:CODE_OF_CONDUCT.md:0009",
+      "file_path": "CODE_OF_CONDUCT.md",
+      "label": "2. Warning",
+      "references": 0,
+      "semantic_links": 14,
+      "total_links": 14
+    },
+    {
+      "id": "chunk:docs/disulfide_schematic_README.md:0008",
+      "file_path": "docs/disulfide_schematic_README.md",
+      "label": "`create_disulfide_schematic`",
+      "references": 0,
+      "semantic_links": 14,
+      "total_links": 14
+    },
+    {
+      "id": "chunk:viewer/DOCKER_README.md:0004",
+      "file_path": "viewer/DOCKER_README.md",
+      "label": "Memory Configuration",
+      "references": 0,
+      "semantic_links": 14,
+      "total_links": 14
+    }
+  ],
+  "issues": [],
+  "vs_previous": null,
+  "vs_baseline": {
+    "nodes": -170,
+    "edges": -2564,
+    "coverage_delta": 0.006111185893121651,
+    "issues_delta": 0
+  }
+}

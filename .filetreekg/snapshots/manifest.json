@@ -1,6 +1,6 @@
 {
   "format": "1.0",
-  "last_update": "2026-03-23T03:55:20.053513+00:00",
+  "last_update": "2026-04-10T20:12:25.890792+00:00",
   "snapshots": [
     {
       "key": "9d642891f86da793c3505e331c3b506d2abcb2c6",
@@ -25,6 +25,77 @@
       "deltas": {
         "vs_previous": null,
         "vs_baseline": null
+      }
+    },
+    {
+      "key": "d15747fad7702715212152f0a08681e64d926247",
+      "branch": "master",
+      "timestamp": "2026-04-10T20:12:25.887660+00:00",
+      "version": "0.5.0",
+      "file": "d15747fad7702715212152f0a08681e64d926247.json",
+      "metrics": {
+        "total_nodes": 475,
+        "total_edges": 475,
+        "node_counts": {
+          "directory": 77,
+          "file": 398
+        },
+        "edge_counts": {
+          "CONTAINS": 475
+        },
+        "total_files": 398,
+        "total_dirs": 77,
+        "dir_node_counts": {
+          ".claude": 7,
+          ".eggs": 46,
+          ".gitattributes": 1,
+          ".pdocconfig.py": 1,
+          ".pre-commit-config.yaml": 1,
+          ".pycodekg": 28,
+          "CHANGELOG.md": 1,
+          "CODE_OF_CONDUCT.md": 1,
+          "LICENSE": 1,
+          "README.md": 1,
+          "TODO.md": 1,
+          "analysis": 4,
+          "benchmarks": 24,
+          "class_analysis_outputs": 23,
+          "commit.txt": 1,
+          "data": 16,
+          "docs": 48,
+          "examples": 15,
+          "get_version.py": 1,
+          "lib": 9,
+          "logdir": 33,
+          "logo": 22,
+          "logo.png": 1,
+          "makefile": 1,
+          "notebooks": 22,
+          "old": 21,
+          "poetry.lock": 1,
+          "poetry.toml": 1,
+          "programs": 35,
+          "proteusPy": 54,
+          "proteusPy.code-workspace": 1,
+          "proteusPy.egg-info": 7,
+          "proteusPy_graph.png": 1,
+          "proteus_logo_sb.png": 1,
+          "pyproject.toml": 1,
+          "runs": 4,
+          "schematic_outputs": 7,
+          "scripts": 4,
+          "tests": 16,
+          "viewer": 12
+        }
+      },
+      "deltas": {
+        "vs_previous": null,
+        "vs_baseline": {
+          "nodes": 10,
+          "edges": 10,
+          "files_delta": 5,
+          "dirs_delta": 5
+        }
       }
     }
   ]
