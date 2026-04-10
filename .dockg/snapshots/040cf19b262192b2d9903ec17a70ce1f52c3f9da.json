@@ -1,0 +1,122 @@
+{
+  "key": "040cf19b262192b2d9903ec17a70ce1f52c3f9da",
+  "branch": "dev.jrml",
+  "timestamp": "2026-04-10T19:33:39.933689+00:00",
+  "version": "0.5.1",
+  "metrics": {
+    "db_path": ".dockg/graph.sqlite",
+    "total_nodes": 2084,
+    "total_edges": 11703,
+    "node_counts": {
+      "chunk": 339,
+      "document": 22,
+      "entity": 609,
+      "keyword": 659,
+      "section": 159,
+      "topic": 296
+    },
+    "edge_counts": {
+      "CONTAINS": 498,
+      "CO_OCCURS_WITH": 7898,
+      "HAS_KEYWORD": 1329,
+      "HAS_TOPIC": 339,
+      "MENTIONS_ENTITY": 1410,
+      "NEXT": 121,
+      "SIMILAR_TO": 108
+    },
+    "meaningful_nodes": 2062,
+    "coverage_score": 0.9803343166175025,
+    "issues_count": 0,
+    "complexity_median": 15.0
+  },
+  "hotspots": [
+    {
+      "id": "chunk:benchmarks/canonical_tests/cifar100_report.md:0000",
+      "file_path": "benchmarks/canonical_tests/cifar100_report.md",
+      "label": "Manifold-Informed Architecture Benchmark \u2014 CIFAR100",
+      "references": 0,
+      "semantic_links": 16,
+      "total_links": 16
+    },
+    {
+      "id": "chunk:benchmarks/canonical_tests/cifar100_report.md:0005",
+      "file_path": "benchmarks/canonical_tests/cifar100_report.md",
+      "label": "Architecture Comparison",
+      "references": 0,
+      "semantic_links": 16,
+      "total_links": 16
+    },
+    {
+      "id": "chunk:docs/disulfide_schematic_README.md:0007",
+      "file_path": "docs/disulfide_schematic_README.md",
+      "label": "`create_disulfide_schematic`",
+      "references": 0,
+      "semantic_links": 15,
+      "total_links": 16
+    },
+    {
+      "id": "chunk:docs/graph_reasoner_spec/summary.md:0004",
+      "file_path": "docs/graph_reasoner_spec/summary.md",
+      "label": "The Architecture",
+      "references": 0,
+      "semantic_links": 15,
+      "total_links": 16
+    },
+    {
+      "id": "chunk:analysis/proteusPy_analysis_20260323.md:0010",
+      "file_path": "analysis/proteusPy_analysis_20260323.md",
+      "label": "Module Architecture",
+      "references": 0,
+      "semantic_links": 15,
+      "total_links": 15
+    },
+    {
+      "id": "chunk:benchmarks/canonical_tests/cifar100_report.md:0002",
+      "file_path": "benchmarks/canonical_tests/cifar100_report.md",
+      "label": "Manifold Discovery",
+      "references": 0,
+      "semantic_links": 15,
+      "total_links": 15
+    },
+    {
+      "id": "chunk:benchmarks/canonical_tests/cifar10_report.md:0000",
+      "file_path": "benchmarks/canonical_tests/cifar10_report.md",
+      "label": "Manifold-Informed Architecture Benchmark \u2014 CIFAR10",
+      "references": 0,
+      "semantic_links": 15,
+      "total_links": 15
+    },
+    {
+      "id": "chunk:benchmarks/canonical_tests/cifar10_report.md:0004",
+      "file_path": "benchmarks/canonical_tests/cifar10_report.md",
+      "label": "Architecture Comparison",
+      "references": 0,
+      "semantic_links": 15,
+      "total_links": 15
+    },
+    {
+      "id": "chunk:benchmarks/disulfide_flight_results_report.md:0005",
+      "file_path": "benchmarks/disulfide_flight_results_report.md",
+      "label": "Flight Summary",
+      "references": 0,
+      "semantic_links": 15,
+      "total_links": 15
+    },
+    {
+      "id": "chunk:docs/disulfide_schematic_README.md:0001",
+      "file_path": "docs/disulfide_schematic_README.md",
+      "label": "Features",
+      "references": 0,
+      "semantic_links": 15,
+      "total_links": 15
+    }
+  ],
+  "issues": [],
+  "vs_previous": null,
+  "vs_baseline": {
+    "nodes": -231,
+    "edges": -2532,
+    "coverage_delta": 0.013896482902780893,
+    "issues_delta": 0
+  }
+}

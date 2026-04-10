@@ -441,9 +441,7 @@ class DisulfideViewer(QMainWindow):
         if pdb_id in self.ss_dict:
             self.update_pdb_selection(pdb_id)
         else:
-            QMessageBox.warning(
-                self, "Invalid PDB ID", "The entered PDB ID is not valid."
-            )
+            QMessageBox.warning(self, "Invalid PDB ID", "The entered PDB ID is not valid.")
         disulfides = self.ss_dict.get(pdb_id, [])
 
         self.dropdown.clear()
@@ -496,9 +494,7 @@ class DisulfideViewer(QMainWindow):
             index (int): The index of the selected item in the dropdown.
         """
         selected_name = self.dropdown.currentText()
-        self.current_ss = next(
-            (ss for ss in self.ss_list if ss.name == selected_name), None
-        )
+        self.current_ss = next((ss for ss in self.ss_list if ss.name == selected_name), None)
         if self.current_ss is not None:
             self.statusBar().showMessage(f"Displaying: {self.current_ss.name}")
             self.display()
@@ -621,15 +617,9 @@ class DisulfideViewer(QMainWindow):
         plotter.remove_all_lights()
 
         # Define multiple light sources for better illumination
-        light1 = pv.Light(
-            position=(5, 5, 5), focal_point=(0, 0, 0), color="white", intensity=1.0
-        )
-        light2 = pv.Light(
-            position=(-5, -5, 5), focal_point=(0, 0, 0), color="white", intensity=0.5
-        )
-        light3 = pv.Light(
-            position=(5, -5, -5), focal_point=(0, 0, 0), color="white", intensity=0.5
-        )
+        light1 = pv.Light(position=(5, 5, 5), focal_point=(0, 0, 0), color="white", intensity=1.0)
+        light2 = pv.Light(position=(-5, -5, 5), focal_point=(0, 0, 0), color="white", intensity=0.5)
+        light3 = pv.Light(position=(5, -5, -5), focal_point=(0, 0, 0), color="white", intensity=0.5)
 
         plotter.add_light(light1)
         plotter.add_light(light2)
@@ -646,14 +636,10 @@ class DisulfideViewer(QMainWindow):
         # Update the layout to replace the old plotter widget with the new one
         layout = self.centralWidget().layout()
         layout.removeWidget(self.plotter_widget)  # Remove the old plotter widget
-        self.plotter_widget.setParent(
-            None
-        )  # Detach the old plotter widget from its parent
+        self.plotter_widget.setParent(None)  # Detach the old plotter widget from its parent
 
         layout.addWidget(new_plotter_widget)  # Add the new plotter widget to the layout
-        self.plotter_widget = (
-            new_plotter_widget  # Update the reference to the new plotter widget
-        )
+        self.plotter_widget = new_plotter_widget  # Update the reference to the new plotter widget
 
     def display(self, light="Auto", shadows=False):
         """

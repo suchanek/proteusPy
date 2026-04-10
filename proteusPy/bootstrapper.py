@@ -48,9 +48,7 @@ def main():
     parser.add_argument(
         "-p", "--percentile", type=float, default=-1.0, help="Percentile cutoff value"
     )
-    parser.add_argument(
-        "-v", "--verbose", action="store_true", help="Enable verbose output"
-    )
+    parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
 
     args = parser.parse_args()
 

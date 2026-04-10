@@ -200,11 +200,7 @@ def list_all_loggers():
     :rtype: list
     """
     logger_dict = logging.Logger.manager.loggerDict
-    loggers = [
-        name
-        for name, logger in logger_dict.items()
-        if isinstance(logger, logging.Logger)
-    ]
+    loggers = [name for name, logger in logger_dict.items() if isinstance(logger, logging.Logger)]
     return loggers
 
 

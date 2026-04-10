@@ -247,8 +247,10 @@ class ManifoldModel:
             self._geometries[node_id] = geom
             intrinsic_dims.append(geom.intrinsic_dim)
             if (i + 1) % _log_interval == 0:
-                print(f"  Explore: {i + 1}/{n_samples} nodes "
-                      f"(mean d={np.mean(intrinsic_dims):.1f})", flush=True)
+                print(
+                    f"  Explore: {i + 1}/{n_samples} nodes (mean d={np.mean(intrinsic_dims):.1f})",
+                    flush=True,
+                )
 
         self._global_intrinsic_dim = float(np.mean(intrinsic_dims))
 
@@ -285,7 +287,7 @@ class ManifoldModel:
         centroid = neighbors.mean(axis=0)
         centered = neighbors - centroid
         _, s, Vt = np.linalg.svd(centered, full_matrices=False)
-        eigenvalues = (s ** 2) / (len(neighbors) - 1)
+        eigenvalues = (s**2) / (len(neighbors) - 1)
         eigenvalues = np.maximum(eigenvalues, 0.0)
 
         # Intrinsic dimensionality
@@ -301,6 +303,8 @@ class ManifoldModel:
         # Truncated basis: only store the d principal directions we need
         # Vt rows are principal directions in descending singular value order
         basis = Vt[:intrinsic_dim]  # shape (d, ndim) — NOT (ndim, ndim)
+        if not np.isfinite(basis).all():
+            basis = np.nan_to_num(basis, nan=0.0, posinf=0.0, neginf=0.0)
 
         label = self._y_train[idx] if self._y_train is not None else None
 
@@ -339,6 +343,8 @@ class ManifoldModel:
 
                 # Project difference into tangent space
                 diff = tgt_point - src_geom.centroid
+                if not np.isfinite(diff).all():
+                    diff = np.nan_to_num(diff, nan=0.0, posinf=0.0, neginf=0.0)
                 proj = src_geom.basis[:d] @ diff  # project onto d tangent dims
                 manifold_dist = float(np.linalg.norm(proj))
                 euclidean_dist = float(dists_euc[j])
@@ -419,7 +425,7 @@ class ManifoldModel:
         centroid = pca_neighbors.mean(axis=0)
         centered = pca_neighbors - centroid
         _, s, Vt = np.linalg.svd(centered, full_matrices=False)
-        eigenvalues = (s ** 2) / (len(pca_neighbors) - 1)
+        eigenvalues = (s**2) / (len(pca_neighbors) - 1)
         eigenvalues = np.maximum(eigenvalues, 0.0)
 
         total = eigenvalues.sum()
@@ -472,9 +478,7 @@ class ManifoldModel:
 
         return max(label_scores, key=label_scores.get)
 
-    def _gather_graph_neighbors(
-        self, entry_id: str, max_hops: int = 2
-    ) -> list[int]:
+    def _gather_graph_neighbors(self, entry_id: str, max_hops: int = 2) -> list[int]:
         """Walk the graph from entry_id, returning training indices of reachable nodes."""
         visited = set()
         result_indices = []
@@ -776,9 +780,7 @@ class ManifoldModel:
             max_intrinsic_dim, n_nodes, ambient_dim, n_edges
         """
         dims = [g.intrinsic_dim for g in self._geometries.values()]
-        n_edges = sum(
-            len(edges) for edges in self._graph._edges.values()
-        )
+        n_edges = sum(len(edges) for edges in self._graph._edges.values())
 
         return {
             "mean_intrinsic_dim": float(np.mean(dims)),

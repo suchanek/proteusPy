@@ -343,9 +343,7 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
             atom_record1 = atom_list.get((chain_id1, res_seq_num1, atom_name))
             atom_record2 = atom_list.get((chain_id2, res_seq_num2, atom_name))
             if atom_record1:
-                ssbond_atom_list["atoms"][
-                    (chain_id1, res_seq_num1, atom_name)
-                ] = atom_record1
+                ssbond_atom_list["atoms"][(chain_id1, res_seq_num1, atom_name)] = atom_record1
             else:
                 errors.append(
                     f"Atom record not found for chain {chain_id1}, residue {res_seq_num1}, atom {atom_name}"
@@ -358,9 +356,7 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                     )
 
             if atom_record2:
-                ssbond_atom_list["atoms"][
-                    (chain_id2, res_seq_num2, atom_name)
-                ] = atom_record2
+                ssbond_atom_list["atoms"][(chain_id2, res_seq_num2, atom_name)] = atom_record2
             else:
                 errors.append(
                     f"Atom record not found for chain {chain_id2}, residue {res_seq_num2}, atom {atom_name}"
@@ -379,9 +375,7 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                 try:
                     int(res_seq_num) + offset
                 except ValueError:
-                    _logger.error(
-                        "get_phiipsi_atoms: ValueError: {res_seq_num} + {offset}"
-                    )
+                    _logger.error("get_phiipsi_atoms: ValueError: {res_seq_num} + {offset}")
                     continue
 
                 for atom_name in ["N", "C"]:
@@ -390,9 +384,7 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
                     if atom_record:
                         if f"{res_seq_num}{offset}" not in phipsi_atoms:
                             phipsi_atoms[f"{res_seq_num}{offset}"] = {}
-                        phipsi_atoms[f"{res_seq_num}{offset}"][atom_name] = atom_record[
-                            "coords"
-                        ]  #
+                        phipsi_atoms[f"{res_seq_num}{offset}"][atom_name] = atom_record["coords"]  #
 
                     else:
                         errors.append(
@@ -407,26 +399,14 @@ def extract_ssbonds_and_atoms(input_pdb_file, verbose=False, dbg=False) -> tuple
             return phipsi_atoms
 
         phipsi = {
-            "proximal-1": get_phipsi_atoms(chain_id1, res_seq_num1).get(
-                f"{res_seq_num1}-1", {}
-            ),
-            "proximal+1": get_phipsi_atoms(chain_id1, res_seq_num1).get(
-                f"{res_seq_num1}+1", {}
-            ),
-            "distal-1": get_phipsi_atoms(chain_id2, res_seq_num2).get(
-                f"{res_seq_num2}-1", {}
-            ),
-            "distal+1": get_phipsi_atoms(chain_id2, res_seq_num2).get(
-                f"{res_seq_num2}+1", {}
-            ),
+            "proximal-1": get_phipsi_atoms(chain_id1, res_seq_num1).get(f"{res_seq_num1}-1", {}),
+            "proximal+1": get_phipsi_atoms(chain_id1, res_seq_num1).get(f"{res_seq_num1}+1", {}),
+            "distal-1": get_phipsi_atoms(chain_id2, res_seq_num2).get(f"{res_seq_num2}-1", {}),
+            "distal+1": get_phipsi_atoms(chain_id2, res_seq_num2).get(f"{res_seq_num2}+1", {}),
         }
 
-        prox_secondary = get_secondary_structure(
-            chain_id1, res_seq_num1, ssbond_atom_list
-        )
-        dist_secondary = get_secondary_structure(
-            chain_id2, res_seq_num2, ssbond_atom_list
-        )
+        prox_secondary = get_secondary_structure(chain_id1, res_seq_num1, ssbond_atom_list)
+        dist_secondary = get_secondary_structure(chain_id2, res_seq_num2, ssbond_atom_list)
 
         # Add the pair information to the pairs list
         pairs.append(
@@ -480,10 +460,7 @@ def get_secondary_structure(chain_id, res_seq_num, pdb_data) -> str:
 
     # Check turns
     for turn in pdb_data.get("turns", []):
-        if (
-            turn["start"][0] == chain_id
-            and turn["start"][1] <= int(res_seq_num) <= turn["end"][1]
-        ):
+        if turn["start"][0] == chain_id and turn["start"][1] <= int(res_seq_num) <= turn["end"][1]:
             return "turn"
 
     # If no secondary structure is found
@@ -508,23 +485,17 @@ def extract_and_write_ssbonds_and_atoms(
     if verbose:
         _logger.info(str(f"Loading disulfides from {input_pdb_file}"))
 
-    ssbond_atom_list, _, _ = extract_ssbonds_and_atoms(
-        input_pdb_file, verbose=verbose, dbg=dbg
-    )
+    ssbond_atom_list, _, _ = extract_ssbonds_and_atoms(input_pdb_file, verbose=verbose, dbg=dbg)
 
     if verbose:
-        _logger.info(
-            str(f"Writing disulfide bond and atom information to {output_pkl_file}")
-        )
+        _logger.info(str(f"Writing disulfide bond and atom information to {output_pkl_file}"))
 
     with open(output_pkl_file, "wb") as f:
         pickle.dump(ssbond_atom_list, f)
 
     if verbose:
         _logger.info(
-            str(
-                f"Successfully wrote disulfide bond and atom information to {output_pkl_file}"
-            )
+            str(f"Successfully wrote disulfide bond and atom information to {output_pkl_file}")
         )
 
 
@@ -616,11 +587,7 @@ def print_disulfide_bond_info_dict(ssbond_atom_data) -> None:
                     else (
                         int(res_seq_num1) + 1
                         if "proximal+1" in key
-                        else (
-                            int(res_seq_num2) - 1
-                            if "distal-1" in key
-                            else int(res_seq_num2) + 1
-                        )
+                        else (int(res_seq_num2) - 1 if "distal-1" in key else int(res_seq_num2) + 1)
                     )
                 )
                 print(f"    Atom {atom_name} (Residue {res_seq_num}): {coords}")
@@ -628,9 +595,7 @@ def print_disulfide_bond_info_dict(ssbond_atom_data) -> None:
         print("-" * 50)
 
 
-def get_atom_coordinates(
-    ssbond_dict, chain_id, res_seq_num, atom_name, verbose=False
-) -> Vector3D:
+def get_atom_coordinates(ssbond_dict, chain_id, res_seq_num, atom_name, verbose=False) -> Vector3D:
     """
     Accessor function to get the coordinates of a specific atom in a residue.
 
@@ -663,9 +628,7 @@ def get_atom_coordinates(
         return Vector3D([])
 
 
-def get_residue_atoms_coordinates(
-    ssbond_dict, chain_id, res_seq_num, verbose=False
-) -> list:
+def get_residue_atoms_coordinates(ssbond_dict, chain_id, res_seq_num, verbose=False) -> list:
     """
     Accessor function to get the coordinates of specific atoms in a residue in the order N, CA, C, O, CB, SG.
 
@@ -775,9 +738,7 @@ def check_file(
         return None
 
     # Returns > 0 if we can't parse the SSBOND header
-    ssbond_dict, found, errors = extract_ssbonds_and_atoms(
-        fname, verbose=verbose, dbg=dbg
-    )
+    ssbond_dict, found, errors = extract_ssbonds_and_atoms(fname, verbose=verbose, dbg=dbg)
 
     if verbose:
         _logger.info(str(f"Found: {found} errors: {errors}"))

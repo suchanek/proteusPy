@@ -80,6 +80,7 @@ def filter_by_percentage(df: pd.DataFrame, cutoff) -> pd.DataFrame:
     """
     return df[df["percentage"] >= cutoff]
 
+
 def is_between(x, a, b):
     """
     Returns True if x is between a and b (inclusive), False otherwise.

@@ -342,9 +342,7 @@ def png_tree(
     import matplotlib.patches as mpatches
     import matplotlib.pyplot as plt
 
-    positions, edges = _collect_layout(
-        tree, root, 0, max_children, max_depth, show_members, [0]
-    )
+    positions, edges = _collect_layout(tree, root, 0, max_children, max_depth, show_members, [0])
 
     fig, ax = plt.subplots(1, 1, figsize=figsize)
     ax.set_aspect("auto")
@@ -478,9 +476,7 @@ def _collect_layout_3d(
     edges: list[tuple[str, str]] = []
 
     if depth > max_depth:
-        positions[node_key] = np.array(
-            [counter[0] * x_spacing, -depth * _LEVEL_Y_SPACING, 0.0]
-        )
+        positions[node_key] = np.array([counter[0] * x_spacing, -depth * _LEVEL_Y_SPACING, 0.0])
         counter[0] += 1
         return positions, edges
 
@@ -494,9 +490,7 @@ def _collect_layout_3d(
         all_items = all_items[:max_children]
 
     if not all_items:
-        positions[node_key] = np.array(
-            [counter[0] * x_spacing, -depth * _LEVEL_Y_SPACING, 0.0]
-        )
+        positions[node_key] = np.array([counter[0] * x_spacing, -depth * _LEVEL_Y_SPACING, 0.0])
         counter[0] += 1
         return positions, edges
 
@@ -525,15 +519,11 @@ def _collect_layout_3d(
         parent_x = counter[0] * x_spacing
         counter[0] += 1
 
-    positions[node_key] = np.array(
-        [parent_x, -depth * _LEVEL_Y_SPACING, 0.0]
-    )
+    positions[node_key] = np.array([parent_x, -depth * _LEVEL_Y_SPACING, 0.0])
     return positions, edges
 
 
-def _node_color_rgb(
-    data: TreeNodeData | None, node_key: str
-) -> tuple[float, float, float]:
+def _node_color_rgb(data: TreeNodeData | None, node_key: str) -> tuple[float, float, float]:
     """Return an RGB tuple for a tree node."""
     if node_key == "root":
         return _LEVEL_COLORS_RGB["root"]

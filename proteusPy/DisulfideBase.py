@@ -24,7 +24,6 @@ Last Modification: 2025-04-08 19:15:45
 
 # Cα N, Cα, Cβ, C', Sγ Å ° ρ
 
-
 import copy
 import itertools
 import logging
@@ -136,8 +135,7 @@ class DisulfideList(UserList):
 
             # Create name with slice info
             name = (
-                sublist[0].pdb_id
-                + f"_slice[{indices[0]}:{indices[-1]+1}]_{sublist[-1].pdb_id}"
+                sublist[0].pdb_id + f"_slice[{indices[0]}:{indices[-1] + 1}]_{sublist[-1].pdb_id}"
             )
             return DisulfideList(sublist, name)
 
@@ -268,9 +266,7 @@ class DisulfideList(UserList):
         sslist = self.data
         torsions = np.array([ss.torsion_array for ss in sslist])
         # Calculate circular mean for each torsion angle separately
-        avg_torsions = np.array(
-            [DisulfideStats.circular_mean(torsions[:, i]) for i in range(5)]
-        )
+        avg_torsions = np.array([DisulfideStats.circular_mean(torsions[:, i]) for i in range(5)])
         return avg_torsions
 
     @property
@@ -399,9 +395,7 @@ class DisulfideList(UserList):
         elif len(args) == 5:
             chi1, chi2, chi3, chi4, chi5 = args
         else:
-            raise ValueError(
-                "You must provide either 5 individual angles or a list of 5 angles."
-            )
+            raise ValueError("You must provide either 5 individual angles or a list of 5 angles.")
 
         modelss = Disulfide("model", torsions=[chi1, chi2, chi3, chi4, chi5])
         res = modelss.torsion_neighbors(self, cutoff)
@@ -468,9 +462,7 @@ class DisulfideList(UserList):
 
     def extract_distances(self, distance_type="sg", comparison="less", cutoff=-1):
         """Extract and filter distance values"""
-        return DisulfideStats.extract_distances(
-            self.data, distance_type, comparison, cutoff
-        )
+        return DisulfideStats.extract_distances(self.data, distance_type, comparison, cutoff)
 
     def extract_energies(self, comparison="less", cutoff=-1):
         """Extract and filter energy values"""
@@ -635,20 +627,14 @@ class DisulfideList(UserList):
         # Filter based on the specified distance type
         if distance_type == "ca":
             reslist = [
-                ss
-                for ss in sslist
-                if ss.ca_distance < distance and ss.ca_distance > minimum
+                ss for ss in sslist if ss.ca_distance < distance and ss.ca_distance > minimum
             ]
         elif distance_type == "sg":
             reslist = [
-                ss
-                for ss in sslist
-                if ss.sg_distance < distance and ss.sg_distance > minimum
+                ss for ss in sslist if ss.sg_distance < distance and ss.sg_distance > minimum
             ]
 
-        return DisulfideList(
-            reslist, f"filtered by {distance_type} distance < {distance:.2f}"
-        )
+        return DisulfideList(reslist, f"filtered by {distance_type} distance < {distance:.2f}")
 
     def sort_by_ca_distance(self):
         """
@@ -872,9 +858,7 @@ class Disulfide:
         self.ca_distance = _FLOAT_INIT
         self.cb_distance = _FLOAT_INIT
         self.sg_distance = _FLOAT_INIT
-        self.torsion_array = np.array(
-            (_ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT)
-        )
+        self.torsion_array = np.array((_ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT, _ANG_INIT))
         self.phiprox = _ANG_INIT
         self.psiprox = _ANG_INIT
         self.phidist = _ANG_INIT
@@ -1161,9 +1145,7 @@ class Disulfide:
         """
         self.build_model(self.chi1, self.chi2, self.chi3, self.chi4, self.chi5)
 
-    def build_model(
-        self, chi1: float, chi2: float, chi3: float, chi4: float, chi5: float
-    ) -> None:
+    def build_model(self, chi1: float, chi2: float, chi3: float, chi4: float, chi5: float) -> None:
         """
         Build a model Disulfide based on the input dihedral angles.
         Routine assumes turtle is in orientation #1 (at Ca, headed toward
@@ -1490,9 +1472,7 @@ class Disulfide:
             raise ValueError("Torsion arrays must be of the same length.")
 
         # Compute the total squared difference between corresponding internal coordinates
-        total_squared_diff = sum(
-            (angle1 - angle2) ** 2 for angle1, angle2 in zip(ic1, ic2)
-        )
+        total_squared_diff = sum((angle1 - angle2) ** 2 for angle1, angle2 in zip(ic1, ic2))
         mean_squared_diff = total_squared_diff / len(ic1)
 
         # Return the square root of the mean squared difference as the RMS distance
@@ -1520,9 +1500,7 @@ class Disulfide:
                 raise ValueError("Torsion arrays must be of the same length.")
 
             # Compute the total squared difference between corresponding internal coordinates
-            total_squared_diff = sum(
-                (angle1 - angle2) ** 2 for angle1, angle2 in zip(ic1, ic2)
-            )
+            total_squared_diff = sum((angle1 - angle2) ** 2 for angle1, angle2 in zip(ic1, ic2))
             mean_squared_diff = total_squared_diff / len(ic1)
             rms = math.sqrt(mean_squared_diff)
             rms_list.append(rms)
@@ -1730,9 +1708,7 @@ class Disulfide:
              Unable to find residue: {resnumb} "
             raise DisulfideConstructionWarning(mess)
 
-    def make_movie(
-        self, style="sb", fname="ssbond.mp4", verbose=False, steps=360
-    ) -> None:
+    def make_movie(self, style="sb", fname="ssbond.mp4", verbose=False, steps=360) -> None:
         """
         Create an animation for ```self``` rotating one revolution about the Y axis,
         in the given ```style```, saving to ```filename```.
@@ -1970,9 +1946,7 @@ class Disulfide:
         v4 = self.n_dist - self.ca_dist
         v3 = self.c_dist - self.ca_dist
         n2 = np.cross(v4.get_array(), v3.get_array())
-        self._rho = calc_dihedral(
-            Vector3D(n1), self.ca_prox, self.ca_dist, Vector3D(n2)
-        )
+        self._rho = calc_dihedral(Vector3D(n1), self.ca_prox, self.ca_dist, Vector3D(n2))
         return self._rho
 
     def reset(self) -> None:
@@ -2021,9 +1995,7 @@ class Disulfide:
         :param shadows: Enable shadows, defaults to False
         """
 
-        DisulfideVisualization.screenshot(
-            self, single, style, fname, verbose, shadows, light
-        )
+        DisulfideVisualization.screenshot(self, single, style, fname, verbose, shadows, light)
 
     def set_positions(
         self,
@@ -2133,9 +2105,7 @@ class Disulfide:
 
         # Check length of torsion arrays
         if len(self.torsion_array) != 5 or len(other.torsion_array) != 5:
-            raise ProteusPyWarning(
-                "--> Torsion_Distance() requires vectors of length 5!"
-            )
+            raise ProteusPyWarning("--> Torsion_Distance() requires vectors of length 5!")
 
         # Convert to numpy arrays
         p1 = np.array(self.torsion_array)
@@ -2237,11 +2207,7 @@ class Disulfide:
         chi1, chi2, chi3, chi4, chi5 = x
         energy = 2.0 * (np.cos(np.deg2rad(3.0 * chi1)) + np.cos(np.deg2rad(3.0 * chi5)))
         energy += np.cos(np.deg2rad(3.0 * chi2)) + np.cos(np.deg2rad(3.0 * chi4))
-        energy += (
-            3.5 * np.cos(np.deg2rad(2.0 * chi3))
-            + 0.6 * np.cos(np.deg2rad(3.0 * chi3))
-            + 10.1
-        )
+        energy += 3.5 * np.cos(np.deg2rad(2.0 * chi3)) + 0.6 * np.cos(np.deg2rad(3.0 * chi3)) + 10.1
         return energy
 
     @staticmethod
@@ -2259,7 +2225,10 @@ class Disulfide:
 
         initial_guess = inputSS.torsion_array
         result = minimize(
-            Disulfide.disulfide_energy_function, initial_guess, method="Nelder-Mead", options={'disp': True}
+            Disulfide.disulfide_energy_function,
+            initial_guess,
+            method="Nelder-Mead",
+            options={"disp": True},
         )
         minimum_conformation = result.x
         modelled_min = Disulfide("minimized", torsions=minimum_conformation)

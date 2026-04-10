@@ -94,15 +94,11 @@ class DisulfideClassManager:
         self.consensus_oct_list = None
 
         if self.verbose:
-            _logger.info(
-                "Loading binary consensus structure list from %s", SS_CONSENSUS_BIN_FILE
-            )
+            _logger.info("Loading binary consensus structure list from %s", SS_CONSENSUS_BIN_FILE)
         self.consensus_binary_list = self.load_consensus_file(octant=False)
 
         if self.verbose:
-            _logger.info(
-                "Loading octant consensus structure list from %s", SS_CONSENSUS_OCT_FILE
-            )
+            _logger.info("Loading octant consensus structure list from %s", SS_CONSENSUS_OCT_FILE)
         self.consensus_oct_list = self.load_consensus_file(octant=True)
 
         self.build_classes(loader)
@@ -371,9 +367,7 @@ class DisulfideClassManager:
 
         # Create a new column with the class ID for each row
         class_id_column = "class_id"
-        df[class_id_column] = (df[sign_columns] + 1).apply(
-            lambda x: "".join(x.astype(str)), axis=1
-        )
+        df[class_id_column] = (df[sign_columns] + 1).apply(lambda x: "".join(x.astype(str)), axis=1)
 
         # Group the DataFrame by the class ID and return the grouped data
         grouped = df.groupby(class_id_column)["ss_id"].unique().reset_index()
@@ -451,9 +445,7 @@ class DisulfideClassManager:
             )
 
         # Concatenate the transformed chi columns to create class_id
-        df["class_id"] = df[["chi1_t", "chi2_t", "chi3_t", "chi4_t", "chi5_t"]].agg(
-            "".join, axis=1
-        )
+        df["class_id"] = df[["chi1_t", "chi2_t", "chi3_t", "chi4_t", "chi5_t"]].agg("".join, axis=1)
 
         # Group by class_id and aggregate required statistics
         grouped = df.groupby("class_id").agg({"ss_id": "unique"})
@@ -493,9 +485,7 @@ class DisulfideClassManager:
         Returns:
         :return str. The binary quadrant (0 or 2) that the angle belongs to.
         """
-        angle_deg = (
-            np.array(angle_deg) % 360
-        )  # Normalize the angle to the range [0, 360)
+        angle_deg = np.array(angle_deg) % 360  # Normalize the angle to the range [0, 360)
 
         if np.isscalar(angle_deg):
             if angle_deg >= 0 and angle_deg < 180:
@@ -504,9 +494,7 @@ class DisulfideClassManager:
             if angle_deg >= 180 and angle_deg < 360:
                 return str(0)
 
-            raise ValueError(
-                "Invalid angle value: angle must be in the range [-360, 360)."
-            )
+            raise ValueError("Invalid angle value: angle must be in the range [-360, 360).")
 
         quadrants = np.where((angle_deg >= 0) & (angle_deg < 180), "2", "0")
         return "".join(quadrants)
@@ -630,8 +618,7 @@ class DisulfideClassManager:
                 return DisulfideClassManager.get_class_string(angles[0], base=base)
             case 5:
                 segments = [
-                    DisulfideClassManager.get_class_string(angle, base=base)
-                    for angle in angles
+                    DisulfideClassManager.get_class_string(angle, base=base) for angle in angles
                 ]
                 return "".join(segments)
             case _:
@@ -684,9 +671,7 @@ class DisulfideClassManager:
         """
 
         if base is None and len(cls_str) == 5:
-            raise ValueError(
-                "Base must be specified if the class string is of length 5."
-            )
+            raise ValueError("Base must be specified if the class string is of length 5.")
 
         if base is None and len(cls_str) == 6:
             bstr = cls_str[-1]

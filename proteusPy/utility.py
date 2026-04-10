@@ -162,9 +162,7 @@ def extract_firstchain_ss(sslist, verbose=False):
     try:
         chain = chainlist[0]
     except IndexError:
-        _logger.warning(
-            "extract_firstchain_ss(): No chains found in SS list: %s", chain
-        )
+        _logger.warning("extract_firstchain_ss(): No chains found in SS list: %s", chain)
         return res, xchain
 
     for ss in sslist:
@@ -220,9 +218,7 @@ def download_file(url: str, directory: str | Path, verbose: bool = False) -> Non
             command = ["wget", "-P", str(directory), url]
             result = subprocess.run(command, check=True, capture_output=True, text=True)
             if verbose:
-                _logger.info(
-                    "Download complete with result %s for: %s", result, file_name
-                )
+                _logger.info("Download complete with result %s for: %s", result, file_name)
         except subprocess.CalledProcessError as e:
             _logger.error("Download failed: %s\nError: %s", file_name, e.stderr)
             raise
@@ -287,9 +283,7 @@ def image_to_ascii_art(fname: str, nwidth: int) -> None:
     img = Image.open(fname)
     width, height = img.size
     aspect_ratio = height / width
-    new_height = int(
-        aspect_ratio * nwidth * 0.55
-    )  # 0.55 compensates for character aspect ratio
+    new_height = int(aspect_ratio * nwidth * 0.55)  # 0.55 compensates for character aspect ratio
     img = img.resize((nwidth, new_height))
     img = img.convert("L")  # Convert to grayscale
 
@@ -297,16 +291,12 @@ def image_to_ascii_art(fname: str, nwidth: int) -> None:
     pixels = np.array(img.getdata())
     # Normalize to [0, len(CHAR_SET)-1] range
     pixel_indices = (
-        (pixels - pixels.min())
-        * (len(CHAR_SET) - 1)
-        / (pixels.max() - pixels.min() + 1e-8)
+        (pixels - pixels.min()) * (len(CHAR_SET) - 1) / (pixels.max() - pixels.min() + 1e-8)
     ).astype(int)
     chars = [CHAR_SET[idx] for idx in pixel_indices]
 
     # Generate and print ASCII art
-    ascii_art = "\n".join(
-        "".join(chars[i : i + nwidth]) for i in range(0, len(chars), nwidth)
-    )
+    ascii_art = "\n".join("".join(chars[i : i + nwidth]) for i in range(0, len(chars), nwidth))
     print(ascii_art)
 
 
@@ -436,9 +426,7 @@ def display_ss_pymol(
     return None
 
 
-def Download_Disulfides(
-    pdb_home=PDB_DIR, model_home=MODEL_DIR, verbose=False, reset=False
-) -> None:
+def Download_Disulfides(pdb_home=PDB_DIR, model_home=MODEL_DIR, verbose=False, reset=False) -> None:
     """
     Read a comma separated list of PDB IDs and download them to the ``pdb_home`` path.
 
@@ -672,9 +660,7 @@ def Extract_Disulfides(
                 bad += 1
                 problem_ids.append(entry)
                 if verbose:
-                    _logger.warning(
-                        "Extract_Disulfides(): No SS parsed for: %s!", entry
-                    )
+                    _logger.warning("Extract_Disulfides(): No SS parsed for: %s!", entry)
 
                 if prune:
                     fname = f"pdb{entry}.ent"
@@ -850,9 +836,7 @@ def Extract_Disulfides_From_List(
                 bad += 1
                 problem_ids.append(entry)
                 if verbose:
-                    _logger.warning(
-                        "Extract_Disulfides(): No SS parsed for: %s!", entry
-                    )
+                    _logger.warning("Extract_Disulfides(): No SS parsed for: %s!", entry)
                 if prune:
                     fname = f"pdb{entry}.ent"
                     # Construct the full path for the new destination file
@@ -866,9 +850,7 @@ def Extract_Disulfides_From_List(
                     shutil.move(fname, destination_file_path)
                 continue  ## this entry has no SS bonds, so we break the loop
 
-            pbar.set_postfix(
-                {"ID": entry, "NoSS": bad, "Cnt": tot}
-            )  # update the progress bar
+            pbar.set_postfix({"ID": entry, "NoSS": bad, "Cnt": tot})  # update the progress bar
 
     if bad > 0:
         prob_cols = ["id"]
@@ -1252,7 +1234,9 @@ def calculate_fontsize(title, window_width, max_fontsize=FONTSIZE, min_fontsize=
     if not font_path:
         _logger.warning("No suitable font found. Using default font size.")
         # Return a reasonable default size based on title length and window width
-        estimated_size = max(min(max_fontsize, int(effective_width / (len(title) * 0.6))), min_fontsize)
+        estimated_size = max(
+            min(max_fontsize, int(effective_width / (len(title) * 0.6))), min_fontsize
+        )
         _logger.info("Estimated font size for title length %d: %d", len(title), estimated_size)
         return estimated_size
 
@@ -1265,9 +1249,7 @@ def calculate_fontsize(title, window_width, max_fontsize=FONTSIZE, min_fontsize=
             sz = font.getbbox(text)
             text_width = font.getbbox(text)[2]
 
-            _logger.debug(
-                "Font size: %d, bbox: %s, text width: %d", size, sz, text_width
-            )
+            _logger.debug("Font size: %d, bbox: %s, text width: %d", size, sz, text_width)
 
             return text_width
         except Exception as e:

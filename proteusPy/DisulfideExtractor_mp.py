@@ -248,7 +248,7 @@ def extract_disulfides_chunk(args):
 
     task_pbar = tqdm(
         total=len(entrylist),
-        desc=f"{Fore.BLUE}  Process {pbar_index+1:2}{Style.RESET_ALL}".ljust(10),
+        desc=f"{Fore.BLUE}  Process {pbar_index + 1:2}{Style.RESET_ALL}".ljust(10),
         position=pbar_index + 1,
         leave=False,
         ncols=PBAR_COLS,
@@ -458,7 +458,6 @@ def do_stuff(
         do_build(_verbose, _full, _subset, cutoff, sg_cutoff)
 
     if _update is True:
-
         if _forge == "miniforge3":
             venv_dir = MINIFORGE_DIR / _env / VENV_DIR
         else:

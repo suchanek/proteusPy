@@ -37,9 +37,7 @@ TOTAL_COMBINATIONS = VALUES_PER_ANGLE**NUM_DIHEDRAL_ANGLES  # 243
 BINARY_BASE = 2
 OCTANT_BASE = 8
 DIHEDRAL_COLUMNS = [
-    f"chi{i}_{stat}"
-    for i in range(1, NUM_DIHEDRAL_ANGLES + 1)
-    for stat in ["mean", "std"]
+    f"chi{i}_{stat}" for i in range(1, NUM_DIHEDRAL_ANGLES + 1) for stat in ["mean", "std"]
 ]
 
 # Logger setup
@@ -249,9 +247,7 @@ class DisulfideClassGenerator:
         parsed_base, clean_cls = self.parse_class_string(clsid)
         base = parsed_base if parsed_base else base
         target_dict = (
-            self.binary_class_disulfides
-            if base == BINARY_BASE
-            else self.octant_class_disulfides
+            self.binary_class_disulfides if base == BINARY_BASE else self.octant_class_disulfides
         )
 
         if clean_cls not in target_dict:
@@ -282,7 +278,7 @@ class DisulfideClassGenerator:
         chi_values = [[m - s, m, m + s] for m, s in zip(chi_means, chi_stds)]
         combinations = list(itertools.product(*chi_values))
         disulfides = [
-            Disulfide(f"{class_id}_comb{i+1}", torsions=list(combo))
+            Disulfide(f"{class_id}_comb{i + 1}", torsions=list(combo))
             for i, combo in enumerate(combinations)
         ]
         return DisulfideList(disulfides, f"Class_{class_id}")
@@ -317,30 +313,18 @@ class DisulfideClassGenerator:
             return None
 
         row_data = row.iloc[0]
-        chi_means = tuple(
-            row_data[f"chi{i}_mean"] for i in range(1, NUM_DIHEDRAL_ANGLES + 1)
-        )
-        chi_stds = tuple(
-            row_data[f"chi{i}_std"] for i in range(1, NUM_DIHEDRAL_ANGLES + 1)
-        )
-        disulfide_list = self._generate_disulfides_for_class(
-            clean_string, chi_means, chi_stds
-        )
+        chi_means = tuple(row_data[f"chi{i}_mean"] for i in range(1, NUM_DIHEDRAL_ANGLES + 1))
+        chi_stds = tuple(row_data[f"chi{i}_std"] for i in range(1, NUM_DIHEDRAL_ANGLES + 1))
+        disulfide_list = self._generate_disulfides_for_class(clean_string, chi_means, chi_stds)
 
         target_dict = (
-            self.binary_class_disulfides
-            if base == BINARY_BASE
-            else self.octant_class_disulfides
+            self.binary_class_disulfides if base == BINARY_BASE else self.octant_class_disulfides
         )
         target_dict[clean_string] = disulfide_list
-        _logger.info(
-            "Generated %d disulfides for class %s", len(disulfide_list), class_id
-        )
+        _logger.info("Generated %d disulfides for class %s", len(disulfide_list), class_id)
         return disulfide_list
 
-    def generate_for_selected_classes(
-        self, class_ids: list[str]
-    ) -> dict[str, DisulfideList]:
+    def generate_for_selected_classes(self, class_ids: list[str]) -> dict[str, DisulfideList]:
         """
         Generate disulfides for multiple classes in parallel.
 
@@ -355,12 +339,8 @@ class DisulfideClassGenerator:
 
         class_disulfides = {}
         with ThreadPoolExecutor() as executor:
-            futures = {
-                executor.submit(self.generate_for_class, cid): cid for cid in class_ids
-            }
-            for future in tqdm.tqdm(
-                futures, desc="Generating classes", disable=not self.verbose
-            ):
+            futures = {executor.submit(self.generate_for_class, cid): cid for cid in class_ids}
+            for future in tqdm.tqdm(futures, desc="Generating classes", disable=not self.verbose):
                 class_id = futures[future]
                 if (_result := future.result()) is not None:
                     class_disulfides[class_id] = _result
@@ -410,9 +390,7 @@ class DisulfideClassGenerator:
         :return: Iterator over DataFrame rows.
         """
         return (
-            tqdm.tqdm(
-                df.iterrows(), total=len(df), desc=f"Generating {desc} disulfides"
-            )
+            tqdm.tqdm(df.iterrows(), total=len(df), desc=f"Generating {desc} disulfides")
             if self.verbose
             else df.iterrows()
         )
@@ -428,9 +406,7 @@ class DisulfideClassGenerator:
         :return: DisulfideList for the row.
         :rtype: DisulfideList
         """
-        chi_means = tuple(
-            row[f"chi{i}_mean"] for i in range(1, NUM_DIHEDRAL_ANGLES + 1)
-        )
+        chi_means = tuple(row[f"chi{i}_mean"] for i in range(1, NUM_DIHEDRAL_ANGLES + 1))
         chi_stds = tuple(row[f"chi{i}_std"] for i in range(1, NUM_DIHEDRAL_ANGLES + 1))
         return self._generate_disulfides_for_class(class_id, chi_means, chi_stds)
 
@@ -484,9 +460,7 @@ class DisulfideClassGenerator:
         ]:
             for class_id, disulfide_list in d.items():
                 for ss in disulfide_list:
-                    energy_data.append(
-                        {"class": class_id, "energy": ss.energy, "base": base}
-                    )
+                    energy_data.append({"class": class_id, "energy": ss.energy, "base": base})
         df = pd.DataFrame(energy_data)
         (
             _logger.info("Prepared energy data with %d entries", len(df))
@@ -601,9 +575,7 @@ class DisulfideClassGenerator:
             )
         else:
             # Split into multiple plots
-            num_plots = (
-                len(plot_df) + max_classes_per_plot - 1
-            ) // max_classes_per_plot
+            num_plots = (len(plot_df) + max_classes_per_plot - 1) // max_classes_per_plot
 
             if verbose:
                 _logger.info(
@@ -618,8 +590,8 @@ class DisulfideClassGenerator:
                 subset_df = plot_df.iloc[start_idx:end_idx]
 
                 # Create plot title for this subset
-                subset_title = f"{plot_title} (Part {i+1} of {num_plots})"
-                fname_prefix = f"{plot_title.lower().replace(' ', '_')}_part_{i+1}"
+                subset_title = f"{plot_title} (Part {i + 1} of {num_plots})"
+                fname_prefix = f"{plot_title.lower().replace(' ', '_')}_part_{i + 1}"
                 # Create line plot for this subset
                 DisulfideVisualization.plot_torsion_distance_by_class(
                     subset_df,
@@ -666,9 +638,7 @@ class DisulfideClassGenerator:
         """
         base, clean_string = self.parse_class_string(class_id)
         target_dict = (
-            self.binary_class_disulfides
-            if base == BINARY_BASE
-            else self.octant_class_disulfides
+            self.binary_class_disulfides if base == BINARY_BASE else self.octant_class_disulfides
         )
 
         if clean_string in target_dict:

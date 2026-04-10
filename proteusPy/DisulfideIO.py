@@ -132,9 +132,7 @@ def Initialize_Disulfide_From_Coords(
 
     # distal residue
     try:
-        dist_atom_list = get_residue_atoms_coordinates(
-            ssbond_atom_data, distal_chain_id, distal
-        )
+        dist_atom_list = get_residue_atoms_coordinates(ssbond_atom_data, distal_chain_id, distal)
         n2 = dist_atom_list[0]
         ca2 = dist_atom_list[1]
         c2 = dist_atom_list[2]
@@ -155,13 +153,9 @@ def Initialize_Disulfide_From_Coords(
         ssbond_atom_data, proximal_chain_id, "proximal+1"
     )
 
-    prevdist_atom_list = get_phipsi_atoms_coordinates(
-        ssbond_atom_data, distal_chain_id, "distal-1"
-    )
+    prevdist_atom_list = get_phipsi_atoms_coordinates(ssbond_atom_data, distal_chain_id, "distal-1")
 
-    nextdist_atom_list = get_phipsi_atoms_coordinates(
-        ssbond_atom_data, distal_chain_id, "distal+1"
-    )
+    nextdist_atom_list = get_phipsi_atoms_coordinates(ssbond_atom_data, distal_chain_id, "distal+1")
 
     if len(prevprox_atom_list) != 0:
         cprev_prox = prevprox_atom_list[1]
@@ -352,9 +346,7 @@ def load_disulfides_from_id(
             continue
 
         if verbose:
-            mess = (
-                f"SSBond: {i}: {pdb_id}: {proximal} {chain1_id} - {distal} {chain2_id}"
-            )
+            mess = f"SSBond: {i}: {pdb_id}: {proximal} {chain1_id} - {distal} {chain2_id}"
             _logger.info(mess)
 
         new_ss = Initialize_Disulfide_From_Coords(
@@ -443,9 +435,7 @@ def extract_disulfide(
 
     # returns an empty list if none are found.
     _sslist = DisulfideList([], pdbid)
-    _sslist = load_disulfides_from_id(
-        pdbid, verbose=verbose, quiet=quiet, pdb_dir=pdbdir
-    )
+    _sslist = load_disulfides_from_id(pdbid, verbose=verbose, quiet=quiet, pdb_dir=pdbdir)
 
     if len(_sslist) == 0 or _sslist is None:
         mess = f"Can't find SSBonds: {pdbid}"

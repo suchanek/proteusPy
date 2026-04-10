@@ -68,9 +68,7 @@ class DisulfideVisualization:
     statistical plots, and overlay displays."""
 
     @staticmethod
-    def enumerate_class_fromlist(
-        tclass: DisulfideClassManager, clslist, base=8
-    ) -> pd.DataFrame:
+    def enumerate_class_fromlist(tclass: DisulfideClassManager, clslist, base=8) -> pd.DataFrame:
         """Enumerate the classes from a list of class IDs.
 
         :param tclass: DisulfideClassManager instance
@@ -207,9 +205,7 @@ class DisulfideVisualization:
         clslist = tclass.binaryclass_df["class_id"]
         for cls in clslist:
             eightcls = tclass.binary_to_class(cls, 8)
-            df = DisulfideVisualization.enumerate_class_fromlist(
-                tclass, eightcls, base=8
-            )
+            df = DisulfideVisualization.enumerate_class_fromlist(tclass, eightcls, base=8)
             DisulfideVisualization.plot_count_vs_class_df(
                 df,
                 title=cls,
@@ -555,9 +551,7 @@ class DisulfideVisualization:
         :param paginated: Whether to paginate the output
         """
         classlist = tclass.binary_to_class(class_string, base)
-        df = DisulfideVisualization.enumerate_class_fromlist(
-            tclass, classlist, base=base
-        )
+        df = DisulfideVisualization.enumerate_class_fromlist(tclass, classlist, base=base)
         if paginated:
             DisulfideVisualization.plot_count_vs_class_df_paginated(
                 df,
@@ -594,9 +588,7 @@ class DisulfideVisualization:
         set_pyvista_theme(light)
 
         pl = pv.Plotter(window_size=winsize, shape=(rows, cols))
-        pl = DisulfideVisualization._render_sslist(
-            pl, sslist, style, panelsize=panelsize
-        )
+        pl = DisulfideVisualization._render_sslist(pl, sslist, style, panelsize=panelsize)
         pl.enable_anti_aliasing("msaa")
 
         pl.link_views()
@@ -811,9 +803,7 @@ class DisulfideVisualization:
             # Then apply the orbit path - this will spin the view and keep the window open
             try:
                 # Use our custom simulation function instead of orbit_on_path
-                DisulfideVisualization.simulate_orbit_on_path(
-                    pl, steps=steps, step_size=step_size
-                )
+                DisulfideVisualization.simulate_orbit_on_path(pl, steps=steps, step_size=step_size)
             except ValueError as e:
                 _logger.error("Error during simulate_orbit_on_path: %s", e)
 
@@ -873,9 +863,7 @@ class DisulfideVisualization:
         # Adjust vertical spacing based on scale factor
         vertical_spacing = 0.125 * (1 + 0.2 * (scale_factor - 1))
 
-        fig = make_subplots(
-            rows=2, cols=2, vertical_spacing=vertical_spacing, column_widths=[1, 1]
-        )
+        fig = make_subplots(rows=2, cols=2, vertical_spacing=vertical_spacing, column_widths=[1, 1])
 
         fig.update_layout(
             title={
@@ -1141,9 +1129,7 @@ class DisulfideVisualization:
                     xtitle = "Sγ-Sγ Distances, (no cutoff)"
                 else:
                     xtitle = (
-                        f"Sγ Distance < {cutoff} Å"
-                        if not flip
-                        else f"Sγ-Sγ Distance >= {cutoff} Å"
+                        f"Sγ Distance < {cutoff} Å" if not flip else f"Sγ-Sγ Distance >= {cutoff} Å"
                     )
             case "ca":
                 column_name = "Ca Distance"
@@ -1152,9 +1138,7 @@ class DisulfideVisualization:
                     xtitle = "Cα-Cα Distances, (no cutoff)"
                 else:
                     xtitle = (
-                        f"Cα Distance < {cutoff} Å"
-                        if not flip
-                        else f"Cα-Cα Distance >= {cutoff} Å"
+                        f"Cα Distance < {cutoff} Å" if not flip else f"Cα-Cα Distance >= {cutoff} Å"
                     )
             case _:
                 raise ValueError("Invalid distance_type. Must be 'sg' or 'ca'.")
@@ -1187,9 +1171,7 @@ class DisulfideVisualization:
         set_plotly_theme(theme)
         dotsize = 2
 
-        fig = px.scatter(
-            df, x=df.index, y="Bondlength_Deviation", title="Bondlength Deviation"
-        )
+        fig = px.scatter(df, x=df.index, y="Bondlength_Deviation", title="Bondlength Deviation")
         fig.update_layout(xaxis_title="Row Index", yaxis_title="Bondlength Deviation")
         fig.update_traces(marker=dict(size=dotsize))
         fig.show()
@@ -1239,9 +1221,7 @@ class DisulfideVisualization:
             scaling_factor = np.max(hist) / np.max(y)
             y_scaled = y * scaling_factor
 
-            fig.add_trace(
-                go.Scatter(x=x, y=y_scaled, mode="lines", name="Normal Distribution")
-            )
+            fig.add_trace(go.Scatter(x=x, y=y_scaled, mode="lines", name="Normal Distribution"))
 
             fig.update_layout(
                 title={"text": title, "x": 0.5, "xanchor": "center"},
@@ -1557,9 +1537,7 @@ class DisulfideVisualization:
                 )
 
                 if style == "plain":
-                    cyl = pv.Cylinder(
-                        origin, direction, radius=bradius, height=height * 2.0
-                    )
+                    cyl = pv.Cylinder(origin, direction, radius=bradius, height=height * 2.0)
                     pvp.add_mesh(cyl, color=orig_col)
                 else:
                     cyl1 = pv.Cylinder(
@@ -1615,9 +1593,7 @@ class DisulfideVisualization:
         if style == "cpk":
             add_atoms(pvp, coords, atoms, ATOM_RADII_CPK, ATOM_COLORS, spec, specpow)
         elif style == "cov":
-            add_atoms(
-                pvp, coords, atoms, ATOM_RADII_COVALENT, ATOM_COLORS, spec, specpow
-            )
+            add_atoms(pvp, coords, atoms, ATOM_RADII_COVALENT, ATOM_COLORS, spec, specpow)
         elif style == "bs":
             add_atoms(
                 pvp,
@@ -1752,9 +1728,7 @@ class DisulfideVisualization:
         return
 
     @staticmethod
-    def make_movie(
-        ss, style="sb", fname="ssbond.mp4", verbose=False, steps=360
-    ) -> None:
+    def make_movie(ss, style="sb", fname="ssbond.mp4", verbose=False, steps=360) -> None:
         """
         Create an animation for ```self``` rotating one revolution about the Y axis,
         in the given ```style```, saving to ```filename```.
@@ -1801,9 +1775,7 @@ class DisulfideVisualization:
             print(f"Saved mp4 animation to: {fname}")
 
     @staticmethod
-    def spin(
-        ss, style="sb", pl=None, verbose=False, steps=360, theme="auto"
-    ) -> pv.Plotter:
+    def spin(ss, style="sb", pl=None, verbose=False, steps=360, theme="auto") -> pv.Plotter:
         """
         Spin the object by rotating it one revolution about the Y axis in the given style.
 
@@ -1850,9 +1822,7 @@ class DisulfideVisualization:
 
         try:
             # Use our custom simulation function instead of orbit_on_path
-            DisulfideVisualization.simulate_orbit_on_path(
-                pl, steps=steps, step_size=step_size
-            )
+            DisulfideVisualization.simulate_orbit_on_path(pl, steps=steps, step_size=step_size)
         except ValueError as e:
             _logger.error("Error during simulate_orbit_on_path: %s", e)
 
@@ -2001,14 +1971,10 @@ class DisulfideVisualization:
         worst_ca = df.nlargest(top_n, "Ca_Distance")
 
         # Combine the worst structures
-        worst_structures = pd.concat(
-            [worst_distance, worst_angle, worst_ca]
-        ).drop_duplicates()
+        worst_structures = pd.concat([worst_distance, worst_angle, worst_ca]).drop_duplicates()
 
         # Aggregate worst structures by PDB_ID
-        worst_structures_agg = (
-            worst_structures.groupby("PDB_ID").size().reset_index(name="Count")
-        )
+        worst_structures_agg = worst_structures.groupby("PDB_ID").size().reset_index(name="Count")
 
         # Scatter plot for all structures
         fig = px.scatter(
@@ -2028,9 +1994,7 @@ class DisulfideVisualization:
             y=worst_structures["Angle_Deviation"],
             mode="markers",
             marker=dict(color="red", size=10, symbol="x"),
-            customdata=worst_structures[
-                ["PDB_ID", "Bondlength_Deviation", "Angle_Deviation"]
-            ],
+            customdata=worst_structures[["PDB_ID", "Bondlength_Deviation", "Angle_Deviation"]],
             hovertemplate="<b>PDB ID: %{customdata[0]}</b><br>Bondlength Deviation: %{customdata[1]:.2f}<br>Angle Deviation: %{customdata[2]:.2f}<extra></extra>",
             name="Worst Structures",
         )
@@ -2089,9 +2053,7 @@ class DisulfideVisualization:
         from proteusPy import DisulfideStats
 
         # Create deviation dataframe
-        dev_df = DisulfideStats.create_deviation_dataframe(
-            pdb_full.SSList, verbose=verbose
-        )
+        dev_df = DisulfideStats.create_deviation_dataframe(pdb_full.SSList, verbose=verbose)
 
         # Generate percentile values
         percentiles = np.linspace(percentile_range[0], percentile_range[1], num_steps)
@@ -2260,9 +2222,7 @@ class DisulfideVisualization:
         else:
             # Split into multiple plots
             unique_classes = metrics_df["class"].unique()
-            num_plots = (
-                len(unique_classes) + max_classes_per_plot - 1
-            ) // max_classes_per_plot
+            num_plots = (len(unique_classes) + max_classes_per_plot - 1) // max_classes_per_plot
 
             if verbose:
                 _logger.info(
@@ -2280,7 +2240,7 @@ class DisulfideVisualization:
                 subset_df = metrics_df[metrics_df["class"].isin(classes_subset)]
 
                 # Create plot title for this subset
-                subset_title = f"{title} (Part {i+1}/{num_plots})"
+                subset_title = f"{title} (Part {i + 1}/{num_plots})"
 
                 # Create box plot for this subset
                 fig = px.box(
@@ -2304,13 +2264,10 @@ class DisulfideVisualization:
                 # Save or display the plot
                 if save:
                     fname = (
-                        Path(savedir)
-                        / f"{title.lower().replace(' ', '_')}_part_{i+1}.{suffix}"
+                        Path(savedir) / f"{title.lower().replace(' ', '_')}_part_{i + 1}.{suffix}"
                     )
                     if verbose:
-                        _logger.info(
-                            "Saving plot part %d to %s with DPI %d", i + 1, fname, dpi
-                        )
+                        _logger.info("Saving plot part %d to %s with DPI %d", i + 1, fname, dpi)
                     # Convert DPI to scale factor (300 DPI is considered standard, so scale = dpi/300)
                     scale = dpi / 300
                     fig.write_image(fname, suffix, scale=scale)
@@ -2355,11 +2312,7 @@ class DisulfideVisualization:
 
         # Create color array based on threshold
         colors = [
-            (
-                "rgba(65, 105, 225, 0.7)"
-                if x < count_threshold
-                else "rgba(220, 20, 60, 0.7)"
-            )
+            ("rgba(65, 105, 225, 0.7)" if x < count_threshold else "rgba(220, 20, 60, 0.7)")
             for x in metrics_df["count"]
         ]
 
@@ -2451,19 +2404,11 @@ class DisulfideVisualization:
             return
 
         # Calculate means and standard deviations
-        tor_means = class_df[
-            ["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]
-        ].mean()
-        tor_stds = class_df[
-            ["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]
-        ].std()
+        tor_means = class_df[["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]].mean()
+        tor_stds = class_df[["chi1", "chi2", "chi3", "chi4", "chi5", "torsion_length"]].std()
 
-        dist_means = class_df[
-            ["ca_distance", "cb_distance", "sg_distance", "energy", "rho"]
-        ].mean()
-        dist_stds = class_df[
-            ["ca_distance", "cb_distance", "sg_distance", "energy", "rho"]
-        ].std()
+        dist_means = class_df[["ca_distance", "cb_distance", "sg_distance", "energy", "rho"]].mean()
+        dist_stds = class_df[["ca_distance", "cb_distance", "sg_distance", "energy", "rho"]].std()
 
         # Calculate pixel dimensions
         _width = figure_size[0] * dpi
@@ -2485,9 +2430,7 @@ class DisulfideVisualization:
         # Adjust vertical spacing based on scale factor
         vertical_spacing = 0.125 * (1 + 0.1 * (scale_factor - 1))
 
-        fig = make_subplots(
-            rows=2, cols=2, vertical_spacing=vertical_spacing, column_widths=[1, 1]
-        )
+        fig = make_subplots(rows=2, cols=2, vertical_spacing=vertical_spacing, column_widths=[1, 1])
 
         fig.update_layout(
             title={
@@ -2523,10 +2466,7 @@ class DisulfideVisualization:
                     visible=True,
                     thickness=1.25 * scale_factor,
                 ),
-                text=[
-                    f"{val:.2f} ± {std:.2f}"
-                    for val, std in zip(tor_means[:5], tor_stds[:5])
-                ],
+                text=[f"{val:.2f} ± {std:.2f}" for val, std in zip(tor_means[:5], tor_stds[:5])],
                 textposition="outside",
                 textfont=dict(size=text_font_size),
                 legendgroup="torsion",
@@ -2876,9 +2816,7 @@ class DisulfideVisualization:
             plotter.show()
 
         except AttributeError as e:
-            print(
-                f"Error: DataFrame might be missing required columns (chi2, chi4): {e}"
-            )
+            print(f"Error: DataFrame might be missing required columns (chi2, chi4): {e}")
         except ValueError as e:
             print(f"Error: Invalid parameter value: {e}")
 
@@ -2929,9 +2867,7 @@ class DisulfideVisualization:
         try:
             # Validate column names exist in DataFrame
             if column1 not in df.columns or column2 not in df.columns:
-                raise ValueError(
-                    f"Columns '{column1}' or '{column2}' not found in DataFrame"
-                )
+                raise ValueError(f"Columns '{column1}' or '{column2}' not found in DataFrame")
 
             # Extract data from specified columns
             x = df[column1]
@@ -3014,9 +2950,7 @@ class DisulfideVisualization:
             plotter.show()  # Native rendering
 
         except AttributeError as e:
-            print(
-                f"Error: DataFrame might be missing required columns ({column1}, {column2}): {e}"
-            )
+            print(f"Error: DataFrame might be missing required columns ({column1}, {column2}): {e}")
         except ValueError as e:
             print(f"Error: Invalid parameter value: {e}")
 
