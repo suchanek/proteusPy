@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.99.62] - 2026-04-10
+
+### Added
+
 - **`docs/suchanek_disulfide_chapter_2026.pdf`** — completed Springer book chapter on disulfide bond geometry and the proteusPy analysis methodology. The chapter is now finished and the final PDF is included in the repository.
 - **ManifoldModel baseline in MNIST benchmark** (`mnist_manifold_architecture.py`) — `ManifoldModel` (zero-parameter, pure-geometry classifier) is now included as a named architecture entry alongside the neural models. Uses `run_trial_sklearn()` path; reports intrinsic dimensionality and noise-suppression percentage. `ManifoldModel` is skipped in the parameter-efficiency table (0 params) but participates in the winner comparison with the label "Uses ZERO learned parameters — pure manifold geometry".
 - **`.claude/settings.json`** — Claude Code project settings file.
@@ -101,6 +111,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Added missing BSD/Flux-Frontiers header blocks to `manifold_observer.py`, `manifold_model.py`, `manifold_walker.py`, `turtleND.py`, and `disulfide_tree.py`.
+
 
 ---
 
