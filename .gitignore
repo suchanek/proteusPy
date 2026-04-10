@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+.eggs/
+
+# Distribution / packaging
+build/
+dist/
+lib/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+notebooks/.ipynb_checkpoints/
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# VS Code
+.vscode/
+
+# Large data / binary artifacts
+proteusPy/data/*.pkl
+proteusPy/data/*.hdf5
+proteusPy/data/*.db
+
+# KG indices (runtime-generated, not committed except snapshots)
+.codekg/graph.sqlite
+.codekg/lancedb/
+.dockg/graph.sqlite
+.dockg/lancedb/
+.ftreekg/graph.sqlite
+.ftreekg/lancedb/
+
+# Build / test outputs
+logdir/
+schematic_outputs/
+class_analysis_outputs/
+benchmarks/canonical_tests/logs/
+
+# Misc
+*.log
+*.tmp
+commit.txt
