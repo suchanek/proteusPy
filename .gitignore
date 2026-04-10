@@ -34,13 +34,24 @@ proteusPy/data/*.pkl
 proteusPy/data/*.hdf5
 proteusPy/data/*.db
 
-# KG indices (runtime-generated, not committed except snapshots)
-.codekg/graph.sqlite
-.codekg/lancedb/
-.dockg/graph.sqlite
+# KG indices — databases and vectors are transient/reproducible; snapshots/ is tracked
+.pycodekg/lancedb/
+.pycodekg/lancedb-*
+.pycodekg/graph.sqlite
+.pycodekg/graph.sqlite*
+.pycodekg/models/
+
 .dockg/lancedb/
-.ftreekg/graph.sqlite
-.ftreekg/lancedb/
+.dockg/lancedb-*
+.dockg/graph.sqlite
+.dockg/graph.sqlite*
+.dockg/models/
+
+.filetreekg/lancedb/
+.filetreekg/lancedb-*
+.filetreekg/graph.sqlite
+.filetreekg/graph.sqlite*
+.filetreekg/models/
 
 # Build / test outputs
 logdir/

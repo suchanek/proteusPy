@@ -83,9 +83,8 @@ PyQt5            = { version = ">=5.15.0", optional = true }
 markdown         = { version = ">=3.6", optional = true }
 trame-vtk        = { version = ">=2.0.0", optional = true }
 doc-kg           = { git = "https://github.com/Flux-Frontiers/doc_kg.git", optional = true }
-code-kg          = { git = "https://github.com/Flux-Frontiers/code_kg.git", optional = true }
-#ftree-kg          = { git = "https://github.com/Flux-Frontiers/ftree_kg.git", optional = true }
-ftree-kg         = { path = "../ftreekg", develop = true}
+pycode-kg          = { git = "https://github.com/Flux-Frontiers/pycode_kg.git", optional = true }
+ftree-kg          = { git = "https://github.com/Flux-Frontiers/ftree_kg.git", optional = true }
 
 [tool.poetry.group.ml.dependencies]
 tensorflow       = "2.18.0"
@@ -118,8 +117,8 @@ optional = true
 
 [tool.poetry.extras]
 viz3d  = ["PyQt5", "pyvistaqt", "markdown", "trame-vtk"]
-kg     = ["doc-kg", "code-kg", "ftree-kg"]
-all    = ["PyQt5", "pyvistaqt", "markdown", "trame-vtk", "doc-kg", "code-kg", "ftree-kg"]
+kg     = ["doc-kg", "pycode-kg", "ftree-kg"]
+all    = ["PyQt5", "pyvistaqt", "markdown", "trame-vtk", "doc-kg", "pycode-kg", "ftree-kg"]
 
 [tool.poetry.group.dev.dependencies]
 pytest        = ">=8.0.0"
