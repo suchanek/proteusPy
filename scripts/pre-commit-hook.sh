@@ -25,11 +25,11 @@ if [ -x "$PYCODEKG" ] && [ -d "$REPO_ROOT/.pycodekg" ]; then
 fi
 
 if [ -x "$DOCKG" ] && [ -d "$REPO_ROOT/.dockg" ]; then
-    "$DOCKG" build --wipe || exit 1
+    "$DOCKG" build || exit 1
 fi
 
 if [ -x "$FTREEKG" ] && [ -d "$REPO_ROOT/.filetreekg" ]; then
-    "$FTREEKG" build --wipe || exit 1
+    "$FTREEKG" build || exit 1
 fi
 
 # --- Snapshots ---
