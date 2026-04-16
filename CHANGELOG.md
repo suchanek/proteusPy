@@ -11,9 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`README.md`** — added Announcement section highlighting the Springer Nature book chapter (in press, 2026) with accurate statistics: 158,965 disulfide bonds across 35,367 filtered structures from 38,214 RCSB entries, binary/octant classification scheme. Added GitHub release badge. Removed stale WaveRider section (extracted to flux-frontiers/WaveRider). Fixed `qt5viewer` → `qt5_viewer` endpoint name. Updated Contributing → Contact/Reporting section to reflect maintenance-mode status. Updated BibTeX version to 0.99.62.
+
 ### Changed
 
+- **`DisulfideExtractor_mp.py`** — added `venv` as a valid `--forge` option; when selected, the update destination resolves to `<project_root>/.venv/lib/python3.12/site-packages/proteusPy/data`, enabling use with local virtual environments alongside the existing miniforge3/mambaforge paths.
+
 ### Fixed
+
+- **`DisulfideExtractor_mp.py`** — eliminated logging noise during multiprocessing extraction. Worker processes now receive a pool initializer (`_worker_log_init`) that calls `logging.disable(logging.CRITICAL)`, preventing parser errors/warnings from child processes from leaking to the console. Root logger is now configured file-only (no `RichHandler`) and `disable_stream_handlers_for_namespace("proteusPy")` is called on startup to silence any stream handlers attached by module-level code.
 
 ### Removed
 

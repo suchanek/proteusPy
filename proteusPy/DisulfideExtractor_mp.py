@@ -44,11 +44,10 @@ from proteusPy import (
     DisulfideList,
     DisulfideLoader,
     configure_master_logger,
-    create_logger,
+    disable_stream_handlers_for_namespace,
     load_disulfides_from_id,
     remove_duplicate_ss,
     set_logger_level,
-    toggle_stream_handler,
 )
 from proteusPy.ProteusGlobals import (
     CA_CUTOFF,
@@ -59,25 +58,19 @@ from proteusPy.ProteusGlobals import (
     SS_SUBSET_PICKLE_FILE,
 )
 
-# Create a root logger. This will open ~/logs/DisulfideExtractor.log
-# and write all log messages to it. There are quite a few messages
-# generated while parsing. This provides a record of the process.
+# Configure the root logger to write ONLY to file — no console output.
+# All proteusPy sub-loggers propagate to this handler via the root logger.
+configure_master_logger("DisulfideExtractor.log", log_level=logging.INFO)
 
-configure_master_logger("DisulfideExtractor.log")
+# Belt-and-suspenders: silence any stream handlers already attached to
+# proteusPy loggers (e.g. created before this point by module-level code).
+disable_stream_handlers_for_namespace("proteusPy")
 set_logger_level("proteusPy.ssparser", "ERROR")
-set_logger_level("proteusPy.DisulfideBase.Disulfide", "INFO")
-# set_logger_level("proteusPy.DisulfideLoader", "INFO")
 
-# Disable the stream handlers for the following namespaces.
-# This will suppress the output to the console.
-toggle_stream_handler("proteusPy.ssparser", False)
-toggle_stream_handler("proteusPy.DisulfideBase", False)
-toggle_stream_handler("proteusPy.DisulfideIO", False)
-toggle_stream_handler("proteusPy.DisulfideClassManager", False)
-
-# Create a logger for this program.
-_logger = create_logger("DisulfideExtractor")
-_logger.setLevel("INFO")
+# Create a logger for this program.  We keep propagate=True so messages
+# flow to the file handler configured above; no RichHandler is added.
+_logger = logging.getLogger("DisulfideExtractor")
+_logger.setLevel(logging.INFO)
 
 
 PBAR_COLS = 79
@@ -203,7 +196,7 @@ def parse_arguments():
         "--forge",
         "-r",
         type=str,
-        help="miniforge3 or mambaforge",
+        help="miniforge3, mambaforge, or venv (local .venv in project root)",
         default="miniforge3",
     )
     parser.add_argument(
@@ -222,6 +215,16 @@ def parse_arguments():
     )
 
     return parser.parse_args()
+
+
+def _worker_log_init():
+    """
+    Initializer for multiprocessing pool workers.
+    Disables all logging output to avoid polluting the console with
+    parser errors/warnings from child processes.  Errors will still
+    propagate through Python's normal multiprocessing exception handling.
+    """
+    logging.disable(logging.CRITICAL)
 
 
 def extract_disulfides_chunk(args):
@@ -322,7 +325,7 @@ def do_extract(verbose, full, cutoff=-1.0, sg_cutoff=-1.0, nthreads=8):
         for i in range(nthreads)
     ]
 
-    with multiprocessing.Pool(nthreads) as pool:
+    with multiprocessing.Pool(nthreads, initializer=_worker_log_init) as pool:
         results = pool.map(extract_disulfides_chunk, pool_args)
 
     if verbose:
@@ -460,8 +463,15 @@ def do_stuff(
     if _update is True:
         if _forge == "miniforge3":
             venv_dir = MINIFORGE_DIR / _env / VENV_DIR
-        else:
+        elif _forge == "mambaforge":
             venv_dir = MAMBAFORGE_DIR / _env / VENV_DIR
+        elif _forge == "venv":
+            # Local .venv at the project root (parent of the proteusPy package dir)
+            project_root = Path(MODULE_DATA).parent.parent
+            venv_dir = project_root / ".venv" / VENV_DIR
+        else:
+            print(f"Error: Unknown forge type '{_forge}'. Use miniforge3, mambaforge, or venv.")
+            sys.exit(1)
 
         if verbose:
             print(f"Copying SS files from: {DATA_DIR} to {venv_dir}")

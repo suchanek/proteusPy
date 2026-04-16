@@ -1,4 +1,5 @@
 [![PyPI version](https://badge.fury.io/py/proteusPy.svg)](https://badge.fury.io/py/proteusPy)
+[![GitHub release](https://img.shields.io/github/v/release/suchanek/proteusPy)](https://github.com/suchanek/proteusPy/releases)
 ![Testing](https://github.com/suchanek/proteusPy/actions/workflows/pytest.yml/badge.svg)
 [![status](https://joss.theoj.org/papers/45de839b48a550d6ab955c5fbbc508f2/status.svg)](https://joss.theoj.org/papers/45de839b48a550d6ab955c5fbbc508f2)
 [![DOI](https://zenodo.org/badge/575657091.svg)](https://doi.org/10.5281/zenodo.13241499)
@@ -6,11 +7,15 @@
 
 <!-- markdownlint-disable MD014 -->
 
-# WaveRider Geometric ML Stack
+## 🎉 Announcement
 
-The **WaveRider** geometric ML stack — TurtleND, ManifoldWalker, ManifoldModel, ManifoldObserver, and the knowledge-graph reasoner — now lives in its own repository: **[flux-frontiers/WaveRider](https://github.com/flux-frontiers/WaveRider)**.
+**proteusPy is going to print!**
 
-See that repo for documentation, benchmarks, and experimental results.
+A chapter written around disulfide structural analysis based on proteusPy is now **in press** in **Functional Disulphide Bonds: Methods and Protocols, Second Edition** (ed. Philip Hogg, Springer Nature, 2026). It covers the full analysis pipeline: parsing and geometric filtering of 38,214 RCSB structures down to 35,367 high-quality entries containing **158,965 disulfide bonds**, statistical characterization of bond geometry, torsional energy, and a binary/octant classification scheme that carves conformational space into up to 32,768 structural families.
+
+> Suchanek, E. G. (2026). *Structural Analysis of Disulfide Bonds in the RCSB Protein Data Bank Using proteusPy.* In *Functional Disulphide Bonds: Methods and Protocols, Second Edition*, ed. P. Hogg, Springer Nature. DOI: [10.1007/978-1-0716-5158-2](https://doi.org/10.1007/978-1-0716-5158-2)
+
+Pre-publication PDF available [here](docs/suchanek_disulfide_chapter_2026.pdf).
 
 ---
 
@@ -67,7 +72,7 @@ It's simplest to clone the repo via GitHub since it contains all of the notebook
 - Install GNU make:
   - <https://gnuwin32.sourceforge.net/packages/make.htm>
 - Open a Miniforge prompt and cd into your repo dir:
-  
+
   ```console
   (base) C:\Users\egs\repos> git clone https://github.com/suchanek/proteusPy.git
   (base) C:\Users\egs\repos> cd proteusPy
@@ -118,7 +123,7 @@ The [programs](https://github.com/suchanek/proteusPy/tree/master/programs) subdi
 
 - [DisulfideDownloader.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideDownloader.py): Downloads the raw RCSB structure files. The download consists of over 35,000 .ent files and took about twelve hours on a 200Mb internet connection. It is necessary to have these files locally to build the database. The download is about 35GB in size.
 - [DisulfideExtractor_mp.py](https://github.com/suchanek/proteusPy/blob/master/proteusPy/DisulfideExtractor_mp.py): Extracts the disulfides and creates the database loaders. This program is fully multi-processing, and one can specify the number of cores to use for the extract. The downloaded PDB files must be in $PDB/good. On my 14 core MacbookPro M3 Max the extraction of over 36,000 files and creation of the Disulfide loaders takes a bit over two minutes. This is in contrast to the initial single-threaded version present in the initial release, which takes almost an hour to run! This program is now a part of the module itself and may be invoked with:
-  
+
   ```python
   proteusPy.DisulfideExtractor --help
   ```
@@ -144,7 +149,7 @@ The fastest way to inspect disulfides in the database is to launch ``rcsb_viewer
 If you want to play with the notebooks and interact with the package directly:
 
 ```console
-$ jupyter notebook 
+$ jupyter notebook
 ```
 
 and open [Analysis_2q7q.ipynb](https://github.com/suchanek/proteusPy/blob/master/notebooks/Analysis_2q7q.ipynb). This notebook looks at the disulfide bond with the lowest energy in the entire database. There are several other notebooks in this directory that illustrate using the program. Some of these reflect active development work so may not be 'fully baked'.
@@ -216,7 +221,7 @@ This will display disulfide 75-140 in chain D and save an image to file 2q7q.png
 
 I have created a number of endpoints to facilitate easy access to some of the functions and visualization capabilities of ``proteusPy``:
 
-- ``proteusPy.qt5viewer`` - launches the QT5 viewer.
+- ``proteusPy.qt5_viewer`` - launches the QT5 viewer.
 - ``proteusPy.DisulfideExtractor`` - launches the main program to extract the RCSB database from the native .PDB files.
 - ``proteusPy.bootstrapper`` - bootstraps downloading the master disulfide list and building the main and subset ``DisulfideLoaders``.
 - ``proteusPy.render_disulfide_schematic`` - creates a cartoon of a specific disulfide bond.
@@ -225,9 +230,9 @@ I have created a number of endpoints to facilitate easy access to some of the fu
 
 Invoking the endpoint with ``--help`` will list the appropriate arguments.
 
-## Contributing/Reporting
+## Contact/Reporting
 
-I welcome anyone interested in collaborating on proteusPy! Feel free to contact me at mailto:suchanek@mac.com, fork the repository: <https://github.com/suchanek/proteusPy/> and get coding. Issues can be reported to <https://github.com/suchanek/proteusPy/issues>.
+proteusPy is in maintenance mode. For questions or inquiries please contact mailto:suchanek@flux-frontiers.com. Issues can be reported to <https://github.com/suchanek/proteusPy/issues>.
 
 ## Citing proteusPy
 
@@ -251,7 +256,7 @@ The proteusPy package was developed by Eric G. Suchanek, PhD. If you find it use
   title = {proteusPy: A Package for Modeling and Analyzing Proteins of Known Structure},
   year = {2024},
   publisher = {GitHub},
-  version = {0.99.50},
+  version = {0.99.62},
   journal = {GitHub repository},
   url = {https://github.com/suchanek/proteusPy}
 }
@@ -259,6 +264,7 @@ The proteusPy package was developed by Eric G. Suchanek, PhD. If you find it use
 
 ## Publications
 
+- [Structural Analysis of Disulfide Bonds in the RCSB Protein Data Bank Using proteusPy](docs/suchanek_disulfide_chapter_2026.pdf) — Suchanek, E. G. (2026). Book chapter in *Functional Disulphide Bonds: Methods and Protocols, Second Edition*, Springer Nature. DOI: [10.1007/978-1-0716-5158-2](https://doi.org/10.1007/978-1-0716-5158-2)
 - [proteusPy: A Python Package for Protein Structure and Disulfide Bond Modeling and Analysis](https://joss.theoj.org/papers/10.21105/joss.06169)
 - [Computer-aided Strategies for Protein Design](https://doi.org/10.1021/bi00368a023)
 - [An engineered intersubunit disulfide enhances the stability and DNA binding of the N-terminal domain of .lambda. repressor](https://doi.org/10.1021/bi00368a024)
