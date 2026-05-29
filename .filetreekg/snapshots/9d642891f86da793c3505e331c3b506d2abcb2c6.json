@@ -1,0 +1,24 @@
+{
+  "key": "9d642891f86da793c3505e331c3b506d2abcb2c6",
+  "branch": "feat.manifold",
+  "timestamp": "2026-03-23T03:55:20.053128+00:00",
+  "version": "0.99.40",
+  "metrics": {
+    "total_nodes": 465,
+    "total_edges": 465,
+    "node_counts": {
+      "directory": 72,
+      "file": 393
+    },
+    "edge_counts": {
+      "CONTAINS": 465
+    },
+    "total_files": 393,
+    "total_dirs": 72,
+    "dir_node_counts": {}
+  },
+  "hotspots": [],
+  "issues": [],
+  "vs_previous": null,
+  "vs_baseline": null
+}

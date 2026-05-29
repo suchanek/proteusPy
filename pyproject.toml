@@ -1,0 +1,191 @@
+#
+# pyproject.toml for the proteusPy Python package.
+# Author: Eric G. Suchanek, PhD
+# Last revision: 2026-03-22
+#
+
+[build-system]
+requires = ["poetry-core>=2.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "proteusPy"
+version = "0.100.0"
+description = "proteusPy - Protein Structure Analysis and Modeling Tools"
+readme = "README.md"
+authors = ["Eric G. Suchanek, PhD <suchanek@mac.com>"]
+license = "BSD"
+homepage = "https://suchanek.github.io/proteusPy/"
+repository = "https://github.com/suchanek/proteusPy/"
+documentation = "https://suchanek.github.io/proteusPy/"
+keywords = ["proteusPy", "suchanek", "disulfide"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: BSD License",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Chemistry",
+]
+packages = [{ include = "proteusPy" }]
+include = [
+    "proteusPy/README.md",
+    "proteusPy/CHANGELOG.md",
+    "proteusPy/LICENSE",
+    "proteusPy/data/pdb5rsa.ent",
+    "proteusPy/data/ss_completed.txt",
+    "proteusPy/data/ss_query.json",
+    "proteusPy/data/ss_ids.txt",
+    "proteusPy/data/SS_consensus_class_oct.pkl",
+    "proteusPy/data/SS_consensus_class_32.pkl",
+    "proteusPy/data/binary_class_metrics.pkl",
+    "proteusPy/data/octant_class_metrics.pkl",
+    "proteusPy/data/2q7q_seqsim.csv",
+]
+exclude = [
+    "proteusPy/data/PDB_all_ss.pkl",
+    "proteusPy/data/PDB_SS_ALL_LOADER.pkl",
+    "proteusPy/data/PDB_SS_SUBSET_LOADER.pkl",
+]
+
+[tool.poetry.dependencies]
+python           = ">=3.12,<3.14"
+Biopython        = "*"
+colorama         = "0.4.6"
+darkdetect       = "0.8.0"
+gdown            = ">=5.2.2"
+matplotlib       = "3.9.2"
+numpy            = "*"
+pandas           = "*"
+param            = ">=2.0.0"
+Pillow           = ">=12.2.0"
+plotly           = ">=5.14.0"
+plotly_express   = "0.4.1"
+psutil           = "*"
+Pympler          = "1.1"
+Requests         = ">=2.33.0"
+scipy            = "1.14.1"
+seaborn          = "0.13.2"
+setuptools       = "*"
+tabulate         = "*"
+tqdm             = "4.67.0"
+wheel            = "*"
+networkx         = "*"
+rich             = "*"
+scikit-learn     = "*"
+pydssp           = ">=0.9.0"
+pyvista          = ">=0.44.0"
+# Optional extras
+pyvistaqt        = { version = ">=0.11.0", optional = true }
+PyQt5            = { version = ">=5.15.0", optional = true }
+markdown         = { version = ">=3.6", optional = true }
+trame-vtk        = { version = ">=2.0.0", optional = true }
+
+[tool.poetry.group.kg.dependencies]
+doc-kg    = ">=0.12.3"
+pycode-kg = ">=0.18.1"
+ftree-kg  = ">=0.8.0"
+
+[tool.poetry.group.kg]
+optional = true
+
+[tool.poetry.group.ml.dependencies]
+tensorflow       = "2.18.0"
+tensorflow-metal = "1.2.0"
+tf-keras         = "*"
+
+[tool.poetry.group.ml]
+optional = true
+
+[tool.poetry.group.jupyter.dependencies]
+jupyter          = "1.1.1"
+notebook         = "7.2.2"
+nbconvert        = "*"
+ipykernel        = "*"
+ipywidgets       = "*"
+jupyter_bokeh    = "4.0.5"
+jupyter_contrib_nbextensions = "*"
+
+[tool.poetry.group.jupyter]
+optional = true
+
+[tool.poetry.group.viz.dependencies]
+imageio          = { version = "*", extras = ["ffmpeg"] }
+kaleido          = "*"
+panel            = "1.5.3"
+pymolPy3         = "0.1.2"
+
+[tool.poetry.group.viz]
+optional = true
+
+[tool.poetry.extras]
+viz3d  = ["PyQt5", "pyvistaqt", "markdown", "trame-vtk"]
+all    = ["PyQt5", "pyvistaqt", "markdown", "trame-vtk"]
+
+[tool.poetry.group.dev.dependencies]
+pytest        = ">=8.0.0"
+pytest-cov    = ">=5.0.0"
+ruff          = ">=0.4.0"
+mypy          = ">=1.10.0"
+pre-commit    = "^4.5.1"
+detect-secrets = "^1.5.0"
+pylint        = "^4.0.5"
+pdoc          = ">=14.0.0"
+twine         = "*"
+build         = "*"
+
+[tool.poetry.scripts]
+"proteusPy.qt5viewer"                  = "proteusPy.qt5viewer:main"
+"proteusPy.DisulfideExtractor"         = "proteusPy.DisulfideExtractor_mp:main"
+"proteusPy.bootstrapper"               = "proteusPy.bootstrapper:main"
+"proteusPy.render_disulfide_schematic" = "proteusPy.render_disulfide_schematic:main"
+"proteusPy.display_class_disulfides"   = "proteusPy.display_class_disulfides:main"
+"proteusPy.hexbin_plot"                = "proteusPy.hexbin_plot:main"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = ["notebooks/", "examples/", "old/"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"proteusPy/__init__.py" = ["E402", "F401"]
+"proteusPy/DisulfideExtractor_mp.py" = ["E402"]
+"proteusPy/graph_reasoner.py" = ["E402"]
+"proteusPy/qt5viewer.py" = ["E402"]
+"proteusPy/turtle3D.py" = ["E402"]
+"turtlend_package/src/turtle3D.py" = ["E402"]
+"turtlend_package/src/__init__.py" = ["F401"]
+"benchmarks/*.py" = ["E402"]
+"turtlend_package/benchmarks/*.py" = ["E402"]
+"programs/cluster.py" = ["E402", "F403", "F405"]
+"programs/DisulfideCluster.py" = ["E402", "F401", "F403", "F405", "F811"]
+"programs/screenshot.py" = ["F403", "F405"]
+"programs/DisulfidePruner.py" = ["F403", "F405"]
+"programs/dse_calculator.py" = ["F403", "F405"]
+"programs/rosetta.py" = ["F403", "F405"]
+
+[tool.pytest.ini_options]
+addopts = "--ignore=tests/test_DisplaySS.py --ignore=tests/test_disulfide_schematic.py --ignore=turtlend_package --ignore=benchmarks"
+
+# KGRAG integration
+
+[tool.pycodekg]
+# Directories to include in the knowledge graph build and analysis.
+# When unset, all directories are indexed.
+include = ["proteusPy"]
+
+# Directories to exclude at every depth during the file walk.
+# Combined with the built-in SKIP_DIRS (.git, .venv, __pycache__, etc.).
+# exclude = ["tests", "benchmarks", "build"]
+
+[tool.dockg]
+# Add extra directories to exclude beyond the built-in SKIP_DIRS.
+# SKIP_DIRS already covers: .dockg, .git, .venv, venv, __pycache__, node_modules, etc.
+exclude = ["bundles", "dist","data","lib","old","programs","turtlend_package", "pepys", "waverider_missions"]

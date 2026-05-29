@@ -1,0 +1,71 @@
+{
+  "key": "46c4c7b2572e4513b1067c29dcf35337de350a3c",
+  "branch": "master",
+  "timestamp": "2026-04-15T21:50:37.302299+00:00",
+  "version": "0.5.0",
+  "metrics": {
+    "total_nodes": 480,
+    "total_edges": 480,
+    "node_counts": {
+      "directory": 77,
+      "file": 403
+    },
+    "edge_counts": {
+      "CONTAINS": 480
+    },
+    "total_files": 403,
+    "total_dirs": 77,
+    "dir_node_counts": {
+      ".claude": 8,
+      ".eggs": 46,
+      ".gitattributes": 1,
+      ".pdocconfig.py": 1,
+      ".pre-commit-config.yaml": 1,
+      ".pycodekg": 30,
+      "CHANGELOG.md": 1,
+      "CODE_OF_CONDUCT.md": 1,
+      "LICENSE": 1,
+      "README.md": 1,
+      "TODO.md": 1,
+      "analysis": 4,
+      "benchmarks": 24,
+      "class_analysis_outputs": 23,
+      "commit.txt": 1,
+      "data": 16,
+      "docs": 49,
+      "examples": 15,
+      "get_version.py": 1,
+      "lib": 9,
+      "logdir": 33,
+      "logo": 22,
+      "logo.png": 1,
+      "makefile": 1,
+      "notebooks": 22,
+      "old": 21,
+      "poetry.lock": 1,
+      "poetry.toml": 1,
+      "programs": 35,
+      "proteusPy": 54,
+      "proteusPy.code-workspace": 1,
+      "proteusPy.egg-info": 7,
+      "proteusPy_graph.png": 1,
+      "proteus_logo_sb.png": 1,
+      "pyproject.toml": 1,
+      "release-notes.md": 1,
+      "runs": 4,
+      "schematic_outputs": 7,
+      "scripts": 4,
+      "tests": 16,
+      "viewer": 12
+    }
+  },
+  "hotspots": [],
+  "issues": [],
+  "vs_previous": null,
+  "vs_baseline": {
+    "nodes": 15,
+    "edges": 15,
+    "files_delta": 10,
+    "dirs_delta": 5
+  }
+}

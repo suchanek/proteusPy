@@ -1,0 +1,37 @@
+name: proteusPy
+channels:
+  - conda-forge
+dependencies:
+  - python<3.12
+  - traitlets=5.9.0
+  - notebook=6.4.12
+  - pandas<2.0
+  - matplotlib
+  - biopython
+  - scikit-learn
+  - pyvista
+  - seaborn
+  - plotly_express
+  - ipygany
+  - qtpy
+  - pyvistaqt
+  - pythreejs
+  - panel
+  - ipyparallel
+  - pycryptodome
+  - nodejs
+  - pillow
+  - pytube
+  - openai
+  - grpcio
+  - pip
+  - pip:
+    - wget
+    - gdown
+    - tqdm
+    - ipykernel
+    - jupyter_bokeh
+    - jupyter_contrib_nbextensions
+  - trame
+  - ipywidgets
+

@@ -1,0 +1,118 @@
+{
+  "key": "9d642891f86da793c3505e331c3b506d2abcb2c6",
+  "branch": "feat.manifold",
+  "timestamp": "2026-03-23T03:55:19.932305+00:00",
+  "version": "0.99.40",
+  "metrics": {
+    "db_path": ".dockg/graph.sqlite",
+    "total_nodes": 2315,
+    "total_edges": 14235,
+    "node_counts": {
+      "chunk": 437,
+      "document": 31,
+      "entity": 621,
+      "keyword": 679,
+      "section": 211,
+      "topic": 336
+    },
+    "edge_counts": {
+      "CONTAINS": 648,
+      "CO_OCCURS_WITH": 8354,
+      "HAS_KEYWORD": 1727,
+      "HAS_TOPIC": 436,
+      "MENTIONS_ENTITY": 1712,
+      "NEXT": 175,
+      "REFERENCES": 1,
+      "SIMILAR_TO": 1182
+    },
+    "meaningful_nodes": 2284,
+    "coverage_score": 0.9664378337147216,
+    "issues_count": 0,
+    "complexity_median": 18.0
+  },
+  "hotspots": [
+    {
+      "id": "chunk:docs/graph_reasoner_spec/summary.md:0021",
+      "file_path": "docs/graph_reasoner_spec/summary.md",
+      "label": "The Three Navigators",
+      "references": 0,
+      "semantic_links": 18,
+      "total_links": 19
+    },
+    {
+      "id": "chunk:docs/manifold_walker_spec/manifold_walker_spec.md:0003",
+      "file_path": "docs/manifold_walker_spec/manifold_walker_spec.md",
+      "label": "Table of Contents",
+      "references": 0,
+      "semantic_links": 18,
+      "total_links": 19
+    },
+    {
+      "id": "chunk:docs/waverider/waverider.md:0019",
+      "file_path": "docs/waverider/waverider.md",
+      "label": "2.5 Manifold-Projected KNN (ManifoldKNN)",
+      "references": 0,
+      "semantic_links": 18,
+      "total_links": 19
+    },
+    {
+      "id": "chunk:docs/waverider/waverider.md:0032",
+      "file_path": "docs/waverider/waverider.md",
+      "label": "Finding 3: The Loss Landscape Is 2\u20133 Dimensional",
+      "references": 0,
+      "semantic_links": 18,
+      "total_links": 19
+    },
+    {
+      "id": "chunk:docs/waverider/waverider.md:0046",
+      "file_path": "docs/waverider/waverider.md",
+      "label": "Finding 9: The Efficiency Frontier",
+      "references": 0,
+      "semantic_links": 18,
+      "total_links": 19
+    },
+    {
+      "id": "chunk:CHANGELOG.md:0008",
+      "file_path": "CHANGELOG.md",
+      "label": "Added",
+      "references": 0,
+      "semantic_links": 18,
+      "total_links": 18
+    },
+    {
+      "id": "chunk:docs/disulfide_schematic_README.md:0008",
+      "file_path": "docs/disulfide_schematic_README.md",
+      "label": "`create_disulfide_schematic`",
+      "references": 0,
+      "semantic_links": 18,
+      "total_links": 18
+    },
+    {
+      "id": "chunk:docs/manifold_walker_spec/manifold_walker_spec.md:0030",
+      "file_path": "docs/manifold_walker_spec/manifold_walker_spec.md",
+      "label": "9. Parameters and Tuning",
+      "references": 0,
+      "semantic_links": 18,
+      "total_links": 18
+    },
+    {
+      "id": "chunk:docs/manifold_walker_spec/manifold_walker_spec.md:0032",
+      "file_path": "docs/manifold_walker_spec/manifold_walker_spec.md",
+      "label": "10.2 Relationship to Existing Methods",
+      "references": 0,
+      "semantic_links": 18,
+      "total_links": 18
+    },
+    {
+      "id": "chunk:README.md:0005",
+      "file_path": "README.md",
+      "label": "General Capabilities",
+      "references": 0,
+      "semantic_links": 17,
+      "total_links": 18
+    }
+  ],
+  "issues": [],
+  "vs_previous": null,
+  "vs_baseline": null
+}

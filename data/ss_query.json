@@ -1,0 +1,38 @@
+{
+  "query": {
+    "type": "terminal",
+    "label": "text",
+    "service": "text",
+    "parameters": {
+      "attribute": "rcsb_entry_info.disulfide_bond_count",
+      "operator": "greater",
+      "negation": false,
+      "value": 1
+    }
+  },
+  "return_type": "entry",
+  "request_options": {
+    "group_by_return_type": "representatives",
+    "group_by": {
+      "aggregation_method": "matching_deposit_group_id",
+      "ranking_criteria_type": {
+        "sort_by": "rcsb_entry_info.resolution_combined",
+        "direction": "asc"
+      }
+    },
+    "paginate": {
+      "start": 0,
+      "rows": 25
+    },
+    "results_content_type": [
+      "experimental"
+    ],
+    "sort": [
+      {
+        "sort_by": "score",
+        "direction": "desc"
+      }
+    ],
+    "scoring_strategy": "combined"
+  }
+}
