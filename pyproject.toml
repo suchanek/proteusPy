@@ -10,7 +10,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "proteusPy"
-version = "0.100.0"
+version = "0.100.1"
 description = "proteusPy - Protein Structure Analysis and Modeling Tools"
 readme = "README.md"
 authors = ["Eric G. Suchanek, PhD <suchanek@mac.com>"]
@@ -61,7 +61,7 @@ matplotlib       = "3.9.2"
 numpy            = "*"
 pandas           = "*"
 param            = ">=2.0.0"
-Pillow           = ">=12.2.0"
+Pillow           = ">=12.3.0"
 plotly           = ">=5.14.0"
 plotly_express   = "0.4.1"
 psutil           = "*"
@@ -85,9 +85,9 @@ markdown         = { version = ">=3.6", optional = true }
 trame-vtk        = { version = ">=2.0.0", optional = true }
 
 [tool.poetry.group.kg.dependencies]
-doc-kg    = ">=0.12.3"
-pycode-kg = ">=0.18.1"
-ftree-kg  = ">=0.8.0"
+doc-kg    = ">=0.18.2"
+pycode-kg = ">=0.20.0"
+ftree-kg  = ">=0.9.0"
 
 [tool.poetry.group.kg]
 optional = true
@@ -102,7 +102,7 @@ optional = true
 
 [tool.poetry.group.jupyter.dependencies]
 jupyter          = "1.1.1"
-notebook         = "7.2.2"
+notebook         = ">=7.5.6"
 nbconvert        = "*"
 ipykernel        = "*"
 ipywidgets       = "*"
@@ -115,7 +115,7 @@ optional = true
 [tool.poetry.group.viz.dependencies]
 imageio          = { version = "*", extras = ["ffmpeg"] }
 kaleido          = "*"
-panel            = "1.5.3"
+panel            = ">=1.8.0"
 pymolPy3         = "0.1.2"
 
 [tool.poetry.group.viz]

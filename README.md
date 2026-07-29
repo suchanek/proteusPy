@@ -256,7 +256,7 @@ The proteusPy package was developed by Eric G. Suchanek, PhD. If you find it use
   title = {proteusPy: A Package for Modeling and Analyzing Proteins of Known Structure},
   year = {2024},
   publisher = {GitHub},
-  version = {0.99.62},
+  version = {0.100.1},
   journal = {GitHub repository},
   url = {https://github.com/suchanek/proteusPy}
 }

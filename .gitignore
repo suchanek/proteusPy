@@ -63,3 +63,5 @@ benchmarks/canonical_tests/logs/
 *.log
 *.tmp
 commit.txt
+.pycodekg/vectors.sqlite
+.filetreekg/vectors.sqlite

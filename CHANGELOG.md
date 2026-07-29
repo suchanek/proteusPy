@@ -14,25 +14,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`backbone_loader.py`** — new module providing `BackboneLoader` and `BackboneResidue` for parallel extraction of backbone φ/ψ/ω dihedral angles from PDB files. `BackboneLoader` uses a `multiprocessing.Pool` (same pattern as `DisulfideExtractor_mp`) to parse every `pdb*.ent` file in a directory; results are a flat `list[BackboneResidue]`. `BackboneResidue` is a dataclass whose attribute interface (`phi`, `psi`, `omega`, `residue_name`, `chain_id`, `seq_pos`, `pdb_id`, `secondary_structure`) is consumed directly by WaveRider's `BackboneAngleList.from_proteuspy()`. Secondary structure is annotated from PDB HELIX/SHEET records (H/E/U); terminal residues carry `math.nan` so WaveRider's `.valid()` filter can exclude them before manifold fitting. Both classes are exported from the top-level `proteusPy` namespace.
 - **`tests/test_backbone_loader.py`** — 17 unit tests covering: N/C-terminal NaN invariants, angle range bounds (−180, 180], secondary structure code validity, WaveRider duck-type interface, α-helix φ/ψ clustering near ideal (−60°/−40°), and graceful empty-result on missing PDB ID.
 
-- **`README.md`** — added Announcement section highlighting the Springer Nature book chapter (in press, 2026) with accurate statistics: 158,965 disulfide bonds across 35,367 filtered structures from 38,214 RCSB entries, binary/octant classification scheme. Added GitHub release badge. Removed stale WaveRider section (extracted to flux-frontiers/WaveRider). Fixed `qt5viewer` → `qt5_viewer` endpoint name. Updated Contributing → Contact/Reporting section to reflect maintenance-mode status. Updated BibTeX version to 0.99.62.
+- **`README.md`** — added Announcement section highlighting the Springer Nature book chapter (in press, 2026) with accurate statistics: 158,965 disulfide bonds across 35,367 filtered structures from 38,214 RCSB entries, binary/octant classification scheme. Added GitHub release badge. Removed stale WaveRider section (extracted to flux-frontiers/WaveRider). Fixed `qt5viewer` → `qt5_viewer` endpoint name. Updated Contributing → Contact/Reporting section to reflect maintenance-mode status. Updated BibTeX version to 0.100.1.
 
 ### Changed
 
 - **`DisulfideExtractor_mp.py`** — added `venv` as a valid `--forge` option; when selected, the update destination resolves to `<project_root>/.venv/lib/python3.12/site-packages/proteusPy/data`, enabling use with local virtual environments alongside the existing miniforge3/mambaforge paths.
-- **KG packages moved from `[extras]` to Poetry dependency group** (`pyproject.toml`) — `doc-kg`, `pycode-kg`, and `ftree-kg` are private GitHub-hosted packages that PyPI forbids as declared extras. They are now declared under `[tool.poetry.group.kg.dependencies]` (optional). Install them in a development environment with `poetry install --with kg`; a plain `pip install proteusPy` or `poetry install` skips them as before.
+- **KG packages moved from `[extras]` to Poetry dependency group** (`pyproject.toml`) — `doc-kg`, `pycode-kg`, and `ftree-kg` are private GitHub-hosted packages that PyPI forbids as declared extras. They are now declared under `[tool.poetry.group.kg.dependencies]` (optional). Install them in a development environment with `poetry install --with kg`; a plain `pip install proteusPy` or `poetry install` skips them as before. Minimum versions raised to `doc-kg ≥ 0.18.2`, `pycode-kg ≥ 0.20.0`, `ftree-kg ≥ 0.9.0`.
+- **`.gitignore`** — ignore `.pycodekg/vectors.sqlite` and `.filetreekg/vectors.sqlite`; these are regenerable KG vector indices that should not be tracked.
 
 ### Fixed
 
 - **`DisulfideExtractor_mp.py`** — eliminated logging noise during multiprocessing extraction. Worker processes now receive a pool initializer (`_worker_log_init`) that calls `logging.disable(logging.CRITICAL)`, preventing parser errors/warnings from child processes from leaking to the console. Root logger is now configured file-only (no `RichHandler`) and `disable_stream_handlers_for_namespace("proteusPy")` is called on startup to silence any stream handlers attached by module-level code.
 - **Security advisories resolved** — updated pinned dependency versions to eliminate known CVEs:
   - `gdown` ≥ 5.2.2 (CVE-2026-40491)
-  - `Pillow` ≥ 12.2.0 (CVE-2026-25990, CVE-2026-40192, CVE-2026-42308, CVE-2026-42310, CVE-2026-42311)
+  - `Pillow` ≥ 12.3.0 (CVE-2026-25990, CVE-2026-40192, CVE-2026-42308, CVE-2026-42310, CVE-2026-42311, plus the 12.3.0 batch: heap OOB writes in `ImageCmsTransform.apply()` / `Image.paste()` / `ImageFilter.RankFilter`, decompression-bomb bypasses in the font and GD loaders, JPEG2000 and EPS DoS)
   - `Requests` ≥ 2.33.0 (CVE-2024-47081, CVE-2026-25645)
   - `python-multipart` ≥ 0.0.27 (CVE-2026-42561; transitive via `mcp`)
+- **Dependabot alerts cleared across all dependency groups** — two exact pins were transitively holding back vulnerable packages and have been relaxed:
+  - `notebook` `7.2.2` → `≥7.5.6` (jupyter group). The exact pin forced `jupyterlab >=4.2.0,<4.3`, stranding JupyterLab at 4.2.7 with four open advisories (XSS via `overrides.json`, XSS in the image viewer, PluginManager lock-rule bypass, unenforced extension allowlist). Now resolves to notebook 7.6.1 / JupyterLab 4.6.2.
+  - `panel` `1.5.3` → `≥1.8.0` (viz group). The exact pin forced `bokeh >=3.5.0,<3.7.0`, stranding Bokeh at 3.6.3. Now resolves to panel 1.9.3 / Bokeh 3.9.2.
+  - Lockfile refresh additionally advances `mistune` 3.3.4, `soupsieve` 2.9.1, `setuptools` 83.0.0, `mcp` 2.0.0, `torch` 2.13.0, `starlette` 1.3.1, `tornado` 6.5.7, and `requests` 2.34.2, clearing their respective advisories. Runtime dependencies are unchanged — only the optional `jupyter` and `viz` groups moved.
 
 ### Removed
 
 - **`kg` extra removed from `pyproject.toml`** — the `pip install proteusPy[kg]` extra is no longer available for PyPI installs (see Changed above). Use `poetry install --with kg` for local development.
+- **`old/pyproject.toml` deleted** — a stale setuptools-based manifest for v0.98.41.dev2 (last touched January 2025) that pinned `Pillow==11.0.0`. Nothing referenced it — the live project has been Poetry-based for several releases — but Dependabot scans every file named `pyproject.toml` and it was the sole source of ten Pillow advisories. The sibling archives (`pyproject.toml.sav`, `.poetry`, `.setuptools`) are untouched; their extensions keep them out of Dependabot's scan.
 
 ## [0.99.62] - 2026-04-10
 
