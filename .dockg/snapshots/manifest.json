@@ -1,6 +1,6 @@
 {
   "format": "1.0",
-  "last_update": "2026-07-29T00:31:21.094616+00:00",
+  "last_update": "2026-08-20T02:25:01.929774+00:00",
   "snapshots": [
     {
       "key": "9d642891f86da793c3505e331c3b506d2abcb2c6",
@@ -417,6 +417,49 @@
         "vs_baseline": {
           "nodes": -18,
           "edges": -257,
+          "coverage_delta": 0.018294990712759418,
+          "issues_delta": 0
+        }
+      }
+    },
+    {
+      "key": "d1c7899efaa23e537efa5805900cbcd2d9a018f8",
+      "branch": "docs/citation-trail-zenodo-concept-doi",
+      "timestamp": "2026-08-20T02:25:01.929311+00:00",
+      "version": "0.18.2",
+      "file": "d1c7899efaa23e537efa5805900cbcd2d9a018f8.json",
+      "metrics": {
+        "db_path": "/Users/egs/repos/proteusPy/.dockg/graph.sqlite",
+        "total_nodes": 2300,
+        "total_edges": 13996,
+        "node_counts": {
+          "chunk": 393,
+          "document": 22,
+          "entity": 707,
+          "keyword": 693,
+          "section": 179,
+          "topic": 306
+        },
+        "edge_counts": {
+          "CONTAINS": 572,
+          "CO_OCCURS_WITH": 9116,
+          "HAS_KEYWORD": 1571,
+          "HAS_TOPIC": 397,
+          "MENTIONS_ENTITY": 1710,
+          "NEXT": 149,
+          "REFERENCES": 1,
+          "SIMILAR_TO": 480
+        },
+        "meaningful_nodes": 2278,
+        "coverage_score": 0.984732824427481,
+        "issues_count": 0,
+        "complexity_median": 19.0
+      },
+      "deltas": {
+        "vs_previous": null,
+        "vs_baseline": {
+          "nodes": -15,
+          "edges": -239,
           "coverage_delta": 0.018294990712759418,
           "issues_delta": 0
         }

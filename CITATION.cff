@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use proteusPy in your research, please cite it as below."
+title: "proteusPy: A Python Package for Protein Structure and Disulfide Bond Modeling and Analysis"
+abstract: >-
+  proteusPy is a Python package for the modeling and analysis of proteins of
+  known structure, with an emphasis on disulfide bonds.
+type: software
+authors:
+  - family-names: "Suchanek"
+    given-names: "Eric G."
+    email: "suchanek@mac.com"
+version: "0.100.1"
+license: BSD-3-Clause
+repository-code: "https://github.com/suchanek/proteusPy"
+url: "https://suchanek.github.io/proteusPy/"
+doi: "10.5281/zenodo.11148440"
+preferred-citation:
+  type: article
+  title: "proteusPy: A Python Package for Protein Structure and Disulfide Bond Modeling and Analysis"
+  authors:
+    - family-names: "Suchanek"
+      given-names: "Eric G."
+      email: "suchanek@mac.com"
+  doi: "10.21105/joss.06169"
+  journal: "Journal of Open Source Software"
+  year: 2024
+  volume: 9
+  issue: 100
+  start: 6169
+  publisher:
+    name: "The Open Journal"

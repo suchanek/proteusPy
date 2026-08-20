@@ -1,0 +1,66 @@
+{
+  "key": "d1c7899efaa23e537efa5805900cbcd2d9a018f8",
+  "branch": "docs/citation-trail-zenodo-concept-doi",
+  "timestamp": "2026-08-20T02:25:01.995742+00:00",
+  "version": "0.9.0",
+  "metrics": {
+    "total_nodes": 390,
+    "total_edges": 390,
+    "node_counts": {
+      "directory": 52,
+      "file": 338
+    },
+    "edge_counts": {
+      "CONTAINS": 390
+    },
+    "total_files": 338,
+    "total_dirs": 52,
+    "dir_node_counts": {
+      "CHANGELOG.md": 1,
+      "CITATION.cff": 1,
+      "CODE_OF_CONDUCT.md": 1,
+      "LICENSE": 1,
+      "README.md": 1,
+      "TODO.md": 1,
+      "analysis": 4,
+      "benchmarks": 24,
+      "class_analysis_outputs": 23,
+      "commit.txt": 1,
+      "data": 15,
+      "docs": 49,
+      "examples": 15,
+      "get_version.py": 1,
+      "lib": 9,
+      "logdir": 33,
+      "logo": 22,
+      "logo.png": 1,
+      "makefile": 1,
+      "notebooks": 18,
+      "old": 20,
+      "poetry.lock": 1,
+      "poetry.toml": 1,
+      "programs": 35,
+      "proteusPy": 55,
+      "proteusPy.code-workspace": 1,
+      "proteusPy.egg-info": 7,
+      "proteusPy_graph.png": 1,
+      "proteus_logo_sb.png": 1,
+      "pyproject.toml": 1,
+      "release-notes.md": 1,
+      "runs": 4,
+      "schematic_outputs": 7,
+      "scripts": 4,
+      "tests": 17,
+      "viewer": 12
+    }
+  },
+  "hotspots": [],
+  "issues": [],
+  "vs_previous": null,
+  "vs_baseline": {
+    "nodes": -75,
+    "edges": -75,
+    "files_delta": -55,
+    "dirs_delta": -20
+  }
+}
