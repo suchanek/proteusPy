@@ -1,8 +1,7 @@
 [![PyPI version](https://badge.fury.io/py/proteusPy.svg)](https://badge.fury.io/py/proteusPy)
-[![GitHub release](https://img.shields.io/github/v/release/suchanek/proteusPy)](https://github.com/suchanek/proteusPy/releases)
 ![Testing](https://github.com/suchanek/proteusPy/actions/workflows/pytest.yml/badge.svg)
 [![status](https://joss.theoj.org/papers/45de839b48a550d6ab955c5fbbc508f2/status.svg)](https://joss.theoj.org/papers/45de839b48a550d6ab955c5fbbc508f2)
-[![DOI](https://zenodo.org/badge/575657091.svg)](https://doi.org/10.5281/zenodo.13241499)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.11148440-blue.svg)](https://doi.org/10.5281/zenodo.11148440)
 [![API Docs](https://img.shields.io/badge/API%20Documentation-8A2BE2)](https://suchanek.github.io/proteusPy/proteusPy.html)
 
 <!-- markdownlint-disable MD014 -->
@@ -258,6 +257,7 @@ The proteusPy package was developed by Eric G. Suchanek, PhD. If you find it use
   publisher = {GitHub},
   version = {0.100.1},
   journal = {GitHub repository},
+  doi = {10.5281/zenodo.11148440},
   url = {https://github.com/suchanek/proteusPy}
 }
 ```
