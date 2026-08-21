@@ -9,12 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.100.1] - 2026-08-21
+
 ### Added
 
 - **`backbone_loader.py`** — new module providing `BackboneLoader` and `BackboneResidue` for parallel extraction of backbone φ/ψ/ω dihedral angles from PDB files. `BackboneLoader` uses a `multiprocessing.Pool` (same pattern as `DisulfideExtractor_mp`) to parse every `pdb*.ent` file in a directory; results are a flat `list[BackboneResidue]`. `BackboneResidue` is a dataclass whose attribute interface (`phi`, `psi`, `omega`, `residue_name`, `chain_id`, `seq_pos`, `pdb_id`, `secondary_structure`) is consumed directly by WaveRider's `BackboneAngleList.from_proteuspy()`. Secondary structure is annotated from PDB HELIX/SHEET records (H/E/U); terminal residues carry `math.nan` so WaveRider's `.valid()` filter can exclude them before manifold fitting. Both classes are exported from the top-level `proteusPy` namespace.
 - **`tests/test_backbone_loader.py`** — 17 unit tests covering: N/C-terminal NaN invariants, angle range bounds (−180, 180], secondary structure code validity, WaveRider duck-type interface, α-helix φ/ψ clustering near ideal (−60°/−40°), and graceful empty-result on missing PDB ID.
 
 - **`README.md`** — added Announcement section highlighting the Springer Nature book chapter (in press, 2026) with accurate statistics: 158,965 disulfide bonds across 35,367 filtered structures from 38,214 RCSB entries, binary/octant classification scheme. Added GitHub release badge. Removed stale WaveRider section (extracted to flux-frontiers/WaveRider). Fixed `qt5viewer` → `qt5_viewer` endpoint name. Updated Contributing → Contact/Reporting section to reflect maintenance-mode status. Updated BibTeX version to 0.100.1.
+- **`CITATION.cff`** — added so GitHub's "Cite this repository" button works, carrying the Zenodo concept DOI (`10.5281/zenodo.11148440`) with the JOSS paper as `preferred-citation`.
 
 ### Changed
 
@@ -34,11 +37,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `notebook` `7.2.2` → `≥7.5.6` (jupyter group). The exact pin forced `jupyterlab >=4.2.0,<4.3`, stranding JupyterLab at 4.2.7 with four open advisories (XSS via `overrides.json`, XSS in the image viewer, PluginManager lock-rule bypass, unenforced extension allowlist). Now resolves to notebook 7.6.1 / JupyterLab 4.6.2.
   - `panel` `1.5.3` → `≥1.8.0` (viz group). The exact pin forced `bokeh >=3.5.0,<3.7.0`, stranding Bokeh at 3.6.3. Now resolves to panel 1.9.3 / Bokeh 3.9.2.
   - Lockfile refresh additionally advances `mistune` 3.3.4, `soupsieve` 2.9.1, `setuptools` 83.0.0, `mcp` 2.0.0, `torch` 2.13.0, `starlette` 1.3.1, `tornado` 6.5.7, and `requests` 2.34.2, clearing their respective advisories. Runtime dependencies are unchanged — only the optional `jupyter` and `viz` groups moved.
+- **DOI badge** (`README.md`) — the Zenodo badge image (`zenodo.org/badge/575657091.svg`) returned 502 to every reader: GitHub proxies README images through camo, Zenodo rate-limits camo, and camo serves the 429 back as a 502. Replaced with a shields.io static badge, which renders through the proxy. The badge also linked to `10.5281/zenodo.13241499`, the version DOI for v0.96.31 (August 2024), pinning every citation two years back; repointed to the concept DOI `10.5281/zenodo.11148440`, and added the same DOI to the `@software` BibTeX entry.
 
 ### Removed
 
 - **`kg` extra removed from `pyproject.toml`** — the `pip install proteusPy[kg]` extra is no longer available for PyPI installs (see Changed above). Use `poetry install --with kg` for local development.
 - **`old/pyproject.toml` deleted** — a stale setuptools-based manifest for v0.98.41.dev2 (last touched January 2025) that pinned `Pillow==11.0.0`. Nothing referenced it — the live project has been Poetry-based for several releases — but Dependabot scans every file named `pyproject.toml` and it was the sole source of ten Pillow advisories. The sibling archives (`pyproject.toml.sav`, `.poetry`, `.setuptools`) are untouched; their extensions keep them out of Dependabot's scan.
+- **GitHub release badge** (`README.md`) — the 21 releases were orphaned by the 2026-05-28 history squash, which deleted their tags, so their source tarballs and asset URLs both 404'd. All 21 remain permanently archived on Zenodo with DOIs; the badge is dropped since it otherwise renders "no releases or repo not found".
 
 ## [0.99.62] - 2026-04-10
 
