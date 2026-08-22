@@ -1,0 +1,153 @@
+{
+  "key": "e4bdeaaa925b5c049a850f1cc3bd13f70a7eabb2",
+  "branch": "master",
+  "timestamp": "2026-08-22T17:07:35.795096+00:00",
+  "version": "0.20.0",
+  "metrics": {
+    "db_path": ".pycodekg/graph.sqlite",
+    "total_nodes": 10719,
+    "meaningful_nodes": 753,
+    "total_edges": 10196,
+    "node_counts": {
+      "class": 42,
+      "function": 170,
+      "method": 502,
+      "module": 39,
+      "symbol": 9966
+    },
+    "edge_counts": {
+      "ATTR_ACCESS": 3657,
+      "CALLS": 3001,
+      "CONTAINS": 714,
+      "IMPORTS": 505,
+      "INHERITS": 19,
+      "RESOLVES_TO": 2300
+    },
+    "module_count": 39,
+    "class_count": 42,
+    "function_count": 170,
+    "method_count": 502,
+    "docstring_coverage": 0.887,
+    "snapshot_count": 7,
+    "critical_issues": 6,
+    "complexity_median": 6,
+    "module_node_counts": {
+      "proteusPy/DisulfideBase.py": 1301,
+      "proteusPy/DisulfideClassGenerator.py": 334,
+      "proteusPy/DisulfideClassManager.py": 231,
+      "proteusPy/DisulfideClasses.py": 15,
+      "proteusPy/DisulfideEnergy.py": 252,
+      "proteusPy/DisulfideExceptions.py": 6,
+      "proteusPy/DisulfideExtractor_mp.py": 208,
+      "proteusPy/DisulfideIO.py": 151,
+      "proteusPy/DisulfideLoader.py": 458,
+      "proteusPy/DisulfideStats.py": 221,
+      "proteusPy/DisulfideVisualization.py": 970,
+      "proteusPy/Plotting.py": 53,
+      "proteusPy/ProteusGlobals.py": 67,
+      "proteusPy/ProteusPyWarning.py": 2,
+      "proteusPy/Residue.py": 57,
+      "proteusPy/__init__.py": 21,
+      "proteusPy/_version.py": 2,
+      "proteusPy/angle_annotation.py": 148,
+      "proteusPy/atoms.py": 26,
+      "proteusPy/backbone_loader.py": 302,
+      "proteusPy/bootstrapper.py": 24,
+      "proteusPy/display_class_disulfides.py": 19,
+      "proteusPy/disulfide_schematic.py": 116,
+      "proteusPy/disulfide_tree.py": 212,
+      "proteusPy/graph_reasoner.py": 484,
+      "proteusPy/hexbin_plot.py": 62,
+      "proteusPy/logger_config.py": 133,
+      "proteusPy/manifold_model.py": 395,
+      "proteusPy/manifold_observer.py": 306,
+      "proteusPy/manifold_walker.py": 214,
+      "proteusPy/qt5viewer.py": 380,
+      "proteusPy/rcsb_viewer.py": 433,
+      "proteusPy/render_disulfide_schematic.py": 112,
+      "proteusPy/ssparser.py": 201,
+      "proteusPy/tree_visualizer.py": 255,
+      "proteusPy/turtle3D.py": 306,
+      "proteusPy/turtleND.py": 238,
+      "proteusPy/utility.py": 490,
+      "proteusPy/vector3D.py": 186
+    }
+  },
+  "hotspots": [
+    {
+      "name": "m:proteusPy/DisulfideBase.py:Disulfide.copy",
+      "callers": 49,
+      "callees": 1,
+      "risk_level": "low"
+    },
+    {
+      "name": "m:proteusPy/vector3D.py:Vector3D.copy",
+      "callers": 49,
+      "callees": 1,
+      "risk_level": "low"
+    },
+    {
+      "name": "cls:proteusPy/vector3D.py:Vector3D",
+      "callers": 36,
+      "callees": 0,
+      "risk_level": "low"
+    },
+    {
+      "name": "cls:proteusPy/DisulfideBase.py:DisulfideList",
+      "callers": 26,
+      "callees": 0,
+      "risk_level": "low"
+    },
+    {
+      "name": "m:proteusPy/DisulfideBase.py:DisulfideList.torsion_array",
+      "callers": 10,
+      "callees": 2,
+      "risk_level": "low"
+    },
+    {
+      "name": "m:proteusPy/DisulfideVisualization.py:DisulfideVisualization._render_ss",
+      "callers": 8,
+      "callees": 2,
+      "risk_level": "low"
+    },
+    {
+      "name": "m:proteusPy/turtleND.py:TurtleND._rotate",
+      "callers": 6,
+      "callees": 4,
+      "risk_level": "low"
+    },
+    {
+      "name": "m:proteusPy/turtle3D.py:Turtle3D.unit",
+      "callers": 6,
+      "callees": 1,
+      "risk_level": "low"
+    },
+    {
+      "name": "m:proteusPy/DisulfideBase.py:DisulfideList.create_deviation_dataframe",
+      "callers": 6,
+      "callees": 1,
+      "risk_level": "low"
+    },
+    {
+      "name": "m:proteusPy/DisulfideBase.py:Disulfide.__init__",
+      "callers": 6,
+      "callees": 6,
+      "risk_level": "low"
+    }
+  ],
+  "issues": [
+    "[WARN] 1 orphaned functions found (`handle_help_menu`) -- consider archiving or documenting",
+    "[WARN] `DisulfideBase.py` has 132 functions/methods/classes -- consider splitting into focused submodules",
+    "[WARN] `graph_reasoner.py` has 58 functions/methods/classes -- consider splitting into focused submodules",
+    "[WARN] `DisulfideLoader.py` has 37 functions/methods/classes -- consider splitting into focused submodules",
+    "[WARN] `DisulfideVisualization.py` has 34 functions/methods/classes -- consider splitting into focused submodules",
+    "[WARN] `rcsb_viewer.py` has 33 functions/methods/classes -- consider splitting into focused submodules"
+  ],
+  "vs_previous": null,
+  "vs_baseline": {
+    "nodes": 356,
+    "edges": 312,
+    "coverage_delta": 0.001000000000000112,
+    "critical_issues_delta": 5
+  }
+}
