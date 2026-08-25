@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Rebuild proteusPy KG indices (PyCodeKG SQLite + LanceDB).
+# Rebuild proteusPy KG indices (PyCodeKG SQLite + sqlite-vec).
 # Usage: bash scripts/rebuild-kg.sh [--wipe]
 set -e
 
@@ -9,7 +9,7 @@ WIPE=${1:-}
 echo "--- PyCodeKG rebuild: SQLite ---"
 poetry run pycodekg build-sqlite --repo "$REPO_ROOT" ${WIPE}
 
-echo "--- PyCodeKG rebuild: LanceDB ---"
-poetry run pycodekg build-lancedb --repo "$REPO_ROOT" ${WIPE}
+echo "--- PyCodeKG rebuild: sqlite-vec ---"
+poetry run pycodekg build-index --repo "$REPO_ROOT" ${WIPE}
 
 echo "--- PyCodeKG rebuild: complete ---"
