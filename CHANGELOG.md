@@ -9,10 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.100.2] - 2026-09-08
+
+Documentation and repository maintenance only. No library code changed in this
+release: nothing under `proteusPy/` differs from v0.100.1, and no runtime
+dependency moved. The release exists so that PyPI, which renders `README.md` as
+the project long description and cannot have it edited in place, stops
+advertising the Springer chapter as "in press."
+
+### Fixed
+
+- **`scripts/rebuild-kg.sh`** — the script called `pycodekg build-lancedb`, a
+  subcommand retired along with LanceDB, so `bash scripts/rebuild-kg.sh` failed
+  outright on its second step. The sqlite-vec equivalent is `build-index`,
+  which takes the same `--repo`/`--wipe` flags. Repository tooling only; not
+  part of the distributed package.
+
 ### Changed
 
 - **`CITATION.cff`** — added the Springer chapter under `references:` so GitHub's "Cite this repository" panel and downstream citation tooling surface it alongside the software. `preferred-citation` is unchanged and still points at the JOSS paper, which remains the right way to cite the package itself. CFF 1.2.0 has no book-chapter reference type, so the entry uses `type: generic` with `collection-title` for the series (Methods in Molecular Biology), `volume`/`volume-title` for the book, and `section` for the chapter. Validated against the CFF 1.2.0 JSON schema.
 - **`README.md`** — the Springer book chapter is **published**, so the Announcement and Publications sections no longer say "in press." Both now cite the chapter itself rather than the book: *Structural Analysis of Disulfide Bonds in the RCSB Protein Data Bank Using proteusPy*, pp. 15–32 in *Functional Disulphide Bonds: Methods and Protocols*, 2nd ed., ed. P. J. Hogg, Methods in Molecular Biology vol. 3016 (Springer US, 2026), DOI `10.1007/978-1-0716-5158-2_2`. The previously used `10.1007/978-1-0716-5158-2` is the *book* DOI and does not resolve to the chapter; it is now shown separately as the SpringerLink book link alongside the print (978-1-0716-5157-5) and eBook (978-1-0716-5158-2) ISBNs. `docs/suchanek_disulfide_chapter_2026.pdf` is relabelled from "pre-publication PDF" to the author's accepted manuscript, since a version of record now exists.
+- **Chapter number.** Both README citations name chapter 2, initially inferred from the DOI suffix `_2` and the page range and since confirmed by the author against his copy.
+- **`pyproject.toml`, `poetry.lock`** — fleet packages relocked to current PyPI versions as part of the dependency-currency sweep queued 2026-08-20: `doc-kg` 0.22.0, `pycode-kg` 0.23.1, `ftree-kg` 0.14.0, with `kgmodule-utils` 0.18.0 arriving as a transitive resolution. These live in the optional `kg` Poetry group, which is dev-only and never ships in the wheel, so `pip install proteusPy` is unaffected.
+- **`.pre-commit-config.yaml`** — added a top-level `exclude: '^old/'`. The archived `old/` directory was tripping `check-yaml` and `debug-statements`, which ruff's own config already excludes it from.
+- **`.gitignore`** — dropped the stale `lancedb/` rules under `.pycodekg`, `.dockg` and `.filetreekg`, which named a path nothing produces since the fleet's sqlite-vec migration, and added the previously uncovered `.dockg/vectors.sqlite` to match its siblings.
 
 ## [0.100.1] - 2026-08-21
 
