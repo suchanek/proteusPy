@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **`CITATION.cff`** — added the Springer chapter under `references:` so GitHub's "Cite this repository" panel and downstream citation tooling surface it alongside the software. `preferred-citation` is unchanged and still points at the JOSS paper, which remains the right way to cite the package itself. CFF 1.2.0 has no book-chapter reference type, so the entry uses `type: generic` with `collection-title` for the series (Methods in Molecular Biology), `volume`/`volume-title` for the book, and `section` for the chapter. Validated against the CFF 1.2.0 JSON schema.
+- **`README.md`** — the Springer book chapter is **published**, so the Announcement and Publications sections no longer say "in press." Both now cite the chapter itself rather than the book: *Structural Analysis of Disulfide Bonds in the RCSB Protein Data Bank Using proteusPy*, pp. 15–32 in *Functional Disulphide Bonds: Methods and Protocols*, 2nd ed., ed. P. J. Hogg, Methods in Molecular Biology vol. 3016 (Springer US, 2026), DOI `10.1007/978-1-0716-5158-2_2`. The previously used `10.1007/978-1-0716-5158-2` is the *book* DOI and does not resolve to the chapter; it is now shown separately as the SpringerLink book link alongside the print (978-1-0716-5157-5) and eBook (978-1-0716-5158-2) ISBNs. `docs/suchanek_disulfide_chapter_2026.pdf` is relabelled from "pre-publication PDF" to the author's accepted manuscript, since a version of record now exists.
+
 ## [0.100.1] - 2026-08-21
 
 ### Added

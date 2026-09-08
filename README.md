@@ -8,13 +8,15 @@
 
 ## 🎉 Announcement
 
-**proteusPy is going to print!**
+**proteusPy is in print!**
 
-A chapter written around disulfide structural analysis based on proteusPy is now **in press** in **Functional Disulphide Bonds: Methods and Protocols, Second Edition** (ed. Philip Hogg, Springer Nature, 2026). It covers the full analysis pipeline: parsing and geometric filtering of 38,214 RCSB structures down to 35,367 high-quality entries containing **158,965 disulfide bonds**, statistical characterization of bond geometry, torsional energy, and a binary/octant classification scheme that carves conformational space into up to 32,768 structural families.
+A chapter written around disulfide structural analysis based on proteusPy is now **published** in **Functional Disulphide Bonds: Methods and Protocols, Second Edition** (ed. Philip J. Hogg, Methods in Molecular Biology vol. 3016, Springer US / Humana Press, 2026). It covers the full analysis pipeline: parsing and geometric filtering of 38,214 RCSB structures down to 35,367 high-quality entries containing **158,965 disulfide bonds**, statistical characterization of bond geometry, torsional energy, and a binary/octant classification scheme that carves conformational space into up to 32,768 structural families.
 
-> Suchanek, E. G. (2026). *Structural Analysis of Disulfide Bonds in the RCSB Protein Data Bank Using proteusPy.* In *Functional Disulphide Bonds: Methods and Protocols, Second Edition*, ed. P. Hogg, Springer Nature. DOI: [10.1007/978-1-0716-5158-2](https://doi.org/10.1007/978-1-0716-5158-2)
+> Suchanek, E. G. (2026). *Structural Analysis of Disulfide Bonds in the RCSB Protein Data Bank Using proteusPy.* In P. J. Hogg (ed.), *Functional Disulphide Bonds: Methods and Protocols*, Second Edition (Methods in Molecular Biology, vol. 3016), chapter 2, pp. 15–32. New York, NY: Springer US. DOI: [10.1007/978-1-0716-5158-2_2](https://doi.org/10.1007/978-1-0716-5158-2_2)
 
-Pre-publication PDF available [here](docs/suchanek_disulfide_chapter_2026.pdf).
+Print ISBN 978-1-0716-5157-5 · eBook ISBN 978-1-0716-5158-2 · [book on SpringerLink](https://doi.org/10.1007/978-1-0716-5158-2)
+
+The author's accepted manuscript is available [here](docs/suchanek_disulfide_chapter_2026.pdf); the version of record is the published chapter linked above.
 
 ---
 
@@ -264,7 +266,7 @@ The proteusPy package was developed by Eric G. Suchanek, PhD. If you find it use
 
 ## Publications
 
-- [Structural Analysis of Disulfide Bonds in the RCSB Protein Data Bank Using proteusPy](docs/suchanek_disulfide_chapter_2026.pdf) — Suchanek, E. G. (2026). Book chapter in *Functional Disulphide Bonds: Methods and Protocols, Second Edition*, Springer Nature. DOI: [10.1007/978-1-0716-5158-2](https://doi.org/10.1007/978-1-0716-5158-2)
+- [Structural Analysis of Disulfide Bonds in the RCSB Protein Data Bank Using proteusPy](https://doi.org/10.1007/978-1-0716-5158-2_2) — Suchanek, E. G. (2026). Book chapter in *Functional Disulphide Bonds: Methods and Protocols, Second Edition*, ed. P. J. Hogg, Methods in Molecular Biology vol. 3016, chapter 2, pp. 15–32, Springer US. DOI: [10.1007/978-1-0716-5158-2_2](https://doi.org/10.1007/978-1-0716-5158-2_2) ([author's accepted manuscript](docs/suchanek_disulfide_chapter_2026.pdf))
 - [proteusPy: A Python Package for Protein Structure and Disulfide Bond Modeling and Analysis](https://joss.theoj.org/papers/10.21105/joss.06169)
 - [Computer-aided Strategies for Protein Design](https://doi.org/10.1021/bi00368a023)
 - [An engineered intersubunit disulfide enhances the stability and DNA binding of the N-terminal domain of .lambda. repressor](https://doi.org/10.1021/bi00368a024)
