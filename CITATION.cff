@@ -29,3 +29,31 @@ preferred-citation:
   start: 6169
   publisher:
     name: "The Open Journal"
+references:
+  # CFF 1.2.0 has no "book chapter" reference type; "generic" with
+  # collection-title (the series), volume/volume-title (the book) and
+  # section (the chapter) is the standard way to express one.
+  - type: generic
+    title: "Structural Analysis of Disulfide Bonds in the RCSB Protein Data Bank Using proteusPy"
+    authors:
+      - family-names: "Suchanek"
+        given-names: "Eric G."
+        email: "suchanek@mac.com"
+    editors:
+      - family-names: "Hogg"
+        given-names: "Philip J."
+    collection-title: "Methods in Molecular Biology"
+    volume: 3016
+    volume-title: "Functional Disulphide Bonds: Methods and Protocols"
+    edition: "2nd"
+    section: "2"
+    start: 15
+    end: 32
+    year: 2026
+    isbn: "978-1-0716-5157-5"
+    doi: "10.1007/978-1-0716-5158-2_2"
+    publisher:
+      name: "Springer US"
+      city: "New York"
+      region: "NY"
+      country: "US"
