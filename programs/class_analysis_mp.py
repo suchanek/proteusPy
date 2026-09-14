@@ -30,23 +30,13 @@ init(autoreset=True)
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-b", "--binary", action=argparse.BooleanOptionalAction, default=False
-    )
-    parser.add_argument(
-        "-o", "--octant", action=argparse.BooleanOptionalAction, default=False
-    )
+    parser.add_argument("-b", "--binary", action=argparse.BooleanOptionalAction, default=False)
+    parser.add_argument("-o", "--octant", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("-t", "--threads", type=int, default=8)
-    parser.add_argument(
-        "-g", "--graph", action=argparse.BooleanOptionalAction, default=False
-    )
+    parser.add_argument("-g", "--graph", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("-c", "--cutoff", type=float, default=0.0)
-    parser.add_argument(
-        "-v", "--verbose", action=argparse.BooleanOptionalAction, default=False
-    )
-    parser.add_argument(
-        "-u", "--update", action=argparse.BooleanOptionalAction, default=False
-    )
+    parser.add_argument("-v", "--verbose", action=argparse.BooleanOptionalAction, default=False)
+    parser.add_argument("-u", "--update", action=argparse.BooleanOptionalAction, default=False)
     return parser.parse_args()
 
 
@@ -61,9 +51,7 @@ def task(
     save_dir,
     prefix,
 ):
-    loader = pp.Load_PDB_SS(
-        verbose=True, subset=False, cutoff=CA_CUTOFF, sg_cutoff=SG_CUTOFF
-    )
+    loader = pp.Load_PDB_SS(verbose=True, subset=False, cutoff=CA_CUTOFF, sg_cutoff=SG_CUTOFF)
 
     for idx in range(start_idx, end_idx):
         row = eight_or_bin.iloc[idx]
@@ -107,9 +95,7 @@ def analyze_classes_multiprocessing(
     do_octant=True,
     prefix="ss",
 ):
-    loader = pp.Load_PDB_SS(
-        verbose=verbose, subset=False, cutoff=CA_CUTOFF, sg_cutoff=SG_CUTOFF
-    )
+    loader = pp.Load_PDB_SS(verbose=verbose, subset=False, cutoff=CA_CUTOFF, sg_cutoff=SG_CUTOFF)
     save_dir = OCTANT if do_octant else BINARY
     eight_or_bin = loader.tclass.eightclass_df if do_octant else loader.tclass.classdf
     tot_classes = eight_or_bin.shape[0]
@@ -145,9 +131,7 @@ def analyze_classes_multiprocessing(
     for process in processes:
         process.join()
 
-    res_list = pp.DisulfideList(
-        [], "SS_8class_Avg_SS" if do_octant else "SS_32class_Avg_SS"
-    )
+    res_list = pp.DisulfideList([], "SS_8class_Avg_SS" if do_octant else "SS_32class_Avg_SS")
     for result_list in result_lists:
         res_list.extend(result_list)
 

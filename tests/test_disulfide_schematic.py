@@ -107,9 +107,7 @@ class TestDisulfideSchematic(unittest.TestCase):
     def test_create_model_schematic_with_ca_ca_distance(self):
         """Test creating a model schematic diagram with Ca-Ca distance line."""
         # Test with model parameters and Ca-Ca distance line
-        output_file = os.path.join(
-            self.temp_dir_obj.name, "test_model_schematic_ca_ca.png"
-        )
+        output_file = os.path.join(self.temp_dir_obj.name, "test_model_schematic_ca_ca.png")
 
         fig, ax = create_disulfide_schematic_from_model(
             chi1=-60,

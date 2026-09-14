@@ -58,9 +58,7 @@ def extract_pdb_id(filename: str) -> str:
     if filename.startswith("pdb") and filename.endswith(".ent"):
         return filename[3:-4]
     else:
-        raise ValueError(
-            "Filename {filename} does not follow the expected format 'pdb{id}.ent'"
-        )
+        raise ValueError("Filename {filename} does not follow the expected format 'pdb{id}.ent'")
 
 
 def timer(func):
@@ -199,9 +197,7 @@ def check_file(
         return None
 
     # Returns > 0 if we can't parse the SSBOND header
-    ssbond_dict, found, errors = extract_ssbonds_and_atoms(
-        fname, verbose=verbose, dbg=dbg
-    )
+    ssbond_dict, found, errors = extract_ssbonds_and_atoms(fname, verbose=verbose, dbg=dbg)
 
     if dbg:
         _logger.info("Found: %d errors: %d", found, errors)

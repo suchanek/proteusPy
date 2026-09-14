@@ -134,9 +134,7 @@ def embed_ollama(texts: list[str]) -> np.ndarray:
     """Embed texts one at a time via ollama."""
     vecs = []
     for text in tqdm(texts, desc="Embedding (ollama)"):
-        r = requests.post(
-            OLLAMA_URL, json={"model": OLLAMA_MODEL, "prompt": text}, timeout=30
-        )
+        r = requests.post(OLLAMA_URL, json={"model": OLLAMA_MODEL, "prompt": text}, timeout=30)
         r.raise_for_status()
         vecs.append(r.json()["embedding"])
     return np.array(vecs, dtype=np.float32)
@@ -204,9 +202,7 @@ def elbow_pca(eigenvalues: np.ndarray, threshold: float = 0.90) -> int:
 # ---------------------------------------------------------------------------
 # Retrieval evaluation: MRR@K
 # ---------------------------------------------------------------------------
-def mrr_at_k(
-    embeddings: np.ndarray, queries_idx: list, relevant: list, k: int = 10
-) -> float:
+def mrr_at_k(embeddings: np.ndarray, queries_idx: list, relevant: list, k: int = 10) -> float:
     """
     Mean Reciprocal Rank @ K.
     queries_idx: indices into corpus used as query
@@ -241,9 +237,7 @@ def main():
         E = embed(CORPUS)
     except Exception as exc:
         console.print(f"[red]Embedding failed: {exc}[/red]")
-        console.print(
-            "Ensure ollama is running:  ollama serve && ollama pull nomic-embed-text"
-        )
+        console.print("Ensure ollama is running:  ollama serve && ollama pull nomic-embed-text")
         sys.exit(1)
 
     console.print(f"  Embedding matrix: {E.shape}  (dtype={E.dtype})")
@@ -294,9 +288,7 @@ def main():
         norms_q = np.linalg.norm(Q, axis=1, keepdims=True)
         Q = Q / np.clip(norms_q, 1e-8, None)
     except Exception as exc:
-        console.print(
-            f"[yellow]Query embedding failed ({exc}); skipping retrieval eval.[/yellow]"
-        )
+        console.print(f"[yellow]Query embedding failed ({exc}); skipping retrieval eval.[/yellow]")
         Q = None
 
     retrieval_table = Table(
@@ -345,12 +337,8 @@ def main():
         else:
             mrr = float("nan")
 
-        results.append(
-            {"dim": d, "mrr": mrr, "var_explained": var_explained, "pca_id_90": id_d90}
-        )
-        retrieval_table.add_row(
-            str(d), f"{mrr:.3f}", f"{var_explained:.1%}", str(id_d90)
-        )
+        results.append({"dim": d, "mrr": mrr, "var_explained": var_explained, "pca_id_90": id_d90})
+        retrieval_table.add_row(str(d), f"{mrr:.3f}", f"{var_explained:.1%}", str(id_d90))
 
     console.print(retrieval_table)
 
@@ -372,9 +360,7 @@ def main():
                 ]
             )
         )
-        console.print(
-            f"  ManifoldModel mean local intrinsic dim: [green]{mean_dim:.1f}[/green]"
-        )
+        console.print(f"  ManifoldModel mean local intrinsic dim: [green]{mean_dim:.1f}[/green]")
     except Exception as exc:
         console.print(f"  [yellow]ManifoldModel check skipped: {exc}[/yellow]")
 

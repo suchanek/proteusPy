@@ -88,8 +88,8 @@ def calculate_dse(pdbid, pose=None):
                     total_strain, chi_1, chi_2 = get_disulfide_energy(pose, i, j)
 
                     # Format chi angles for storage
-                    chi_angles_1 = ','.join([f"{angle:.2f}" for angle in chi_1])
-                    chi_angles_2 = ','.join([f"{angle:.2f}" for angle in chi_2])
+                    chi_angles_1 = ",".join([f"{angle:.2f}" for angle in chi_1])
+                    chi_angles_2 = ",".join([f"{angle:.2f}" for angle in chi_2])
 
                     # Store result with both proximal and distal information
                     results.append(

@@ -34,9 +34,7 @@ def parse_ssbond_records(pdb_filename):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Parse SSBOND records from a PDB file."
-    )
+    parser = argparse.ArgumentParser(description="Parse SSBOND records from a PDB file.")
     parser.add_argument("pdb_filename", type=str, help="The path to the PDB file.")
     args = parser.parse_args()
 

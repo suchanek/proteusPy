@@ -119,9 +119,7 @@ styles_group = pn.widgets.RadioBoxGroup(
     inline=False,
 )
 
-rcsb_ss_widget = pn.widgets.Select(
-    name="Disulfide", value=_default_ss, options=_ssidlist
-)
+rcsb_ss_widget = pn.widgets.Select(name="Disulfide", value=_default_ss, options=_ssidlist)
 
 rcsb_selector_widget = pn.widgets.AutocompleteInput(
     name="RCSB ID (start typing)",
@@ -132,9 +130,9 @@ rcsb_selector_widget = pn.widgets.AutocompleteInput(
 )
 
 # controls on sidebar
-ss_props = pn.WidgetBox(
-    "## Disulfide Selection", rcsb_selector_widget, rcsb_ss_widget
-).servable(target="sidebar")
+ss_props = pn.WidgetBox("## Disulfide Selection", rcsb_selector_widget, rcsb_ss_widget).servable(
+    target="sidebar"
+)
 
 
 # Replace single checkbox with a selector widget
@@ -150,9 +148,7 @@ view_selector = pn.widgets.Select(
 )
 
 # Modify the layout
-ss_styles = pn.WidgetBox("## Display Style", styles_group, view_selector).servable(
-    target="sidebar"
-)
+ss_styles = pn.WidgetBox("## Display Style", styles_group, view_selector).servable(target="sidebar")
 
 
 # Adjust the update_single function to handle the different view options
@@ -230,9 +226,7 @@ def set_widgets_defaults():
 
     # Ensure the RCSB list is correctly populated from loaded data
     if not RCSB_list:
-        RCSB_list = sorted(
-            PDB_SS.IDList
-        )  # Load PDB IDs into RCSB_list if not populated
+        RCSB_list = sorted(PDB_SS.IDList)  # Load PDB IDs into RCSB_list if not populated
 
     rcsb_selector_widget.options = RCSB_list
     rcsb_selector_widget.value = ss_state_default["rcsid"]
@@ -671,9 +665,7 @@ def render_overlay(
 
     for i, ss in zip(range(tot_ss), ssbonds):
         color = [int(mycol[i][0]), int(mycol[i][1]), int(mycol[i][2])]
-        DisulfideVisualization._render_ss(
-            ss, pl, style="plain", bondcolor=color, res=res
-        )
+        DisulfideVisualization._render_ss(ss, pl, style="plain", bondcolor=color, res=res)
 
     pl.reset_camera()
     return pl
@@ -895,19 +887,13 @@ def save_as_file():
 
     global ss_state
 
-    fname = create_filename(
-        ss_state["rcsid"], ss_state["defaultss"], ss_state["view_mode"]
-    )
+    fname = create_filename(ss_state["rcsid"], ss_state["defaultss"], ss_state["view_mode"])
     screenshot_path = SAVE_PATH / fname
 
     _logger.info("Saving the current view to file %s", str(screenshot_path))
     try:
-        plotter.add_light(
-            pv.Light(position=(10, 10, 10), focal_point=(0, 0, 0), intensity=1.0)
-        )
-        plotter.add_light(
-            pv.Light(position=(-10, -10, 10), focal_point=(0, 0, 0), intensity=0.5)
-        )
+        plotter.add_light(pv.Light(position=(10, 10, 10), focal_point=(0, 0, 0), intensity=1.0))
+        plotter.add_light(pv.Light(position=(-10, -10, 10), focal_point=(0, 0, 0), intensity=0.5))
         plotter.screenshot(str(screenshot_path))
         _logger.info("Saved screenshot to %s", screenshot_path)
     except (OSError, ValueError) as e:

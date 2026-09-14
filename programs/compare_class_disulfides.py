@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """
 Script for comparing disulfides from different structural classes.
@@ -17,7 +16,6 @@ Last Modification: 2025-04-27 23:50:53 -egs-
 
 import pickle
 from pathlib import Path
-from typing import Dict
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -31,8 +29,8 @@ SAVE_DIR.mkdir(exist_ok=True)
 
 
 def compare_energy_distributions(
-    class_disulfides: Dict[str, DisulfideList],
-    class_names: Dict[str, str],
+    class_disulfides: dict[str, DisulfideList],
+    class_names: dict[str, str],
     save_dir: Path = SAVE_DIR,
 ) -> None:
     """
@@ -112,8 +110,8 @@ def compare_energy_distributions(
 
 
 def compare_dihedral_distributions(
-    class_disulfides: Dict[str, DisulfideList],
-    class_names: Dict[str, str],
+    class_disulfides: dict[str, DisulfideList],
+    class_names: dict[str, str],
     save_dir: Path = SAVE_DIR,
 ) -> None:
     """
@@ -199,10 +197,10 @@ def compare_dihedral_distributions(
 
 
 def compare_minimum_energy_disulfides(
-    class_disulfides: Dict[str, DisulfideList],
-    class_names: Dict[str, str],
+    class_disulfides: dict[str, DisulfideList],
+    class_names: dict[str, str],
     save_dir: Path = SAVE_DIR,
-) -> Dict[str, Disulfide]:
+) -> dict[str, Disulfide]:
     """
     Compare the minimum energy disulfides from different classes.
 
@@ -278,10 +276,10 @@ def compare_minimum_energy_disulfides(
 
 
 def compare_average_conformations(
-    class_disulfides: Dict[str, DisulfideList],
-    class_names: Dict[str, str],
+    class_disulfides: dict[str, DisulfideList],
+    class_names: dict[str, str],
     save_dir: str = SAVE_DIR,
-) -> Dict[str, Disulfide]:
+) -> dict[str, Disulfide]:
     """
     Compare the average conformations of disulfides from different classes.
 
@@ -297,9 +295,7 @@ def compare_average_conformations(
 
     print("\nAverage Conformation Comparison:")
     print("-" * 80)
-    print(
-        f"{'Class Name':<15} {'Chi1':>10} {'Chi2':>10} {'Chi3':>10} {'Chi4':>10} {'Chi5':>10}"
-    )
+    print(f"{'Class Name':<15} {'Chi1':>10} {'Chi2':>10} {'Chi3':>10} {'Chi4':>10} {'Chi5':>10}")
     print("-" * 80)
 
     for class_id, disulfide_list in class_disulfides.items():
@@ -307,9 +303,7 @@ def compare_average_conformations(
         avg_conformation = disulfide_list.average_conformation
 
         # Create a disulfide with the average conformation
-        avg_disulfide = Disulfide(
-            name=f"{class_names[class_id]}_avg", torsions=avg_conformation
-        )
+        avg_disulfide = Disulfide(name=f"{class_names[class_id]}_avg", torsions=avg_conformation)
         avg_conformation_disulfides[class_id] = avg_disulfide
 
         # Print information about the average conformation
@@ -318,9 +312,7 @@ def compare_average_conformations(
         )
 
         # Save the average conformation disulfide to a file
-        avg_file = (
-            save_dir / f"cls_{class_names[class_id]}_avg_conformation_disulfide.pkl"
-        )
+        avg_file = save_dir / f"cls_{class_names[class_id]}_avg_conformation_disulfide.pkl"
         with open(avg_file, "wb") as f:
             pickle.dump(avg_disulfide, f)
 
@@ -335,9 +327,7 @@ def compare_average_conformations(
     angles += angles[:1]  # Close the loop
 
     # Generate dynamic colors using viridis colormap
-    colors = plt.get_cmap("viridis")(
-        np.linspace(0, 1, len(avg_conformation_disulfides))
-    )
+    colors = plt.get_cmap("viridis")(np.linspace(0, 1, len(avg_conformation_disulfides)))
     markers = ["o", "s", "^", "D", "v", ">", "<", "p", "*", "h"]
 
     # Plot each class

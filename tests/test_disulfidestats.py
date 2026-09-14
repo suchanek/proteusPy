@@ -58,9 +58,7 @@ class TestDisulfideStats(unittest.TestCase):
 
     def test_calculate_torsion_statistics(self):
         """Test the calculate_torsion_statistics method."""
-        tor_stats, dist_stats = DisulfideStats.calculate_torsion_statistics(
-            self.mock_sslist
-        )
+        tor_stats, dist_stats = DisulfideStats.calculate_torsion_statistics(self.mock_sslist)
         self.assertIsInstance(tor_stats, pd.DataFrame)
         self.assertIsInstance(dist_stats, pd.DataFrame)
         self.assertIn("chi1", tor_stats.columns)
@@ -68,12 +66,8 @@ class TestDisulfideStats(unittest.TestCase):
 
     def test_extract_distances(self):
         """Test the extract_distances method."""
-        sg_distances = DisulfideStats.extract_distances(
-            self.mock_sslist, distance_type="sg"
-        )
-        ca_distances = DisulfideStats.extract_distances(
-            self.mock_sslist, distance_type="ca"
-        )
+        sg_distances = DisulfideStats.extract_distances(self.mock_sslist, distance_type="sg")
+        ca_distances = DisulfideStats.extract_distances(self.mock_sslist, distance_type="ca")
 
         self.assertEqual(len(sg_distances), len(self.mock_sslist))
         self.assertEqual(len(ca_distances), len(self.mock_sslist))

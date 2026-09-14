@@ -446,7 +446,7 @@ def analyze_classes_threaded(
         pbar_index = i + 1
         pbar = tqdm(
             total=end_idx - start_idx,
-            desc=f"{Fore.BLUE}Thread {i+1:2}{Style.RESET_ALL}".ljust(10),
+            desc=f"{Fore.BLUE}Thread {i + 1:2}{Style.RESET_ALL}".ljust(10),
             position=pbar_index,
             leave=False,
             ncols=PBAR_COLS + 10,
@@ -611,9 +611,7 @@ def update_repository(
         source = Path(source_dir) / SS_CONSENSUS_BIN_FILE
         dest = Path(repo_dir) / SS_CONSENSUS_BIN_FILE
         if verbose:
-            print(
-                f"\nCopying binary consensus structures from:\n -> {source} to \n -> {dest}"
-            )
+            print(f"\nCopying binary consensus structures from:\n -> {source} to \n -> {dest}")
         try:
             shutil.copy(source, dest)
         except OSError as e:
@@ -632,9 +630,7 @@ def update_repository(
         source = Path(source_dir) / SS_CONSENSUS_OCT_FILE
         dest = Path(repo_dir) / SS_CONSENSUS_OCT_FILE
         if verbose:
-            print(
-                f"\nCopying octant consensus structures from\n -> {source} to \n -> {dest}"
-            )
+            print(f"\nCopying octant consensus structures from\n -> {source} to \n -> {dest}")
         try:
             shutil.copy(source, dest)
         except OSError as e:

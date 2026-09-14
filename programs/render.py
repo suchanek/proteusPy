@@ -353,9 +353,7 @@ class DisulfideBondRenderer:
             )
 
             if style == "plain":
-                cyl = pv.Cylinder(
-                    origin, direction, radius=bradius, height=height * 2.0
-                )
+                cyl = pv.Cylinder(origin, direction, radius=bradius, height=height * 2.0)
                 pvp.add_mesh(cyl, color=orig_col)
             else:
                 cyl1 = pv.Cylinder(

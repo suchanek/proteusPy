@@ -18,7 +18,6 @@ def cmp_vec(v1: Vector3D, v2: Vector3D, tol: float) -> bool:
 
 
 class TestTurtle3D(unittest.TestCase):
-
     def test_init(self):
         """
         Test initializing a Turtle3D object.

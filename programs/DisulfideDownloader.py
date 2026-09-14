@@ -18,9 +18,7 @@ from Bio.PDB import PDBList
 from tqdm import tqdm
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Paths
 HOME_DIR = os.path.expanduser("~")
@@ -106,9 +104,7 @@ def get_filenames_from_directory(directory_path):
             entry_name = filename[3:-4].lower()  # Remove 'pdb' prefix and '.ent' suffix
             entries.add(entry_name)
         else:
-            logging.error(
-                f"Skipping file: {filename}. Does not comply with naming convention."
-            )
+            logging.error(f"Skipping file: {filename}. Does not comply with naming convention.")
     return entries
 
 
@@ -140,18 +136,14 @@ def DisulfideLoader(idfilename="./ss_ids.txt"):
         if entry not in completed:
             try:
                 # if fetch_and_save_pdb(entry, save_path=PDB_DIR):
-                fname = pdblist.retrieve_pdb_file(
-                    entry, file_format="pdb", pdir=PDB_DIR
-                )
+                fname = pdblist.retrieve_pdb_file(entry, file_format="pdb", pdir=PDB_DIR)
                 if fname != "":
                     completed.add(entry)
                     count += 1
                 else:
                     found = False
                     for format in formats:
-                        fname = pdblist.retrieve_pdb_file(
-                            entry, file_format=format, pdir=PDB_DIR
-                        )
+                        fname = pdblist.retrieve_pdb_file(entry, file_format=format, pdir=PDB_DIR)
                         if fname != "":
                             completed.add(entry)
                             count += 1

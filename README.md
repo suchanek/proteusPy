@@ -1,5 +1,5 @@
 [![PyPI version](https://badge.fury.io/py/proteusPy.svg)](https://badge.fury.io/py/proteusPy)
-![Testing](https://github.com/suchanek/proteusPy/actions/workflows/pytest.yml/badge.svg)
+![Testing](https://github.com/suchanek/proteusPy/actions/workflows/ci.yml/badge.svg)
 [![status](https://joss.theoj.org/papers/45de839b48a550d6ab955c5fbbc508f2/status.svg)](https://joss.theoj.org/papers/45de839b48a550d6ab955c5fbbc508f2)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.11148440-blue.svg)](https://doi.org/10.5281/zenodo.11148440)
 [![API Docs](https://img.shields.io/badge/API%20Documentation-8A2BE2)](https://suchanek.github.io/proteusPy/proteusPy.html)
@@ -157,7 +157,7 @@ The [programs](https://github.com/suchanek/proteusPy/tree/master/programs) subdi
 - [DisulfideExtractor_mp.py](https://github.com/suchanek/proteusPy/blob/master/proteusPy/DisulfideExtractor_mp.py): Extracts the disulfides and creates the database loaders. This program is fully multi-processing, and one can specify the number of cores to use for the extract. The downloaded PDB files must be in $PDB/good. On my 14 core MacbookPro M3 Max the extraction of over 36,000 files and creation of the Disulfide loaders takes a bit over two minutes. This is in contrast to the initial single-threaded version present in the initial release, which takes almost an hour to run! This program is now a part of the module itself and may be invoked with:
 
   ```python
-  proteusPy.DisulfideExtractor --help
+  proteusPy.DisulfideExtractor - -help
   ```
 
 - [DisulfideClass_Analysis.py](https://github.com/suchanek/proteusPy/blob/master/programs/DisulfideClass_Analysis.py): Extracts consensus structures for the binary, sextant and octant classes. Each consensus class is the average structure in torsional space for that class. The number of members of each class is determined by the `cutoff` chosen at the time of program run. These can be found in the `DATA_DIR` directory. This analysis is ongoing.
@@ -238,8 +238,9 @@ To visualize the lowest energy structure in the database:
 from proteusPy import Load_PDB_SS, display_ss_pymol
 
 pdb = Load_PDB_SS(verbose=True, subset=False)
-display_ss_pymol('2q7q', chain='D', proximal=75, distal=140, ray=False, solvent=True, sas=True, fname='2q7q.png')
-
+display_ss_pymol(
+    "2q7q", chain="D", proximal=75, distal=140, ray=False, solvent=True, sas=True, fname="2q7q.png"
+)
 ```
 
 This will display disulfide 75-140 in chain D and save an image to file 2q7q.png. Hit the return key to close the window.

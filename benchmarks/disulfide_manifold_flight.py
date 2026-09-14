@@ -61,22 +61,22 @@ LEVEL_BASES = {"binary": 2, "quadrant": 4, "sextant": 6, "octant": 8}
 
 def parse_args():
     p = argparse.ArgumentParser(description="Manifold flight through disulfide torsional space")
-    p.add_argument("--n", type=int, default=0,
-                   help="Number of disulfides to sample (0 = full database)")
+    p.add_argument(
+        "--n", type=int, default=0, help="Number of disulfides to sample (0 = full database)"
+    )
     p.add_argument("--k", type=int, default=20, help="KNN for graph construction")
     p.add_argument("--subset", action="store_true", help="Use subset loader (faster)")
     p.add_argument("--tau", type=float, default=0.90, help="PCA variance threshold")
     p.add_argument("--w", type=float, default=0.8, help="Manifold weight in blending")
-    p.add_argument("--max-steps", type=int, default=500,
-                   help="Maximum graph hops for fly_toward")
-    p.add_argument("--patience", type=int, default=15,
-                   help="Non-improving hops before stopping")
+    p.add_argument("--max-steps", type=int, default=500, help="Maximum graph hops for fly_toward")
+    p.add_argument("--patience", type=int, default=15, help="Non-improving hops before stopping")
     return p.parse_args()
 
 
 def all_class_ids(angles):
     """Return {level: class_id_str} for all four levels of the hierarchy."""
     from proteusPy.disulfide_tree import classify_angles
+
     return {level: classify_angles(angles, LEVEL_BASES[level]) for level in LEVELS}
 
 
@@ -103,7 +103,7 @@ def load_disulfides(subset: bool, n_sample: int, rng: np.random.Generator):
         console.print(f"  Sampled {n_sample:,} from {len(all_ss):,}")
 
     angles_list = []
-    classes_list = []   # list of dicts: {level: class_id_str}
+    classes_list = []  # list of dicts: {level: class_id_str}
     ids = []
 
     for ss in track(sample, description="  Extracting angles + classes"):
@@ -377,9 +377,7 @@ def main():
     # -----------------------------------------------------------------------
     # 1. Load data with full class hierarchy
     # -----------------------------------------------------------------------
-    X, classes_list, _ = load_disulfides(
-        subset=args.subset, n_sample=args.n, rng=rng
-    )
+    X, classes_list, _ = load_disulfides(subset=args.subset, n_sample=args.n, rng=rng)
 
     # Binary class as integer label for ManifoldModel
     y, _ = binary_label_array(classes_list)
@@ -405,9 +403,7 @@ def main():
     console.print(f"  Fit complete in {time.perf_counter() - t0:.1f}s")
 
     local_dims = [
-        mm._geometries[f"n{i}"].intrinsic_dim
-        for i in range(len(X))
-        if f"n{i}" in mm._geometries
+        mm._geometries[f"n{i}"].intrinsic_dim for i in range(len(X)) if f"n{i}" in mm._geometries
     ]
     console.print(
         f"  Local intrinsic dim: mean={np.mean(local_dims):.1f}  "
@@ -427,7 +423,9 @@ def main():
     #     hierarchy from the inside out.
     #   - Going binary→binary only guarantees one sign-level crossing (too coarse).
     # -----------------------------------------------------------------------
-    console.print("\n[bold]Step 3:[/bold] Octant-class centroids (finest level → maximum traversal) …")
+    console.print(
+        "\n[bold]Step 3:[/bold] Octant-class centroids (finest level → maximum traversal) …"
+    )
 
     octant_ids_present = sorted(set(c["octant"] for c in classes_list))
     centroids = {}
@@ -464,28 +462,28 @@ def main():
         c = centroids[oid]
         marker = " ←ORIGIN" if oid == origin_bid else (" ←DEST" if oid == dest_bid else "")
         cen_table.add_row(
-            oid + marker, str(counts[oid]),
-            f"{c[0]:.1f}", f"{c[1]:.1f}", f"{c[2]:.1f}", f"{c[3]:.1f}", f"{c[4]:.1f}",
+            oid + marker,
+            str(counts[oid]),
+            f"{c[0]:.1f}",
+            f"{c[1]:.1f}",
+            f"{c[2]:.1f}",
+            f"{c[3]:.1f}",
+            f"{c[4]:.1f}",
         )
     console.print(cen_table)
     console.print(
-        f"\n  Flight: octant {origin_bid} → octant {dest_bid}  "
-        f"(centroid dist = {best_dist:.1f}°)"
+        f"\n  Flight: octant {origin_bid} → octant {dest_bid}  (centroid dist = {best_dist:.1f}°)"
     )
     origin_binary = next(c["binary"] for c in classes_list if c["octant"] == origin_bid)
     dest_binary = next(c["binary"] for c in classes_list if c["octant"] == dest_bid)
-    console.print(
-        f"  [dim]Origin binary: {origin_binary}  Dest binary: {dest_binary}[/dim]"
-    )
+    console.print(f"  [dim]Origin binary: {origin_binary}  Dest binary: {dest_binary}[/dim]")
 
     # -----------------------------------------------------------------------
     # 4. Fly the manifold
     # -----------------------------------------------------------------------
     console.print("\n[bold]Step 4:[/bold] Flying along the manifold graph …")
     mm.fly_to_nearest(centroids[origin_bid])
-    path = mm.fly_toward(centroids[dest_bid],
-                         max_steps=args.max_steps,
-                         patience=args.patience)
+    path = mm.fly_toward(centroids[dest_bid], max_steps=args.max_steps, patience=args.patience)
 
     if not path:
         console.print("[red]  No path found — try increasing --n or --k[/red]")
@@ -500,16 +498,18 @@ def main():
         geom = mm._geometries.get(f"n{idx}")
         local_d = geom.intrinsic_dim if geom else 0
         chi = X[idx].tolist() if idx < len(X) else []
-        path_data.append({
-            "node": node_id,
-            "idx": idx,
-            "local_dim": local_d,
-            "chi": chi,
-            "binary": cls.get("binary", "?"),
-            "quadrant": cls.get("quadrant", "?"),
-            "sextant": cls.get("sextant", "?"),
-            "octant": cls.get("octant", "?"),
-        })
+        path_data.append(
+            {
+                "node": node_id,
+                "idx": idx,
+                "local_dim": local_d,
+                "chi": chi,
+                "binary": cls.get("binary", "?"),
+                "quadrant": cls.get("quadrant", "?"),
+                "sextant": cls.get("sextant", "?"),
+                "octant": cls.get("octant", "?"),
+            }
+        )
 
     # Flight table
     flight_table = Table(title="Manifold Flight Path (all four class levels)", show_header=True)
@@ -527,8 +527,13 @@ def main():
     for hop, pd in enumerate(path_data):
         chi = pd["chi"]
         flight_table.add_row(
-            str(hop), pd["node"], str(pd["local_dim"]),
-            pd["binary"], pd["quadrant"], pd["sextant"], pd["octant"],
+            str(hop),
+            pd["node"],
+            str(pd["local_dim"]),
+            pd["binary"],
+            pd["quadrant"],
+            pd["sextant"],
+            pd["octant"],
             *(f"{c:.1f}" for c in chi[:3]) if chi else ["—", "—", "—"],
         )
     console.print(flight_table)
@@ -539,9 +544,7 @@ def main():
         crossings = []
         for i in range(1, len(path_data)):
             if path_data[i][level] != path_data[i - 1][level]:
-                crossings.append(
-                    f"  hop {i:2d}: {path_data[i-1][level]} → {path_data[i][level]}"
-                )
+                crossings.append(f"  hop {i:2d}: {path_data[i - 1][level]} → {path_data[i][level]}")
         label = f"    {level:10s} ({len(crossings)} crossings)"
         if crossings:
             console.print(f"[cyan]{label}[/cyan]")
@@ -553,7 +556,7 @@ def main():
     # -----------------------------------------------------------------------
     # 5. Observer view
     # -----------------------------------------------------------------------
-    landmarks = []   # populated inside try block; always defined for result dict
+    landmarks = []  # populated inside try block; always defined for result dict
     console.print("\n[bold]Step 5:[/bold] ManifoldObserver.observe_path() — view from above …")
     try:
         from proteusPy.manifold_observer import ManifoldObserver
@@ -575,8 +578,12 @@ def main():
             k = path_view["curvatures"][hop]
             d = path_view["intrinsic_dims"][hop]
             obs_table.add_row(
-                str(hop), pd["binary"], pd["quadrant"],
-                f"{h:.4f}", f"{k:.4f}", str(d),
+                str(hop),
+                pd["binary"],
+                pd["quadrant"],
+                f"{h:.4f}",
+                f"{k:.4f}",
+                str(d),
             )
         console.print(obs_table)
 
@@ -602,20 +609,14 @@ def main():
         # Detect peaks (κ > μ+σ) and valleys (κ < μ-σ)
         kappas = path_view["curvatures"]
         mean_k = float(np.mean(kappas))
-        std_k  = float(np.std(kappas))
+        std_k = float(np.std(kappas))
         heights = path_view["heights"]
         mean_h = float(np.mean(heights))
-        std_h  = float(np.std(heights))
+        std_h = float(np.std(heights))
 
-        high_curv = [
-            (i, float(kappas[i]))
-            for i in range(len(path))
-            if kappas[i] > mean_k + std_k
-        ]
+        high_curv = [(i, float(kappas[i])) for i in range(len(path)) if kappas[i] > mean_k + std_k]
         low_curv = [
-            (i, float(kappas[i]))
-            for i in range(len(path))
-            if kappas[i] < max(0, mean_k - std_k)
+            (i, float(kappas[i])) for i in range(len(path)) if kappas[i] < max(0, mean_k - std_k)
         ]
 
         # Build landmarks list (ordered by hop)
@@ -634,16 +635,18 @@ def main():
                 if hop_i > 0 and path_data[hop_i][level] != path_data[hop_i - 1][level]:
                     tags.append(f"CROSS_{level.upper()}")
             if tags:
-                landmarks.append({
-                    "hop": hop_i,
-                    "node": path_data[hop_i]["node"],
-                    "tags": tags,
-                    "curvature": round(float(kappas[hop_i]), 6),
-                    "height": round(float(heights[hop_i]), 6),
-                    "octant": path_data[hop_i]["octant"],
-                    "binary": path_data[hop_i]["binary"],
-                    "chi": path_data[hop_i]["chi"],
-                })
+                landmarks.append(
+                    {
+                        "hop": hop_i,
+                        "node": path_data[hop_i]["node"],
+                        "tags": tags,
+                        "curvature": round(float(kappas[hop_i]), 6),
+                        "height": round(float(heights[hop_i]), 6),
+                        "octant": path_data[hop_i]["octant"],
+                        "binary": path_data[hop_i]["binary"],
+                        "chi": path_data[hop_i]["chi"],
+                    }
+                )
 
         if high_curv:
             console.print(
@@ -675,8 +678,7 @@ def main():
     level_crossings = {}
     for level in LEVELS:
         n_cross = sum(
-            1 for i in range(1, len(path_data))
-            if path_data[i][level] != path_data[i - 1][level]
+            1 for i in range(1, len(path_data)) if path_data[i][level] != path_data[i - 1][level]
         )
         level_crossings[level] = n_cross
 
@@ -687,14 +689,14 @@ def main():
   Centroid distance     : {best_dist:.1f}°
   Path length           : {len(path)} hops
   Arrived at dest       : {"YES ✓" if arrived else f"NO (ended at octant {end_cls})"}
-  Mean local intrinsic d: {np.mean([d['local_dim'] for d in path_data]):.1f}
+  Mean local intrinsic d: {np.mean([d["local_dim"] for d in path_data]):.1f}
   Total time            : {time.perf_counter() - t0:.1f}s
 
   Boundary crossings per level:
-    binary   : {level_crossings['binary']}
-    quadrant : {level_crossings['quadrant']}
-    sextant  : {level_crossings['sextant']}
-    octant   : {level_crossings['octant']}
+    binary   : {level_crossings["binary"]}
+    quadrant : {level_crossings["quadrant"]}
+    sextant  : {level_crossings["sextant"]}
+    octant   : {level_crossings["octant"]}
 """)
 
     elapsed = time.perf_counter() - t0
@@ -706,8 +708,7 @@ def main():
         "elapsed_seconds": round(elapsed, 1),
         "n_disulfides": len(X),
         "hierarchy_classes_present": {
-            level: len(set(c[level] for c in classes_list))
-            for level in LEVELS
+            level: len(set(c[level] for c in classes_list)) for level in LEVELS
         },
         "octant_classes_with_centroids": len(present),
         "origin_octant": origin_bid,
@@ -715,9 +716,7 @@ def main():
         "centroid_distance_deg": round(best_dist, 2),
         "path_length": len(path),
         "arrived": bool(arrived),
-        "mean_path_local_dim": round(
-            float(np.mean([d["local_dim"] for d in path_data])), 2
-        ),
+        "mean_path_local_dim": round(float(np.mean([d["local_dim"] for d in path_data])), 2),
         "level_crossings": level_crossings,
         "observer": obs_summary,
         "landmarks": landmarks,
@@ -733,6 +732,7 @@ def main():
     # -----------------------------------------------------------------------
     import importlib.util as _ilu
     import os as _os
+
     _spec = _ilu.spec_from_file_location(
         "disulfide_flight_visualizer",
         _os.path.join(_os.path.dirname(__file__), "disulfide_flight_visualizer.py"),

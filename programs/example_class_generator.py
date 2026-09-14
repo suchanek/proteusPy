@@ -45,7 +45,7 @@ def main():
         # Display information about the first few disulfides
         print("\nFirst 3 disulfides:")
         for i, disulfide in enumerate(disulfide_list[:3]):
-            print(f"Disulfide {i+1}:")
+            print(f"Disulfide {i + 1}:")
             print(f"  Name: {disulfide.name}")
             print(f"  Dihedrals: {disulfide.dihedrals}")
             print(f"  Energy: {disulfide.energy:.2f} kcal/mol")
@@ -63,9 +63,7 @@ def main():
         class_str = "++++++"  # Corrected class string
         disulfide_list = generator.generate_for_class("+++++")
         if disulfide_list:
-            print(
-                f"Generated {len(disulfide_list)} disulfides for class '+++++' (RH Spiral)."
-            )
+            print(f"Generated {len(disulfide_list)} disulfides for class '+++++' (RH Spiral).")
 
     # Example 2: Generate disulfides for a specific class using class ID
     class_id = "-----"  # The LH Spiral class

@@ -46,9 +46,7 @@ class DataFetchTestCase(unittest.TestCase):
         cls.served.mkdir()
         (cls.served / ASSET).write_bytes(PAYLOAD)
 
-        handler = functools.partial(
-            http.server.SimpleHTTPRequestHandler, directory=str(cls.served)
-        )
+        handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(cls.served))
         socketserver.TCPServer.allow_reuse_address = True
         cls.server = socketserver.TCPServer(("127.0.0.1", 0), handler)
         cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)

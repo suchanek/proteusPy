@@ -21,9 +21,7 @@ MODEL_DIR = PDB / "good"
 PDB_DATA_DIR = PDB / "data"
 
 
-SAVE_DIR = (
-    HOME / "repos" / "proteusPy_priv" / "Disulfide_Chapter/SpringerBookChapter/Figures"
-)
+SAVE_DIR = HOME / "repos" / "proteusPy_priv" / "Disulfide_Chapter/SpringerBookChapter/Figures"
 
 
 def main():

@@ -181,7 +181,9 @@ def build_standard(n_in: int, n_classes: int, lr: float, seed: int):
     return model
 
 
-def build_expand_n1(n_in: int, n_classes: int, lr: float, seed: int, qr_init: bool = False, pca=None):
+def build_expand_n1(
+    n_in: int, n_classes: int, lr: float, seed: int, qr_init: bool = False, pca=None
+):
     """B/D: 30 → 31 → 16 → 8 → 10"""
     tf.random.set_seed(seed)
     n_expand = n_in + 1
@@ -263,9 +265,7 @@ def train_eval(model, X_train, y_train, X_test, y_test, epochs: int, batch: int)
 
     # Convergence: epoch at which val_acc first exceeds 90% of its best
     threshold = 0.9 * best_val
-    converge_epoch = next(
-        (i + 1 for i, v in enumerate(val_accs) if v >= threshold), epochs
-    )
+    converge_epoch = next((i + 1 for i, v in enumerate(val_accs) if v >= threshold), epochs)
 
     return {
         "test_acc": float(test_acc),
@@ -289,8 +289,10 @@ def main():
         return
 
     console.rule("[bold blue]MLP Expand-First Benchmark")
-    console.print(f"\n  epochs={args.epochs}  pca_dim={args.pca_dim}  "
-                  f"batch={args.batch}  lr={args.lr}  n_runs={args.n_runs}\n")
+    console.print(
+        f"\n  epochs={args.epochs}  pca_dim={args.pca_dim}  "
+        f"batch={args.batch}  lr={args.lr}  n_runs={args.n_runs}\n"
+    )
 
     X_train, X_test, y_train, y_test, pca = load_cifar10_pca(args.pca_dim, args.seed)
     n_in = X_train.shape[1]
@@ -298,10 +300,10 @@ def main():
     console.print(f"  Input dim: {n_in}  Classes: {n_classes}\n")
 
     architectures = {
-        "A_standard":  "30→16→8→10  (standard compress)",
-        "B_expand_n1": f"30→{n_in+1}→16→8→10  (N+1 expand)",
-        "C_expand_4x": f"30→{n_in*4}→16→8→10  (×4 Transformer style)",
-        "D_qr_init":   f"30→{n_in+1}→16→8→10  (QR-init normal, then fine-tune)",
+        "A_standard": "30→16→8→10  (standard compress)",
+        "B_expand_n1": f"30→{n_in + 1}→16→8→10  (N+1 expand)",
+        "C_expand_4x": f"30→{n_in * 4}→16→8→10  (×4 Transformer style)",
+        "D_qr_init": f"30→{n_in + 1}→16→8→10  (QR-init normal, then fine-tune)",
     }
 
     all_results = {k: [] for k in architectures}
@@ -311,10 +313,14 @@ def main():
         console.print(f"[bold]Run {run + 1}/{args.n_runs}[/bold]  (seed={seed})")
 
         builders = {
-            "A_standard":  lambda s=seed: build_standard(n_in, n_classes, args.lr, s),
-            "B_expand_n1": lambda s=seed: build_expand_n1(n_in, n_classes, args.lr, s, qr_init=False),
+            "A_standard": lambda s=seed: build_standard(n_in, n_classes, args.lr, s),
+            "B_expand_n1": lambda s=seed: build_expand_n1(
+                n_in, n_classes, args.lr, s, qr_init=False
+            ),
             "C_expand_4x": lambda s=seed: build_expand_4x(n_in, n_classes, args.lr, s),
-            "D_qr_init":   lambda s=seed: build_expand_n1(n_in, n_classes, args.lr, s, qr_init=True, pca=pca),
+            "D_qr_init": lambda s=seed: build_expand_n1(
+                n_in, n_classes, args.lr, s, qr_init=True, pca=pca
+            ),
         }
 
         for key, desc in architectures.items():
@@ -392,10 +398,10 @@ def main():
         verdict = "Geometric expansion did not improve on this dataset configuration."
 
     console.print(f"""
-  Baseline (A)     : {aggregated['A_standard']['mean_test_acc']*100:.2f}%
-  N+1 expand (B)   : {aggregated['B_expand_n1']['mean_test_acc']*100:.2f}%  (Δ={b_delta:+.3f})
-  ×4 expand (C)    : {aggregated['C_expand_4x']['mean_test_acc']*100:.2f}%  (Δ={aggregated['C_expand_4x']['delta_vs_A']:+.3f})
-  QR-init (D)      : {aggregated['D_qr_init']['mean_test_acc']*100:.2f}%  (Δ={d_delta:+.3f},  converge @ ep {d_conv:.0f} vs {a_conv:.0f})
+  Baseline (A)     : {aggregated["A_standard"]["mean_test_acc"] * 100:.2f}%
+  N+1 expand (B)   : {aggregated["B_expand_n1"]["mean_test_acc"] * 100:.2f}%  (Δ={b_delta:+.3f})
+  ×4 expand (C)    : {aggregated["C_expand_4x"]["mean_test_acc"] * 100:.2f}%  (Δ={aggregated["C_expand_4x"]["delta_vs_A"]:+.3f})
+  QR-init (D)      : {aggregated["D_qr_init"]["mean_test_acc"] * 100:.2f}%  (Δ={d_delta:+.3f},  converge @ ep {d_conv:.0f} vs {a_conv:.0f})
 
   Verdict: {verdict}
 """)

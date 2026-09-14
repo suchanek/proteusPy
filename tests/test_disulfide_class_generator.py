@@ -240,9 +240,7 @@ class TestDisulfideClassGenerator:
         class_id = row["class_str"]
         chi_means = tuple(row[f"chi{i}_mean"] for i in range(1, 6))
         chi_stds = tuple(row[f"chi{i}_std"] for i in range(1, 6))
-        disulfide_list = generator._generate_disulfides_for_class(
-            class_id, chi_means, chi_stds
-        )
+        disulfide_list = generator._generate_disulfides_for_class(class_id, chi_means, chi_stds)
         assert isinstance(disulfide_list, DisulfideList)
         assert len(disulfide_list) == 243
         assert disulfide_list.pdb_id == f"Class_{class_id}"
@@ -261,9 +259,7 @@ class TestDisulfideClassGenerator:
         class_id = row["class"]
         chi_means = tuple(row[f"chi{i}_mean"] for i in range(1, 6))
         chi_stds = tuple(row[f"chi{i}_std"] for i in range(1, 6))
-        disulfide_list = generator._generate_disulfides_for_class(
-            class_id, chi_means, chi_stds
-        )
+        disulfide_list = generator._generate_disulfides_for_class(class_id, chi_means, chi_stds)
         first_disulfide = disulfide_list[0]
         assert first_disulfide.name.startswith(f"{class_id}_comb")
 
@@ -288,9 +284,7 @@ class TestDisulfideClassGenerator:
             assert result.pdb_id == "generated_class"
             generator.generate_for_class.assert_called_once_with("new_class")
         with patch.object(generator, "generate_for_class", return_value=None):
-            with pytest.raises(
-                KeyError, match="Class invalid not found or could not be generated"
-            ):
+            with pytest.raises(KeyError, match="Class invalid not found or could not be generated"):
                 generator["invalid"]
 
     def test_class_to_sslist(self, generator):
@@ -310,15 +304,9 @@ class TestDisulfideClassGenerator:
 
     def test_display(self, generator):
         """Test the display method."""
-        with patch(
-            "proteusPy.DisulfideBase.DisulfideList.display_overlay"
-        ) as mock_display:
-            generator.binary_class_disulfides = {
-                "+-+++": DisulfideList([], "test_binary")
-            }
-            generator.octant_class_disulfides = {
-                "12345": DisulfideList([], "test_octant")
-            }
+        with patch("proteusPy.DisulfideBase.DisulfideList.display_overlay") as mock_display:
+            generator.binary_class_disulfides = {"+-+++": DisulfideList([], "test_binary")}
+            generator.octant_class_disulfides = {"12345": DisulfideList([], "test_octant")}
             generator.display("+-+++")
             mock_display.assert_called_once()
             mock_display.reset_mock()

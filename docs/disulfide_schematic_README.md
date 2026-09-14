@@ -27,10 +27,7 @@ ss = PDB_SS[0]  # Get the first disulfide
 
 # Create and save a schematic
 fig, ax = create_disulfide_schematic(
-    disulfide=ss,
-    output_file="disulfide_schematic.png",
-    show_angles=True,
-    style="publication"
+    disulfide=ss, output_file="disulfide_schematic.png", show_angles=True, style="publication"
 )
 ```
 
@@ -41,9 +38,13 @@ from proteusPy.disulfide_schematic import create_disulfide_schematic_from_model
 
 # Create a model disulfide schematic with specific dihedral angles
 fig, ax = create_disulfide_schematic_from_model(
-    chi1=-60, chi2=-60, chi3=-90, chi4=-60, chi5=-60,
+    chi1=-60,
+    chi2=-60,
+    chi3=-90,
+    chi4=-60,
+    chi5=-60,
     output_file="model_disulfide_schematic.png",
-    show_angles=True
+    show_angles=True,
 )
 ```
 
@@ -60,7 +61,7 @@ create_disulfide_schematic(
     show_title=True,
     style="publication",
     dpi=300,
-    figsize=(8, 6)
+    figsize=(8, 6),
 )
 ```
 
@@ -83,13 +84,17 @@ create_disulfide_schematic(
 
 ```python
 create_disulfide_schematic_from_model(
-    chi1=-60, chi2=-60, chi3=-90, chi4=-60, chi5=-60,
+    chi1=-60,
+    chi2=-60,
+    chi3=-90,
+    chi4=-60,
+    chi5=-60,
     output_file=None,
     show_labels=True,
     show_angles=True,
     style="publication",
     dpi=300,
-    figsize=(8, 6)
+    figsize=(8, 6),
 )
 ```
 

@@ -49,10 +49,7 @@ for i, component_name in enumerate(["chi1_chi5", "chi2_chi4", "chi3", "constant"
         if chi_idx > 0 and component_name == "constant":
             continue  # Skip constant for duplicate plots
 
-        values = [
-            components_by_chi[chi_name][j][0][component_name]
-            for j in range(len(angles))
-        ]
+        values = [components_by_chi[chi_name][j][0][component_name] for j in range(len(angles))]
         ax1.plot(
             angles,
             values,
@@ -70,16 +67,11 @@ ax1.grid(True, alpha=0.3)
 
 # Plot DSE components
 ax2 = axs[1]
-for i, component_name in enumerate(
-    ["chi1_chi5", "chi2_chi4", "chi3_2fold", "chi3_3fold"]
-):
+for i, component_name in enumerate(["chi1_chi5", "chi2_chi4", "chi3_2fold", "chi3_3fold"]):
     for chi_idx, chi_name in enumerate(
         ["chi1", "chi3", "chi5"]
     ):  # Select a few key chi angles to avoid clutter
-        values = [
-            components_by_chi[chi_name][j][1][component_name]
-            for j in range(len(angles))
-        ]
+        values = [components_by_chi[chi_name][j][1][component_name] for j in range(len(angles))]
         ax2.plot(
             angles,
             values,
@@ -127,11 +119,7 @@ for i in range(chi2_vals.shape[0]):
 
             # Use DisulfideEnergy for DSE energy
             ss_energy = DisulfideEnergy(
-                chi1,
-                chi2_vals[i, j, k],
-                chi3_vals[i, j, k],
-                chi4_vals[i, j, k],
-                chi5
+                chi1, chi2_vals[i, j, k], chi3_vals[i, j, k], chi4_vals[i, j, k], chi5
             )
             energies_kj[i, j, k] = ss_energy.dse_energy
 
@@ -173,6 +161,4 @@ print(f"\nCorrelation coefficient: {correlation:.3f}")
 # Calculate the percentage of negative values in standard energy
 neg_values = np.sum(energies_kcal_kj < 0)
 total_values = energies_kcal_kj.size
-print(
-    f"\nPercentage of negative values in standard energy: {100 * neg_values/total_values:.2f}%"
-)
+print(f"\nPercentage of negative values in standard energy: {100 * neg_values / total_values:.2f}%")

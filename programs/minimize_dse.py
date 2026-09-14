@@ -82,9 +82,7 @@ if __name__ == "__main__":
 
     print("\n=== DSE Energy Minimization ===")
     min_dse = minimize_dse_energy()
-    print(
-        f"Dihedrals [χ1, χ2, χ3, χ4, χ5]: [{', '.join(f'{x:.1f}' for x in min_dse.dihedrals)}]"
-    )
+    print(f"Dihedrals [χ1, χ2, χ3, χ4, χ5]: [{', '.join(f'{x:.1f}' for x in min_dse.dihedrals)}]")
     print(f"DSE Energy: {min_dse._calculate_dse():.2f} kJ/mol")
     print(f"Standard Energy: {min_dse.energy:.2f} kcal/mol")
     dse_reduction = initial_ss._calculate_dse() - min_dse._calculate_dse()
@@ -92,9 +90,7 @@ if __name__ == "__main__":
 
     print("\n=== Standard Energy Minimization ===")
     min_std = minimize_standard_energy()
-    print(
-        f"Dihedrals [χ1, χ2, χ3, χ4, χ5]: [{', '.join(f'{x:.1f}' for x in min_std.dihedrals)}]"
-    )
+    print(f"Dihedrals [χ1, χ2, χ3, χ4, χ5]: [{', '.join(f'{x:.1f}' for x in min_std.dihedrals)}]")
     print(f"DSE Energy: {min_std._calculate_dse():.2f} kJ/mol")
     print(f"Standard Energy: {min_std.energy:.2f} kcal/mol")
     std_reduction = initial_ss.energy - min_std.energy

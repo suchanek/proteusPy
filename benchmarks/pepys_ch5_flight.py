@@ -268,12 +268,24 @@ def make_figure(
             zorder=6,
         )
     ax1.scatter(
-        path_coords[0, 0], path_coords[0, 1],
-        c="white", s=80, marker="o", zorder=5, edgecolors=color, linewidths=2,
+        path_coords[0, 0],
+        path_coords[0, 1],
+        c="white",
+        s=80,
+        marker="o",
+        zorder=5,
+        edgecolors=color,
+        linewidths=2,
     )
     ax1.scatter(
-        path_coords[-1, 0], path_coords[-1, 1],
-        c="white", s=80, marker="*", zorder=5, edgecolors=color, linewidths=2,
+        path_coords[-1, 0],
+        path_coords[-1, 1],
+        c="white",
+        s=80,
+        marker="*",
+        zorder=5,
+        edgecolors=color,
+        linewidths=2,
     )
     tau_final = hops[-1]["running_tau"]
     tau_str = f"{tau_final:.4f}" if tau_final is not None else "—"
@@ -371,9 +383,7 @@ def run_flight(
     dest_emb = E_aug[dest_idx].astype(np.float64)
 
     for step in range(max_steps):
-        neighbors = [
-            int(j) for j in indices[current] if j != current and j not in visited
-        ]
+        neighbors = [int(j) for j in indices[current] if j != current and j not in visited]
         if not neighbors:
             break
 
@@ -418,9 +428,7 @@ def run_flight(
                 "date": timestamps[idx].strftime("%Y-%m-%d"),
                 "text": texts[idx][:120],
                 "fyear": round(float(fyears[idx]), 4),
-                "running_tau": (
-                    round(running_tau, 4) if running_tau is not None else None
-                ),
+                "running_tau": (round(running_tau, 4) if running_tau is not None else None),
             }
         )
 
@@ -434,21 +442,15 @@ def run_flight(
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="WaveRider Chapter 5 temporal flight")
-    p.add_argument(
-        "--corpus", default=DEFAULT_CORPUS, help="Path to pepys_mpnet_embeddings.json"
-    )
-    p.add_argument(
-        "--origin-date", default="1663-10-21", help="Target origin date (YYYY-MM-DD)"
-    )
+    p.add_argument("--corpus", default=DEFAULT_CORPUS, help="Path to pepys_mpnet_embeddings.json")
+    p.add_argument("--origin-date", default="1663-10-21", help="Target origin date (YYYY-MM-DD)")
     p.add_argument(
         "--origin-entry",
         type=int,
         default=0,
         help="Which entry on origin date to use (0-indexed)",
     )
-    p.add_argument(
-        "--dest-date", default="1664-01-23", help="Target destination date (YYYY-MM-DD)"
-    )
+    p.add_argument("--dest-date", default="1664-01-23", help="Target destination date (YYYY-MM-DD)")
     p.add_argument(
         "--dest-entry",
         type=int,
@@ -465,9 +467,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    console.rule(
-        "[bold blue]WaveRider Chapter 5 — Destination-Relative Temporal Flight"
-    )
+    console.rule("[bold blue]WaveRider Chapter 5 — Destination-Relative Temporal Flight")
 
     # ------------------------------------------------------------------
     # Load corpus
@@ -481,8 +481,7 @@ def main() -> None:
     E, texts, timestamps = load_corpus(str(corpus_path))
     N, D = E.shape
     console.print(
-        f"  {N} entries × {D} dims  "
-        f"({min(timestamps).date()} → {max(timestamps).date()})"
+        f"  {N} entries × {D} dims  ({min(timestamps).date()} → {max(timestamps).date()})"
     )
 
     # L2-normalise
@@ -495,9 +494,7 @@ def main() -> None:
     # Find origin and destination indices
     # ------------------------------------------------------------------
     def entries_on_date(date_str: str) -> list[int]:
-        return [
-            i for i, t in enumerate(timestamps) if t.strftime("%Y-%m-%d") == date_str
-        ]
+        return [i for i, t in enumerate(timestamps) if t.strftime("%Y-%m-%d") == date_str]
 
     origin_candidates = entries_on_date(args.origin_date)
     dest_candidates = entries_on_date(args.dest_date)
@@ -512,9 +509,7 @@ def main() -> None:
     origin_idx = origin_candidates[min(args.origin_entry, len(origin_candidates) - 1)]
     dest_idx = dest_candidates[min(args.dest_entry, len(dest_candidates) - 1)]
 
-    console.print(
-        f"\n[bold]Origin:[/bold]  [{origin_idx}] {timestamps[origin_idx].date()}"
-    )
+    console.print(f"\n[bold]Origin:[/bold]  [{origin_idx}] {timestamps[origin_idx].date()}")
     console.print(f"  {texts[origin_idx][:100]}")
     console.print(f"\n[bold]Dest:  [/bold] [{dest_idx}] {timestamps[dest_idx].date()}")
     console.print(f"  {texts[dest_idx][:100]}")
@@ -526,9 +521,7 @@ def main() -> None:
     # ------------------------------------------------------------------
     # Build destination-relative augmented space
     # ------------------------------------------------------------------
-    console.print(
-        f"\n[bold]Augmenting:[/bold] destination-relative encoding (α={args.alpha}) …"
-    )
+    console.print(f"\n[bold]Augmenting:[/bold] destination-relative encoding (α={args.alpha}) …")
     E_aug = augment_dest_relative(E, fyears, dest_fyear, alpha=args.alpha)
     console.print(f"  {D}D → {E_aug.shape[1]}D  (temporal axis appended)")
     t_col = E_aug[:, -1]
@@ -561,9 +554,7 @@ def main() -> None:
     # ------------------------------------------------------------------
     path_times = fyears[[h["idx"] for h in hops]]
     final_tau = kendall_tau(path_times)
-    monotonicity = (
-        float(np.mean(np.diff(path_times) > 0)) if len(path_times) > 1 else 1.0
-    )
+    monotonicity = float(np.mean(np.diff(path_times) > 0)) if len(path_times) > 1 else 1.0
     reached = hops[-1]["idx"] == dest_idx
 
     console.print()
@@ -637,9 +628,9 @@ def main() -> None:
 
     class _NpEncoder(json.JSONEncoder):
         def default(self, obj):
-            if isinstance(obj, (np.integer,)):
+            if isinstance(obj, np.integer):
                 return int(obj)
-            if isinstance(obj, (np.floating,)):
+            if isinstance(obj, np.floating):
                 return float(obj)
             return super().default(obj)
 
@@ -656,6 +647,7 @@ def main() -> None:
     except Exception as exc:
         console.print(f"[yellow]Figure generation failed: {exc}[/yellow]")
         import traceback
+
         traceback.print_exc()
 
     console.rule("[bold green]Done")

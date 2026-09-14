@@ -290,9 +290,7 @@ class TestDirectedDiscoverer(unittest.TestCase):
     def test_filters_backward_edges(self):
         g = _make_corridor_graph(n=5, ndim=3)
         # Replace with directed discoverer, 60 degree cone
-        g._discoverers = [
-            DirectedDiscoverer(RadiusDiscoverer(threshold=1.5), cone_angle=60.0)
-        ]
+        g._discoverers = [DirectedDiscoverer(RadiusDiscoverer(threshold=1.5), cone_angle=60.0)]
         heading = np.array([1.0, 0.0, 0.0])  # pointing right
         edges = g.discover_neighbors("n2", heading)
         target_ids = {e.target_id for e in edges}
@@ -302,9 +300,7 @@ class TestDirectedDiscoverer(unittest.TestCase):
 
     def test_no_heading_passes_all(self):
         g = _make_corridor_graph(n=3, ndim=3)
-        g._discoverers = [
-            DirectedDiscoverer(RadiusDiscoverer(threshold=1.5), cone_angle=60.0)
-        ]
+        g._discoverers = [DirectedDiscoverer(RadiusDiscoverer(threshold=1.5), cone_angle=60.0)]
         edges = g.discover_neighbors("n1", heading=None)
         self.assertEqual(len(edges), 2)  # n0 and n2
 
@@ -335,6 +331,7 @@ class TestGradientSteering(unittest.TestCase):
     def test_prefers_lower_energy(self):
         def field(x):
             return np.sum(x**2)
+
         strategy = GradientSteering(field, minimize=True)
         current = np.array([5.0, 0.0, 0.0])
         heading = np.array([-1.0, 0.0, 0.0])
@@ -356,9 +353,7 @@ class TestExplorationSteering(unittest.TestCase):
         heading = np.array([1.0, 0.0, 0.0])
         edge = SemanticEdge("a", "b", 0.5)
 
-        path = ReasoningPath(
-            embeddings=[np.array([0.0, 0.0, 0.0]), np.array([1.0, 0.0, 0.0])]
-        )
+        path = ReasoningPath(embeddings=[np.array([0.0, 0.0, 0.0]), np.array([1.0, 0.0, 0.0])])
 
         novel = np.array([0.0, 5.0, 0.0])  # far from visited
         redundant = np.array([0.5, 0.0, 0.0])  # near visited
