@@ -1,6 +1,6 @@
 {
   "format": "1.0",
-  "last_update": "2026-09-14T20:07:06.563191+00:00",
+  "last_update": "2026-09-14T20:20:31.396239+00:00",
   "snapshots": [
     {
       "key": "9d642891f86da793c3505e331c3b506d2abcb2c6",
@@ -562,6 +562,99 @@
           "logo": 15195737,
           "examples": 6475812,
           ".": 5523654,
+          "class_analysis_outputs": 4216133,
+          "data": 1702492,
+          "logdir": 1196522,
+          "lib": 749391,
+          "schematic_outputs": 619324,
+          "programs": 164562,
+          "old": 150319,
+          "tests": 136275,
+          "viewer": 37678,
+          "proteusPy.egg-info": 20671,
+          "analysis": 17744,
+          "scripts": 3171,
+          "runs": 436
+        },
+        "total_files": 339,
+        "total_dirs": 51,
+        "dir_node_counts": {
+          "CHANGELOG.md": 1,
+          "CITATION.cff": 1,
+          "CODE_OF_CONDUCT.md": 1,
+          "LICENSE": 1,
+          "README.md": 1,
+          "TODO.md": 1,
+          "analysis": 4,
+          "benchmarks": 24,
+          "class_analysis_outputs": 23,
+          "commit.txt": 1,
+          "data": 15,
+          "docs": 49,
+          "examples": 15,
+          "get_version.py": 1,
+          "lib": 9,
+          "logdir": 33,
+          "logo": 22,
+          "logo.png": 1,
+          "makefile": 1,
+          "notebooks": 18,
+          "old": 20,
+          "poetry.lock": 1,
+          "poetry.toml": 1,
+          "programs": 35,
+          "proteusPy": 56,
+          "proteusPy.code-workspace": 1,
+          "proteusPy.egg-info": 7,
+          "proteusPy_graph.png": 1,
+          "proteus_logo_sb.png": 1,
+          "pyproject.toml": 1,
+          "release-notes.md": 1,
+          "runs": 4,
+          "schematic_outputs": 7,
+          "scripts": 4,
+          "tests": 18,
+          "viewer": 10
+        }
+      },
+      "deltas": {
+        "vs_previous": null,
+        "vs_baseline": {
+          "nodes": -75,
+          "edges": -75,
+          "files_delta": -54,
+          "dirs_delta": -21
+        }
+      }
+    },
+    {
+      "key": "2026-09-14T20:20:31.395159+00:00",
+      "branch": "master",
+      "timestamp": "2026-09-14T20:20:31.395541+00:00",
+      "version": "0.16.0",
+      "subject": "",
+      "tool": "ftree-kg",
+      "tool_version": "0.16.0",
+      "file": "2026-09-14T20:20:31.395159+00:00.json",
+      "metrics": {
+        "total_nodes": 390,
+        "total_edges": 390,
+        "node_counts": {
+          "directory": 51,
+          "file": 339
+        },
+        "edge_counts": {
+          "CONTAINS": 390
+        },
+        "total_size_bytes": 1161146385,
+        "size_by_top_dir": {
+          "proteusPy": 980378620,
+          "notebooks": 60920415,
+          "benchmarks": 42149012,
+          "docs": 41485678,
+          "logo": 15195737,
+          "examples": 6475812,
+          ".": 5526393,
           "class_analysis_outputs": 4216133,
           "data": 1702492,
           "logdir": 1196522,

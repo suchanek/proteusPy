@@ -1,61 +1,106 @@
-# Release Notes — v0.100.2
+# Release Notes — v0.100.3
 
-> Released: 2026-09-08
+> Released: 2026-09-14
 
-A documentation release. The Springer book chapter built on proteusPy is now
-published, and this release exists to say so where it matters most: on PyPI.
+The disulfide database and prebuilt loaders move off git entirely and onto
+GitHub Release assets, with real checksums now published. CI and release
+automation land for the first time. Packaging metadata converts to PEP 621,
+matching the rest of the fleet, and a tornado transitive dependency is bumped
+to close three Dependabot alerts.
 
 ## Why this release exists
 
-`pyproject.toml` sets `readme = "README.md"`, so the README is rendered as the
-project's long description on PyPI — and PyPI does not allow the metadata of an
-already-published release to be edited. The 0.100.1 page therefore still
-announced the chapter as "going to print" and "in press," and linked the book
-DOI, which resolves to a landing page that never names the chapter. Uploading a
-new version is the only way to correct that.
-
-**No library code changed.** Nothing under `proteusPy/` differs from v0.100.1,
-and no runtime dependency moved, so upgrading changes nothing about how the
-package behaves.
+v0.100.2 was documentation-only; nothing under `proteusPy/` had changed since
+v0.100.1. This release is the opposite: it's the first to ship the data-asset
+distribution work, the first built and published through the new CI/release
+pipeline, and the first with PEP 621 packaging metadata.
 
 ## What changed
 
-**The chapter is published.** *Structural Analysis of Disulfide Bonds in the
-RCSB Protein Data Bank Using proteusPy* is out as chapter 2, pp. 15–32, of
-*Functional Disulphide Bonds: Methods and Protocols*, 2nd edition, edited by
-Philip J. Hogg (Methods in Molecular Biology, vol. 3016; Springer US / Humana
-Press, New York, NY, 2026). Print ISBN 978-1-0716-5157-5, eBook ISBN
-978-1-0716-5158-2.
+### Data distribution is now live
 
-Every citation in the repository now points at the **chapter** DOI,
-`10.1007/978-1-0716-5158-2_2`. The previously used `10.1007/978-1-0716-5158-2`
-is the book DOI; it survives only as an explicit book-level SpringerLink
-pointer. `docs/suchanek_disulfide_chapter_2026.pdf` is relabelled from a
-pre-publication PDF to the author's accepted manuscript, now that a version of
-record exists.
+The large `.pkl` files — the disulfide database (`PDB_all_ss.pkl`, 457 MB) and
+the prebuilt loaders (`PDB_SS_ALL_LOADER.pkl`, 482 MB; `PDB_SS_SUBSET_LOADER.pkl`,
+14 MB) — are GitHub Release assets on a dedicated `data-v1.0` tag rather than
+git-lfs objects. git-lfs bandwidth used to be exhausted by a single clone of
+this repo; release-asset downloads are unmetered and need no credentials.
 
-**Machine-readable citation.** `CITATION.cff` gains the chapter under
-`references:`, so GitHub's "Cite this repository" panel and downstream citation
-tooling surface it alongside the software. `preferred-citation` is deliberately
-unchanged and still names the JOSS paper, which remains the correct citation
-for the package itself. CFF 1.2.0 has no book-chapter reference type, so the
-entry uses `type: generic` with the containing work expressed structurally:
-`collection-title` for the series, `volume`/`volume-title` for the book, and
-`section` for the chapter. The file validates against the CFF 1.2.0 schema.
+`proteusPy/data_fetch.py` is new: `fetch_data_file()` streams a download to a
+`.part` file, verifies it against a sha256 recorded in `DATA_RELEASE_SHA256`,
+and only then moves it into place, so an interrupted transfer can't leave a
+truncated pickle where the loader expects a whole one. `Load_PDB_SS()` fetches
+the prebuilt loader directly now instead of rebuilding it — 14 MB for
+`subset=True` against the 457 MB master list and the minutes a rebuild used to
+cost. Google Drive is a fallback if the release asset can't be fetched, not
+the primary source; `gdown` is imported lazily, only on that path.
 
-**Tooling fix.** `scripts/rebuild-kg.sh` called `pycodekg build-lancedb`, a
-subcommand retired along with LanceDB, so the script failed outright on its
-second step. It now calls `build-index`, the sqlite-vec equivalent, which takes
-the same `--repo`/`--wipe` flags. This is repository tooling and is not part of
-the distributed package.
+The `data-v1.0` release is published with all three assets and their real
+sha256 checksums in `proteusPy/ProteusGlobals.py` — this release is what
+completes that: the release existed but `DATA_RELEASE_SHA256` still held empty
+placeholders until now. Verified by fetching all three into a clean directory
+and confirming each downloads and checksum-verifies. The four small
+consensus/metrics files (`SS_consensus_class_32.pkl`, `SS_consensus_class_oct.pkl`,
+`binary_class_metrics.pkl`, `octant_class_metrics.pkl`) are restored as
+ordinary git blobs, since their git-lfs objects are gone from the server for
+good (`410 Object does not exist`) and what remained in the tree was 130-byte
+pointer text under a `.pkl` name — worse than absent, since the loader would
+try to unpickle a pointer instead of fetching the real file.
 
-**Repository maintenance.** The fleet knowledge-graph packages were relocked to
-current PyPI versions — `doc-kg` 0.22.0, `pycode-kg` 0.23.1, `ftree-kg` 0.14.0,
-with `kgmodule-utils` 0.18.0 as a transitive resolution. These live in the
-optional `kg` Poetry group, which is dev-only and never ships in the wheel, so
-`pip install proteusPy` is unaffected. `.pre-commit-config.yaml` gained a
-top-level `exclude: '^old/'`, and `.gitignore` dropped stale `lancedb/` rules
-that named a path nothing produces since the sqlite-vec migration.
+### CI and release automation
+
+`.github/workflows/ci.yml` and `release.yml` are new, adapted from the doc_kg
+templates. CI runs on every push and pull request to `master`: `ruff format
+--check` plus `ruff check`, the pytest suite, and a wheel smoke test that
+builds the package, installs it into an empty venv, and imports it, so a wheel
+missing a data file or a dependency fails here rather than on a user's
+machine. Release fires on `v*` tags: builds once, creates the GitHub Release
+with this file as the body, and publishes the same artifacts to PyPI. The old
+`pytest.yml` workflow and a `publish-to-pypi.yml` that lived outside
+`workflows/` and so never ran are both removed.
+
+CI's first run caught a real bug: `programs/DisulfideCluster.py` and
+`programs/DisulfidePruner.py` imported `proteusPy.proteusGlobals`; the module
+is `ProteusGlobals`. macOS's case-insensitive filesystem had hidden the
+mismatch — ruff resolved it as a first-party import locally — but on the
+Linux CI runner it doesn't resolve, and both scripts would have raised
+`ModuleNotFoundError` for anyone running them.
+
+### Packaging converts to PEP 621
+
+`pyproject.toml` metadata that only Poetry read — name, version, description,
+dependencies, extras, scripts, urls, classifiers — now lives under `[project]`
+and `[project.optional-dependencies]`, matching every other repo in the fleet.
+`license = "BSD"` becomes the SPDX identifier `"BSD-3-Clause"` with
+`license-files = ["LICENSE"]`, replacing the ambiguous
+`License :: OSI Approved :: BSD License` / `License :: Other/Proprietary
+License` classifier pair PyPI has been showing with an unambiguous
+`License-Expression` in the wheel metadata. A built wheel and sdist were
+diffed against a build from before this change: only the license fields, two
+added Python-version classifiers, and the extra-marker form differ — no
+dependency changed. `[tool.poetry.group.kg]` floors are raised to current
+PyPI: `doc-kg` 0.22.0 → 0.26.0, `pycode-kg` 0.23.1 → 0.27.0, `ftree-kg` 0.14.0
+→ 0.16.0.
+
+### Security
+
+`poetry.lock`: tornado 6.5.7 → 6.5.9, closing three Dependabot alerts
+(GHSA-wwv5-g3v4-889x, GHSA-8423-8fgw-73vq, GHSA-mpf4-983q-p7j4 — cookie
+attribute injection, multipart memory amplification, and an event-loop stall
+from urlencoded body parsing). tornado is not a direct dependency; it arrives
+transitively through bokeh and the jupyter stack, both optional groups, so
+`pip install proteusPy` is unaffected.
+
+### Repository tooling
+
+`.pre-commit-config.yaml` now pins `ruff-pre-commit` at v0.16.0, the version
+Poetry resolves, instead of v0.9.10 — the two had drifted far enough apart
+that the old hook enforced a rule newer ruff has retired, so a tree that
+passed `poetry run ruff check` could still fail at commit time. 41 files were
+reformatted at the 100-column width `pyproject.toml` already declared; every
+one was AST-compared against the prior version, and only
+`programs/compare_class_disulfides.py` has a behavioral-looking diff, where
+pyupgrade replaced `typing.Dict` with `dict`. `.gitignore` now excludes
+`**/.agentkg/`, matching the rest of the fleet.
 
 ## Upgrading
 
@@ -63,5 +108,7 @@ that named a path nothing produces since the sqlite-vec migration.
 $ pip install --upgrade proteusPy
 ```
 
-Nothing to do. There are no API changes, no behavioural changes, and no
-migration steps.
+No API changes. The one behavioral difference: `Load_PDB_SS()` now downloads
+the prebuilt loader from the `data-v1.0` release on first use instead of
+rebuilding it locally, which is faster and no longer requires the 457 MB
+master list to be present up front.
