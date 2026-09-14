@@ -56,6 +56,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The docker image targets now fetch `viewer/data/PDB_SS_ALL_LOADER.pkl` from
   the release instead of expecting to find it in the tree.
 
+- **`.github/PULL_REQUEST_TEMPLATE.md`** — the repository had no pull request
+  template. This one follows the house style the existing PRs already use: lead
+  with why and the evidence for it, then the changes, then a test plan that
+  leaves a box unchecked for anything that could not be verified and says why.
+  Its checklist names the repository's actual tripwires — the `[Unreleased]`
+  changelog section, `check-added-large-files`, and the five surfaces that carry
+  the version number.
+
 ### Removed
 
 - **`.pkl` tracking in `.gitattributes`**, along with the `.pkl` pointers
