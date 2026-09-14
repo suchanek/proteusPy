@@ -91,6 +91,39 @@ LOADER_SUBSET_URL = "https://drive.google.com/uc?id=1puy9pxrClFks0KN9q5PPV_ONKvL
 # SS_LIST_URL="https://drive.google.com/file/uc?id=1-B-uODacYHVEAYtWQhp-s2M4SEWGllM"
 SS_LIST_URL = "https://drive.google.com/uc?id=1-B-uODacYHVEAYtWQhp-s2M4SEWGllM-"
 
+# --- Release-asset data distribution ----------------------------------------
+#
+# The database and the prebuilt loaders are hundreds of megabytes: too large for
+# git and too large to bundle in the wheel. They ride on a GitHub Release as
+# assets instead, the arrangement quiltwright uses for its quilts. Release-asset
+# downloads are unmetered and need no credentials, unlike git-lfs bandwidth,
+# which is how these files used to travel.
+#
+# The assets hang from a dedicated data tag rather than from each version tag:
+# the database is rebuilt only when the extractor reruns, so a patch release
+# does not have to re-upload ~950 MB. Bump DATA_RELEASE_TAG when the extractor
+# produces a new database, then refresh the checksums below with
+# `make data-checksums` and upload with `make data-assets`.
+
+DATA_RELEASE_REPO = "https://github.com/suchanek/proteusPy"
+DATA_RELEASE_TAG = "data-v1.0"
+DATA_RELEASE_BASE_URL = f"{DATA_RELEASE_REPO}/releases/download/{DATA_RELEASE_TAG}"
+
+# Files served from the data release. Values are the sha256 each download must
+# match; an empty string means the asset has not been published and checksummed
+# yet, and the download proceeds unverified. Populate with `make data-checksums`.
+DATA_RELEASE_SHA256 = {
+    SS_PICKLE_FILE: "",
+    LOADER_FNAME: "",
+    LOADER_SUBSET_FNAME: "",
+}
+
+# Where to fall back to when a release asset cannot be fetched. Only the master
+# list has a Drive copy; the loaders are rebuilt from it instead.
+DATA_RELEASE_FALLBACK_URL = {
+    SS_PICKLE_FILE: SS_LIST_URL,
+}
+
 SS_CLASS_DEFINITIONS = """
 Idx,chi1_s,chi2_s,chi3_s,chi4_s,chi5_s,class_id,SS_Classname,FXN
 0,-1,-1,-1,-1,-1,00000,-LHSpiral,UNK

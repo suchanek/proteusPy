@@ -163,7 +163,13 @@ Set in docker-compose.yml:
 The viewer expects database files in `/app/data/`:
 - `PDB_SS_ALL_LOADER.pkl` - Main disulfide bond database
 
-Ensure data files are present before starting the container.
+This file is a release asset rather than part of the repository, so fetch it
+into `viewer/data/` before building the image. The docker targets in the
+makefile do this for you:
+
+```console
+$ make viewer/data/PDB_SS_ALL_LOADER.pkl
+```
 
 ## Performance Notes
 

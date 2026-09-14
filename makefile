@@ -15,6 +15,28 @@ OS_NAME := $(shell uname -s 2>/dev/null || echo Windows_NT)
 # Repository location (can be overridden)
 REPO_DIR ?= $(shell pwd)
 
+# The large .pkl files travel as assets on a dedicated data release rather than
+# in git: release-asset downloads are unmetered, and a single clone of the
+# LFS-tracked database used to exhaust the whole monthly LFS bandwidth quota.
+# The tag is deliberately not a version tag -- the database is rebuilt only when
+# the extractor reruns, so a patch release need not re-upload ~950 MB. Keep
+# DATA_TAG in step with DATA_RELEASE_TAG in proteusPy/ProteusGlobals.py.
+DATA_TAG ?= data-v1.0
+DATA_ASSETS = proteusPy/data/PDB_all_ss.pkl \
+              proteusPy/data/PDB_SS_ALL_LOADER.pkl \
+              proteusPy/data/PDB_SS_SUBSET_LOADER.pkl
+
+# Small enough to stay in git as ordinary blobs, and needed by the wheel.
+TRACKED_PKL = proteusPy/data/PDB_SS_SUBSET_LOADER.pkl \
+              proteusPy/data/SS_consensus_class_oct.pkl \
+              proteusPy/data/SS_consensus_class_32.pkl \
+              proteusPy/data/binary_class_metrics.pkl \
+              proteusPy/data/octant_class_metrics.pkl \
+              data/SS_consensus_class_oct.pkl \
+              data/SS_consensus_class_32.pkl \
+              data/binary_class_metrics.pkl \
+              data/octant_class_metrics.pkl
+
 ifeq ($(OS_NAME), Darwin)
     RM := rm -rf
 else ifeq ($(OS_NAME), Linux)
@@ -28,7 +50,8 @@ endif
 .PHONY: all vers newvers nuke pkg dev clean devclean install \
 	install_dev jup jup_dev format sdist docs upload tag push-tag commit \
 	tests docker docker_hub docker_github docker_all docker_run docker_purge \
-	update_pyproject_version info conda_env bootstrap bld wheels
+	update_pyproject_version info conda_env bootstrap bld wheels \
+	data-assets data-checksums data-restore
 
 all: docs bld docker_all
 
@@ -192,6 +215,44 @@ docker_run:
 
 docker_purge:
 	docker system prune -a
+
+# Fetch the full prebuilt loader for the viewer image. It is a release asset, so
+# the docker targets below pull it on demand instead of finding it in the tree.
+viewer/data/PDB_SS_ALL_LOADER.pkl:
+	@mkdir -p viewer/data
+	python -c "from proteusPy.data_fetch import fetch_data_file; \
+		fetch_data_file('PDB_SS_ALL_LOADER.pkl', destdir='viewer/data', verbose=True)"
+
+data-assets:
+	@for f in $(DATA_ASSETS); do \
+		test -s "$$f" || { echo "missing $$f -- build it with 'make bootstrap' first"; exit 1; }; \
+	done
+	@gh release view $(DATA_TAG) >/dev/null 2>&1 || \
+		gh release create $(DATA_TAG) --title "proteusPy data $(DATA_TAG)" \
+			--notes "Disulfide database and prebuilt loaders for proteusPy. Fetched automatically by proteusPy.data_fetch."
+	gh release upload $(DATA_TAG) $(DATA_ASSETS) --clobber
+	@echo "Uploaded. Now run 'make data-checksums' and paste the result into proteusPy/ProteusGlobals.py."
+
+data-checksums:
+	@echo "DATA_RELEASE_SHA256 = {"
+	@for f in $(DATA_ASSETS); do \
+		test -s "$$f" || { echo "missing $$f"; exit 1; }; \
+		printf '    "%s": "%s",\n' "$$(basename $$f)" "$$(shasum -a 256 $$f | cut -d" " -f1)"; \
+	done
+	@echo "}"
+
+# One-time step completing the move off git-lfs: re-add the small .pkl files as
+# ordinary blobs. Their lfs objects are gone from the server, so the only copies
+# are local -- this refuses to commit a leftover pointer in their place.
+data-restore:
+	@for f in $(TRACKED_PKL); do \
+		test -s "$$f" || { echo "missing $$f -- build it with 'make bootstrap' first"; exit 1; }; \
+		head -c 40 "$$f" | grep -q "^version https://git-lfs" && \
+			{ echo "$$f is still an lfs pointer, not the real file"; exit 1; }; \
+		git add -- "$$f"; \
+		echo "staged $$f"; \
+	done
+	@echo "Review with 'git diff --cached --stat', then commit."
 
 info:
 	@echo "Available targets in this Makefile:"

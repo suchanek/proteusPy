@@ -9,6 +9,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Large `.pkl` files are now GitHub Release assets rather than git-lfs objects.**
+  The disulfide database (`PDB_all_ss.pkl`, 457 MB) and the prebuilt loaders
+  (`PDB_SS_ALL_LOADER.pkl`, 490 MB; `PDB_SS_SUBSET_LOADER.pkl`, 14 MB) are
+  published as assets on a dedicated data release and fetched on demand, the
+  arrangement quiltwright uses for its quilts. Release-asset downloads are
+  unmetered, whereas a single `git clone` of the lfs-tracked database consumed
+  the entire monthly lfs bandwidth quota — and in practice the repository's lfs
+  objects are no longer retrievable at all (the server answers `410 Object does
+  not exist`), so every `.pkl` in the tree had become a dangling pointer.
+
+  The assets hang from a dedicated tag (`DATA_RELEASE_TAG`, currently
+  `data-v1.0`) rather than from each version tag: the database is rebuilt only
+  when the extractor reruns, so a patch release does not have to re-upload
+  ~950 MB.
+
+- **`Load_PDB_SS()` now downloads the prebuilt loader instead of rebuilding it.**
+  On a first run it fetches the loader asset directly — 14 MB for
+  `subset=True`, against the 457 MB master list and the minutes of filtering
+  the rebuild used to cost. Passing `percentile` still bootstraps from the
+  master list, since those cutoffs have to be applied while filtering, and any
+  download failure falls back to the old rebuild path.
+
+- **Google Drive is now a fallback, not the primary source.** `SS_LIST_URL` is
+  still consulted if the release asset cannot be fetched, so a botched upload or
+  a yanked release does not strand anyone. `gdown` is imported lazily, only on
+  that path.
+
+### Added
+
+- **`proteusPy/data_fetch.py`** — `fetch_data_file()`, `data_asset_url()` and
+  `sha256_file()`, all re-exported from the package. A download is streamed to a
+  `.part` file, checked against the sha256 recorded in `DATA_RELEASE_SHA256`, and
+  only then moved into place, so an interrupted transfer cannot leave a truncated
+  pickle where the loader expects a whole one. Covered by
+  `tests/test_data_fetch.py`, which serves a throwaway HTTP server in place of
+  the release and touches neither the network nor the real data directory.
+
+- **`make data-assets` / `make data-checksums`** — upload the three large files
+  to the data release, and regenerate the checksum table to paste into
+  `ProteusGlobals.py`. `make data-restore` re-adds the small `.pkl` files as
+  ordinary git blobs, refusing to commit a leftover lfs pointer in their place.
+
+- The docker image targets now fetch `viewer/data/PDB_SS_ALL_LOADER.pkl` from
+  the release instead of expecting to find it in the tree.
+
+### Removed
+
+- **`.pkl` tracking in `.gitattributes`**, along with the `.pkl` pointers
+  themselves. Their lfs objects are gone from the server, so what remained in
+  the tree was 130-byte pointer text under a `.pkl` name — worse than absence,
+  since the loader would try to unpickle it instead of fetching the real file.
+  The small files (`SS_consensus_class_*.pkl`, `*_class_metrics.pkl`, and the
+  subset loader) belong in git as plain blobs; re-add them from a working copy
+  that has the real files with `make data-restore`.
+
+
 ## [0.100.2] - 2026-09-08
 
 Documentation and repository maintenance only. No library code changed in this

@@ -60,6 +60,7 @@ from .atoms import (
     SPECULARITY,
 )
 from .backbone_loader import BackboneLoader, BackboneResidue
+from .data_fetch import data_asset_url, fetch_data_file, sha256_file
 from .disulfide_tree import (
     DisulfideTree,
     TreeNodeData,
@@ -138,6 +139,9 @@ from .ProteusGlobals import (
     BINARY_CLASS_METRICS_FILE,
     CA_CUTOFF,
     CAMERA_POS,
+    DATA_RELEASE_BASE_URL,
+    DATA_RELEASE_SHA256,
+    DATA_RELEASE_TAG,
     FONTSIZE,
     LOADER_ALL_MASTER_URL,
     LOADER_FNAME,
