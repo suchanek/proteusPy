@@ -22,7 +22,7 @@ from tqdm import tqdm
 
 from proteusPy import Load_PDB_SS
 from proteusPy.DisulfideBase import DisulfideList
-from proteusPy.proteusGlobals import Torsion_DF_Cols
+from proteusPy.ProteusGlobals import Torsion_DF_Cols
 
 # override the default location for the stored disulfides, which defaults to DATA_DIR
 datadir = "/Users/egs/PDB/data/"

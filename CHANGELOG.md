@@ -92,6 +92,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   changelog section, `check-added-large-files`, and the five surfaces that carry
   the version number.
 
+### Fixed
+
+- **`programs/DisulfideCluster.py`, `programs/DisulfidePruner.py`** imported
+  `proteusPy.proteusGlobals`; the module is `ProteusGlobals`. macOS's
+  case-insensitive filesystem hid the mismatch, and ruff there classified the
+  import as first-party. On the Linux CI runner the file does not resolve, so
+  ruff sorted it as third-party and I001 failed, and the scripts themselves
+  would have raised `ModuleNotFoundError`.
+
 ### Removed
 
 - **`.github/workflows/pytest.yml`**, superseded by `ci.yml`, and
