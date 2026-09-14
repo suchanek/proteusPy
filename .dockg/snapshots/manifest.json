@@ -1,6 +1,6 @@
 {
   "format": "1.0",
-  "last_update": "2026-08-22T17:07:36.178788+00:00",
+  "last_update": "2026-09-14T19:34:40.999309+00:00",
   "snapshots": [
     {
       "key": "9d642891f86da793c3505e331c3b506d2abcb2c6",
@@ -504,6 +504,51 @@
           "nodes": -1,
           "edges": -214,
           "coverage_delta": 0.01941539351781607,
+          "issues_delta": 0
+        }
+      }
+    },
+    {
+      "key": "2026-09-14T19:34:40.998227+00:00",
+      "branch": "fix/tornado-dependabot",
+      "timestamp": "2026-09-14T19:34:40.998285+00:00",
+      "version": "0.26.0",
+      "subject": "",
+      "tool": "doc-kg",
+      "tool_version": "0.26.0",
+      "file": "2026-09-14T19:34:40.998227+00:00.json",
+      "metrics": {
+        "db_path": ".dockg/graph.sqlite",
+        "total_nodes": 2540,
+        "total_edges": 15198,
+        "node_counts": {
+          "chunk": 412,
+          "document": 22,
+          "entity": 768,
+          "keyword": 762,
+          "section": 239,
+          "topic": 337
+        },
+        "edge_counts": {
+          "CONTAINS": 651,
+          "CO_OCCURS_WITH": 10094,
+          "HAS_KEYWORD": 1647,
+          "HAS_TOPIC": 416,
+          "MENTIONS_ENTITY": 1763,
+          "NEXT": 164,
+          "SIMILAR_TO": 463
+        },
+        "meaningful_nodes": 2518,
+        "coverage_score": 0.9830097087378641,
+        "issues_count": 0,
+        "complexity_median": 18.0
+      },
+      "deltas": {
+        "vs_previous": null,
+        "vs_baseline": {
+          "nodes": 225,
+          "edges": 963,
+          "coverage_delta": 0.0165718750231425,
           "issues_delta": 0
         }
       }

@@ -101,6 +101,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ruff sorted it as third-party and I001 failed, and the scripts themselves
   would have raised `ModuleNotFoundError`.
 
+### Changed
+
+- **`pyproject.toml` converted to PEP 621**, matching the rest of the fleet.
+  Metadata that only Poetry read (`name`, `version`, `description`, `readme`,
+  `authors`, `license`, `keywords`, `classifiers`, dependencies, extras,
+  scripts, urls) now lives under `[project]` and `[project.optional-dependencies]`
+  instead of `[tool.poetry]`; `[tool.poetry]` keeps only what has no PEP 621
+  equivalent (`packages`, `include`, `exclude`). `license = "BSD"` becomes the
+  SPDX identifier `license = "BSD-3-Clause"` with `license-files = ["LICENSE"]`,
+  replacing the ambiguous `License :: OSI Approved :: BSD License` /
+  `License :: Other/Proprietary License` classifier pair PyPI currently shows
+  with an unambiguous `License-Expression` in the wheel metadata. Dependency
+  version pins (`colorama = "0.4.6"`) become PEP 508 strings
+  (`"colorama==0.4.6"`); the `viz3d` and `all` extras (identical sets) move to
+  `[project.optional-dependencies]`. The built wheel and sdist were diffed
+  against a build from before this change: the only metadata differences are
+  the license fields, the added `Programming Language :: Python :: 3` and
+  `:: 3.13` classifiers (3.13 was already in `requires-python`; the wheel
+  simply hadn't declared it), and `extra == "viz3d" or extra == "all"`
+  becoming two separate `Requires-Dist` lines per PEP 621's per-extra form
+  (same resolution). `twine check` passes on both artifacts, and installing
+  the wheel into a clean venv still imports `proteusPy`.
+- **`[tool.poetry.group.kg]` floors raised**: `doc-kg` 0.22.0 -> 0.26.0,
+  `pycode-kg` 0.23.1 -> 0.27.0, `ftree-kg` 0.14.0 -> 0.16.0, matching current
+  PyPI. `poetry install --with kg` resolves and all three import cleanly.
+
 ### Security
 
 - **`poetry.lock`**: tornado 6.5.7 -> 6.5.9, closing Dependabot alerts 159,

@@ -1232,19 +1232,19 @@ files = [
 
 [[package]]
 name = "doc-kg"
-version = "0.22.0"
+version = "0.26.0"
 description = "A tool to build a semantically searchable knowledge graph from markdown and text documents"
 optional = false
 python-versions = "<3.14,>=3.12"
 groups = ["kg"]
 files = [
-    {file = "doc_kg-0.22.0-py3-none-any.whl", hash = "sha256:9ad50cad83ac37518ff916b44342c72cbb1972034963b3ab4ebbfd21e8361a43"},
-    {file = "doc_kg-0.22.0.tar.gz", hash = "sha256:77ccf66da16dee6c79ce22cebd08d9c27f1ec907f5f9bb32c67f096cb258dcc0"},
+    {file = "doc_kg-0.26.0-py3-none-any.whl", hash = "sha256:0827bed5b18c8f72650fb2b7c823850a49381db4979bcce8905e87e7a0ef14b0"},
+    {file = "doc_kg-0.26.0.tar.gz", hash = "sha256:a7b0968b665c46fe8a8220095f06347f3650f6ee778f29573a5a51233d904c71"},
 ]
 
 [package.dependencies]
 click = ">=8.1.0,<9"
-kgmodule-utils = {version = ">=0.18.0", extras = ["semantic"]}
+kgmodule-utils = {version = ">=0.20.0", extras = ["semantic"]}
 mcp = ">=1.0.0,<2"
 pymupdf4llm = ">=0.0.17"
 pyyaml = ">=6.0.0"
@@ -1477,25 +1477,25 @@ tqdm = ["tqdm"]
 
 [[package]]
 name = "ftree-kg"
-version = "0.14.0"
+version = "0.16.0"
 description = "KGModule for file tree knowledge graphs"
 optional = false
 python-versions = "<3.14,>=3.12"
 groups = ["kg"]
 files = [
-    {file = "ftree_kg-0.14.0-py3-none-any.whl", hash = "sha256:b1e2397741ea03a6e9a5cd24555d43dd36a5c517091b64974c593fe7f68d67e5"},
-    {file = "ftree_kg-0.14.0.tar.gz", hash = "sha256:0cffca37f441de76289ff8affc7ae2697bbb6e4b52ba4040f9061193958180ed"},
+    {file = "ftree_kg-0.16.0-py3-none-any.whl", hash = "sha256:fd3314d3171ed95ce70f2cac354ef4ad96e5b3e90ab48ae0e05063dadb40feed"},
+    {file = "ftree_kg-0.16.0.tar.gz", hash = "sha256:8c0fc21e7a70a38b697fe260456bebdcb6ea5637e5351a36992a5960a227a0e0"},
 ]
 
 [package.dependencies]
 click = ">=8.1.0,<9"
-kgmodule-utils = {version = ">=0.18.0", extras = ["semantic", "sqlite-vec"]}
+kgmodule-utils = {version = ">=0.20.0", extras = ["semantic", "sqlite-vec"]}
 mcp = ">=1.0.0,<2"
 pillow = ">=10.0.0"
 rich = ">=13.0.0,<15.0.0"
 
 [package.extras]
-adapter = ["kg-rag (>=0.12.0)"]
+adapter = ["kg-rag (>=0.14.0)"]
 
 [[package]]
 name = "gast"
@@ -2737,14 +2737,14 @@ type = ["pygobject-stubs", "pytest-mypy (>=1.0.1)", "shtab", "types-pywin32"]
 
 [[package]]
 name = "kgmodule-utils"
-version = "0.18.0"
+version = "0.21.0"
 description = "Shared types, graph store, semantic index, and pipeline base for the KGModule SDK"
 optional = false
 python-versions = "<3.14,>=3.12"
 groups = ["kg"]
 files = [
-    {file = "kgmodule_utils-0.18.0-py3-none-any.whl", hash = "sha256:230adc9bdeb517867c18d9f357d25f619f66a64aee7fef0ee9a7cc125553a818"},
-    {file = "kgmodule_utils-0.18.0.tar.gz", hash = "sha256:b8b02d1f5397e39d1459b8f05af0ae29b218ea183ad21f2a37b533fbe75725c7"},
+    {file = "kgmodule_utils-0.21.0-py3-none-any.whl", hash = "sha256:45770743cb45604bc3d253d63b5d1ba9a28de795b508fe415d7fdb1c9152098d"},
+    {file = "kgmodule_utils-0.21.0.tar.gz", hash = "sha256:b40d48c0cd303b08500eb64b0ddd055518385e1a27d04ed9a6ef6a4eecd7468b"},
 ]
 
 [package.dependencies]
@@ -2764,7 +2764,7 @@ synthesis = ["httpx (>=0.27.0)", "openai (>=1.30.0)", "pillow (>=10.0.0)"]
 synthesis-mflux = ["httpx (>=0.27.0)", "mflux (>=0.9.0)", "openai (>=1.30.0)", "pillow (>=10.0.0)"]
 viz = ["pyvis (>=0.3.2)"]
 viz3d = ["numpy (>=1.24.0)"]
-viz3d-qt = ["PyQt5 (>=5.15.0)", "numpy (>=1.24.0)", "pyvista (>=0.44.0)", "quiltwright (>=0.6.0)"]
+viz3d-qt = ["PyQt5 (>=5.15.0)", "numpy (>=1.24.0)", "pyvista (>=0.44.0)", "quiltwright (>=0.7.0)"]
 viz3d-render = ["numpy (>=1.24.0)", "pyvista (>=0.44.0)"]
 
 [[package]]
@@ -5139,19 +5139,19 @@ tests = ["pytest"]
 
 [[package]]
 name = "pycode-kg"
-version = "0.23.1"
+version = "0.27.0"
 description = "A tool to build a searchable knowledge graph from Python repositories"
 optional = false
 python-versions = "<3.14,>=3.12"
 groups = ["kg"]
 files = [
-    {file = "pycode_kg-0.23.1-py3-none-any.whl", hash = "sha256:3904100f333a688aacbd1e637bf52dec9d3adaa3e79786cd8848f2203e305f1c"},
-    {file = "pycode_kg-0.23.1.tar.gz", hash = "sha256:b3896b9043d5b978239af2e7a5ecb09eb3cb8ee906b696fd8d7015050fde4926"},
+    {file = "pycode_kg-0.27.0-py3-none-any.whl", hash = "sha256:39eac05f5fc3be2e39ad9bff5789fc5824721a5ca4311f47511b2cfc4c12db8f"},
+    {file = "pycode_kg-0.27.0.tar.gz", hash = "sha256:bc2d4f591a095897301b24c3b4b64b7e04aebaf36394381cc264610540178e80"},
 ]
 
 [package.dependencies]
 click = ">=8.1.0,<9"
-kgmodule-utils = {version = ">=0.13.1", extras = ["semantic", "viz3d"]}
+kgmodule-utils = {version = ">=0.20.0", extras = ["semantic", "viz3d"]}
 mcp = ">=1.0.0,<2"
 networkx = ">=3.0"
 numpy = ">=1.24.0"
@@ -5163,9 +5163,9 @@ starlette = ">=0.49.1,<1.4.0"
 torch = ">=2.5.1"
 
 [package.extras]
-all = ["PyQt5 (>=5.15.0)", "markdown (>=3.6)", "param (>=2.0.0)", "plotly (>=5.14.0)", "pyvis (>=0.3.2)", "pyvista (>=0.44.0)", "pyvistaqt (>=0.11.0)", "quiltwright (>=0.4.0)", "streamlit (>=1.56.0)", "trame-vtk (>=2.0.0)"]
+all = ["PyQt5 (>=5.15.0)", "markdown (>=3.6)", "param (>=2.0.0)", "plotly (>=5.14.0)", "pyvis (>=0.3.2)", "pyvista (>=0.44.0)", "pyvistaqt (>=0.11.0)", "quiltwright (>=0.8.0)", "streamlit (>=1.56.0)", "trame-vtk (>=2.0.0)"]
 viz = ["plotly (>=5.14.0)", "pyvis (>=0.3.2)", "streamlit (>=1.56.0)"]
-viz3d = ["PyQt5 (>=5.15.0)", "kgmodule-utils[viz3d-render] (>=0.12.1)", "markdown (>=3.6)", "param (>=2.0.0)", "pyvistaqt (>=0.11.0)", "quiltwright (>=0.4.0)", "trame-vtk (>=2.0.0)"]
+viz3d = ["PyQt5 (>=5.15.0)", "kgmodule-utils[viz3d-qt,viz3d-render] (>=0.20.0)", "markdown (>=3.6)", "param (>=2.0.0)", "pyvistaqt (>=0.11.0)", "quiltwright (>=0.8.0)", "trame-vtk (>=2.0.0)"]
 
 [[package]]
 name = "pycparser"
@@ -8059,10 +8059,10 @@ files = [
 ]
 
 [extras]
-all = ["PyQt5", "markdown", "pyvistaqt", "trame-vtk"]
-viz3d = ["PyQt5", "markdown", "pyvistaqt", "trame-vtk"]
+all = ["markdown", "pyqt5", "pyvistaqt", "trame-vtk"]
+viz3d = ["markdown", "pyqt5", "pyvistaqt", "trame-vtk"]
 
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<3.14"
-content-hash = "e036ed1dec62f358321f4182fc517735b82120e1bccce79a34125570001aa6d3"
+content-hash = "ec9fcff81c3ae902ac6d0980ac95691d96a1ae1287380745d2af5274ade174e3"
