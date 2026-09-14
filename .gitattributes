@@ -1,5 +1,8 @@
-*.pkl filter=lfs diff=lfs merge=lfs -text
+# The .pkl data files are no longer tracked here: the large ones ride on the
+# proteusPy data release as assets (see proteusPy/data_fetch.py) and the small
+# ones are ordinary git blobs. Release-asset downloads are unmetered, where a
+# single clone of the LFS-tracked database exhausted the whole monthly LFS
+# bandwidth quota.
 *.whl filter=lfs diff=lfs merge=lfs -text
 *.mp4 filter=lfs diff=lfs merge=lfs -text
-viewer/data/PDB_SS_ALL_LOADER.pkl filter=lfs diff=lfs merge=lfs -text
 *.ipynb filter=lfs diff=lfs merge=lfs -text

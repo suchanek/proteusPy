@@ -29,8 +29,13 @@ notebooks/.ipynb_checkpoints/
 # VS Code
 .vscode/
 
-# Large data / binary artifacts
-proteusPy/data/*.pkl
+# Large data / binary artifacts. The big .pkl files are release assets, fetched
+# on demand into the package data dir; the small ones are tracked normally, so
+# this ignores the downloads by name rather than by glob.
+proteusPy/data/PDB_all_ss.pkl
+proteusPy/data/PDB_all_ss_master.pkl
+proteusPy/data/PDB_SS_ALL_LOADER.pkl
+viewer/data/PDB_SS_ALL_LOADER.pkl
 proteusPy/data/*.hdf5
 proteusPy/data/*.db
 

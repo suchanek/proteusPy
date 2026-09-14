@@ -56,7 +56,7 @@ def main():
     print("Percentile cutoff: ", args.percentile)
     print("Verbose: ", args.verbose)
     print("Data Directory: ", DATA_DIR)
-    print("-> Downloading total Disulfide list from Google Drive")
+    print("-> Downloading total Disulfide list from the proteusPy data release")
 
     pdb_ss = pp.Bootstrap_PDB_SS(
         loadpath=DATA_DIR,

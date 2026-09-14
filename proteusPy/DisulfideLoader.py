@@ -24,12 +24,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-import gdown
 import pandas as pd
 import plotly_express as px
 from pympler import asizeof
 
 from proteusPy import __version__
+from proteusPy.data_fetch import fetch_data_file
 from proteusPy.DisulfideBase import Disulfide, DisulfideList
 from proteusPy.DisulfideClassGenerator import DisulfideClassGenerator
 from proteusPy.DisulfideClassManager import DisulfideClassManager
@@ -148,17 +148,20 @@ class DisulfideLoader:
         try:
             # Check if the file exists before attempting to open it
             if not full_path.exists():
-                fname = SS_PICKLE_FILE
-                url = SS_LIST_URL
-
-                _fname = Path(DATA_DIR) / fname
+                _fname = Path(DATA_DIR) / SS_PICKLE_FILE
 
                 if not _fname.exists():
                     if self.verbose:
                         _logger.info(
-                            "Master SS list unavailable. Downloading Disulfide Database from Drive..."
+                            "Master SS list unavailable. Downloading the Disulfide "
+                            "Database from the proteusPy data release..."
                         )
-                    gdown.download(url, str(_fname), quiet=False)
+                    fetch_data_file(
+                        SS_PICKLE_FILE,
+                        destdir=DATA_DIR,
+                        verbose=self.verbose,
+                        fallback_url=SS_LIST_URL,
+                    )
 
             with open(full_path, "rb") as f:
                 sslist = pickle.load(f)
@@ -1094,9 +1097,9 @@ def Load_PDB_SS(
 ) -> DisulfideLoader:
     """
     Load the fully instantiated Disulfide database from the specified file. This function
-    will load the pre-built database if available, or bootstrap a new loader by downloading
-    the data from Google Drive if needed. Use the provided parameters to control the loading
-    behavior, filtering cutoffs, and verbosity.
+    will load the pre-built database if available, or fetch it from the proteusPy data
+    release if needed. Use the provided parameters to control the loading behavior,
+    filtering cutoffs, and verbosity.
 
     :param loadpath: Path from which to load the database; defaults to DATA_DIR.
     :type loadpath: str
@@ -1108,7 +1111,7 @@ def Load_PDB_SS(
     :type cutoff: float
     :param sg_cutoff: Sγ distance cutoff used to filter disulfides; defaults to SG_CUTOFF.
     :type sg_cutoff: float
-    :param force: If True, forces re-loading from Google Drive even if the file exists; defaults to False.
+    :param force: If True, re-fetches the loader even if the file exists; defaults to False.
     :type force: bool
     :param percentile: Percentile (0-100) to compute cutoffs dynamically; if set to -1.0, the percentile method is not used.
     :type percentile: float
@@ -1125,15 +1128,45 @@ def Load_PDB_SS(
         <Disulfide 6dmb_203A_226A, Source: 6dmb, Resolution: 3.0 Å>
     """
 
-    # normally the .pkl files are local, EXCEPT for the first run from a newly-installed proteusPy
-    # distribution. In that case we need to download the files for all disulfides and the subset
-    # from my Google Drive. This is a one-time operation.
+    # Normally the .pkl files are local, EXCEPT for the first run from a newly
+    # installed proteusPy distribution. In that case the loader is fetched from
+    # the proteusPy data release, where it rides as an asset. This is a one-time
+    # operation.
 
     _fname_sub = Path(loadpath) / LOADER_SUBSET_FNAME
     _fname_all = Path(loadpath) / LOADER_FNAME
     _fpath = _fname_sub if subset else _fname_all
 
     if not _fpath.exists() or force is True:
+        # Downloading the prebuilt loader beats rebuilding it: the subset loader
+        # is 14 MB against the 457 MB master list, and even the full loader saves
+        # the minutes a rebuild costs. A custom percentile has to be applied
+        # while filtering, so that case still bootstraps from the master list.
+        if percentile <= 0.0:
+            try:
+                fetch_data_file(
+                    _fpath.name,
+                    destdir=loadpath,
+                    verbose=verbose,
+                    force=force,
+                )
+            # Any failure here -- no asset, no network, bad checksum -- means
+            # falling back to the rebuild below rather than giving up.
+            except Exception as exc:
+                _logger.warning(
+                    "Could not fetch the prebuilt loader %s (%s); building it instead.",
+                    _fpath.name,
+                    exc,
+                )
+            else:
+                if verbose:
+                    _logger.info("Reading prebuilt loader from: %s...", _fpath)
+                with open(_fpath, "rb") as f:
+                    loader = pickle.load(f)
+                if verbose:
+                    loader.describe()
+                return loader
+
         if verbose:
             _logger.info(f"Bootstrapping new loader: {str(_fpath)}... ")
 
@@ -1171,9 +1204,9 @@ def Bootstrap_PDB_SS(
     percentile: float = -1.0,
 ) -> DisulfideLoader | None:
     """
-    Download and instantiate the disulfide databases from Google Drive.
+    Download and instantiate the disulfide databases from the proteusPy data release.
 
-    This function downloads the disulfide master SS list from Google Drive if it doesn't
+    This function downloads the disulfide master SS list from the data release if it doesn't
     already exist in the specified load path or if the force flag is set to True.
     It then loads the disulfide data from the downloaded file and initializes a
     DisulfideLoader instance.
@@ -1194,18 +1227,22 @@ def Bootstrap_PDB_SS(
     :rtype: DisulfideLoader
     """
 
-    fname = SS_PICKLE_FILE
-    url = SS_LIST_URL
-
-    # _fname = Path(loadpath) / fname
-    full_path = Path(loadpath) / fname
+    full_path = Path(loadpath) / SS_PICKLE_FILE
 
     if not full_path.exists() or force is True:
         if verbose:
-            _logger.warning("Can't find %s. Downloading from Drive...", full_path)
+            _logger.warning(
+                "Can't find %s. Downloading from the data release...", full_path
+            )
 
         if not fake:
-            gdown.download(url, str(full_path), quiet=False)
+            fetch_data_file(
+                SS_PICKLE_FILE,
+                destdir=loadpath,
+                verbose=verbose,
+                force=force,
+                fallback_url=SS_LIST_URL,
+            )
         else:
             if verbose:
                 _logger.warning("Fake download: %s", full_path)

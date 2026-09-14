@@ -40,6 +40,8 @@ The author's accepted manuscript is available [here](docs/suchanek_disulfide_cha
 # Requirements
 
 1. PC running MacOS, Linux, Windows with git, git-lfs, make and C compiler installed.
+   (`git-lfs` is used for the notebooks; the disulfide database itself arrives as
+   a release asset — see [Data Files](#data-files).)
 2. 8 GB RAM
 3. 1 GB disk space
 
@@ -81,6 +83,35 @@ It's simplest to clone the repo via GitHub since it contains all of the notebook
   (base) C:\Users\egs\repos>\proteuspy> conda activate proteusPy
   (proteusPy) C:\Users\egs\repos> make bootstrap
   ```
+
+# Data Files
+
+The disulfide database and the prebuilt loaders are hundreds of megabytes, so
+they are not in the repository. They are published as assets on a dedicated
+[data release](https://github.com/suchanek/proteusPy/releases) and fetched on
+demand the first time you load the database — no credentials, no `git-lfs`
+bandwidth, nothing to do by hand:
+
+| Asset | Size | Fetched when |
+| --- | --- | --- |
+| `PDB_SS_SUBSET_LOADER.pkl` | 14 MB | `Load_PDB_SS(subset=True)` |
+| `PDB_SS_ALL_LOADER.pkl` | 490 MB | `Load_PDB_SS()` |
+| `PDB_all_ss.pkl` | 457 MB | rebuilding the loader, e.g. `Load_PDB_SS(percentile=95)` |
+
+Each download is streamed to a `.part` file, checked against the sha256 recorded
+in `proteusPy/ProteusGlobals.py`, and only then moved into place, so an
+interrupted transfer cannot leave a truncated pickle behind. To fetch one
+explicitly:
+
+```python
+from proteusPy.data_fetch import fetch_data_file
+
+fetch_data_file("PDB_SS_SUBSET_LOADER.pkl", verbose=True)
+```
+
+Maintainers: after the extractor produces a new database, bump `DATA_RELEASE_TAG`
+in `proteusPy/ProteusGlobals.py`, then `make data-assets` to upload and
+`make data-checksums` to regenerate the checksums.
 
 # Testing
 
