@@ -27,8 +27,11 @@ DATA_ASSETS = proteusPy/data/PDB_all_ss.pkl \
               proteusPy/data/PDB_SS_SUBSET_LOADER.pkl
 
 # Small enough to stay in git as ordinary blobs, and needed by the wheel.
-TRACKED_PKL = proteusPy/data/PDB_SS_SUBSET_LOADER.pkl \
-              proteusPy/data/SS_consensus_class_oct.pkl \
+# PDB_SS_SUBSET_LOADER.pkl does NOT belong here despite its name: at ~14 MB it
+# is a DATA_ASSETS release asset like its two siblings (pyproject.toml's wheel
+# `exclude` list agrees), and committing it trips check-added-large-files
+# (--maxkb=1000).
+TRACKED_PKL = proteusPy/data/SS_consensus_class_oct.pkl \
               proteusPy/data/SS_consensus_class_32.pkl \
               proteusPy/data/binary_class_metrics.pkl \
               proteusPy/data/octant_class_metrics.pkl \

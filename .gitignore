@@ -35,6 +35,7 @@ notebooks/.ipynb_checkpoints/
 proteusPy/data/PDB_all_ss.pkl
 proteusPy/data/PDB_all_ss_master.pkl
 proteusPy/data/PDB_SS_ALL_LOADER.pkl
+proteusPy/data/PDB_SS_SUBSET_LOADER.pkl
 viewer/data/PDB_SS_ALL_LOADER.pkl
 proteusPy/data/*.hdf5
 proteusPy/data/*.db

@@ -113,9 +113,9 @@ DATA_RELEASE_BASE_URL = f"{DATA_RELEASE_REPO}/releases/download/{DATA_RELEASE_TA
 # match; an empty string means the asset has not been published and checksummed
 # yet, and the download proceeds unverified. Populate with `make data-checksums`.
 DATA_RELEASE_SHA256 = {
-    SS_PICKLE_FILE: "",
-    LOADER_FNAME: "",
-    LOADER_SUBSET_FNAME: "",
+    SS_PICKLE_FILE: "ac4475055bfba37c6c2bcdd6c154644085fcd591749053c025f8870a7064944c",
+    LOADER_FNAME: "e91b9e184d71e1c5dcaf4c1c8c1b5b555f022aa02e9628258674f1fb13d2bbba",
+    LOADER_SUBSET_FNAME: "0aa048b2b60794ccc8fee1eff17d550d60d32a4e67702078ed0301bdc3134178",
 }
 
 # Where to fall back to when a release asset cannot be fetched. Only the master

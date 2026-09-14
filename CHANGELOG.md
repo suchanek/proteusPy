@@ -11,6 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Data release published.** The `data-v1.0` GitHub Release now carries
+  `PDB_all_ss.pkl`, `PDB_SS_ALL_LOADER.pkl` and `PDB_SS_SUBSET_LOADER.pkl` as
+  assets, closing the gap #43 opened. `DATA_RELEASE_SHA256` in
+  `proteusPy/ProteusGlobals.py` is populated with the real checksums (was
+  empty placeholders); verified by fetching all three into a clean directory
+  and confirming each downloads and checksum-verifies. The four small
+  consensus/metrics files (`SS_consensus_class_32.pkl`,
+  `SS_consensus_class_oct.pkl`, `binary_class_metrics.pkl`,
+  `octant_class_metrics.pkl`) are restored as ordinary git blobs in both
+  `proteusPy/data/` and `data/`, sourced from a local build that matches the
+  repo's own `PDB_all_ss.pkl` vintage (February 2025); the full test suite
+  (272 tests) and the `Load_PDB_SS(subset=True)` path both pass against them.
+- **`makefile`**: `PDB_SS_SUBSET_LOADER.pkl` removed from `TRACKED_PKL`. At
+  ~14 MB it is a `DATA_ASSETS` release asset like its two siblings, not a
+  small git blob -- `pyproject.toml`'s wheel `exclude` list already agreed,
+  and committing it was tripping `check-added-large-files` (`--maxkb=1000`).
+  Added to `.gitignore` alongside its two `DATA_ASSETS` siblings.
+
 - **Formatting sweep.** `ruff format` and `ruff check --fix` run over the
   tree at the 100-column line length `pyproject.toml` already declares, so the
   new CI lint job passes from its first run. 41 files under `benchmarks/`,
