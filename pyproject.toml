@@ -1,35 +1,28 @@
 #
-# pyproject.toml for the proteusPy Python package.
+# pyproject.toml for the proteusPy Python package (PEP 621).
 # Author: Eric G. Suchanek, PhD
-# Last revision: 2026-03-22
+# Last revision: 2026-09-14
 #
+# Build system : Poetry 2.x with PEP 621 [project] table
+#
+# Install -- extras are package features, groups are repo tooling (Poetry-only)
+# ----------------------------------------------------------------------------
+#   pip install proteusPy                 core runtime
+#   pip install "proteusPy[viz3d]"        + the Qt viewer (PyQt5, pyvistaqt, trame-vtk)
+#
+#   poetry install --with dev             + pytest, ruff, pre-commit, pdoc
+#   poetry install --with jupyter,viz     + notebooks, panel, pymol, kaleido
+#   poetry install --with ml              + tensorflow (Apple Metal build)
+#   poetry install --with kg              + the KGRAG CLIs
+#
+# The large .pkl data files are GitHub Release assets, not package content --
+# see the Data Files section of README.md and proteusPy/data_fetch.py.
 
 [build-system]
 requires = ["poetry-core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "proteusPy"
-version = "0.100.2"
-description = "proteusPy - Protein Structure Analysis and Modeling Tools"
-readme = "README.md"
-authors = ["Eric G. Suchanek, PhD <suchanek@mac.com>"]
-license = "BSD"
-homepage = "https://suchanek.github.io/proteusPy/"
-repository = "https://github.com/suchanek/proteusPy/"
-documentation = "https://suchanek.github.io/proteusPy/"
-keywords = ["proteusPy", "suchanek", "disulfide"]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "License :: OSI Approved :: BSD License",
-    "Intended Audience :: Developers",
-    "Intended Audience :: Science/Research",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.12",
-    "Topic :: Scientific/Engineering",
-    "Topic :: Scientific/Engineering :: Bio-Informatics",
-    "Topic :: Scientific/Engineering :: Chemistry",
-]
 packages = [{ include = "proteusPy" }]
 include = [
     "proteusPy/README.md",
@@ -51,45 +44,102 @@ exclude = [
     "proteusPy/data/PDB_SS_SUBSET_LOADER.pkl",
 ]
 
-[tool.poetry.dependencies]
-python           = ">=3.12,<3.14"
-Biopython        = "*"
-colorama         = "0.4.6"
-darkdetect       = "0.8.0"
-gdown            = ">=5.2.2"
-matplotlib       = "3.9.2"
-numpy            = "*"
-pandas           = "*"
-param            = ">=2.0.0"
-Pillow           = ">=12.3.0"
-plotly           = ">=5.14.0"
-plotly_express   = "0.4.1"
-psutil           = "*"
-Pympler          = "1.1"
-Requests         = ">=2.33.0"
-scipy            = "1.14.1"
-seaborn          = "0.13.2"
-setuptools       = "*"
-tabulate         = "*"
-tqdm             = "4.67.0"
-wheel            = "*"
-networkx         = "*"
-rich             = "*"
-scikit-learn     = "*"
-pydssp           = ">=0.9.0"
-pyvista          = ">=0.44.0"
-# Optional extras
-pyvistaqt        = { version = ">=0.11.0", optional = true }
-PyQt5            = { version = ">=5.15.0", optional = true }
-markdown         = { version = ">=3.6", optional = true }
-trame-vtk        = { version = ">=2.0.0", optional = true }
+# ---------------------------------------------------------------------------
+# PEP 621 project metadata
+# ---------------------------------------------------------------------------
+[project]
+name = "proteusPy"
+version = "0.100.2"
+description = "proteusPy - Protein Structure Analysis and Modeling Tools"
+readme = "README.md"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Eric G. Suchanek, PhD", email = "suchanek@mac.com" }
+]
+keywords = ["proteusPy", "suchanek", "disulfide"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Chemistry",
+]
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "biopython",
+    "colorama==0.4.6",
+    "darkdetect==0.8.0",
+    "gdown>=5.2.2",
+    "matplotlib==3.9.2",
+    "networkx",
+    "numpy",
+    "pandas",
+    "param>=2.0.0",
+    "pillow>=12.3.0",
+    "plotly>=5.14.0",
+    "plotly-express==0.4.1",
+    "psutil",
+    "pydssp>=0.9.0",
+    "pympler==1.1",
+    "pyvista>=0.44.0",
+    "requests>=2.33.0",
+    "rich",
+    "scikit-learn",
+    "scipy==1.14.1",
+    "seaborn==0.13.2",
+    "setuptools",
+    "tabulate",
+    "tqdm==4.67.0",
+    "wheel",
+]
+
+[project.optional-dependencies]
+# The Qt-based 3-D viewer (proteusPy.qt5viewer).
+viz3d = [
+    "markdown>=3.6",
+    "pyqt5>=5.15.0",
+    "pyvistaqt>=0.11.0",
+    "trame-vtk>=2.0.0",
+]
+# Kept as an alias of viz3d so existing `pip install "proteusPy[all]"` keeps working.
+all = [
+    "markdown>=3.6",
+    "pyqt5>=5.15.0",
+    "pyvistaqt>=0.11.0",
+    "trame-vtk>=2.0.0",
+]
+
+[project.urls]
+Homepage      = "https://suchanek.github.io/proteusPy/"
+Repository    = "https://github.com/suchanek/proteusPy/"
+Documentation = "https://suchanek.github.io/proteusPy/"
+
+[project.scripts]
+"proteusPy.qt5viewer"                  = "proteusPy.qt5viewer:main"
+"proteusPy.DisulfideExtractor"         = "proteusPy.DisulfideExtractor_mp:main"
+"proteusPy.bootstrapper"               = "proteusPy.bootstrapper:main"
+"proteusPy.render_disulfide_schematic" = "proteusPy.render_disulfide_schematic:main"
+"proteusPy.display_class_disulfides"   = "proteusPy.display_class_disulfides:main"
+"proteusPy.hexbin_plot"                = "proteusPy.hexbin_plot:main"
+
+# ---------------------------------------------------------------------------
+# Repo tooling (Poetry groups, not PEP 621 extras -- they stay out of the wheel)
+# ---------------------------------------------------------------------------
+[tool.poetry.group.kg]
+optional = true
 
 [tool.poetry.group.kg.dependencies]
-doc-kg    = ">=0.22.0"
-pycode-kg = ">=0.23.1"
-ftree-kg  = ">=0.14.0"
+doc-kg    = ">=0.26.0"
+pycode-kg = ">=0.27.0"
+ftree-kg  = ">=0.16.0"
 
-[tool.poetry.group.kg]
+[tool.poetry.group.ml]
 optional = true
 
 [tool.poetry.group.ml.dependencies]
@@ -97,7 +147,7 @@ tensorflow       = "2.18.0"
 tensorflow-metal = "1.2.0"
 tf-keras         = "*"
 
-[tool.poetry.group.ml]
+[tool.poetry.group.jupyter]
 optional = true
 
 [tool.poetry.group.jupyter.dependencies]
@@ -109,7 +159,7 @@ ipywidgets       = "*"
 jupyter_bokeh    = "4.0.5"
 jupyter_contrib_nbextensions = "*"
 
-[tool.poetry.group.jupyter]
+[tool.poetry.group.viz]
 optional = true
 
 [tool.poetry.group.viz.dependencies]
@@ -117,13 +167,6 @@ imageio          = { version = "*", extras = ["ffmpeg"] }
 kaleido          = "*"
 panel            = ">=1.8.0"
 pymolPy3         = "0.1.2"
-
-[tool.poetry.group.viz]
-optional = true
-
-[tool.poetry.extras]
-viz3d  = ["PyQt5", "pyvistaqt", "markdown", "trame-vtk"]
-all    = ["PyQt5", "pyvistaqt", "markdown", "trame-vtk"]
 
 [tool.poetry.group.dev.dependencies]
 pytest        = ">=8.0.0"
@@ -136,14 +179,6 @@ pylint        = "^4.0.5"
 pdoc          = ">=14.0.0"
 twine         = "*"
 build         = "*"
-
-[tool.poetry.scripts]
-"proteusPy.qt5viewer"                  = "proteusPy.qt5viewer:main"
-"proteusPy.DisulfideExtractor"         = "proteusPy.DisulfideExtractor_mp:main"
-"proteusPy.bootstrapper"               = "proteusPy.bootstrapper:main"
-"proteusPy.render_disulfide_schematic" = "proteusPy.render_disulfide_schematic:main"
-"proteusPy.display_class_disulfides"   = "proteusPy.display_class_disulfides:main"
-"proteusPy.hexbin_plot"                = "proteusPy.hexbin_plot:main"
 
 [tool.ruff]
 line-length = 100
@@ -188,4 +223,4 @@ include = ["proteusPy"]
 [tool.dockg]
 # Add extra directories to exclude beyond the built-in SKIP_DIRS.
 # SKIP_DIRS already covers: .dockg, .git, .venv, venv, __pycache__, node_modules, etc.
-exclude = ["bundles", "dist","data","lib","old","programs","turtlend_package", "pepys", "waverider_missions"]
+exclude = ["bundles", "dist","data","lib","old","programs","turtlend_package"]
