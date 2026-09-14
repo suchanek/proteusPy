@@ -101,10 +101,7 @@ def main():
         top_binary = binary_children[0]
         top_data = tree.node_data(top_binary)
         print(f"    Most populated binary class: {top_binary}")
-        print(
-            f"      occupancy={top_data.occupancy:,} "
-            f"({top_data.occupancy_pct:.1f}%)"
-        )
+        print(f"      occupancy={top_data.occupancy:,} ({top_data.occupancy_pct:.1f}%)")
         if top_data.consensus_torsions:
             angles = ", ".join(f"{a:.1f}" for a in top_data.consensus_torsions)
             print(f"      consensus torsions: [{angles}]")

@@ -61,9 +61,7 @@ class TestManifoldWalkerOrient(unittest.TestCase):
     def test_orient_discovers_intrinsic_dim(self):
         """On a 3D manifold in 10D space, orient should find ~3 dimensions."""
         embeddings, _ = _make_sphere_embeddings(n=500, ndim=10, intrinsic_dim=3)
-        mw = ManifoldWalker(
-            embeddings, _quadratic_objective, k=50, variance_threshold=0.95
-        )
+        mw = ManifoldWalker(embeddings, _quadratic_objective, k=50, variance_threshold=0.95)
         # Start at a point on the manifold
         mw.position = embeddings[0]
         dim = mw.orient()
@@ -97,9 +95,7 @@ class TestManifoldWalkerStep(unittest.TestCase):
         """A step should reduce the objective for a simple quadratic."""
         rng = np.random.RandomState(123)
         embeddings = rng.randn(200, 5)
-        mw = ManifoldWalker(
-            embeddings, _quadratic_objective, k=30, learning_rate=0.01
-        )
+        mw = ManifoldWalker(embeddings, _quadratic_objective, k=30, learning_rate=0.01)
         mw.position = np.array([1.0, 1.0, 1.0, 1.0, 1.0])
         val_before = _quadratic_objective(mw.position)
         mw.step()
@@ -110,9 +106,7 @@ class TestManifoldWalkerStep(unittest.TestCase):
         """Step with an explicit gradient should also reduce objective."""
         rng = np.random.RandomState(123)
         embeddings = rng.randn(200, 5)
-        mw = ManifoldWalker(
-            embeddings, _quadratic_objective, k=30, learning_rate=0.01
-        )
+        mw = ManifoldWalker(embeddings, _quadratic_objective, k=30, learning_rate=0.01)
         start = np.array([2.0, 2.0, 2.0, 2.0, 2.0])
         mw.position = start
         grad = 2 * start  # analytic gradient of ||x||^2
@@ -124,9 +118,7 @@ class TestManifoldWalkerStep(unittest.TestCase):
     def test_history_recorded(self):
         rng = np.random.RandomState(123)
         embeddings = rng.randn(200, 5)
-        mw = ManifoldWalker(
-            embeddings, _quadratic_objective, k=30, learning_rate=0.01
-        )
+        mw = ManifoldWalker(embeddings, _quadratic_objective, k=30, learning_rate=0.01)
         mw.position = np.ones(5)
         mw.step()
         mw.step()
@@ -138,9 +130,7 @@ class TestManifoldWalkerWalk(unittest.TestCase):
         """Walking should move toward the objective minimum."""
         rng = np.random.RandomState(99)
         embeddings = rng.randn(300, 5)
-        mw = ManifoldWalker(
-            embeddings, _quadratic_objective, k=40, learning_rate=0.05
-        )
+        mw = ManifoldWalker(embeddings, _quadratic_objective, k=40, learning_rate=0.05)
         mw.position = np.array([3.0, 3.0, 3.0, 3.0, 3.0])
         initial_obj = _quadratic_objective(mw.position)
         final_pos = mw.walk(n_steps=50)
@@ -150,23 +140,17 @@ class TestManifoldWalkerWalk(unittest.TestCase):
     def test_walk_with_analytic_gradient(self):
         rng = np.random.RandomState(99)
         embeddings = rng.randn(300, 5)
-        mw = ManifoldWalker(
-            embeddings, _quadratic_objective, k=40, learning_rate=0.05
-        )
+        mw = ManifoldWalker(embeddings, _quadratic_objective, k=40, learning_rate=0.05)
         mw.position = np.array([3.0, 3.0, 3.0, 3.0, 3.0])
         initial_obj = _quadratic_objective(mw.position)
-        final_pos = mw.walk(
-            n_steps=50, gradient_fn=lambda x: 2 * x
-        )
+        final_pos = mw.walk(n_steps=50, gradient_fn=lambda x: 2 * x)
         final_obj = _quadratic_objective(final_pos)
         self.assertLess(final_obj, initial_obj * 0.1)
 
     def test_walk_on_manifold(self):
         """Walking on a manifold-embedded objective should still converge."""
         embeddings, q = _make_sphere_embeddings(n=500, ndim=10, intrinsic_dim=3)
-        mw = ManifoldWalker(
-            embeddings, _quadratic_objective, k=50, learning_rate=0.01
-        )
+        mw = ManifoldWalker(embeddings, _quadratic_objective, k=50, learning_rate=0.01)
         mw.position = embeddings[0] * 5.0  # start away from origin
         initial_obj = _quadratic_objective(mw.position)
         final_pos = mw.walk(n_steps=30)

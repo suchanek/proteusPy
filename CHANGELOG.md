@@ -11,6 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Formatting sweep.** `ruff format` and `ruff check --fix` run over the
+  tree at the 100-column line length `pyproject.toml` already declares, so the
+  new CI lint job passes from its first run. 41 files under `benchmarks/`,
+  `programs/`, `tests/`, `data/`, `viewer/` and `proteusPy/` are reflowed; the
+  AST of every one was compared against `master` and only
+  `programs/compare_class_disulfides.py` differs, where pyupgrade replaced
+  `typing.Dict` with `dict` and dropped the coding cookie. No behaviour
+  changes. The code blocks in `docs/disulfide_schematic_README.md` and the
+  README were reflowed to match.
+- **`.pre-commit-config.yaml`** pins `ruff-pre-commit` at v0.16.0, the
+  version Poetry resolves, instead of v0.9.10. The two had drifted far enough
+  apart that the hook enforced rules the newer ruff has retired (UP038), so a
+  tree that passed `poetry run ruff check` still failed at commit time. The
+  hook id follows the rename to `ruff-check`.
+- **`.gitignore`** now excludes `**/.agentkg/`, matching the other fleet
+  repos. The AgentKG conversational memory is private to a checkout and its
+  SQLite files grow every session.
+
 - **Large `.pkl` files are now GitHub Release assets rather than git-lfs objects.**
   The disulfide database (`PDB_all_ss.pkl`, 457 MB) and the prebuilt loaders
   (`PDB_SS_ALL_LOADER.pkl`, 490 MB; `PDB_SS_SUBSET_LOADER.pkl`, 14 MB) are
@@ -40,6 +58,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`.github/workflows/ci.yml` and `.github/workflows/release.yml`**, adapted
+  from the doc_kg templates. CI runs on pushes and pull requests to `master`
+  with three jobs: `ruff format --check` plus `ruff check`, the pytest suite,
+  and a wheel smoke test that builds the package with `poetry build`, installs
+  it into an empty venv, and imports it, so a wheel missing a data file or a
+  dependency fails here rather than on a user's machine. Release fires on
+  `v*` tags, builds once, creates the GitHub Release with `release-notes.md`
+  as the body, and publishes the same artifacts to PyPI. The README "Testing"
+  badge now points at `ci.yml`.
+
 - **`proteusPy/data_fetch.py`** — `fetch_data_file()`, `data_asset_url()` and
   `sha256_file()`, all re-exported from the package. A download is streamed to a
   `.part` file, checked against the sha256 recorded in `DATA_RELEASE_SHA256`, and
@@ -64,7 +92,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   changelog section, `check-added-large-files`, and the five surfaces that carry
   the version number.
 
+### Fixed
+
+- **`programs/DisulfideCluster.py`, `programs/DisulfidePruner.py`** imported
+  `proteusPy.proteusGlobals`; the module is `ProteusGlobals`. macOS's
+  case-insensitive filesystem hid the mismatch, and ruff there classified the
+  import as first-party. On the Linux CI runner the file does not resolve, so
+  ruff sorted it as third-party and I001 failed, and the scripts themselves
+  would have raised `ModuleNotFoundError`.
+
 ### Removed
+
+- **`.github/workflows/pytest.yml`**, superseded by `ci.yml`, and
+  **`.github/publish-to-pypi.yml`**, which lived outside `workflows/` and so
+  never ran; `release.yml` replaces it.
 
 - **`.pkl` tracking in `.gitattributes`**, along with the `.pkl` pointers
   themselves. Their lfs objects are gone from the server, so what remained in

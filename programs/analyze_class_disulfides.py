@@ -99,20 +99,14 @@ def analyze_energy_distribution(disulfide_list: DisulfideList, class_str: str) -
     plt.grid(True, alpha=0.3)
 
     # Save the plot
-    plt.savefig(
-        f"class_{class_str}_energy_distribution.png", dpi=300, bbox_inches="tight"
-    )
-    print(
-        f"Saved energy distribution plot to class_{class_str}_energy_distribution.png"
-    )
+    plt.savefig(f"class_{class_str}_energy_distribution.png", dpi=300, bbox_inches="tight")
+    print(f"Saved energy distribution plot to class_{class_str}_energy_distribution.png")
 
     # Show the plot (comment out if running in a non-interactive environment)
     # plt.show()
 
 
-def analyze_dihedral_distributions(
-    disulfide_list: DisulfideList, class_str: str
-) -> None:
+def analyze_dihedral_distributions(disulfide_list: DisulfideList, class_str: str) -> None:
     """
     Analyze and plot the distribution of each dihedral angle in the generated disulfides.
 
@@ -162,12 +156,8 @@ def analyze_dihedral_distributions(
     plt.tight_layout(rect=[0.05, 0, 1, 0.97])
 
     # Save the plot
-    plt.savefig(
-        f"class_{class_str}_dihedral_distributions.png", dpi=300, bbox_inches="tight"
-    )
-    print(
-        f"Saved dihedral distributions plot to class_{class_str}_dihedral_distributions.png"
-    )
+    plt.savefig(f"class_{class_str}_dihedral_distributions.png", dpi=300, bbox_inches="tight")
+    print(f"Saved dihedral distributions plot to class_{class_str}_dihedral_distributions.png")
 
     # Show the plot (comment out if running in a non-interactive environment)
     # plt.show()

@@ -21,10 +21,8 @@ def calculate_energy_components(chi1, chi2, chi3, chi4, chi5):
 
     # DSE components (kJ/mol)
     dse_components = {
-        "chi1_chi5": 8.37
-        * ((1 + np.cos(3 * torad(chi1))) + (1 + np.cos(3 * torad(chi5)))),
-        "chi2_chi4": 4.18
-        * ((1 + np.cos(3 * torad(chi2))) + (1 + np.cos(3 * torad(chi4)))),
+        "chi1_chi5": 8.37 * ((1 + np.cos(3 * torad(chi1))) + (1 + np.cos(3 * torad(chi5)))),
+        "chi2_chi4": 4.18 * ((1 + np.cos(3 * torad(chi2))) + (1 + np.cos(3 * torad(chi4)))),
         "chi3_2fold": 14.64 * (1 + np.cos(2 * torad(chi3))),
         "chi3_3fold": 2.51 * (1 + np.cos(3 * torad(chi3))),
     }
@@ -139,9 +137,7 @@ def plot_energy_components():
         # Standard energy components (left column)
         ax_std = axs[i - 1, 0]
         for component_name in ["chi1_chi5", "chi2_chi4", "chi3", "constant"]:
-            values = [
-                chi_data[chi_name][j][0][component_name] for j in range(len(angles))
-            ]
+            values = [chi_data[chi_name][j][0][component_name] for j in range(len(angles))]
 
             # Plot with appropriate style, color, and markers
             if markers[component_name]:
@@ -169,9 +165,7 @@ def plot_energy_components():
                 )
 
         # Add total energy line
-        total_values = [
-            sum(chi_data[chi_name][j][0].values()) for j in range(len(angles))
-        ]
+        total_values = [sum(chi_data[chi_name][j][0].values()) for j in range(len(angles))]
         ax_std.plot(
             angles,
             total_values,
@@ -193,8 +187,7 @@ def plot_energy_components():
         for component_name in ["chi1_chi5", "chi2_chi4", "chi3_2fold", "chi3_3fold"]:
             # Convert from kJ/mol to kcal/mol
             values = [
-                chi_data[chi_name][j][1][component_name] * KJ_TO_KCAL
-                for j in range(len(angles))
+                chi_data[chi_name][j][1][component_name] * KJ_TO_KCAL for j in range(len(angles))
             ]
 
             # Plot with appropriate style, color, and markers
@@ -224,8 +217,7 @@ def plot_energy_components():
 
         # Add total energy line - Convert from kJ/mol to kcal/mol
         total_values = [
-            sum(chi_data[chi_name][j][1].values()) * KJ_TO_KCAL
-            for j in range(len(angles))
+            sum(chi_data[chi_name][j][1].values()) * KJ_TO_KCAL for j in range(len(angles))
         ]
         ax_dse.plot(
             angles,

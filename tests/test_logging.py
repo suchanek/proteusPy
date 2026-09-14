@@ -17,7 +17,6 @@ from proteusPy import (
 
 
 class TestLoggingUtilities(unittest.TestCase):
-
     def setUp(self):
         """Setup before each test."""
         self.test_logger_name = "test_logger"
@@ -61,14 +60,10 @@ class TestLoggingUtilities(unittest.TestCase):
         )
 
     def test_configure_master_logger(self):
-        configure_master_logger(
-            self.test_log_file, str(self.test_log_path), logging.INFO
-        )
+        configure_master_logger(self.test_log_file, str(self.test_log_path), logging.INFO)
         root_logger = logging.getLogger()
         self.assertEqual(root_logger.level, logging.INFO)
-        self.assertTrue(
-            any(isinstance(h, logging.FileHandler) for h in root_logger.handlers)
-        )
+        self.assertTrue(any(isinstance(h, logging.FileHandler) for h in root_logger.handlers))
 
     def test_create_logger(self):
         logger = create_logger("test_logger2", logging.WARNING)

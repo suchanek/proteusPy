@@ -66,12 +66,8 @@ BINARY.mkdir(parents=True, exist_ok=True)
 PDB_SS = Load_PDB_SS(subset=False, verbose=True)
 PDB_SS.describe()
 
-PDB_SS.plot_binary_to_eightclass_incidence(
-    theme="light", save=True, verbose=True, savedir=OCTANT
-)
-PDB_SS.plot_binary_to_sixclass_incidence(
-    theme="light", save=True, verbose=True, savedir=SEXTANT
-)
+PDB_SS.plot_binary_to_eightclass_incidence(theme="light", save=True, verbose=True, savedir=OCTANT)
+PDB_SS.plot_binary_to_sixclass_incidence(theme="light", save=True, verbose=True, savedir=SEXTANT)
 
 print("Plotting binary class incidence and saving to", BINARY)
 

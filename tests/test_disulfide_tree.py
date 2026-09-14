@@ -236,9 +236,7 @@ class TestDisulfideTree(unittest.TestCase):
 
     def test_binary_has_quadrant_children(self):
         """Each binary class should have quadrant children."""
-        binary_nodes = [
-            k for k, v in self.tree._node_data.items() if v.level == "binary"
-        ]
+        binary_nodes = [k for k, v in self.tree._node_data.items() if v.level == "binary"]
         has_children = False
         for bk in binary_nodes:
             kids = self.tree.children(bk)
@@ -250,9 +248,7 @@ class TestDisulfideTree(unittest.TestCase):
 
     def test_octant_has_members(self):
         """At least some octant classes should have member disulfides."""
-        oct_nodes = [
-            k for k, v in self.tree._node_data.items() if v.level == "octant"
-        ]
+        oct_nodes = [k for k, v in self.tree._node_data.items() if v.level == "octant"]
         has_members = False
         for ok in oct_nodes:
             mems = self.tree.members(ok)
@@ -263,11 +259,7 @@ class TestDisulfideTree(unittest.TestCase):
 
     def test_occupancy_sums(self):
         """Binary-level occupancies should sum to total."""
-        binary_occ = sum(
-            v.occupancy
-            for v in self.tree._node_data.values()
-            if v.level == "binary"
-        )
+        binary_occ = sum(v.occupancy for v in self.tree._node_data.values() if v.level == "binary")
         self.assertEqual(binary_occ, len(self.sslist))
 
     def test_children_sorted_by_occupancy(self):

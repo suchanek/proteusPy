@@ -152,9 +152,7 @@ def ingest_diary(
         texts.append(f"{label} | {content}" if label else content)
         try:
             ts = (
-                datetime.fromisoformat(c.timestamp)
-                if isinstance(c.timestamp, str)
-                else c.timestamp
+                datetime.fromisoformat(c.timestamp) if isinstance(c.timestamp, str) else c.timestamp
             )
         except (ValueError, TypeError):
             continue
@@ -481,8 +479,13 @@ def make_figure(
         ax.grid(True, axis="y", alpha=0.3)
     else:
         ax.text(
-            0.5, 0.5, "No retrieval data",
-            ha="center", va="center", color="#8b949e", transform=ax.transAxes,
+            0.5,
+            0.5,
+            "No retrieval data",
+            ha="center",
+            va="center",
+            color="#8b949e",
+            transform=ax.transAxes,
         )
         ax.set_title("MRL MRR@10", color="#c9d1d9", fontsize=11)
 
@@ -508,10 +511,14 @@ def make_figure(
             ax.grid(True, alpha=0.3)
         else:
             ax.text(
-                0.5, 0.5,
+                0.5,
+                0.5,
                 "No flight data\n(run without --no-walker)",
-                ha="center", va="center", color="#8b949e",
-                transform=ax.transAxes, fontsize=9,
+                ha="center",
+                va="center",
+                color="#8b949e",
+                transform=ax.transAxes,
+                fontsize=9,
             )
         title_map = {
             "heights": "Flight path: observer height",
@@ -553,9 +560,7 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument(
         "--diary",
-        default=str(
-            Path(__file__).parent.parent.parent / "diary_kg" / "pepys" / "pepys_clean.txt"
-        ),
+        default=str(Path(__file__).parent.parent.parent / "diary_kg" / "pepys" / "pepys_clean.txt"),
         help="Diary source path (only used with --rebuild-cache)",
     )
     p.add_argument(
@@ -637,6 +642,7 @@ def main() -> None:  # noqa: C901
         texts, timestamps = ingest_diary(str(diary_path), max_chunks_per_entry=args.max_chunks)
 
         import os
+
         n_workers = args.workers or os.cpu_count() or 1
         console.print(
             f"  Embedding {len(texts)} sentences  model={EMBED_MODEL}  "
@@ -644,9 +650,7 @@ def main() -> None:  # noqa: C901
         )
         t0 = time.time()
         E = embed_corpus(texts, model=EMBED_MODEL, n_workers=n_workers, batch_size=args.batch_size)
-        console.print(
-            f"  Done: {E.shape[0]} × {E.shape[1]} float32 in {time.time() - t0:.1f}s"
-        )
+        console.print(f"  Done: {E.shape[0]} × {E.shape[1]} float32 in {time.time() - t0:.1f}s")
         save_cache(str(cache_path), E, texts, timestamps)
     else:
         console.print(f"\n[bold]Step 1:[/bold] Loading cached embeddings from {cache_path} …")
@@ -783,9 +787,7 @@ def main() -> None:  # noqa: C901
 
             labels = np.array([ts.year for ts in timestamps])
 
-            console.print(
-                f"  Fitting ManifoldModel (k={args.k}, τ={args.tau}) on {N} sentences …"
-            )
+            console.print(f"  Fitting ManifoldModel (k={args.k}, τ={args.tau}) on {N} sentences …")
             mm = ManifoldModel(
                 k_graph=args.k,
                 variance_threshold=args.tau,
@@ -808,29 +810,26 @@ def main() -> None:  # noqa: C901
             ts_orig = timestamps[i_orig]
             dist_cos = float(1 - sims[i_loc, j_loc])
             console.print(
-                f'  Origin : sentence {i_orig}  ({ts_orig.date()})  '
-                f'"{texts[i_orig][:70]}…"'
+                f'  Origin : sentence {i_orig}  ({ts_orig.date()})  "{texts[i_orig][:70]}…"'
             )
             console.print(
-                f'  Dest   : sentence {i_dest}  ({timestamps[i_dest].date()})  '
+                f"  Dest   : sentence {i_dest}  ({timestamps[i_dest].date()})  "
                 f'"{texts[i_dest][:70]}…"'
             )
             console.print(f"  Cosine distance: {dist_cos:.4f}")
 
             mm.fly_to(f"n{i_orig}")
             path = mm.fly_toward(E[i_dest], max_steps=200, patience=15)
-            arrived = (
-                np.linalg.norm(E[i_dest] - mm._graph.get_embedding(path[-1])) < 0.05
-            )
+            arrived = np.linalg.norm(E[i_dest] - mm._graph.get_embedding(path[-1])) < 0.05
             console.print(f"  Path length: {len(path)} hops  |  arrived: {arrived}")
 
             obs = ManifoldObserver(mm)
             flight_obs = obs.observe_path(path)
             mean_h = float(np.mean(flight_obs["heights"])) if len(flight_obs["heights"]) else 0.0
-            mean_c = float(np.mean(flight_obs["curvatures"])) if len(flight_obs["curvatures"]) else 0.0
-            console.print(
-                f"  Observer: mean height={mean_h:.4f}  mean curvature={mean_c:.4f}°"
+            mean_c = (
+                float(np.mean(flight_obs["curvatures"])) if len(flight_obs["curvatures"]) else 0.0
             )
+            console.print(f"  Observer: mean height={mean_h:.4f}  mean curvature={mean_c:.4f}°")
 
             flight_info = {
                 "origin_idx": i_orig,
@@ -847,6 +846,7 @@ def main() -> None:  # noqa: C901
         except Exception as exc:
             console.print(f"[yellow]ManifoldWalker step failed: {exc}[/yellow]")
             import traceback
+
             traceback.print_exc()
 
     # -----------------------------------------------------------------------

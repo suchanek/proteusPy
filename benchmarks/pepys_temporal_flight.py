@@ -266,9 +266,7 @@ class TemporalFlyer:
 
     # ------- Flight modes -------
 
-    def semantic_flight(
-        self, origin: int, dest: int, max_steps: int = 100
-    ) -> list[int]:
+    def semantic_flight(self, origin: int, dest: int, max_steps: int = 100) -> list[int]:
         """Fly from *origin* toward *dest* using pure semantic heading."""
         self.fly_to(origin)
         target = self.E_aug[dest].astype(np.float64)
@@ -284,9 +282,7 @@ class TemporalFlyer:
                 break
         return list(self._path)
 
-    def temporal_flight(
-        self, origin: int, max_steps: int = 100, forward: bool = True
-    ) -> list[int]:
+    def temporal_flight(self, origin: int, max_steps: int = 100, forward: bool = True) -> list[int]:
         """Fly from *origin* along the pure temporal axis.
 
         :param forward: True = advance in time, False = go backward.
@@ -644,26 +640,24 @@ def main() -> None:
     console.print(f"\n[bold]Step 3:[/bold] Building KNN graph (k={args.k}) …")
     t0 = time.time()
     flyer = TemporalFlyer(
-        E, timestamps, texts, k=args.k, alpha=args.alpha,
+        E,
+        timestamps,
+        texts,
+        k=args.k,
+        alpha=args.alpha,
         negate_time=args.negate_time,
     )
     elapsed = time.time() - t0
     console.print(f"  Built in {elapsed:.1f}s")
 
     i_orig, i_dest = find_distant_pair(E)
-    console.print(
-        f'  Origin : [{i_orig}] {timestamps[i_orig].date()} — "{texts[i_orig][:60]}…"'
-    )
-    console.print(
-        f'  Dest   : [{i_dest}] {timestamps[i_dest].date()} — "{texts[i_dest][:60]}…"'
-    )
+    console.print(f'  Origin : [{i_orig}] {timestamps[i_orig].date()} — "{texts[i_orig][:60]}…"')
+    console.print(f'  Dest   : [{i_dest}] {timestamps[i_dest].date()} — "{texts[i_dest][:60]}…"')
 
     # ------------------------------------------------------------------
     # Step 4: Three flight modes
     # ------------------------------------------------------------------
-    console.print(
-        f"\n[bold]Step 4:[/bold] Flying three modes (max {args.max_steps} hops) …"
-    )
+    console.print(f"\n[bold]Step 4:[/bold] Flying three modes (max {args.max_steps} hops) …")
 
     paths = {}
     coherence = {}
@@ -675,9 +669,7 @@ def main() -> None:
 
     # 4b: Temporal flight (forward from origin)
     console.print("  [green]Temporal flight …[/green]")
-    paths["temporal"] = flyer.temporal_flight(
-        i_orig, max_steps=args.max_steps, forward=True
-    )
+    paths["temporal"] = flyer.temporal_flight(i_orig, max_steps=args.max_steps, forward=True)
     coherence["temporal"] = temporal_coherence(paths["temporal"], flyer.fyears)
 
     # 4c: Mixed flight
@@ -692,9 +684,7 @@ def main() -> None:
     paths["temporal_backward"] = flyer.temporal_flight(
         i_orig, max_steps=args.max_steps, forward=False
     )
-    coherence["temporal_backward"] = temporal_coherence(
-        paths["temporal_backward"], flyer.fyears
-    )
+    coherence["temporal_backward"] = temporal_coherence(paths["temporal_backward"], flyer.fyears)
 
     # ------------------------------------------------------------------
     # Step 5: Results table
@@ -743,9 +733,7 @@ def main() -> None:
 
     t.position = flyer.E_aug[i_orig].astype(np.float64)
     ang = t.orient_in_time(time_idx)
-    console.print(
-        f"  orient_in_time() rotated heading {ang:.1f}° toward axis {time_idx}"
-    )
+    console.print(f"  orient_in_time() rotated heading {ang:.1f}° toward axis {time_idx}")
     console.print(f"  heading[time_axis] = {t.heading[time_idx]:.4f}")
 
     # Move forward in time
@@ -760,8 +748,7 @@ def main() -> None:
     # Step 7: Save results
     # ------------------------------------------------------------------
     tau_symmetry = round(
-        coherence["temporal"]["kendall_tau"]
-        + coherence["temporal_backward"]["kendall_tau"],
+        coherence["temporal"]["kendall_tau"] + coherence["temporal_backward"]["kendall_tau"],
         4,
     )
     results = {

@@ -32,7 +32,6 @@ Last revision: 2025-02-26 19:57:07 -egs-
 # pylint: disable=C0114 # missing-module-docstring
 # pylint: disable=C0103 # non-snake-case variable name
 
-
 import os
 import sys
 import unittest
@@ -119,9 +118,7 @@ class TestDisplaySS(unittest.TestCase):
         # Test the screenshot functionality and verify the screenshot files exist.
         cpk_filename = os.path.join(self.temp_dir_obj.name, "cpk3.png")
         try:
-            ss.screenshot(
-                style="cpk", single=True, fname=str(cpk_filename), verbose=True
-            )
+            ss.screenshot(style="cpk", single=True, fname=str(cpk_filename), verbose=True)
         except Exception as e:
             self.fail(f"Screenshot (cpk) method raised an exception: {e}")
 

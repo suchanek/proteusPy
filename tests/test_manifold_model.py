@@ -251,9 +251,7 @@ class TestFly:
         # _pad_basis expands basis to (ndim, ndim); first d rows should match
         # original basis up to sign flip
         frame_top = model.turtle._frame[:d]
-        np.testing.assert_allclose(
-            np.abs(frame_top), np.abs(geom.basis), atol=1e-10
-        )
+        np.testing.assert_allclose(np.abs(frame_top), np.abs(geom.basis), atol=1e-10)
 
     def test_fly_step_with_direction(self, fitted_model):
         """Fly step with explicit direction."""

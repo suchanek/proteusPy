@@ -22,7 +22,7 @@ from tqdm import tqdm
 
 from proteusPy import Load_PDB_SS
 from proteusPy.DisulfideBase import DisulfideList
-from proteusPy.proteusGlobals import Torsion_DF_Cols
+from proteusPy.ProteusGlobals import Torsion_DF_Cols
 
 # override the default location for the stored disulfides, which defaults to DATA_DIR
 datadir = "/Users/egs/PDB/data/"
@@ -66,9 +66,7 @@ for _, pdbid_tuple in zip(pbar, enumerate(ssdict)):
     xchain = 0
     removed = 0
     pdbid = pdbid_tuple[1]
-    pbar.set_postfix(
-        {"ID": pdbid, "Rem": removed_tot, "XC": xchain_tot}
-    )  # update the progress bar
+    pbar.set_postfix({"ID": pdbid, "Rem": removed_tot, "XC": xchain_tot})  # update the progress bar
     sslist = PDB_SS[pdbid]
     pruned = remove_duplicate_ss(sslist)
     removed = len(sslist) - len(pruned)

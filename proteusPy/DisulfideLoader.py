@@ -1231,9 +1231,7 @@ def Bootstrap_PDB_SS(
 
     if not full_path.exists() or force is True:
         if verbose:
-            _logger.warning(
-                "Can't find %s. Downloading from the data release...", full_path
-            )
+            _logger.warning("Can't find %s. Downloading from the data release...", full_path)
 
         if not fake:
             fetch_data_file(

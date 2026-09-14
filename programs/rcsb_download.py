@@ -36,9 +36,7 @@ def download_structure(pdb_id, file_format="cif", save_dir="structures"):
 
 def main():
     parser = argparse.ArgumentParser(description="Download and process PDB structures.")
-    parser.add_argument(
-        "pdb_id", type=str, help="The PDB ID of the structure to download."
-    )
+    parser.add_argument("pdb_id", type=str, help="The PDB ID of the structure to download.")
     parser.add_argument(
         "--format",
         type=str,

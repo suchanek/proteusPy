@@ -34,7 +34,6 @@ class TestDisulfide(unittest.TestCase):
     """Contains unit tests for the Disulfide class."""
 
     def setUp(self):
-
         entry = "5rsa"
         ok = False
 
@@ -59,7 +58,6 @@ class TestDisulfide(unittest.TestCase):
         self.assertEqual(result, expected_result)
 
     def test_dihedrals(self):
-
         ss1 = self.sslist[0]
         result = ss1.dihedrals
         expected_result = [
@@ -72,7 +70,6 @@ class TestDisulfide(unittest.TestCase):
         assert_allclose(result, expected_result, rtol=1e-05, atol=1e-08)
 
     def test_energy(self):
-
         dihedrals = [-60.0, -60.0, -90.0, -60.0, -90.0]
         result = Disulfide.disulfide_energy_function(dihedrals)
         expected_result = 2.5999999999999996
@@ -89,28 +86,23 @@ class TestDisulfide(unittest.TestCase):
             -60.0,
         ]
 
-        result = minimize(
-            Disulfide.disulfide_energy_function, initial_guess, method="Nelder-Mead"
-        )
+        result = minimize(Disulfide.disulfide_energy_function, initial_guess, method="Nelder-Mead")
         minimum_energy = result.fun
         expected_result = 0.4889387355489303
         self.assertAlmostEqual(minimum_energy, expected_result, places=5)
 
     def test_load(self):
-
         entry = "5rsa"
 
         sslist = load_disulfides_from_id(entry, pdb_dir=DATA_DIR)
         self.assertTrue(len(sslist) > 0)
 
     def test_compare(self):
-
         ss1 = self.sslist[0]
 
         self.assertTrue(ss1 == ss1)
 
     def test_compare2(self):
-
         ss1 = self.sslist[0]
         ss2 = self.sslist[1]
 

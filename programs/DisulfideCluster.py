@@ -42,7 +42,7 @@ PDB_SS = DisulfideLoader(verbose=True, subset=True)
 
 
 # retrieve the torsions dataframe
-from proteusPy.proteusGlobals import Torsion_DF_Cols
+from proteusPy.ProteusGlobals import Torsion_DF_Cols
 
 _SSdf = PDB_SS.getTorsions()
 
@@ -118,6 +118,4 @@ X["cluster"] = aff_model.fit_predict(X[["torsion_length"]])
 
 fig, ax = plt.subplots()
 ax.set(title="Affinity Propagation")
-sns.scatterplot(
-    x="chi1", y="torsion_length", data=X, hue="cluster", ax=ax, size=2
-)
+sns.scatterplot(x="chi1", y="torsion_length", data=X, hue="cluster", ax=ax, size=2)
