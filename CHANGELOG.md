@@ -101,6 +101,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ruff sorted it as third-party and I001 failed, and the scripts themselves
   would have raised `ModuleNotFoundError`.
 
+### Security
+
+- **`poetry.lock`**: tornado 6.5.7 -> 6.5.9, closing Dependabot alerts 159,
+  160 and 161 (GHSA-wwv5-g3v4-889x, GHSA-8423-8fgw-73vq, GHSA-mpf4-983q-p7j4:
+  cookie attribute injection, multipart memory amplification, and an
+  event-loop stall from urlencoded body parsing). tornado is not a direct
+  dependency; bokeh and the jupyter stack pull it in through the optional
+  `viz` and `jupyter` groups, so `pip install proteusPy` is unaffected. Only
+  the tornado entry in the lock changed.
+
 ### Removed
 
 - **`.github/workflows/pytest.yml`**, superseded by `ci.yml`, and
