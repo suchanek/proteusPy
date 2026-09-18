@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.100.3] - 2026-09-18
+
 ### Changed
 
 - **Data release published.** The `data-v1.0` GitHub Release now carries
@@ -74,6 +76,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a yanked release does not strand anyone. `gdown` is imported lazily, only on
   that path.
 
+- **`pyproject.toml` converted to PEP 621**, matching the rest of the fleet.
+  Metadata that only Poetry read (`name`, `version`, `description`, `readme`,
+  `authors`, `license`, `keywords`, `classifiers`, dependencies, extras,
+  scripts, urls) now lives under `[project]` and `[project.optional-dependencies]`
+  instead of `[tool.poetry]`; `[tool.poetry]` keeps only what has no PEP 621
+  equivalent (`packages`, `include`, `exclude`). `license = "BSD"` becomes the
+  SPDX identifier `license = "BSD-3-Clause"` with `license-files = ["LICENSE"]`,
+  replacing the ambiguous `License :: OSI Approved :: BSD License` /
+  `License :: Other/Proprietary License` classifier pair PyPI currently shows
+  with an unambiguous `License-Expression` in the wheel metadata. Dependency
+  version pins (`colorama = "0.4.6"`) become PEP 508 strings
+  (`"colorama==0.4.6"`); the `viz3d` and `all` extras (identical sets) move to
+  `[project.optional-dependencies]`. The built wheel and sdist were diffed
+  against a build from before this change: the only metadata differences are
+  the license fields, the added `Programming Language :: Python :: 3` and
+  `:: 3.13` classifiers (3.13 was already in `requires-python`; the wheel
+  simply hadn't declared it), and `extra == "viz3d" or extra == "all"`
+  becoming two separate `Requires-Dist` lines per PEP 621's per-extra form
+  (same resolution). `twine check` passes on both artifacts, and installing
+  the wheel into a clean venv still imports `proteusPy`.
+- **`[tool.poetry.group.kg]` floors raised**: `doc-kg` 0.22.0 -> 0.26.0,
+  `pycode-kg` 0.23.1 -> 0.27.0, `ftree-kg` 0.14.0 -> 0.16.0, matching current
+  PyPI. `poetry install --with kg` resolves and all three import cleanly.
+
+- **Git LFS is gone from the repository.** `.gitattributes` still routed
+  `*.ipynb`, `*.whl` and `*.mp4` through LFS, and GitHub no longer serves any
+  of this repo's LFS objects, so a plain `git clone` aborted at checkout. The
+  three LFS rules are dropped and the 19 LFS-tracked files recommitted as
+  ordinary blobs: 16 notebooks byte-identical to their LFS objects, two with
+  outputs cleared (`DisulfideDatabaseAnalysis.ipynb` 43.9 MB to 12 KB,
+  `ss_stats.ipynb` 15.8 MB to 15 KB), and `data/PDB_SS_classes_master2.csv`,
+  which every checkout had held as three lines of pointer text. A fresh clone
+  now checks out without git-lfs; checking out a commit from before this
+  change still needs `GIT_LFS_SKIP_SMUDGE=1`.
+- **`scripts/pre-commit-hook.sh`** runs the quality checks first, and rebuilds
+  the KG indices and saves snapshots only with `PROTEUSPY_SNAPSHOT=1` on the
+  default branch. A per-commit snapshot keyed itself on a tree that was never
+  the committed one. `PROTEUSPY_SKIP_SNAPSHOT=1` gates only the snapshot.
+- **`release.yml`** moves `upload-artifact` and `download-artifact` from v4 to
+  v7 and v8, off the deprecated Node 20 runtime.
+
 ### Added
 
 - **`.github/workflows/ci.yml` and `.github/workflows/release.yml`**, adapted
@@ -119,32 +162,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ruff sorted it as third-party and I001 failed, and the scripts themselves
   would have raised `ModuleNotFoundError`.
 
-### Changed
-
-- **`pyproject.toml` converted to PEP 621**, matching the rest of the fleet.
-  Metadata that only Poetry read (`name`, `version`, `description`, `readme`,
-  `authors`, `license`, `keywords`, `classifiers`, dependencies, extras,
-  scripts, urls) now lives under `[project]` and `[project.optional-dependencies]`
-  instead of `[tool.poetry]`; `[tool.poetry]` keeps only what has no PEP 621
-  equivalent (`packages`, `include`, `exclude`). `license = "BSD"` becomes the
-  SPDX identifier `license = "BSD-3-Clause"` with `license-files = ["LICENSE"]`,
-  replacing the ambiguous `License :: OSI Approved :: BSD License` /
-  `License :: Other/Proprietary License` classifier pair PyPI currently shows
-  with an unambiguous `License-Expression` in the wheel metadata. Dependency
-  version pins (`colorama = "0.4.6"`) become PEP 508 strings
-  (`"colorama==0.4.6"`); the `viz3d` and `all` extras (identical sets) move to
-  `[project.optional-dependencies]`. The built wheel and sdist were diffed
-  against a build from before this change: the only metadata differences are
-  the license fields, the added `Programming Language :: Python :: 3` and
-  `:: 3.13` classifiers (3.13 was already in `requires-python`; the wheel
-  simply hadn't declared it), and `extra == "viz3d" or extra == "all"`
-  becoming two separate `Requires-Dist` lines per PEP 621's per-extra form
-  (same resolution). `twine check` passes on both artifacts, and installing
-  the wheel into a clean venv still imports `proteusPy`.
-- **`[tool.poetry.group.kg]` floors raised**: `doc-kg` 0.22.0 -> 0.26.0,
-  `pycode-kg` 0.23.1 -> 0.27.0, `ftree-kg` 0.14.0 -> 0.16.0, matching current
-  PyPI. `poetry install --with kg` resolves and all three import cleanly.
-
 ### Security
 
 - **`poetry.lock`**: tornado 6.5.7 -> 6.5.9, closing Dependabot alerts 159,
@@ -168,6 +185,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   The small files (`SS_consensus_class_*.pkl`, `*_class_metrics.pkl`, and the
   subset loader) belong in git as plain blobs; re-add them from a working copy
   that has the real files with `make data-restore`.
+
+- **27 `.pycodekg` snapshots** whose key names no commit in the repository,
+  written by the old per-commit hook, and their manifest entries.
 
 
 ## [0.100.2] - 2026-09-08

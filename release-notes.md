@@ -1,6 +1,6 @@
 # Release Notes — v0.100.3
 
-> Released: 2026-09-14
+> Released: 2026-09-18
 
 The disulfide database and prebuilt loaders move off git entirely and onto
 GitHub Release assets, with real checksums now published. CI and release
@@ -101,6 +101,20 @@ one was AST-compared against the prior version, and only
 `programs/compare_class_disulfides.py` has a behavioral-looking diff, where
 pyupgrade replaced `typing.Dict` with `dict`. `.gitignore` now excludes
 `**/.agentkg/`, matching the rest of the fleet.
+
+### The repository clones normally again
+
+`.gitattributes` still routed notebooks through Git LFS after the data moved
+off it, and GitHub no longer serves this repository's LFS objects, so a plain
+`git clone` failed at checkout. Git LFS is now gone from the repository: the
+19 files it tracked are ordinary blobs, two very large notebooks had their
+outputs cleared, and `data/PDB_SS_classes_master2.csv` holds its data rather
+than LFS pointer text. Checking out a commit from before this release still
+needs `GIT_LFS_SKIP_SMUDGE=1`.
+
+The pre-commit hook now runs the quality checks first, and rebuilds the KG
+indices and saves snapshots only when `PROTEUSPY_SNAPSHOT=1` is set. The 27
+snapshots the old per-commit hook wrote are removed.
 
 ## Upgrading
 
