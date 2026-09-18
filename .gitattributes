@@ -3,6 +3,9 @@
 # ones are ordinary git blobs. Release-asset downloads are unmetered, where a
 # single clone of the LFS-tracked database exhausted the whole monthly LFS
 # bandwidth quota.
-*.whl filter=lfs diff=lfs merge=lfs -text
-*.mp4 filter=lfs diff=lfs merge=lfs -text
-*.ipynb filter=lfs diff=lfs merge=lfs -text
+#
+# Nothing is tracked through Git LFS any more. The notebooks, and one CSV,
+# were the last files that were; their LFS objects were purged with the rest,
+# so every fresh clone failed at checkout until they were recommitted as
+# ordinary blobs (2026-09-18). Notebooks are committed with their outputs
+# cleared, which is what keeps them small.
