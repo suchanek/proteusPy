@@ -1,23 +1,23 @@
-docs(waverider): justify intrinsic-dim claims with mechanism refs + corrections
+ci: add CI and release workflows, ruff-format the tree
 
-Relocate waverider_arxiv.tex to docs/waverider/article/ and strengthen the
-paper's scientific rigour:
+Replace the lone pytest.yml workflow with ci.yml and release.yml adapted
+from doc_kg. CI lints with ruff, runs the test suite, and smoke-tests the
+built wheel in an empty venv. Release fires on v* tags, creates the
+GitHub Release from release-notes.md, and publishes the same artifacts
+to PyPI. Delete .github/publish-to-pypi.yml, which sat outside
+workflows/ and never ran. Point the README Testing badge at ci.yml.
 
-- Introduction: replace bare numerical claims ("roughly 13", "roughly 29",
-  ">99% noise") with data-backed statements grounded in WaveRider's own local
-  PCA estimator (Algorithm 1, step 3).  Per-dataset noise fractions corrected:
-  71–83% for UCI Digits, 98.8–99.3% for CIFAR-10 (from Table 4 τ-sweep).
-  Forward references added to §3.2 and Algorithm 1 via new \label anchors.
+Run ruff format and ruff check --fix over the tree at the configured
+100-column width so the lint job passes on its first run. Every
+reformatted Python file was AST-compared against master; only
+compare_class_disulfides.py differs, where pyupgrade swapped
+typing.Dict for dict. No behaviour changes.
 
-- Algorithm 1 / §3.2: added \label{alg:walker} and \label{sec:manifoldwalker}
-  so the Introduction can cross-reference the intrinsic-dimension step directly.
+Pin ruff-pre-commit at v0.16.0 to match the ruff Poetry resolves. The
+old v0.9.10 hook enforced UP038, which newer ruff has retired, so the
+tree passed poetry run ruff check yet failed at commit time. The hook
+id follows the rename to ruff-check.
 
-- Related Work: new "Intrinsic dimensionality estimation" paragraph covering the
-  TwoNN estimator (Facco et al. 2017, implemented in pepys_manifold_explorer.py
-  for global corroboration), participation ratio, and PCA-elbow methods
-  (Kambhatla 1997, the local variant WaveRider uses per node).
+Ignore **/.agentkg/ to match the rest of the fleet.
 
-- Bibliography: added Facco et al. 2017 (Scientific Reports, TwoNN) and Pope
-  et al. 2021 (ICLR, intrinsic dimension of images) as external corroboration.
-
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
