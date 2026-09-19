@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- **FileTreeKG.** `ftree-kg` leaves the `kg` Poetry group, the pre-commit
+  hook no longer builds or snapshots a `.filetreekg` index, and the four
+  committed `.filetreekg` snapshots, their `.gitignore` rules and
+  `analysis/filetreekg_analysis.md` are deleted. The repository's code and
+  documents are still indexed by PyCodeKG and DocKG.
+
+### Changed
+
+- **Fleet dependencies current:** `pycode-kg` floor 0.27.0 -> 0.27.1, and the
+  lock moves `kgmodule-utils` 0.21.0 -> 0.22.0. `pytest` floor 8.0 -> 9.0.3,
+  the fleet's floor.
+
 ## [0.100.3] - 2026-09-18
 
 ### Changed

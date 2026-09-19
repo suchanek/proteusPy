@@ -43,7 +43,6 @@ DEFAULT_BRANCH="${DEFAULT_BRANCH#origin/}"
 
 PYCODEKG="$REPO_ROOT/.venv/bin/pycodekg"
 DOCKG="$REPO_ROOT/.venv/bin/dockg"
-FTREEKG="$REPO_ROOT/.venv/bin/ftreekg"
 
 if [ -x "$PYCODEKG" ] && [ -d "$REPO_ROOT/.pycodekg" ]; then
     "$PYCODEKG" build --repo "$REPO_ROOT" || exit 1
@@ -57,13 +56,6 @@ if [ -x "$DOCKG" ] && [ -d "$REPO_ROOT/.dockg" ]; then
     "$DOCKG" snapshot save --repo . --branch "$BRANCH" \
       || echo "[dockg] snapshot skipped" >&2
     git add .dockg/snapshots/ 2>/dev/null || true
-fi
-
-if [ -x "$FTREEKG" ] && [ -d "$REPO_ROOT/.filetreekg" ]; then
-    "$FTREEKG" build || exit 1
-    "$FTREEKG" snapshot save --repo . --branch "$BRANCH" \
-      || echo "[ftreekg] snapshot skipped" >&2
-    git add .filetreekg/snapshots/ 2>/dev/null || true
 fi
 
 exit 0
