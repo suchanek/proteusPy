@@ -51,10 +51,6 @@ proteusPy/data/*.db
 .dockg/vectors.sqlite*
 .dockg/models/
 
-.filetreekg/graph.sqlite
-.filetreekg/graph.sqlite*
-.filetreekg/models/
-
 # Build / test outputs
 logdir/
 schematic_outputs/
@@ -66,7 +62,6 @@ benchmarks/canonical_tests/logs/
 *.tmp
 commit.txt
 .pycodekg/vectors.sqlite
-.filetreekg/vectors.sqlite
 
 # AgentKG conversational memory (private to this checkout)
 **/.agentkg/

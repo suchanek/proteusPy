@@ -11,7 +11,7 @@ repos:
       - id: check-merge-conflict
       - id: check-added-large-files
         args: [--maxkb=1000]
-        exclude: '^(proteusPy|docs|benchmarks)/.*\.(png|jpg|jpeg|gif|pdf)$|^\.(codekg|dockg|ftreekg)/'
+        exclude: '^(proteusPy|docs|benchmarks)/.*\.(png|jpg|jpeg|gif|pdf)$|^\.(codekg|dockg)/'
       - id: debug-statements
 
   - repo: local

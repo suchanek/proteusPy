@@ -1476,28 +1476,6 @@ test-full = ["adlfs", "aiohttp (!=4.0.0a0,!=4.0.0a1)", "backports-zstd ; python_
 tqdm = ["tqdm"]
 
 [[package]]
-name = "ftree-kg"
-version = "0.16.0"
-description = "KGModule for file tree knowledge graphs"
-optional = false
-python-versions = "<3.14,>=3.12"
-groups = ["kg"]
-files = [
-    {file = "ftree_kg-0.16.0-py3-none-any.whl", hash = "sha256:fd3314d3171ed95ce70f2cac354ef4ad96e5b3e90ab48ae0e05063dadb40feed"},
-    {file = "ftree_kg-0.16.0.tar.gz", hash = "sha256:8c0fc21e7a70a38b697fe260456bebdcb6ea5637e5351a36992a5960a227a0e0"},
-]
-
-[package.dependencies]
-click = ">=8.1.0,<9"
-kgmodule-utils = {version = ">=0.20.0", extras = ["semantic", "sqlite-vec"]}
-mcp = ">=1.0.0,<2"
-pillow = ">=10.0.0"
-rich = ">=13.0.0,<15.0.0"
-
-[package.extras]
-adapter = ["kg-rag (>=0.14.0)"]
-
-[[package]]
 name = "gast"
 version = "0.7.0"
 description = "Python AST that abstracts the underlying Python version"
@@ -2737,21 +2715,21 @@ type = ["pygobject-stubs", "pytest-mypy (>=1.0.1)", "shtab", "types-pywin32"]
 
 [[package]]
 name = "kgmodule-utils"
-version = "0.21.0"
+version = "0.22.0"
 description = "Shared types, graph store, semantic index, and pipeline base for the KGModule SDK"
 optional = false
 python-versions = "<3.14,>=3.12"
 groups = ["kg"]
 files = [
-    {file = "kgmodule_utils-0.21.0-py3-none-any.whl", hash = "sha256:45770743cb45604bc3d253d63b5d1ba9a28de795b508fe415d7fdb1c9152098d"},
-    {file = "kgmodule_utils-0.21.0.tar.gz", hash = "sha256:b40d48c0cd303b08500eb64b0ddd055518385e1a27d04ed9a6ef6a4eecd7468b"},
+    {file = "kgmodule_utils-0.22.0-py3-none-any.whl", hash = "sha256:407bb0ee4b29d3f9008050e5abb040649bb156ab3ef849c197f884576126bab6"},
+    {file = "kgmodule_utils-0.22.0.tar.gz", hash = "sha256:93af0fdabd907f52ee83d2f9c673882fb7d29c1dc54fd342e315800f17d3e744"},
 ]
 
 [package.dependencies]
 numpy = {version = ">=1.24.0", optional = true, markers = "extra == \"semantic\" or extra == \"viz3d\""}
 rich = {version = ">=13.0.0,<15.0.0", optional = true, markers = "extra == \"semantic\""}
 sentence-transformers = {version = ">=5.4.1", optional = true, markers = "extra == \"semantic\""}
-sqlite-vec = {version = "0.1.9", optional = true, markers = "extra == \"semantic\" or extra == \"sqlite-vec\""}
+sqlite-vec = {version = "0.1.9", optional = true, markers = "extra == \"semantic\""}
 torch = {version = ">=2.5.1", optional = true, markers = "extra == \"semantic\""}
 transformers = {version = ">=5.5.0,<6", optional = true, markers = "extra == \"semantic\""}
 
@@ -2764,7 +2742,7 @@ synthesis = ["httpx (>=0.27.0)", "openai (>=1.30.0)", "pillow (>=10.0.0)"]
 synthesis-mflux = ["httpx (>=0.27.0)", "mflux (>=0.9.0)", "openai (>=1.30.0)", "pillow (>=10.0.0)"]
 viz = ["pyvis (>=0.3.2)"]
 viz3d = ["numpy (>=1.24.0)"]
-viz3d-qt = ["PyQt5 (>=5.15.0)", "numpy (>=1.24.0)", "pyvista (>=0.44.0)", "quiltwright (>=0.7.0)"]
+viz3d-qt = ["PyQt5 (>=5.15.0)", "numpy (>=1.24.0)", "pyvista (>=0.44.0)", "quiltwright (>=0.14.1)"]
 viz3d-render = ["numpy (>=1.24.0)", "pyvista (>=0.44.0)"]
 
 [[package]]
@@ -4805,7 +4783,7 @@ version = "12.3.0"
 description = "Python Imaging Library (fork)"
 optional = false
 python-versions = ">=3.10"
-groups = ["main", "jupyter", "kg", "viz"]
+groups = ["main", "jupyter", "viz"]
 files = [
     {file = "pillow-12.3.0-cp310-cp310-macosx_10_10_x86_64.whl", hash = "sha256:6c0016e7b354317c4e9e525b937ac8596c38d2d232b419529b9cd7a1cd46e39a"},
     {file = "pillow-12.3.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:bcc33feacfaefce60c12fd500a277533bdc02b10a19f7f6d348763d8140bbba7"},
@@ -5139,19 +5117,19 @@ tests = ["pytest"]
 
 [[package]]
 name = "pycode-kg"
-version = "0.27.0"
+version = "0.27.1"
 description = "A tool to build a searchable knowledge graph from Python repositories"
 optional = false
 python-versions = "<3.14,>=3.12"
 groups = ["kg"]
 files = [
-    {file = "pycode_kg-0.27.0-py3-none-any.whl", hash = "sha256:39eac05f5fc3be2e39ad9bff5789fc5824721a5ca4311f47511b2cfc4c12db8f"},
-    {file = "pycode_kg-0.27.0.tar.gz", hash = "sha256:bc2d4f591a095897301b24c3b4b64b7e04aebaf36394381cc264610540178e80"},
+    {file = "pycode_kg-0.27.1-py3-none-any.whl", hash = "sha256:29e0d7611e1c78fec0464be733731ce717c29b3984b1bbe8e2aefecb72731add"},
+    {file = "pycode_kg-0.27.1.tar.gz", hash = "sha256:bc046c523995559493d07c7dff8ada1302f6f2b7efe5a28682c494e8053092d0"},
 ]
 
 [package.dependencies]
 click = ">=8.1.0,<9"
-kgmodule-utils = {version = ">=0.20.0", extras = ["semantic", "viz3d"]}
+kgmodule-utils = {version = ">=0.22.0", extras = ["semantic", "viz3d"]}
 mcp = ">=1.0.0,<2"
 networkx = ">=3.0"
 numpy = ">=1.24.0"
@@ -5163,9 +5141,9 @@ starlette = ">=0.49.1,<1.4.0"
 torch = ">=2.5.1"
 
 [package.extras]
-all = ["PyQt5 (>=5.15.0)", "markdown (>=3.6)", "param (>=2.0.0)", "plotly (>=5.14.0)", "pyvis (>=0.3.2)", "pyvista (>=0.44.0)", "pyvistaqt (>=0.11.0)", "quiltwright (>=0.8.0)", "streamlit (>=1.56.0)", "trame-vtk (>=2.0.0)"]
+all = ["PyQt5 (>=5.15.0)", "markdown (>=3.6)", "param (>=2.0.0)", "plotly (>=5.14.0)", "pyvis (>=0.3.2)", "pyvista (>=0.44.0)", "pyvistaqt (>=0.11.0)", "quiltwright (>=0.14.1)", "streamlit (>=1.56.0)", "trame-vtk (>=2.0.0)"]
 viz = ["plotly (>=5.14.0)", "pyvis (>=0.3.2)", "streamlit (>=1.56.0)"]
-viz3d = ["PyQt5 (>=5.15.0)", "kgmodule-utils[viz3d-qt,viz3d-render] (>=0.20.0)", "markdown (>=3.6)", "param (>=2.0.0)", "pyvistaqt (>=0.11.0)", "quiltwright (>=0.8.0)", "trame-vtk (>=2.0.0)"]
+viz3d = ["PyQt5 (>=5.15.0)", "kgmodule-utils[viz3d-qt,viz3d-render] (>=0.22.0)", "markdown (>=3.6)", "param (>=2.0.0)", "pyvistaqt (>=0.11.0)", "quiltwright (>=0.14.1)", "trame-vtk (>=2.0.0)"]
 
 [[package]]
 name = "pycparser"
@@ -8065,4 +8043,4 @@ viz3d = ["markdown", "pyqt5", "pyvistaqt", "trame-vtk"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<3.14"
-content-hash = "ec9fcff81c3ae902ac6d0980ac95691d96a1ae1287380745d2af5274ade174e3"
+content-hash = "6931516cd2c771bf322492ac3895c1ff1b87845693f0bf7eaa1d4534466f44dd"
