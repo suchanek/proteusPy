@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **`ruff` floor raised from `>=0.4.0` to `>=0.15`** (`kgrag_priv` sweep item
+  49, tier 1). Every fleet lock already installs 0.15, so the old floor meant
+  nothing. proteusPy declares no `<0.16` cap, unlike most of the fleet, and
+  none was added here -- the lock resolves 0.16.8.
+
 ### Removed
 
 - **FileTreeKG.** `ftree-kg` leaves the `kg` Poetry group, the pre-commit
