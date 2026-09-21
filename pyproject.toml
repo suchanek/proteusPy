@@ -79,6 +79,7 @@ dependencies = [
     "matplotlib==3.9.2",
     "networkx",
     "numpy",
+    "turtlend>=0.1.0",
     "pandas",
     "param>=2.0.0",
     "pillow>=12.3.0",
@@ -183,11 +184,7 @@ ignore = ["E501"]
 "proteusPy/DisulfideExtractor_mp.py" = ["E402"]
 "proteusPy/graph_reasoner.py" = ["E402"]
 "proteusPy/qt5viewer.py" = ["E402"]
-"proteusPy/turtle3D.py" = ["E402"]
-"turtlend_package/src/turtle3D.py" = ["E402"]
-"turtlend_package/src/__init__.py" = ["F401"]
 "benchmarks/*.py" = ["E402"]
-"turtlend_package/benchmarks/*.py" = ["E402"]
 "programs/cluster.py" = ["E402", "F403", "F405"]
 "programs/DisulfideCluster.py" = ["E402", "F401", "F403", "F405", "F811"]
 "programs/screenshot.py" = ["F403", "F405"]
@@ -196,7 +193,7 @@ ignore = ["E501"]
 "programs/rosetta.py" = ["F403", "F405"]
 
 [tool.pytest.ini_options]
-addopts = "--ignore=tests/test_DisplaySS.py --ignore=tests/test_disulfide_schematic.py --ignore=turtlend_package --ignore=benchmarks"
+addopts = "--ignore=tests/test_DisplaySS.py --ignore=tests/test_disulfide_schematic.py --ignore=benchmarks"
 
 # KGRAG integration
 
@@ -212,4 +209,4 @@ include = ["proteusPy"]
 [tool.dockg]
 # Add extra directories to exclude beyond the built-in SKIP_DIRS.
 # SKIP_DIRS already covers: .dockg, .git, .venv, venv, __pycache__, node_modules, etc.
-exclude = ["bundles", "dist","data","lib","old","programs","turtlend_package"]
+exclude = ["bundles", "dist","data","lib","old","programs"]

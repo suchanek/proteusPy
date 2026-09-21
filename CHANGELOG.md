@@ -11,6 +11,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **`Turtle3D`, `TurtleND` and `Vector3D` now come from the `turtlend`
+  package** ([PyPI](https://pypi.org/project/turtlend/), BSD-3-Clause, NumPy
+  only). This repo and WaveRider each carried an identical copy of
+  `turtle3D.py`, `turtleND.py` and `vector3D.py`; `turtlend` 0.1.0 is now the
+  single source. The three modules here are re-exports, so
+  `proteusPy.turtle3D`, `proteusPy.turtleND`, `proteusPy.vector3D` and the
+  top-level names keep resolving and no caller changes. `turtlend>=0.1.0` is a
+  new main dependency. Verified before and after: 289 tests pass, and the
+  coordinates of three built disulfides, `build_residue` and a 300-step
+  `TurtleND` walk are identical to nine decimal places. `proteusPy.vector3D`
+  sets the `turtlend.vector3D` logger to `ERROR`, which keeps zero-vector
+  warnings quiet as before.
+
+  This also picks up three `Turtle3D` fixes made in `turtlend`. `orient` left
+  the `Position` property stale, `ResetTape` raised `TypeError`, and
+  `orient_at_residue` raised `AttributeError`. Nothing in this repo called
+  those paths.
+
+  The pdoc pages for the three modules now document re-exports and are nearly
+  empty. The API documentation needs a separate refresh that points at the
+  [turtlend docs](https://flux-frontiers.github.io/turtlend/).
+
 - **The `kg` Poetry group is gone** (`kgrag_priv` sweep item 50, phase 1).
   It held `doc-kg` and `pycode-kg`, tools this repo runs but never imports. Under the fleet's
   "tools are global" rule a tool is installed once with `uv tool` and is
