@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **The `kg` Poetry group is gone** (`kgrag_priv` sweep item 50, phase 1).
+  It held `doc-kg` and `pycode-kg`, tools this repo runs but never imports. Under the fleet's
+  "tools are global" rule a tool is installed once with `uv tool` and is
+  never a dependency of the repo; 20 of 22 clones were carrying their own
+  copy, and every copy was a lock entry that drifted on each release.
+  `scripts/pre-commit-hook.sh` now resolves `pycodekg` and `dockg` from
+  `PATH`, falling back to a `.venv` copy. Both were `-x`-guarded against a
+  venv path, so after this removal they would have skipped silently
+  forever.
+
 - **`ruff` floor raised from `>=0.4.0` to `>=0.15`** (`kgrag_priv` sweep item
   49, tier 1). Every fleet lock already installs 0.15, so the old floor meant
   nothing. proteusPy declares no `<0.16` cap, unlike most of the fleet, and

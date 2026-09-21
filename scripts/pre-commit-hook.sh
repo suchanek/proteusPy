@@ -41,8 +41,11 @@ DEFAULT_BRANCH=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null |
 DEFAULT_BRANCH="${DEFAULT_BRANCH#origin/}"
 [ "$BRANCH" != "${DEFAULT_BRANCH:-master}" ] && exit 0
 
-PYCODEKG="$REPO_ROOT/.venv/bin/pycodekg"
-DOCKG="$REPO_ROOT/.venv/bin/dockg"
+# Global tools (uv tool install), with a .venv copy honoured if present.
+PYCODEKG="$(command -v pycodekg 2>/dev/null || true)"
+[ -n "$PYCODEKG" ] || PYCODEKG="$REPO_ROOT/.venv/bin/pycodekg"
+DOCKG="$(command -v dockg 2>/dev/null || true)"
+[ -n "$DOCKG" ] || DOCKG="$REPO_ROOT/.venv/bin/dockg"
 
 if [ -x "$PYCODEKG" ] && [ -d "$REPO_ROOT/.pycodekg" ]; then
     "$PYCODEKG" build --repo "$REPO_ROOT" || exit 1
