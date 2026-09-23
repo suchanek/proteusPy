@@ -2,6 +2,7 @@
 3D vector class and angle, dihedral and distance helpers. The implementation
 lives in the ``turtlend`` package, https://github.com/Flux-Frontiers/turtlend.
 This module re-exports it so that ``proteusPy.vector3D`` keeps resolving.
+Full documentation: https://flux-frontiers.github.io/turtlend/api/vector3D/
 
 Author: Eric G. Suchanek, PhD
 """

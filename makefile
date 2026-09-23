@@ -163,7 +163,7 @@ wheels: proteusPy/_version.py
 
 docs: $(wildcard proteusPy/**/*.py)
 	@echo "Generating documentation..."
-	pdoc -o docs --math --logo "./logo.png" ./proteusPy
+	pdoc -o docs --math --logo "./logo.png" ./proteusPy '!proteusPy.rcsb_viewer'
 
 upload: wheels
 	twine upload -r proteusPy dist/proteusPy-$(VERS)*
