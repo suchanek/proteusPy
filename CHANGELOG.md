@@ -29,6 +29,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `orient_at_residue` raised `AttributeError`. Nothing in this repo called
   those paths.
 
+- **API docs regenerated.** The pdoc site under `docs/` dated from 2026-05-28.
+  It had no `turtleND` page, kept pages for five modules that no longer exist
+  (`Disulfide`, `DisulfideList`, `DisulfideClass_Constructor`, `data`,
+  `version`), and had no pages for ten newer ones. `Residue.html` and
+  `ProteusPyWarning.html` were committed in lowercase, so the index's links to
+  them returned 404 on GitHub Pages. The `turtle3D`, `turtleND` and `vector3D`
+  pages document the re-exported classes in full and link to the `turtlend`
+  API docs. `make docs` now skips `rcsb_viewer`, a `panel serve` app that
+  needs the `viz` group to import. The README's `Disulfide` link now points
+  at `DisulfideBase.html#Disulfide`.
+
   The pdoc pages for the three modules now document re-exports and are nearly
   empty. The API documentation needs a separate refresh that points at the
   [turtlend docs](https://flux-frontiers.github.io/turtlend/).
