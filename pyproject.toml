@@ -87,6 +87,7 @@ dependencies = [
     "plotly-express==0.4.1",
     "psutil",
     "pydssp>=0.9.0",
+    "pyarrow",
     "pympler==1.1",
     "pyvista>=0.44.0",
     "requests>=2.33.0",
