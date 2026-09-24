@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`pyarrow` is now a declared main dependency.** It was used but never
+  declared: `BackboneLoader` imports it for parquet I/O, and unpickling the
+  full `PDB_SS_ALL_LOADER.pkl` needs it because the loader holds
+  arrow-backed pandas data. A clean install could not run
+  `Load_PDB_SS(subset=False)` and failed with
+  `ModuleNotFoundError: No module named 'pyarrow'`. Locked at 25.0.1; 289
+  tests pass.
+
 ### Changed
 
 - **`Turtle3D`, `TurtleND` and `Vector3D` now come from the `turtlend`
