@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **`turtlend` floor raised from `>=0.1.0` to `>=0.1.1`**, the current
+  release; the lock moves to 0.1.1. proteusPy 0.100.4 shipped still pinning
+  0.1.0.
+  289 tests pass.
+
 ## [0.100.4] - 2026-10-05
 
 ### Fixed

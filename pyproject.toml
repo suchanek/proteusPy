@@ -78,7 +78,7 @@ dependencies = [
     "matplotlib==3.9.2",
     "networkx",
     "numpy",
-    "turtlend>=0.1.0",
+    "turtlend>=0.1.1",
     "pandas",
     "param>=2.0.0",
     "pillow>=12.3.0",
