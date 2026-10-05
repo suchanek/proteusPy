@@ -9,7 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.100.4] - 2026-10-05
+
 ### Fixed
+
+- **Torsional energy equation in the docs.** The `Disulfide` docstring and
+  the `DisulfideAnalysis` notebook gave the `chi5` term a coefficient of 1.0;
+  the code has always used 2.0 for both `chi1` and `chi5`. With the written
+  coefficients the minimum possible energy is 1.49 kcal/mol, not the 0.49
+  kcal/mol the code reports for 2q7q 75D-140D. The code and every computed
+  energy are unchanged; the pdoc site is regenerated to match (#56).
 
 - **`pyarrow` is now a declared main dependency.** It was used but never
   declared: `BackboneLoader` imports it for parquet I/O, and unpickling the
@@ -69,6 +78,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   nothing. proteusPy declares no `<0.16` cap, unlike most of the fleet, and
   none was added here -- the lock resolves 0.16.8.
 
+- **Fleet dependencies current:** `pycode-kg` floor 0.27.0 -> 0.27.1, and the
+  lock moves `kgmodule-utils` 0.21.0 -> 0.22.0. `pytest` floor 8.0 -> 9.0.3,
+  the fleet's floor.
+
+- **README** gains a version badge and an APA citation alongside the BibTeX
+  entries.
+
 ### Removed
 
 - **FileTreeKG.** `ftree-kg` leaves the `kg` Poetry group, the pre-commit
@@ -76,12 +92,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   committed `.filetreekg` snapshots, their `.gitignore` rules and
   `analysis/filetreekg_analysis.md` are deleted. The repository's code and
   documents are still indexed by PyCodeKG and DocKG.
-
-### Changed
-
-- **Fleet dependencies current:** `pycode-kg` floor 0.27.0 -> 0.27.1, and the
-  lock moves `kgmodule-utils` 0.21.0 -> 0.22.0. `pytest` floor 8.0 -> 9.0.3,
-  the fleet's floor.
 
 ## [0.100.3] - 2026-09-18
 

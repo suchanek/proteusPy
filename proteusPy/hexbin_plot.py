@@ -3,7 +3,6 @@ hexbin_plotter.py
 Purpose: Create hexbin plots with customizable parameters.
 Usage: python hexbin_plotter.py [arguments]
 Author: Eric G. Suchanek, PhD.
-Last revision: 2025-03-26
 """
 
 # pylint: disable=c0103

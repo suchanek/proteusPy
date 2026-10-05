@@ -1,6 +1,5 @@
 # Analysis of Disulfide Bonds in Proteins of Known Structure
 # Author: Eric G. Suchanek, PhD.
-# Last revision: 1/19/23 -egs-
 # Cα Cβ Sγ
 
 import time

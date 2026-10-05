@@ -1,7 +1,6 @@
 # Initialization for the proteusPy package
 # Copyright (c) 2025 Eric G. Suchanek, PhD., all rights reserved
 # Subject to the BSD public license.
-# Last updated: 2025-03-27 19:48:55 -egs-
 
 # pylint: disable=C0413
 # pylint: disable=C0103

@@ -3,7 +3,6 @@ test_hexbin.py
 Purpose: Test hexbin plots for the proteusPy package.
 Usage: python test_hexbin.py
 Author: Eric G. Suchanek, PhD.
-Last revision: 2025-03-26 18:12:46 -egs-
 """
 
 # pylint: disable=c0103

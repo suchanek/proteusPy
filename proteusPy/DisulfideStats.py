@@ -3,7 +3,6 @@ This module provides statistical analysis functionality for disulfide bonds
 in the proteusPy package.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-02-25 17:34:59
 """
 
 # pylint: disable=C0301

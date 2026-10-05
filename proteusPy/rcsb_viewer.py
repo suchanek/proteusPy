@@ -1,7 +1,6 @@
 """
 RCSB Disulfide Bond Database Browser
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-02-23 16:41:02 -egs-
 """
 
 # pylint: disable=C0301 # line too long

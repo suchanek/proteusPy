@@ -6,7 +6,6 @@ using the proteusPy package. It shows various visualization methods for both sin
 disulfide bonds and lists of disulfide bonds.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-02-13
 """
 
 # pylint: disable=W1203

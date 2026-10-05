@@ -13,7 +13,6 @@ Dependencies:
 - numpy
 - pandas
 
-Last Revision: 2025-02-25 23:51:14 -egs-
 """
 
 # pylint: disable=C0301 # line too long

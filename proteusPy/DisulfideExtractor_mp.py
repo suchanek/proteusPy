@@ -17,7 +17,6 @@ utilizes multiprocessing to speed up the extraction process.
 * Subset: Only extract and process the first 1000 Disulfides found in the PDB directory.
 
 Author: Eric G. Suchanek, PhD.
-Last revision: 2025-01-17 13:16:20 -egs-
 """
 
 import argparse

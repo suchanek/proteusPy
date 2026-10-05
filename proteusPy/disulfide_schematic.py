@@ -3,7 +3,6 @@ This module provides functionality to create 2D schematic diagrams of disulfide 
 for publication purposes.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-03-04 10:15:04
 """
 
 import matplotlib.patches as patches

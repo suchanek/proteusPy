@@ -1,6 +1,5 @@
 # Makefile for proteusPy and associated programs
 # Author: Eric G. Suchanek, PhD
-# Last revision: 2025-04-27 21:21:28 -egs-
 
 VERS = $(shell python -c "exec(open('proteusPy/_version.py').read()); print(__version__)")
 CONDA ?= conda

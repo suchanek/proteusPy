@@ -7,7 +7,6 @@ in the proteusPy package, allowing users to create publication-ready 2D diagrams
 of disulfide bonds with various customization options.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-03-04
 """
 
 import argparse

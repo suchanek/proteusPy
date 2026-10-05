@@ -3,7 +3,6 @@ This module provides I/O operations for the proteusPy package's disulfide bond f
 It handles loading and extracting disulfide bonds from PDB files.
 
 Author: Eric G. Suchanek, PhD
-Last revision: 2025-02-12
 """
 
 # pylint: disable=C0103 # snake case

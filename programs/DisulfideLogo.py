@@ -1,6 +1,5 @@
 # Disulfide Bond Analysis
 # Author: Eric G. Suchanek, PhD.
-# Last revision: 1/2/23 -egs-
 # Cα Cβ Sγ
 
 

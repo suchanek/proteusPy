@@ -36,7 +36,6 @@ Usage examples:
     DisulfideEnergy.create_surface_plot(chi_indices=(2, 3))
 
 Author: Eric G. Suchanek, PhD
-Last Revision: 2025-04-16 18:23:33
 License: BSD
 """
 

@@ -1,0 +1,126 @@
+{
+  "key": "0.100.4",
+  "branch": "master",
+  "timestamp": "2026-10-05T15:28:11.176548+00:00",
+  "version": "0.100.4",
+  "subject": "repo:proteuspy",
+  "tool": "doc-kg",
+  "tool_version": "0.27.0",
+  "tree_hash": "d915732f7601fbaafc6dca0d03e5a831aea6b25d",
+  "metrics": {
+    "db_path": ".dockg/graph.sqlite",
+    "total_nodes": 2614,
+    "total_edges": 15847,
+    "node_counts": {
+      "chunk": 432,
+      "document": 16,
+      "entity": 787,
+      "keyword": 779,
+      "section": 246,
+      "topic": 354
+    },
+    "edge_counts": {
+      "CONTAINS": 678,
+      "CO_OCCURS_WITH": 10514,
+      "HAS_KEYWORD": 1727,
+      "HAS_TOPIC": 437,
+      "MENTIONS_ENTITY": 1841,
+      "NEXT": 180,
+      "SIMILAR_TO": 470
+    },
+    "meaningful_nodes": 2598,
+    "coverage_score": 0.9830246913580246,
+    "issues_count": 0,
+    "complexity_median": 17.0
+  },
+  "hotspots": [
+    {
+      "id": "chunk:analysis/proteusPy_analysis_20260323.md:0005",
+      "file_path": "analysis/proteusPy_analysis_20260323.md",
+      "label": "Fan-In Ranking",
+      "references": 0,
+      "semantic_links": 22,
+      "total_links": 23
+    },
+    {
+      "id": "chunk:analysis/proteusPy_analysis_20260323.md:0009",
+      "file_path": "analysis/proteusPy_analysis_20260323.md",
+      "label": "Module Architecture",
+      "references": 0,
+      "semantic_links": 20,
+      "total_links": 20
+    },
+    {
+      "id": "chunk:README.md:0001",
+      "file_path": "README.md",
+      "label": "\ud83c\udf89 Announcement",
+      "references": 0,
+      "semantic_links": 18,
+      "total_links": 19
+    },
+    {
+      "id": "chunk:analysis/proteusPy_analysis_20260323.md:0012",
+      "file_path": "analysis/proteusPy_analysis_20260323.md",
+      "label": "Public API Surface",
+      "references": 0,
+      "semantic_links": 18,
+      "total_links": 18
+    },
+    {
+      "id": "chunk:CHANGELOG.md:0043",
+      "file_path": "CHANGELOG.md",
+      "label": "Changed",
+      "references": 0,
+      "semantic_links": 17,
+      "total_links": 18
+    },
+    {
+      "id": "chunk:docs/disulfide_schematic_README.md:0007",
+      "file_path": "docs/disulfide_schematic_README.md",
+      "label": "`create_disulfide_schematic`",
+      "references": 0,
+      "semantic_links": 17,
+      "total_links": 18
+    },
+    {
+      "id": "chunk:analysis/proteusPy_analysis_20260323.md:0000",
+      "file_path": "analysis/proteusPy_analysis_20260323.md",
+      "label": "chunk:0001",
+      "references": 0,
+      "semantic_links": 17,
+      "total_links": 17
+    },
+    {
+      "id": "chunk:analysis/proteusPy_analysis_20260323.md:0002",
+      "file_path": "analysis/proteusPy_analysis_20260323.md",
+      "label": "Baseline Metrics",
+      "references": 0,
+      "semantic_links": 17,
+      "total_links": 17
+    },
+    {
+      "id": "chunk:analysis/proteusPy_analysis_20260323.md:0014",
+      "file_path": "analysis/proteusPy_analysis_20260323.md",
+      "label": "Docstring Coverage",
+      "references": 0,
+      "semantic_links": 17,
+      "total_links": 17
+    },
+    {
+      "id": "chunk:analysis/proteusPy_analysis_20260323.md:0016",
+      "file_path": "analysis/proteusPy_analysis_20260323.md",
+      "label": "Structural Importance Ranking (SIR)",
+      "references": 0,
+      "semantic_links": 17,
+      "total_links": 17
+    }
+  ],
+  "issues": [],
+  "vs_previous": null,
+  "vs_baseline": {
+    "nodes": 74,
+    "edges": 649,
+    "coverage_delta": 1.4982620160530757e-05,
+    "issues_delta": 0
+  }
+}

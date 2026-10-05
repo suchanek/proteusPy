@@ -1,7 +1,6 @@
 #
 # pyproject.toml for the proteusPy Python package (PEP 621).
 # Author: Eric G. Suchanek, PhD
-# Last revision: 2026-09-14
 #
 # Build system : Poetry 2.x with PEP 621 [project] table
 #
@@ -49,7 +48,7 @@ exclude = [
 # ---------------------------------------------------------------------------
 [project]
 name = "proteusPy"
-version = "0.100.3"
+version = "0.100.4"
 description = "proteusPy - Protein Structure Analysis and Modeling Tools"
 readme = "README.md"
 license = "BSD-3-Clause"
