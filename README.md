@@ -2,7 +2,7 @@
 ![Testing](https://github.com/suchanek/proteusPy/actions/workflows/ci.yml/badge.svg)
 [![status](https://joss.theoj.org/papers/45de839b48a550d6ab955c5fbbc508f2/status.svg)](https://joss.theoj.org/papers/45de839b48a550d6ab955c5fbbc508f2)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.11148440-blue.svg)](https://doi.org/10.5281/zenodo.11148440)
-[![Version](https://img.shields.io/badge/version-0.100.4-blue.svg)](https://github.com/suchanek/proteusPy/releases)
+[![Version](https://img.shields.io/badge/version-0.100.5-blue.svg)](https://github.com/suchanek/proteusPy/releases)
 [![API Docs](https://img.shields.io/badge/API%20Documentation-8A2BE2)](https://suchanek.github.io/proteusPy/proteusPy.html)
 
 <!-- markdownlint-disable MD014 -->
@@ -272,7 +272,7 @@ proteusPy is in maintenance mode. For questions or inquiries please contact mail
 
 The proteusPy package was developed by Eric G. Suchanek, PhD. If you find it useful in your research and wish to cite it please use the following citation or BibTeX entries:
 
-> Suchanek, E. G. (2024). *proteusPy: A Package for Modeling and Analyzing Proteins of Known Structure* (Version 0.100.4) [Software]. GitHub. https://doi.org/10.5281/zenodo.11148440
+> Suchanek, E. G. (2024). *proteusPy: A Package for Modeling and Analyzing Proteins of Known Structure* (Version 0.100.5) [Software]. GitHub. https://doi.org/10.5281/zenodo.11148440
 
 ```
 @article{Suchanek2024,
@@ -292,7 +292,7 @@ The proteusPy package was developed by Eric G. Suchanek, PhD. If you find it use
   title = {proteusPy: A Package for Modeling and Analyzing Proteins of Known Structure},
   year = {2024},
   publisher = {GitHub},
-  version = {0.100.4},
+  version = {0.100.5},
   journal = {GitHub repository},
   doi = {10.5281/zenodo.11148440},
   url = {https://github.com/suchanek/proteusPy}

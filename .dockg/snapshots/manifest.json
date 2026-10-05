@@ -1,6 +1,6 @@
 {
   "format": "1.0",
-  "last_update": "2026-10-05T15:28:11.178611+00:00",
+  "last_update": "2026-10-05T15:41:59.147979+00:00",
   "snapshots": [
     {
       "key": "2026-09-14T19:34:40.998227+00:00",
@@ -178,6 +178,52 @@
           "nodes": 74,
           "edges": 649,
           "coverage_delta": 1.4982620160530757e-05,
+          "issues_delta": 0
+        }
+      }
+    },
+    {
+      "key": "0.100.5",
+      "branch": "master",
+      "timestamp": "2026-10-05T15:41:59.146319+00:00",
+      "version": "0.100.5",
+      "subject": "repo:proteuspy",
+      "tool": "doc-kg",
+      "tool_version": "0.27.0",
+      "file": "0.100.5.json",
+      "metrics": {
+        "db_path": ".dockg/graph.sqlite",
+        "total_nodes": 2583,
+        "total_edges": 15550,
+        "node_counts": {
+          "chunk": 421,
+          "document": 16,
+          "entity": 784,
+          "keyword": 775,
+          "section": 241,
+          "topic": 346
+        },
+        "edge_counts": {
+          "CONTAINS": 662,
+          "CO_OCCURS_WITH": 10352,
+          "HAS_KEYWORD": 1683,
+          "HAS_TOPIC": 425,
+          "MENTIONS_ENTITY": 1797,
+          "NEXT": 174,
+          "REFERENCES": 1,
+          "SIMILAR_TO": 456
+        },
+        "meaningful_nodes": 2567,
+        "coverage_score": 0.9817893903404592,
+        "issues_count": 0,
+        "complexity_median": 17.0
+      },
+      "deltas": {
+        "vs_previous": null,
+        "vs_baseline": {
+          "nodes": 43,
+          "edges": 352,
+          "coverage_delta": -0.0012203183974048848,
           "issues_delta": 0
         }
       }
