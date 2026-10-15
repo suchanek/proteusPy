@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Documentation
+
+- **JOSS paper source restored and corrected** (`paper/`). The source of the
+  2024 JOSS paper (10.21105/joss.06169) was no longer in the repository; it
+  is restored from the v0.96.31 Zenodo archive (10.5281/zenodo.13241499) that
+  the paper was accepted on. Two errors fixed: the torsional-energy equation
+  now applies the 2.0 coefficient to both `chi1` and `chi5`, as the code
+  always has, and the Schmidt 2006 reference now carries its real title,
+  authors and pages (Schmidt, Ho and Hogg, "Allosteric Disulfide Bonds",
+  Biochemistry 45:7429-7433).
+
 ## [0.100.6] - 2026-10-06
 
 ### Security
