@@ -191,24 +191,26 @@ else
 	python proteusPy/DisulfideClasses.py
 endif
 
-docker: viewer/rcsb_viewer.py viewer/dockerfile
-	docker build -t rcsb_viewer viewer/ --no-cache
+docker: viewer/rcsb_viewer.py viewer/dockerfile viewer/data/PDB_SS_ALL_LOADER.pkl
+	docker build -t rcsb_viewer viewer/ --build-arg PROTEUSPY_VERSION=$(VERS)
 
 docker_hub: viewer/rcsb_viewer.py viewer/dockerfile viewer/data/PDB_SS_ALL_LOADER.pkl
-	docker buildx use cloud-egsuchanek-rcsbviewer
-	docker buildx build viewer/ --platform linux/arm64,linux/amd64 \
+	docker buildx build viewer/ --builder cloud-egsuchanek-rcsbviewer \
+		--platform linux/arm64,linux/amd64 \
 		-f viewer/dockerfile \
+		--build-arg PROTEUSPY_VERSION=$(VERS) \
 		-t docker.io/egsuchanek/rcsb_viewer:latest \
 		-t docker.io/egsuchanek/rcsb_viewer:$(VERS) \
-		--push --no-cache
+		--progress=plain --push
 
 docker_github: viewer/rcsb_viewer.py viewer/dockerfile viewer/data/PDB_SS_ALL_LOADER.pkl
-	docker buildx use cloud-egsuchanek-rcsbviewer
-	docker buildx build viewer/ --platform linux/arm64,linux/amd64 \
+	docker buildx build viewer/ --builder cloud-egsuchanek-rcsbviewer \
+		--platform linux/arm64,linux/amd64 \
 		-f viewer/dockerfile \
+		--build-arg PROTEUSPY_VERSION=$(VERS) \
 		-t ghcr.io/suchanek/rcsb_viewer:latest \
 		-t ghcr.io/suchanek/rcsb_viewer:$(VERS) \
-		--push --no-cache
+		--progress=plain --push
 
 docker_all: docker docker_hub docker_github
 

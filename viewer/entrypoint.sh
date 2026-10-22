@@ -1,10 +1,6 @@
 #!/bin/bash
 set -e
 
-# Activate the Conda environment
-source /opt/conda/etc/profile.d/conda.sh
-conda activate proteusPy
-
 # Check if Xvfb is already running and kill it if necessary
 if pgrep Xvfb > /dev/null; then
     echo "Xvfb is already running. Killing the existing process."

@@ -1,63 +1,61 @@
-# Use the Miniconda3 image as a base
-FROM continuumio/miniconda3
+# RCSB Disulfide Viewer: a Panel app served on port 5006.
+#
+# Plain python:3.12-slim with pip, no conda: proteusPy from PyPI brings
+# pyvista and vtk, and panel is the only other runtime dependency. VTK ships
+# Linux wheels for both amd64 and arm64, so the same file builds both.
+# PROTEUSPY_VERSION pins the release, so the pip layer rebuilds when the
+# version changes and is reused from cache otherwise.
+
+FROM python:3.12-slim
+
+ARG PROTEUSPY_VERSION
 
 LABEL org.opencontainers.image.source=https://github.com/suchanek/proteusPy
 LABEL org.opencontainers.image.description="RCSB Disulfide Viewer"
 LABEL org.opencontainers.image.licenses=BSD-3-Clause
 
-# Set environment variables to prevent interactive prompts during package installations
 ENV DEBIAN_FRONTEND=noninteractive \
-    PATH="/opt/conda/envs/proteusPy/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PYVISTA_OFF_SCREEN=true \
     DOCKER_RUNNING=true \
     MPLCONFIGDIR=/tmp/matplotlib \
     PDB=/home/appuser
 
-
-# Install system dependencies
+# Virtual display and the GL/X libraries the VTK wheel loads.
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         libgl1 \
-        mesa-utils \
         libegl1 \
         libglib2.0-0 \
-        xvfb \
-        xauth \
         libxrender1 \
-        libxext6 && \
+        libxext6 \
+        procps \
+        xvfb \
+        xauth && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy the environment.yml file for better caching
-COPY environment.yml /tmp/environment.yml
+# proteusPy needs torch through pydssp. The CPU-only build comes first: the
+# PyPI torch for amd64 pulls several GB of CUDA libraries the viewer never uses.
+RUN test -n "$PROTEUSPY_VERSION" && \
+    pip install torch --index-url https://download.pytorch.org/whl/cpu && \
+    pip install "proteusPy==${PROTEUSPY_VERSION}" "panel>=1.8.0"
 
-# Create the conda environment
-RUN conda env create -f /tmp/environment.yml
+RUN useradd -m appuser && \
+    mkdir -p /tmp/matplotlib /app && \
+    chown appuser:appuser /tmp/matplotlib /app
 
-RUN /opt/conda/envs/proteusPy/bin/pip install --verbose proteusPy --upgrade && \
-    conda clean -a -y
-
-
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+# The database first: it is the largest layer and changes least often.
+# --chown here, not a later chown -R, which would store it a second time.
+COPY --chown=appuser:appuser data /app/data
+COPY --chown=appuser:appuser --chmod=755 entrypoint.sh /app/
+COPY --chown=appuser:appuser rcsb_viewer.py /app/
 
-# Fix permissions and prepare Matplotlib cache
-RUN useradd -m appuser && \
-    mkdir -p /tmp/matplotlib && \
-    chown -R appuser:appuser /tmp/matplotlib && \
-    chown -R appuser:appuser /app && \
-    chmod +x /app/entrypoint.sh
-
-# Update the login bash profile to activate the environment with interactive access.
-RUN echo "source activate proteusPy" >> ~/.bashrc
-
-# Switch to the non-root user
 USER appuser
 
-# Expose port 5006 for the Bokeh server
 EXPOSE 5006
 
-# Set the entrypoint to the entrypoint script
 ENTRYPOINT ["/app/entrypoint.sh"]

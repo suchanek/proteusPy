@@ -201,17 +201,21 @@ and open [Analysis_2q7q.ipynb](https://github.com/suchanek/proteusPy/blob/master
    $ panel serve ~/repos/proteusPy/viewer/rcsb_viewer.py --show --autoreload
    ```
 
-3) rcsb_viewer `Docker` version -  I've created a `Docker` image of the viewer. It's available on `DockerHub` at `egsuchanek/rcsb_viewer:latest`, as well as on GitHub at: `ghcr.io/suchanek/rcsb_viewer`. It's possible to build the image for MacOS or Linux by going into the `viewer` directory and executing:
+3) rcsb_viewer `Docker` version -  I've created a `Docker` image of the viewer. It's available on `DockerHub` at `egsuchanek/rcsb_viewer:latest`, as well as on GitHub at: `ghcr.io/suchanek/rcsb_viewer`, for both `linux/amd64` and `linux/arm64`. It's possible to build the image locally from the repository root with:
 
   ```console
-  $ docker build -t rcsb_viewer .
+  $ make docker
   ```
+
+This downloads the database into `viewer/data` if needed and builds the image for the current platform.
 
 It's also possible to simply pull the Docker image directly from DockerHub and run it via:
 
   ```console
-    $ docker run -d  -p 5006:5006  --n rcsb_viewer --restart unless-stopped egsuchanek/rcsb_viewer:latest
+    $ docker run -d -p 5006:5006 --memory 8g --name rcsb_viewer --restart unless-stopped egsuchanek/rcsb_viewer:latest
   ```
+
+Then open <http://localhost:5006/rcsb_viewer>. The loaded database needs about 7 GB of memory, so give Docker at least 8 GB (in Docker Desktop: **Settings > Resources > Memory**). With less, the viewer is killed while loading and the page refuses the connection.
 
 1) [qt5_viewer.py](https://github.com/suchanek/proteusPy/blob/master/proteusPy/qt5_viewer.py) - I have added a pyqt5-based viewer. This is similar to the ``Panel`` program but uses ``pyqt5`` for rendering. This works under Macos and Windows, but can't run under Linux due to the inability to install pyqt5. If you'd like to try it out under MacOS or Windows install proteusPy as above. After installation install the pyqt5 libraries with:
 
