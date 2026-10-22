@@ -9,7 +9,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Viewer Docker image rebuilt on `python:3.12-slim`** (`viewer/dockerfile`).
+  The Miniconda base and conda environment are gone: pip installs CPU-only
+  torch (needed through `pydssp`; the PyPI build for amd64 adds several GB of
+  CUDA libraries), then `proteusPy==<version>` and `panel`. The database is
+  copied with `--chown` so it is stored once. Local image: 4.21 GB, down from
+  an 8.66 GB compressed push. `make docker`, `docker_hub` and `docker_github`
+  pass the version as a build argument, keep the build cache (no
+  `--no-cache`), and name the Build Cloud builder with `--builder` instead of
+  switching the global default.
+- **The viewer reports proteusPy's version** instead of a hard-coded `0.99.1`
+  (`viewer/rcsb_viewer.py`, `proteusPy/rcsb_viewer.py`).
+
+### Fixed
+
+- `DisulfideVisualization` passes `center` and `direction` to `pv.Cylinder` by
+  keyword. PyVista 0.49 warns on positional arguments and 0.50 will raise
+  `TypeError`.
+
 ### Documentation
+
+- README: the Docker section builds with `make docker`, fixes the `docker
+  run` flag (`--name`, not `--n`), and states the memory need: the loaded
+  database peaks at about 7 GB, so Docker needs at least 8 GB.
 
 - **JOSS paper source restored and corrected** (`paper/`). The source of the
   2024 JOSS paper (10.21105/joss.06169) was no longer in the repository; it

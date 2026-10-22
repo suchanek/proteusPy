@@ -40,7 +40,7 @@ from proteusPy.ProteusGlobals import DATA_DIR
 
 proteus_vers = __version__
 
-_vers = "0.99.1"
+_vers = proteus_vers
 
 # Set PyVista to use offscreen rendering if the environment variable is set
 # needed in Docker.
@@ -798,9 +798,9 @@ help_menu_button = pn.widgets.MenuButton(
 def show_about_dialog():
     """Shows the about dialog."""
     return pn.pane.Alert(
-        """
+        f"""
         RCSB Disulfide Bond Database Browser
-        Version: 0.99.1
+        Version: {_vers}
         """
     )
 

@@ -136,16 +136,16 @@ docker rm rcsb_viewer
 - [docker_win.yml](docker_win.yml) - Windows container Dockerfile
 - [entrypoint.sh](entrypoint.sh) - Linux container startup script
 - [entrypoint.bat](entrypoint.bat) - Windows container startup script
-- [environment.yml](environment.yml) - Conda environment specification
+- [environment.yml](environment.yml) - Conda environment specification (Windows container only)
 - [rcsb_viewer.py](rcsb_viewer.py) - Main viewer application
 
 ## Architecture
 
 The container:
-1. Uses Miniconda3 as the base image
-2. Installs system dependencies (OpenGL, Mesa, Xvfb)
-3. Creates a Conda environment from environment.yml
-4. Installs proteusPy package
+1. Uses python:3.12-slim as the base image
+2. Installs system dependencies (OpenGL, Xvfb)
+3. Installs CPU-only torch, then proteusPy (pinned to the repository's version) and panel with pip
+4. Copies in the database, the viewer and the entrypoint
 5. Runs Xvfb (virtual frame buffer) for headless rendering
 6. Starts Panel/Bokeh server on port 5006
 7. Loads the RCSB Disulfide Database on startup

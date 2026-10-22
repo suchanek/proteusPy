@@ -1536,20 +1536,22 @@ class DisulfideVisualization:
                 )
 
                 if style == "plain":
-                    cyl = pv.Cylinder(origin, direction, radius=bradius, height=height * 2.0)
+                    cyl = pv.Cylinder(
+                        center=origin, direction=direction, radius=bradius, height=height * 2.0
+                    )
                     pvp.add_mesh(cyl, color=orig_col)
                 else:
                     cyl1 = pv.Cylinder(
-                        origin1,
-                        direction,
+                        center=origin1,
+                        direction=direction,
                         radius=bradius,
                         height=height,
                         capping=False,
                         resolution=res,
                     )
                     cyl2 = pv.Cylinder(
-                        origin2,
-                        direction,
+                        center=origin2,
+                        direction=direction,
                         radius=bradius,
                         height=height,
                         capping=False,
