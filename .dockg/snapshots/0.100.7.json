@@ -1,0 +1,127 @@
+{
+  "key": "0.100.7",
+  "branch": "master",
+  "timestamp": "2026-10-22T23:02:54.174809+00:00",
+  "version": "0.100.7",
+  "subject": "repo:proteusPy",
+  "tool": "doc-kg",
+  "tool_version": "0.27.0",
+  "tree_hash": "4c47d477a68e975edc751eb20ba8fdf639566fdf",
+  "metrics": {
+    "db_path": ".dockg/graph.sqlite",
+    "total_nodes": 2833,
+    "total_edges": 17448,
+    "node_counts": {
+      "chunk": 476,
+      "document": 17,
+      "entity": 848,
+      "keyword": 839,
+      "section": 264,
+      "topic": 389
+    },
+    "edge_counts": {
+      "CONTAINS": 740,
+      "CO_OCCURS_WITH": 11530,
+      "HAS_KEYWORD": 1903,
+      "HAS_TOPIC": 481,
+      "MENTIONS_ENTITY": 2028,
+      "NEXT": 205,
+      "REFERENCES": 1,
+      "SIMILAR_TO": 560
+    },
+    "meaningful_nodes": 2816,
+    "coverage_score": 0.9831932773109244,
+    "issues_count": 0,
+    "complexity_median": 19.0
+  },
+  "hotspots": [
+    {
+      "id": "chunk:analysis/proteusPy_analysis_20260323.md:0005",
+      "file_path": "analysis/proteusPy_analysis_20260323.md",
+      "label": "Fan-In Ranking",
+      "references": 0,
+      "semantic_links": 22,
+      "total_links": 23
+    },
+    {
+      "id": "chunk:README.md:0046",
+      "file_path": "README.md",
+      "label": "Publications",
+      "references": 0,
+      "semantic_links": 21,
+      "total_links": 22
+    },
+    {
+      "id": "chunk:README.md:0001",
+      "file_path": "README.md",
+      "label": "\ud83c\udf89 Announcement",
+      "references": 0,
+      "semantic_links": 20,
+      "total_links": 21
+    },
+    {
+      "id": "chunk:analysis/proteusPy_analysis_20260323.md:0009",
+      "file_path": "analysis/proteusPy_analysis_20260323.md",
+      "label": "Module Architecture",
+      "references": 0,
+      "semantic_links": 20,
+      "total_links": 20
+    },
+    {
+      "id": "chunk:README.md:0044",
+      "file_path": "README.md",
+      "label": "Citing proteusPy",
+      "references": 0,
+      "semantic_links": 19,
+      "total_links": 20
+    },
+    {
+      "id": "chunk:README.md:0021",
+      "file_path": "README.md",
+      "label": "Usage",
+      "references": 0,
+      "semantic_links": 18,
+      "total_links": 19
+    },
+    {
+      "id": "chunk:README.md:0043",
+      "file_path": "README.md",
+      "label": "Citing proteusPy",
+      "references": 0,
+      "semantic_links": 18,
+      "total_links": 19
+    },
+    {
+      "id": "chunk:README.md:0045",
+      "file_path": "README.md",
+      "label": "Citing proteusPy",
+      "references": 0,
+      "semantic_links": 18,
+      "total_links": 18
+    },
+    {
+      "id": "chunk:analysis/proteusPy_analysis_20260323.md:0012",
+      "file_path": "analysis/proteusPy_analysis_20260323.md",
+      "label": "Public API Surface",
+      "references": 0,
+      "semantic_links": 18,
+      "total_links": 18
+    },
+    {
+      "id": "chunk:CHANGELOG.md:0052",
+      "file_path": "CHANGELOG.md",
+      "label": "Changed",
+      "references": 0,
+      "semantic_links": 17,
+      "total_links": 18
+    }
+  ],
+  "issues": [],
+  "vs_previous": null,
+  "vs_baseline": {
+    "nodes": 293,
+    "edges": 2250,
+    "coverage_delta": 0.00018356857306034424,
+    "issues_delta": 0
+  }
+}

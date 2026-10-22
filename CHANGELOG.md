@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.100.7] - 2026-10-22
+
 ### Changed
 
 - **Viewer Docker image rebuilt on `python:3.12-slim`** (`viewer/dockerfile`).
@@ -22,6 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   switching the global default.
 - **The viewer reports proteusPy's version** instead of a hard-coded `0.99.1`
   (`viewer/rcsb_viewer.py`, `proteusPy/rcsb_viewer.py`).
+- Development lock: pyvista 0.48.4 -> 0.49.1. The suite and every
+  `_render_ss` style run clean on 0.49.1 with its deprecation warnings as
+  errors.
 
 ### Fixed
 
@@ -34,7 +39,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README: the Docker section builds with `make docker`, fixes the `docker
   run` flag (`--name`, not `--n`), and states the memory need: the loaded
   database peaks at about 7 GB, so Docker needs at least 8 GB.
-
 - **JOSS paper source restored and corrected** (`paper/`). The source of the
   2024 JOSS paper (10.21105/joss.06169) was no longer in the repository; it
   is restored from the v0.96.31 Zenodo archive (10.5281/zenodo.13241499) that

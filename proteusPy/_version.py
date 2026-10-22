@@ -1,2 +1,2 @@
 # module version
-__version__ = "0.100.6"
+__version__ = "0.100.7"
