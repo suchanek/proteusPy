@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Web export for The Knowledge Press: The Disulfides**
+  (`proteusPy/export_web.py`, console script `proteusPy.export_web`).
+  `proteusPy.export_web --database subset|full --out DIR` writes
+  `catalog.json` (18 groves by class family, the 32 binary classes as
+  lines, their quadrant and octant classes), one class card per class under
+  `classes/`, one bond card per sampled member under `bonds/`, and
+  `atoms.json`, the atom order, colors, radii and bond tables of
+  `DisulfideVisualization._render_ss`. The tiers are binary > quadrant >
+  octant, computed with `classify_angles` at bases 2, 4 and 8, which nest
+  exactly; `DisulfideTree`'s sextant tier does not, and is not used. Octant
+  classes under `--min-members` (default 2 on the subset, 20 on the full
+  database) fold into a `<quadrant id>-other` tip; each octant class carries
+  up to `--members-per-class` (default 12) members, lowest energy first.
+  Models come from `SS_consensus_class_32.pkl` and
+  `SS_consensus_class_oct.pkl`, else from the class's consensus torsions.
+  The home disulfide defaults to the lowest-energy bond, 2q7q_75D_140D on
+  the full database. The full export (175,277 bonds) loads in 5 s and
+  writes 57 MB in 4 s more.
+
 ## [0.100.7] - 2026-10-22
 
 ### Changed

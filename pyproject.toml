@@ -129,6 +129,7 @@ Documentation = "https://suchanek.github.io/proteusPy/"
 "proteusPy.render_disulfide_schematic" = "proteusPy.render_disulfide_schematic:main"
 "proteusPy.display_class_disulfides"   = "proteusPy.display_class_disulfides:main"
 "proteusPy.hexbin_plot"                = "proteusPy.hexbin_plot:main"
+"proteusPy.export_web"                 = "proteusPy.export_web:main"
 
 [tool.poetry.group.ml]
 optional = true
