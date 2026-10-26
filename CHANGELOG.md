@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.101.0] - 2026-10-26
+
 ### Added
 
 - **Web export for The Knowledge Press: The Disulfides**
