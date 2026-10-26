@@ -164,6 +164,17 @@ CLASSOBJ_FNAME = "PDB_CLASS_OBJ.pkl"
 # Default cutoffs for the database from analysis. These are 95% confidence
 # intervals for Ca and Sg distances. The cutoffs are used to filter the database
 # for the most statistically reliable disulfide bonds.
+#
+# They are the 95th percentiles of the full database's Ca-Ca and Sg-Sg
+# distances (6.7052 and 2.1218 A), rounded. The two forms give slightly
+# different sets, both in use:
+#   - these constants, 0 < d < cutoff (filter_by_distance's rule): 158,965
+#     bonds in 35,367 structures, the Springer chapter's published set, and
+#     what export_web keeps;
+#   - DisulfideLoader(percentile=95), which computes the cutoffs unrounded:
+#     158,938 bonds in 35,375 structures, the analysis notebooks' counts.
+# Load_PDB_SS has taken only `percentile` since v0.99.34, and the prebuilt
+# loader it downloads is unfiltered (175,277 bonds).
 
 CA_CUTOFF = 6.71
 CA_MIN_CUTOFF = 1.0

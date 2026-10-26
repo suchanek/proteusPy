@@ -1,6 +1,6 @@
 """
 Tests for proteusPy.export_web, the data export for The Knowledge Press:
-The Disulfides, on the 5,000-bond subset.
+The Disulfides, on the 5,000-bond subset (4,575 within the cutoffs).
 
 Author: Eric G. Suchanek, PhD
 """
@@ -13,7 +13,7 @@ import pytest
 
 from proteusPy import Load_PDB_SS
 from proteusPy.export_web import build, main, write
-from proteusPy.ProteusGlobals import DATA_DIR
+from proteusPy.ProteusGlobals import CA_CUTOFF, DATA_DIR, SG_CUTOFF
 
 CLASS_ID = re.compile(r"^(\d{5}[bqo]|[1-4]{5}q-other)$")
 
@@ -182,11 +182,49 @@ def test_groves_follow_the_class_names(export):
     assert order[0]["id"] == "lhspiral"
 
 
+def _kept(df: pd.DataFrame) -> pd.DataFrame:
+    """The bonds within proteusPy's cutoffs, by filter_by_distance's rule."""
+    return df[
+        (df.ca_distance > 0)
+        & (df.ca_distance < CA_CUTOFF)
+        & (df.sg_distance > 0)
+        & (df.sg_distance < SG_CUTOFF)
+    ]
+
+
 def test_home_is_the_lowest_energy_bond(loader, export):
     catalog, _, bonds = export
-    df = loader.TorsionDF
+    df = _kept(loader.TorsionDF)
     assert catalog["home"] == df.ss_id[df.energy.idxmin()]
     assert catalog["home"] in bonds
+
+
+def test_only_bonds_within_the_cutoffs(loader, export):
+    """The export holds exactly the bonds within CA_CUTOFF and SG_CUTOFF, and says so."""
+    catalog, _, bonds = export
+    db = catalog["meta"]["database"]
+    kept = _kept(loader.TorsionDF)
+    assert db["bonds"] == len(kept) < db["unfiltered_bonds"] == len(loader.TorsionDF)
+    assert db["pdb_entries"] == kept.source.nunique()
+    assert db["filter"] == {"ca_cutoff": CA_CUTOFF, "sg_cutoff": SG_CUTOFF}
+    assert sum(ln["count"] for ln in catalog["lines"]) == db["bonds"]
+    for card in bonds.values():
+        assert 0 < card["ca_distance"] < CA_CUTOFF + 0.001
+        assert 0 < card["sg_distance"] < SG_CUTOFF + 0.001
+
+
+def test_cutoffs_can_be_turned_off(loader):
+    catalog, _, _ = build(loader, "subset", ca_cutoff=-1, sg_cutoff=-1)
+    db = catalog["meta"]["database"]
+    assert db["bonds"] == db["unfiltered_bonds"] == len(loader.TorsionDF)
+    assert db["filter"] == {"ca_cutoff": None, "sg_cutoff": None}
+
+
+def test_a_home_outside_the_cutoffs_is_refused(loader):
+    df = loader.TorsionDF
+    outside = df.ss_id[df.sg_distance >= SG_CUTOFF].iloc[0]
+    with pytest.raises(ValueError, match="within the cutoffs"):
+        build(loader, "subset", home=outside)
 
 
 def test_write_and_cli(tmp_path, export):

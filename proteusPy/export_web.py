@@ -6,6 +6,13 @@ classes), one class card per line and class under ``classes/``, one bond
 card per sampled member under ``bonds/``, and ``atoms.json`` (the atom
 order, colors, radii and bond tables of ``DisulfideVisualization._render_ss``).
 
+Only the bonds within ``CA_CUTOFF`` and ``SG_CUTOFF`` are exported, the set
+the Springer chapter describes (158,965 bonds on the full database).
+``Load_PDB_SS`` returns the prebuilt loader unfiltered (175,277 bonds), so
+the export filters it here. The constants are the 95th percentiles of the
+Ca and Sg distances, rounded; ``DisulfideLoader(percentile=95)`` uses them
+unrounded and keeps 158,938 bonds (see ``ProteusGlobals``).
+
 The class hierarchy is binary > quadrant > octant > members. The tiers are
 computed here with :func:`proteusPy.disulfide_tree.classify_angles` at bases
 2, 4 and 8, which partition each other exactly, and not through
@@ -39,8 +46,10 @@ from proteusPy.disulfide_tree import LEVEL_SUFFIXES, _circular_mean_deg, classif
 from proteusPy.DisulfideBase import Disulfide
 from proteusPy.DisulfideLoader import Load_PDB_SS
 from proteusPy.ProteusGlobals import (
+    CA_CUTOFF,
     DATA_DIR,
     OCTANT_CLASS_METRICS_FILE,
+    SG_CUTOFF,
     SS_CONSENSUS_BIN_FILE,
     SS_CONSENSUS_OCT_FILE,
 )
@@ -299,20 +308,35 @@ def build(
     min_members: int | None = None,
     members_per_class: int = 12,
     home: str | None = None,
+    ca_cutoff: float = CA_CUTOFF,
+    sg_cutoff: float = SG_CUTOFF,
 ) -> tuple[dict, dict[str, dict], dict[str, dict]]:
     """Build the catalog, class cards and bond cards in memory.
 
-    :param loader: A ``DisulfideLoader`` (``Load_PDB_SS``).
+    Only the bonds within the distance cutoffs are exported, by the rule of
+    ``DisulfideList.filter_by_distance``: 0 < distance < cutoff. The defaults
+    are proteusPy's ``CA_CUTOFF`` and ``SG_CUTOFF``, which give the published
+    set on the full database (158,965 bonds in 35,367 structures).
+
+    :param loader: A ``DisulfideLoader`` (``Load_PDB_SS``), unfiltered as it is distributed.
     :param database: ``"subset"`` or ``"full"``, recorded in the catalog.
     :param min_members: Octant classes with fewer members fold into an
         ``<quadrant id>-other`` tip; default 2 on the subset, 20 on the full database.
     :param members_per_class: Members sampled per octant class, lowest energy first.
     :param home: The home disulfide's key; default the lowest-energy bond.
+    :param ca_cutoff: Largest Cα-Cα distance kept, Å; -1 keeps every bond.
+    :param sg_cutoff: Largest Sγ-Sγ distance kept, Å; -1 keeps every bond.
     :return: ``(catalog, class cards by id, bond cards by key)``.
     """
     if min_members is None:
         min_members = 2 if database == "subset" else 20
+    # Row labels stay the bonds' positions in loader.SSList, for the bond cards.
     df = loader.TorsionDF.reset_index(drop=True)
+    unfiltered = len(df)
+    if ca_cutoff > 0:
+        df = df[(df.ca_distance > 0) & (df.ca_distance < ca_cutoff)]
+    if sg_cutoff > 0:
+        df = df[(df.sg_distance > 0) & (df.sg_distance < sg_cutoff)]
     total = len(df)
     chis = df[CHI].to_numpy(dtype=float)
     tiers = [class_ids(row) for row in chis]
@@ -334,6 +358,8 @@ def build(
     }
 
     home_key = home or str(df.ss_id[df.energy.idxmin()])
+    if not (df.ss_id == home_key).any():
+        raise ValueError(f"home disulfide {home_key} is not among the bonds within the cutoffs")
     lines: list[dict] = []
     classes: list[dict] = []
     cards: dict[str, dict] = {}
@@ -465,6 +491,11 @@ def build(
                 "name": database,
                 "bonds": total,
                 "pdb_entries": int(df.source.nunique()),
+                "unfiltered_bonds": unfiltered,
+                "filter": {
+                    "ca_cutoff": ca_cutoff if ca_cutoff > 0 else None,
+                    "sg_cutoff": sg_cutoff if sg_cutoff > 0 else None,
+                },
             },
             "min_members": min_members,
             "members_per_class": members_per_class,
@@ -543,6 +574,18 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--members-per-class", type=int, default=12)
     parser.add_argument("--home", default=None, help="Home disulfide key (default lowest energy).")
+    parser.add_argument(
+        "--ca-cutoff",
+        type=float,
+        default=CA_CUTOFF,
+        help="Keep bonds with Ca-Ca distance below this, A; -1 keeps every bond.",
+    )
+    parser.add_argument(
+        "--sg-cutoff",
+        type=float,
+        default=SG_CUTOFF,
+        help="Keep bonds with Sg-Sg distance below this, A; -1 keeps every bond.",
+    )
     parser.add_argument("--force", action="store_true", help="Replace an existing export.")
     args = parser.parse_args(argv)
 
@@ -555,12 +598,15 @@ def main(argv: list[str] | None = None) -> int:
         min_members=args.min_members,
         members_per_class=args.members_per_class,
         home=args.home,
+        ca_cutoff=args.ca_cutoff,
+        sg_cutoff=args.sg_cutoff,
     )
     write(args.out, catalog, cards, bonds, force=args.force)
     t2 = time.perf_counter()
     counts = catalog["meta"]["counts"]
     print(
-        f"{args.out}: {catalog['meta']['database']['bonds']} bonds, "
+        f"{args.out}: {catalog['meta']['database']['bonds']} bonds "
+        f"(of {catalog['meta']['database']['unfiltered_bonds']} before the cutoffs), "
         f"{counts['groves']} groves, {counts['lines']} lines, "
         f"{counts['quadrant_classes']} quadrant and {counts['octant_classes']} octant classes, "
         f"{counts['members_sampled']} members sampled; home {catalog['home']}; "
