@@ -41,6 +41,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bonds, so the published counts come from 2.12 A. The full export loads in 5 s and writes about 52 MB in
   4 s more.
 
+### Fixed
+
+- **`programs/class_analysis_mp.py` and `programs/test_hexbin.py` ran
+  again.** Both still passed `cutoff=` and `sg_cutoff=` to `Load_PDB_SS`,
+  which has taken only `percentile` since v0.99.34. The class analysis now
+  builds its loader as `DisulfideLoader(cutoff=CA_CUTOFF,
+  sg_cutoff=SG_CUTOFF)`, the published set (158,965 bonds, 35,367
+  structures, 8,534 octant classes, in about 24 s from the master list);
+  its workers only look bonds up by id, so they use the prebuilt loader.
+  `test_hexbin` drops its `-1.0` cutoffs, which were the default.
+
 ## [0.100.7] - 2026-10-22
 
 ### Changed
