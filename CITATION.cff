@@ -34,7 +34,7 @@ references:
   # collection-title (the series), volume/volume-title (the book) and
   # section (the chapter) is the standard way to express one.
   - type: generic
-    title: "Structural Analysis of Disulfide Bonds in the RCSB Protein Data Bank Using proteusPy"
+    title: "Structural Analysis of Disulfide Bonds in the Worldwide Protein Data Bank Using proteusPy"
     authors:
       - family-names: "Suchanek"
         given-names: "Eric G."
