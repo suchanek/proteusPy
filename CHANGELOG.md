@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **The chapter's title.** `CITATION.cff` and the README cite the Springer
+  chapter by its final title, "Structural Analysis of Disulfide Bonds in
+  the Worldwide Protein Data Bank Using proteusPy"; the proof corrections
+  changed "RCSB" to "Worldwide". The DOI is unchanged.
+
 ## [0.101.1] - 2026-10-26
 
 ### Security
