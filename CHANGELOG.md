@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- **Dependencies patched for 59 Dependabot alerts and one more from a
+  `pip-audit` of the full install.** Floors raised to `pillow>=13.0.0` (41
+  alerts, 5 critical) and `setuptools>=84.1.0`; relocked certifi
+  2026.10.23, filelock 4.2.4, virtualenv 21.14.13, nbconvert 7.17.2 and
+  jupyter-server 2.21.1 (PYSEC-2026-4054, which Dependabot had not
+  flagged). A `pip-audit` of every installed group and extra (246
+  packages), and of the locked versions of the 25 Linux, CUDA and Windows
+  packages a macOS install leaves out, finds no known vulnerabilities.
+  The suite passes on Pillow 13; proteusPy's `Image.open`, `Resampling`
+  and `ImageFont` calls are unchanged.
+
 ## [0.101.0] - 2026-10-26
 
 ### Added
