@@ -27,8 +27,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Models come from `SS_consensus_class_32.pkl` and
   `SS_consensus_class_oct.pkl`, else from the class's consensus torsions.
   The home disulfide defaults to the lowest-energy bond, 2q7q_75D_140D on
-  the full database. The full export (175,277 bonds) loads in 5 s and
-  writes 57 MB in 4 s more.
+  the full database. Only bonds within `CA_CUTOFF` and `SG_CUTOFF` are
+  exported (`--ca-cutoff`, `--sg-cutoff`; -1 keeps every bond), by
+  `filter_by_distance`'s rule, 0 < distance < cutoff: the published set,
+  158,965 of the full loader's 175,277 bonds in 35,367 structures, and
+  4,575 of the subset's 5,000. The catalog records the filter and the
+  unfiltered count. The full export loads in 5 s and writes about 52 MB in
+  4 s more.
 
 ## [0.100.7] - 2026-10-22
 
