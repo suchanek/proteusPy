@@ -8,6 +8,10 @@ order, colors, radii and bond tables of ``DisulfideVisualization._render_ss``).
 
 Only the bonds within ``CA_CUTOFF`` and ``SG_CUTOFF`` are exported, the set
 the Springer chapter describes (158,965 bonds on the full database).
+``Load_PDB_SS`` returns the prebuilt loader unfiltered (175,277 bonds), so
+the export filters it here. The constants are the 95th percentiles of the
+Ca and Sg distances, rounded; ``DisulfideLoader(percentile=95)`` uses them
+unrounded and keeps 158,938 bonds (see ``ProteusGlobals``).
 
 The class hierarchy is binary > quadrant > octant > members. The tiers are
 computed here with :func:`proteusPy.disulfide_tree.classify_angles` at bases
