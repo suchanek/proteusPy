@@ -29,7 +29,7 @@ def main():
     """Main function for testing hexbin plots."""
 
     # default parameters will read from the package itself.
-    PDB = pp.Load_PDB_SS(verbose=True, subset=False, cutoff=-1.0, sg_cutoff=-1.0)
+    PDB = pp.Load_PDB_SS(verbose=True, subset=False)
 
     PDB.plot_3d_hexbin_leftright(
         scaling="sqrt",

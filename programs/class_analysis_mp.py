@@ -51,7 +51,9 @@ def task(
     save_dir,
     prefix,
 ):
-    loader = pp.Load_PDB_SS(verbose=True, subset=False, cutoff=CA_CUTOFF, sg_cutoff=SG_CUTOFF)
+    # Only looks bonds up by id, and the ids come from the filtered class
+    # tables, so the prebuilt (unfiltered) loader serves.
+    loader = pp.Load_PDB_SS(verbose=False, subset=False)
 
     for idx in range(start_idx, end_idx):
         row = eight_or_bin.iloc[idx]
@@ -95,7 +97,11 @@ def analyze_classes_multiprocessing(
     do_octant=True,
     prefix="ss",
 ):
-    loader = pp.Load_PDB_SS(verbose=verbose, subset=False, cutoff=CA_CUTOFF, sg_cutoff=SG_CUTOFF)
+    # The classes of the published set: Load_PDB_SS takes no cutoffs and its
+    # prebuilt loader is unfiltered, so build one filtered from the master list.
+    loader = pp.DisulfideLoader(
+        subset=False, verbose=verbose, cutoff=CA_CUTOFF, sg_cutoff=SG_CUTOFF
+    )
     save_dir = OCTANT if do_octant else BINARY
     eight_or_bin = loader.tclass.eightclass_df if do_octant else loader.tclass.classdf
     tot_classes = eight_or_bin.shape[0]
