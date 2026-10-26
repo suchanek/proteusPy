@@ -48,7 +48,7 @@ exclude = [
 # ---------------------------------------------------------------------------
 [project]
 name = "proteusPy"
-version = "0.101.0"
+version = "0.101.1"
 description = "proteusPy - Protein Structure Analysis and Modeling Tools"
 readme = "README.md"
 license = "BSD-3-Clause"

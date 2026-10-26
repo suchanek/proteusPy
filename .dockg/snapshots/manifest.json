@@ -1,6 +1,6 @@
 {
   "format": "1.0",
-  "last_update": "2026-10-26T17:11:16.121829+00:00",
+  "last_update": "2026-10-26T18:34:00.060691+00:00",
   "snapshots": [
     {
       "key": "2026-09-14T19:34:40.998227+00:00",
@@ -329,6 +329,52 @@
       "tool": "doc-kg",
       "tool_version": "0.29.0",
       "file": "0.101.0.json",
+      "metrics": {
+        "db_path": ".dockg/graph.sqlite",
+        "total_nodes": 2863,
+        "total_edges": 17487,
+        "node_counts": {
+          "chunk": 485,
+          "document": 17,
+          "entity": 851,
+          "keyword": 850,
+          "section": 266,
+          "topic": 394
+        },
+        "edge_counts": {
+          "CONTAINS": 751,
+          "CO_OCCURS_WITH": 11496,
+          "HAS_KEYWORD": 1939,
+          "HAS_TOPIC": 490,
+          "MENTIONS_ENTITY": 2030,
+          "NEXT": 212,
+          "REFERENCES": 1,
+          "SIMILAR_TO": 568
+        },
+        "meaningful_nodes": 2846,
+        "coverage_score": 0.9828178694158076,
+        "issues_count": 0,
+        "complexity_median": 19.0
+      },
+      "deltas": {
+        "vs_previous": null,
+        "vs_baseline": {
+          "nodes": 323,
+          "edges": 2289,
+          "coverage_delta": -0.00019183932205646403,
+          "issues_delta": 0
+        }
+      }
+    },
+    {
+      "key": "0.101.1",
+      "branch": "release/v0.101.1",
+      "timestamp": "2026-10-26T18:34:00.059003+00:00",
+      "version": "0.101.1",
+      "subject": "repo:proteusPy",
+      "tool": "doc-kg",
+      "tool_version": "0.29.0",
+      "file": "0.101.1.json",
       "metrics": {
         "db_path": ".dockg/graph.sqlite",
         "total_nodes": 2863,
